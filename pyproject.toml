@@ -53,9 +53,9 @@ local_scheme = "dirty-tag"
 
 [tool.pdm]
 version = { source = "scm" }
+package-dir = {"" = "src"}
 
 [tool.pdm.build]
-package-dir = "analytics"
 excludes = ["**/.pytest_cache"]
 
 [tool.pytest.ini_options]
