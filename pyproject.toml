@@ -13,7 +13,7 @@ dependencies = [
     "matplotlib>=3.5",
     "pandas>=2.8.0",
     "requests>=2.30",
-    "dotenv>=0.9"
+    "python-dotenv>=1.0"
 
 ]
 classifiers = [
@@ -30,7 +30,6 @@ classifiers = [
 
 [project.optional-dependencies]
 
-
 [dependency-groups]
 dev = [
     "pytest>=8.3.4,<10",
@@ -45,7 +44,7 @@ lint = [
 default-groups = ["dev", "lint"]
 
 [build-system]
-requires = ["pdm-backend", "setuptools", "setuptools_scm", "grpcio-tools"]
+requires = ["pdm-backend", "setuptools_scm"]
 build-backend = "pdm.backend"
 
 [tool.setuptools_scm]
@@ -60,8 +59,9 @@ package-dir = {"" = "src"}
 excludes = ["**/.pytest_cache"]
 
 [tool.pytest.ini_options]
-pythonpath = ["analytics", "."]
+pythonpath = ["src"]
 testpaths = ["tests"]
+addopts = "--cov=hiero_analytics --cov-report=term-missing"
 
 [tool.ruff]
 line-length = 120
