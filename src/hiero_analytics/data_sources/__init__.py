@@ -1,5 +1,5 @@
 from .github_client import GitHubClient
-from .github_fetch import (
+from .github_rest import (
     fetch_org_repos,
     fetch_repo_issues,
 )
