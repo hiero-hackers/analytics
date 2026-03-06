@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 import matplotlib.pyplot as plt
 
@@ -17,13 +19,14 @@ def finalize_chart(
     output_path: Path,
     legend: bool = False,
     rotate_x: int | None = None,
-):
+) -> None:
+
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-    if rotate_x is not None:
-        plt.xticks(rotation=rotate_x, ha="right")
+    if rotate_x:
+        plt.xticks(rotation=rotate_x)
 
     if legend:
         plt.legend()
