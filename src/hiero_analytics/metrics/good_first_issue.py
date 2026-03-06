@@ -7,6 +7,7 @@ from typing import Dict
 GFI_LABELS = {
     "good first issue",
     "good first issue candidate",
+    "skill: good first issue",
 }
 
 

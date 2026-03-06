@@ -6,6 +6,7 @@ DEFAULT_REPO: str = "hiero-ledger/hiero-sdk-python"
 DEFAULT_LABELS: list[str] = [
     "good first issue",
     "good first issue candidate",
+    "skill: good first issue",
 ]
 
 DEFAULT_TIMEFRAME: str = "all"  # "all", "12m", "24m"
