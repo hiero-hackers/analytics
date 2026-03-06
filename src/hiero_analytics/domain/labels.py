@@ -44,3 +44,32 @@ BUG = LabelSpec(
     name="Bug Reports",
     labels={"bug"},
 )
+
+DIFFICULTY_GOOD_FIRST_ISSUE = LabelSpec(
+    name="Good First Issue",
+    labels={
+        "Good First Issue",
+        "skill: Good First Issue",
+    },
+)
+
+DIFFICULTY_BEGINNER = LabelSpec(
+    name="Beginner",
+    labels={
+        "beginner",
+    },
+)
+
+DIFFICULTY_INTERMEDIATE = LabelSpec(
+    name="Intermediate",
+    labels={
+        "intermediate",
+    },
+)
+
+DIFFICULTY_ADVANCED = LabelSpec(
+    name="Advanced",
+    labels={
+        "advanced",
+    },
+)

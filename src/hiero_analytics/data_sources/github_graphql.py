@@ -57,6 +57,37 @@ query($owner:String!,$repo:String!,$cursor:String){
 }
 """
 
+MERGED_PR_QUERY = """
+query($owner:String!, $repo:String!, $cursor:String) {
+  repository(owner:$owner, name:$repo) {
+    pullRequests(
+      first:100
+      after:$cursor
+      states:MERGED
+      orderBy:{field:UPDATED_AT, direction:DESC}
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        number
+        mergedAt
+        closingIssuesReferences(first:10) {
+          nodes {
+            number
+            labels(first:20) {
+              nodes {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
 
 # --------------------------------------------------------
 # FETCH REPOSITORIES
@@ -132,6 +163,54 @@ def fetch_repo_issues_graphql(
 
     return paginate_cursor(page)
 
+
+def fetch_repo_merged_pr_difficulty(
+    client: GitHubClient,
+    owner: str,
+    repo: str,
+) -> list[dict]:
+
+    def page(cursor):
+
+        data = client.graphql(
+            MERGED_PR_QUERY,
+            {
+                "owner": owner,
+                "repo": repo,
+                "cursor": cursor,
+            },
+        )
+
+        pr_data = data["data"]["repository"]["pullRequests"]
+
+        items = []
+
+        for pr in pr_data["nodes"]:
+
+            issues = pr["closingIssuesReferences"]["nodes"]
+
+            for issue in issues:
+
+                labels = [
+                    label["name"]
+                    for label in issue["labels"]["nodes"]
+                ]
+
+                items.append(
+                    {
+                        "pr": pr["number"],
+                        "issue": issue["number"],
+                        "labels": labels,
+                        "merged_at": pr["mergedAt"],
+                    }
+                )
+
+        next_cursor = pr_data["pageInfo"]["endCursor"]
+        has_next = pr_data["pageInfo"]["hasNextPage"]
+
+        return items, next_cursor, has_next
+
+    return paginate_cursor(page)
 
 # --------------------------------------------------------
 # FETCH ALL ISSUES ACROSS AN ORG (PARALLEL)
