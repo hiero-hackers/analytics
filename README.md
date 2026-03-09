@@ -41,7 +41,7 @@ Replace `YOUR_USERNAME` with your actual GitHub username.
 Connect your local repository to the original repository. This allows you to keep your fork synchronized with the latest changes.
 
 ```bash
-git remote add upstream https://github.com/hiero-ledger/hiero-hackers/analytics.git
+git remote add upstream https://github.com/hiero-hackers/analytics.git
 ```
 
 **What this does:**
@@ -60,8 +60,8 @@ You should see:
 ```
 origin    https://github.com/YOUR_USERNAME/hiero-hackers/analytics.git (fetch)
 origin    https://github.com/YOUR_USERNAME/hiero-hackers/analytics.git (push)
-upstream  https://github.com/hiero-ledger/hiero-hackers/analytics.git (fetch)
-upstream  https://github.com/hiero-ledger/hiero-hackers/analytics.git (push)
+upstream  https://github.com/hiero-hackers/analytics.git (fetch)
+upstream  https://github.com/hiero-hackers/analytics.git (push)
 ```
 
 ---
