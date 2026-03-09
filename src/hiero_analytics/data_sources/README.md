@@ -7,7 +7,7 @@ The goal is to provide **clean, typed records** that downstream analytics code c
 
 ---
 
-# Overview
+## Overview
 
 The data source layer is responsible for:
 
@@ -21,7 +21,9 @@ The module exports a small public API for fetching repository, issue, and pull r
 
 ---
 
-# Module Structure
+## Module Structure
+
+```
 data_sources/
 │
 ├── cache.py
@@ -31,11 +33,12 @@ data_sources/
 ├── github_search.py
 ├── models.py
 └── pagination.py
+```
 
 
 ---
 
-# Public API
+## Public API
 
 The following objects are exported through the package:
 
@@ -54,9 +57,9 @@ from hiero_analytics.data_sources import (
 )
 ```
 
-# Components
+## Components
 
-## GitHubClient
+### GitHubClient
 
 `github_client.py`
 
@@ -69,7 +72,7 @@ Features:
 - Support for REST and GraphQL requests
 
 
-## GraphQL Ingestion
+### GraphQL Ingestion
 
 `github_ingest.py`
 
@@ -80,13 +83,13 @@ These functions automatically:
 - convert API responses into typed records
 - optionally fetch data across multiple repositories in parallel
 
-## REST Search API
+### REST Search API
 
 `github_search.py`
 
 Supports GitHub's search endpoint.
 
-## Data Models
+### Data Models
 
 GitHub objects are normalized into typed dataclasses.
 
@@ -95,7 +98,7 @@ e.g.
 `IssueRecord`
 `PullRequestDifficultyRecord`
 
-## Pagination Utilities
+### Pagination Utilities
 
 Provides reusable helpers for APIs that use pagination.
 
@@ -109,7 +112,7 @@ Used by GraphQL endpoints:
 paginate_cursor()
 ```
 
-## Caching
+### Caching
 
 Location: `cache.py`
 
@@ -124,9 +127,9 @@ Cached responses are stored at:
 .cache/github/
 ```
 
-# Typical Workflow
+## Typical Workflow
 A typical analytics pipeline will look like:
-
+```
 GitHub API
     ↓
 GitHubClient
@@ -138,3 +141,4 @@ IssueRecord / RepositoryRecord / PullRequestDifficultyRecord
 transform → DataFrame
     ↓
 metrics + charts
+```
