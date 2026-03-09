@@ -25,13 +25,13 @@ def finalize_chart(
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-    if rotate_x:
-        plt.xticks(rotation=rotate_x)
-
+    if rotate_x is not None:
+        plt.xticks(rotation=rotate_x, ha='right', rotation_mode='anchor') #the default horzontal alignment was center which is now changed to 'right'
+        
     if legend:
         plt.legend()
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0.05, 1, 1]) #this reseves a 5% space at bottom for labels- if the labels are too long or might overlap
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
