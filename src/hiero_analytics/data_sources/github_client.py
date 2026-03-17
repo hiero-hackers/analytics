@@ -1,9 +1,8 @@
 """
 Low-level GitHub HTTP client.
 
-Handles authentication, connection reuse, retries,
-GraphQL rate-limit awareness, and request execution
-for both REST and GraphQL GitHub API calls.
+Handles authentication, connection reuse, retries, and request execution
+for both REST and GraphQL API calls.
 """
 
 from __future__ import annotations
@@ -11,8 +10,7 @@ from __future__ import annotations
 import logging
 import time
 from collections.abc import Mapping
-from datetime import UTC, datetime
-from typing import Any, TypedDict
+from typing import Any
 
 import requests
 
@@ -22,43 +20,25 @@ from hiero_analytics.config.github import (
     HTTP_TIMEOUT_SECONDS,
     REQUEST_DELAY_SECONDS,
 )
+from .rate_limit import (
+    Action,
+    JSON,
+    RateLimitDecision,
+    RateLimitPolicy,
+    RateLimitSnapshot,
+)
 
 logger = logging.getLogger(__name__)
 
 MAX_RETRIES = 3
-
-
-# --------------------------------------------------------
-# TYPES
-# --------------------------------------------------------
-
-JSON = dict[str, Any]
-
-
-class GraphQLRateLimit(TypedDict, total=False):
-    """
-    GraphQL returns rate limit information.
-        cost: cost of the query
-        remaining: available api requests 
-        limit: maximum api requests
-        resetAt: limit resets each hour, notifies you when that is
-
-    """
-    cost: int
-    remaining: int
-    limit: int
-    resetAt: str
-
+MAX_GRAPHQL_FRESH_RETRIES = 2
 
 # --------------------------------------------------------
 # HEADERS
 # --------------------------------------------------------
 
 def github_headers() -> dict[str, str]:
-    """
-    Build HTTP headers used for GitHub API requests.
-    This is required for github to accept the query.
-    """
+    """Build HTTP headers required for GitHub API requests."""
     headers: dict[str, str] = {
         "User-Agent": "hiero-analytics",
         "Accept": "application/vnd.github+json",
@@ -71,12 +51,10 @@ def github_headers() -> dict[str, str]:
         return headers
 
     logger.info(
-        "Using GITHUB_TOKEN for authenticated requests. API allows up to 5000 requests per hour."
+        "Using GITHUB_TOKEN for authenticated requests. "
+        "API allows up to 5000 requests per hour."
     )
-
-    # Pass the Github Token for higher rate limits
     headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
-
     return headers
 
 
@@ -88,17 +66,14 @@ class GitHubClient:
     """HTTP client for interacting with the GitHub API."""
 
     def __init__(self) -> None:
-        """
-        Initialize the client with a persistent HTTP session and
-        authentication headers.
-        """
-        # Reusable HTTP session with default headers for authentication and content type
         self.session: requests.Session = requests.Session()
         self.session.headers.update(github_headers())
 
-        # usage counters to keep track of API usage 
+        # Rate-limit policy: reads signals, returns decisions.
+        self._policy = RateLimitPolicy()
+
+        # usage counters to keep track of API usage
         self.requests_made: int = 0
-        # this is the graphQL counter which has uses variable costs 
         self.cost_used: int = 0
 
     # --------------------------------------------------------
@@ -106,238 +81,138 @@ class GitHubClient:
     # --------------------------------------------------------
 
     def log_usage(self) -> None:
-        """Log API usage statistics."""
+        """Log cumulative API usage statistics."""
         logger.info(
             "GitHub API usage: %d requests, %d GraphQL points used",
             self.requests_made,
             self.cost_used,
         )
 
-    # --------------------------------------------------------
-    # RATE LIMIT HANDLING
-    # --------------------------------------------------------
+    def _apply_decision(self, decision: RateLimitDecision) -> Action:
+        """Apply policy decision side effects and return the action."""
+        if decision.sleep_seconds > 0:
+            time.sleep(decision.sleep_seconds)
+        return decision.action
 
-    def _handle_graphql_rate(self, data: JSON) -> None:
-        """Handle GraphQL rate-limit reporting and throttling."""
-        rate: GraphQLRateLimit | None = (data.get("data") or {}).get("rateLimit")
-
-        if not rate:
-            return
-
-        remaining = rate.get("remaining")
-        cost = rate.get("cost")
-        limit = rate.get("limit")
-        reset_at = rate.get("resetAt")
-
-        logger.debug(
-            "GraphQL cost=%s remaining=%s/%s",
-            cost,
-            remaining,
-            limit,
-        )
-
-        if reset_at:
-
-            reset_time = datetime.fromisoformat(reset_at.replace("Z", "+00:00"))
-            now = datetime.now(UTC)
-
-            seconds_until_reset = int((reset_time - now).total_seconds())
-
-            logger.debug(
-                "GraphQL rate limit resets at %s (%ds)",
-                reset_time.isoformat(),
-                max(seconds_until_reset, 0),
-            )
-
-        if remaining is not None and remaining < 50:
-
-            logger.warning(
-                "GraphQL budget low (%s remaining). Pausing briefly.",
-                remaining,
-            )
-
-            time.sleep(5)
-
-    # --------------------------------------------------------
-    # ERROR HANDLING
-    # --------------------------------------------------------
-
-    def _handle_graphql_errors(
+    def _record_usage(
         self,
         data: JSON,
-        method: str,
-        url: str,
-        kwargs: Mapping[str, Any],
-    ) -> JSON | None:
-        """Detect GraphQL errors and retry if rate-limited."""
-        errors = data.get("errors")
-
-        if not errors:
+        *,
+        is_graphql: bool,
+    ) -> RateLimitSnapshot | None:
+        """Extract rate-limit info from response and update usage counters."""
+        self.requests_made += 1
+        if not is_graphql:
             return None
 
-        for err in errors:
-
-            if err.get("type") == "RATE_LIMIT":
-
-                logger.warning("GraphQL rate limit exceeded.")
-
-                rate: GraphQLRateLimit | None = (data.get("data") or {}).get("rateLimit")
-
-                if rate and rate.get("resetAt"):
-
-                    reset_time = datetime.fromisoformat(
-                        rate["resetAt"].replace("Z", "+00:00")
-                    )
-
-                    now = datetime.now(UTC)
-                    wait_seconds = int((reset_time - now).total_seconds())
-
-                    wait_seconds = max(wait_seconds, 60)
-
-                    logger.warning(
-                        "Sleeping %ds until rate limit reset at %s",
-                        wait_seconds,
-                        reset_time.isoformat(),
-                    )
-
-                    time.sleep(wait_seconds)
-
-                    return self._request(method, url, **kwargs)
-
-                logger.warning("Sleeping 300s before retrying request")
-
-                time.sleep(300)
-
-                return self._request(method, url, **kwargs)
-
-        raise RuntimeError(f"GitHub GraphQL error: {data}")
+        snapshot = RateLimitSnapshot.from_graphql_payload(data)
+        if snapshot and snapshot.cost is not None:
+            self.cost_used += snapshot.cost
+        return snapshot
 
     # --------------------------------------------------------
     # REQUEST EXECUTION
     # --------------------------------------------------------
 
-    def _request(
+    def _execute_http_with_retries(
         self,
         method: str,
         url: str,
         **kwargs: Any,
-    ) -> JSON:
+    ) -> requests.Response:
         """
-        Execute HTTP request with retries and rate-limit awareness for both
-        REST (via HTTP headers) and GraphQL (via response payload).
+        Handle low-level network retries and REST header-based rate limiting.
+        Returns a successful HTTP response or raises.
         """
         for attempt in range(1, MAX_RETRIES + 1):
-
             logger.debug(
-                "GitHub request → %s %s (attempt %d)",
+                "GitHub request -> %s %s (attempt %d)",
                 method,
                 url,
                 attempt,
             )
-
             start = time.time()
 
             try:
-
                 response = self.session.request(
                     method,
                     url,
                     timeout=HTTP_TIMEOUT_SECONDS,
                     **kwargs,
                 )
-
             except requests.RequestException as exc:
-
                 if attempt == MAX_RETRIES:
                     logger.error(
                         "GitHub request failed after %d attempts",
                         MAX_RETRIES,
                     )
                     raise
-
                 logger.warning(
                     "Request error (%s). Retrying attempt %d...",
                     exc,
                     attempt + 1,
                 )
-
-                time.sleep(2**attempt)
+                time.sleep(2 ** attempt)
                 continue
 
-            elapsed = time.time() - start
+            logger.debug("GitHub response <- %.2fs", time.time() - start)
 
-            logger.debug("GitHub response ← %.2fs", elapsed)
+            # Check REST headers for all endpoints, including GraphQL.
+            snapshot = RateLimitSnapshot.from_rest_headers(response.headers)
+            if snapshot:
+                rest_decision = self._policy.check_rest_response(
+                    snapshot,
+                    status_code=response.status_code,
+                    is_ok=response.ok,
+                    attempt=attempt,
+                    max_retries=MAX_RETRIES,
+                )
+                action = self._apply_decision(rest_decision)
+                if action == Action.DELAY_THEN_RETRY_LOOP:
+                    continue
 
-            # --------------------------------------------------------
-            # REST rate-limit handling (non-GraphQL responses)
-            # --------------------------------------------------------
-            is_graphql = url.endswith("/graphql")
-            if not is_graphql:
-                remaining_header = response.headers.get("X-RateLimit-Remaining")
-                reset_header = response.headers.get("X-RateLimit-Reset")
-                if remaining_header is not None and reset_header is not None:
-                    try:
-                        remaining = int(remaining_header)
-                        reset_epoch = int(reset_header)
-                    except (TypeError, ValueError):
-                        remaining = None
-                        reset_epoch = None
-                    if remaining == 0 and reset_epoch is not None:
-                        # Compute how long to wait until the rate limit resets.
-                        sleep_seconds = max(0, reset_epoch - int(time.time()))
-                        if response.status_code == 403 and attempt < MAX_RETRIES:
-                            logger.warning(
-                                "GitHub REST rate limit reached (403). "
-                                "Sleeping for %ds before retrying attempt %d...",
-                                sleep_seconds,
-                                attempt + 1,
-                            )
-                            if sleep_seconds > 0:
-                                time.sleep(sleep_seconds)
-                            continue
-                        if response.ok and sleep_seconds > 0:
-                            # Successful response but no remaining budget; delay
-                            # to avoid immediate rate-limit errors on subsequent calls.
-                            logger.warning(
-                                "GitHub REST rate limit exhausted. "
-                                "Sleeping for %ds before returning response...",
-                                sleep_seconds,
-                            )
-                            time.sleep(sleep_seconds)
-            # For GraphQL and non-rate-limited REST responses, propagate HTTP errors.
-            
             response.raise_for_status()
+            return response
 
+        raise RuntimeError("Unreachable request state")
+
+
+    def _request(self, method: str, url: str, **kwargs: Any) -> JSON:
+        """
+        Execute request and apply GraphQL-specific retry policy.
+        """
+        is_graphql = url.endswith("/graphql")
+
+        for _fresh_retry_count in range(MAX_GRAPHQL_FRESH_RETRIES + 1):
+            response = self._execute_http_with_retries(method, url, **kwargs)
             data: JSON = response.json()
 
-            # update counters
-            self.requests_made += 1
+            # Keep usage accounting for both REST and GraphQL.
+            graphql_snapshot = self._record_usage(data, is_graphql=is_graphql)
 
-            # --------------------------------------------------------
-            # GraphQL-specific rate-limit accounting
-            # --------------------------------------------------------
-            rate: GraphQLRateLimit | None = (data.get("data") or {}).get("rateLimit")
-            if rate:
-                self.cost_used += rate.get("cost", 0)
+            if not is_graphql:
+                if REQUEST_DELAY_SECONDS > 0:
+                    time.sleep(REQUEST_DELAY_SECONDS)
+                return data
 
-            retry = self._handle_graphql_errors(
-                data,
-                method,
-                url,
-                kwargs,
-            )
+            error_decision = self._policy.check_graphql_errors(data, graphql_snapshot)
+            action = self._apply_decision(error_decision)
 
-            if retry is not None:
-                return retry
+            if action == Action.DELAY_THEN_RETRY_FRESH:
+                continue
 
-            self._handle_graphql_rate(data)
+            if graphql_snapshot:
+                budget_decision = self._policy.check_graphql_budget(graphql_snapshot)
+                self._apply_decision(budget_decision)
 
             if REQUEST_DELAY_SECONDS > 0:
                 time.sleep(REQUEST_DELAY_SECONDS)
 
             return data
 
-        raise RuntimeError("Unreachable request state")
+        raise RuntimeError(
+            "GraphQL fresh retry limit exceeded after RATE_LIMIT responses"
+        )
 
     # --------------------------------------------------------
     # PUBLIC API
@@ -355,11 +230,7 @@ class GitHubClient:
         """
         return self._request("GET", url, **kwargs)
 
-    def graphql(
-        self,
-        query: str,
-        variables: Mapping[str, Any],
-    ) -> JSON:
+    def graphql(self, query: str, variables: Mapping[str, Any]) -> JSON:
         """
         Execute a GraphQL query against the GitHub API.
 
@@ -370,13 +241,5 @@ class GitHubClient:
         Returns:
             Parsed JSON response
         """
-        payload: JSON = {
-            "query": query,
-            "variables": dict(variables),
-        }
-
-        return self._request(
-            "POST",
-            f"{BASE_URL}/graphql",
-            json=payload,
-        )
+        payload: JSON = {"query": query, "variables": dict(variables)}
+        return self._request("POST", f"{BASE_URL}/graphql", json=payload)

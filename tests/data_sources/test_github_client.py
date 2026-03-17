@@ -134,3 +134,34 @@ def test_graphql_request(monkeypatch):
 
     assert kwargs["json"]["query"] == query
     assert kwargs["json"]["variables"] == variables
+
+
+def test_graphql_fresh_retry_limit_exceeded(monkeypatch, mock_sleep):
+
+    rate_limited = Mock()
+    rate_limited.raise_for_status = Mock()
+    rate_limited.headers = {}
+    rate_limited.status_code = 200
+    rate_limited.ok = True
+    rate_limited.json.return_value = {
+        "data": {
+            "rateLimit": {
+                "remaining": 0,
+                "limit": 5000,
+                "cost": 1,
+                "resetAt": "2099-01-01T00:00:00Z",
+            }
+        },
+        "errors": [{"type": "RATE_LIMIT"}],
+    }
+
+    client = github_client.GitHubClient()
+
+    monkeypatch.setattr(
+        client.session,
+        "request",
+        Mock(return_value=rate_limited),
+    )
+
+    with pytest.raises(RuntimeError, match="GraphQL fresh retry limit exceeded"):
+        client.graphql("query { viewer { login } }", {})
