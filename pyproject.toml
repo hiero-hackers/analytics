@@ -29,6 +29,10 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+dashboard = [
+    "streamlit>=1.38,<2",
+    "plotly>=5.24,<7",
+]
 
 [dependency-groups]
 dev = [

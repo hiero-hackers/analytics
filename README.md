@@ -128,6 +128,12 @@ Run the test suite to ensure everything is working:
 ```bash
 uv run pytest
 ```
+
+### Launch the dashboard
+
+```bash
+streamlit run dashboards/app.py
+```
 ---
 
 ## License
