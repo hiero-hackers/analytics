@@ -134,6 +134,8 @@ uv run pytest
 ```bash
 streamlit run dashboards/app.py
 ```
+Open the URL displayed in the terminal (typically `http://localhost:8501`).
+
 ---
 
 ## License
