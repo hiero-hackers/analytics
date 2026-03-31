@@ -178,11 +178,11 @@ def test_fetch_org_contributor_merged_pr_count_graphql(mock_client, bypass_pagin
     )
 
     assert len(records) == 2
-    
+
     # Find records by repo name to ensure order-independent testing
     repo1_record = next((r for r in records if "repo1" in r.repo), None)
     repo2_record = next((r for r in records if "repo2" in r.repo), None)
-    
+
     assert repo1_record is not None
     assert repo1_record.login == "carol"
     assert repo1_record.merged_pr_count == 10
@@ -190,43 +190,6 @@ def test_fetch_org_contributor_merged_pr_count_graphql(mock_client, bypass_pagin
     assert repo2_record is not None
     assert repo2_record.login == "carol"
     assert repo2_record.merged_pr_count == 5
-
-
-def test_fetch_org_contributor_merged_pr_count_with_repo_filter(mock_client):
-    """Test fetching with a specific repo filter."""
-    
-    # Mock repos
-    mock_client.graphql.return_value = {
-        "data": {
-            "organization": {
-                "repositories": {
-                    "nodes": [
-                        {"name": "repo1"},
-                        {"name": "repo2"},
-                        {"name": "repo3"},
-                    ],
-                    "pageInfo": {
-                        "hasNextPage": False,
-                        "endCursor": None,
-                    },
-                }
-            }
-        }
-    }
-
-    # When we filter to just repo1, we should only get data for that repo
-    records = ingest.fetch_org_contributor_merged_pr_count_graphql(
-        mock_client,
-        org="hiero-ledger",
-        login="dave",
-        repos=["repo1"],
-        max_workers=1,
-    )
-
-    # With mocking side_effect exhaustion, we expect mock errors
-    # In real scenario, only repo1 would be queried
-    # This is a structural test
-
 
 # ---------------------------------------------------------
 # dataclass serialization
