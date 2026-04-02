@@ -22,6 +22,17 @@ def _parse_dt(value: str | None) -> datetime | None:
 @dataclass(frozen=True)
 class BaseRecord:
     """Base class for all GitHub data records."""
+    @staticmethod
+    def _owner(context: dict) -> str:
+        """Extract the owner name from a GraphQL hydration context."""
+        return context.get("owner", "")
+
+    @staticmethod
+    def _repo_name(context: dict) -> str:
+        """Build an owner/repo name from a GraphQL hydration context."""
+        owner = BaseRecord._owner(context)
+        repo = context.get("repo", "")
+        return f"{owner}/{repo}" if owner and repo else ""
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[BaseRecord]:
@@ -41,12 +52,11 @@ class RepositoryRecord(BaseRecord):
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[RepositoryRecord]:
-        owner = context.get("owner", "")
         return [
             cls(
-                full_name=f"{owner}/{node['name']}",
+                full_name=f"{cls._owner(context)}/{node['name']}",
                 name=node["name"],
-                owner=owner,
+                owner=cls._owner(context),
                 created_at=_parse_dt(node.get("createdAt")),
                 stargazers=node.get("stargazerCount"),
                 forks=node.get("forkCount"),
@@ -67,9 +77,7 @@ class IssueRecord(BaseRecord):
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[IssueRecord]:
-        owner = context.get("owner", "")
-        repo = context.get("repo", "")
-        repo_name = f"{owner}/{repo}" if owner and repo else ""
+        repo_name = cls._repo_name(context)
         labels = [label["name"].lower() for label in node.get("labels", {}).get("nodes", [])]
         return [
             cls(
@@ -100,9 +108,7 @@ class PullRequestDifficultyRecord(BaseRecord):
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[PullRequestDifficultyRecord]:
-        owner = context.get("owner", "")
-        repo = context.get("repo", "")
-        repo_name = f"{owner}/{repo}" if owner and repo else ""
+        repo_name = cls._repo_name(context)
         author = node.get("author", {}).get("login")
         issues = node.get("closingIssuesReferences", {}).get("nodes", [])
         records = []
@@ -140,9 +146,7 @@ class ContributorActivityRecord(BaseRecord):
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[ContributorActivityRecord]:
-        owner = context.get("owner", "")
-        repo = context.get("repo", "")
-        repo_name = f"{owner}/{repo}" if owner and repo else ""
+        repo_name = cls._repo_name(context)
         cutoff = context.get("cutoff")
         pr_number = node["number"]
         records = []
@@ -205,9 +209,7 @@ class ContributorMergedPRCountRecord(BaseRecord):
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[ContributorMergedPRCountRecord]:
-        owner = context.get("owner", "")
-        repo = context.get("repo", "")
-        repo_name = f"{owner}/{repo}" if owner and repo else ""
+        repo_name = cls._repo_name(context)
         login = context.get("login", "")
         return [
             cls(

@@ -1,6 +1,4 @@
 import os
-import sys
-from pathlib import Path
 from dotenv import load_dotenv
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
