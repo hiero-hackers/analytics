@@ -74,7 +74,7 @@ class IssueRecord(BaseRecord):
             number=node["number"],
             title=node["title"],
             state=node["state"],
-            created_at=_parse_dt(node["createdAt"]),  # type: ignore
+            created_at=_parse_dt(node["createdAt"]),
             closed_at=_parse_dt(node.get("closedAt")),
             labels=labels,
         )
@@ -108,8 +108,8 @@ class PullRequestDifficultyRecord(BaseRecord):
                 cls(
                     repo=repo_name,
                     pr_number=node["number"],
-                    pr_created_at=_parse_dt(node["createdAt"]),  # type: ignore
-                    pr_merged_at=_parse_dt(node["mergedAt"]),  # type: ignore
+                    pr_created_at=_parse_dt(node["createdAt"]),
+                    pr_merged_at=_parse_dt(node["mergedAt"]),
                     pr_additions=node["additions"],
                     pr_deletions=node["deletions"],
                     pr_changed_files=node["changedFiles"],

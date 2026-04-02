@@ -2,10 +2,6 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
-
-user_site_analytics = Path(__file__).resolve().parent.parent.parent / "analytics" / "src"
-sys.path.insert(0, str(user_site_analytics))
-
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_contributor_merged_pr_count_graphql,
