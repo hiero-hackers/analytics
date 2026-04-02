@@ -32,23 +32,6 @@ def bypass_pagination(monkeypatch):
 
 
 # ---------------------------------------------------------
-# parse datetime
-# ---------------------------------------------------------
-
-def test_parse_dt():
-    value = "2024-01-01T00:00:00Z"
-
-    dt = ingest._parse_dt(value)
-
-    assert isinstance(dt, datetime)
-    assert dt.year == 2024
-
-
-def test_parse_dt_none():
-    assert ingest._parse_dt(None) is None
-
-
-# ---------------------------------------------------------
 # repositories
 # ---------------------------------------------------------
 

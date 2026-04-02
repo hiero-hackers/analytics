@@ -8,7 +8,7 @@ import logging
 import os
 import re
 from dataclasses import asdict
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TypeVar
@@ -133,8 +133,8 @@ def _deserialize_record(  # noqa: UP047
 def _normalize_cached_at(cached_at: datetime) -> datetime:
     """Ensure cached timestamps are offset-aware and normalized to UTC."""
     if cached_at.tzinfo is None:
-        return cached_at.replace(tzinfo=UTC)
-    return cached_at.astimezone(UTC)
+        return cached_at.replace(tzinfo=timezone.utc)
+    return cached_at.astimezone(timezone.utc)
 
 
 def _cache_path(
@@ -195,7 +195,7 @@ def load_records_cache(  # noqa: UP047
 
     effective_ttl_seconds = _cache_ttl_seconds(ttl_seconds)
     if effective_ttl_seconds > 0:
-        age_seconds = (datetime.now(UTC) - cached_at).total_seconds()
+        age_seconds = (datetime.now(timezone.utc) - cached_at).total_seconds()
         if age_seconds > effective_ttl_seconds:
             logger.info("Cache entry is stale for %s (%s)", kind, scope)
             return None
@@ -235,7 +235,7 @@ def save_records_cache(  # noqa: UP047
         "scope": scope,
         "parameters": parameters,
         "record_type": record_type.__name__,
-        "cached_at": datetime.now(UTC).isoformat(),
+        "cached_at": datetime.now(timezone.utc).isoformat(),
         "records": [_serialize_record(record) for record in records],
     }
 

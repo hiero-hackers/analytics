@@ -1,15 +1,18 @@
 from .github_client import GitHubClient
 from .github_ingest import (
     fetch_org_contributor_activity_graphql,
+    fetch_org_contributor_merged_pr_count_graphql,
     fetch_org_issues_graphql,
     fetch_org_merged_pr_difficulty_graphql,
     fetch_org_repos_graphql,
     fetch_repo_contributor_activity_graphql,
+    fetch_repo_contributor_merged_pr_count_graphql,
     fetch_repo_issues_graphql,
     fetch_repo_merged_pr_difficulty_graphql,
 )
 from .github_queries import (
     CONTRIBUTOR_ACTIVITY_QUERY,
+    CONTRIBUTOR_MERGED_PRS_COUNT_QUERY,
     ISSUES_QUERY,
     MERGED_PR_QUERY,
     REPOS_QUERY,
@@ -19,6 +22,7 @@ from .github_search import (
 )
 from .models import (
     ContributorActivityRecord,
+    ContributorMergedPRCountRecord,
     IssueRecord,
     PullRequestDifficultyRecord,
     RepositoryRecord,
@@ -32,16 +36,20 @@ __all__ = [
     "ISSUES_QUERY",
     "MERGED_PR_QUERY",
     "CONTRIBUTOR_ACTIVITY_QUERY",
+    "CONTRIBUTOR_MERGED_PRS_COUNT_QUERY",
     "fetch_org_issues_graphql",
     "fetch_org_repos_graphql",
     "fetch_org_merged_pr_difficulty_graphql",
     "fetch_org_contributor_activity_graphql",
+    "fetch_org_contributor_merged_pr_count_graphql",
     "fetch_repo_merged_pr_difficulty_graphql",
     "fetch_repo_contributor_activity_graphql",
+    "fetch_repo_contributor_merged_pr_count_graphql",
     "fetch_repo_issues_graphql",
     "RepositoryRecord",
     "IssueRecord",
     "PullRequestDifficultyRecord",
     "ContributorActivityRecord",
+    "ContributorMergedPRCountRecord",
     "paginate_cursor",
 ]

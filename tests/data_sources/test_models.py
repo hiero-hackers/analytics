@@ -4,9 +4,11 @@ import pytest
 
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
+    ContributorMergedPRCountRecord,
     IssueRecord,
     PullRequestDifficultyRecord,
     RepositoryRecord,
+    _parse_dt,
 )
 
 # ---------------------------------------------------------
@@ -157,3 +159,70 @@ def test_issue_record_is_frozen():
 
     with pytest.raises(Exception):
         issue.number = 2
+
+
+# ---------------------------------------------------------
+# ContributorMergedPRCountRecord
+# ---------------------------------------------------------
+
+def test_contributor_merged_pr_count_record_creation():
+    """Test creating a ContributorMergedPRCountRecord."""
+    record = ContributorMergedPRCountRecord(
+        repo="hiero-ledger/hiero-sdk-python",
+        login="john-doe",
+        merged_pr_count=42,
+    )
+
+    assert record.repo == "hiero-ledger/hiero-sdk-python"
+    assert record.login == "john-doe"
+    assert record.merged_pr_count == 42
+
+
+def test_contributor_merged_pr_count_record_zero():
+    """Test a record with zero merged PRs."""
+    record = ContributorMergedPRCountRecord(
+        repo="hiero-ledger/hiero-sdk-python",
+        login="inactive-user",
+        merged_pr_count=0,
+    )
+
+    assert record.merged_pr_count == 0
+
+
+def test_contributor_merged_pr_count_record_is_frozen():
+    """Test that the record is immutable (frozen)."""
+    record = ContributorMergedPRCountRecord(
+        repo="hiero-ledger/hiero-sdk-python",
+        login="john-doe",
+        merged_pr_count=10,
+    )
+
+    with pytest.raises(Exception):
+        record.merged_pr_count = 20
+
+
+def test_contributor_merged_pr_count_record_equality():
+    """Test record equality."""
+    r1 = ContributorMergedPRCountRecord("org/repo", "alice", 5)
+    r2 = ContributorMergedPRCountRecord("org/repo", "alice", 5)
+    r3 = ContributorMergedPRCountRecord("org/repo", "alice", 6)
+
+    assert r1 == r2
+    assert r1 != r3
+
+# ---------------------------------------------------------
+# parse datetime
+# ---------------------------------------------------------
+
+def test_parse_dt():
+    value = "2024-01-01T00:00:00Z"
+
+    dt = _parse_dt(value)
+
+    assert isinstance(dt, datetime)
+    assert dt.year == 2024
+
+
+def test_parse_dt_none():
+    assert _parse_dt(None) is None
+

@@ -147,3 +147,18 @@ query($owner:String!, $repo:String!, $cursor:String) {
   }
 }
 """
+
+
+CONTRIBUTOR_MERGED_PRS_COUNT_QUERY: str = """
+query($searchQuery:String!) {
+  search(type:ISSUE, query:$searchQuery, first:0) {
+    issueCount
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}
+"""
