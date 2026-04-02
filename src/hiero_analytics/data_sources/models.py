@@ -24,7 +24,7 @@ class BaseRecord:
     """Base class for all GitHub data records."""
 
     @classmethod
-    def from_github_node(cls, node: dict, context: dict) -> BaseRecord | list[BaseRecord]:
+    def from_github_node(cls, node: dict, context: dict) -> list[BaseRecord]:
         """Hydrate appropriate model(s) from a GitHub GraphQL node."""
         raise NotImplementedError(f"Mapping not implemented for {cls.__name__}")
 
@@ -40,16 +40,18 @@ class RepositoryRecord(BaseRecord):
     forks: int | None = None
 
     @classmethod
-    def from_github_node(cls, node: dict, context: dict) -> RepositoryRecord:
+    def from_github_node(cls, node: dict, context: dict) -> list[RepositoryRecord]:
         owner = context.get("owner", "")
-        return cls(
-            full_name=f"{owner}/{node['name']}",
-            name=node["name"],
-            owner=owner,
-            created_at=_parse_dt(node.get("createdAt")),
-            stargazers=node.get("stargazerCount"),
-            forks=node.get("forkCount"),
-        )
+        return [
+            cls(
+                full_name=f"{owner}/{node['name']}",
+                name=node["name"],
+                owner=owner,
+                created_at=_parse_dt(node.get("createdAt")),
+                stargazers=node.get("stargazerCount"),
+                forks=node.get("forkCount"),
+            )
+        ]
 
 
 @dataclass(frozen=True)
@@ -64,20 +66,22 @@ class IssueRecord(BaseRecord):
     labels: list[str]
 
     @classmethod
-    def from_github_node(cls, node: dict, context: dict) -> IssueRecord:
+    def from_github_node(cls, node: dict, context: dict) -> list[IssueRecord]:
         owner = context.get("owner", "")
         repo = context.get("repo", "")
         repo_name = f"{owner}/{repo}" if owner and repo else ""
         labels = [label["name"].lower() for label in node.get("labels", {}).get("nodes", [])]
-        return cls(
-            repo=repo_name,
-            number=node["number"],
-            title=node["title"],
-            state=node["state"],
-            created_at=_parse_dt(node["createdAt"]),
-            closed_at=_parse_dt(node.get("closedAt")),
-            labels=labels,
-        )
+        return [
+            cls(
+                repo=repo_name,
+                number=node["number"],
+                title=node["title"],
+                state=node["state"],
+                created_at=_parse_dt(node["createdAt"]),
+                closed_at=_parse_dt(node.get("closedAt")),
+                labels=labels,
+            )
+        ]
 
 
 @dataclass(frozen=True)
@@ -200,13 +204,15 @@ class ContributorMergedPRCountRecord(BaseRecord):
     merged_pr_count: int
 
     @classmethod
-    def from_github_node(cls, node: dict, context: dict) -> ContributorMergedPRCountRecord:
+    def from_github_node(cls, node: dict, context: dict) -> list[ContributorMergedPRCountRecord]:
         owner = context.get("owner", "")
         repo = context.get("repo", "")
         repo_name = f"{owner}/{repo}" if owner and repo else ""
         login = context.get("login", "")
-        return cls(
-            repo=repo_name,
-            login=login,
-            merged_pr_count=node.get("issueCount", 0),
-        )
+        return [
+            cls(
+                repo=repo_name,
+                login=login,
+                merged_pr_count=node.get("issueCount", 0),
+            )
+        ]

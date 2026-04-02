@@ -145,3 +145,39 @@ def paginate_cursor(
     logger.info("Cursor pagination collected %d items total", len(results))
 
     return results
+
+
+# ---------------------------------------------------------
+# GRAPHQL CURSOR PAGE EXTRACTION
+# ---------------------------------------------------------
+
+def extract_graphql_cursor_page(
+    data: dict[str, Any],
+    nodes_path: list[str],
+) -> tuple[list[dict[str, Any]], str | None, bool]:
+    """
+    Safely navigates a GraphQL response and extracts nodes + pagination info.
+    """
+    container = data.get("data", {})
+    for key in nodes_path:
+        if not isinstance(container, dict):
+            logger.warning("Path traversal failed: '%s' is not a dict.", key)
+            return [], None, False
+        container = container.get(key, {})
+
+    if not isinstance(container, dict):
+        return [], None, False
+
+    nodes = container.get("nodes")
+    if nodes is None:
+        nodes = [container] if container else []
+
+    if not isinstance(nodes, list):
+        logger.error("Expected list at %s, got %s", nodes_path, type(nodes))
+        nodes = []
+
+    page_info = container.get("pageInfo", {})
+    next_cursor = page_info.get("endCursor")
+    has_next = bool(page_info.get("hasNextPage", False))
+
+    return nodes, next_cursor, has_next

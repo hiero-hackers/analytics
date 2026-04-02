@@ -35,7 +35,7 @@ from .models import (
     PullRequestDifficultyRecord,
     RepositoryRecord,
 )
-from .pagination import paginate_cursor
+from .pagination import extract_graphql_cursor_page, paginate_cursor
 
 logger = logging.getLogger(__name__)
 
@@ -97,28 +97,13 @@ def fetch_github_resource(
         paginated_vars["cursor"] = cursor
 
         data = client.graphql(query, paginated_vars)
-
-        current = data.get("data", {})
-        for key in nodes_path:
-            current = current.get(key, {})
-
-        nodes = current.get("nodes")
-        if nodes is None:
-            nodes = [current]
-
-        page_info = current.get("pageInfo", {})
-        next_cursor = page_info.get("endCursor")
-        has_next = page_info.get("hasNextPage", False)
+        nodes, next_cursor, has_next = extract_graphql_cursor_page(data, nodes_path)
 
         items = []
         for node in nodes:
             context = context_builder(node) if context_builder else {}
             result = model_class.from_github_node(node, context)
-
-            if isinstance(result, list):
-                items.extend(result)
-            else:
-                items.append(result)
+            items.extend(result)
 
         return items, next_cursor, has_next
 
