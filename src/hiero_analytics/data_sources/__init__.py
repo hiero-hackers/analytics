@@ -10,13 +10,7 @@ from .github_ingest import (
     fetch_repo_issues_graphql,
     fetch_repo_merged_pr_difficulty_graphql,
 )
-from .github_queries import (
-    CONTRIBUTOR_ACTIVITY_QUERY,
-    CONTRIBUTOR_MERGED_PRS_COUNT_QUERY,
-    ISSUES_QUERY,
-    MERGED_PR_QUERY,
-    REPOS_QUERY,
-)
+
 from .github_search import (
     search_issues,
 )
@@ -32,11 +26,6 @@ from .pagination import paginate_cursor
 __all__ = [
     "GitHubClient",
     "search_issues",
-    "REPOS_QUERY",
-    "ISSUES_QUERY",
-    "MERGED_PR_QUERY",
-    "CONTRIBUTOR_ACTIVITY_QUERY",
-    "CONTRIBUTOR_MERGED_PRS_COUNT_QUERY",
     "fetch_org_issues_graphql",
     "fetch_org_repos_graphql",
     "fetch_org_merged_pr_difficulty_graphql",
