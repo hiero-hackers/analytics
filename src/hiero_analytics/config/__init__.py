@@ -17,6 +17,7 @@ from .paths import (
     ORG,
     REPO,
     ensure_output_dirs,
+    load_query,
 )
 
 __all__ = [
@@ -33,5 +34,6 @@ __all__ = [
     "GRID_ALPHA",
     "GRID_STYLE",    
     "HTTP_TIMEOUT_SECONDS",
-    "REQUEST_DELAY_SECONDS"
+    "REQUEST_DELAY_SECONDS",
+    "load_query",
 ]

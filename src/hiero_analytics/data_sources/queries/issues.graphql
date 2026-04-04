@@ -1,0 +1,28 @@
+query ISSUES_QUERY($owner:String!,$repo:String!,$cursor:String,$states:[IssueState!]){
+  repository(owner:$owner,name:$repo){
+    issues(first:100, after:$cursor, states:$states){
+      pageInfo{
+        hasNextPage
+        endCursor
+      }
+      nodes{
+        number
+        title
+        state
+        createdAt
+        closedAt
+        labels(first:10){
+          nodes{
+            name
+          }
+        }
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

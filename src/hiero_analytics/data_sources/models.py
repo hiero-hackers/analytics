@@ -9,7 +9,7 @@ issues, and merged pull request difficulty metrics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime
 from typing import Mapping
 
 
@@ -110,7 +110,8 @@ class PullRequestDifficultyRecord(BaseRecord):
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[PullRequestDifficultyRecord]:
         repo_name = cls._repo_name(context)
-        author = node.get("author", {}).get("login")
+        author_node = node.get("author")
+        author = author_node.get("login") if isinstance(author_node, Mapping) else None
         issues = node.get("closingIssuesReferences", {}).get("nodes", [])
         records = []
         for issue in issues:

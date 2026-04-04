@@ -1,0 +1,19 @@
+query REPOS_QUERY($org:String!,$cursor:String){
+  organization(login:$org){
+    repositories(first:100, after:$cursor){
+      pageInfo{
+        hasNextPage
+        endCursor
+      }
+      nodes{
+        name
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

@@ -16,7 +16,7 @@ DATA_DIR is the subdirectory within OUTPUTS_DIR where all data files (e.g., CSVs
 CHARTS_DIR is the subdirectory within OUTPUTS_DIR where all generated charts (e.g., PNGs, SVGs) will be saved.
 """
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
+SRC = PROJECT_ROOT / "src" / "hiero_analytics"
 
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 
@@ -86,3 +86,9 @@ def ensure_repo_dirs(repo: str) -> tuple[Path, Path]:
     repo_charts_dir.mkdir(parents=True, exist_ok=True)
 
     return repo_data_dir, repo_charts_dir
+
+def load_query(query_name: str) -> str:
+    """Helper to load query text from the queries directory."""
+    query_path = SRC / "data_sources" / "queries" / f"{query_name}.graphql"
+    with open(query_path, "r", encoding="utf-8") as f:
+        return f.read()

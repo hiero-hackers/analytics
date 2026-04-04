@@ -19,14 +19,10 @@ from .cache import (
     load_records_cache,
     save_records_cache,
 )
+from hiero_analytics.config.paths import load_query
+
 from .github_client import GitHubClient
-from .github_queries import (
-    CONTRIBUTOR_ACTIVITY_QUERY,
-    CONTRIBUTOR_MERGED_PRS_COUNT_QUERY,
-    ISSUES_QUERY,
-    MERGED_PR_QUERY,
-    REPOS_QUERY,
-)
+
 from .models import (
     BaseRecord,
     ContributorActivityRecord,
@@ -41,6 +37,11 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BaseRecord)
 
+REPOS_QUERY = load_query("repos")
+ISSUES_QUERY = load_query("issues")
+MERGED_PR_QUERY = load_query("merged_pr")
+CONTRIBUTOR_ACTIVITY_QUERY = load_query("contributor_activity")
+CONTRIBUTOR_MERGED_PRS_COUNT_QUERY = load_query("contributor_merged_prs_count")
 
 def _cache_kwargs(
     use_cache: bool | None,
