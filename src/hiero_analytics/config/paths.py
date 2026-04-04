@@ -87,8 +87,12 @@ def ensure_repo_dirs(repo: str) -> tuple[Path, Path]:
 
     return repo_data_dir, repo_charts_dir
 
+_query_cache: dict[str, str] = {}
+
 def load_query(query_name: str) -> str:
     """Helper to load query text from the queries directory."""
-    query_path = SRC / "data_sources" / "queries" / f"{query_name}.graphql"
-    with open(query_path, "r", encoding="utf-8") as f:
-        return f.read()
+    if query_name not in _query_cache:
+        query_path = SRC / "data_sources" / "queries" / f"{query_name}.graphql"
+        with open(query_path, "r", encoding="utf-8") as f:
+            _query_cache[query_name] = f.read()
+    return _query_cache[query_name]
