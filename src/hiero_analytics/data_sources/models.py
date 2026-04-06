@@ -229,3 +229,19 @@ class ScorecardRecord:
     score: float
     checks: dict[str, int]
     date: datetime
+
+@dataclass(frozen=True)
+class CodeOwnersRecord:
+    """Represents the presence of a CODEOWNERS file in a repository."""
+    repo: str
+    status: bool
+
+@dataclass(frozen=True)
+class RunnerRecord:
+    """Represents usage for a specific GitHub Actions job."""
+    repo: str
+    workflow_file: str
+    job_name: str
+    runner: str
+    is_self_hosted: bool
+

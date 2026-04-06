@@ -20,6 +20,8 @@ from .models import (
     IssueRecord,
     PullRequestDifficultyRecord,
     RepositoryRecord,
+    CodeOwnersRecord,
+    RunnerRecord,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,8 @@ _DATETIME_FIELDS: dict[type[object], tuple[str, ...]] = {
     IssueRecord: ("created_at", "closed_at"),
     PullRequestDifficultyRecord: ("pr_created_at", "pr_merged_at"),
     ContributorActivityRecord: ("occurred_at",),
+    CodeOwnersRecord: (),
+    RunnerRecord: (),
 }
 RecordType = TypeVar(
     "RecordType",
