@@ -243,5 +243,5 @@ class RunnerRecord:
     workflow_file: str
     job_name: str
     runner: str
-    is_self_hosted: bool
+    is_self_hosted: bool | None # None = undefine/fallback/env-param
 
