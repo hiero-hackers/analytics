@@ -14,7 +14,7 @@ reviews:
   high_level_summary: false # Do not summarise a pull request first as there is a walkthrough
   review_status: false # Do not state what kind of review as performed or why (spammy)
   commit_status: false # Do not state the review is in progress (spammy)
-  collapse_walkthrough: false # Provide a walkthrough for reviewers (useful)
+  collapse_walkthrough: false # Open a walkthrough for reviewers (useful)
   sequence_diagrams: false # Do not draw sequence diagrams in walkthrough (spammy)
   estimate_code_review_effort: false # Do not estimate code review effort (spammy)
   assess_linked_issues: true # Assess linked issues for relevance to the PR (useful)
@@ -30,4 +30,27 @@ reviews:
     label: spam
   art: false # Do not create ASCII art (spammy)
   allow_non_org_members: false # Do not allow non-organization members to trigger reviews
-  auto-reply: false # Do not automatically reply to comments (spammy)
+  chat:
+    auto_reply: false
+  
+  review_guidelines: |
+    Review ONLY for critical issues.
+
+    Critical issues include:
+    - Bugs
+    - Security vulnerabilities
+    - Data inaccuracy risks
+    - Performance problems with real impact
+
+    Ignore completely:
+    - Code style, formatting, naming, or linting
+    - Refactoring suggestions
+    - Readability improvements
+    - Comments, documentation, or wording
+    - "Nice to have" improvements
+
+    Output rules:
+    - If no critical issues are found, return no comments.
+    - Do not provide suggestions unless they fix a critical issue.
+    - Do not explain obvious code behavior.
+    - Keep responses short and direct.
