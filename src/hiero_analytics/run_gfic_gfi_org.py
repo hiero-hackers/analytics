@@ -120,7 +120,7 @@ def main() -> None:
             stack_cols=STACK_COLS,
             labels=STACK_LABELS,
             colors=ONBOARDING_COLORS,
-            title="Onboarding Pipeline (GFIC → GFI) by Year",
+            title="Onboarding Migration Pipeline (Candidate → Approved) Yearly",
             output_path=org_charts_dir / "gfi_pipeline.png",
         )
 
@@ -131,7 +131,7 @@ def main() -> None:
             stack_cols=STACK_COLS,
             labels=STACK_LABELS,
             colors=ONBOARDING_COLORS,
-            title="Total GFIC and GFI by Repository",
+            title="Total Onboarding Issue Pool by Repository",
             output_path=org_charts_dir / "total_gfi_gfic_by_repo.png",
             rotate_x=45,
         )

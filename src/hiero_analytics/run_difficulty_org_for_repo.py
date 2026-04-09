@@ -75,12 +75,12 @@ def main() -> None:
     pie_variants = [
         (
             difficulty_counts,
-            "Issue Difficulty Distribution Last 30 Days (Including Unknown)",
+            "Opened Issues (Last 30 Days) by Difficulty Distribution (Including Unknown)",
             "difficulty_distribution_with_unknown_30_days.png",
         ),
         (
             difficulty_counts[difficulty_counts["difficulty"] != UNKNOWN_DIFFICULTY],
-            "Issue Difficulty Distribution Last 30 Days (Excluding Unknown)",
+            "Opened Issues (Last 30 Days) by Difficulty Distribution (Excluding Unknown)",
             "difficulty_distribution_without_unknown_30_days.png",
         ),
     ]
@@ -125,7 +125,7 @@ def main() -> None:
         x_col="repo",
         stack_cols=difficulty_cols,
         labels=difficulty_cols,
-        title="Issue Difficulty Distribution by Repository (Last 30 Days)",
+        title="Opened Issues (Last 30 Days) by Difficulty Distribution in a Repository",
         output_path=org_charts_dir / "difficulty_by_repo_30_days.png",
         colors=DIFFICULTY_COLORS,
         rotate_x=45,
