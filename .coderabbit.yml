@@ -1,8 +1,4 @@
 language: "en-US" # USA English
-# Set up means coderabbit should review PRs but only provide one high level walkthrough, collapsed
-# It should not state preliminary information like: getting ready to review, draw a picture
-# It should not state additional information like: related issues, PRs, suggest reviewers
-# It should not continue a casual conversation with users that reply to it
 
 knowledge_base: # Enable knowledge base access for up-to-date information
   web_search: # Enable web search for up-to-date information
@@ -28,29 +24,32 @@ reviews:
   slop_detection:
     enabled: true
     label: spam
+
+  path_instructions:
+    - path: "**"
+      instructions: |
+        Review ONLY for critical issues.
+
+        Critical issues include:
+        - Bugs
+        - Security vulnerabilities
+        - Data inaccuracy
+        - Performance problems with real impact
+
+        Ignore completely:
+        - Code style, formatting, naming, or linting
+        - Refactoring suggestions
+        - Readability improvements
+        - Comments, documentation, or wording
+        - "Nice to have" improvements
+
+        Output rules:
+        - If no critical issues are found, return no comments.
+        - Do not provide suggestions unless they fix a critical issue.
+        - Do not explain obvious code behavior.
+        - Keep responses short and direct.
+
+chat:
+  auto_reply: false
   art: false # Do not create ASCII art (spammy)
   allow_non_org_members: false # Do not allow non-organization members to trigger reviews
-  chat:
-    auto_reply: false
-  
-  review_guidelines: |
-    Review ONLY for critical issues.
-
-    Critical issues include:
-    - Bugs
-    - Security vulnerabilities
-    - Data inaccuracy risks
-    - Performance problems with real impact
-
-    Ignore completely:
-    - Code style, formatting, naming, or linting
-    - Refactoring suggestions
-    - Readability improvements
-    - Comments, documentation, or wording
-    - "Nice to have" improvements
-
-    Output rules:
-    - If no critical issues are found, return no comments.
-    - Do not provide suggestions unless they fix a critical issue.
-    - Do not explain obvious code behavior.
-    - Keep responses short and direct.
