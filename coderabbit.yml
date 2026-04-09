@@ -1,0 +1,33 @@
+language: "en-US" # USA English
+# Set up means coderabbit should review PRs but only provide one high level walkthrough, collapsed
+# It should not state preliminary information like: getting ready to review, draw a picture
+# It should not state additional information like: related issues, PRs, suggest reviewers
+# It should not continue a casual conversation with users that reply to it
+
+knowledge_base: # Enable knowledge base access for up-to-date information
+  web_search: # Enable web search for up-to-date information
+    enabled: true
+
+# Only documents non-default options:
+reviews:
+  profile: "chill" # Chill profile yields less feedback, that may be considered lenient.
+  high_level_summary: false # Do not summarise a pull request first as there is a walkthrough
+  review_status: false # Do not state what kind of review as performed or why (spammy)
+  commit_status: false # Do not state the review is in progress (spammy)
+  collapse_walkthrough: false # Provide a walkthrough for reviewers (useful)
+  sequence_diagrams: false # Do not draw sequence diagrams in walkthrough (spammy)
+  estimate_code_review_effort: false # Do not estimate code review effort (spammy)
+  assess_linked_issues: true # Assess linked issues for relevance to the PR (useful)
+  related_issues: false # Do not suggest related issues (spammy)
+  related_prs: false # Do not suggest related PRs (spammy)
+  suggested_labels: false # Do not suggest labels for the PR (spammy)
+  suggested_reviewers: false # Do not suggest reviewers for the PR (spammy)
+  in_progress_fortune: false # Do not stall time with a message (spammy)
+  poem: false # Do not write a literal poem (spammy)
+  enable_prompt_for_ai_agents: false # Disable prompts for AI agents (spammy)
+  slop_detection:
+    enabled: true
+    label: spam
+  art: false # Do not create ASCII art (spammy)
+  allow_non_org_members: false # Do not allow non-organization members to trigger reviews
+  auto-reply: false # Do not automatically reply to comments (spammy)
