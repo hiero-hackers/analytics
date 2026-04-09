@@ -76,34 +76,6 @@ body:
       required: true
 
   - type: textarea
-    id: implementation
-    attributes:
-      label: 🛠️ Implementation Notes
-      description: |
-        Guide the quality of their work with clear constraints.
-      value: |
-        <!-- Clarify any key risk areas -->
-
-        <!-- Clarify any constraints -->
-
-    validations:
-      required: true
-
-  - type: textarea
-    id: domains
-    attributes:
-      label: 🔬 Technical Domains
-      description: |
-        Adapt as needed. Technical areas this issue touches to help developers self-select based on expertise.
-      value: |
-        <!-- Edit Technical Domains If needed -->      
-
-        - [ ] **Intermediate to Advanced Programming** (Object oriented design, Pandas, Matplotlib)
-        - [ ] **System Architecture** (fetch → data model → dataframe → csv → plotting)
-        - [ ] **Testing** (unit and accuracy verification)
-
-
-  - type: textarea
     id: intermediate_contributors
     attributes:
       label: 🧠 Intermediate Contributors — Prerequisites & Expectations
@@ -114,23 +86,17 @@ body:
         > **Intermediate issues are higher complexity. We expect more than just a 'working solution' and will recommend beginner issues if the PR does not meet these standards.**
   
         ### 🏁 Concrete Prerequisites
-        - **Advanced Programming Language:** Higher level intermediate or advanced programming language.
-        - **Expertise:** Strong understanding of files related to this issue (research before claiming!).
-        - **Proven History:** Successfully completed **≥ 2 beginner issues** in this repo.
+        - **Advanced Programming Language:** Higher level intermediate programming language.
+        - **Expertise:** Built a good understanding of files related to this issue
+        - **Proven History:** Recommend to complete at least 1 beginner issue.
 
         > [!NOTE]
         > **CI/CD Exception:** For issues focused on **GitHub Actions / Workflows**, the repo-specific thresholds above may be waived if the contributor demonstrates intermediate-level proficiency in CI/CD.
 
         If this feels like too big a step, that is completely fine — try a [Beginner Issue](https://github.com/issues?q=is%3Aopen%20is%3Aissue%20org%3Ahiero-ledger%20archived%3Afalse%20no%3Aassignee%20(label%3A%22beginner%22%20OR%20label%3A%22skill%3A%20beginner%22)%20(repo%3Ahiero-ledger%2Fhiero-sdk-cpp%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-swift%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-python%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-js%20OR%20repo%3Ahiero-ledger%2Fhiero-website)) first or a different **[Intermediate Issue](https://github.com/issues?q=is%3Aopen%20is%3Aissue%20org%3Ahiero-ledger%20archived%3Afalse%20no%3Aassignee%20(label%3A%22intermediate%22%20OR%20label%3A%22skill%3A%20intermediate%22)%20(repo%3Ahiero-ledger%2Fhiero-sdk-cpp%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-swift%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-python%20OR%20repo%3Ahiero-ledger%2Fhiero-sdk-js%20OR%20repo%3Ahiero-ledger%2Fhiero-website))**. You can always come back when you are ready.
 
-        ### ⚠️ AI Usage Policy
-
-        - Using AI to generate code for Intermediate issues is **strictly discouraged**
-        - Using AI as the main source of research is **strictly discouraged**, refer to language and library documentation, protobuf definitions and other SDKs.
-        
         ### ⏱️ Timeline & Workflow
         - **Typical time:** ~2 weeks / ~25 hours.
-        - 🔴 Completing an intermediate issue in 1–3 days is a **red flag**.
 
         > [!TIP]
         > **Suggested:** share your proposed implementation approach as a comment before writing code to get early feedback and avoid wasted effort.
