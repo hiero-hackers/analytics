@@ -188,7 +188,7 @@ def run():
         finalize_chart(
             fig=fig,
             ax=ax1,
-            title=f"{short_repo}: Cumulative Approved Onboarding Issues vs Cumulative Merged PR Contributors",
+            title=f"{short_repo}: Cumulative Onboarding Issues (GFIs & Candidates) vs Cumulative Merged PR Contributors",
             xlabel="Date",
             ylabel="Cumulative Good First Issues",
             output_path=output_path,
