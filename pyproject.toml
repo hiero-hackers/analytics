@@ -12,7 +12,7 @@ requires-python = ">=3.11, <4"
 dependencies = [
     "matplotlib>=3.10.8",
     "pandas>=3.0.2",
-    "requests>=2.30",
+    "requests>=2.33.1",
     "python-dotenv>=1.0",
     "pyyaml>=6.0"
 
