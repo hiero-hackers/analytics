@@ -6,20 +6,30 @@ def compute_progression_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute contributor-level progression statistics from PR records.
     Deduplicates PRs to avoid inflation from multiple linked issues.
+    Highest difficulty level is chosen if a PR closes multiple issues.
     """
     if df.empty:
         return pd.DataFrame()
 
+    level_order = {spec.name: i for i, spec in enumerate(DIFFICULTY_LEVELS)}
+    level_order["Unknown"] = -1
+
+    # One level per PR: highest difficulty across its closing issues.
+    # This ensures start_level and levels list are deterministic and not inflated.
+    pr_level = (
+        df.assign(_rank=df["level"].map(lambda l: level_order.get(l, -1)))
+          .sort_values(["author", "pr_merged_at", "_rank"])
+          .drop_duplicates(subset=["author", "pr_number"], keep="last")
+          .drop(columns="_rank")
+    )
+
     # Progression Analysis
-    progression = df.groupby("author").agg({
+    progression = pr_level.groupby("author").agg({
         "level": list,
         "pr_merged_at": ["min", "max"],
         "pr_number": "nunique"
     })
     progression.columns = ["levels", "first_seen", "last_seen", "pr_count"]
-    
-    level_order = {spec.name: i for i, spec in enumerate(DIFFICULTY_LEVELS)}
-    level_order["Unknown"] = -1
     
     progression["max_level"] = progression["levels"].apply(
         lambda lvls: max(lvls, key=lambda l: level_order.get(l, -1))
@@ -30,9 +40,8 @@ def compute_progression_stats(df: pd.DataFrame) -> pd.DataFrame:
     # Calculate early activity (first 30 days) to avoid data leakage in predictions
     early_window = pd.Timedelta(days=30)
     
-    # We need the original df to find PRs within the window
-    # Join first_seen back to df
-    df_with_start = df.merge(progression[["first_seen"]], on="author")
+    # Join first_seen back to deduplicated pr_level
+    df_with_start = pr_level.merge(progression[["first_seen"]], on="author")
     early_prs = df_with_start[df_with_start["pr_merged_at"] <= df_with_start["first_seen"] + early_window]
     
     early_stats = early_prs.groupby("author").agg({"pr_number": "nunique"}).rename(columns={"pr_number": "early_pr_count"})
@@ -43,17 +52,25 @@ def compute_progression_stats(df: pd.DataFrame) -> pd.DataFrame:
 def compute_transition_metrics(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute transition metrics between difficulty levels.
+    Deduplicates PRs to avoid spurious intra-PR transitions.
     """
     if df.empty:
         return pd.DataFrame()
 
-    # Sort by author and date
-    df_sorted = df.sort_values(["author", "pr_merged_at"])
+    level_order = {spec.name: i for i, spec in enumerate(DIFFICULTY_LEVELS)}
+    level_order["Unknown"] = -1
+
+    # Deduplicate to one level per PR (highest difficulty) before walking transitions
+    df_sorted = (
+        df.assign(_rank=df["level"].map(lambda l: level_order.get(l, -1)))
+          .sort_values(["author", "pr_merged_at", "_rank"])
+          .drop_duplicates(subset=["author", "pr_number"], keep="last")
+          .sort_values(["author", "pr_merged_at"])
+    )
     
     transitions = []
     for author, group in df_sorted.groupby("author"):
         levels = group["level"].tolist()
-        unique_levels_seen = []
         last_level = None
         
         for level in levels:
