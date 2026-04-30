@@ -122,6 +122,7 @@ def plot_scatter_with_regression(
     # Layout polish
     # -------------------------
     ax.margins(x=0.05, y=0.08)
+    ax.set_ylim(bottom=0)
 
     # -------------------------
     # Finalize
