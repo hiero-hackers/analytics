@@ -24,11 +24,11 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-local-node** | 7 | 2 | 0 |
 | **hiero-mirror-node** | 27 | 1 | 1 |
 | **hiero-mirror-node-explorer** | 6 | 0 | 0 |
-| **hiero-sdk-cpp** | 11 | 2 | 0 |
+| **hiero-sdk-cpp** | 12 | 2 | 0 |
 | **hiero-sdk-go** | 5 | 0 | 0 |
 | **hiero-sdk-java** | 9 | 0 | 0 |
 | **hiero-sdk-js** | 21 | 3 | 0 |
-| **hiero-sdk-python** | 26 | 3 | 7 |
+| **hiero-sdk-python** | 27 | 3 | 7 |
 | **hiero-sdk-rust** | 9 | 0 | 0 |
 | **hiero-sdk-swift** | 2 | 0 | 0 |
 | **hiero-sdk-tck** | 8 | 2 | 0 |
@@ -36,7 +36,7 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-website** | 0 | 2 | 0 |
 | **homebrew-tools** | 1 | 0 | 3 |
 | **identity-collaboration-hub** | 2 | 0 | 0 |
-| **solo** | 23 | 1 | 2 |
+| **solo** | 26 | 2 | 2 |
 | **solo-docs** | 1 | 0 | 0 |
 | **tsc** | 1 | 0 | 0 |
 
