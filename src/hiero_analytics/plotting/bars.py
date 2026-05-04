@@ -198,6 +198,7 @@ def plot_bar(
         ax.set_xlim(0, _compute_horizontal_axis_limit(max_value, padding))
     else:
         ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
+        ax.set_ylim(bottom=0)
 
     finalize_chart(
         fig=fig,
@@ -346,6 +347,7 @@ def plot_stacked_bar(
         if annotate_totals and len(df) <= 12:
             _annotate_bar_totals(ax, patches, totals, horizontal=False)
         ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
+        ax.set_ylim(bottom=0)
         # Force integer ticks when all x values are whole numbers (e.g. years).
         if is_numeric_or_datetime(df[x_col]) and (df[x_col] % 1 == 0).all():
             ax.set_xticks(df[x_col])

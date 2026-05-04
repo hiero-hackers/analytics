@@ -8,8 +8,7 @@ from hiero_analytics.data_sources.github_ingest import fetch_repo_merged_pr_diff
 from hiero_analytics.analysis.prs import prs_to_dataframe
 from hiero_analytics.analysis.contributor_churn import (
     compute_progression_stats, 
-    compute_transition_metrics, 
-    run_prediction_analysis
+    compute_transition_metrics
 )
 from hiero_analytics.domain.labels import DIFFICULTY_LEVELS
 from hiero_analytics.plotting.bars import plot_bar
@@ -86,7 +85,10 @@ def run():
     else:
         print("No transitions detected.")
 
-    run_prediction_analysis(gfi_starters)
+    # Save progression data for verification
+    csv_path = repo_data_dir / "contributor_progression.csv"
+    gfi_starters.to_csv(csv_path)
+    print(f"\nDetailed progression data for GFI starters saved to: {csv_path}")
 
     # Visualizations using project utilities
     plot_bar(

@@ -93,6 +93,7 @@ def plot_line(
 
     ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
     ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax.set_ylim(bottom=0)
     ax.set_xlim(float(data[x_col].min()) - 0.15, float(data[x_col].max()) + 0.45)
     ax.margins(x=0.03, y=0.16)
 
@@ -294,6 +295,7 @@ def plot_multiline(
 
     ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
     ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax.set_ylim(bottom=0)
     ax.set_xlim(float(pivot.index.min()) - 0.15, float(pivot.index.max()) + 0.45)
     ax.margins(x=0.03, y=0.16)
 
