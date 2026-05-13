@@ -34,7 +34,10 @@ def compute_progression_stats(df: pd.DataFrame) -> pd.DataFrame:
     progression["max_level"] = progression["levels"].apply(
         lambda lvls: max(lvls, key=lambda l: level_order.get(l, -1))
     )
-    progression["start_level"] = progression["levels"].apply(lambda lvls: lvls[0])
+    # Define start_level as the first non-Unknown level to avoid missing GFI starters
+    progression["start_level"] = progression["levels"].apply(
+        lambda lvls: next((l for l in lvls if l != "Unknown"), lvls[0])
+    )
     progression["tenure_days"] = (progression["last_seen"] - progression["first_seen"]).dt.days
     
     return progression
@@ -51,8 +54,10 @@ def compute_transition_metrics(df: pd.DataFrame) -> pd.DataFrame:
     level_order["Unknown"] = -1
 
     # Deduplicate to one level per PR (highest difficulty) before walking transitions
+    # Filter out 'Unknown' to avoid noise in transitions
     df_sorted = (
-        df.assign(_rank=df["level"].map(lambda l: level_order.get(l, -1)))
+        df[df["level"] != "Unknown"]
+          .assign(_rank=df["level"].map(lambda l: level_order.get(l, -1)))
           .sort_values(["author", "pr_merged_at", "_rank"])
           .drop_duplicates(subset=["author", "pr_number"], keep="last")
           .sort_values(["author", "pr_merged_at"])

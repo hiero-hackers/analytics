@@ -77,9 +77,11 @@ def run():
     for _, row in funnel_df.iterrows():
         print(f"{row['stage']}: {row['count']} ({row['count']/total_gfi*100:.1f}%)")
 
-    # Transition Metrics
-    print("\n--- Level Transition Metrics ---")
-    transitions = compute_transition_metrics(df)
+    # Transition Metrics (only for GFI starters to match funnel)
+    print("\n--- Level Transition Metrics (GFI Starters only) ---")
+    gfi_author_list = gfi_starters.index.tolist()
+    gfi_starter_prs = df[df["author"].isin(gfi_author_list)]
+    transitions = compute_transition_metrics(gfi_starter_prs)
     if not transitions.empty:
         print(transitions.to_string(index=False))
     else:
@@ -115,6 +117,34 @@ def run():
         y_col="contributors",
         title=f"{short_repo}: Contributor Retention by PR Count",
         output_path=repo_charts_dir / "contributor_retention.png"
+    )
+
+    # New Visualization: Level Transitions
+    if not transitions.empty:
+        trans_plot_df = transitions.copy()
+        trans_plot_df["transition"] = trans_plot_df["from"] + " -> " + trans_plot_df["to"]
+        plot_bar(
+            df=trans_plot_df,
+            x_col="transition",
+            y_col="count",
+            title=f"{short_repo}: GFI Starter Level Transitions",
+            output_path=repo_charts_dir / "contributor_transitions.png"
+        )
+
+    # New Visualization: Average Tenure by Max Level reached
+    tenure_by_level = gfi_starters.groupby("max_level")["tenure_days"].mean().reset_index()
+    tenure_by_level = tenure_by_level.rename(columns={"tenure_days": "avg_tenure_days"})
+    # Order by difficulty
+    from hiero_analytics.domain.labels import DIFFICULTY_ORDER
+    tenure_by_level["max_level"] = pd.Categorical(tenure_by_level["max_level"], categories=DIFFICULTY_ORDER, ordered=True)
+    tenure_by_level = tenure_by_level.sort_values("max_level")
+
+    plot_bar(
+        df=tenure_by_level,
+        x_col="max_level",
+        y_col="avg_tenure_days",
+        title=f"{short_repo}: Avg Tenure (Days) by Max Level Reached",
+        output_path=repo_charts_dir / "avg_tenure_by_level.png"
     )
 
 if __name__ == "__main__":
