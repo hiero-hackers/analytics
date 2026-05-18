@@ -26,9 +26,9 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-mirror-node-explorer** | 6 | 0 | 0 |
 | **hiero-sdk-cpp** | 13 | 2 | 0 |
 | **hiero-sdk-go** | 5 | 0 | 0 |
-| **hiero-sdk-java** | 9 | 0 | 0 |
+| **hiero-sdk-java** | 10 | 0 | 0 |
 | **hiero-sdk-js** | 21 | 3 | 0 |
-| **hiero-sdk-python** | 30 | 3 | 7 |
+| **hiero-sdk-python** | 31 | 3 | 7 |
 | **hiero-sdk-rust** | 9 | 0 | 0 |
 | **hiero-sdk-swift** | 2 | 0 | 0 |
 | **hiero-sdk-tck** | 8 | 2 | 0 |
