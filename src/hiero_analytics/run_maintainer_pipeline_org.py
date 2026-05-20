@@ -29,7 +29,7 @@ def main() -> None:
     repo_role_lookup = build_repo_role_lookup(gov_config)
 
     client = GitHubClient()
-    records = fetch_org_contributor_activity_graphql(client, org=ORG)
+    records = fetch_org_contributor_activity_graphql(client, org=ORG, lookback_days=None)
 
     print(f"Fetched {len(records)} contributor activity records")
 

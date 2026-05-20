@@ -573,7 +573,7 @@ def _fetch_repo_pull_request_activity_graphql(
     client: GitHubClient,
     owner: str,
     repo: str,
-    cutoff: datetime,
+    cutoff: datetime | None,
 ) -> list[ContributorActivityRecord]:
     """Fetch contributor activity signals from pull request lifecycle data."""
     contributor_activity_query = load_query("contributor_activity")
@@ -600,7 +600,7 @@ def _fetch_repo_issue_activity_graphql(
     client: GitHubClient,
     owner: str,
     repo: str,
-    cutoff: datetime,
+    cutoff: datetime | None,
 ) -> list[ContributorActivityRecord]:
     """Fetch contributor activity signals from recently opened issues."""
     contributor_issue_activity_query = load_query("contributor_issue_activity")
@@ -618,7 +618,7 @@ def _fetch_repo_issue_activity_graphql(
 
         for node in nodes:
             created_at = _parse_graphql_datetime(node.get("createdAt"))
-            if created_at is not None and created_at < cutoff:
+            if cutoff is not None and created_at is not None and created_at < cutoff:
                 page_has_older_issues = True
 
             records.extend(
@@ -643,7 +643,7 @@ def fetch_repo_contributor_activity_graphql(
     owner: str,
     repo: str,
     *,
-    lookback_days: int = 183,
+    lookback_days: int | None = 183,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,
     refresh: bool = False
@@ -653,6 +653,9 @@ def fetch_repo_contributor_activity_graphql(
     Issue activity (issues opened by a contributor) and pull request
     activity (PRs authored, reviewed, or merged) are combined into a
     single stream of ``ContributorActivityRecord`` instances.
+
+    When ``lookback_days`` is *None* all historical activity
+    is returned, which is required for stable yearly aggregate charts.
 
     Signals include:
     - authored_issue (issues opened within the lookback window)
@@ -679,7 +682,11 @@ def fetch_repo_contributor_activity_graphql(
     if cached is not None:
         return cached
 
-    cutoff = datetime.now(UTC) - timedelta(days=lookback_days)
+    cutoff = (
+        datetime.now(UTC) - timedelta(days=lookback_days)
+        if lookback_days is not None
+        else None
+    )
     records = [
         *_fetch_repo_pull_request_activity_graphql(client, owner, repo, cutoff),
         *_fetch_repo_issue_activity_graphql(client, owner, repo, cutoff),
@@ -701,12 +708,17 @@ def fetch_org_contributor_activity_graphql(
     max_workers: int = 5,
     *,
     repos: list[str] | None = None,
-    lookback_days: int = 183,
+    lookback_days: int | None = 183,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,
     refresh: bool = False
     ) -> list[ContributorActivityRecord]:
-    """Fetch contributor activity records across all repositories in an organization."""
+    """Fetch contributor activity records across all repositories in an organization.
+
+    Pass ``lookback_days=None`` to retrieve the full history, which is
+    necessary for yearly aggregation charts where past counts must remain
+    stable across refreshes.
+    """
     def fetch_func(repo):
         """Fetch contributor activity for a repository."""
         return fetch_repo_contributor_activity_graphql(client, repo.owner, repo.name, lookback_days=lookback_days, **_cache_kwargs(use_cache, cache_ttl_seconds, refresh))

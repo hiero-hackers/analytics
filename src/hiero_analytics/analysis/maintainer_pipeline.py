@@ -7,6 +7,8 @@ aggregated pipeline tables for yearly and repository-level views.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 import pandas as pd
 
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -25,7 +27,11 @@ def activity_to_role_dataframe(
     records: list[ContributorActivityRecord],
     repo_role_lookup: dict[str, dict[str, str]],
 ) -> pd.DataFrame:
-    """Classify each contributor activity record by governance role."""
+    """Classify each contributor activity record by governance role.
+
+    Includes ``occurred_at`` so downstream aggregations can apply per-year
+    activity windows without re-fetching.
+    """
     rows = []
 
     for record in records:
@@ -36,28 +42,82 @@ def activity_to_role_dataframe(
         actor_key = record.actor.strip().lower()
         role = repo_role_lookup.get(repo_name, {}).get(actor_key, "general_user")
 
+        # Normalize to UTC so downstream window comparisons never hit
+        # a naive-vs-aware mismatch.
+        occurred_at = record.occurred_at
+        if occurred_at.tzinfo is None:
+            occurred_at = occurred_at.replace(tzinfo=timezone.utc)
+        else:
+            occurred_at = occurred_at.astimezone(timezone.utc)
+
         rows.append(
             {
                 "repo": repo_name,
                 "actor": record.actor,
-                "year": record.occurred_at.year,
+                "occurred_at": occurred_at,
+                "year": occurred_at.year,
                 "stage": role,
             }
         )
 
     if not rows:
-        return pd.DataFrame(columns=["repo", "actor", "year", "stage"])
+        return pd.DataFrame(columns=["repo", "actor", "occurred_at", "year", "stage"])
 
     return pd.DataFrame(rows)
 
 
-def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
-    """Build yearly contributor counts for each observed PR and issue activity stage."""
+def _active_window_for_year(
+    year: int, today: datetime, window_days: int = 183
+) -> tuple[datetime, datetime]:
+    """Return the (start, end) activity window for a given year.
+
+    Completed years use a fixed H2 window (Jul 1 – Dec 31) so historical
+    counts never change on refresh.  The current year uses a trailing
+    ``window_days``-day window ending today.
+    """
+    if year < today.year:
+        # Past year: fixed last-6-months window, immune to re-run date.
+        window_start = datetime(year, 7, 1, tzinfo=timezone.utc)
+        window_end = datetime(year, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+    else:
+        # Current year: trailing window from today.
+        window_end = today
+        window_start = today - timedelta(days=window_days)
+
+    return window_start, window_end
+
+
+def build_maintainer_yearly_pipeline(
+    stage_df: pd.DataFrame,
+    *,
+    active_window_days: int = 183,
+) -> pd.DataFrame:
+    """Build yearly contributor counts per PR and issue activity stage.
+
+    Only counts contributors active in the last 6 months of each year.
+    Past years use a fixed H2 window (stable across refreshes); the current
+    year uses a trailing ``active_window_days``-day window from today.
+    """
     if stage_df.empty:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
 
+    today = datetime.now(timezone.utc)
+    years = stage_df["year"].unique()
+
+    filtered_frames: list[pd.DataFrame] = []
+    for year in sorted(years):
+        window_start, window_end = _active_window_for_year(year, today, active_window_days)
+        mask = (
+            (stage_df["year"] == year)
+            & (stage_df["occurred_at"] >= window_start)
+            & (stage_df["occurred_at"] <= window_end)
+        )
+        filtered_frames.append(stage_df.loc[mask])
+
+    active_df = pd.concat(filtered_frames, ignore_index=True) if filtered_frames else stage_df.iloc[0:0]
+
     yearly = (
-        stage_df.groupby(["year", "stage"])["actor"]
+        active_df.groupby(["year", "stage"])["actor"]
         .nunique()
         .unstack(fill_value=0)
         .reindex(columns=STAGE_COLUMNS, fill_value=0)
@@ -68,13 +128,28 @@ def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
     return yearly.astype({column: int for column in STAGE_COLUMNS})
 
 
-def build_maintainer_repo_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
-    """Build repository-level contributor counts for each observed PR and issue activity stage."""
+def build_maintainer_repo_pipeline(
+    stage_df: pd.DataFrame,
+    *,
+    active_window_days: int = 183,
+) -> pd.DataFrame:
+    """Build repository-level active contributor counts per governance stage.
+
+    Only counts contributors active within the trailing ``active_window_days``
+    window ending today, so the chart reflects current engagement rather than
+    all-time history.
+    """
     if stage_df.empty:
         return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
 
+    cutoff = datetime.now(timezone.utc) - timedelta(days=active_window_days)
+    active_df = stage_df[stage_df["occurred_at"] >= cutoff]
+
+    if active_df.empty:
+        return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
+
     by_repo = (
-        stage_df.groupby(["repo", "stage"])["actor"]
+        active_df.groupby(["repo", "stage"])["actor"]
         .nunique()
         .unstack(fill_value=0)
         .reindex(columns=STAGE_COLUMNS, fill_value=0)
