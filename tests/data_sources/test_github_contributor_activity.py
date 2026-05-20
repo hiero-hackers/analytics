@@ -25,6 +25,7 @@ def bypass_pagination(monkeypatch):
 
 
 def _to_iso(value: datetime) -> str:
+    """Format a datetime as a GitHub-style ISO 8601 string."""
     return value.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
@@ -146,6 +147,63 @@ def test_fetch_repo_issue_activity_graphql_stops_after_older_issue(mock_client):
     assert records[0].actor == "dana"
     assert mock_client.graphql.call_count == 1
 
+
+def test_lookback_days_none_includes_old_activity(mock_client, bypass_pagination):
+    """When lookback_days is None all historical records should be returned."""
+    old_date = _to_iso(datetime(2023, 1, 15, tzinfo=UTC))
+
+    pr_response = {
+        "data": {
+            "repository": {
+                "pullRequests": {
+                    "nodes": [
+                        {
+                            "number": 1,
+                            "createdAt": old_date,
+                            "updatedAt": old_date,
+                            "mergedAt": old_date,
+                            "author": {"login": "alice"},
+                            "mergedBy": {"login": "bob"},
+                            "reviews": {"nodes": []},
+                        }
+                    ],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+    }
+    empty_issues_response = {
+        "data": {
+            "repository": {
+                "issues": {
+                    "nodes": [],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+    }
+
+    # Each fetch_repo call triggers two GraphQL calls (PRs + issues).
+    mock_client.graphql.side_effect = [
+        pr_response, empty_issues_response,  # lookback_days=30
+        pr_response, empty_issues_response,  # lookback_days=None
+    ]
+
+    # With a short lookback the old PR should be filtered out
+    records_limited = ingest.fetch_repo_contributor_activity_graphql(
+        mock_client, "org", "repo", lookback_days=30, use_cache=False,
+    )
+    assert len(records_limited) == 0
+
+    # With lookback_days=None all history is included
+    records_all = ingest.fetch_repo_contributor_activity_graphql(
+        mock_client, "org", "repo", lookback_days=None, use_cache=False,
+    )
+    assert len(records_all) == 2  # authored + merged
+    assert {r.activity_type for r in records_all} == {
+        "authored_pull_request",
+        "merged_pull_request",
+    }
 
 def test_fetch_org_contributor_activity_graphql(monkeypatch, mock_client):
     """Test fetching organization contributor activity."""
