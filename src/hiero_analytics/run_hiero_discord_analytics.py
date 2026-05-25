@@ -29,26 +29,12 @@ import os
 from datetime import date
 from pathlib import Path
 
-import matplotlib.dates as mdates
 import pandas as pd
 
-from hiero_analytics.config.charts import (
-    ANNOTATION_FONT_SIZE,
-    ENDPOINT_LABEL_BOX_STYLE,
-    FIGURE_BACKGROUND_COLOR,
-    FONT_WEIGHT_SEMIBOLD,
-    LEGEND_EDGE_COLOR,
-    LINE_FILL_ALPHA,
-    LINE_MARKER_EDGE_WIDTH,
-    LINE_MARKER_SIZE,
-    LINE_WIDTH,
-    MUTED_HISTORICAL_COLOR,
-    PRIMARY_PALETTE,
-    TITLE_COLOR,
-)
+from hiero_analytics.config.charts import MUTED_HISTORICAL_COLOR, PRIMARY_PALETTE
 from hiero_analytics.config.paths import INPUTS_DIR, ensure_org_dirs
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
-from hiero_analytics.plotting.base import create_figure, finalize_chart
+from hiero_analytics.plotting.lines import plot_date_line
 
 ORG = "hiero-ledger"
 
@@ -138,63 +124,12 @@ def plot_category_breakdown(channels: pd.DataFrame, output_path: Path) -> None:
 
 def plot_monthly_traffic(series: pd.DataFrame, output_path: Path) -> None:
     """Monthly message volume as a date-aware line chart with fill."""
-    fig, ax = create_figure()
-    color = PRIMARY_PALETTE[2]
-
-    ax.plot(
-        series["month"],
-        series["messages"],
-        marker="o",
-        color=color,
-        linewidth=LINE_WIDTH,
-        markersize=LINE_MARKER_SIZE,
-        markeredgecolor=FIGURE_BACKGROUND_COLOR,
-        markeredgewidth=LINE_MARKER_EDGE_WIDTH,
-        solid_capstyle="round",
-        zorder=3,
-    )
-    ax.fill_between(series["month"], series["messages"], 0, color=color, alpha=LINE_FILL_ALPHA, zorder=2)
-
-    # Annotate peak month and the most recent month so the growth story reads
-    # at a glance without crowding every marker.
-    peak_idx = int(series["messages"].idxmax())
-    latest_idx = len(series) - 1
-    for idx in {peak_idx, latest_idx}:
-        row = series.iloc[idx]
-        label_text = f"{row['month']:%b %Y}: {int(row['messages'])}"
-        ax.annotate(
-            label_text,
-            xy=(row["month"], row["messages"]),
-            xytext=(0, 14),
-            textcoords="offset points",
-            ha="center",
-            va="bottom",
-            fontsize=ANNOTATION_FONT_SIZE,
-            color=TITLE_COLOR,
-            fontweight=FONT_WEIGHT_SEMIBOLD,
-            bbox={
-                "boxstyle": ENDPOINT_LABEL_BOX_STYLE,
-                "facecolor": FIGURE_BACKGROUND_COLOR,
-                "edgecolor": LEGEND_EDGE_COLOR,
-                "linewidth": 0.9,
-            },
-            zorder=4,
-        )
-
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
-    ax.margins(x=0.02, y=0.18)
-    ax.set_ylim(0, float(series["messages"].max()) * 1.25)
-
-    finalize_chart(
-        fig=fig,
-        ax=ax,
+    plot_date_line(
+        series,
+        x_col="month",
+        y_col="messages",
         title="Hiero Discord — Monthly message volume (Sept 2024 → May 2026)",
-        xlabel="month",
-        ylabel="messages",
         output_path=output_path,
-        rotate_x=30,
-        grid_axis="y",
     )
 
 
