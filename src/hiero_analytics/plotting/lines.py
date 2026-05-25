@@ -124,7 +124,11 @@ def plot_date_line(
     """
     df = prepare_dataframe(df, x_col, y_col)
     data = df.sort_values(x_col).copy()
-    data[x_col] = pd.to_datetime(data[x_col])
+    data[x_col] = pd.to_datetime(data[x_col], errors="coerce")
+    data = data.dropna(subset=[x_col])
+
+    if data.empty:
+        raise ValueError("No valid datetime x-axis values")
 
     fig, ax = create_figure()
     color = PRIMARY_PALETTE[2]
@@ -144,7 +148,7 @@ def plot_date_line(
     ax.fill_between(data[x_col], data[y_col], 0, color=color, alpha=LINE_FILL_ALPHA, zorder=2)
 
     if annotate_peak_and_latest:
-        peak_idx = int(data[y_col].idxmax())
+        peak_idx = data[y_col].idxmax()
         latest_idx = data.index[-1]
         # Use a set so peak == latest only renders one badge.
         for idx in {peak_idx, latest_idx}:
@@ -172,7 +176,9 @@ def plot_date_line(
     ax.xaxis.set_major_locator(mdates.MonthLocator(interval=month_interval))
     ax.xaxis.set_major_formatter(mdates.DateFormatter(date_format))
     ax.margins(x=DATE_LINE_X_MARGIN, y=DATE_LINE_Y_MARGIN)
-    ax.set_ylim(0, float(data[y_col].max()) * DATE_LINE_Y_HEADROOM)
+    # Guard against singular ylim (and matplotlib's warning) on all-zero series.
+    max_y = float(data[y_col].max())
+    ax.set_ylim(0, max_y * DATE_LINE_Y_HEADROOM if max_y > 0 else 1.0)
 
     finalize_chart(
         fig=fig,
