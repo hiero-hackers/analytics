@@ -19,13 +19,13 @@ import hiero_analytics.run_hiero_discord_analytics as runner
 # --------------------------------------------------------------------------- #
 
 CHANNELS_CSV_TEXT = (
-    "channel,last_message,d30,d90,d365,total,category\n"
-    "hiero-sdk-python,2026-05-11,87,125,322,483,SDKs\n"
-    "hiero-general,2026-05-10,95,124,160,200,Community\n"
-    "hiero-sdk-cpp,2026-05-10,27,29,55,56,SDKs\n"
-    "hiero-website,2026-04-28,15,56,155,155,Community\n"
-    "hiero-sdk-java,2026-02-02,0,0,4,8,SDKs\n"        # excluded by d30>0 filter
-    "hiero-hips,2026-02-09,0,0,4,9,Governance\n"      # excluded by d30>0 filter
+    "channel,last_message,d30,d90,d365,total\n"
+    "hiero-sdk-python,2026-05-11,87,125,322,483\n"
+    "hiero-general,2026-05-10,95,124,160,200\n"
+    "hiero-sdk-cpp,2026-05-10,27,29,55,56\n"
+    "hiero-website,2026-04-28,15,56,155,155\n"
+    "hiero-sdk-java,2026-02-02,0,0,4,8\n"        # excluded by d30>0 filter
+    "hiero-hips,2026-02-09,0,0,4,9\n"            # excluded by d30>0 filter
 )
 
 # Intentionally unsorted to verify load_monthly_df sorts ascending.
@@ -60,14 +60,51 @@ def monthly_csv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 # Loader tests
 # --------------------------------------------------------------------------- #
 
-def test_load_channels_df_reads_csv_and_derives_label(channels_csv: Path) -> None:
+def test_load_channels_df_reads_csv_and_derives_label_and_category(channels_csv: Path) -> None:
     df = runner.load_channels_df()
 
-    # All committed columns plus the derived label.
+    # All CSV columns plus the derived label and (auto-derived) category.
     expected = {"channel", "last_message", "d30", "d90", "d365", "total", "category", "channel_label"}
     assert expected.issubset(df.columns)
     assert len(df) == 6
     assert df.loc[df["channel"] == "hiero-sdk-python", "channel_label"].iloc[0] == "#hiero-sdk-python"
+    # Category is derived from the channel name, not the CSV.
+    assert df.loc[df["channel"] == "hiero-sdk-python", "category"].iloc[0] == "SDKs"
+    assert df.loc[df["channel"] == "hiero-general", "category"].iloc[0] == "Community"
+    assert df.loc[df["channel"] == "hiero-hips", "category"].iloc[0] == "Governance"
+
+
+@pytest.mark.parametrize(
+    "channel, expected",
+    [
+        # Identity wins over SDKs when both keywords appear.
+        ("hiero-did-sdk-js", "Identity"),
+        ("hiero-did-sdk-python", "Identity"),
+        ("hiero-identity-collaboration-hub", "Identity"),
+        ("heka-identity-platform", "Identity"),
+        # Plain SDK channels.
+        ("hiero-sdk-python", "SDKs"),
+        ("hiero-sdk-cpp", "SDKs"),
+        ("hiero-enterprise-java", "SDKs"),
+        ("hiero-sdk-v3-playground", "SDKs"),
+        # Governance / Core / Tooling sentinels.
+        ("hiero-maintainers", "Governance"),
+        ("hiero-hips", "Governance"),
+        ("hiero-community-management", "Governance"),
+        ("hiero-consensus-node", "Core"),
+        ("hiero-mirror-node", "Core"),
+        ("solo", "Tooling"),
+        ("hiero-solo-action", "Tooling"),
+        # Community fallback.
+        ("hiero-general", "Community"),
+        ("hiero-website", "Community"),
+        ("hiero-gfi", "Community"),
+        ("hedera-dev-announcements-xp", "Community"),
+        ("some-future-channel", "Community"),
+    ],
+)
+def test_categorize_channel_maps_known_channels(channel: str, expected: str) -> None:
+    assert runner._categorize_channel(channel) == expected
 
 
 def test_load_channels_df_raises_when_missing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -13,7 +13,9 @@ The raw counts are not committed. Two CSVs are read from
 ``inputs/`` by default (the directory is gitignored):
 
 - ``hiero_discord_channels.csv`` — per-channel snapshot with columns
-  ``channel,last_message,d30,d90,d365,total,category``
+  ``channel,last_message,d30,d90,d365,total``. Category is derived from the
+  channel name by ``_categorize_channel``; any ``category`` column in the
+  CSV is ignored.
 - ``hiero_discord_monthly_traffic.csv`` — monthly volume with columns
   ``month,messages``
 
@@ -52,8 +54,43 @@ def _resolve_path(env_var: str, default: Path) -> Path:
     return Path(override).expanduser() if override else default
 
 
+def _categorize_channel(channel: str) -> str:
+    """Map a Discord channel name to its Hiero topic area.
+
+    Identity channels often contain ``-sdk-`` too (e.g. ``hiero-did-sdk-js``),
+    so identity rules win first. SDK / governance / core / tooling keywords
+    are checked next, with anything unmatched bucketed as Community.
+    """
+    name = channel.lower()
+    if "-did-" in name or "-identity-" in name or name.startswith("heka"):
+        return "Identity"
+    if (
+        "-sdk-" in name
+        or name.endswith("-sdk")
+        or "enterprise-java" in name
+        or "playground" in name
+    ):
+        return "SDKs"
+    if (
+        name.endswith("-maintainers")
+        or name.endswith("-hips")
+        or name.endswith("-community-management")
+    ):
+        return "Governance"
+    if name.endswith("-consensus-node") or name.endswith("-mirror-node"):
+        return "Core"
+    if name == "solo" or name.endswith("-solo-action"):
+        return "Tooling"
+    return "Community"
+
+
 def load_channels_df() -> pd.DataFrame:
-    """Load the per-channel snapshot from local CSV (never committed)."""
+    """Load the per-channel snapshot from local CSV (never committed).
+
+    Any ``category`` column in the CSV is replaced by the deterministic
+    result of ``_categorize_channel`` so fresh exports don't need manual
+    re-categorisation.
+    """
     path = _resolve_path("HIERO_DISCORD_CHANNELS_CSV", DEFAULT_CHANNELS_CSV)
     if not path.exists():
         raise FileNotFoundError(
@@ -62,6 +99,7 @@ def load_channels_df() -> pd.DataFrame:
         )
     df = pd.read_csv(path)
     df["channel_label"] = "#" + df["channel"]
+    df["category"] = df["channel"].apply(_categorize_channel)
     return df
 
 
