@@ -9,13 +9,14 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **heka-identity-platform** | 0 | 7 | 0 |
 | **hiero-block-node** | 20 | 0 | 1 |
 | **hiero-cli** | 5 | 1 | 0 |
-| **hiero-consensus-node** | 150 | 0 | 2 |
+| **hiero-consensus-node** | 151 | 0 | 2 |
 | **hiero-consensus-specifications** | 0 | 1 | 0 |
 | **hiero-contracts** | 9 | 1 | 0 |
+| **hiero-cryptography** | 8 | 1 | 1 |
 | **hiero-did-sdk-js** | 3 | 1 | 0 |
 | **hiero-did-sdk-python** | 0 | 7 | 0 |
 | **hiero-docs** | 0 | 1 | 0 |
-| **hiero-enterprise-java** | 0 | 4 | 1 |
+| **hiero-enterprise-java** | 0 | 7 | 1 |
 | **hiero-ethereum-execution-spec-tests** | 11 | 14 | 0 |
 | **hiero-gradle-conventions** | 4 | 0 | 0 |
 | **hiero-hederium** | 0 | 5 | 0 |
@@ -28,7 +29,7 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-sdk-go** | 5 | 0 | 0 |
 | **hiero-sdk-java** | 10 | 0 | 0 |
 | **hiero-sdk-js** | 21 | 3 | 0 |
-| **hiero-sdk-python** | 31 | 3 | 7 |
+| **hiero-sdk-python** | 33 | 3 | 7 |
 | **hiero-sdk-rust** | 9 | 0 | 0 |
 | **hiero-sdk-swift** | 2 | 0 | 0 |
 | **hiero-sdk-tck** | 8 | 2 | 0 |

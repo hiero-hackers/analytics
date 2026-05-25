@@ -17,6 +17,7 @@
 | hiero-mirror-node-explorer | ✅ |
 | hiero-sdk-tck | ❌ |
 | hiero-sdk-cpp | ✅ |
+| hiero-cryptography | ✅ |
 | solo | ✅ |
 | hiero-block-node | ✅ |
 | hiero-solo-action | ❌ |
@@ -35,7 +36,7 @@
 | hiero-did-sdk-js | ❌ |
 | homebrew-tools | ❌ |
 | hiero-identity-standards | ❌ |
-| hiero-enterprise-java | ❌ |
+| hiero-enterprise-java | ✅ |
 | identity-collaboration-hub | ✅ |
 | hiero-contracts | ✅ |
 | hiero-consensus-specifications | ✅ |
