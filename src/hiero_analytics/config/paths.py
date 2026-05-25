@@ -20,6 +20,10 @@ SRC = PROJECT_ROOT / "src" / "hiero_analytics"
 
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 
+# Local-only directory for raw/manual input data (Discord exports, etc.).
+# Gitignored — never commit the contents.
+INPUTS_DIR = PROJECT_ROOT / "inputs"
+
 DATA_DIR = OUTPUTS_DIR / "data"
 CHARTS_DIR = OUTPUTS_DIR / "charts"
 

@@ -9,7 +9,15 @@ import matplotlib.ticker as ticker
 import pandas as pd
 from matplotlib.patches import Patch
 
-from hiero_analytics.config.charts import FIGURE_BACKGROUND_COLOR, PLOT_BACKGROUND_COLOR, PRIMARY_PALETTE
+from hiero_analytics.config.charts import (
+    FIGURE_BACKGROUND_COLOR,
+    LINE_FILL_ALPHA,
+    LINE_MARKER_EDGE_WIDTH,
+    LINE_MARKER_SIZE,
+    LINE_WIDTH,
+    PLOT_BACKGROUND_COLOR,
+    PRIMARY_PALETTE,
+)
 
 from .base import create_figure, finalize_chart, prepare_dataframe
 from .primitives import annotate_endpoint_badge, build_palette, format_chart_value, is_numeric_or_datetime
@@ -41,10 +49,10 @@ def plot_line(
         data[y_col],
         marker="o",
         color=PRIMARY_PALETTE[2],
-        linewidth=2.6,
-        markersize=7,
+        linewidth=LINE_WIDTH,
+        markersize=LINE_MARKER_SIZE,
         markeredgecolor=FIGURE_BACKGROUND_COLOR,
-        markeredgewidth=2,
+        markeredgewidth=LINE_MARKER_EDGE_WIDTH,
         solid_capstyle="round",
         zorder=3,
     )
@@ -53,7 +61,7 @@ def plot_line(
         data[y_col],
         0,
         color=PRIMARY_PALETTE[2],
-        alpha=0.08,
+        alpha=LINE_FILL_ALPHA,
         zorder=2,
     )
     annotate_endpoint_badge(
@@ -151,9 +159,9 @@ def plot_multiline(
             label=str(column),
             color=color,
             linewidth=3 if is_total else 2.4,
-            markersize=7,
+            markersize=LINE_MARKER_SIZE,
             markeredgecolor=FIGURE_BACKGROUND_COLOR,
-            markeredgewidth=2,
+            markeredgewidth=LINE_MARKER_EDGE_WIDTH,
             solid_capstyle="round",
             zorder=3,
         )
@@ -165,7 +173,7 @@ def plot_multiline(
                 series,
                 0,
                 color=color,
-                alpha=0.08,
+                alpha=LINE_FILL_ALPHA,
                 zorder=2,
             )
         annotate_endpoint_badge(

@@ -38,3 +38,6 @@ uv.lock
 pdm.lock
 pubkey.asc
 outputs/cache/
+
+# Local-only input data (Discord exports, etc.)
+inputs/

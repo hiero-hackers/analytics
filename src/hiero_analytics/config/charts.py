@@ -54,6 +54,18 @@ LEGEND_BOX_STYLE = "round,pad=0.35,rounding_size=1.4"
 ENDPOINT_LABEL_BOX_STYLE = "round,pad=0.28,rounding_size=0.8"
 
 # --------------------------------------------------
+# Line / time-series styling
+# --------------------------------------------------
+LINE_WIDTH: float = 2.6
+LINE_MARKER_SIZE: int = 7
+LINE_MARKER_EDGE_WIDTH: int = 2
+LINE_FILL_ALPHA: float = 0.08
+
+# Muted neutral used to background "earlier" / context series so the
+# accent color carries the eye to the recent / live portion of a chart.
+MUTED_HISTORICAL_COLOR = "#CBD5E1"
+
+# --------------------------------------------------
 # Donut / pie styling
 # --------------------------------------------------
 DONUT_START_ANGLE = 110
