@@ -162,11 +162,13 @@ def plot_category_breakdown(channels: pd.DataFrame, output_path: Path) -> None:
 
 def plot_monthly_traffic(series: pd.DataFrame, output_path: Path) -> None:
     """Monthly message volume as a date-aware line chart with fill."""
+    start = series["month"].min().strftime("%b %Y")
+    end = series["month"].max().strftime("%b %Y")
     plot_date_line(
         series,
         x_col="month",
         y_col="messages",
-        title="Hiero Discord — Monthly message volume (Sept 2024 → May 2026)",
+        title=f"Hiero Discord — Monthly message volume ({start} → {end})",
         output_path=output_path,
     )
 
