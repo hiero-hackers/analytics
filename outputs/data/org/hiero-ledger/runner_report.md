@@ -37,7 +37,7 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-website** | 0 | 2 | 0 |
 | **homebrew-tools** | 1 | 0 | 3 |
 | **identity-collaboration-hub** | 2 | 0 | 0 |
-| **solo** | 26 | 3 | 2 |
+| **solo** | 28 | 3 | 2 |
 | **solo-docs** | 1 | 0 | 0 |
 | **tsc** | 1 | 0 | 0 |
 
