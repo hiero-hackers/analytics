@@ -162,6 +162,78 @@ def test_labeled_within_window_qualifies():
     assert result == {("org/repo", 1)}
 
 
+def test_label_applied_before_window_does_not_qualify():
+    """A still-active label applied *before* the cutoff must be excluded.
+
+    Regression: with full-history timeline events, an old open issue that still
+    carries a difficulty label would otherwise be counted as "labeled in the
+    last 30 days" even though the label was applied long ago.
+    """
+    issues = [_issue(1, created_at=CUTOFF - timedelta(days=200), labels=["good first issue"])]
+    events = [
+        _event(1, "labeled", occurred_at=CUTOFF - timedelta(days=150), label="good first issue"),
+    ]
+
+    result = issues_labeled_since(issues, events, CUTOFF, DIFFICULTY_LEVELS)
+
+    assert result == set()
+
+
+def test_label_applied_exactly_at_cutoff_qualifies():
+    """The cutoff boundary is inclusive (applied_at == cutoff qualifies)."""
+    issues = [_issue(1, created_at=CUTOFF - timedelta(days=10), labels=["beginner"])]
+    events = [_event(1, "labeled", occurred_at=CUTOFF, label="beginner")]
+
+    result = issues_labeled_since(issues, events, CUTOFF, DIFFICULTY_LEVELS)
+
+    assert result == {("org/repo", 1)}
+
+
+def test_label_applied_one_microsecond_before_cutoff_excluded():
+    """Just outside the window (a microsecond early) must not qualify."""
+    issues = [_issue(1, created_at=CUTOFF - timedelta(days=10), labels=["beginner"])]
+    events = [_event(1, "labeled", occurred_at=CUTOFF - timedelta(microseconds=1), label="beginner")]
+
+    result = issues_labeled_since(issues, events, CUTOFF, DIFFICULTY_LEVELS)
+
+    assert result == set()
+
+
+def test_relabel_within_window_after_earlier_removal_qualifies():
+    """A label removed then re-added in-window qualifies via the newer event, not the original."""
+    issues = [_issue(1, created_at=CUTOFF - timedelta(days=300), labels=["beginner"])]
+    events = [
+        _event(1, "labeled", occurred_at=CUTOFF - timedelta(days=200), label="beginner"),
+        _event(1, "unlabeled", occurred_at=CUTOFF - timedelta(days=180), label="beginner"),
+        _event(1, "labeled", occurred_at=CUTOFF + timedelta(days=3), label="beginner"),
+    ]
+
+    result = issues_labeled_since(issues, events, CUTOFF, DIFFICULTY_LEVELS)
+
+    assert result == {("org/repo", 1)}
+
+
+def test_naive_cutoff_is_normalized():
+    """A timezone-naive cutoff is normalized to UTC rather than raising."""
+    naive_cutoff = datetime(2026, 5, 4)  # noqa: DTZ001 - deliberately naive for the test
+    issues = [_issue(1, created_at=datetime(2026, 4, 24, tzinfo=UTC), labels=["beginner"])]
+    events = [_event(1, "labeled", occurred_at=datetime(2026, 5, 6, tzinfo=UTC), label="beginner")]
+
+    result = issues_labeled_since(issues, events, naive_cutoff, DIFFICULTY_LEVELS)
+
+    assert result == {("org/repo", 1)}
+
+
+def test_event_label_matching_is_case_insensitive():
+    """A mixed-case event label still matches the lower-cased difficulty specs."""
+    issues = [_issue(1, created_at=CUTOFF - timedelta(days=10), labels=["Good First Issue"])]
+    events = [_event(1, "labeled", occurred_at=CUTOFF + timedelta(days=2), label="Good First Issue")]
+
+    result = issues_labeled_since(issues, events, CUTOFF, DIFFICULTY_LEVELS)
+
+    assert result == {("org/repo", 1)}
+
+
 def test_label_then_unlabeled_does_not_qualify():
     """A label added then removed leaves no active difficulty label."""
     issues = [_issue(1, created_at=CUTOFF - timedelta(days=10), labels=[])]

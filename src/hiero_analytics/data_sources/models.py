@@ -140,6 +140,57 @@ class IssueTimelineEventRecord:
             label=label_name,
         )
 
+    @classmethod
+    def from_github_node(cls, node: dict, context: dict) -> list[IssueTimelineEventRecord]:
+        """Hydrate label add/remove events from a GraphQL issue node's timelineItems.
+
+        Each issue node carries a ``timelineItems`` connection filtered to
+        ``LABELED_EVENT``/``UNLABELED_EVENT``; this expands it into one record
+        per event, matching the normalization of :meth:`from_rest_event`
+        (lower-cased event type and label name).
+        """
+        owner = context.get("owner", "")
+        repo = context.get("repo", "")
+        full_repo = f"{owner}/{repo}" if owner and repo else ""
+
+        issue_number = node.get("number")
+        if not isinstance(issue_number, int):
+            return []
+
+        type_map = {"LabeledEvent": "labeled", "UnlabeledEvent": "unlabeled"}
+        records: list[IssueTimelineEventRecord] = []
+
+        for item in node.get("timelineItems", {}).get("nodes", []):
+            if not isinstance(item, Mapping):
+                continue
+
+            event_type = type_map.get(item.get("__typename"))
+            if event_type is None:
+                continue
+
+            occurred_at = _parse_dt(item.get("createdAt"))
+            if occurred_at is None:
+                continue
+
+            label_name: str | None = None
+            label_node = item.get("label")
+            if isinstance(label_node, Mapping):
+                raw_label = label_node.get("name")
+                if isinstance(raw_label, str):
+                    label_name = raw_label.lower()
+
+            records.append(
+                cls(
+                    repo=full_repo,
+                    issue_number=issue_number,
+                    event_type=event_type,
+                    occurred_at=occurred_at,
+                    label=label_name,
+                )
+            )
+
+        return records
+
 
 @dataclass(frozen=True)
 class PullRequestDifficultyRecord(BaseRecord):

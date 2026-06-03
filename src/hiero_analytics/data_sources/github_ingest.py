@@ -254,6 +254,66 @@ def fetch_org_issues_graphql(
     )
 
 
+def fetch_repo_issue_label_events_graphql(
+    client: GitHubClient,
+    owner: str,
+    repo: str,
+    states: list[str] | None = None,
+    *,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    refresh: bool = False,
+) -> list[IssueTimelineEventRecord]:
+    """Fetch label add/remove events for a repo's issues via GraphQL ``timelineItems``.
+
+    Unlike the repo-wide ``/issues/events`` REST endpoint (which streams every
+    event type for every issue and is page-capped), this requests only
+    ``LABELED_EVENT``/``UNLABELED_EVENT`` items inline with the issue list, so it
+    transfers a fraction of the data, never truncates, and is cached on a stable
+    key (owner/repo/states) rather than a per-run ``since`` timestamp.
+    """
+    query = load_query("issue_label_events")
+    norm_states = [s.upper() for s in states] if states else None
+    return fetch_github_resource(
+        client,
+        query,
+        {"owner": owner, "repo": repo, "states": norm_states},
+        IssueTimelineEventRecord,
+        ["repository", "issues"],
+        cache_key="repo_issue_label_events",
+        cache_scope=f"{owner}_{repo}",
+        cache_parameters={"owner": owner, "repo": repo, "states": sorted(norm_states or [])},
+        context_builder=lambda _node: {"owner": owner, "repo": repo},
+        **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+    )
+
+
+def fetch_org_issue_label_events_graphql(
+    client: GitHubClient,
+    org: str,
+    states: list[str] | None = None,
+    max_workers: int = 5,
+    *,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    refresh: bool = False,
+) -> list[IssueTimelineEventRecord]:
+    """Fetch label add/remove events for all issues across an organization via GraphQL."""
+    def fetch_func(repo):
+        """Fetch label events for a single repository."""
+        return fetch_repo_issue_label_events_graphql(
+            client, repo.owner, repo.name, states=states,
+            **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+        )
+
+    return fetch_org_resource_parallel(
+        client, org, fetch_func, IssueTimelineEventRecord, max_workers, "org_issue_label_events",
+        {"org": org, "states": sorted(s.upper() for s in states) if states else []},
+        task_desc="organization issue label events",
+        **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+    )
+
+
 def fetch_repo_issue_timeline_events_rest(
     client: GitHubClient,
     owner: str,

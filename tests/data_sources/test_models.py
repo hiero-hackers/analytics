@@ -172,6 +172,45 @@ def test_issue_timeline_event_record_creation():
     assert record.label == "good first issue"
 
 
+def test_issue_timeline_event_from_github_node_expands_timeline_items():
+    """A GraphQL issue node expands its timelineItems into normalized events."""
+    node = {
+        "number": 42,
+        "timelineItems": {
+            "nodes": [
+                {
+                    "__typename": "LabeledEvent",
+                    "createdAt": "2024-03-01T12:00:00Z",
+                    "label": {"name": "Beginner"},
+                },
+                {
+                    "__typename": "UnlabeledEvent",
+                    "createdAt": "2024-03-05T09:30:00Z",
+                    "label": {"name": "Beginner"},
+                },
+            ]
+        },
+    }
+
+    records = IssueTimelineEventRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+
+    assert [(r.event_type, r.label) for r in records] == [
+        ("labeled", "beginner"),  # event type and label name lower-cased
+        ("unlabeled", "beginner"),
+    ]
+    assert all(r.repo == "org/repo" and r.issue_number == 42 for r in records)
+    assert records[0].occurred_at == _parse_dt("2024-03-01T12:00:00Z")
+
+
+def test_issue_timeline_event_from_github_node_handles_empty():
+    """An issue with no label events yields no records."""
+    node = {"number": 7, "timelineItems": {"nodes": []}}
+
+    records = IssueTimelineEventRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+
+    assert records == []
+
+
 # ---------------------------------------------------------
 # dataclass equality
 # ---------------------------------------------------------

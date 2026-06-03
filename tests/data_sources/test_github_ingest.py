@@ -411,3 +411,81 @@ def test_fetch_org_merged_pr_difficulty_graphql(monkeypatch, mock_client):
 
     assert repos_returned == {"org/repo1", "org/repo2"}
     assert len(records) == 2
+
+
+# ---------------------------------------------------------
+# issue label events (GraphQL timelineItems)
+# ---------------------------------------------------------
+
+def _label_events_payload():
+    """Build a GraphQL issues+timelineItems response for two issues."""
+    return {
+        "data": {
+            "repository": {
+                "issues": {
+                    "nodes": [
+                        {
+                            "number": 1,
+                            "timelineItems": {
+                                "nodes": [
+                                    {
+                                        "__typename": "LabeledEvent",
+                                        "createdAt": "2026-05-10T00:00:00Z",
+                                        "label": {"name": "Beginner"},
+                                    },
+                                    {
+                                        "__typename": "UnlabeledEvent",
+                                        "createdAt": "2026-05-12T00:00:00Z",
+                                        "label": {"name": "Beginner"},
+                                    },
+                                ]
+                            },
+                        },
+                        {"number": 2, "timelineItems": {"nodes": []}},
+                    ],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+    }
+
+
+def test_fetch_repo_issue_label_events_graphql_parses_events(mock_client, bypass_pagination):
+    """The GraphQL fetch expands timelineItems into normalized label events."""
+    _ = bypass_pagination
+    mock_client.graphql.return_value = _label_events_payload()
+
+    events = ingest.fetch_repo_issue_label_events_graphql(
+        mock_client, "org", "repo", states=["OPEN"], use_cache=False,
+    )
+
+    assert [(e.issue_number, e.event_type, e.label) for e in events] == [
+        (1, "labeled", "beginner"),
+        (1, "unlabeled", "beginner"),
+    ]
+    assert all(e.repo == "org/repo" for e in events)
+
+
+def test_fetch_repo_issue_label_events_graphql_uses_stable_cache_key(
+    mock_client, bypass_pagination, monkeypatch,
+):
+    """Cache key must not embed a per-run timestamp (guards the since-churn bug)."""
+    _ = bypass_pagination
+    mock_client.graphql.return_value = _label_events_payload()
+
+    captured: dict[str, object] = {}
+
+    def fake_load(kind, scope, parameters, _record_type, **_kwargs):
+        captured["kind"] = kind
+        captured["scope"] = scope
+        captured["parameters"] = parameters  # cache miss -> implicit return None
+
+    monkeypatch.setattr(ingest, "load_records_cache", fake_load)
+    monkeypatch.setattr(ingest, "save_records_cache", lambda *_a, **_k: None)
+
+    ingest.fetch_repo_issue_label_events_graphql(mock_client, "org", "repo", states=["OPEN"])
+
+    assert captured["scope"] == "org_repo"
+    assert captured["parameters"] == {"owner": "org", "repo": "repo", "states": ["OPEN"]}
+    # No volatile time component anywhere in the key.
+    assert "since" not in captured["parameters"]

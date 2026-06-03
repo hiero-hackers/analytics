@@ -14,8 +14,8 @@ from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
+    fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
-    fetch_repo_issue_events_for_issues_since,
 )
 from hiero_analytics.domain.labels import (
     DIFFICULTY_ADVANCED,
@@ -56,11 +56,13 @@ def main() -> None:
     all_issues = fetch_org_issues_graphql(client, org=ORG, states=["OPEN", "CLOSED"])
     print(f"Fetched {len(all_issues)} total issues")
 
-    # Fetch timeline events for all issues to identify label application dates.
-    timeline_events = fetch_repo_issue_events_for_issues_since(
+    # Fetch label add/remove events (GraphQL timelineItems) to identify label
+    # application dates. Only LABELED/UNLABELED events are transferred, so this
+    # avoids the repo-wide REST event firehose and its 300-page truncation.
+    timeline_events = fetch_org_issue_label_events_graphql(
         client,
-        all_issues,
-        since=start_at,
+        org=ORG,
+        states=["OPEN", "CLOSED"],
         max_workers=TIMELINE_MAX_WORKERS,
     )
     print(f"Fetched {len(timeline_events)} repository issue events")

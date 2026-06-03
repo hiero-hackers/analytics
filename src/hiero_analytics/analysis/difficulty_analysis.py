@@ -109,24 +109,38 @@ def issues_labeled_since(
         ),
     )
 
-    # Track active difficulty labels per issue: add on "labeled", remove on
-    # "unlabeled".  Keyed by (repo, issue_number, label) so that removing
-    # one difficulty label does not erase the record of a different one.
-    active_labels: set[tuple[str, int, str]] = set()
+    # Track active difficulty labels per issue *and* the time each became
+    # active.  Keyed by (repo, issue_number, label) so removing one difficulty
+    # label does not erase the record of a different one.  We record the
+    # application time so the cutoff can be applied here rather than relying on
+    # the caller having pre-filtered events to the window: the timeline source
+    # (GraphQL ``timelineItems``) returns full history, so an issue labeled long
+    # ago is still "active" and must be excluded explicitly.
+    cutoff = normalize_datetime(cutoff)
+    active_since: dict[tuple[str, int, str], datetime | None] = {}
     for event in sorted_events:
         if (event.repo, event.issue_number) not in issue_key_set:
             continue
-        if event.label is None or event.label not in difficulty_label_names:
+        # Normalize the label case-insensitively: spec label sets are lower-cased,
+        # so a mixed-case event label must be folded before comparison rather than
+        # relying on the ingestion layer to have done it.
+        normalized_label = event.label.lower() if event.label is not None else None
+        if normalized_label is None or normalized_label not in difficulty_label_names:
             continue
 
-        label_key = (event.repo, event.issue_number, event.label)
+        label_key = (event.repo, event.issue_number, normalized_label)
         if event.event_type == "labeled":
-            active_labels.add(label_key)
+            active_since[label_key] = normalize_datetime(event.occurred_at)
         elif event.event_type == "unlabeled":
-            active_labels.discard(label_key)
+            active_since.pop(label_key, None)
 
-    # Derive the set of qualifying issue keys from active labels.
-    labeled: set[tuple[str, int]] = {(repo, number) for repo, number, _label in active_labels}
+    # An issue qualifies when it still carries a difficulty label that was
+    # applied within the window (on or after the cutoff).
+    labeled: set[tuple[str, int]] = {
+        (repo, number)
+        for (repo, number, _label), applied_at in active_since.items()
+        if applied_at is not None and cutoff is not None and applied_at >= cutoff
+    }
 
     # Fallback: include issues created after the cutoff whose current labels
     # match a difficulty spec but lack a corresponding timeline event.

@@ -22,8 +22,8 @@ from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
+    fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
-    fetch_repo_issue_events_for_issues_since,
 )
 from hiero_analytics.domain.labels import (
     DIFFICULTY_LEVELS,
@@ -52,11 +52,13 @@ def main() -> None:
 
     cutoff = datetime.now(UTC) - timedelta(days=30)
 
-    # Fetch timeline events to determine when difficulty labels were applied.
-    timeline_events = fetch_repo_issue_events_for_issues_since(
+    # Fetch label add/remove events (GraphQL timelineItems) to determine when
+    # difficulty labels were applied. Only LABELED/UNLABELED events are
+    # transferred, avoiding the repo-wide REST event firehose.
+    timeline_events = fetch_org_issue_label_events_graphql(
         client,
-        issues,
-        since=cutoff,
+        org=ORG,
+        states=["OPEN"],
         max_workers=TIMELINE_MAX_WORKERS,
     )
     print(f"Fetched {len(timeline_events)} timeline events")
