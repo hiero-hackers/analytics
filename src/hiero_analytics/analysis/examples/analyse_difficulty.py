@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from hiero_analytics.analysis.dataframe_utils import (
-    build_difficulty_dataframe,
-    issues_to_dataframe,
-)
+from hiero_analytics.analysis.dataframe_utils import issues_to_dataframe
+from hiero_analytics.analysis.difficulty_analysis import build_difficulty_dataframe
 from hiero_analytics.config.paths import ensure_output_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_repo_issues_graphql

@@ -27,7 +27,7 @@ _DIFFICULTY_OVER_TIME_SPECS = (
     ("intermediate", DIFFICULTY_INTERMEDIATE),
     ("advanced", DIFFICULTY_ADVANCED),
 )
-_TIMELINE_EVENT_ORDER = {
+TIMELINE_EVENT_ORDER = {
     "unlabeled": 0,
     "labeled": 1,
     "closed": 2,
@@ -35,7 +35,7 @@ _TIMELINE_EVENT_ORDER = {
 }
 
 
-def _normalize_datetime(value: datetime | None) -> datetime | None:
+def normalize_datetime(value: datetime | None) -> datetime | None:
     """Return a timezone-aware UTC datetime for stable comparisons."""
     if value is None:
         return None
@@ -104,8 +104,8 @@ def _timeline_events_by_issue(
     for key in grouped:
         grouped[key].sort(
             key=lambda event: (
-                _normalize_datetime(event.occurred_at),
-                _TIMELINE_EVENT_ORDER.get(event.event_type, 99),
+                normalize_datetime(event.occurred_at),
+                TIMELINE_EVENT_ORDER.get(event.event_type, 99),
             )
         )
 
@@ -119,8 +119,8 @@ def _difficulty_intervals_for_issue(
     end_at: datetime,
 ) -> list[tuple[str, datetime, datetime]]:
     """Build historical difficulty-state intervals for one issue."""
-    created_at = _normalize_datetime(issue.created_at)
-    closed_at = _normalize_datetime(issue.closed_at)
+    created_at = normalize_datetime(issue.created_at)
+    closed_at = normalize_datetime(issue.closed_at)
 
     if created_at is None:
         return []
@@ -132,7 +132,7 @@ def _difficulty_intervals_for_issue(
     intervals: list[tuple[str, datetime, datetime]] = []
 
     for event in issue_events:
-        occurred_at = _normalize_datetime(event.occurred_at)
+        occurred_at = normalize_datetime(event.occurred_at)
         if occurred_at is None or occurred_at < created_at:
             continue
 
@@ -182,8 +182,8 @@ def _current_difficulty_labels(issue: IssueRecord) -> set[str]:
 
 def issue_overlaps_window(issue: IssueRecord, start_at: datetime, end_at: datetime) -> bool:
     """Return whether an issue is open at any point inside a window."""
-    created_at = _normalize_datetime(issue.created_at)
-    closed_at = _normalize_datetime(issue.closed_at)
+    created_at = normalize_datetime(issue.created_at)
+    closed_at = normalize_datetime(issue.closed_at)
 
     if created_at is None or created_at > end_at:
         return False
@@ -199,7 +199,7 @@ def _windowed_difficulty_intervals_for_issue(
     end_at: datetime,
 ) -> list[tuple[str, datetime, datetime]]:
     """Build difficulty-state intervals within a bounded time window."""
-    created_at = _normalize_datetime(issue.created_at)
+    created_at = normalize_datetime(issue.created_at)
     if created_at is None or created_at > end_at:
         return []
 
@@ -217,7 +217,7 @@ def _windowed_difficulty_intervals_for_issue(
         relevant_events = [
             event
             for event in issue_events
-            if effective_start <= _normalize_datetime(event.occurred_at) <= end_at
+            if effective_start <= normalize_datetime(event.occurred_at) <= end_at
         ]
 
         for event in reversed(relevant_events):
@@ -235,7 +235,7 @@ def _windowed_difficulty_intervals_for_issue(
     current_bucket = _bucket_from_active_labels(active_difficulty_labels, is_open)
 
     for event in issue_events:
-        occurred_at = _normalize_datetime(event.occurred_at)
+        occurred_at = normalize_datetime(event.occurred_at)
         if occurred_at is None or occurred_at < effective_start or occurred_at > end_at:
             continue
 
@@ -283,11 +283,11 @@ def get_difficulty_over_time(
     if not issues:
         return []
 
-    end_at = _normalize_datetime(today) or datetime.now(UTC)
+    end_at = normalize_datetime(today) or datetime.now(UTC)
     start_at = min(
         created_at
         for issue in issues
-        if (created_at := _normalize_datetime(issue.created_at)) is not None
+        if (created_at := normalize_datetime(issue.created_at)) is not None
     )
 
     if end_at < start_at:
@@ -336,8 +336,8 @@ def get_difficulty_over_time_windowed(
     if not issues:
         return []
 
-    end_at = _normalize_datetime(today) or datetime.now(UTC)
-    start_at = _normalize_datetime(start_at) or end_at
+    end_at = normalize_datetime(today) or datetime.now(UTC)
+    start_at = normalize_datetime(start_at) or end_at
 
     if end_at < start_at:
         end_at = start_at
@@ -401,8 +401,8 @@ def get_difficulty_over_time_event_based(
     if not issues:
         return []
 
-    end_at = _normalize_datetime(today) or datetime.now(UTC)
-    start_at = _normalize_datetime(start_at) or end_at
+    end_at = normalize_datetime(today) or datetime.now(UTC)
+    start_at = normalize_datetime(start_at) or end_at
 
     if end_at < start_at:
         end_at = start_at
@@ -415,7 +415,7 @@ def get_difficulty_over_time_event_based(
     filtered_issues = [
         issue
         for issue in issues
-        if (created := _normalize_datetime(issue.created_at)) is not None
+        if (created := normalize_datetime(issue.created_at)) is not None
         and start_at <= created <= end_at
     ]
 
@@ -447,7 +447,7 @@ def get_difficulty_over_time_event_based(
             # Skip issues with no recorded label event.
             continue
 
-        label_timestamp = _normalize_datetime(most_recent_label_event.occurred_at)
+        label_timestamp = normalize_datetime(most_recent_label_event.occurred_at)
         if label_timestamp is None:
             continue
 
@@ -487,7 +487,7 @@ def get_difficulty_over_time_event_based(
                 continue
 
             # Issue is open if no closed_at or closed_at is after the sample point.
-            closed_at = _normalize_datetime(issue.closed_at)
+            closed_at = normalize_datetime(issue.closed_at)
             if closed_at is not None and closed_at <= sample_point:
                 continue
 

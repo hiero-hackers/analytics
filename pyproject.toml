@@ -62,7 +62,12 @@ excludes = ["**/.pytest_cache"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-addopts = "--cov=hiero_analytics --cov-report=term-missing"
+addopts = "--cov=hiero_analytics --cov-report=term-missing --cov-fail-under=70"
+
+[tool.coverage.run]
+omit = [
+    "*/examples/*",
+]
 
 [tool.ruff]
 line-length = 120

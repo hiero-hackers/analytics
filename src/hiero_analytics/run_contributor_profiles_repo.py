@@ -10,16 +10,15 @@ from __future__ import annotations
 
 import pandas as pd
 
+from hiero_analytics.analysis.difficulty_analysis import assign_difficulty
+from hiero_analytics.analysis.prs import prs_to_dataframe
 from hiero_analytics.config.paths import ORG, ensure_repo_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_merged_pr_difficulty_graphql,
 )
-from hiero_analytics.analysis.prs import prs_to_dataframe
-from hiero_analytics.domain.labels import DIFFICULTY_LEVELS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
-
 
 PLOT_DIFFICULTY_ORDER = [
     "Good First Issue",
@@ -31,13 +30,6 @@ PLOT_DIFFICULTY_ORDER = [
 
 # Helpers
 # =========================================================
-
-
-def assign_difficulty(labels):
-    for spec in DIFFICULTY_LEVELS:
-        if spec.matches(set(labels or [])):
-            return spec.name
-    return "Unknown"
 
 
 def classify_contributor(row):

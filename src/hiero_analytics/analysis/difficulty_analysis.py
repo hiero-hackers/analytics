@@ -1,79 +1,168 @@
+"""Difficulty classification and window-selection helpers for issue analytics."""
+
 from __future__ import annotations
+
+from datetime import datetime
 
 import pandas as pd
 
+from hiero_analytics.analysis.timeseries import (
+    TIMELINE_EVENT_ORDER,
+    normalize_datetime,
+)
+from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
 from hiero_analytics.domain.labels import (
-    DIFFICULTY_ADVANCED,
-    DIFFICULTY_BEGINNER,
-    DIFFICULTY_GOOD_FIRST_ISSUE,
-    DIFFICULTY_INTERMEDIATE,
+    DIFFICULTY_LEVELS,
+    UNKNOWN_DIFFICULTY,
+    LabelSpec,
 )
 
-DIFFICULTY_GROUPS = {
-    DIFFICULTY_GOOD_FIRST_ISSUE.name: DIFFICULTY_GOOD_FIRST_ISSUE.labels,
-    DIFFICULTY_BEGINNER.name: DIFFICULTY_BEGINNER.labels,
-    DIFFICULTY_INTERMEDIATE.name: DIFFICULTY_INTERMEDIATE.labels,
-    DIFFICULTY_ADVANCED.name: DIFFICULTY_ADVANCED.labels,
-}
 
+def assign_difficulty(
+    labels,
+    specs: tuple[LabelSpec, ...] = DIFFICULTY_LEVELS,
+) -> str:
+    """Return the first matching difficulty label for an issue, or Unknown.
 
-def count_label_groups(df: pd.DataFrame, groups: dict[str, set[str]]) -> pd.DataFrame:
+    ``labels`` may be any iterable of label names (or ``None``); matching is
+    delegated to each spec and is case-insensitive.  This is the single
+    per-issue difficulty classifier used across the analytics pipelines.
     """
-    Count issues belonging to predefined label groups.
+    label_set = set(labels or [])
+    for spec in specs:
+        if spec.matches(label_set):
+            return spec.name
+    return UNKNOWN_DIFFICULTY
 
-    For each group, the function checks whether an issue contains at least
-    one label from the group. Issues matching a group are counted toward
-    that group’s total.
+
+def build_difficulty_dataframe(
+    df: pd.DataFrame,
+    specs: tuple[LabelSpec, ...] = DIFFICULTY_LEVELS,
+    *,
+    state: str | None = None,
+) -> pd.DataFrame:
+    """Aggregate issue counts per difficulty level, including an Unknown bucket.
+
+    Each issue is assigned to exactly one bucket via :func:`assign_difficulty`
+    (the first matching spec wins), so counts sum to the number of issues.
+    The result has one row per spec in ``specs`` order followed by an
+    ``Unknown`` row, with zero-filled counts for absent buckets.
 
     Parameters
     ----------
     df
-        DataFrame containing an issue dataset. Must include a `labels`
-        column containing label lists for each issue.
-    groups
-        Mapping of group names to sets of labels representing the group.
+        Issue dataframe containing a ``labels`` column (and a ``state`` column
+        if ``state`` filtering is requested).
+    specs
+        Ordered difficulty specifications. Defaults to ``DIFFICULTY_LEVELS``.
+    state
+        Optional issue state filter (e.g. ``"open"``); when provided, only
+        rows whose ``state`` column matches are aggregated.
 
     Returns:
     -------
     pd.DataFrame
-        DataFrame with columns:
-        - difficulty : name of the label group
-        - count      : number of issues matching that group
+        DataFrame with ``difficulty`` and ``count`` columns.
     """
-    if df.empty:
-        return pd.DataFrame(columns=["difficulty", "count"])
+    if state:
+        df = df[df["state"] == state]
 
-    rows = []
+    assigned = df["labels"].apply(lambda labels: assign_difficulty(labels, specs))
+    counts = assigned.value_counts()
 
-    for name, labels in groups.items():
-        mask = df["labels"].map(lambda xs: bool(set(xs or []) & labels))
-        rows.append({"difficulty": name, "count": int(mask.sum())})
+    rows = [{"difficulty": spec.name, "count": int(counts.get(spec.name, 0))} for spec in specs]
+    rows.append({"difficulty": UNKNOWN_DIFFICULTY, "count": int(counts.get(UNKNOWN_DIFFICULTY, 0))})
 
     return pd.DataFrame(rows)
 
 
-def difficulty_distribution(df: pd.DataFrame) -> pd.DataFrame:
+def issues_labeled_since(
+    issues: list[IssueRecord],
+    timeline_events: list[IssueTimelineEventRecord],
+    cutoff: datetime,
+    difficulty_specs: tuple[LabelSpec, ...],
+) -> set[tuple[str, int]]:
+    """Return (repo, number) pairs for issues with an active difficulty label applied since cutoff.
+
+    An issue qualifies when a difficulty label was added within the window
+    and has not been subsequently removed.  Issues created after the cutoff
+    that already carry a difficulty label are included as a fallback for
+    cases where the label was applied at creation time (e.g. via an issue
+    template) and no separate ``labeled`` event is recorded.
     """
-    Compute the distribution of issues across defined difficulty levels.
+    difficulty_label_names: set[str] = set()
+    for spec in difficulty_specs:
+        difficulty_label_names |= spec.labels
 
-    Difficulty levels are determined using the predefined DIFFICULTY_GROUPS
-    label mapping.
+    # Precompute the set of issue keys we care about so we can skip
+    # repository-wide events for issues outside the fetched set (e.g.
+    # closed issues or issues not matching the query).
+    issue_key_set = {(issue.repo, issue.number) for issue in issues}
 
-    Parameters
-    ----------
-    df
-        Issue dataframe containing a `labels` column.
+    # Sort events chronologically with a stable tie-breaker to handle
+    # unordered results from concurrent per-repo REST API fetches.
+    sorted_events = sorted(
+        timeline_events,
+        key=lambda event: (
+            normalize_datetime(event.occurred_at),
+            TIMELINE_EVENT_ORDER.get(event.event_type, 99),
+        ),
+    )
 
-    Returns:
-    -------
-    pd.DataFrame
-        DataFrame summarizing issue counts for each difficulty level.
+    # Track active difficulty labels per issue: add on "labeled", remove on
+    # "unlabeled".  Keyed by (repo, issue_number, label) so that removing
+    # one difficulty label does not erase the record of a different one.
+    active_labels: set[tuple[str, int, str]] = set()
+    for event in sorted_events:
+        if (event.repo, event.issue_number) not in issue_key_set:
+            continue
+        if event.label is None or event.label not in difficulty_label_names:
+            continue
+
+        label_key = (event.repo, event.issue_number, event.label)
+        if event.event_type == "labeled":
+            active_labels.add(label_key)
+        elif event.event_type == "unlabeled":
+            active_labels.discard(label_key)
+
+    # Derive the set of qualifying issue keys from active labels.
+    labeled: set[tuple[str, int]] = {(repo, number) for repo, number, _label in active_labels}
+
+    # Fallback: include issues created after the cutoff whose current labels
+    # match a difficulty spec but lack a corresponding timeline event.
+    for issue in issues:
+        key = (issue.repo, issue.number)
+        if key in labeled:
+            continue
+        if issue.created_at >= cutoff:
+            for spec in difficulty_specs:
+                if spec.matches(set(issue.labels)):
+                    labeled.add(key)
+                    break
+
+    return labeled
+
+
+def issues_unlabeled_created_since(
+    issues: list[IssueRecord],
+    cutoff: datetime,
+    difficulty_specs: tuple[LabelSpec, ...],
+) -> set[tuple[str, int]]:
+    """Return (repo, number) pairs for issues created since cutoff lacking a difficulty label.
+
+    These form the "Unknown" bucket.  Unlike labeled issues, an untriaged
+    issue has no ``labeled`` event to anchor to, so the bucket is anchored to
+    issue *creation* date instead: it captures newly opened issues that have
+    not yet been assigned a difficulty.  This keeps the Unknown category
+    meaningful (and distinct from the labeled buckets, which are anchored to
+    label-application date) rather than collapsing it to zero.
     """
-    return count_label_groups(df, DIFFICULTY_GROUPS)
+    unknown: set[tuple[str, int]] = set()
+    for issue in issues:
+        if issue.created_at < cutoff:
+            continue
+        if any(spec.matches(set(issue.labels)) for spec in difficulty_specs):
+            continue
+        unknown.add((issue.repo, issue.number))
 
-
-def merged_pr_difficulty_distribution(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Identical to `difficulty_distribution` but named to reflect that the input dataframe is expected to be a merged dataset of pull requests.
-    """
-    return count_label_groups(df, DIFFICULTY_GROUPS)
+    return unknown
