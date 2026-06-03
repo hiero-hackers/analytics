@@ -128,6 +128,31 @@ def _issues_labeled_since(
     return labeled
 
 
+def _issues_unlabeled_created_since(
+    issues: list[IssueRecord],
+    cutoff: datetime,
+    difficulty_specs: tuple[LabelSpec, ...],
+) -> set[tuple[str, int]]:
+    """Return (repo, number) pairs for issues created since cutoff lacking a difficulty label.
+
+    These form the "Unknown" bucket.  Unlike labeled issues, an untriaged
+    issue has no ``labeled`` event to anchor to, so the bucket is anchored to
+    issue *creation* date instead: it captures newly opened issues that have
+    not yet been assigned a difficulty.  This keeps the Unknown category
+    meaningful (and distinct from the labeled buckets, which are anchored to
+    label-application date) rather than collapsing it to zero.
+    """
+    unknown: set[tuple[str, int]] = set()
+    for issue in issues:
+        if issue.created_at < cutoff:
+            continue
+        if any(spec.matches(set(issue.labels)) for spec in difficulty_specs):
+            continue
+        unknown.add((issue.repo, issue.number))
+
+    return unknown
+
+
 def main() -> None:
     """Run the difficulty analytics pipeline for the configured organization."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
@@ -160,8 +185,20 @@ def main() -> None:
         DIFFICULTY_LEVELS,
     )
 
+    # Identify newly created, still-untriaged issues for the Unknown bucket.
+    # Anchored to creation date because an unlabeled issue has no labeling
+    # event to anchor to.  The two sets are disjoint by construction (an issue
+    # either carries an active difficulty label or it does not).
+    unknown_issues = _issues_unlabeled_created_since(
+        issues,
+        cutoff,
+        DIFFICULTY_LEVELS,
+    )
+
+    included_issues = labeled_issues | unknown_issues
+
     issue_keys = pd.MultiIndex.from_arrays([df["repo"], df["number"]])
-    df = df[(df["state"] == "open") & issue_keys.isin(labeled_issues)].copy()
+    df = df[(df["state"] == "open") & issue_keys.isin(included_issues)].copy()
 
     # Remove org prefix from repo name
     df["repo"] = df["repo"].str.split("/").str[-1]
@@ -185,12 +222,14 @@ def main() -> None:
     pie_variants = [
         (
             difficulty_counts,
-            "Open Issues (Labeled Last 30 Days) by Difficulty Distribution (Including Unknown)",
+            "Open Issues by Difficulty Distribution "
+            "(Labeled or Newly Created in Last 30 Days, Including Unknown)",
             "difficulty_distribution_with_unknown_30_days.png",
         ),
         (
             difficulty_counts[difficulty_counts["difficulty"] != UNKNOWN_DIFFICULTY],
-            "Open Issues (Labeled Last 30 Days) by Difficulty Distribution (Excluding Unknown)",
+            "Open Issues by Difficulty Distribution "
+            "(Labeled in Last 30 Days, Excluding Unknown)",
             "difficulty_distribution_without_unknown_30_days.png",
         ),
     ]
@@ -235,7 +274,7 @@ def main() -> None:
         x_col="repo",
         stack_cols=difficulty_cols,
         labels=difficulty_cols,
-        title="Open Issues (Labeled Last 30 Days) by Difficulty Distribution in a Repository",
+        title="Labeled or Newly Created Open Issues By Difficulty (in Last 30 Days)",
         output_path=org_charts_dir / "difficulty_by_repo_30_days.png",
         colors=DIFFICULTY_COLORS,
         rotate_x=45,
