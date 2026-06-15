@@ -7,9 +7,9 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **.github** | 0 | 1 | 0 |
 | **governance** | 3 | 0 | 0 |
 | **heka-identity-platform** | 0 | 7 | 0 |
-| **hiero-block-node** | 21 | 0 | 1 |
+| **hiero-block-node** | 22 | 0 | 1 |
 | **hiero-cli** | 5 | 1 | 0 |
-| **hiero-consensus-node** | 155 | 0 | 2 |
+| **hiero-consensus-node** | 152 | 0 | 5 |
 | **hiero-consensus-specifications** | 0 | 1 | 0 |
 | **hiero-contracts** | 9 | 1 | 0 |
 | **hiero-cryptography** | 8 | 1 | 1 |
