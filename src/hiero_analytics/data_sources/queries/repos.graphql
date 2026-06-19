@@ -7,6 +7,13 @@ query REPOS_QUERY($org:String!,$cursor:String){
       }
       nodes{
         name
+        pushedAt
+        primaryLanguage{
+          name
+        }
+        createdAt
+        stargazerCount
+        forkCount
       }
     }
   }

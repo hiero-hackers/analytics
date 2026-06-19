@@ -50,10 +50,17 @@ class RepositoryRecord(BaseRecord):
     created_at: datetime | None = None
     stargazers: int | None = None
     forks: int | None = None
+    pushed_at: datetime | None = None
+    language: str | None = None
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[RepositoryRecord]:
         """Hydrate repository records from a GraphQL repository node."""
+        # Null-safe extraction of primaryLanguage name
+        language = None
+        if node.get("primaryLanguage") and isinstance(node["primaryLanguage"], Mapping):
+            language = node["primaryLanguage"].get("name")
+        
         return [
             cls(
                 full_name=f"{cls._owner(context)}/{node['name']}",
@@ -62,6 +69,8 @@ class RepositoryRecord(BaseRecord):
                 created_at=_parse_dt(node.get("createdAt")),
                 stargazers=node.get("stargazerCount"),
                 forks=node.get("forkCount"),
+                pushed_at=_parse_dt(node.get("pushedAt")),
+                language=language,
             )
         ]
 
