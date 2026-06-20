@@ -83,7 +83,8 @@ def test_repos_to_dataframe_with_records():
         "hiero-hackers/repo-b",
         "hiero-hackers/repo-c",
     ]
-    assert df["language"].tolist() == ["Python", "TypeScript", None]
+    assert df["language"].tolist()[:2] == ["Python", "TypeScript"]
+    assert pd.isna(df["language"].iloc[2])
 
 
 # ---------------------------------------------------------------------------
