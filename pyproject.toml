@@ -10,7 +10,7 @@ license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.11, <4"
 dependencies = [
-    "matplotlib>=3.10.9",
+    "matplotlib>=3.11.0",
     "pandas>=3.0.3",
     "requests>=2.34.2",
     "python-dotenv>=1.2.2",
