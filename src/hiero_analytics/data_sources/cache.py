@@ -34,7 +34,7 @@ GITHUB_CACHE_DIR = OUTPUTS_DIR / "cache" / "github"
 _TRUE_VALUES = {"1", "true", "yes", "on"}
 _FALSE_VALUES = {"0", "false", "no", "off"}
 _DATETIME_FIELDS: dict[type[object], tuple[str, ...]] = {
-    RepositoryRecord: ("created_at",),
+    RepositoryRecord: ("created_at", "pushed_at"),
     IssueRecord: ("created_at", "closed_at"),
     IssueTimelineEventRecord: ("occurred_at",),
     PullRequestDifficultyRecord: ("pr_created_at", "pr_merged_at"),

@@ -13,7 +13,7 @@ Charts are written to ``outputs/charts/org/hiero-hackers/``.
 
 from __future__ import annotations
 
-from datetime import datetime
+import logging
 
 from hiero_analytics.analysis.hiero_hackers_analysis import (
     build_contributor_counts,
@@ -32,6 +32,9 @@ from hiero_analytics.plotting.bars import plot_bar
 from hiero_analytics.plotting.pie import plot_pie
 
 ORG = "hiero-hackers"
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 def main() -> None:
@@ -86,7 +89,7 @@ def main() -> None:
         )
         save_dataframe(contributors_df, data_dir / "contributor_counts.csv")
     
-    print(f"Hiero Hackers analytics complete. Charts written to {charts_dir}")
+    logger.info("Hiero Hackers analytics complete. Charts written to %s", charts_dir)
 
 
 if __name__ == "__main__":

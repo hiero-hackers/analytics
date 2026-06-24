@@ -4,7 +4,41 @@ from __future__ import annotations
 
 import pandas as pd
 
-from hiero_analytics.data_sources.models import IssueRecord
+from hiero_analytics.data_sources.models import IssueRecord, RepositoryRecord
+
+
+def repos_to_dataframe(records: list[RepositoryRecord]) -> pd.DataFrame:
+    """
+    Convert a collection of RepositoryRecord objects into a Pandas DataFrame.
+
+    Columns produced:
+        repo        Full repository name (owner/name)
+        pushed_at   Timestamp of the last push (or None)
+        language    Primary language (or None)
+
+    Parameters
+    ----------
+    records
+        List of RepositoryRecord objects retrieved from the data source layer.
+
+    Returns:
+    -------
+    pd.DataFrame
+        DataFrame containing one row per repository.
+    """
+    if not records:
+        return pd.DataFrame(columns=["repo", "pushed_at", "language"])
+
+    return pd.DataFrame(
+        [
+            {
+                "repo": record.full_name,
+                "pushed_at": record.pushed_at,
+                "language": record.language,
+            }
+            for record in records
+        ]
+    )
 
 
 def issues_to_dataframe(issues: list[IssueRecord]) -> pd.DataFrame:

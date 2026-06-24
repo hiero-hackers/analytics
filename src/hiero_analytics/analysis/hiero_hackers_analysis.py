@@ -10,36 +10,15 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
-from hiero_analytics.data_sources.models import (
-    ContributorActivityRecord,
-    RepositoryRecord,
-)
+from hiero_analytics.analysis.dataframe_utils import repos_to_dataframe
+from hiero_analytics.data_sources.models import ContributorActivityRecord
 
-
-def repos_to_dataframe(records: list[RepositoryRecord]) -> pd.DataFrame:
-    """Convert repository records to a DataFrame for analysis.
-    
-    Parameters
-    ----------
-    records
-        List of RepositoryRecord objects from GitHub API.
-    
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with columns: "repo", "pushed_at", "language"
-    """
-    if not records:
-        return pd.DataFrame(columns=["repo", "pushed_at", "language"])
-    
-    return pd.DataFrame([
-        {
-            "repo": record.full_name,
-            "pushed_at": record.pushed_at,
-            "language": record.language,
-        }
-        for record in records
-    ])
+__all__ = [
+    "repos_to_dataframe",
+    "calculate_push_activity_summary",
+    "calculate_language_distribution",
+    "build_contributor_counts",
+]
 
 
 def calculate_push_activity_summary(

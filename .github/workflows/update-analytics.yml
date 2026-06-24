@@ -71,6 +71,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: uv run python -m hiero_analytics.run_codeowner_and_runner
 
+      - name: Run hiero hackers org analytics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run python -m hiero_analytics.run_hiero_hackers_org
+
       - name: Check for changes
         id: check_changes
         run: |

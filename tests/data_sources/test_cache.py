@@ -14,6 +14,7 @@ from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueRecord,
     IssueTimelineEventRecord,
+    RepositoryRecord,
 )
 
 
@@ -62,6 +63,43 @@ def test_issue_record_cache_round_trip(_temp_cache_dir):
     )
 
     assert loaded == records
+
+
+def test_repository_record_cache_round_trip(_temp_cache_dir):
+    """Both datetime fields on a repository record must survive a cache round-trip."""
+    records = [
+        RepositoryRecord(
+            full_name="org/repo",
+            name="repo",
+            owner="org",
+            created_at=datetime(2024, 1, 1, tzinfo=UTC),
+            pushed_at=datetime(2024, 6, 1, tzinfo=UTC),
+            language="Python",
+        )
+    ]
+    parameters = {"org": "org"}
+
+    cache.save_records_cache(
+        "org_repos",
+        "org",
+        parameters,
+        RepositoryRecord,
+        records,
+        use_cache=True,
+    )
+
+    loaded = cache.load_records_cache(
+        "org_repos",
+        "org",
+        parameters,
+        RepositoryRecord,
+        use_cache=True,
+        ttl_seconds=60,
+    )
+
+    assert loaded == records
+    # Guards against the registry regression: pushed_at must be a datetime, not a str.
+    assert isinstance(loaded[0].pushed_at, datetime)
 
 
 def test_contributor_activity_record_cache_round_trip(_temp_cache_dir):
