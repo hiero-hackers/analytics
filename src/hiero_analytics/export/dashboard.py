@@ -60,8 +60,23 @@ tr:hover td{background:#fbfbfb}
 .snav{font-size:13px;padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#333;cursor:pointer}
 .snav:hover{background:#f3f3f3}
 .scount{font-size:13px;color:#666}
-.slide img{width:100%;height:auto;border:1px solid #eee;border-radius:8px;background:#fff;cursor:zoom-in}
+.slide img{width:100%;height:auto;aspect-ratio:4 / 3;object-fit:contain;border:1px solid #eee;border-radius:8px;background:#fff;cursor:zoom-in}
 .slide figcaption{font-size:13px;color:#444;margin-top:8px;text-align:center;font-weight:600}
+.jump{position:sticky;top:0;z-index:50;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fafafa;padding:10px 0;margin:0 0 6px;border-bottom:1px solid #e6e6e6}
+.jlabel{font-size:12px;color:#888;font-weight:600;margin-right:2px}
+.jbtn{font-size:13px;padding:5px 12px;border:1px solid #ddd;border-radius:999px;background:#fff;color:#444;cursor:pointer;text-decoration:none}
+.jbtn:hover{border-color:#999}
+.jtoggle{margin-left:auto;font-weight:600}
+.grouphdr{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid #e6e6e6}
+details.tsec{padding-top:14px;padding-bottom:14px}
+.tsum{display:flex;align-items:center;gap:10px;list-style:none;cursor:pointer}
+.tsum::-webkit-details-marker{display:none}
+.tsum::before{content:'\\25B8';color:#aaa;font-size:13px;transition:transform .15s ease}
+details[open] .tsum::before{transform:rotate(90deg)}
+.tsum h2{margin:0;font-size:16px;font-weight:600;flex:1}
+.sbadge{font-size:12px;font-weight:500;color:#888;background:#f0f0f0;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.sbody{margin-top:14px}
+@media (prefers-color-scheme:dark){.jump{background:#0f0f0f;border-color:#2a2a2a}.jbtn{background:#1a1a1a;color:#ccc;border-color:#333}.jbtn:hover{border-color:#666}.grouphdr{color:#888;border-color:#2a2a2a}.sbadge{background:#262626;color:#aaa}.jlabel{color:#888}}
 @media (prefers-color-scheme:dark){body{background:#0f0f0f;color:#e6e6e6}.metric,.card{background:#1a1a1a;border-color:#2a2a2a}.metric .label,.sub,.desc,.count{color:#999}th{background:#222;border-color:#333}td{border-color:#222}tr:hover td{background:#1d1d1d}.search{background:#1a1a1a;color:#e6e6e6;border-color:#333}.tablewrap{border-color:#2a2a2a}.dl{background:#1a1a1a;color:#e6e6e6;border-color:#333}.dl:hover{background:#262626}.snav{background:#1a1a1a;color:#e6e6e6;border-color:#333}.snav:hover{background:#262626}.scount,.slide figcaption{color:#bbb}.tabbar{border-color:#2a2a2a}.tab{color:#999}.tab.active{color:#e6e6e6;border-bottom-color:#888}.tab:hover{color:#e6e6e6}.macro{background:#1a1a1a;color:#ccc;border-color:#333}.macro.active{background:#e6e6e6;color:#0f0f0f;border-color:#e6e6e6}.macro:hover{border-color:#666}.glossary{background:#1a1a1a;border-color:#2a2a2a}.glossary dt{color:#ccc}.glossary dd,.gnote{color:#999}.chart img{border-color:#333}.chart figcaption{color:#999}}
 """
 
@@ -76,6 +91,7 @@ function openLightbox(src){document.getElementById('lightbox-img').src=src;docum
 function closeLightbox(){var lb=document.getElementById('lightbox');lb.style.display='none';document.getElementById('lightbox-img').src='';}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
 function slide(id,dir){var s=document.querySelectorAll('#'+id+'-show .slide');if(!s.length)return;var cur=0;s.forEach(function(f,i){if(f.style.display!=='none')cur=i;});s[cur].style.display='none';var n=(cur+dir+s.length)%s.length;s[n].style.display='';var c=document.getElementById(id+'-counter');if(c)c.textContent=(n+1)+' / '+s.length;}
+function toggleAll(pid){var p=document.getElementById(pid);if(!p)return;var ds=p.querySelectorAll('details.tsec');var anyClosed=Array.prototype.some.call(ds,function(d){return !d.open;});ds.forEach(function(d){d.open=anyClosed;});var b=p.querySelector('.jtoggle');if(b)b.textContent=anyClosed?'Collapse all':'Expand all';}
 """
 
 
@@ -113,6 +129,15 @@ _GLOSSARY = (
     "<dt>highest role</dt><dd>the most senior role a person holds in any repo (maintainer &gt; committer "
     "&gt; triage).</dd>"
     "<dt>roles held</dt><dd>every distinct role the person holds across repos.</dd>"
+    "<dt>how roles are set</dt><dd>a person&rsquo;s role in a repo comes from the governance "
+    "config&rsquo;s team&rarr;permission grants: <em>triage</em> &rarr; triage, <em>write</em> &rarr; "
+    "committer, <em>maintain</em> / <em>admin</em> &rarr; maintainer (<em>read</em> access isn&rsquo;t "
+    "counted). Where someone holds more than one, the highest is shown.</dd>"
+    "<dt>org-wide teams</dt><dd>a few teams (github-maintainers, security-maintainers, lf-staff, tsc, "
+    "hiero-triage) are granted on nearly every repo. To keep each repo&rsquo;s domain maintainers "
+    "visible, these are not counted on domain repos; they&rsquo;re credited only on org/meta repos "
+    "(e.g. .github, governance) that have no domain maintainer team of their own. So members of those "
+    "teams appear on just those few repos.</dd>"
     "</dl>"
     "<p class='gnote'>Contribution counts are all-time, except columns labelled &ldquo;90d&rdquo;, which "
     "cover the last 90 days. Recency thresholds: a repo role-holder shows as &ldquo;quiet&rdquo; after 90 "
@@ -193,16 +218,19 @@ def _section_html(section: Mapping, esc) -> str:
         for row in rows
     )
     return (
-        f"<section class='card'>"
-        f"<div class='shead'><h2>{esc(section['title'])}</h2>"
+        f"<details class='card tsec' open>"
+        f"<summary class='tsum'><h2>{esc(section['title'])}</h2>"
+        f"<span class='sbadge'>{len(rows)} rows</span></summary>"
+        f"<div class='sbody'>"
+        f"<div class='shead'><p class='desc'>{esc(section['description'])}</p>"
         f"<button class='dl' onclick=\"exportCSV('{section_id}','{section_id}.csv')\">Download CSV</button>"
         f"</div>"
-        f"<p class='desc'>{esc(section['description'])}</p>"
         f"<input class='search' placeholder='Filter…' "
         f"oninput=\"filterTable('{section_id}',this.value)\">"
         f"<div class='tablewrap'><table id='{section_id}'><thead><tr>{head}</tr></thead>"
         f"<tbody>{body}</tbody></table></div>"
-        f"<p class='count' id='{section_id}-count'>{len(rows)} rows</p></section>"
+        f"<p class='count' id='{section_id}-count'>{len(rows)} rows</p>"
+        f"</div></details>"
     )
 
 
@@ -232,13 +260,45 @@ def _org_panels_html(mslug: str, org_tabs: Sequence[Mapping], esc) -> str:
     panels = []
     for i, tab in enumerate(org_tabs):
         oslug = _slug(tab["org"])
+        panel_id = f"tab-{mslug}-{oslug}"
         namespaced = [{**section, "id": f"{mslug}-{oslug}-{section['id']}"} for section in tab["sections"]]
-        sections_html = "".join(_section_html(section, esc) for section in namespaced)
+
+        # Group sections by their "group" key, preserving order of appearance.
+        groups: list[tuple[str, list[Mapping]]] = []
+        for section in namespaced:
+            gname = section.get("group", "")
+            if not groups or groups[-1][0] != gname:
+                groups.append((gname, []))
+            groups[-1][1].append(section)
+
+        # Jump bar: a link per group, plus expand/collapse-all when there are tables.
+        links = "".join(
+            f"<a class='jbtn' href='#grp-{mslug}-{oslug}-{_slug(g)}'>{esc(g)}</a>" for g, _ in groups
+        )
+        has_tables = any("charts" not in s for s in namespaced)
+        toggle = (
+            f"<button class='jbtn jtoggle' onclick=\"toggleAll('{panel_id}')\">Collapse all</button>"
+            if has_tables else ""
+        )
+        jumpbar = (
+            f"<div class='jump'><span class='jlabel'>Jump to</span>{links}{toggle}</div>"
+            if len(groups) > 1 else ""
+        )
+
+        # Each group: a heading anchor followed by its sections (tables collapsed).
+        # With only one group (e.g. a chart-only macro) the heading is redundant.
+        show_headers = len(groups) > 1
+        blocks = "".join(
+            (f"<h2 class='grouphdr' id='grp-{mslug}-{oslug}-{_slug(g)}'>{esc(g)}</h2>" if show_headers else "")
+            + "".join(_section_html(s, esc) for s in secs)
+            for g, secs in groups
+        )
+
         display = "" if i == 0 else "display:none"
         panels.append(
-            f"<div class='tabpanel' id='tab-{mslug}-{oslug}' style='{display}'>"
+            f"<div class='tabpanel' id='{panel_id}' style='{display}'>"
             f"<div class='metrics'>{_metric_cards(tab['metrics'], esc)}</div>"
-            f"{sections_html}</div>"
+            f"{jumpbar}{blocks}</div>"
         )
     return tab_bar + "".join(panels)
 

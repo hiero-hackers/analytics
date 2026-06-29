@@ -66,6 +66,16 @@ CHART_MACROS = [
                         ("All contributors", "all_network.png"),
                     ],
                 },
+                {
+                    "id": "activity-heatmap",
+                    "title": "Contributor activity heatmap",
+                    "description": (
+                        "Weighted monthly activity for the most active contributors over the last six "
+                        "months (greener = more active that month). This is the ranked, score-based view "
+                        "that complements the networks and the profile tables."
+                    ),
+                    "files": [("Activity heatmap", "contributor_activity_heatmap.png")],
+                },
             ],
             "hiero-hackers": [
                 {
@@ -89,6 +99,15 @@ CHART_MACROS = [
                         "linked when they share contributors. Colour = repository type. Click to enlarge."
                     ),
                     "files": [("Repositories linked by shared contributors", "all_network.png")],
+                },
+                {
+                    "id": "activity-heatmap",
+                    "title": "Contributor activity heatmap",
+                    "description": (
+                        "Weighted monthly activity for the most active contributors over the last six "
+                        "months (greener = more active that month)."
+                    ),
+                    "files": [("Activity heatmap", "contributor_activity_heatmap.png")],
                 },
             ],
         },
@@ -369,21 +388,21 @@ SECTION_SPECS = [
 ]
 
 
-# Display order for the tables: high-level aggregates first (repos, then teams),
-# drilling down to per-holder cohorts, ending at the most granular individual list
-# (every contributor). Decoupled from SECTION_SPECS definition order on purpose.
-_SECTION_ORDER = [
-    "repoactivity",  # per-repo rollup (most aggregate)
-    "understaffed",  # repos with <=1 active maintainer
-    "loadshare",  # review-load concentration
-    "teams",  # per-team rollup
-    "teamrepo",  # team × repo
-    "repo",  # role-holders per repo
-    "account",  # maintainers, by repo
-    "tscrepo",  # TSC members, by repo
-    "gonedark",  # individual holders who've gone quiet
-    "profiles",  # every contributor (most granular)
+# Tables grouped by purpose so viewers get a short, scannable menu instead of one
+# long stack. Each group renders under its own heading (with a jump-bar link), and
+# within a group the order goes high-level aggregate → most granular. Groups render
+# after the charts. Order here is the on-screen order.
+_SECTION_GROUPS = [
+    # The actionable headlines — where coverage is thin or work is concentrated.
+    ("Coverage & risk", ["repoactivity", "understaffed", "loadshare", "gonedark"]),
+    # Reference: who holds which role, per repo and per team.
+    ("Roles & teams", ["repo", "account", "tscrepo", "teams", "teamrepo"]),
+    # The full per-person list.
+    ("All contributors", ["profiles"]),
 ]
+_SECTION_ORDER = [sid for _name, ids in _SECTION_GROUPS for sid in ids]
+_SECTION_GROUP_OF = {sid: name for name, ids in _SECTION_GROUPS for sid in ids}
+CHARTS_GROUP = "Charts"
 
 
 def _load(path: Path) -> pd.DataFrame:
@@ -430,7 +449,8 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
         ]
         if charts:
             section = {
-                "id": spec["id"], "title": spec["title"], "description": spec["description"], "charts": charts,
+                "id": spec["id"], "title": spec["title"], "description": spec["description"],
+                "group": CHARTS_GROUP, "charts": charts,
             }
             if spec.get("slideshow"):
                 section["slideshow"] = True
@@ -451,6 +471,7 @@ def _org_tab(org_name: str, org_data_dir: Path) -> dict | None:
             "id": spec["id"],
             "title": spec["title"],
             "description": spec["description"],
+            "group": _SECTION_GROUP_OF[section_id],
             "columns": spec["columns"],
             "rows": loaded[spec["id"]].to_dict("records"),
         }

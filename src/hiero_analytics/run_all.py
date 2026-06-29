@@ -30,6 +30,7 @@ from collections.abc import Callable
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.run_codeowner_and_runner import main as run_codeowner
 from hiero_analytics.run_contributor_activity_org import main as run_contributor_activity
+from hiero_analytics.run_contributor_heatmap_org import main as run_contributor_heatmap
 from hiero_analytics.run_contributor_profiles_repo import main as run_contributor_profiles
 from hiero_analytics.run_dashboard import main as run_dashboard
 from hiero_analytics.run_difficulty_org_for_repo import main as run_difficulty
@@ -54,6 +55,7 @@ PIPELINES: list[tuple[str, Callable[[], None]]] = [
     ("contributor_profiles", run_contributor_profiles),
     ("maintainer_pipeline", run_maintainer),
     ("contributor_activity", run_contributor_activity),
+    ("contributor_heatmap", run_contributor_heatmap),
     ("role_coverage", run_role_coverage),
     ("scorecard", run_scorecard),
     ("codeowner_and_runner", run_codeowner),
