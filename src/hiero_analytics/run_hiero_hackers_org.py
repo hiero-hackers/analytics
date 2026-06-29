@@ -21,6 +21,7 @@ from hiero_analytics.analysis.hiero_hackers_analysis import (
     calculate_push_activity_summary,
     repos_to_dataframe,
 )
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
@@ -34,7 +35,6 @@ from hiero_analytics.plotting.pie import plot_pie
 ORG = "hiero-hackers"
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def main() -> None:
@@ -93,4 +93,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

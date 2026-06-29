@@ -6,16 +6,7 @@ query ISSUES_QUERY($owner:String!,$repo:String!,$cursor:String,$states:[IssueSta
         endCursor
       }
       nodes{
-        number
-        title
-        state
-        createdAt
-        closedAt
-        labels(first:10){
-          nodes{
-            name
-          }
-        }
+        ...IssueFields
       }
     }
   }

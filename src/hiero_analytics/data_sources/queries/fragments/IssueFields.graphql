@@ -1,0 +1,13 @@
+fragment IssueFields on Issue {
+  number
+  title
+  state
+  createdAt
+  updatedAt
+  closedAt
+  labels(first:100){
+    nodes{
+      name
+    }
+  }
+}

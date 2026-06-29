@@ -51,6 +51,22 @@ def test_plot_scatter_with_regression_raises_on_empty_dataframe(tmp_path):
         )
 
 
+def test_plot_scatter_with_regression_raises_on_missing_column(tmp_path):
+    """A missing required column is reported clearly, not as a raw pandas error."""
+    df = pd.DataFrame({"x": [1.0, 2.0]})  # no "y" column
+
+    with pytest.raises(KeyError, match="Missing columns"):
+        plot_scatter_with_regression(
+            df,
+            x_col="x",
+            y_col="y",
+            title="Missing",
+            xlabel="X",
+            ylabel="Y",
+            output_path=tmp_path / "should_not_exist.png",
+        )
+
+
 def test_plot_scatter_with_regression_raises_on_all_na_data(tmp_path):
     """A DataFrame that becomes empty after dropping NA should raise."""
     na_df = pd.DataFrame(
@@ -60,7 +76,7 @@ def test_plot_scatter_with_regression_raises_on_all_na_data(tmp_path):
         }
     )
 
-    with pytest.raises(ValueError, match="No valid data after dropping NA"):
+    with pytest.raises(ValueError, match="No valid data available for plotting"):
         plot_scatter_with_regression(
             na_df,
             x_col="x",

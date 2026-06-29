@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import ScorecardRecord
 
 
@@ -24,23 +25,11 @@ CHECK_COLUMNS = [
 
 
 def scorecard_to_dataframe(scorecards: list[ScorecardRecord]) -> pd.DataFrame:
-    """
-    Convert ScorecardRecord list into a dataframe.
-    """
-    if not scorecards:
-        return pd.DataFrame(
-            columns=["repo", "score", "date"]
-        )
-
-    return pd.DataFrame(
-        [
-            {
-                "repo": s.repo,
-                "score": s.score,
-                "date": s.date,
-            }
-            for s in scorecards
-        ]
+    """Convert ScorecardRecord list into a dataframe."""
+    return records_to_dataframe(
+        scorecards,
+        lambda s: {"repo": s.repo, "score": s.score, "date": s.date},
+        ["repo", "score", "date"],
     )
 
 

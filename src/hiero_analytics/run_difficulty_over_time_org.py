@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
@@ -9,13 +10,13 @@ import pandas as pd
 from hiero_analytics.analysis.timeseries import (
     DIFFICULTY_OVER_TIME_COLUMN_ORDER,
     get_difficulty_over_time_event_based,
-    issue_overlaps_window,
 )
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
-    fetch_issue_timeline_events_graphql,
+    fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
 )
 from hiero_analytics.domain.labels import (
@@ -37,6 +38,7 @@ DIFFICULTY_OVER_TIME_LABELS = [
 ]
 
 
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -45,32 +47,28 @@ def main() -> None:
     end_at = datetime.now(UTC)
     start_at = end_at - timedelta(days=WINDOW_DAYS)
 
-    print(f"Running event-based difficulty-over-time analytics for org: {ORG}")
-    print(
+    logger.info("Running event-based difficulty-over-time analytics for org: %s", ORG)
+    logger.info(
         "Window: "
         f"{start_at.date().isoformat()} to {end_at.date().isoformat()}"
     )
 
     client = GitHubClient()
-
+    
     # Fetch all issues (open and closed) to get the complete issue set.
     all_issues = fetch_org_issues_graphql(client, org=ORG, states=["OPEN", "CLOSED"])
-    print(f"Fetched {len(all_issues)} total issues")
+    logger.info("Fetched %d total issues", len(all_issues))
 
-    # Pre-filter issues that do not overlap the analysis window to reduce timeline fetches.
-    candidate_issues = [
-        issue for issue in all_issues if issue_overlaps_window(issue, analysis_start, end_at)
-    ]
-    print(f"Candidate issues overlapping window: {len(candidate_issues)}")
-
-    # Fetch timeline events for all issues to identify label application dates.
-    timeline_events = fetch_issue_timeline_events_graphql(
+    # Fetch label add/remove events (GraphQL timelineItems) to identify label
+    # application dates. Only LABELED/UNLABELED events are transferred, so this
+    # avoids the repo-wide REST event firehose and its 300-page truncation.
+    timeline_events = fetch_org_issue_label_events_graphql(
         client,
-        candidate_issues,
-        since=analysis_start,
+        org=ORG,
+        states=["OPEN", "CLOSED"],
         max_workers=TIMELINE_MAX_WORKERS,
     )
-    print(f"Fetched {len(timeline_events)} issue timeline events")
+    logger.info("Fetched %d repository issue events", len(timeline_events))
 
     # Build event-based difficulty-over-time series.
     difficulty_over_time = pd.DataFrame(
@@ -82,7 +80,7 @@ def main() -> None:
         )
     )
     if difficulty_over_time.empty:
-        print("No difficulty-over-time data available")
+        logger.info("No difficulty-over-time data available")
         return
 
     difficulty_over_time = difficulty_over_time[["date", *DIFFICULTY_OVER_TIME_COLUMN_ORDER]]
@@ -104,8 +102,9 @@ def main() -> None:
         ylabel="Open issues",
     )
 
-    print("Event-based difficulty-over-time analytics complete")
+    logger.info("Event-based difficulty-over-time analytics complete")
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

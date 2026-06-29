@@ -65,6 +65,36 @@ def prepare_dataframe(df: pd.DataFrame, *cols: str) -> pd.DataFrame:
     return data
 
 
+def adaptive_legend_placement(
+    count: int,
+    *,
+    bottom_anchor: tuple[float, float] = (0.5, -0.14),
+    bottom_rect_bottom: float = 0.14,
+) -> dict[str, Any]:
+    """Choose legend placement that adapts to the number of legend entries.
+
+    With few entries (``<= 6``) the legend sits in a wide row beneath the plot;
+    with many it moves to a single column on the right so labels do not
+    overflow. Returns kwargs ready to splat into :func:`finalize_chart`.
+
+    The bottom-legend offset and the layout space it reserves differ slightly
+    between chart types, so they are parameters rather than hard-coded.
+    """
+    if count > 6:
+        return {
+            "legend_loc": "upper left",
+            "legend_bbox_to_anchor": (1.02, 1.0),
+            "legend_ncol": 1,
+            "layout_rect": (0.0, 0.0, 0.85, 1.0),
+        }
+    return {
+        "legend_loc": "lower center",
+        "legend_bbox_to_anchor": bottom_anchor,
+        "legend_ncol": min(count, 4),
+        "layout_rect": (0.0, bottom_rect_bottom, 1.0, 1.0),
+    }
+
+
 def create_figure(
     figsize: tuple[float, float] = DEFAULT_FIGSIZE,
 ) -> tuple[Figure, Axes]:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from unittest.mock import Mock
 
-import hiero_analytics.config.logging as logging_config
+import hiero_analytics.config.logging_config as logging_config
 
 
 def test_resolve_log_level_accepts_named_and_numeric_values():

@@ -130,6 +130,61 @@ uv run pytest
 ```
 ---
 
+## Running the Analytics
+
+With your `GITHUB_TOKEN` configured (see [Environment Setup](#environment-setup)), run **every** analytics pipeline with a single command:
+
+```bash
+uv run hiero-analytics
+```
+
+**What this does:**
+- Runs all analytics pipelines in one process (one Python start-up instead of one per pipeline), reusing the on-disk fetch cache between pipelines
+- Writes charts to `outputs/charts/` and data tables to `outputs/data/`
+- Isolates failures — if one pipeline errors it is logged and the rest still run; the command exits non-zero if any failed
+
+This is the same command the scheduled **Refresh Analytics Data** workflow runs.
+
+### Running a single pipeline
+
+To run just one pipeline, invoke its module directly:
+
+```bash
+uv run python -m hiero_analytics.run_gfic_gfi_org
+```
+
+Available pipelines:
+
+| Module | What it produces |
+|---|---|
+| `run_gfic_gfi_org` | Good First Issue / onboarding pipeline |
+| `run_difficulty_org_for_repo` | Issue difficulty distribution |
+| `run_onboarding_signal_for_repo` | Onboarding signal (issues vs. contributors) |
+| `run_contributor_profiles_repo` | Per-contributor profiles |
+| `run_maintainer_pipeline_org` | Maintainer pipeline by governance role |
+| `run_scorecard_for_org` | OpenSSF Scorecard results |
+| `run_codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
+| `run_hiero_hackers_org` | Hiero Hackers org composition and activity |
+
+> Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
+
+### Incremental data fetching
+
+To avoid re-downloading all of GitHub history on every run, fetching is **incremental**:
+
+- The **first run** does a full fetch and stores a dataset under `outputs/data/datasets/` (this run is the slow one).
+- **Later runs** fetch only what changed since the last run and merge it in — much faster.
+- Every 30 days (or with `refresh=True`) it does a full re-fetch to self-heal, so missed updates or deleted items can't accumulate.
+
+**The datasets are not committed to git** — they're gitignored. Persistence is handled differently per environment:
+
+- **Locally:** the dataset lives on your disk under `outputs/data/datasets/`. Nothing to set up — just run the pipeline. To force a clean rebuild, delete that folder.
+- **In CI:** the scheduled workflow persists the dataset between runs via `actions/cache` (see `.github/workflows/update-analytics.yml`). If the cache is ever evicted, the next run simply does one full fetch and then resumes incrementally.
+
+> Local and CI datasets are independent — each maintains its own and stays correct on its own; you never need to sync them.
+
+---
+
 ## License
 
 - Available under the **Apache License, Version 2.0 (Apache-2.0)*

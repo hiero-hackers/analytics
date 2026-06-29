@@ -3,24 +3,23 @@ import logging
 from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_org_codeowners_summary,
     prepare_repo_level_codeowner_summary,
+    prepare_stacked_runner_summary,
     runner_records_to_dataframe,
-    prepare_stacked_runner_summary
 )
+from hiero_analytics.config.logging_config import setup_logging
+from hiero_analytics.config.paths import ORG, ensure_org_dirs
+from hiero_analytics.data_sources.cache import load_records_cache, save_records_cache
+from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_search import (
     fetch_repo_workflows,
     has_codeowners_file,
 )
-from hiero_analytics.config.paths import ORG, ensure_org_dirs
-from hiero_analytics.data_sources.cache import load_records_cache, save_records_cache
-from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.models import CodeOwnersRecord, RepositoryRecord, RunnerRecord
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 from hiero_analytics.run_scorecard_for_org import fetch_org_repos
 
-
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def get_codeowners_for_repos(client: GitHubClient, org: str, repos: list[RepositoryRecord]) -> list[CodeOwnersRecord]:
@@ -71,7 +70,7 @@ def get_workflow_for_repos(client: GitHubClient, org: str, repos: list[Repositor
 
     records = []
     for r in repos:
-        logger.info(f"Processing runners for: {r.name}")
+        logger.info("Processing runners for: %s", r.name)
         job_stats = fetch_repo_workflows(client, org, r.name)
         for stat in job_stats:
             records.append(RunnerRecord(
@@ -102,7 +101,7 @@ def generate_codeowners_markdown_report(records: list[CodeOwnersRecord], output_
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     
-    logger.info(f"Markdown report saved to: {output_path}")
+    logger.info("Markdown report saved to: %s", output_path)
 
 def generate_runner_markdown_report(records: list[RunnerRecord], output_file: str) -> None:
     """Generates a Markdown report from RunnerRecord dataclass objects."""
@@ -129,7 +128,7 @@ def generate_runner_markdown_report(records: list[RunnerRecord], output_file: st
 
         f.write("\n---\n\n")
 
-    print(f"Runner report successfully generated: {output_file}")
+    logger.info("Runner report successfully generated: %s", output_file)
 
 
 def main() -> None:
@@ -190,4 +189,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

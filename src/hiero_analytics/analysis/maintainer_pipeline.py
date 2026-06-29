@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 
+from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import ContributorActivityRecord
 
 STAGE_COLUMNS = ["general_user", "triage", "committer", "maintainer"]
@@ -32,11 +33,10 @@ def activity_to_role_dataframe(
     Includes ``occurred_at`` so downstream aggregations can apply per-year
     activity windows without re-fetching.
     """
-    rows = []
 
-    for record in records:
+    def to_row(record: ContributorActivityRecord) -> dict[str, object] | None:
         if record.activity_type not in _MAINTAINER_ACTIVITY_TYPES:
-            continue
+            return None
 
         repo_name = record.repo.split("/")[-1]
         actor_key = record.actor.strip().lower()
@@ -50,20 +50,19 @@ def activity_to_role_dataframe(
         else:
             occurred_at = occurred_at.astimezone(timezone.utc)
 
-        rows.append(
-            {
-                "repo": repo_name,
-                "actor": record.actor,
-                "occurred_at": occurred_at,
-                "year": occurred_at.year,
-                "stage": role,
-            }
-        )
+        return {
+            "repo": repo_name,
+            "actor": record.actor,
+            "occurred_at": occurred_at,
+            "year": occurred_at.year,
+            "stage": role,
+        }
 
-    if not rows:
-        return pd.DataFrame(columns=["repo", "actor", "occurred_at", "year", "stage"])
-
-    return pd.DataFrame(rows)
+    return records_to_dataframe(
+        records,
+        to_row,
+        ["repo", "actor", "occurred_at", "year", "stage"],
+    )
 
 
 def _active_window_for_year(

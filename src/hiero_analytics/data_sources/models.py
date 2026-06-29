@@ -8,9 +8,12 @@ issues, and merged pull request difficulty metrics.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_dt(value: str | None) -> datetime | None:
@@ -18,6 +21,35 @@ def _parse_dt(value: str | None) -> datetime | None:
     if value is None:
         return None
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def _extract_login(container: Mapping | None, key: str = "author") -> str | None:
+    """Extract a user login (``container[key]["login"]``) defensively.
+
+    Returns ``None`` when the key is missing, the actor node is malformed (GitHub can
+    return a null actor, e.g. a deleted user), or the login is the dependabot bot.
+    """
+    actor = container.get(key) if isinstance(container, Mapping) else None
+    login = actor.get("login") if isinstance(actor, Mapping) else None
+    if not isinstance(login, str) or login == "dependabot":
+        return None
+    return login
+
+
+def _extract_labels(container: Mapping | None, *, lower: bool = False) -> list[str]:
+    """Extract label names from ``container["labels"]["nodes"]``."""
+    if not isinstance(container, Mapping):
+        return []
+    nodes = container.get("labels", {}).get("nodes", [])
+    names = (n.get("name") for n in nodes if isinstance(n, Mapping))
+    return [name.lower() if lower else name for name in names if isinstance(name, str)]
+
+
+def _extract_label_name(container: Mapping | None) -> str | None:
+    """Extract one lower-cased label name from ``container["label"]["name"]``."""
+    label_node = container.get("label") if isinstance(container, Mapping) else None
+    raw = label_node.get("name") if isinstance(label_node, Mapping) else None
+    return raw.lower() if isinstance(raw, str) else None
 
 
 @dataclass(frozen=True)
@@ -94,12 +126,13 @@ class IssueRecord(BaseRecord):
     created_at: datetime
     closed_at: datetime | None
     labels: list[str]
+    updated_at: datetime | None = None
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[IssueRecord]:
         """Hydrate issue records from a GraphQL issue node."""
         repo_name = cls._repo_name(context)
-        labels = [label["name"].lower() for label in node.get("labels", {}).get("nodes", [])]
+        labels = _extract_labels(node, lower=True)
         return [
             cls(
                 repo=repo_name,
@@ -109,6 +142,7 @@ class IssueRecord(BaseRecord):
                 created_at=_parse_dt(node["createdAt"]),
                 closed_at=_parse_dt(node.get("closedAt")),
                 labels=labels,
+                updated_at=_parse_dt(node.get("updatedAt")),
             )
         ]
 
@@ -186,13 +220,11 @@ class IssueTimelineEventRecord:
         if occurred_at is None:
             return None
 
-        label_name: str | None = None
-        if event_type in {"labeled", "unlabeled"}:
-            label_node = event.get("label")
-            if isinstance(label_node, Mapping):
-                raw_label = label_node.get("name")
-                if isinstance(raw_label, str):
-                    label_name = raw_label.lower()
+        label_name = (
+            _extract_label_name(event)
+            if event_type in {"labeled", "unlabeled"}
+            else None
+        )
 
         return cls(
             repo=f"{owner}/{repo}",
@@ -211,9 +243,7 @@ class IssueTimelineEventRecord:
         per event, matching the normalization of :meth:`from_rest_event`
         (lower-cased event type and label name).
         """
-        owner = context.get("owner", "")
-        repo = context.get("repo", "")
-        full_repo = f"{owner}/{repo}" if owner and repo else ""
+        full_repo = BaseRecord._repo_name(context)
 
         issue_number = node.get("number")
         if not isinstance(issue_number, int):
@@ -222,7 +252,18 @@ class IssueTimelineEventRecord:
         type_map = {"LabeledEvent": "labeled", "UnlabeledEvent": "unlabeled"}
         records: list[IssueTimelineEventRecord] = []
 
-        for item in node.get("timelineItems", {}).get("nodes", []):
+        timeline = node.get("timelineItems", {})
+        if timeline.get("pageInfo", {}).get("hasNextPage"):
+            # The fragment caps timelineItems at 100 and does not paginate the
+            # inner connection. Surface when an issue actually exceeds that so we
+            # know whether nested pagination is worth building.
+            logger.warning(
+                "Issue %s#%s has >100 label events; only the first 100 were "
+                "fetched (label-event history truncated for this issue)",
+                full_repo, issue_number,
+            )
+
+        for item in timeline.get("nodes", []):
             if not isinstance(item, Mapping):
                 continue
 
@@ -234,12 +275,7 @@ class IssueTimelineEventRecord:
             if occurred_at is None:
                 continue
 
-            label_name: str | None = None
-            label_node = item.get("label")
-            if isinstance(label_node, Mapping):
-                raw_label = label_node.get("name")
-                if isinstance(raw_label, str):
-                    label_name = raw_label.lower()
+            label_name = _extract_label_name(item)
 
             records.append(
                 cls(
@@ -272,13 +308,13 @@ class PullRequestDifficultyRecord(BaseRecord):
     def from_github_node(cls, node: dict, context: dict) -> list[PullRequestDifficultyRecord]:
         """Hydrate pull-request difficulty records from a GraphQL PR node."""
         repo_name = cls._repo_name(context)
-        author = cls._login(node.get("author"))
-        if not author:
-            return []
+        # Author is optional metadata here — a PR with no author still yields its
+        # difficulty/label records (difficulty is about the linked issues, not the actor).
+        author = _extract_login(node)
         issues = node.get("closingIssuesReferences", {}).get("nodes", [])
         records = []
         for issue in issues:
-            labels = [label["name"] for label in issue.get("labels", {}).get("nodes", [])]
+            labels = _extract_labels(issue)
             records.append(
                 cls(
                     repo=repo_name,
@@ -314,10 +350,8 @@ class ContributorActivityRecord(BaseRecord):
         repo_name = cls._repo_name(context)
         cutoff = context.get("cutoff")
         records = []
-
         activity_source = context.get("activity_source", "pull_request")
-
-        pr_author = cls._login(node.get("author"))
+        pr_author = _extract_login(node)
 
         if activity_source == "issue":
             issue_number = node["number"]
@@ -327,7 +361,7 @@ class ContributorActivityRecord(BaseRecord):
                 records.append(
                     cls(
                         repo=repo_name,
-                        activity_type="created_issue",
+                        activity_type="authored_issue",
                         actor=issue_author,
                         occurred_at=issue_created_at,
                         target_type="issue",
@@ -335,7 +369,6 @@ class ContributorActivityRecord(BaseRecord):
                         target_author=issue_author,
                     )
                 )
-
             return records
 
         pr_number = node["number"]
@@ -354,7 +387,7 @@ class ContributorActivityRecord(BaseRecord):
             )
 
         for review in node.get("reviews", {}).get("nodes", []):
-            review_author = cls._login(review.get("author"))
+            review_author = _extract_login(review)
             reviewed_at = _parse_dt(review.get("submittedAt"))
             if reviewed_at and (cutoff is None or reviewed_at >= cutoff) and review_author:
                 records.append(
@@ -371,7 +404,7 @@ class ContributorActivityRecord(BaseRecord):
                 )
 
         merged_at = _parse_dt(node.get("mergedAt"))
-        merged_by = cls._login(node.get("mergedBy"))
+        merged_by = _extract_login(node, "mergedBy")
         if merged_at and (cutoff is None or merged_at >= cutoff) and merged_by:
             records.append(
                 cls(
@@ -385,7 +418,6 @@ class ContributorActivityRecord(BaseRecord):
                 )
             )
         return records
-
 
 
 @dataclass(frozen=True)

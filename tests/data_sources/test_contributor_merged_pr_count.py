@@ -25,7 +25,7 @@ def bypass_pagination(monkeypatch):
     Replace paginate_cursor with a single-page execution.
     """
     monkeypatch.setattr(
-        ingest,
+        ingest._common,
         "paginate_cursor",
         lambda f: f(None)[0],
     )

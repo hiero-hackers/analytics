@@ -13,9 +13,41 @@ import matplotlib.pyplot as plt
 
 import hiero_analytics.plotting.pie as pie_module
 from hiero_analytics.plotting.bars import _compute_annotation_padding, _round_bar_patches, plot_bar
-from hiero_analytics.plotting.base import create_figure, style_axes
+from hiero_analytics.plotting.base import (
+    adaptive_legend_placement,
+    create_figure,
+    style_axes,
+)
 from hiero_analytics.plotting.lines import plot_date_line, plot_multiline, plot_stacked_area
 from hiero_analytics.plotting.pie import plot_pie
+
+
+def test_adaptive_legend_placement_few_items_sits_below():
+    """Six-or-fewer entries get a wide bottom legend, ncol capped at 4."""
+    placement = adaptive_legend_placement(3)
+    assert placement["legend_loc"] == "lower center"
+    assert placement["legend_ncol"] == 3
+    assert placement["legend_bbox_to_anchor"] == (0.5, -0.14)
+    assert placement["layout_rect"] == (0.0, 0.14, 1.0, 1.0)
+    assert adaptive_legend_placement(6)["legend_ncol"] == 4
+
+
+def test_adaptive_legend_placement_many_items_move_right():
+    """More than six entries switch to a single right-hand column."""
+    placement = adaptive_legend_placement(7)
+    assert placement["legend_loc"] == "upper left"
+    assert placement["legend_ncol"] == 1
+    assert placement["legend_bbox_to_anchor"] == (1.02, 1.0)
+    assert placement["layout_rect"] == (0.0, 0.0, 0.85, 1.0)
+
+
+def test_adaptive_legend_placement_honors_bottom_overrides():
+    """The bottom offset/reserved-space params override the defaults."""
+    placement = adaptive_legend_placement(
+        2, bottom_anchor=(0.5, -0.18), bottom_rect_bottom=0.12
+    )
+    assert placement["legend_bbox_to_anchor"] == (0.5, -0.18)
+    assert placement["layout_rect"] == (0.0, 0.12, 1.0, 1.0)
 
 
 def test_style_axes_uses_single_axis_grid():

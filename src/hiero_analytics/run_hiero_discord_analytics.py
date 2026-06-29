@@ -27,6 +27,7 @@ Charts are written to ``outputs/charts/org/hiero-ledger/``.
 
 from __future__ import annotations
 
+import logging
 import os
 from datetime import date
 from pathlib import Path
@@ -34,6 +35,7 @@ from pathlib import Path
 import pandas as pd
 
 from hiero_analytics.config.charts import MUTED_HISTORICAL_COLOR, PRIMARY_PALETTE
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import INPUTS_DIR, ensure_org_dirs
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 from hiero_analytics.plotting.lines import plot_date_line
@@ -46,6 +48,9 @@ SNAPSHOT_DATE = date(2026, 5, 12)
 
 DEFAULT_CHANNELS_CSV = INPUTS_DIR / "hiero_discord_channels.csv"
 DEFAULT_MONTHLY_CSV = INPUTS_DIR / "hiero_discord_monthly_traffic.csv"
+
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_path(env_var: str, default: Path) -> Path:
@@ -188,8 +193,9 @@ def main() -> None:
     plot_recent_activity_30d(channels, charts_dir / "hiero_discord_recent_activity_30d.png")
     plot_category_breakdown(channels, charts_dir / "hiero_discord_channel_categories.png")
 
-    print(f"Hiero Discord charts written to {charts_dir}")
+    logger.info("Hiero Discord charts written to %s", charts_dir)
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

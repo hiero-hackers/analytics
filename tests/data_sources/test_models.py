@@ -12,6 +12,9 @@ from hiero_analytics.data_sources.models import (
     IssueTimelineEventRecord,
     PullRequestDifficultyRecord,
     RepositoryRecord,
+    _extract_label_name,
+    _extract_labels,
+    _extract_login,
     _parse_dt,
 )
 
@@ -317,3 +320,58 @@ def test_parse_dt():
 def test_parse_dt_none():
     """A missing timestamp should remain missing."""
     assert _parse_dt(None) is None
+
+
+# ---------------------------------------------------------
+# hydration helpers (defensive extraction)
+# ---------------------------------------------------------
+
+def test_extract_login_reads_nested_login():
+    """A well-formed actor node yields its login."""
+    assert _extract_login({"author": {"login": "alice"}}) == "alice"
+
+
+def test_extract_login_honors_custom_key():
+    """A non-default key (e.g. mergedBy) is read."""
+    assert _extract_login({"mergedBy": {"login": "bob"}}, "mergedBy") == "bob"
+
+
+def test_extract_login_degrades_on_missing_or_malformed():
+    """Null, empty, or non-mapping actors return None instead of raising."""
+    assert _extract_login({}) is None
+    assert _extract_login({"author": None}) is None
+    assert _extract_login({"author": {}}) is None
+    assert _extract_login({"author": "alice"}) is None  # actor is not a mapping
+    assert _extract_login(None) is None
+
+
+def test_extract_labels_returns_names():
+    """Label nodes are flattened to a list of names, case preserved by default."""
+    container = {"labels": {"nodes": [{"name": "Bug"}, {"name": "GFI"}]}}
+    assert _extract_labels(container) == ["Bug", "GFI"]
+
+
+def test_extract_labels_lowercases_when_requested():
+    """The lower flag normalizes label case."""
+    container = {"labels": {"nodes": [{"name": "Bug"}]}}
+    assert _extract_labels(container, lower=True) == ["bug"]
+
+
+def test_extract_labels_degrades_on_missing_or_malformed():
+    """Missing labels, non-mapping entries, and non-str names are skipped."""
+    assert _extract_labels({}) == []
+    assert _extract_labels(None) == []
+    assert _extract_labels({"labels": {"nodes": ["x", {"name": 5}, {"name": "ok"}]}}) == ["ok"]
+
+
+def test_extract_label_name_lowercases():
+    """A single label node yields its lower-cased name."""
+    assert _extract_label_name({"label": {"name": "Beginner"}}) == "beginner"
+
+
+def test_extract_label_name_degrades_on_missing_or_malformed():
+    """Null or malformed single labels return None."""
+    assert _extract_label_name({}) is None
+    assert _extract_label_name({"label": None}) is None
+    assert _extract_label_name({"label": {}}) is None
+    assert _extract_label_name(None) is None

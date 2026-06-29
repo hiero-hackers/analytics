@@ -10,6 +10,7 @@ import pytest
 
 import hiero_analytics.data_sources.cache as cache
 import hiero_analytics.data_sources.github_ingest as ingest
+import hiero_analytics.data_sources.serialization as serialization
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueRecord,
@@ -21,11 +22,8 @@ from hiero_analytics.data_sources.models import (
 @pytest.fixture(name="_temp_cache_dir")
 def fixture_temp_cache_dir(monkeypatch, tmp_path):
     """Point cache writes at a temporary directory for test isolation."""
-    gh_cache = cache.GitHubRecordCache(cache_dir=tmp_path / "github")
-
-    cache.GitHubRecordCache._DATETIME_FIELDS[IssueTimelineEventRecord] = ("occurred_at",)
-
-    return gh_cache
+    monkeypatch.setattr(cache, "GITHUB_CACHE_DIR", tmp_path / "github")
+    return cache.GITHUB_CACHE_DIR
 
 
 def test_issue_record_cache_round_trip(_temp_cache_dir):
@@ -47,7 +45,7 @@ def test_issue_record_cache_round_trip(_temp_cache_dir):
         "states": ["OPEN"],
     }
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -56,7 +54,7 @@ def test_issue_record_cache_round_trip(_temp_cache_dir):
         use_cache=True,
     )
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -82,7 +80,7 @@ def test_repository_record_cache_round_trip(_temp_cache_dir):
     ]
     parameters = {"org": "org"}
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "org_repos",
         "org",
         parameters,
@@ -91,7 +89,7 @@ def test_repository_record_cache_round_trip(_temp_cache_dir):
         use_cache=True,
     )
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "org_repos",
         "org",
         parameters,
@@ -125,7 +123,7 @@ def test_contributor_activity_record_cache_round_trip(_temp_cache_dir):
         "lookback_days": 30,
     }
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "repo_contributor_activity",
         "org_repo",
         parameters,
@@ -134,7 +132,7 @@ def test_contributor_activity_record_cache_round_trip(_temp_cache_dir):
         use_cache=True,
     )
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "repo_contributor_activity",
         "org_repo",
         parameters,
@@ -163,7 +161,7 @@ def test_issue_timeline_event_record_cache_round_trip(_temp_cache_dir):
         "issue_number": 10,
     }
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "repo_issue_timeline_events",
         "org_repo_10",
         parameters,
@@ -172,7 +170,7 @@ def test_issue_timeline_event_record_cache_round_trip(_temp_cache_dir):
         use_cache=True,
     )
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "repo_issue_timeline_events",
         "org_repo_10",
         parameters,
@@ -181,22 +179,7 @@ def test_issue_timeline_event_record_cache_round_trip(_temp_cache_dir):
         ttl_seconds=60,
     )
 
-    normalized_loaded = [
-        IssueTimelineEventRecord(
-            repo=r.repo,
-            issue_number=r.issue_number,
-            event_type=r.event_type,
-            occurred_at=(
-                datetime.fromisoformat(r.occurred_at)
-                if isinstance(r.occurred_at, str)
-                else r.occurred_at
-            ),
-            label=r.label,
-        )
-        for r in loaded
-    ]
-
-    assert normalized_loaded == records
+    assert loaded == records
 
 
 def test_stale_cache_entry_is_ignored(_temp_cache_dir):
@@ -214,7 +197,7 @@ def test_stale_cache_entry_is_ignored(_temp_cache_dir):
     ]
     parameters = {"owner": "org", "repo": "repo", "states": []}
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -223,12 +206,12 @@ def test_stale_cache_entry_is_ignored(_temp_cache_dir):
         use_cache=True,
     )
 
-    cache_path = _temp_cache_dir._cache_path("repo_issues", "org_repo", parameters)
+    cache_path = cache._cache_path("repo_issues", "org_repo", parameters)
     payload = json.loads(cache_path.read_text(encoding="utf-8"))
     payload["cached_at"] = (datetime.now(UTC) - timedelta(hours=1)).isoformat()
     cache_path.write_text(json.dumps(payload), encoding="utf-8")
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -255,7 +238,7 @@ def test_naive_cached_at_is_treated_as_utc(_temp_cache_dir):
     ]
     parameters = {"owner": "org", "repo": "repo", "states": []}
 
-    _temp_cache_dir.save_records(
+    cache.save_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -264,12 +247,12 @@ def test_naive_cached_at_is_treated_as_utc(_temp_cache_dir):
         use_cache=True,
     )
 
-    cache_path = _temp_cache_dir._cache_path("repo_issues", "org_repo", parameters)
+    cache_path = cache._cache_path("repo_issues", "org_repo", parameters)
     payload = json.loads(cache_path.read_text(encoding="utf-8"))
     payload["cached_at"] = datetime.now(UTC).replace(tzinfo=None).isoformat()
     cache_path.write_text(json.dumps(payload), encoding="utf-8")
 
-    loaded = _temp_cache_dir.load_records(
+    loaded = cache.load_records_cache(
         "repo_issues",
         "org_repo",
         parameters,
@@ -286,7 +269,7 @@ def test_fetch_repo_issues_graphql_uses_cache(monkeypatch, _temp_cache_dir):
     mock_client = Mock()
 
     monkeypatch.setattr(
-        ingest,
+        ingest._common,
         "paginate_cursor",
         lambda fetch_page: fetch_page(None)[0],
     )
@@ -318,7 +301,8 @@ def test_fetch_repo_issues_graphql_uses_cache(monkeypatch, _temp_cache_dir):
         mock_client,
         "org",
         "repo",
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
+        use_cache=True,
+        cache_ttl_seconds=300,
     )
 
     mock_client.graphql.reset_mock()
@@ -327,15 +311,29 @@ def test_fetch_repo_issues_graphql_uses_cache(monkeypatch, _temp_cache_dir):
         mock_client,
         "org",
         "repo",
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
+        use_cache=True,
+        cache_ttl_seconds=300,
     )
 
     mock_client.graphql.assert_not_called()
     assert second == first
 
 
-def test_fetch_org_issues_graphql_uses_cached_dataset(monkeypatch, _temp_cache_dir):
-    """An org-level cache hit should skip nested repo fetches entirely."""
+def _isolate_dataset_path(monkeypatch, tmp_path):
+    """Redirect the committed dataset path into a temp dir for test isolation.
+
+    ``dataset_path`` is imported into both resource submodules that use it, so
+    patch it on each (the org-issues and contributor-activity call sites).
+    """
+    def fake(resource, scope, fingerprint="all"):
+        return tmp_path / f"{resource}_{scope}_{fingerprint}.json"
+
+    monkeypatch.setattr(ingest.issues, "dataset_path", fake)
+    monkeypatch.setattr(ingest.contributors, "dataset_path", fake)
+
+
+def test_fetch_org_issues_first_run_full_then_incremental(monkeypatch, tmp_path):
+    """First org-issues fetch is full; the next fetches only the delta and merges."""
     mock_client = Mock()
     repos = [Mock(owner="org", name="repo", full_name="org/repo")]
     issues = [
@@ -347,72 +345,170 @@ def test_fetch_org_issues_graphql_uses_cached_dataset(monkeypatch, _temp_cache_d
             created_at=datetime(2024, 1, 1, tzinfo=UTC),
             closed_at=None,
             labels=["bug"],
+            # Recent so the 30-day full-refresh self-heal does not trigger here;
+            # this test exercises the incremental (since) path on the 2nd run.
+            updated_at=datetime.now(UTC),
         )
     ]
 
-    fetch_org_repos = Mock(return_value=repos)
-    fetch_repo_issues = Mock(return_value=issues)
-    monkeypatch.setattr(ingest, "fetch_org_repos_graphql", fetch_org_repos)
-    monkeypatch.setattr(ingest, "fetch_repo_issues_graphql", fetch_repo_issues)
+    _isolate_dataset_path(monkeypatch, tmp_path)
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
+    full = Mock(return_value=issues)
+    delta = Mock(return_value=[])  # nothing changed since the watermark
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issues_graphql", full)
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issues_since_graphql", delta)
 
-    first = ingest.fetch_org_issues_graphql(
-        mock_client,
-        "org",
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
-    )
+    first = ingest.fetch_org_issues_graphql(mock_client, "org")
+    assert first == issues
+    full.assert_called_once()
+    delta.assert_not_called()
 
-    fetch_org_repos.reset_mock()
-    fetch_repo_issues.reset_mock()
+    full.reset_mock()
+    second = ingest.fetch_org_issues_graphql(mock_client, "org")
 
-    second = ingest.fetch_org_issues_graphql(
-        mock_client,
-        "org",
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
-    )
-
-    fetch_org_repos.assert_not_called()
-    fetch_repo_issues.assert_not_called()
-    assert second == first
+    full.assert_not_called()      # second run does not do a full fetch
+    delta.assert_called_once()    # it fetches the incremental delta
+    assert second == issues       # empty delta -> merged set unchanged
 
 
-def test_fetch_org_issues_graphql_sorts_states_for_cache_key(monkeypatch, _temp_cache_dir):
-    """Org cache entries should be reused regardless of state filter order."""
+def test_fetch_org_issues_dataset_fingerprint_ignores_state_order(monkeypatch, tmp_path):
+    """State filter order does not change the dataset file (same fingerprint)."""
+    mock_client = Mock()
+    seen_paths = []
+
+    def fake_path(resource, scope, fingerprint="all"):
+        path = tmp_path / f"{resource}_{scope}_{fingerprint}.json"
+        seen_paths.append(path)
+        return path
+
+    monkeypatch.setattr(ingest.issues, "dataset_path", fake_path)
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=[]))
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issues_graphql", Mock(return_value=[]))
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issues_since_graphql", Mock(return_value=[]))
+
+    ingest.fetch_org_issues_graphql(mock_client, "org", states=["closed", "open"])
+    ingest.fetch_org_issues_graphql(mock_client, "org", states=["OPEN", "CLOSED"])
+
+    assert seen_paths[0] == seen_paths[1]  # identical regardless of state order
+
+
+def test_fetch_org_label_events_incremental_dedups_on_merge(monkeypatch, tmp_path):
+    """The 2nd run fetches the delta and merges events without double-counting."""
     mock_client = Mock()
     repos = [Mock(owner="org", name="repo", full_name="org/repo")]
-    issues = [
-        IssueRecord(
-            repo="org/repo",
-            number=1,
-            title="Issue A",
-            state="OPEN",
-            created_at=datetime(2024, 1, 1, tzinfo=UTC),
-            closed_at=None,
-            labels=["bug"],
-        )
-    ]
-
-    fetch_org_repos = Mock(return_value=repos)
-    fetch_repo_issues = Mock(return_value=issues)
-    monkeypatch.setattr(ingest, "fetch_org_repos_graphql", fetch_org_repos)
-    monkeypatch.setattr(ingest, "fetch_repo_issues_graphql", fetch_repo_issues)
-
-    first = ingest.fetch_org_issues_graphql(
-        mock_client,
-        "org",
-        states=["closed", "open"],
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
+    occurred = datetime.now(UTC)  # recent, so the 30-day refresh does not trigger
+    ev1 = IssueTimelineEventRecord(
+        repo="org/repo", issue_number=1, event_type="labeled",
+        occurred_at=occurred, label="bug",
+    )
+    ev2 = IssueTimelineEventRecord(
+        repo="org/repo", issue_number=2, event_type="unlabeled",
+        occurred_at=occurred, label="bug",
     )
 
-    fetch_org_repos.reset_mock()
-    fetch_repo_issues.reset_mock()
+    _isolate_dataset_path(monkeypatch, tmp_path)
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
+    full = Mock(return_value=[ev1])
+    delta = Mock(return_value=[ev1, ev2])  # re-sends ev1 (must dedup) + a new ev2
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issue_label_events_graphql", full)
+    monkeypatch.setattr(ingest.issues, "fetch_repo_issue_label_events_since_graphql", delta)
 
-    second = ingest.fetch_org_issues_graphql(
-        mock_client,
-        "org",
-        states=["OPEN", "CLOSED"],
-        cache_options=cache.FetchCacheOptions(use_cache=True, cache_ttl_seconds=300),
+    first = ingest.fetch_org_issue_label_events_graphql(mock_client, "org")
+    assert first == [ev1]
+    full.assert_called_once()
+
+    second = ingest.fetch_org_issue_label_events_graphql(mock_client, "org")
+    delta.assert_called_once()
+    keys = {(e.repo, e.issue_number, e.event_type, e.occurred_at, e.label) for e in second}
+    assert len(second) == 2  # ev1 deduped (not 3), ev2 added
+    assert len(keys) == 2
+
+
+def test_fetch_org_contributor_activity_full_history_is_incremental(monkeypatch, tmp_path):
+    """lookback_days=None routes through the dataset store: full then delta-merge."""
+    mock_client = Mock()
+    repos = [Mock(owner="org", name="repo", full_name="org/repo")]
+    occurred = datetime.now(UTC)
+    ev1 = ContributorActivityRecord(
+        repo="org/repo", activity_type="authored_pull_request", actor="alice",
+        occurred_at=occurred, target_type="pull_request", target_number=1,
+    )
+    ev2 = ContributorActivityRecord(
+        repo="org/repo", activity_type="reviewed_pull_request", actor="bob",
+        occurred_at=occurred, target_type="pull_request", target_number=2,
     )
 
-    fetch_org_repos.assert_not_called()
-    fetch_repo_issues.assert_not_called()
-    assert second == first
+    _isolate_dataset_path(monkeypatch, tmp_path)
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
+
+    def at_cutoff(_client, _owner, _repo, cutoff):
+        return [ev1] if cutoff is None else [ev1, ev2]  # full vs delta (re-sends ev1)
+
+    monkeypatch.setattr(ingest.contributors, "_fetch_repo_contributor_activity_at_cutoff", at_cutoff)
+
+    first = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=None)
+    assert first == [ev1]
+
+    second = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=None)
+    keys = {
+        (e.repo, e.activity_type, e.actor, e.occurred_at, e.target_type, e.target_number)
+        for e in second
+    }
+    assert len(second) == 2  # ev1 deduped, ev2 added
+    assert len(keys) == 2
+
+
+def test_fetch_org_contributor_activity_bounded_window_skips_dataset(monkeypatch):
+    """lookback_days set uses the bounded path and writes no incremental dataset."""
+    mock_client = Mock()
+
+    def fake_path(*_a, **_k):
+        raise AssertionError("dataset_path used for the bounded-window path")
+
+    monkeypatch.setattr(ingest.contributors, "dataset_path", fake_path)
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=[]))
+
+    result = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=183)
+    assert result == []
+
+
+# ---------------------------------------------------------
+# _datetime_fields derivation (registry-free datetime handling)
+# ---------------------------------------------------------
+
+def test_datetime_fields_match_each_record_schema():
+    """Every record's datetime fields are derived from its type hints."""
+    assert serialization.datetime_fields(RepositoryRecord) == ("created_at", "pushed_at")
+    assert serialization.datetime_fields(IssueRecord) == ("created_at", "closed_at", "updated_at")
+    assert serialization.datetime_fields(IssueTimelineEventRecord) == ("occurred_at",)
+    assert serialization.datetime_fields(ContributorActivityRecord) == ("occurred_at",)
+
+
+def test_datetime_fields_auto_discovers_new_datetime_field():
+    """A new datetime field is found without touching any registry.
+
+    This is the property the refactor guarantees: adding a datetime field to a
+    record can never silently break cache round-tripping.
+    """
+    from dataclasses import dataclass
+
+    @dataclass(frozen=True)
+    class _SampleRecord:
+        name: str
+        created_at: datetime
+        deleted_at: datetime | None
+        count: int
+
+    assert serialization.datetime_fields(_SampleRecord) == ("created_at", "deleted_at")
+
+
+def test_datetime_fields_empty_for_records_without_datetimes():
+    """A record with no datetime fields derives an empty tuple."""
+    from dataclasses import dataclass
+
+    @dataclass(frozen=True)
+    class _PlainRecord:
+        name: str
+        active: bool
+
+    assert serialization.datetime_fields(_PlainRecord) == ()

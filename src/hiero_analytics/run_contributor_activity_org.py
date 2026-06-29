@@ -4,15 +4,14 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
 import pandas as pd
+from matplotlib.colors import Normalize
 
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
-from hiero_analytics.data_sources.cache import FetchCacheOptions
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_org_contributor_activity_graphql
 from hiero_analytics.data_sources.governance_config import (
@@ -35,7 +34,7 @@ ROLE_LABELS = {
 ACTION_TYPES = ["issues", "reviews", "prs created", "prs merged"]
 
 ACTIVITY_TYPE_TO_ACTION = {
-    "created_issue": "issues",
+    "authored_issue": "issues",
     "reviewed_pull_request": "reviews",
     "authored_pull_request": "prs created",
     "merged_pull_request": "prs merged",
@@ -55,8 +54,8 @@ HEATMAP_TOP_ROWS = 25
 def _as_utc(value: datetime) -> datetime:
     """Normalize datetimes to UTC for monthly grouping."""
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
 
 
 def _month_key(value: datetime) -> str:
@@ -217,6 +216,7 @@ def _save_activity_heatmap_chart(heatmap_df: pd.DataFrame, output_path: Path) ->
     fig, ax = plt.subplots(figsize=(width, height))
     fig.patch.set_facecolor("#F6F8FB")
     ax.set_facecolor("#FFFFFF")
+    ax.grid(False)  # the project style enables a grid globally; it must not overlay the heatmap
 
     image = ax.imshow(values, aspect="auto", cmap=cmap, norm=normalization, interpolation="nearest")
 
@@ -271,11 +271,9 @@ def main() -> None:
     client = GitHubClient()
     logger.info("Fetching contributor activity for org: %s", ORG)
 
-    cache_options = FetchCacheOptions(use_cache=False)
     records = fetch_org_contributor_activity_graphql(
         client,
         org=ORG,
-        cache_options=cache_options,
         lookback_days=183,
     )
 

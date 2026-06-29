@@ -2,8 +2,9 @@ name: Refresh Analytics Data
 
 on:
   schedule:
-    # Run weekly every Monday at 9 AM UTC
-    - cron: '0 9 * * 1'
+    # Every 5 days at 9 AM UTC. Keeps gaps under the 7-day cache-eviction
+    # window so the incremental dataset cache stays warm.
+    - cron: '0 9 */5 * *'
   workflow_dispatch:
     inputs:
       dryrun:
@@ -36,45 +37,32 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run gfic gfi analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_gfic_gfi_org
+      # Persist the incremental-fetch datasets across runs without committing
+      # them to git. A unique key per run always saves; restore-keys pulls the
+      # most recent prior dataset. If the cache is ever evicted, the pipeline's
+      # 30-day self-heal just does one full fetch, then resumes incrementally.
+      - name: Restore incremental datasets
+        uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        with:
+          path: outputs/data/datasets
+          key: analytics-datasets-${{ github.run_id }}
+          restore-keys: |
+            analytics-datasets-
 
-      - name: Run difficulty analytics
+      - name: Run all analytics pipelines
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_difficulty_org_for_repo
+        run: uv run python -m hiero_analytics.run_all
 
-      - name: Run onboarding analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_onboarding_signal_for_repo
-
-      - name: Run contributor analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_contributor_profiles_repo
-
-      - name: Run maintainer analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_maintainer_pipeline_org
-
-      - name: Run scorecard analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_scorecard_for_org
-
-      - name: Run codeowner and runner analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_codeowner_and_runner
-
-      - name: Run hiero hackers org analytics
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_hiero_hackers_org
+      # Only persist datasets when the run succeeds. Saving after a failed run
+      # would let a partial snapshot become the next incremental baseline
+      # (restore picks the most recent analytics-datasets- key); on failure we
+      # keep the last good cache and let the next run resume from it.
+      - name: Save incremental datasets
+        uses: actions/cache/save@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        with:
+          path: outputs/data/datasets
+          key: analytics-datasets-${{ github.run_id }}
 
       - name: Check for changes
         id: check_changes

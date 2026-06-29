@@ -12,7 +12,11 @@ from hiero_analytics.config.charts import (
     CARD_BORDER_COLOR,
     PLOT_BACKGROUND_COLOR,
 )
-from hiero_analytics.plotting.base import create_figure, finalize_chart
+from hiero_analytics.plotting.base import (
+    create_figure,
+    finalize_chart,
+    prepare_dataframe,
+)
 
 
 def plot_scatter_with_regression(
@@ -35,16 +39,10 @@ def plot_scatter_with_regression(
     - Consistent design system integration
     """
 
-    if df.empty:
-        raise ValueError("DataFrame is empty")
-
     # -------------------------
-    # Prepare data
+    # Prepare data (shared validation: required columns, non-empty, drop NA)
     # -------------------------
-    df = df[[x_col, y_col]].dropna()
-
-    if df.empty:
-        raise ValueError("No valid data after dropping NA")
+    df = prepare_dataframe(df, x_col, y_col)
 
     x = df[x_col].astype(float)
     y = df[y_col].astype(float)

@@ -18,7 +18,7 @@ def mock_client():
 def bypass_pagination(monkeypatch):
     """Bypass pagination to return a single page."""
     monkeypatch.setattr(
-        ingest,
+        ingest.contributors,
         "paginate_cursor",
         lambda f: f(None)[0],
     )
@@ -89,21 +89,22 @@ def test_fetch_repo_contributor_activity_graphql(mock_client, bypass_pagination)
         "org",
         "repo",
         lookback_days=30,
-        cache_options=None,
+        use_cache=False,
     )
 
     assert len(records) == 4
     assert all(isinstance(record, ContributorActivityRecord) for record in records)
     assert {record.activity_type for record in records} == {
-        "created_issue",
+        "authored_issue",
         "authored_pull_request",
         "reviewed_pull_request",
         "merged_pull_request",
     }
-    issue_record = next(record for record in records if record.activity_type == "created_issue")
+    issue_record = next(record for record in records if record.activity_type == "authored_issue")
     assert issue_record.actor == "dana"
     assert issue_record.target_type == "issue"
     assert issue_record.target_number == 20
+    assert "states:[OPEN, CLOSED]" in mock_client.graphql.call_args_list[1].args[0]
 
 
 def test_fetch_repo_issue_activity_graphql_stops_after_older_issue(mock_client):
@@ -115,40 +116,85 @@ def test_fetch_repo_issue_activity_graphql_stops_after_older_issue(mock_client):
     mock_client.graphql.return_value = {
         "data": {
             "repository": {
-                "pullRequests": {"nodes": [], "pageInfo": {"hasNextPage": False}}
+                "issues": {
+                    "nodes": [
+                        {
+                            "number": 20,
+                            "createdAt": recent_issue_created_at,
+                            "author": {"login": "dana"},
+                        },
+                        {
+                            "number": 21,
+                            "createdAt": older_issue_created_at,
+                            "author": {"login": "erin"},
+                        },
+                    ],
+                    "pageInfo": {"hasNextPage": True, "endCursor": "next-page"},
+                }
             }
         }
     }
-    mock_client.graphql.side_effect = [
-        mock_client.graphql.return_value,
-        {
-            "data": {
-                "repository": {
-                    "issues": {
-                        "nodes": [
-                            {
-                                "number": 20,
-                                "createdAt": recent_issue_created_at,
-                                "author": {"login": "dana"},
-                            },
-                        ],
-                        "pageInfo": {"hasNextPage": False},
-                    }
-                }
-            }
-        },
-    ]
 
-    records = ingest.fetch_repo_contributor_activity_graphql(
+    records = ingest._fetch_repo_issue_activity_graphql(
         mock_client,
         "org",
         "repo",
-        lookback_days=30,
+        cutoff=now - timedelta(days=30),
     )
 
     assert len(records) == 1
-    assert records[0].activity_type == "created_issue"
+    assert records[0].activity_type == "authored_issue"
     assert records[0].actor == "dana"
+    assert mock_client.graphql.call_count == 1
+
+
+def test_fetch_repo_pull_request_activity_graphql_stops_after_older_pr(mock_client):
+    """PR pagination stops once a PR updated before the cutoff appears."""
+    now = datetime.now(UTC)
+    recent = _to_iso(now - timedelta(days=5))
+    older = _to_iso(now - timedelta(days=40))
+
+    mock_client.graphql.return_value = {
+        "data": {
+            "repository": {
+                "pullRequests": {
+                    "nodes": [
+                        {
+                            "number": 10,
+                            "createdAt": recent,
+                            "updatedAt": recent,
+                            "mergedAt": None,
+                            "author": {"login": "alice"},
+                            "mergedBy": None,
+                            "reviews": {"nodes": []},
+                        },
+                        {
+                            "number": 11,
+                            "createdAt": older,
+                            "updatedAt": older,
+                            "mergedAt": None,
+                            "author": {"login": "bob"},
+                            "mergedBy": None,
+                            "reviews": {"nodes": []},
+                        },
+                    ],
+                    "pageInfo": {"hasNextPage": True, "endCursor": "next-page"},
+                }
+            }
+        }
+    }
+
+    records = ingest._fetch_repo_pull_request_activity_graphql(
+        mock_client,
+        "org",
+        "repo",
+        cutoff=now - timedelta(days=30),
+    )
+
+    assert len(records) == 1
+    assert records[0].activity_type == "authored_pull_request"
+    assert records[0].actor == "alice"
+    assert mock_client.graphql.call_count == 1
 
 
 def test_lookback_days_none_includes_old_activity(mock_client, bypass_pagination):
@@ -194,13 +240,13 @@ def test_lookback_days_none_includes_old_activity(mock_client, bypass_pagination
 
     # With a short lookback the old PR should be filtered out
     records_limited = ingest.fetch_repo_contributor_activity_graphql(
-        mock_client, "org", "repo", lookback_days=30, cache_options=None
+        mock_client, "org", "repo", lookback_days=30, use_cache=False,
     )
     assert len(records_limited) == 0
 
     # With lookback_days=None all history is included
     records_all = ingest.fetch_repo_contributor_activity_graphql(
-        mock_client, "org", "repo", lookback_days=None, cache_options=None,
+        mock_client, "org", "repo", lookback_days=None, use_cache=False,
     )
     assert len(records_all) == 2  # authored + merged
     assert {r.activity_type for r in records_all} == {
@@ -216,13 +262,13 @@ def test_fetch_org_contributor_activity_graphql(monkeypatch, mock_client):
     ]
 
     monkeypatch.setattr(
-        ingest,
+        ingest._common,
         "fetch_org_repos_graphql",
         lambda client, org, **kwargs: repos,
     )
 
     monkeypatch.setattr(
-        ingest,
+        ingest.contributors,
         "fetch_repo_contributor_activity_graphql",
         lambda client, owner, repo, **kwargs: [
             ContributorActivityRecord(
@@ -240,7 +286,7 @@ def test_fetch_org_contributor_activity_graphql(monkeypatch, mock_client):
         mock_client,
         "org",
         max_workers=2,
-        cache_options=None,
+        use_cache=False,
     )
 
     assert len(records) == 2

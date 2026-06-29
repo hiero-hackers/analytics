@@ -38,6 +38,9 @@ uv.lock
 pdm.lock
 pubkey.asc
 outputs/cache/
+# Incremental-fetch datasets persist across CI runs via actions/cache,
+# not committed to git (see .github/workflows/update-analytics.yml).
+outputs/data/datasets/
 
 # Local-only input data (Discord exports, etc.)
 inputs/

@@ -1,9 +1,9 @@
-
 query CONTRIBUTOR_ISSUE_ACTIVITY_QUERY($owner:String!, $repo:String!, $cursor:String) {
   repository(owner:$owner, name:$repo) {
     issues(
       first:100
       after:$cursor
+      states:[OPEN, CLOSED]
       orderBy:{field:CREATED_AT, direction:DESC}
     ) {
       pageInfo {

@@ -11,7 +11,12 @@ from matplotlib.patches import FancyBboxPatch, Patch, Rectangle
 
 from hiero_analytics.config.charts import ANNOTATION_FONT_SIZE, DEFAULT_FIGSIZE, FONT_WEIGHT_SEMIBOLD, PRIMARY_PALETTE, TITLE_COLOR
 
-from .base import create_figure, finalize_chart, prepare_dataframe
+from .base import (
+    adaptive_legend_placement,
+    create_figure,
+    finalize_chart,
+    prepare_dataframe,
+)
 from .primitives import build_palette, format_chart_value, is_numeric_or_datetime
 
 BAR_HEIGHT = 0.68
@@ -348,23 +353,16 @@ def plot_stacked_bar(
 
     ## Adaptive Legend placement
     labels_count = len(labels)
-    legend_loc = "lower center"
-    legend_anchor = (0.5, -0.14)
-    layout_rect = (0, 0.14, 1.0, 1.0)
-    legend_ncol = min(labels_count, 4)
-
-    if labels_count > 6:
-        legend_loc = "upper left"
-        legend_anchor = (1.02, 1.0)
-        layout_rect = (0, 0, 0.85, 1.0)
-        legend_ncol = 1
+    placement = adaptive_legend_placement(labels_count)
 
     # Backward-compatible override.
     if legend_inside_bottom_right:
-        legend_loc = "lower right"
-        legend_anchor = (0.985, 0.02)
-        layout_rect = (0, 0, 1.0, 1.0)
-        legend_ncol = min(labels_count, 4)
+        placement = {
+            "legend_loc": "lower right",
+            "legend_bbox_to_anchor": (0.985, 0.02),
+            "legend_ncol": min(labels_count, 4),
+            "layout_rect": (0.0, 0.0, 1.0, 1.0),
+        }
 
     finalize_chart(
         fig=fig,
@@ -378,9 +376,6 @@ def plot_stacked_bar(
         grid_axis="x" if horizontal else "y",
         legend_handles=legend_handles,
         legend_labels=labels,
-        legend_loc=legend_loc,
-        legend_bbox_to_anchor=legend_anchor,
-        legend_ncol=legend_ncol,
         legend_kwargs={"borderaxespad": 0.0},
-        layout_rect=layout_rect,
+        **placement,
     )

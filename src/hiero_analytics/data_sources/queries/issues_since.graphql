@@ -1,0 +1,19 @@
+query ISSUES_SINCE_QUERY($owner:String!,$repo:String!,$cursor:String,$states:[IssueState!],$since:DateTime!){
+  repository(owner:$owner,name:$repo){
+    issues(first:100, after:$cursor, states:$states, filterBy:{since:$since}, orderBy:{field:UPDATED_AT, direction:ASC}){
+      pageInfo{
+        hasNextPage
+        endCursor
+      }
+      nodes{
+        ...IssueFields
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

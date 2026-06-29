@@ -31,6 +31,9 @@ classifiers = [
 
 [project.optional-dependencies]
 
+[project.scripts]
+hiero-analytics = "hiero_analytics.run_all:main"
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1,<10",

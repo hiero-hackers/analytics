@@ -6,20 +6,7 @@ query ISSUE_LABEL_EVENTS_QUERY($owner:String!,$repo:String!,$cursor:String,$stat
         endCursor
       }
       nodes{
-        number
-        timelineItems(first:100, itemTypes:[LABELED_EVENT,UNLABELED_EVENT]){
-          nodes{
-            __typename
-            ... on LabeledEvent{
-              createdAt
-              label{ name }
-            }
-            ... on UnlabeledEvent{
-              createdAt
-              label{ name }
-            }
-          }
-        }
+        ...IssueLabelEventFields
       }
     }
   }

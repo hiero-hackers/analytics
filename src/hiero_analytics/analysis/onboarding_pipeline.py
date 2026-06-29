@@ -69,6 +69,7 @@ def build_onboarding_repo_pipeline(
     pipeline = (
         gfi.merge(gfic, on="repo", how="outer")
         .fillna(0)
+        .astype({"gfi": int, "gfic": int})
         .sort_values("gfi", ascending=False)
     )
 

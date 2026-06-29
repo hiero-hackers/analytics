@@ -9,6 +9,8 @@ Produces analytics for:
 
 from __future__ import annotations
 
+import logging
+
 import pandas as pd
 
 from hiero_analytics.analysis.dataframe_utils import (
@@ -21,6 +23,7 @@ from hiero_analytics.analysis.onboarding_pipeline import (
     build_onboarding_repo_pipeline,
 )
 from hiero_analytics.config.charts import ONBOARDING_COLORS, STATE_COLORS
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_org_issues_graphql
@@ -28,9 +31,11 @@ from hiero_analytics.domain.labels import (
     GOOD_FIRST_ISSUE,
     GOOD_FIRST_ISSUE_CANDIDATE,
 )
-from hiero_analytics.export.save import save_dataframe
+from hiero_analytics.export.save import plot_and_save, save_dataframe
 from hiero_analytics.plotting.bars import plot_stacked_bar
 from hiero_analytics.plotting.lines import plot_multiline
+
+logger = logging.getLogger(__name__)
 
 STACK_COLS = ["gfic", "gfi"]
 STACK_LABELS = [
@@ -50,12 +55,12 @@ def main() -> None:
     """Execute onboarding analytics pipeline."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
 
-    print(f"Running onboarding analytics for org: {ORG}")
+    logger.info("Running onboarding analytics for org: %s", ORG)
 
     client = GitHubClient()
     issues = fetch_org_issues_graphql(client, org=ORG)
 
-    print(f"Fetched {len(issues)} issues")
+    logger.info("Fetched %d issues", len(issues))
 
     df = issues_to_dataframe(issues)
 
@@ -107,49 +112,50 @@ def main() -> None:
     save_dataframe(pipeline, org_data_dir / "gfi_pipeline.csv")
     save_dataframe(repo_pipeline, org_data_dir / "onboarding_repo_pipeline.csv")
 
-    print("Saved analytics tables")
+    logger.info("Saved analytics tables")
 
     # --------------------------------------------------
     # Charts
     # --------------------------------------------------
 
-    if not pipeline.empty:
-        plot_stacked_bar(
-            pipeline,
-            x_col="year",
-            stack_cols=STACK_COLS,
-            labels=STACK_LABELS,
-            colors=ONBOARDING_COLORS,
-            title="Onboarding Migration Pipeline (Candidate → Approved) Yearly",
-            output_path=org_charts_dir / "gfi_pipeline.png",
-        )
+    plot_and_save(
+        pipeline,
+        plot_stacked_bar,
+        output_path=org_charts_dir / "gfi_pipeline.png",
+        x_col="year",
+        stack_cols=STACK_COLS,
+        labels=STACK_LABELS,
+        colors=ONBOARDING_COLORS,
+        title="Onboarding Migration Pipeline (Candidate → Approved) Yearly",
+    )
 
-    if not repo_pipeline.empty:
-        plot_stacked_bar(
-            repo_pipeline,
-            x_col="repo",
-            stack_cols=STACK_COLS,
-            labels=STACK_LABELS,
-            colors=ONBOARDING_COLORS,
-            title="Total Onboarding Issue Pool by Repository",
-            output_path=org_charts_dir / "total_gfi_gfic_by_repo.png",
-            rotate_x=45,
-        )
+    plot_and_save(
+        repo_pipeline,
+        plot_stacked_bar,
+        output_path=org_charts_dir / "total_gfi_gfic_by_repo.png",
+        x_col="repo",
+        stack_cols=STACK_COLS,
+        labels=STACK_LABELS,
+        colors=ONBOARDING_COLORS,
+        title="Total Onboarding Issue Pool by Repository",
+        rotate_x=45,
+    )
 
-    if not gfi_yearly_state_total.empty:
-        plot_multiline(
-            gfi_yearly_state_total,
-            x_col="year",
-            y_col="count",
-            group_col="state",
-            colors=STATE_COLORS,
-            title="Good First Issues by State per Year",
-            output_path=org_charts_dir / "gfi_yearly_state_line.png",
-        )
+    plot_and_save(
+        gfi_yearly_state_total,
+        plot_multiline,
+        output_path=org_charts_dir / "gfi_yearly_state_line.png",
+        x_col="year",
+        y_col="count",
+        group_col="state",
+        colors=STATE_COLORS,
+        title="Good First Issues by State per Year",
+    )
 
-    print("Charts generated")
-    print("Analytics pipeline completed")
+    logger.info("Charts generated")
+    logger.info("Analytics pipeline completed")
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

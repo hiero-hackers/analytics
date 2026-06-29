@@ -4,6 +4,7 @@ Defines configuration constants for paths and directories used in the analytics 
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 ORG = os.getenv("GITHUB_ORG", "hiero-ledger")
@@ -33,6 +34,21 @@ ORG_DATA_DIR = DATA_DIR / "org"
 REPO_CHARTS_DIR = CHARTS_DIR / "repo"
 ORG_CHARTS_DIR = CHARTS_DIR / "org"
 
+# Persistent "system of record" datasets for incremental fetching (see
+# data_sources/dataset_store.py). Gitignored locally; CI persists them across
+# runs via the GitHub Actions cache, unlike the short-lived TTL cache.
+DATASETS_DIR = DATA_DIR / "datasets"
+
+
+def dataset_path(resource: str, scope: str, fingerprint: str = "all") -> Path:
+    """Path to a persistent incremental-fetch dataset file.
+
+    e.g. ``dataset_path("issues", "hiero-ledger")`` ->
+    ``outputs/data/datasets/issues_hiero-ledger_all.json``.
+    """
+    scope_slug = scope.replace("/", "_")
+    return DATASETS_DIR / f"{resource}_{scope_slug}_{fingerprint}.json"
+
 def ensure_output_dirs() -> None:
     """
     Ensure the above directories exist.
@@ -51,6 +67,7 @@ def ensure_output_dirs() -> None:
         ORG_DATA_DIR,
         REPO_CHARTS_DIR,
         ORG_CHARTS_DIR,
+        DATASETS_DIR,
     ]:
         path.mkdir(parents=True, exist_ok=True)
 
@@ -93,10 +110,20 @@ def ensure_repo_dirs(repo: str) -> tuple[Path, Path]:
 
 _query_cache: dict[str, str] = {}
 
+
 def load_query(query_name: str) -> str:
-    """Helper to load query text from the queries directory."""
+    """Load a GraphQL query, appending any named fragments it references.
+
+    A query may share a node selection by spreading a fragment (``...IssueFields``);
+    the fragment lives once in ``queries/fragments/<Name>.graphql`` and is appended
+    to the document here, so a base query and its ``_since`` variant never drift.
+    """
     if query_name not in _query_cache:
-        query_path = SRC / "data_sources" / "queries" / f"{query_name}.graphql"
-        with open(query_path, "r", encoding="utf-8") as f:
-            _query_cache[query_name] = f.read()
+        queries_dir = SRC / "data_sources" / "queries"
+        text = (queries_dir / f"{query_name}.graphql").read_text(encoding="utf-8")
+        for fragment in sorted(set(re.findall(r"\.\.\.(\w+)", text))):
+            fragment_path = queries_dir / "fragments" / f"{fragment}.graphql"
+            if fragment_path.exists():
+                text += "\n" + fragment_path.read_text(encoding="utf-8")
+        _query_cache[query_name] = text
     return _query_cache[query_name]

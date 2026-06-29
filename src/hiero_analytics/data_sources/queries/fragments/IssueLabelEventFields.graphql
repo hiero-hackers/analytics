@@ -1,0 +1,17 @@
+fragment IssueLabelEventFields on Issue {
+  number
+  timelineItems(first:100, itemTypes:[LABELED_EVENT,UNLABELED_EVENT]){
+    pageInfo{ hasNextPage }
+    nodes{
+      __typename
+      ... on LabeledEvent{
+        createdAt
+        label{ name }
+      }
+      ... on UnlabeledEvent{
+        createdAt
+        label{ name }
+      }
+    }
+  }
+}

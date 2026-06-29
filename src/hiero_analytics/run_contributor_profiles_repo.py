@@ -8,10 +8,13 @@ Output:
 
 from __future__ import annotations
 
+import logging
+
 import pandas as pd
 
 from hiero_analytics.analysis.difficulty_analysis import assign_difficulty
 from hiero_analytics.analysis.prs import prs_to_dataframe
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_repo_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
@@ -30,6 +33,9 @@ PLOT_DIFFICULTY_ORDER = [
 
 # Helpers
 # =========================================================
+
+
+logger = logging.getLogger(__name__)
 
 
 def classify_contributor(row):
@@ -174,7 +180,7 @@ def main():
 
     pr_df = prs_to_dataframe(prs)
 
-    print(f"Fetched {len(pr_df)} PRs")
+    logger.info("Fetched %d PRs", len(pr_df))
 
     # build dataset
     avg_mix = build_avg_contribution_mix(pr_df)
@@ -198,8 +204,9 @@ def main():
         repo,
     )
 
-    print("Done.")
+    logger.info("Done.")
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

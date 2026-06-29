@@ -1,6 +1,9 @@
-"""Generic dataframe helpers for converting and filtering issue records."""
+"""Generic dataframe helpers for converting and filtering records."""
 
 from __future__ import annotations
+
+from collections.abc import Callable, Sequence
+from typing import TypeVar
 
 import pandas as pd
 
@@ -9,36 +12,58 @@ from hiero_analytics.data_sources.models import IssueRecord, RepositoryRecord
 
 def repos_to_dataframe(records: list[RepositoryRecord]) -> pd.DataFrame:
     """
-    Convert a collection of RepositoryRecord objects into a Pandas DataFrame.
+    Convert RepositoryRecord objects into a DataFrame.
 
     Columns produced:
         repo        Full repository name (owner/name)
         pushed_at   Timestamp of the last push (or None)
         language    Primary language (or None)
+    """
+    return records_to_dataframe(
+        records,
+        lambda record: {
+            "repo": record.full_name,
+            "pushed_at": record.pushed_at,
+            "language": record.language,
+        },
+        ["repo", "pushed_at", "language"],
+    )
+
+# PEP 695 type parameters are intentionally avoided here because the package
+# supports Python 3.11.
+T = TypeVar("T")
+
+
+def records_to_dataframe(  # noqa: UP047
+    records: Sequence[T],
+    mapper: Callable[[T], dict[str, object] | None],
+    columns: Sequence[str],
+) -> pd.DataFrame:
+    """Convert a list of records into a DataFrame via a per-record mapper.
+
+    ``mapper`` returns a column-name -> value dict for each record, or
+    ``None`` to skip that record. When no rows are produced (empty input or
+    every record skipped) an empty DataFrame carrying ``columns`` is returned,
+    so downstream code always sees a stable schema.
 
     Parameters
     ----------
     records
-        List of RepositoryRecord objects retrieved from the data source layer.
+        Records to convert (any dataclass record type).
+    mapper
+        Maps one record to a row dict, or returns ``None`` to drop it.
+    columns
+        Column schema used for the empty-result DataFrame.
 
     Returns:
     -------
     pd.DataFrame
-        DataFrame containing one row per repository.
+        One row per non-skipped record, or an empty frame with ``columns``.
     """
-    if not records:
-        return pd.DataFrame(columns=["repo", "pushed_at", "language"])
-
-    return pd.DataFrame(
-        [
-            {
-                "repo": record.full_name,
-                "pushed_at": record.pushed_at,
-                "language": record.language,
-            }
-            for record in records
-        ]
-    )
+    rows = [row for record in records if (row := mapper(record)) is not None]
+    if not rows:
+        return pd.DataFrame(columns=list(columns))
+    return pd.DataFrame(rows)
 
 
 def issues_to_dataframe(issues: list[IssueRecord]) -> pd.DataFrame:

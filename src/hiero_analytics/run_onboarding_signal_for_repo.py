@@ -1,42 +1,38 @@
+import logging
 import pathlib
-import numpy as np
+
+import pandas as pd
 from matplotlib.axes import Axes
 
+from hiero_analytics.analysis.dataframe_utils import (
+    filter_by_labels,
+    issues_to_dataframe,
+)
+from hiero_analytics.analysis.prs import (
+    filter_gfi_prs,
+    prs_to_dataframe,
+)
+from hiero_analytics.analysis.timeseries import cumulative_timeseries
 from hiero_analytics.config.charts import PRIMARY_PALETTE
-from hiero_analytics.config.logging import setup_logging
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG
-
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_issues_graphql,
     fetch_repo_merged_pr_difficulty_graphql,
 )
-
-from hiero_analytics.analysis.dataframe_utils import (
-    issues_to_dataframe,
-    filter_by_labels,
-)
-from hiero_analytics.analysis.timeseries import cumulative_timeseries
-from hiero_analytics.analysis.prs import (
-    prs_to_dataframe,
-    filter_gfi_prs,
-)
-
 from hiero_analytics.domain.labels import ALL_ONBOARDING, DIFFICULTY_LEVELS
-import matplotlib.pyplot as plt
-import pandas as pd
-
 from hiero_analytics.plotting.base import create_figure, finalize_chart
 from hiero_analytics.plotting.primitives import annotate_endpoint_badge
 from hiero_analytics.plotting.scatter import plot_scatter_with_regression
-
-setup_logging()
 
 ORG_NAME = ORG
 REPO = "hiero-sdk-python"
 short_repo = REPO.split("/")[-1]
 
 from hiero_analytics.config.paths import ensure_repo_dirs
+
+logger = logging.getLogger(__name__)
 
 
 def plot_issue_vs_contributors(
@@ -232,7 +228,7 @@ def run():
         )
 
         if issues_ts_subset.empty or contrib_ts_subset.empty:
-            print(f"Skipping {spec.name}: no data")
+            logger.info("Skipping %s: no data", spec.name)
             continue
 
         # -------------------------
@@ -249,4 +245,5 @@ def run():
 
 
 if __name__ == "__main__":
+    setup_logging()
     run()

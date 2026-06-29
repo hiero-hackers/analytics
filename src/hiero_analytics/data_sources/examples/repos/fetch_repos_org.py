@@ -1,6 +1,6 @@
 """Example script for fetching all repositories in a GitHub organization."""
 
-from hiero_analytics.config.logging import setup_logging
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_org_repos_graphql

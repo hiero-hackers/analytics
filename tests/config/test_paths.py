@@ -130,6 +130,27 @@ def test_load_query_reads_file_and_caches(monkeypatch, tmp_path):
     paths._query_cache.clear()
 
 
+def test_load_query_appends_referenced_fragments(monkeypatch, tmp_path):
+    """A query spreading a fragment has that fragment's definition appended."""
+    queries_dir = tmp_path / "data_sources" / "queries"
+    (queries_dir / "fragments").mkdir(parents=True)
+    (queries_dir / "q.graphql").write_text(
+        "query { repository { ...Foo } }", encoding="utf-8"
+    )
+    (queries_dir / "fragments" / "Foo.graphql").write_text(
+        "fragment Foo on Repository { name }", encoding="utf-8"
+    )
+
+    monkeypatch.setattr(paths, "SRC", tmp_path)
+    paths._query_cache.clear()
+
+    result = paths.load_query("q")
+
+    assert "...Foo" in result  # the spread stays in the query
+    assert "fragment Foo on Repository { name }" in result  # definition appended
+    paths._query_cache.clear()
+
+
 def test_load_query_raises_on_missing_file(monkeypatch, tmp_path):
     """A non-existent query name should raise FileNotFoundError."""
     monkeypatch.setattr(paths, "SRC", tmp_path)

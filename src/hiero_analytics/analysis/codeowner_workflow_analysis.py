@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 
+from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import CodeOwnersRecord, RunnerRecord
 
 logger = logging.getLogger(__name__)
@@ -21,32 +22,25 @@ def prepare_org_codeowners_summary(codeowners: list[CodeOwnersRecord]) -> pd.Dat
 
 def prepare_repo_level_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> pd.DataFrame:
     """Transforms a list of CodeOwnersRecords into a repository level DataFrame"""
-    if not codeowners:
-        return pd.DataFrame(columns=["repo", "status"])
-
-    return pd.DataFrame([
-        {
-            "repo": r.repo,
-            "status": r.status
-        }
-        for r in codeowners
-    ])
+    return records_to_dataframe(
+        codeowners,
+        lambda r: {"repo": r.repo, "status": r.status},
+        ["repo", "status"],
+    )
 
 
 def runner_records_to_dataframe(runners: list[RunnerRecord]) -> pd.DataFrame:
     """Converts a list of RunnerRecords into DataFrame"""
-    if not runners:
-        return pd.DataFrame(columns=["repo", "job", "runner", "self_hosted"])
-    
-    return pd.DataFrame([
-        {
+    return records_to_dataframe(
+        runners,
+        lambda r: {
             "repo": r.repo,
             "job": r.job_name,
             "runner": r.runner,
-            "self_hosted": r.is_self_hosted
-        }
-        for r in runners
-    ])
+            "self_hosted": r.is_self_hosted,
+        },
+        ["repo", "job", "runner", "self_hosted"],
+    )
 
 def prepare_stacked_runner_summary(runners: list[RunnerRecord]) -> pd.DataFrame:
     """Aggregates runner type counts per repository for stacked bar chart visualization."""

@@ -1,6 +1,6 @@
 """Example script for fetching open and closed issues from a repository."""
 
-from hiero_analytics.config.logging import setup_logging
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, REPO
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_repo_issues_graphql

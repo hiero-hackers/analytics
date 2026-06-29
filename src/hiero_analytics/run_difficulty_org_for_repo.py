@@ -8,6 +8,7 @@ Produces:
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
@@ -19,6 +20,7 @@ from hiero_analytics.analysis.difficulty_analysis import (
     issues_unlabeled_created_since,
 )
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
@@ -37,16 +39,19 @@ from hiero_analytics.plotting.pie import plot_pie
 TIMELINE_MAX_WORKERS = 3
 
 
+logger = logging.getLogger(__name__)
+
+
 def main() -> None:
     """Run the difficulty analytics pipeline for the configured organization."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
 
-    print(f"Running difficulty analytics for org: {ORG}")
+    logger.info("Running difficulty analytics for org: %s", ORG)
 
     client = GitHubClient()
     issues = fetch_org_issues_graphql(client, org=ORG, states=["OPEN"])
 
-    print(f"Fetched {len(issues)} issues")
+    logger.info("Fetched %d issues", len(issues))
 
     df = issues_to_dataframe(issues)
 
@@ -61,7 +66,7 @@ def main() -> None:
         states=["OPEN"],
         max_workers=TIMELINE_MAX_WORKERS,
     )
-    print(f"Fetched {len(timeline_events)} timeline events")
+    logger.info("Fetched %d timeline events", len(timeline_events))
 
     # Identify issues that received a difficulty label within the window.
     labeled_issues = issues_labeled_since(
@@ -166,8 +171,9 @@ def main() -> None:
         rotate_x=45,
     )
 
-    print("Difficulty analytics complete")
+    logger.info("Difficulty analytics complete")
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

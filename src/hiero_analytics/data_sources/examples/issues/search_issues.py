@@ -1,6 +1,6 @@
 """Example script for searching GitHub issues."""
 
-from hiero_analytics.config.logging import setup_logging
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_search import search_issues
 
