@@ -7,10 +7,12 @@ fragment IssueLabelEventFields on Issue {
       ... on LabeledEvent{
         createdAt
         label{ name }
+        actor{ login }
       }
       ... on UnlabeledEvent{
         createdAt
         label{ name }
+        actor{ login }
       }
     }
   }

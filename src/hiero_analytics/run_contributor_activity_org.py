@@ -1,313 +1,128 @@
-"""Export contributor activity reports for a GitHub organization."""
+"""Build the informational contributor-activity tables for an organization.
+
+For each contributor this writes a high-level view of *how they show up* — their
+work split across three neutral families (building & fixing, reviewing & guiding,
+organizing & answering) — as CSV tables only, org-wide and per-repository. It is
+deliberately descriptive: counts and shares, no score and no cross-contributor
+ranking. Rows are ordered by ``last_active`` (recency).
+
+This complements ``run_maintainer_pipeline_org`` (which maps activity onto named
+governance roles); here we never name or rank roles.
+"""
 
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
-from datetime import UTC, datetime
-from pathlib import Path
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 
-import matplotlib.pyplot as plt
-import pandas as pd
-from matplotlib.colors import Normalize
-
-from hiero_analytics.config.paths import ORG, ensure_org_dirs
+from hiero_analytics.analysis.comembership import build_comembership_network
+from hiero_analytics.analysis.contributor_activity_profile import (
+    build_active_membership,
+    build_contributor_profiles,
+    build_contributor_profiles_by_repo,
+)
+from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
+from hiero_analytics.config.logging_config import setup_logging
+from hiero_analytics.config.paths import ORG, dataset_path, ensure_org_dirs, ensure_repo_dirs
+from hiero_analytics.data_sources.dataset_store import load_dataset
 from hiero_analytics.data_sources.github_client import GitHubClient
-from hiero_analytics.data_sources.github_ingest import fetch_org_contributor_activity_graphql
-from hiero_analytics.data_sources.governance_config import (
-    ROLE_PRIORITY,
-    build_repo_role_lookup,
-    fetch_governance_config,
+from hiero_analytics.data_sources.github_ingest import (
+    fetch_org_contributor_activity_graphql,
+    fetch_org_issue_label_events_graphql,
+)
+from hiero_analytics.data_sources.models import (
+    ContributorActivityRecord,
+    IssueTimelineEventRecord,
 )
 from hiero_analytics.export.save import save_dataframe
+from hiero_analytics.plotting.network import render_comembership_network
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-ROLE_LABELS = {
-    "general_user": "General User",
-    "triage": "Triage",
-    "committer": "Committer",
-    "maintainer": "Maintainer",
-}
-
-ACTION_TYPES = ["issues", "reviews", "prs created", "prs merged"]
-
-ACTIVITY_TYPE_TO_ACTION = {
-    "authored_issue": "issues",
-    "reviewed_pull_request": "reviews",
-    "authored_pull_request": "prs created",
-    "merged_pull_request": "prs merged",
-}
-
-ACTIVITY_WEIGHTS = {
-    "issues": 2,
-    "reviews": 3,
-    "prs created": 3,
-    "prs merged": 2,
-}
-
-HEATMAP_MONTHS = 6
-HEATMAP_TOP_ROWS = 25
 
 
-def _as_utc(value: datetime) -> datetime:
-    """Normalize datetimes to UTC for monthly grouping."""
-    if value.tzinfo is None:
-        return value.replace(tzinfo=UTC)
-    return value.astimezone(UTC)
+def _build_contributor_network(records, label_events, by_repo, org_charts_dir) -> None:
+    """Render the all-contributors co-membership network for the org.
+
+    Governance-independent (no roles needed), so it runs for every org. Repos are
+    sized by active contributors and linked when they share contributors; the link
+    threshold scales with org size so a large org stays legible and a small one
+    still shows its overlaps.
+    """
+    cutoff = datetime.now(UTC) - timedelta(days=ROLE_ACTIVE_DAYS)
+    recent_records = [r for r in records if r.occurred_at and r.occurred_at >= cutoff]
+    recent_labels = [e for e in label_events if e.occurred_at and e.occurred_at >= cutoff]
+    recent_by_repo = build_contributor_profiles_by_repo(recent_records, recent_labels)
+
+    membership = build_active_membership(by_repo, recent_by_repo)
+    min_shared = max(1, round(len(by_repo) / CONTRIBUTOR_NETWORK_REPOS_PER_LINK))
+    nodes, edges = build_comembership_network(membership, min_shared=min_shared)
+    if render_comembership_network(
+        nodes, edges, org_charts_dir / "all_network.png",
+        title=f"{ORG} — contributors network (repos linked by shared contributors)",
+        member_label="contributors",
+    ):
+        logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
-def _month_key(value: datetime) -> str:
-    """Return a stable month bucket label for a timestamp."""
-    return _as_utc(value).strftime("%Y-%m")
+def _load_or_fetch(resource: str, model: type, fetch_fn: Callable[[], list]) -> list:
+    """Reuse the persisted system-of-record dataset when present; fetch otherwise.
 
-
-def _recent_month_keys(months_back: int) -> list[str]:
-    """Return the most recent month labels, oldest first."""
-    current_month = pd.Period(pd.Timestamp.now(tz="UTC"), freq="M")
-    return [str(period) for period in pd.period_range(end=current_month, periods=months_back, freq="M")]
-
-
-def _activity_action(activity_type: str) -> str | None:
-    """Map a normalized activity event to a report bucket."""
-    return ACTIVITY_TYPE_TO_ACTION.get(activity_type)
-
-
-def _build_activity_rollup(
-    records,
-    repo_role_lookup: dict[str, dict[str, str]],
-) -> dict[str, dict[str, object]]:
-    """Aggregate contributor actions into a per-person rollup."""
-    per_contributor: dict[str, dict[str, object]] = defaultdict(
-        lambda: {
-            "contributor name": "",
-            "role key": "general_user",
-            "role priority": ROLE_PRIORITY["general_user"],
-            "issues": 0,
-            "reviews": 0,
-            "prs created": 0,
-            "prs merged": 0,
-            "weighted activity score": 0,
-            "monthly scores": defaultdict(int),
-        }
-    )
-
-    for record in records:
-        actor = (record.actor or "").strip()
-        action = _activity_action(record.activity_type)
-        if not actor or action is None:
-            continue
-
-        actor_key = actor.lower()
-        repo_name = record.repo.split("/")[-1]
-        detected_role = repo_role_lookup.get(repo_name, {}).get(actor_key, "general_user")
-
-        row = per_contributor[actor_key]
-        row["contributor name"] = actor
-
-        current_role = str(row["role key"])
-        if ROLE_PRIORITY[detected_role] > ROLE_PRIORITY[current_role]:
-            row["role key"] = detected_role
-            row["role priority"] = ROLE_PRIORITY[detected_role]
-
-        row[action] = int(row[action]) + 1
-        row["weighted activity score"] = int(row["weighted activity score"]) + ACTIVITY_WEIGHTS[action]
-        row["monthly scores"][_month_key(record.occurred_at)] += ACTIVITY_WEIGHTS[action]
-
-    return per_contributor
-
-
-def _build_activity_summary_dataframe(records, repo_role_lookup: dict[str, dict[str, str]]) -> pd.DataFrame:
-    """Aggregate contributor activity into the role overview table."""
-    rollup = _build_activity_rollup(records, repo_role_lookup)
-
-    columns = ["contributor name", "role", *ACTION_TYPES, "activity score"]
-    rows: list[dict[str, object]] = []
-    for item in rollup.values():
-        rows.append(
-            {
-                "contributor name": item["contributor name"],
-                "role": ROLE_LABELS.get(str(item["role key"]), "General User"),
-                "issues": bool(item["issues"]),
-                "reviews": bool(item["reviews"]),
-                "prs created": bool(item["prs created"]),
-                "prs merged": bool(item["prs merged"]),
-                "activity score": int(item["weighted activity score"]),
-            }
-        )
-
-    if not rows:
-        return pd.DataFrame(columns=columns)
-
-    df = pd.DataFrame(rows)
-    return df.sort_values(by=["activity score", "contributor name"], ascending=[False, True]).reset_index(drop=True)
-
-
-def _build_top_active_contributors_dataframe(summary_df: pd.DataFrame) -> pd.DataFrame:
-    """Filter the overview to high-engagement contributors without elevated roles."""
-    columns = ["rank", *summary_df.columns.tolist()]
-    if summary_df.empty:
-        return pd.DataFrame(columns=columns)
-
-    top_active = summary_df[
-        (summary_df["role"] == "General User")
-        & (summary_df["activity score"] > 0)
-    ].copy()
-
-    if top_active.empty:
-        return pd.DataFrame(columns=columns)
-
-    top_active = top_active.sort_values(
-        by=["activity score", "prs created", "reviews", "issues", "prs merged", "contributor name"],
-        ascending=[False, False, False, False, False, True],
-    ).reset_index(drop=True)
-    top_active.insert(0, "rank", range(1, len(top_active) + 1))
-    return top_active
-
-
-def _build_activity_heatmap_dataframe(
-    records,
-    repo_role_lookup: dict[str, dict[str, str]],
-    *,
-    months_back: int = HEATMAP_MONTHS,
-) -> pd.DataFrame:
-    """Build a contributor-by-month activity matrix for the heatmap."""
-    month_columns = _recent_month_keys(months_back)
-    rollup = _build_activity_rollup(records, repo_role_lookup)
-
-    rows: list[dict[str, object]] = []
-    for item in rollup.values():
-        monthly_scores = item["monthly scores"]
-        row = {
-            "contributor name": item["contributor name"],
-            "role": ROLE_LABELS.get(str(item["role key"]), "General User"),
-            "activity score": int(item["weighted activity score"]),
-        }
-        for month in month_columns:
-            row[month] = int(monthly_scores.get(month, 0))
-        rows.append(row)
-
-    columns = ["contributor name", "role", "activity score", *month_columns]
-    if not rows:
-        return pd.DataFrame(columns=columns)
-
-    df = pd.DataFrame(rows)
-    return df.sort_values(by=["activity score", "contributor name"], ascending=[False, True]).reset_index(drop=True)
-
-
-def _save_activity_heatmap_chart(heatmap_df: pd.DataFrame, output_path: Path) -> None:
-    """Render a color-coded activity heatmap to a PNG file."""
-    if heatmap_df.empty:
-        return
-
-    month_columns = [column for column in heatmap_df.columns if column not in {"contributor name", "role", "activity score"}]
-    chart_df = heatmap_df.head(HEATMAP_TOP_ROWS).copy()
-    if chart_df.empty:
-        return
-
-    values = chart_df[month_columns].to_numpy(dtype=float)
-    max_value = float(values.max()) if values.size else 0.0
-    normalization = Normalize(vmin=0, vmax=max(max_value, 1.0))
-    cmap = plt.get_cmap("RdYlGn")
-
-    width = max(10.0, len(month_columns) * 1.15 + 4.0)
-    height = max(6.0, len(chart_df) * 0.4 + 2.4)
-    fig, ax = plt.subplots(figsize=(width, height))
-    fig.patch.set_facecolor("#F6F8FB")
-    ax.set_facecolor("#FFFFFF")
-    ax.grid(False)  # the project style enables a grid globally; it must not overlay the heatmap
-
-    image = ax.imshow(values, aspect="auto", cmap=cmap, norm=normalization, interpolation="nearest")
-
-    ax.set_xticks(range(len(month_columns)))
-    ax.set_xticklabels(month_columns, rotation=45, ha="right")
-    ax.set_yticks(range(len(chart_df)))
-    ax.set_yticklabels(chart_df["contributor name"].tolist())
-
-    for row_index, row_values in enumerate(values):
-        for column_index, cell_value in enumerate(row_values):
-            text_color = "#0F172A" if normalization(cell_value) < 0.6 else "#FFFFFF"
-            ax.text(
-                column_index,
-                row_index,
-                int(cell_value),
-                ha="center",
-                va="center",
-                fontsize=9,
-                fontweight="semibold",
-                color=text_color,
-            )
-
-    ax.set_title(
-        f"Top {len(chart_df)} Contributor Activity Heatmap",
-        loc="left",
-        color="#0F172A",
-    )
-    ax.set_xlabel("Month")
-    ax.set_ylabel("Contributor")
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-
-    ax.tick_params(axis="both", colors="#64748B")
-    colorbar = fig.colorbar(image, ax=ax, pad=0.02)
-    colorbar.set_label("Weighted monthly activity score")
-
-    fig.tight_layout()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+    Inside ``run_all`` the maintainer pipeline populates the contributor-activity
+    dataset (same ``all`` fingerprint) earlier in the same run, so this reads it
+    from disk instead of issuing another org-wide fetch — avoiding extra GitHub
+    secondary-rate-limit pressure. Label events are reused from this pipeline's
+    own prior-run dataset. With no dataset yet (first run), it falls back to
+    fetching; the persisted data is then refreshed by the fetch pipelines and the
+    30-day self-heal.
+    """
+    state = load_dataset(dataset_path(resource, ORG, "all"), model)
+    if state is not None:
+        records, _ = state
+        logger.info("Reusing persisted %s dataset (%d records)", resource, len(records))
+        return records
+    logger.info("No persisted %s dataset; fetching from GitHub", resource)
+    return fetch_fn()
 
 
 def main() -> None:
-    """Fetch contributor activity records and export the report tables."""
+    """Build the informational contributor-activity tables for the org."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
 
-    print(f"Running contributor activity export for org: {ORG}")
-
-    gov_config = fetch_governance_config()
-    repo_role_lookup = build_repo_role_lookup(gov_config)
+    logger.info("Building contributor activity tables for org: %s", ORG)
 
     client = GitHubClient()
-    logger.info("Fetching contributor activity for org: %s", ORG)
-
-    records = fetch_org_contributor_activity_graphql(
-        client,
-        org=ORG,
-        lookback_days=183,
+    records = _load_or_fetch(
+        "contributor_activity",
+        ContributorActivityRecord,
+        lambda: fetch_org_contributor_activity_graphql(client, org=ORG, lookback_days=None),
     )
+    label_events = _load_or_fetch(
+        "issue_label_events",
+        IssueTimelineEventRecord,
+        lambda: fetch_org_issue_label_events_graphql(client, org=ORG),
+    )
+    logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
 
-    logger.info("Fetched %d contributor activity records", len(records))
-    print(f"Fetched {len(records)} contributor activity events")
+    # Org-wide: one row per contributor across all repos (cumulative, all-time).
+    profiles = build_contributor_profiles(records, label_events)
+    save_dataframe(profiles, org_data_dir / "contributor_activity_profiles.csv")
+    logger.info("Built org-wide profiles for %d contributors", len(profiles))
 
-    if records:
-        sample = records[0]
-        logger.info(
-            "Sample record: repo=%s, actor=%s, activity_type=%s",
-            sample.repo,
-            sample.actor,
-            sample.activity_type,
-        )
+    # Per-repository: the same table scoped to each repo, so a person's shape can
+    # be seen to shift across repos. Written under each repo's data dir.
+    by_repo = build_contributor_profiles_by_repo(records, label_events)
+    for repo, repo_profiles in by_repo.items():
+        repo_data_dir, _ = ensure_repo_dirs(repo)
+        save_dataframe(repo_profiles, repo_data_dir / "contributor_activity_profiles.csv")
+    logger.info("Wrote per-repo profiles for %d repositories", len(by_repo))
 
-    summary_df = _build_activity_summary_dataframe(records, repo_role_lookup)
-    top_active_df = _build_top_active_contributors_dataframe(summary_df)
-    heatmap_df = _build_activity_heatmap_dataframe(records, repo_role_lookup)
+    # All-contributors network (no governance needed, so every org gets it).
+    _build_contributor_network(records, label_events, by_repo, org_charts_dir)
 
-    overview_path = org_data_dir / "contributor_activity_role_overview.csv"
-    top_active_path = org_data_dir / "contributor_activity_top_active.csv"
-    heatmap_data_path = org_data_dir / "contributor_activity_heatmap.csv"
-    heatmap_chart_path = org_charts_dir / "contributor_activity_heatmap.png"
-
-    save_dataframe(summary_df, overview_path)
-    save_dataframe(top_active_df, top_active_path)
-    save_dataframe(heatmap_df, heatmap_data_path)
-    _save_activity_heatmap_chart(heatmap_df, heatmap_chart_path)
-
-    print(f"Saved role overview to: {overview_path}")
-    print(f"Saved top active contributors to: {top_active_path}")
-    print(f"Saved heatmap data to: {heatmap_data_path}")
-    print(f"Saved heatmap chart to: {heatmap_chart_path}")
+    logger.info("Contributor activity tables complete")
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

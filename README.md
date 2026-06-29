@@ -145,6 +145,21 @@ uv run hiero-analytics
 
 This is the same command the scheduled **Refresh Analytics Data** workflow runs.
 
+> ⏱️ **The first run is slow.** It fetches org-wide activity from the GitHub API (subject to rate limits), so the initial run can take **several minutes**. Later runs are incremental and much faster (see [Incremental data fetching](#incremental-data-fetching)).
+
+### Viewing the dashboard
+
+The single-file dashboard at `outputs/dashboard.html` is **built from the generated data** — it reads the tables in `outputs/data/` and the charts in `outputs/charts/`. Because of that:
+
+- **Generate the data first, or the dashboard will be empty.** Building the dashboard with no data produces a page with nothing in it. `uv run hiero-analytics` already builds the dashboard as its **last** step, so on a fresh checkout that one command gives you data *and* a populated dashboard.
+- **To rebuild only the dashboard** once the data already exists (e.g. after tweaking a label), run:
+
+  ```bash
+  uv run python -m hiero_analytics.run_dashboard
+  ```
+
+- Open `outputs/dashboard.html` in any browser — it's fully self-contained (no server required) and shows one tab per organization that has data.
+
 ### Running a single pipeline
 
 To run just one pipeline, invoke its module directly:

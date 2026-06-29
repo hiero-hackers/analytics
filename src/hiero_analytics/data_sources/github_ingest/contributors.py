@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 
+from hiero_analytics.config.github import GITHUB_MAX_WORKERS
 from hiero_analytics.config.paths import dataset_path, load_query
 
 from ..cache import load_records_cache, save_records_cache
@@ -202,7 +203,7 @@ def _fetch_repo_contributor_activity_at_cutoff(
 def fetch_org_contributor_activity_graphql(
     client: GitHubClient,
     org: str,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     *,
     repos: list[str] | None = None,
     lookback_days: int | None = 183,
@@ -323,7 +324,7 @@ def fetch_org_contributor_merged_pr_count_graphql(
     org: str,
     login: str,
     repos: list[str] | None = None,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     *,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,

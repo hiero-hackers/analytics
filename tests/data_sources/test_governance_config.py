@@ -57,49 +57,64 @@ def test_build_repo_role_lookup_assigns_highest_role_per_user():
     assert repo_role_lookup["repo-a"]["carol"] == "maintainer"
 
 
-def test_build_repo_role_lookup_excludes_global_and_more_specific_repo_teams():
-    """Broad teams and teams owned by a more specific repo should be ignored."""
+def test_build_repo_role_lookup_excludes_blanket_but_keeps_explicit_grants():
+    """Blanket org-wide teams are excluded, but every explicitly-granted team counts.
+
+    A team granted to several repos (here solo-docs-admins on both solo and solo-docs)
+    must count on all of them — that cross-repo grant used to be dropped.
+    """
     config = {
         "teams": [
-            {
-                "name": "solo-admins",
-                "maintainers": ["solo-admin"],
-                "members": [],
-            },
-            {
-                "name": "solo-docs-admins",
-                "maintainers": ["docs-admin"],
-                "members": [],
-            },
-            {
-                "name": "github-maintainers",
-                "maintainers": ["global-admin"],
-                "members": [],
-            },
+            {"name": "solo-admins", "maintainers": ["solo-admin"], "members": []},
+            {"name": "solo-docs-admins", "maintainers": ["docs-admin"], "members": []},
+            {"name": "github-maintainers", "maintainers": ["global-admin"], "members": []},
         ],
         "repositories": [
             {
                 "name": "solo",
                 "teams": {
                     "solo-admins": "admin",
-                    "solo-docs-admins": "admin",
-                    "github-maintainers": "maintain",
+                    "solo-docs-admins": "admin",  # also granted here, not just on solo-docs
+                    "github-maintainers": "maintain",  # blanket -> excluded
                 },
             },
-            {
-                "name": "solo-docs",
-                "teams": {
-                    "solo-docs-admins": "admin",
-                    "github-maintainers": "maintain",
-                },
-            },
+            {"name": "solo-docs", "teams": {"solo-docs-admins": "admin", "github-maintainers": "maintain"}},
         ],
     }
 
     repo_role_lookup = build_repo_role_lookup(config)
 
-    assert repo_role_lookup["solo"] == {"solo-admin": "maintainer"}
+    # blanket github-maintainers excluded (both repos have a domain maintainer);
+    # solo-docs-admins counts on solo too.
+    assert repo_role_lookup["solo"] == {"solo-admin": "maintainer", "docs-admin": "maintainer"}
     assert repo_role_lookup["solo-docs"] == {"docs-admin": "maintainer"}
+
+
+def test_build_repo_role_lookup_blanket_fallback_for_meta_repos():
+    """A repo with no domain maintainer team is credited via blanket maintain teams."""
+    config = {
+        "teams": [
+            {"name": "github-maintainers", "maintainers": ["org-admin"], "members": []},
+            {"name": "tsc", "maintainers": ["tsc-chair"], "members": []},
+            {"name": "governance-write", "maintainers": [], "members": ["writer1", "writer2"]},
+        ],
+        "repositories": [
+            {
+                "name": "governance",
+                "teams": {
+                    "github-maintainers": "maintain",  # blanket maintain
+                    "tsc": "maintain",  # blanket maintain
+                    "governance-write": "write",  # domain committer team
+                },
+            },
+        ],
+    }
+
+    lookup = build_repo_role_lookup(config)
+    # governance-write -> committers; no domain maintainer, so blanket maintain teams fill in.
+    assert lookup["governance"]["writer1"] == "committer"
+    assert lookup["governance"]["org-admin"] == "maintainer"
+    assert lookup["governance"]["tsc-chair"] == "maintainer"
 
 
 def test_build_repo_role_lookup_normalizes_usernames():

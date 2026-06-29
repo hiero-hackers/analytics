@@ -85,6 +85,20 @@ PRIMARY_PALETTE = [
     "#EF4444",
 ]
 
+# Colours for the semantic repository categories (see analysis.repo_categories),
+# used to colour the maintainer network. One distinct hue per category.
+REPO_CATEGORY_COLORS = {
+    "SDKs": "#0EA5E9",
+    "Identity / DID": "#8B5CF6",
+    "Core network": "#F97316",
+    "EVM / smart contracts": "#14B8A6",
+    "Tooling / DevEx": "#F59E0B",
+    "Governance": "#EF4444",
+    "Docs / Web": "#64748B",
+    "Apps / Integrations": "#EC4899",
+    "Other": "#94A3B8",
+}
+
 # Preserve the original domain colors for the analytics charts that already
 # have established meaning in project discussions and screenshots.
 DIFFICULTY_COLORS = {

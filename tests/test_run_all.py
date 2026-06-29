@@ -38,6 +38,7 @@ def test_main_exits_nonzero_when_a_pipeline_fails(monkeypatch):
         raise RuntimeError("fail")
 
     monkeypatch.setattr(run_all, "setup_logging", lambda: None)
+    monkeypatch.setattr(run_all, "run_dashboard", lambda: None)
     monkeypatch.setattr(run_all, "PIPELINES", [("boom", boom)])
 
     with pytest.raises(SystemExit) as exc_info:
@@ -49,6 +50,27 @@ def test_main_exits_nonzero_when_a_pipeline_fails(monkeypatch):
 def test_main_succeeds_when_all_pipelines_pass(monkeypatch):
     """main() returns normally (no SystemExit) when all pipelines succeed."""
     monkeypatch.setattr(run_all, "setup_logging", lambda: None)
+    monkeypatch.setattr(run_all, "run_dashboard", lambda: None)
     monkeypatch.setattr(run_all, "PIPELINES", [("ok", lambda: None)])
 
     run_all.main()  # should not raise
+
+
+def test_main_runs_extra_orgs_then_dashboard_once(monkeypatch):
+    """Extra orgs each run contributor-activity; a failed one is reported; dashboard runs once."""
+    monkeypatch.setattr(run_all, "setup_logging", lambda: None)
+    monkeypatch.setattr(run_all, "PIPELINES", [("ok", lambda: None)])
+    monkeypatch.setattr(run_all, "EXTRA_ORGS", ["good-org", "bad-org"])
+
+    attempted = []
+    monkeypatch.setattr(
+        run_all, "_run_extra_org", lambda org: attempted.append(org) or org != "bad-org"
+    )
+    dashboard_runs = []
+    monkeypatch.setattr(run_all, "run_dashboard", lambda: dashboard_runs.append(True))
+
+    with pytest.raises(SystemExit):  # bad-org failed -> non-zero exit
+        run_all.main()
+
+    assert attempted == ["good-org", "bad-org"]  # every extra org attempted
+    assert dashboard_runs == [True]  # dashboard still ran once, after all orgs

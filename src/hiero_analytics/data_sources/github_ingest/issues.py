@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 
+from hiero_analytics.config.github import GITHUB_MAX_WORKERS
 from hiero_analytics.config.paths import dataset_path, load_query
 
 from ..dataset_store import PartialOrgFetchError, fetch_incremental
@@ -82,7 +83,7 @@ def fetch_org_issues_graphql(
     client: GitHubClient,
     org: str,
     states: list[str] | None = None,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     *,
     refresh: bool = False,
 ) -> list[IssueRecord]:
@@ -200,7 +201,7 @@ def fetch_org_issue_label_events_graphql(
     client: GitHubClient,
     org: str,
     states: list[str] | None = None,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     *,
     refresh: bool = False,
 ) -> list[IssueTimelineEventRecord]:

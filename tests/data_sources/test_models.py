@@ -185,6 +185,7 @@ def test_issue_timeline_event_from_issue_node_expands_timeline_items():
                     "__typename": "LabeledEvent",
                     "createdAt": "2024-03-01T12:00:00Z",
                     "label": {"name": "Beginner"},
+                    "actor": {"login": "maria"},
                 },
                 {
                     "__typename": "UnlabeledEvent",
@@ -203,6 +204,8 @@ def test_issue_timeline_event_from_issue_node_expands_timeline_items():
     ]
     assert all(r.repo == "org/repo" and r.issue_number == 42 for r in records)
     assert records[0].occurred_at == _parse_dt("2024-03-01T12:00:00Z")
+    assert records[0].actor == "maria"  # labeler captured
+    assert records[1].actor is None  # absent actor degrades to None
 
 
 def test_issue_timeline_event_from_github_node_handles_empty():

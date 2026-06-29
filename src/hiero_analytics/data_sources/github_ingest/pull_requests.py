@@ -5,6 +5,7 @@ Links merged PRs to the issues they close, repo- and org-wide.
 
 from __future__ import annotations
 
+from hiero_analytics.config.github import GITHUB_MAX_WORKERS
 from hiero_analytics.config.paths import load_query
 
 from ..github_client import GitHubClient
@@ -44,7 +45,7 @@ def fetch_repo_merged_pr_difficulty_graphql(
 def fetch_org_merged_pr_difficulty_graphql(
     client: GitHubClient,
     org: str,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     *,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 from collections import defaultdict
 from typing import Any
 
@@ -25,35 +24,58 @@ ROLE_PRIORITY = {
 }
 
 
+# Org-wide "blanket" teams: assigned to (nearly) every repo, so counting them as a
+# repo's role-holders would stamp the same handful of people onto all repos and
+# drown out domain-specific maintainership. Excluded from domain repos, but used as
+# a maintainer fallback for org/meta repos that have no domain maintainer team.
+BLANKET_TEAMS = frozenset(
+    {"github-maintainers", "security-maintainers", "lf-staff", "tsc", "hiero-triage"}
+)
+
+# Automation accounts that hold team grants but aren't people.
+_BOT_LOGINS = frozenset({"swirlds-automation", "hedera-github-bot", "hedera-local-node-bot"})
+
+
 def _normalize_username(user: str) -> str:
     """Normalize GitHub logins for case-insensitive matching."""
     return user.strip().lower()
 
 
-def _tokenize_name(value: str) -> tuple[str, ...]:
-    """Split a governance name into normalized alphanumeric tokens."""
-    return tuple(token for token in re.split(r"[^a-z0-9]+", value.lower()) if token)
+def _looks_like_bot_login(login: str) -> bool:
+    """Whether a (normalized) login is an automation account, not a person."""
+    return login in _BOT_LOGINS or login.endswith("-bot") or login.endswith("[bot]")
 
 
-def _best_matching_repo_for_team(
-    team_name: str,
-    repo_name_tokens: dict[str, tuple[str, ...]],
-) -> str | None:
-    """Return the most specific repository name prefixed by the team name."""
-    team_tokens = _tokenize_name(team_name)
+def _resolve_roles(
+    assignments: dict[str, Any],
+    team_members: dict[str, set[str]],
+    *,
+    skip: frozenset[str] = frozenset(),
+    only: frozenset[str] | None = None,
+) -> dict[str, str]:
+    """Resolve ``user -> highest role`` for one repo's team assignments.
 
-    best_repo: str | None = None
-    best_length = 0
-    for repo_name, tokens in repo_name_tokens.items():
-        if len(tokens) > len(team_tokens):
+    Skips automation teams, bot logins, teams in ``skip``, and (when ``only`` is
+    given) any team not in it.
+    """
+    roles: dict[str, str] = {}
+    for team_name, permission in assignments.items():
+        if not isinstance(team_name, str) or "automation" in team_name.lower():
             continue
-        if team_tokens[: len(tokens)] != tokens:
+        if only is not None and team_name not in only:
             continue
-        if len(tokens) > best_length:
-            best_repo = repo_name
-            best_length = len(tokens)
-
-    return best_repo
+        if team_name in skip:
+            continue
+        role = permission_to_role(permission)
+        if role is None:
+            continue
+        for user in team_members.get(team_name, set()):
+            if _looks_like_bot_login(user):
+                continue
+            current = roles.get(user)
+            if current is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current]:
+                roles[user] = role
+    return roles
 
 
 def fetch_governance_config(url: str = GOVERNANCE_CONFIG_URL) -> dict[str, Any]:
@@ -68,64 +90,58 @@ def fetch_governance_config(url: str = GOVERNANCE_CONFIG_URL) -> dict[str, Any]:
     return data
 
 
-def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
-    """Build repo -> user -> highest governance role lookup from config.yaml."""
-    teams = config.get("teams", [])
-    repositories = config.get("repositories", [])
-    repo_name_tokens = {
-        repo["name"]: _tokenize_name(repo["name"])
-        for repo in repositories
-        if isinstance(repo, dict) and isinstance(repo.get("name"), str)
-    }
-
-    team_members: dict[str, set[str]] = {}
-    for team in teams:
+def build_team_membership(config: dict[str, Any]) -> dict[str, set[str]]:
+    """Map each governance team to its member logins (maintainers + members)."""
+    membership: dict[str, set[str]] = {}
+    for team in config.get("teams", []):
         if not isinstance(team, dict):
             continue
-
         name = team.get("name")
         if not isinstance(name, str):
             continue
-
-        members = set()
+        members: set[str] = set()
         for field in ("maintainers", "members"):
             values = team.get(field, [])
             if isinstance(values, list):
                 members.update(
                     _normalize_username(user) for user in values if isinstance(user, str) and user
                 )
-        team_members[name] = members
+        membership[name] = members
+    return membership
 
-    team_repo_affinity = {
-        team_name: _best_matching_repo_for_team(team_name, repo_name_tokens)
-        for team_name in team_members
-    }
+
+def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
+    """Build repo -> user -> highest governance role from explicit per-repo teams.
+
+    Applies each repo's listed team→permission grants directly (GitHub's real model),
+    taking the highest role per user — so a team granted to several repos is counted on
+    all of them. Org-wide *blanket* teams (``BLANKET_TEAMS``) and bot/automation teams
+    are excluded from domain repos, so they don't stamp the same people onto every repo.
+    As a fallback, blanket *maintain* teams are credited on repos that have no domain
+    maintainer team (e.g. ``governance``, ``.github``), so org-governed repos aren't
+    shown as unmaintained.
+    """
+    team_members = build_team_membership(config)
 
     repo_roles: dict[str, dict[str, str]] = {}
-    for repo in repositories:
+    for repo in config.get("repositories", []):
         if not isinstance(repo, dict):
             continue
-
         repo_name = repo.get("name")
         assignments = repo.get("teams", {})
         if not isinstance(repo_name, str) or not isinstance(assignments, dict):
             continue
 
-        user_roles: dict[str, str] = {}
-        for team_name, permission in assignments.items():
-            if team_repo_affinity.get(team_name) != repo_name:
-                continue
+        roles = _resolve_roles(assignments, team_members, skip=BLANKET_TEAMS)
+        # Org/meta repos have no domain maintainer team — credit the blanket maintain
+        # teams there so they're not misreported as having zero maintainers.
+        if not any(role == "maintainer" for role in roles.values()):
+            for user, role in _resolve_roles(assignments, team_members, only=BLANKET_TEAMS).items():
+                current = roles.get(user)
+                if current is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current]:
+                    roles[user] = role
 
-            role = permission_to_role(permission)
-            if role is None:
-                continue
-
-            for user in team_members.get(team_name, set()):
-                current_role = user_roles.get(user)
-                if current_role is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current_role]:
-                    user_roles[user] = role
-
-        repo_roles[repo_name] = user_roles
+        repo_roles[repo_name] = roles
 
     return repo_roles
 

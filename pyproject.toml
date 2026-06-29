@@ -14,8 +14,8 @@ dependencies = [
     "pandas>=3.0.3",
     "requests>=2.34.2",
     "python-dotenv>=1.2.2",
-    "pyyaml>=6.0.3"
-
+    "pyyaml>=6.0.3",
+    "networkx>=3.6.1",
 ]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

@@ -157,6 +157,7 @@ class IssueTimelineEventRecord:
     event_type: str
     occurred_at: datetime
     label: str | None = None
+    actor: str | None = None
 
     @classmethod
     def from_timeline_item(cls, node: dict, context: dict) -> list[IssueTimelineEventRecord]:
@@ -199,6 +200,7 @@ class IssueTimelineEventRecord:
                 event_type=event_type,
                 occurred_at=occurred_at,
                 label=label_name,
+                actor=_extract_login(node, "actor"),
             )
         ]
 
@@ -233,6 +235,7 @@ class IssueTimelineEventRecord:
             event_type=event_type,
             occurred_at=occurred_at,
             label=label_name,
+            actor=_extract_login(event, "actor"),
         )
 
     @classmethod
@@ -285,6 +288,7 @@ class IssueTimelineEventRecord:
                     event_type=event_type,
                     occurred_at=occurred_at,
                     label=label_name,
+                    actor=_extract_login(item, "actor"),
                 )
             )
 

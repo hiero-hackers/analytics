@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 
 import requests
 
-from hiero_analytics.config.github import BASE_URL
+from hiero_analytics.config.github import BASE_URL, GITHUB_MAX_WORKERS
 
 from ..cache import load_records_cache, save_records_cache
 from ..github_client import GitHubClient
@@ -103,7 +103,7 @@ def fetch_issue_timeline_events_rest(
     client: GitHubClient,
     issues: list[IssueRecord],
     *,
-    max_workers: int = 8,
+    max_workers: int = GITHUB_MAX_WORKERS,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,
     refresh: bool = False,
@@ -259,7 +259,7 @@ def fetch_repo_issue_events_for_issues_since(
     issues: list[IssueRecord],
     *,
     since: datetime,
-    max_workers: int = 5,
+    max_workers: int = GITHUB_MAX_WORKERS,
     use_cache: bool | None = None,
     cache_ttl_seconds: int | None = None,
     refresh: bool = False,
