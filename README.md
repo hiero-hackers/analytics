@@ -149,7 +149,9 @@ This is the same command the scheduled **Refresh Analytics Data** workflow runs.
 
 ### Viewing the dashboard
 
-The single-file dashboard at `outputs/dashboard.html` is **built from the generated data** — it reads the tables in `outputs/data/` and the charts in `outputs/charts/`. Because of that:
+**Just want to look?** The latest refresh is published to GitHub Pages — open **https://hiero-hackers.github.io/analytics/** to view it in your browser, no clone or setup required. The scheduled **Refresh Analytics Data** workflow rebuilds and republishes it automatically.
+
+To build it yourself, the single-file dashboard at `outputs/dashboard.html` is **built from the generated data** — it reads the tables in `outputs/data/` and the charts in `outputs/charts/`. Because of that:
 
 - **Generate the data first, or the dashboard will be empty.** Building the dashboard with no data produces a page with nothing in it. `uv run hiero-analytics` already builds the dashboard as its **last** step, so on a fresh checkout that one command gives you data *and* a populated dashboard.
 - **To rebuild only the dashboard** once the data already exists (e.g. after tweaking a label), run:

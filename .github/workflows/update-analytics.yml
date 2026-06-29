@@ -15,6 +15,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  pages: write
+  id-token: write
 
 jobs:
   refresh-data:
@@ -63,6 +65,22 @@ jobs:
         with:
           path: outputs/data/datasets
           key: analytics-datasets-${{ github.run_id }}
+
+      # Publish the self-contained dashboard to GitHub Pages so anyone can view the
+      # latest refresh without cloning or regenerating. The HTML embeds every chart
+      # as base64, so the site is a single index.html. _site is gitignored, so it is
+      # not picked up by the "git add -A" below.
+      - name: Assemble Pages site
+        if: inputs.dryrun != 'true'
+        run: |
+          mkdir -p _site
+          cp outputs/dashboard.html _site/index.html
+
+      - name: Upload Pages artifact
+        if: inputs.dryrun != 'true'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
 
       - name: Check for changes
         id: check_changes
@@ -142,3 +160,26 @@ jobs:
           labels: |
             automated
             analytics
+
+  # Publish the freshly-built dashboard to GitHub Pages. Runs after the data refresh
+  # regardless of whether the data changed, so the public page always reflects the
+  # most recent run. Skipped on dry runs. Requires Pages "Source: GitHub Actions"
+  # to be enabled once in the repository settings.
+  deploy-pages:
+    name: Deploy dashboard to GitHub Pages
+    needs: refresh-data
+    if: inputs.dryrun != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
