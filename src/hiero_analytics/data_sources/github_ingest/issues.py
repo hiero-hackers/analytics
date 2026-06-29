@@ -147,8 +147,11 @@ def fetch_repo_issue_label_events_graphql(
     Unlike the repo-wide ``/issues/events`` REST endpoint (which streams every
     event type for every issue and is page-capped), this requests only
     ``LABELED_EVENT``/``UNLABELED_EVENT`` items inline with the issue list, so it
-    transfers a fraction of the data, never truncates, and is cached on a stable
-    key (owner/repo/states) rather than a per-run ``since`` timestamp.
+    transfers a fraction of the data and avoids the REST endpoint's 300-page cap,
+    and is cached on a stable key (owner/repo/states) rather than a per-run
+    ``since`` timestamp. The nested ``timelineItems`` connection is capped at 100
+    events per issue (no inner pagination); ``from_github_node`` logs a warning on
+    the rare issue that exceeds it.
     """
     query = load_query("issue_label_events")
     norm_states = [s.upper() for s in states] if states else None

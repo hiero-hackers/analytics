@@ -31,7 +31,7 @@ def _extract_login(container: Mapping | None, key: str = "author") -> str | None
     """
     actor = container.get(key) if isinstance(container, Mapping) else None
     login = actor.get("login") if isinstance(actor, Mapping) else None
-    if not isinstance(login, str) or login == "dependabot":
+    if not isinstance(login, str) or login in {"dependabot", "dependabot[bot]", "dependabot-preview[bot]"}:
         return None
     return login
 
@@ -40,7 +40,8 @@ def _extract_labels(container: Mapping | None, *, lower: bool = False) -> list[s
     """Extract label names from ``container["labels"]["nodes"]``."""
     if not isinstance(container, Mapping):
         return []
-    nodes = container.get("labels", {}).get("nodes", [])
+    labels = container.get("labels")
+    nodes = labels.get("nodes", []) if isinstance(labels, Mapping) else []
     names = (n.get("name") for n in nodes if isinstance(n, Mapping))
     return [name.lower() if lower else name for name in names if isinstance(name, str)]
 
