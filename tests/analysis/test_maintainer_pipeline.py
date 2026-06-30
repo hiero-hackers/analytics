@@ -1,6 +1,6 @@
 """Tests for maintainer-pipeline aggregations."""
 
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pandas as pd
@@ -149,16 +149,16 @@ def test_build_maintainer_repo_pipeline_excludes_inactive():
 
 def test_active_window_for_completed_year_is_fixed_h2():
     """Completed years should use a fixed July-1 to Dec-31 window."""
-    today = datetime(2026, 4, 24, tzinfo=timezone.utc)
+    today = datetime(2026, 4, 24, tzinfo=UTC)
     start, end = _active_window_for_year(2025, today)
 
-    assert start == datetime(2025, 7, 1, tzinfo=timezone.utc)
-    assert end == datetime(2025, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+    assert start == datetime(2025, 7, 1, tzinfo=UTC)
+    assert end == datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC)
 
 
 def test_active_window_for_current_year_is_trailing_183_days():
     """The current (incomplete) year should use a trailing 183-day window."""
-    today = datetime(2026, 4, 24, tzinfo=timezone.utc)
+    today = datetime(2026, 4, 24, tzinfo=UTC)
     start, end = _active_window_for_year(2026, today)
 
     assert end == today
@@ -193,9 +193,9 @@ def test_yearly_pipeline_historical_bars_are_stable():
     stage_df = activity_to_role_dataframe(records, role_lookup)
 
     # Simulate pipeline run in April 2026.
-    today_apr_2026 = datetime(2026, 4, 24, tzinfo=timezone.utc)
+    today_apr_2026 = datetime(2026, 4, 24, tzinfo=UTC)
     # Simulate pipeline run in October 2026.
-    today_oct_2026 = datetime(2026, 10, 1, tzinfo=timezone.utc)
+    today_oct_2026 = datetime(2026, 10, 1, tzinfo=UTC)
 
     with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
         mock_dt.now.return_value = today_apr_2026

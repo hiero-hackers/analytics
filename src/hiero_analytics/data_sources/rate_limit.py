@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum, auto
 from typing import Any
 
@@ -65,7 +65,7 @@ class RateLimitSnapshot:
             return None
 
         reset_at = (
-            datetime.fromtimestamp(reset_epoch, tz=timezone.utc)
+            datetime.fromtimestamp(reset_epoch, tz=UTC)
             if reset_epoch is not None
             else None
         )
@@ -99,7 +99,7 @@ class RateLimitSnapshot:
         """Seconds until the budget window resets (0 if unknown or already passed)."""
         if self.reset_at is None:
             return 0
-        return max(0, int((self.reset_at - datetime.now(timezone.utc)).total_seconds()))
+        return max(0, int((self.reset_at - datetime.now(UTC)).total_seconds()))
 
 
 # --------------------------------------------------------

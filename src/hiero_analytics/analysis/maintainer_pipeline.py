@@ -7,7 +7,7 @@ aggregated pipeline tables for yearly and repository-level views.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -46,9 +46,9 @@ def activity_to_role_dataframe(
         # a naive-vs-aware mismatch.
         occurred_at = record.occurred_at
         if occurred_at.tzinfo is None:
-            occurred_at = occurred_at.replace(tzinfo=timezone.utc)
+            occurred_at = occurred_at.replace(tzinfo=UTC)
         else:
-            occurred_at = occurred_at.astimezone(timezone.utc)
+            occurred_at = occurred_at.astimezone(UTC)
 
         return {
             "repo": repo_name,
@@ -76,8 +76,8 @@ def _active_window_for_year(
     """
     if year < today.year:
         # Past year: fixed last-6-months window, immune to re-run date.
-        window_start = datetime(year, 7, 1, tzinfo=timezone.utc)
-        window_end = datetime(year, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+        window_start = datetime(year, 7, 1, tzinfo=UTC)
+        window_end = datetime(year, 12, 31, 23, 59, 59, tzinfo=UTC)
     else:
         # Current year: trailing window from today.
         window_end = today
@@ -100,7 +100,7 @@ def build_maintainer_yearly_pipeline(
     if stage_df.empty:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
 
-    today = datetime.now(timezone.utc)
+    today = datetime.now(UTC)
     years = stage_df["year"].unique()
 
     filtered_frames: list[pd.DataFrame] = []
@@ -141,7 +141,7 @@ def build_maintainer_repo_pipeline(
     if stage_df.empty:
         return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=active_window_days)
+    cutoff = datetime.now(UTC) - timedelta(days=active_window_days)
     active_df = stage_df[stage_df["occurred_at"] >= cutoff]
 
     if active_df.empty:
