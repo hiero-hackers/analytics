@@ -97,17 +97,18 @@ def contributor_activity_to_dataframe(
 def label_events_to_dataframe(
     label_events: list[IssueTimelineEventRecord],
 ) -> pd.DataFrame:
-    """Flatten label add/remove events into the same per-event schema.
+    """Flatten label *applications* into the same per-event schema.
 
-    Each event is attributed to the contributor who applied it (``actor``) as a
-    synthetic ``labeled_issue`` activity in the organizing family. Events without
-    an actor (e.g. older datasets fetched before ``actor`` was captured) are
-    dropped, so this is additive and safe on partial data.
+    Each ``labeled`` event is attributed to the contributor who applied it
+    (``actor``) as a synthetic ``labeled_issue`` activity in the organizing family.
+    ``unlabeled`` (removal) events are ignored, so removals don't inflate the
+    organizing counts. Events without an actor (e.g. older datasets fetched before
+    ``actor`` was captured) are dropped, so this is additive and safe on partial data.
     """
     return records_to_dataframe(
         label_events,
         lambda e: None
-        if not e.actor
+        if not e.actor or e.event_type != "labeled"
         else {
             "contributor": e.actor,
             "activity_type": "labeled_issue",

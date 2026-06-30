@@ -21,4 +21,7 @@ SECONDARY_RATE_LIMIT_FALLBACK_SECONDS = 30
 # secondary (abuse) rate limit is triggered by request burst/concurrency, not
 # just hourly quota. Raise via env (e.g. GITHUB_MAX_WORKERS=6) for speed when the
 # org is small or the token has generous limits; lower it when hitting 403s.
-GITHUB_MAX_WORKERS = int(os.getenv("GITHUB_MAX_WORKERS", 3))
+try:
+    GITHUB_MAX_WORKERS = max(1, int(os.getenv("GITHUB_MAX_WORKERS", "3")))
+except ValueError:
+    GITHUB_MAX_WORKERS = 3

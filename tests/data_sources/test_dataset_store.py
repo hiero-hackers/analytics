@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from hiero_analytics.data_sources.dataset_store import (
+    DATASET_VERSION,
     PartialOrgFetchError,
     fetch_incremental,
     load_dataset,
@@ -85,7 +86,7 @@ def test_load_returns_none_on_version_mismatch(tmp_path):
     """A dataset written with an incompatible version is ignored."""
     path = tmp_path / "issues.json"
     save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
-    path.write_text(path.read_text().replace('"version": 1', '"version": 999'))
+    path.write_text(path.read_text().replace(f'"version": {DATASET_VERSION}', '"version": 999'))
     assert load_dataset(path, _Record) is None
 
 

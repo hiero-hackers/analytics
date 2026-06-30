@@ -137,6 +137,8 @@ def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
         # teams there so they're not misreported as having zero maintainers.
         if not any(role == "maintainer" for role in roles.values()):
             for user, role in _resolve_roles(assignments, team_members, only=BLANKET_TEAMS).items():
+                if role != "maintainer":
+                    continue  # credit blanket *maintainers* only — not triage/write holders
                 current = roles.get(user)
                 if current is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current]:
                     roles[user] = role

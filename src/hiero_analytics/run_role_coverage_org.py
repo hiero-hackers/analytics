@@ -111,7 +111,11 @@ def _write_role_coverage(roles_by_repo, all_time_by_repo, recent_by_repo, repo_l
     Counts are all-time with windowed ``*_recent`` columns; status/recency is all-time.
     Every repo with role-holders is covered, even quiet ones.
     """
-    all_repo_names = {repo for repo, _ in repo_last_seen} | set(all_time_by_repo)
+    # Cover every governance repo that has role-holders — including quiet ones with
+    # no recorded activity (often the highest-risk repos) — not just repos seen in
+    # the activity data.
+    role_repo_fulls = {f"{ORG}/{bare}" for bare in roles_by_repo}
+    all_repo_names = {repo for repo, _ in repo_last_seen} | set(all_time_by_repo) | role_repo_fulls
     coverage_all = []
     for repo_full in sorted(all_repo_names):
         holders = roles_by_repo.get(repo_full.split("/")[-1])

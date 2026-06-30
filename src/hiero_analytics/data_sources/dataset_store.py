@@ -25,7 +25,10 @@ from typing import TypeVar
 
 from .serialization import deserialize_record, serialize_record
 
-DATASET_VERSION = 1
+# Bump to invalidate persisted datasets after a schema change so the next run does
+# one full refresh. v2: IssueTimelineEventRecord gained an ``actor`` field, so older
+# label-event datasets must be re-fetched to populate it.
+DATASET_VERSION = 2
 
 # Re-fetch a small window before the stored watermark so edits that landed
 # mid-fetch (or under minor clock skew) are not missed. Re-merges are idempotent.
