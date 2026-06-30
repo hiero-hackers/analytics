@@ -8,30 +8,38 @@ for both REST and GraphQL API calls.
 from __future__ import annotations
 
 import logging
+import random
+import threading
 import time
 from collections.abc import Mapping
 from typing import Any
 
 import requests
-import random
-import threading
 
 from hiero_analytics.config.github import (
     BASE_URL,
+    GITHUB_MAX_WORKERS,
     GITHUB_TOKEN,
     HTTP_TIMEOUT_SECONDS,
     REQUEST_DELAY_SECONDS,
     SECONDARY_RATE_LIMIT_FALLBACK_SECONDS,
 )
+
+from .adaptive_limiter import AdaptiveConcurrencyLimiter
 from .rate_limit import (
-    Action,
     JSON,
+    Action,
     RateLimitDecision,
     RateLimitPolicy,
     RateLimitSnapshot,
 )
 
 logger = logging.getLogger(__name__)
+
+# One shared limiter for the whole process, so every GitHubClient (and every
+# pipeline in run_all) throttles together when GitHub starts returning
+# secondary-rate-limit 403s, and recovers together afterwards.
+_LIMITER = AdaptiveConcurrencyLimiter(GITHUB_MAX_WORKERS)
 
 MAX_RETRIES = 3
 MAX_GRAPHQL_FRESH_RETRIES = 2
@@ -141,12 +149,13 @@ class GitHubClient:
             start = time.time()
 
             try:
-                response = self.session.request(
-                    method,
-                    url,
-                    timeout=HTTP_TIMEOUT_SECONDS,
-                    **kwargs,
-                )
+                with _LIMITER.slot():
+                    response = self.session.request(
+                        method,
+                        url,
+                        timeout=HTTP_TIMEOUT_SECONDS,
+                        **kwargs,
+                    )
             except requests.RequestException as exc:
                 if attempt == MAX_RETRIES:
                     logger.error(
@@ -210,6 +219,7 @@ class GitHubClient:
                 is_rate_limited = "rate limit" in message.lower()
 
                 if retry_after is not None or is_rate_limited:
+                    _LIMITER.on_throttle()  # shrink request concurrency for the whole run
                     if retry_after is not None and retry_after.isdigit():
                         sleep_seconds = max(int(retry_after), 1)
                     else:
@@ -223,6 +233,7 @@ class GitHubClient:
                     continue
                 
             response.raise_for_status()
+            _LIMITER.on_success()  # clean response — let concurrency recover over time
             return response
 
         raise RuntimeError("Unreachable request state")
