@@ -335,7 +335,7 @@ def build_dashboard_html(macros: Sequence[Mapping]) -> str:
     lightbox = (
         "<div id='lightbox' class='lightbox' onclick='closeLightbox()'>"
         "<span class='hint'>click outside or press Esc to close</span>"
-        "<img id='lightbox-img' alt=''>"
+        "<img id='lightbox-img' alt='' onclick='event.stopPropagation()'>"
         "<div id='lightbox-note' class='lbcap' onclick='event.stopPropagation()'></div></div>"
     )
     footer = (

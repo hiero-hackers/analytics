@@ -37,6 +37,7 @@ import re
 import subprocess
 import time
 from collections import Counter
+from urllib.parse import urlparse
 
 import requests
 
@@ -363,8 +364,10 @@ def fetch_linkedin(login: str) -> str:
     if not resp:
         return ""
     for acct in resp.json():
-        if acct.get("provider") == "linkedin" or "linkedin.com" in acct.get("url", ""):
-            return acct.get("url", "")
+        url = acct.get("url", "")
+        host = (urlparse(url).hostname or "").lower()
+        if acct.get("provider") == "linkedin" or host == "linkedin.com" or host.endswith(".linkedin.com"):
+            return url
     return ""
 
 

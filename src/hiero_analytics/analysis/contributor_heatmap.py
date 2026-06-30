@@ -173,7 +173,9 @@ def build_team_activity_heatmap(
     if contributor_heatmap.empty:
         return pd.DataFrame(columns=columns)
 
-    by_login = {str(row["contributor name"]).lower(): row for _, row in contributor_heatmap.iterrows()}
+    by_login = {
+        str(row["contributor name"]).lower(): row for row in contributor_heatmap.to_dict("records")
+    }
     rows: list[dict[str, object]] = []
     for team, members in team_membership.items():
         monthly = dict.fromkeys(month_columns, 0)

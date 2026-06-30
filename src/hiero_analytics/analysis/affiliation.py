@@ -150,8 +150,9 @@ def summarize_affiliation(classified: pd.DataFrame) -> dict[str, object]:
     employer_counts = (
         known[known["status"] == "affiliated"]["organisation"].value_counts()
     )
+    entity_counts = Counter(entities)
     hhi = (
-        round(10000 * sum((entities.count(e) / known_total) ** 2 for e in set(entities)))
+        round(10000 * sum((n / known_total) ** 2 for n in entity_counts.values()))
         if known_total
         else 0
     )
