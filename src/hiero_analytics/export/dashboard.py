@@ -90,6 +90,15 @@ def _fmt(value: object) -> str:
     return str(value)
 
 
+def _chart_caption_html(chart: Mapping, esc) -> str:
+    """A chart's caption plus, when present, its 'how to read it' note shown inline."""
+    caption = f"<figcaption>{esc(chart['title'])}</figcaption>"
+    note = chart.get("note")
+    if not note:
+        return caption
+    return f"{caption}<p class='chartnote'>{esc(note)}</p>"
+
+
 def _slideshow_section_html(section: Mapping, esc) -> str:
     """Render a chart slideshow: one image at a time with Prev/Next navigation."""
     section_id = section["id"]
@@ -97,7 +106,7 @@ def _slideshow_section_html(section: Mapping, esc) -> str:
         f'<figure class="slide" style="{"" if i == 0 else "display:none"}">'
         f'<img src="{chart["src"]}" alt="{esc(chart["title"])}" loading="lazy" '
         f'onclick="openLightbox(this.src)">'
-        f"<figcaption>{esc(chart['title'])}</figcaption></figure>"
+        f"{_chart_caption_html(chart, esc)}</figure>"
         for i, chart in enumerate(section["charts"])
     )
     count = len(section["charts"])
@@ -121,7 +130,7 @@ def _charts_section_html(section: Mapping, esc) -> str:
     figures = "".join(
         f'<figure class="chart"><img src="{chart["src"]}" alt="{esc(chart["title"])}" loading="lazy" '
         f'onclick="openLightbox(this.src)">'
-        f"<figcaption>{esc(chart['title'])}</figcaption></figure>"
+        f"{_chart_caption_html(chart, esc)}</figure>"
         for chart in section["charts"]
     )
     return (

@@ -104,6 +104,27 @@ def test_build_maintainer_yearly_pipeline_counts_unique_actors_per_stage():
     assert row["maintainer"] == 1
 
 
+def test_build_maintainer_yearly_pipeline_counts_each_person_once_by_highest_role():
+    """A person with different roles in different repos counts once, in their highest band."""
+    role_lookup = {
+        "repo-a": {"alice": "maintainer"},
+        "repo-b": {"alice": "general_user"},
+    }
+    records = [
+        _h2_record("authored_pull_request", "alice", "org/repo-a", 2024),  # maintainer here
+        _h2_record("reviewed_pull_request", "alice", "org/repo-b", 2024),  # general here
+    ]
+
+    stage_df = activity_to_role_dataframe(records, role_lookup)
+    yearly = build_maintainer_yearly_pipeline(stage_df)
+
+    row = yearly.iloc[0]
+    assert row["maintainer"] == 1  # counted under her highest role only
+    assert row["general_user"] == 0  # not double-counted in the lower band
+    assert row["committer"] == 0
+    assert row["triage"] == 0
+
+
 def test_build_maintainer_repo_pipeline_sorts_by_total():
     """Repo rollups should sort repositories by total active contributors."""
     now = datetime.now(UTC)

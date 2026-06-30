@@ -20,6 +20,7 @@ from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ORG_CHARTS_DIR, ORG_DATA_DIR, OUTPUTS_DIR, ensure_output_dirs
 from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
+    CHART_NOTES,
     CHARTS_GROUP,
     MACRO_NAME,
     SECTION_GROUP_OF,
@@ -64,15 +65,24 @@ def _img_data_uri(path: Path) -> str | None:
 
 
 def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
-    """Build image-gallery sections for an org from its chart specs (missing files skipped)."""
+    """Build image-gallery sections for an org from its chart specs (missing files skipped).
+
+    A chart filename present in ``CHART_NOTES`` gets a "how to read this" expander
+    under it; the note describes how to read the chart (not the current data), so it
+    stays accurate across refreshes.
+    """
     chart_dir = ORG_CHARTS_DIR / org
     sections = []
     for spec in chart_specs:
-        charts = [
-            {"title": caption, "src": src}
-            for caption, filename in spec["files"]
-            if (src := _img_data_uri(chart_dir / filename)) is not None
-        ]
+        charts = []
+        for caption, filename in spec["files"]:
+            src = _img_data_uri(chart_dir / filename)
+            if src is None:
+                continue
+            chart = {"title": caption, "src": src}
+            if note := CHART_NOTES.get(filename):
+                chart["note"] = note
+            charts.append(chart)
         if charts:
             section = {
                 "id": spec["id"], "title": spec["title"], "description": spec["description"],

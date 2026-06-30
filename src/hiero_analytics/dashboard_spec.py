@@ -388,3 +388,113 @@ SECTION_GROUPS = [
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 CHARTS_GROUP = "Charts"
+
+# "How to read this" notes, keyed by chart filename. These describe how to read the
+# chart (its encoding and window) — never the current data values — so they stay
+# accurate across every refresh. A chart with no entry here simply shows no note.
+CHART_NOTES = {
+    "maintainer_pipeline_yearly.png": (
+        "Each bar is a calendar year, counting people active in its last six months (a fixed Jul–Dec "
+        "window for past years, so old bars stay put; a trailing six-month window for the current year). "
+        "Each person is counted once, under the highest governance role they hold in any repo "
+        "(general → triage → committer → maintainer), so the bar's total is the distinct people active."
+    ),
+    "maintainer_pipeline_by_repo.png": (
+        "Each bar is a repository, counting people active there in the last six months, grouped by the "
+        "governance role they hold in that repo (general → triage → committer → maintainer). A person "
+        "active in several repos is counted in each; smaller repos are pooled into 'Other Repos'."
+    ),
+    "maintainer_network.png": (
+        "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
+        "linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's "
+        "category."
+    ),
+    "committer_network.png": (
+        "Each bubble is a repository, sized by its active committers; two repos are linked when they "
+        "share at least two committers (thicker line = more shared). Bubble colour is the repo's category."
+    ),
+    "triage_network.png": (
+        "Each bubble is a repository, sized by its active triage members; two repos are linked when they "
+        "share a triage member (thicker line = more shared). Bubble colour is the repo's category."
+    ),
+    "general_network.png": (
+        "Each bubble is a repository, sized by its general contributors (people with no governance role); "
+        "two repos are linked when they share at least four of them. Bubble colour is the repo's category."
+    ),
+    "all_network.png": (
+        "Each bubble is a repository, sized by its active contributors; two repos are linked when they "
+        "share contributors. Bubble colour is the repo's category; the link threshold scales with org size."
+    ),
+    "contributor_activity_heatmap.png": (
+        "Rows are the 25 busiest contributors over the last six months; columns are those months. The "
+        "colour and number in each cell are a weighted activity score (issues ×2, reviews ×3, PRs opened "
+        "×3, merges ×2) for that month — greener = more active, redder = less. Bots are excluded."
+    ),
+    "contributor_counts.png": (
+        "The 20 repositories with the most distinct contributors over the last six months; bar height is "
+        "the number of unique contributors."
+    ),
+    "language_distribution.png": (
+        "How many repositories use each primary language (current snapshot). Repositories with no "
+        "detected language are grouped as 'Unknown'."
+    ),
+    "push_activity.png": (
+        "The share of repositories that received a push in the last 30 days (active) versus those that "
+        "did not (inactive)."
+    ),
+    "gfi_pipeline.png": (
+        "Good-first-issue pipeline by year: each bar stacks candidate issues (flagged as potential "
+        "good-first-issues) and approved good-first-issues, counted by the year they were created."
+    ),
+    "gfi_yearly_state_line.png": (
+        "Good-first-issues per year — one line per issue state (e.g. open, closed) plus a total line. "
+        "Each point is the count for that year."
+    ),
+    "total_gfi_gfic_by_repo.png": (
+        "The total good-first-issue pool per repository (all-time): each bar stacks approved "
+        "good-first-issues and candidate issues."
+    ),
+    "difficulty_by_repo_30_days.png": (
+        "Open issues per repository, stacked by difficulty level. Limited to issues labelled with a "
+        "difficulty (or newly created) in the last 30 days; 'Unknown' = recent open issues not yet triaged."
+    ),
+    "difficulty_distribution_with_unknown_30_days.png": (
+        "The same last-30-days open issues taken as a whole and split by difficulty level, including "
+        "untriaged ('Unknown') issues."
+    ),
+    "difficulty_distribution_without_unknown_30_days.png": (
+        "Open issues from the last 30 days by difficulty, excluding untriaged ('Unknown') ones — the mix "
+        "among issues that already have a difficulty label."
+    ),
+    "difficulty_over_time_event_based_weekly.png": (
+        "Open issues by difficulty over the last year, reconstructed from when difficulty labels were "
+        "actually applied (label events). Each band is a difficulty level; the height is how many open "
+        "issues sat at that difficulty on that date."
+    ),
+    "org_scorecard.png": (
+        "Each repository's overall OpenSSF Scorecard score (0–10), a measure of security practices. "
+        "Repositories without a published scorecard are omitted."
+    ),
+    "org_scorecard_breakdown.png": (
+        "Each repository's OpenSSF score split into its individual checks (one colour per check, e.g. "
+        "Code-Review, Branch-Protection), so you can see which practices contribute."
+    ),
+    "org_codeowner_summary.png": (
+        "How many repositories have a CODEOWNERS file (Present) versus none (Missing)."
+    ),
+    "org_runner_chart.png": (
+        "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard "
+        "(GitHub-hosted), or indeterminate (could not be classified)."
+    ),
+    "hiero_discord_channel_categories.png": (
+        "Discord message volume grouped by topic area, split into the last 90 days versus earlier history. "
+        "From a manual Discord export (counts are as of the export date)."
+    ),
+    "hiero_discord_monthly_traffic.png": (
+        "Total Discord messages per month across the export's date range."
+    ),
+    "hiero_discord_recent_activity_30d.png": (
+        "The five Discord channels with the most messages in the last 30 days (relative to the export "
+        "snapshot date)."
+    ),
+}
