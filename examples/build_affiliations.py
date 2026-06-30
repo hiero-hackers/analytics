@@ -106,7 +106,6 @@ _PERSONAL = {
     "gmail.com", NOREPLY, "outlook.com", "hotmail.com", "icloud.com", "proton.me", "protonmail.com",
     "web.de", "yahoo.com", "qq.com", "abv.bg", "pacbell.net", "news.co.uk",
 }
-_SKIP_ORG = {"hiero-ledger", "hiero-hackers", "lf-decentralized-trust", "badging", "support-and-care"}
 _MD_SKIP = {"", "-", "n/a", "none", "tbd"}
 _MD_LINK = re.compile(r"\[([^\]]+)\]\([^)]*\)")
 
@@ -131,6 +130,24 @@ def email_domain(addr: str) -> str:
     only the domain."""
     addr = (addr or "").strip()
     return "@" + addr.split("@", 1)[1] if "@" in addr else ""
+
+
+# Cells that begin with one of these can run as a formula when the CSV is opened in
+# Excel / Google Sheets (CSV injection). Several audit columns carry attacker-controlled
+# GitHub fields (name, company, bio, email domain, LinkedIn URL), so neutralise them.
+_CSV_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def csv_safe(value: object) -> object:
+    """Prefix a formula-triggering cell with ' so spreadsheets treat it as text.
+
+    The lone '-' placeholder used for empty fields is left alone (a bare hyphen is
+    not a formula) so the audit stays readable.
+    """
+    text = str(value)
+    if text and text != "-" and text[0] in _CSV_FORMULA_PREFIXES:
+        return "'" + text
+    return value
 
 
 def org_from_email(raw: str) -> str | None:
@@ -577,7 +594,7 @@ def main() -> None:
         ])
         for r in sorted(rows, key=lambda x: (x["status"], (x["resolved"] or "~"), x["login"].lower())):
             affiliation = r["resolved"] or ("Independent" if r["status"] == "independent" else "?")
-            w.writerow([
+            row = [
                 r["login"], r["name"], r["status"], affiliation, r["decided_by"], r["confidence"],
                 ";".join(r["sources"]) or "-",
                 # Emails are redacted to their domain only — never the full address.
@@ -586,7 +603,9 @@ def main() -> None:
                 r["company"] or "-", r["company_org"] or "-", r["bio_org"] or "-",
                 ";".join(r["orgs"]) or "-", r["org_membership_org"] or "-", r["small_org"] or "-",
                 r["commit_email_org"] or "-", r["linkedin"] or "-",
-            ])
+            ]
+            # Neutralise spreadsheet formula injection from attacker-controlled GitHub fields.
+            w.writerow([csv_safe(cell) for cell in row])
     print(f"wrote {audit_path}")
 
 

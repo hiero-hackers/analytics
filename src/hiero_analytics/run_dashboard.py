@@ -106,9 +106,15 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
             if not variants:
                 continue
             chart = {"title": caption}
-            chart["src" if len(variants) == 1 else "variants"] = (
-                variants[0]["src"] if len(variants) == 1 else variants
-            )
+            if len(variants) == 1:
+                # Only one image survived. If it came from a labelled All / Active pair,
+                # keep the label in the title so an active-only (or all-only) survivor
+                # isn't silently shown as the base chart.
+                only = variants[0]
+                chart["title"] = f"{caption} — {only['label']}" if len(target) > 1 else caption
+                chart["src"] = only["src"]
+            else:
+                chart["variants"] = variants
             if note:
                 chart["note"] = note
             if methodology:

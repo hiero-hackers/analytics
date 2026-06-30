@@ -77,11 +77,12 @@ CHART_MACROS = [
                     "id": "org-diversity",
                     "title": "Organisation diversity",
                     "description": (
-                        "Where maintainer authority sits — org-wide and per repo. The first chart is the "
-                        "ecosystem-wide split of maintainers by employer (solo contributors pooled as "
-                        "'Independent'); the second is each repo's maintainer mix, so single-employer repos "
-                        "(an organisational bus-factor) stand out. See the affiliations and repo-diversity "
-                        "tables for the underlying detail."
+                        "Where maintainer authority sits — org-wide, per team and per repo. The first chart is "
+                        "the ecosystem-wide split of maintainers by employer (solo contributors pooled as "
+                        "'Independent'); the next two count the governance teams and the repositories that a "
+                        "single employer solely controls (an organisational bus-factor); the last two break "
+                        "down each repository's and each team's maintainer mix. See the affiliations and "
+                        "repo-diversity tables for the underlying detail."
                     ),
                     # Each chart offers an All / Active (last 90 days) tab so the roster
                     # and the day-to-day active core can be compared in place.
@@ -580,7 +581,7 @@ CHART_NOTES = {
         "The share of maintainers held by the two largest employers, with everyone else (smaller orgs and "
         "solo 'Independent' contributors) pooled into 'Other' — the concentration at a glance; the full "
         "breakdown is in the affiliations table. Switch to the Active tab to count only maintainers active "
-        "in the last 90 days, where the largest employer's slice grows."
+        "in the last 90 days."
     ),
     "single_employer_donut.png": (
         "Of the governance teams controlled by a single employer, the share each organisation controls. A "
