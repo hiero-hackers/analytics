@@ -93,8 +93,11 @@ select = [
 ignore = [
     "D212",     # disable "summary on same line"
     "E501",     # line length -> formatter
-    "B008",     # function calls in argument defaults 
+    "B008",     # function calls in argument defaults
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/**" = ["D"]  # runnable demo scripts don't need module/function docstrings
 
 [tool.ruff.format]
 quote-style = "double"

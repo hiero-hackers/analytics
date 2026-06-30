@@ -26,7 +26,7 @@ from .serialization import deserialize_record, serialize_record
 logger = logging.getLogger(__name__)
 
 CACHE_VERSION = 1
-DEFAULT_GITHUB_CACHE_TTL_SECONDS = 60 * 60 * 24  # 24 hours
+DEFAULT_GITHUB_CACHE_TTL_SECONDS = 60 * 60 * 24 * 5  # 5 days
 GITHUB_CACHE_DIR = OUTPUTS_DIR / "cache" / "github"
 
 _TRUE_VALUES = {"1", "true", "yes", "on"}

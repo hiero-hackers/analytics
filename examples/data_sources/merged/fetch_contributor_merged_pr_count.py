@@ -1,11 +1,14 @@
 import os
+
 from dotenv import load_dotenv
+
+from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
-    fetch_repo_contributor_merged_pr_count_graphql,
     fetch_org_contributor_merged_pr_count_graphql,
+    fetch_repo_contributor_merged_pr_count_graphql,
 )
-from hiero_analytics.config.logging_config import setup_logging
+
 
 def main():
     setup_logging()
