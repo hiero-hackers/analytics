@@ -163,8 +163,9 @@ def main() -> None:
             macros.append({"name": macro["name"], "org_tabs": org_tabs})
 
     if not macros:
-        logger.warning("No org data or charts found; dashboard not written")
-        return
+        # Still write the (empty) page so the file always exists — callers and the
+        # Pages deploy expect it, and it matches the README's "no data → empty page".
+        logger.warning("No org data or charts found; writing an empty dashboard")
 
     output = OUTPUTS_DIR / "dashboard.html"
     output.write_text(build_dashboard_html(macros), encoding="utf-8")

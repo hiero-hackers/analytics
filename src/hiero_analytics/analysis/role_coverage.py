@@ -16,22 +16,11 @@ from datetime import datetime
 
 import pandas as pd
 
+from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.repos import bare_repo
 
 # Seniority order, used to pick a holder's highest role across repos.
 ROLE_RANK: dict[str, int] = {"triage": 1, "committer": 2, "maintainer": 3}
-
-# Known automation accounts, excluded from "doing the work without a role".
-KNOWN_BOTS: frozenset[str] = frozenset(
-    {
-        "coderabbitai",
-        "copilot-pull-request-reviewer",
-        "dependabot",
-        "github-actions",
-        "hedera-github-bot",
-        "trunk-io",
-    }
-)
 
 _COVERAGE_COLUMNS = [
     "user",
@@ -67,9 +56,8 @@ _UNBADGED_COLUMNS = [
 
 
 def looks_like_bot(login: str) -> bool:
-    """Heuristically identify automation accounts (known names + common suffixes)."""
-    low = login.lower()
-    return low in KNOWN_BOTS or low.endswith("[bot]") or low.endswith("-bot")
+    """Whether a login is an automation account (delegates to the shared detector)."""
+    return is_bot_login(login)
 
 
 def _counts(profile: object | None) -> list[int]:

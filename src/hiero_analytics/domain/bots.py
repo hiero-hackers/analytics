@@ -15,9 +15,11 @@ BOT_LOGINS = frozenset(
         "dependabot-preview",
         "coderabbit",
         "coderabbitai",
+        "copilot-pull-request-reviewer",
         "github-actions",
         "renovate",
         "swirlds-automation",
+        "trunk-io",
     }
 )
 
