@@ -28,6 +28,7 @@ import sys
 from collections.abc import Callable
 
 from hiero_analytics.config.logging_config import setup_logging
+from hiero_analytics.run_affiliation_org import main as run_affiliation
 from hiero_analytics.run_codeowner_and_runner import main as run_codeowner
 from hiero_analytics.run_contributor_activity_org import main as run_contributor_activity
 from hiero_analytics.run_contributor_heatmap_org import main as run_contributor_heatmap
@@ -57,6 +58,7 @@ PIPELINES: list[tuple[str, Callable[[], None]]] = [
     ("contributor_activity", run_contributor_activity),
     ("contributor_heatmap", run_contributor_heatmap),
     ("role_coverage", run_role_coverage),
+    ("affiliation", run_affiliation),
     ("scorecard", run_scorecard),
     ("codeowner_and_runner", run_codeowner),
     ("hiero_hackers", run_hiero_hackers),

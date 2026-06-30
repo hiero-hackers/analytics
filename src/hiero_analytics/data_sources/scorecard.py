@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import os
 import logging
-import requests
+import os
 from typing import Any
+
+import requests
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
 from hiero_analytics.data_sources.models import ScorecardRecord

@@ -20,12 +20,14 @@ from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ORG_CHARTS_DIR, ORG_DATA_DIR, OUTPUTS_DIR, ensure_output_dirs
 from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
+    CHART_METHODOLOGY,
     CHART_NOTES,
     CHARTS_GROUP,
     MACRO_NAME,
     SECTION_GROUP_OF,
     SECTION_ORDER,
     SECTION_SPECS,
+    WIDE_CHARTS,
 )
 from hiero_analytics.export.dashboard import build_dashboard_html
 
@@ -75,13 +77,44 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
     sections = []
     for spec in chart_specs:
         charts = []
-        for caption, filename in spec["files"]:
-            src = _img_data_uri(chart_dir / filename)
-            if src is None:
+        for caption, target in spec["files"]:
+            # ``target`` is a filename, or a list of (tab label, filename) variants
+            # that render as an All / Active toggle on one chart.
+            if isinstance(target, str):
+                src = _img_data_uri(chart_dir / target)
+                if src is None:
+                    continue
+                chart = {"title": caption, "src": src}
+                if note := CHART_NOTES.get(target):
+                    chart["note"] = note
+                if methodology := CHART_METHODOLOGY.get(target):
+                    chart["methodology"] = methodology
+                if target in WIDE_CHARTS:
+                    chart["wide"] = True
+                charts.append(chart)
                 continue
-            chart = {"title": caption, "src": src}
-            if note := CHART_NOTES.get(filename):
+
+            variants, note, methodology, wide = [], None, None, False
+            for label, filename in target:
+                src = _img_data_uri(chart_dir / filename)
+                if src is None:
+                    continue
+                variants.append({"label": label, "src": src})
+                note = note or CHART_NOTES.get(filename)
+                methodology = methodology or CHART_METHODOLOGY.get(filename)
+                wide = wide or filename in WIDE_CHARTS
+            if not variants:
+                continue
+            chart = {"title": caption}
+            chart["src" if len(variants) == 1 else "variants"] = (
+                variants[0]["src"] if len(variants) == 1 else variants
+            )
+            if note:
                 chart["note"] = note
+            if methodology:
+                chart["methodology"] = methodology
+            if wide:
+                chart["wide"] = True
             charts.append(chart)
         if charts:
             section = {
@@ -110,6 +143,9 @@ def _org_tab(org_name: str, org_data_dir: Path) -> dict | None:
             "group": SECTION_GROUP_OF[section_id],
             "columns": spec["columns"],
             "rows": loaded[spec["id"]].to_dict("records"),
+            # Optional "Suggest a correction" action link (e.g. the affiliations table).
+            **({"action_url": spec["action_url"]} if spec.get("action_url") else {}),
+            **({"action_label": spec["action_label"]} if spec.get("action_label") else {}),
         }
         for section_id in SECTION_ORDER
         if (spec := specs_by_id[section_id]) and not loaded[section_id].empty

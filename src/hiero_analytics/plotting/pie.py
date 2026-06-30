@@ -40,6 +40,7 @@ def plot_pie(
     label_order: Sequence[str] | None = None,
     legend_title: str | None = None,
     center_label: str | None = None,
+    donut: bool = True,
 ) -> None:
     """
     Plot a pie chart.
@@ -105,18 +106,17 @@ def plot_pie(
         for label, value, pct in zip(data[label_col], data[value_col], percentages, strict=True)
     ]
 
+    wedge_kwargs = {"edgecolor": PLOT_BACKGROUND_COLOR, "linewidth": DONUT_EDGE_LINE_WIDTH}
+    if donut:
+        wedge_kwargs["width"] = DONUT_WIDTH  # leave a hole; omit for a filled pie
     wedges, _, _ = ax.pie(
         data[value_col],
         autopct=_format_donut_pct,
-        pctdistance=DONUT_PERCENTAGE_DISTANCE,
+        pctdistance=DONUT_PERCENTAGE_DISTANCE if donut else 0.62,
         startangle=DONUT_START_ANGLE,
         colors=slice_colors,
         radius=DONUT_RADIUS,
-        wedgeprops={
-            "width": DONUT_WIDTH,
-            "edgecolor": PLOT_BACKGROUND_COLOR,
-            "linewidth": DONUT_EDGE_LINE_WIDTH,
-        },
+        wedgeprops=wedge_kwargs,
         textprops={
             "color": TITLE_COLOR,
             "fontsize": ANNOTATION_FONT_SIZE,
@@ -133,26 +133,28 @@ def plot_pie(
     )
     style_legend(legend)
 
-    ax.text(
-        0,
-        0.08 if center_label else 0,
-        format_chart_value(total),
-        ha="center",
-        va="center",
-        fontsize=CENTER_TOTAL_FONT_SIZE,
-        fontweight=FONT_WEIGHT_SEMIBOLD,
-        color=TITLE_COLOR,
-    )
-    if center_label:
+    # The centre total/label only makes sense in the donut's hole; a filled pie omits it.
+    if donut:
         ax.text(
             0,
-            -0.11,
-            center_label,
+            0.08 if center_label else 0,
+            format_chart_value(total),
             ha="center",
             va="center",
-            fontsize=ANNOTATION_FONT_SIZE,
-            color=MUTED_TEXT_COLOR,
+            fontsize=CENTER_TOTAL_FONT_SIZE,
+            fontweight=FONT_WEIGHT_SEMIBOLD,
+            color=TITLE_COLOR,
         )
+        if center_label:
+            ax.text(
+                0,
+                -0.11,
+                center_label,
+                ha="center",
+                va="center",
+                fontsize=ANNOTATION_FONT_SIZE,
+                color=MUTED_TEXT_COLOR,
+            )
 
     ax.set_aspect("equal")
 

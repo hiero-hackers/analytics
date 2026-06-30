@@ -109,9 +109,33 @@ def test_chart_section_renders_embedded_images():
     assert 'src="data:image/png;base64,AAAA"' in doc
     assert "<figcaption>By repo</figcaption>" in doc
     assert "<table" not in doc  # charts don't render a table
-    assert "onclick=\"openLightbox(this.src)\"" in doc  # click to expand
+    assert 'onclick="openLightbox(this)"' in doc  # click to expand
     assert "id='lightbox'" in doc  # the overlay exists
+    assert "id='lightbox-note'" in doc  # the zoom view has a slot for the chart's note
     assert "class='glossary'" not in doc  # column glossary doesn't apply to a chart-only macro
+
+
+def test_chart_note_and_methodology_only_appear_in_zoom_view():
+    """The note and step-by-step methodology are carried hidden, for the lightbox only."""
+    sections = [
+        {
+            "id": "ch",
+            "title": "Charts",
+            "description": "pictures",
+            "charts": [{
+                "title": "Yearly",
+                "src": "data:image/png;base64,AAAA",
+                "note": "How to read this chart.",
+                "methodology": ["First do this.", "Then do that."],
+            }],
+        }
+    ]
+    doc = build_dashboard_html([_macro([_tab("hiero-ledger", sections, metrics=())], "Community")])
+    assert "class='lbinfo' hidden" in doc  # note + methodology carried hidden in the figure
+    assert "How to read this chart." in doc  # the short note
+    assert "Step-by-step methodology" in doc  # the expandable methodology
+    assert "<li>First do this.</li>" in doc and "<li>Then do that.</li>" in doc  # steps as a list
+    assert "id='lightbox-note'" in doc  # the zoom view has the slot that reveals them
 
 
 def test_slideshow_section_renders_nav_and_first_slide_only():

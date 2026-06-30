@@ -134,7 +134,7 @@ class Action(Enum):
 
 @dataclass(frozen=True)
 class RateLimitDecision:
-    """ A decision returned by the policy after inspecting a snapshot or response.
+    """A decision returned by the policy after inspecting a snapshot or response.
     The GitHubClient loop will apply the decision by sleeping and/or retrying
     as needed.
     """

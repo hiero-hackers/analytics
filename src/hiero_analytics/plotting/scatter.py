@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
+
 from hiero_analytics.config.charts import (
-    PRIMARY_PALETTE,
     ANNOTATION_FONT_SIZE,
-    TITLE_COLOR,
-    MUTED_TEXT_COLOR,
     CARD_BORDER_COLOR,
+    MUTED_TEXT_COLOR,
     PLOT_BACKGROUND_COLOR,
+    PRIMARY_PALETTE,
+    TITLE_COLOR,
 )
 from hiero_analytics.plotting.base import (
     create_figure,
@@ -38,7 +39,6 @@ def plot_scatter_with_regression(
     - Slope + correlation annotation
     - Consistent design system integration
     """
-
     # -------------------------
     # Prepare data (shared validation: required columns, non-empty, drop NA)
     # -------------------------

@@ -155,3 +155,88 @@ def heatmap_chart_data(
         return None
     values = chart_df[month_columns].to_numpy(dtype=float)
     return values, chart_df["contributor name"].tolist(), month_columns
+
+
+def build_team_activity_heatmap(
+    contributor_heatmap: pd.DataFrame,
+    team_membership: dict[str, set[str]],
+) -> pd.DataFrame:
+    """Sum the per-contributor monthly activity into per-team totals, busiest first.
+
+    Takes the contributor-by-month matrix from :func:`build_activity_heatmap_dataframe`
+    (already weighted, windowed and bot-free) and adds each member's scores to every
+    team they belong to — so team totals overlap, by design. Teams with no recorded
+    activity are dropped.
+    """
+    month_columns = [column for column in contributor_heatmap.columns if column not in set(_META_COLUMNS)]
+    columns = ["team", "activity score", *month_columns]
+    if contributor_heatmap.empty:
+        return pd.DataFrame(columns=columns)
+
+    by_login = {str(row["contributor name"]).lower(): row for _, row in contributor_heatmap.iterrows()}
+    rows: list[dict[str, object]] = []
+    for team, members in team_membership.items():
+        monthly = dict.fromkeys(month_columns, 0)
+        total = 0
+        for member in members:
+            row = by_login.get(member.lower())
+            if row is None:
+                continue
+            total += int(row["activity score"])
+            for month in month_columns:
+                monthly[month] += int(row[month])
+        if total > 0:
+            rows.append({"team": team, "activity score": total, **monthly})
+
+    frame = pd.DataFrame(rows, columns=columns)
+    if frame.empty:
+        return frame
+    return frame.sort_values("activity score", ascending=False).reset_index(drop=True)
+
+
+def build_repo_activity_heatmap(records, *, months_back: int = HEATMAP_MONTHS) -> pd.DataFrame:
+    """Weighted monthly activity per repository (bots excluded), busiest first.
+
+    Aggregated straight from the activity records by repo, so — unlike the team
+    heatmap — each event counts once. Same weights and window as the other heatmaps.
+    """
+    month_columns = _recent_month_keys(months_back)
+    window = set(month_columns)
+    per_repo: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"activity score": 0, **dict.fromkeys(month_columns, 0)}
+    )
+    for record in records:
+        actor = (record.actor or "").strip()
+        action = _activity_action(record.activity_type)
+        if not actor or action is None or record.occurred_at is None or is_bot_login(actor):
+            continue
+        month = _month_key(record.occurred_at)
+        if month not in window:
+            continue
+        repo = bare_repo(record.repo)
+        weight = ACTIVITY_WEIGHTS[action]
+        per_repo[repo]["activity score"] += weight
+        per_repo[repo][month] += weight
+
+    columns = ["repo", "activity score", *month_columns]
+    rows = [{"repo": repo, **values} for repo, values in per_repo.items()]
+    frame = pd.DataFrame(rows, columns=columns)
+    if frame.empty:
+        return frame
+    return frame.sort_values("activity score", ascending=False).reset_index(drop=True)
+
+
+def grouped_heatmap_chart_data(
+    heatmap_df: pd.DataFrame,
+    label_column: str,
+    *,
+    top_rows: int = HEATMAP_TOP_ROWS,
+) -> tuple[np.ndarray, list[str], list[str]] | None:
+    """Top-N rows of a grouped (team/repo/org) heatmap as ``(values, rows, cols)``."""
+    if heatmap_df.empty:
+        return None
+    month_columns = [c for c in heatmap_df.columns if c not in {label_column, "activity score"}]
+    chart_df = heatmap_df.head(top_rows)
+    if chart_df.empty:
+        return None
+    return chart_df[month_columns].to_numpy(dtype=float), chart_df[label_column].tolist(), month_columns

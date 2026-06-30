@@ -202,6 +202,12 @@ To avoid re-downloading all of GitHub history on every run, fetching is **increm
 
 ---
 
+## Documentation
+
+- [**Maintainer affiliations**](docs/affiliations.md) — how each maintainer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
+
+---
+
 ## License
 
 - Available under the **Apache License, Version 2.0 (Apache-2.0)*

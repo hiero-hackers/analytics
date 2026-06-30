@@ -5,7 +5,6 @@ import pandas as pd
 from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import ScorecardRecord
 
-
 CHECK_COLUMNS = [
     "Maintained",
     "Code-Review",

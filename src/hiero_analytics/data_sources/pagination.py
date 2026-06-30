@@ -12,8 +12,8 @@ pagination loops remain observable and debuggable.
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
 import time
+from collections.abc import Callable
 from typing import Any
 
 logger = logging.getLogger(__name__)

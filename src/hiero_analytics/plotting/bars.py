@@ -9,7 +9,13 @@ import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch, Patch, Rectangle
 
-from hiero_analytics.config.charts import ANNOTATION_FONT_SIZE, DEFAULT_FIGSIZE, FONT_WEIGHT_SEMIBOLD, PRIMARY_PALETTE, TITLE_COLOR
+from hiero_analytics.config.charts import (
+    ANNOTATION_FONT_SIZE,
+    DEFAULT_FIGSIZE,
+    FONT_WEIGHT_SEMIBOLD,
+    PRIMARY_PALETTE,
+    TITLE_COLOR,
+)
 
 from .base import (
     adaptive_legend_placement,
@@ -34,6 +40,13 @@ HORIZONTAL_X_MARGIN = 0.08
 HORIZONTAL_Y_MARGIN = 0.04
 VERTICAL_X_MARGIN = 0.04
 VERTICAL_Y_MARGIN = 0.08
+# Wide layout for many *vertical* bars: scale figure width with the bar count so a
+# crowded categorical chart becomes a wide, horizontally-scrollable landscape image.
+VERTICAL_COL_WIDTH = 0.34          # inches per bar
+VERTICAL_FIGURE_OVERHEAD = 3.0     # inches reserved for axes / legend
+VERTICAL_FIGURE_MIN_WIDTH = 12.0
+VERTICAL_FIGURE_HEIGHT = 8.5
+VERTICAL_AUTO_WIDTH_AFTER = 12     # only widen once there are more bars than this
 STACKED_BAR_ALPHA = 0.98
 BAR_ZORDER = 3
 ANNOTATION_ZORDER = 4
@@ -224,6 +237,10 @@ def plot_stacked_bar(
     sort_categorical: bool = True,
     legend_inside_bottom_right: bool = False,
     auto_height_for_horizontal: bool = True,
+    force_horizontal: bool | None = None,
+    value_label: str = "count",
+    reference_value: float | None = None,
+    reference_label: str | None = None,
 ) -> None:
     """
     Plot stacked bar chart.
@@ -280,15 +297,21 @@ def plot_stacked_bar(
         # Repo-level comparisons are easier to read when ordered by total volume.
         df["total"] = df[stack_cols].sum(axis=1)
         df = df.sort_values("total", ascending=False)
-    horizontal = _should_use_horizontal(df, x_col, rotate_x)
+    horizontal = _should_use_horizontal(df, x_col, rotate_x) if force_horizontal is None else force_horizontal
 
-    # Scale the figure to comfortably fit all rows when using a horizontal layout.
+    # Scale the figure: tall for many horizontal bars, wide for many vertical bars.
     if horizontal and auto_height_for_horizontal:
         fig_height = max(
             HORIZONTAL_FIGURE_MIN_HEIGHT,
             len(df) * HORIZONTAL_ROW_HEIGHT + HORIZONTAL_FIGURE_OVERHEAD,
         )
         figsize: tuple[float, float] = (HORIZONTAL_FIGURE_WIDTH, fig_height)
+    elif not horizontal and len(df) > VERTICAL_AUTO_WIDTH_AFTER:
+        fig_width = max(
+            VERTICAL_FIGURE_MIN_WIDTH,
+            len(df) * VERTICAL_COL_WIDTH + VERTICAL_FIGURE_OVERHEAD,
+        )
+        figsize = (fig_width, VERTICAL_FIGURE_HEIGHT)
     else:
         figsize = DEFAULT_FIGSIZE
 
@@ -351,6 +374,18 @@ def plot_stacked_bar(
             ax.set_xticks(df[x_col])
             ax.set_xticklabels([str(int(v)) for v in df[x_col]])
 
+    # Optional reference line on the value axis (e.g. a 50% majority threshold).
+    if reference_value is not None:
+        line = ax.axvline if horizontal else ax.axhline
+        line(reference_value, color="#444", linestyle="--", linewidth=1.3, zorder=ANNOTATION_ZORDER)
+        if reference_label:
+            transform = ax.get_xaxis_transform() if horizontal else ax.get_yaxis_transform()
+            pos = (reference_value, 0.995) if horizontal else (0.995, reference_value)
+            ax.text(
+                *pos, reference_label, transform=transform, ha="right", va="bottom",
+                fontsize=ANNOTATION_FONT_SIZE, color="#444", fontweight=FONT_WEIGHT_SEMIBOLD,
+            )
+
     ## Adaptive Legend placement
     labels_count = len(labels)
     placement = adaptive_legend_placement(labels_count)
@@ -368,8 +403,8 @@ def plot_stacked_bar(
         fig=fig,
         ax=ax,
         title=title,
-        xlabel="count" if horizontal else x_col,
-        ylabel="" if horizontal else "count",
+        xlabel=value_label if horizontal else x_col,
+        ylabel="" if horizontal else value_label,
         output_path=output_path,
         legend=True,
         rotate_x=None if horizontal else rotate_x,

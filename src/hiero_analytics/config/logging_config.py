@@ -132,7 +132,6 @@ def setup_logging(
 
 if __name__ == "__main__":
     # Example usage and demonstration of filtering
-    import sys
 
     # 1. Default configuration (INFO level, all modules)
     setup_logging()

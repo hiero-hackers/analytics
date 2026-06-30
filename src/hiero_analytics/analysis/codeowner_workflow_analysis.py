@@ -1,4 +1,5 @@
 import logging
+
 import pandas as pd
 
 from hiero_analytics.analysis.dataframe_utils import records_to_dataframe

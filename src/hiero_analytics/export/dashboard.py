@@ -91,12 +91,20 @@ def _fmt(value: object) -> str:
 
 
 def _chart_caption_html(chart: Mapping, esc) -> str:
-    """A chart's caption plus, when present, its 'how to read it' note shown inline."""
+    """A chart's caption; the note and methodology are carried hidden, revealed only on zoom."""
     caption = f"<figcaption>{esc(chart['title'])}</figcaption>"
     note = chart.get("note")
-    if not note:
+    methodology = chart.get("methodology")
+    if not note and not methodology:
         return caption
-    return f"{caption}<p class='chartnote'>{esc(note)}</p>"
+    info = f"<p class='chartnote'>{esc(note)}</p>" if note else ""
+    if methodology:
+        steps = "".join(f"<li>{esc(step)}</li>" for step in methodology)
+        info += (
+            "<details class='lbmethod'><summary>Step-by-step methodology</summary>"
+            f"<ol>{steps}</ol></details>"
+        )
+    return f"{caption}<div class='lbinfo' hidden>{info}</div>"
 
 
 def _slideshow_section_html(section: Mapping, esc) -> str:
@@ -105,7 +113,7 @@ def _slideshow_section_html(section: Mapping, esc) -> str:
     slides = "".join(
         f'<figure class="slide" style="{"" if i == 0 else "display:none"}">'
         f'<img src="{chart["src"]}" alt="{esc(chart["title"])}" loading="lazy" '
-        f'onclick="openLightbox(this.src)">'
+        f'onclick="openLightbox(this)">'
         f"{_chart_caption_html(chart, esc)}</figure>"
         for i, chart in enumerate(section["charts"])
     )
@@ -123,16 +131,46 @@ def _slideshow_section_html(section: Mapping, esc) -> str:
     )
 
 
+def _figure_html(chart: Mapping, esc) -> str:
+    """A gallery figure: a single image, or an All/Active tab switcher if it has variants.
+
+    'wide' charts (vertical bars over many items) are wrapped in a horizontally
+    scrollable box so they show at a readable size instead of being squashed to fit.
+    """
+    caption = _chart_caption_html(chart, esc)
+    wide = chart.get("wide")
+    # Wide charts get their own full-width row so the horizontal scroll has room.
+    fig_cls = "chart wide" if wide else "chart"
+    open_scroll = "<div class='chartscroll'>" if wide else ""
+    close_scroll = "</div>" if wide else ""
+    if not chart.get("variants"):
+        img = (
+            f'<img src="{chart["src"]}" alt="{esc(chart["title"])}" '
+            f'loading="lazy" onclick="openLightbox(this)">'
+        )
+        return f'<figure class="{fig_cls}">{open_scroll}{img}{close_scroll}{caption}</figure>'
+    tabs, imgs = "", ""
+    for i, variant in enumerate(chart["variants"]):
+        active = " active" if i == 0 else ""
+        hidden = "" if i == 0 else ' style="display:none"'
+        tabs += (
+            f'<button class="ctab{active}" onclick="chartTab(this,{i})">{esc(variant["label"])}</button>'
+        )
+        imgs += (
+            f'<img class="cimg" data-i="{i}" src="{variant["src"]}" alt="{esc(chart["title"])}" '
+            f'loading="lazy" onclick="openLightbox(this)"{hidden}>'
+        )
+    return (
+        f'<figure class="{fig_cls}"><div class="charttabs">{tabs}</div>'
+        f"{open_scroll}{imgs}{close_scroll}{caption}</figure>"
+    )
+
+
 def _charts_section_html(section: Mapping, esc) -> str:
     """Render an image section: a slideshow if flagged, else a gallery grid."""
     if section.get("slideshow"):
         return _slideshow_section_html(section, esc)
-    figures = "".join(
-        f'<figure class="chart"><img src="{chart["src"]}" alt="{esc(chart["title"])}" loading="lazy" '
-        f'onclick="openLightbox(this.src)">'
-        f"{_chart_caption_html(chart, esc)}</figure>"
-        for chart in section["charts"]
-    )
+    figures = "".join(_figure_html(chart, esc) for chart in section["charts"])
     return (
         f"<section class='card'><h2>{esc(section['title'])}</h2>"
         f"<p class='desc'>{esc(section['description'])}</p>"
@@ -155,6 +193,12 @@ def _section_html(section: Mapping, esc) -> str:
         "<tr>" + "".join(f"<td>{esc(_fmt(row.get(key)))}</td>" for key, _label in columns) + "</tr>"
         for row in rows
     )
+    action = (
+        f"<a class='dl' href=\"{esc(section['action_url'])}\" target='_blank' rel='noopener'>"
+        f"{esc(section.get('action_label', 'Suggest a correction'))}</a>"
+        if section.get("action_url")
+        else ""
+    )
     return (
         f"<details class='card tsec' open>"
         f"<summary class='tsum'><h2>{esc(section['title'])}</h2>"
@@ -162,6 +206,7 @@ def _section_html(section: Mapping, esc) -> str:
         f"<div class='sbody'>"
         f"<div class='shead'><p class='desc'>{esc(section['description'])}</p>"
         f"<button class='dl' onclick=\"exportCSV('{section_id}','{section_id}.csv')\">Download CSV</button>"
+        f"{action}"
         f"</div>"
         f"<input class='search' placeholder='Filter…' "
         f"oninput=\"filterTable('{section_id}',this.value)\">"
@@ -209,26 +254,28 @@ def _org_panels_html(mslug: str, org_tabs: Sequence[Mapping], esc) -> str:
                 groups.append((gname, []))
             groups[-1][1].append(section)
 
-        # Jump bar: a link per group, plus expand/collapse-all when there are tables.
+        # Jump bar: a link per group (each group heading is itself collapsible).
         links = "".join(
             f"<a class='jbtn' href='#grp-{mslug}-{oslug}-{_slug(g)}'>{esc(g)}</a>" for g, _ in groups
         )
-        has_tables = any("charts" not in s for s in namespaced)
-        toggle = (
-            f"<button class='jbtn jtoggle' onclick=\"toggleAll('{panel_id}')\">Collapse all</button>"
-            if has_tables else ""
-        )
         jumpbar = (
-            f"<div class='jump'><span class='jlabel'>Jump to</span>{links}{toggle}</div>"
+            f"<div class='jump'><span class='jlabel'>Jump to</span>{links}</div>"
             if len(groups) > 1 else ""
         )
 
-        # Each group: a heading anchor followed by its sections (tables collapsed).
-        # With only one group (e.g. a chart-only macro) the heading is redundant.
+        # Each group is a collapsible <details>: click its heading to show/hide the
+        # whole group. With only one group (e.g. a chart-only macro) the heading is
+        # redundant, so the sections render bare.
         show_headers = len(groups) > 1
         blocks = "".join(
-            (f"<h2 class='grouphdr' id='grp-{mslug}-{oslug}-{_slug(g)}'>{esc(g)}</h2>" if show_headers else "")
-            + "".join(_section_html(s, esc) for s in secs)
+            (
+                f"<details class='group' id='grp-{mslug}-{oslug}-{_slug(g)}' open>"
+                f"<summary class='grouphdr'>{esc(g)}</summary>"
+                + "".join(_section_html(s, esc) for s in secs)
+                + "</details>"
+            )
+            if show_headers
+            else "".join(_section_html(s, esc) for s in secs)
             for g, secs in groups
         )
 
@@ -287,10 +334,17 @@ def build_dashboard_html(macros: Sequence[Mapping]) -> str:
     # Lightbox overlay (charts expand on click); macro bar is the top-level nav.
     lightbox = (
         "<div id='lightbox' class='lightbox' onclick='closeLightbox()'>"
-        "<span class='hint'>click anywhere or press Esc to close</span>"
-        "<img id='lightbox-img' alt=''></div>"
+        "<span class='hint'>click outside or press Esc to close</span>"
+        "<img id='lightbox-img' alt=''>"
+        "<div id='lightbox-note' class='lbcap' onclick='event.stopPropagation()'></div></div>"
     )
-    body = header + macro_bar + "".join(macro_panels) + lightbox
+    footer = (
+        "<footer class='wip'><span class='wipbadge'>Work in progress</span> "
+        "This dashboard is under active development. Organisation affiliations are curated and still being "
+        "verified — figures are directional and may change. Spotted something wrong? Use a table's "
+        "&ldquo;Suggest a correction&rdquo; link.</footer>"
+    )
+    body = header + macro_bar + "".join(macro_panels) + footer + lightbox
     return (
         "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>"
         "<meta name='viewport' content='width=device-width, initial-scale=1'>"

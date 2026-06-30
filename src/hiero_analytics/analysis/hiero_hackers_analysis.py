@@ -37,7 +37,7 @@ def calculate_push_activity_summary(
     days
         Number of days to consider "active". Defaults to 30.
     
-    Returns
+    Returns:
     -------
     pd.DataFrame
         DataFrame with columns: "status" ("Active"/"Inactive"), "count"
@@ -76,7 +76,7 @@ def calculate_language_distribution(df: pd.DataFrame) -> pd.DataFrame:
     df
         Repository DataFrame with "language" column.
     
-    Returns
+    Returns:
     -------
     pd.DataFrame
         DataFrame with columns: "language", "count", sorted by count descending.
@@ -110,7 +110,7 @@ def build_contributor_counts(
     activity_records
         List of ContributorActivityRecord objects from GitHub API.
     
-    Returns
+    Returns:
     -------
     pd.DataFrame
         DataFrame with columns: "repo", "contributors"

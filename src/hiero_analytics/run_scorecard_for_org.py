@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import logging
-import time
-from typing import List
 
 from hiero_analytics.analysis.scorecard_analysis import (
     CHECK_COLUMNS,
@@ -27,9 +25,9 @@ def fetch_org_repos(client: GitHubClient, org: str):
     return fetch_org_repos_graphql(client, org)
 
 
-def fetch_all_scorecards(repos) -> List[ScorecardRecord]:
+def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
     """Fetch scorecards for each repositories in organization."""
-    scorecards: List[ScorecardRecord] = []
+    scorecards: list[ScorecardRecord] = []
 
     for i, repo in enumerate(repos, start=1):
         logger.info("Fetching scorecard (%d/%d): %s", i, len(repos), repo.name)

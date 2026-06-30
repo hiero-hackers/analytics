@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+
 from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import PullRequestDifficultyRecord
 from hiero_analytics.domain.labels import ALL_ONBOARDING

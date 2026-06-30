@@ -74,8 +74,10 @@ def ensure_output_dirs() -> None:
 def ensure_org_dirs(org: str) -> tuple[Path, Path]:
     """
     Create org-specific output directories.
+
     Args:
         org: Organization identifier, such as a GitHub organization name or slug.
+
     Returns:
         A tuple containing:
             org_data_dir: Directory for organization-level data outputs.

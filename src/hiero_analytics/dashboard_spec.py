@@ -7,6 +7,11 @@ org without touching the rendering code.
 
 from __future__ import annotations
 
+# "Suggest a correction" target for the affiliations reference table — the analytics
+# repo's issues page. The affiliations map is the source of truth, so a correction is
+# either a one-line edit to data/affiliations.yaml (append '# manual') or a new issue here.
+AFFILIATION_ISSUE_URL = "https://github.com/hiero-hackers/analytics/issues"
+
 # The dashboard is organized as macro (family) → org → section. Today there is a
 # single macro built from SECTION_SPECS below; a future dashboard family (e.g.
 # onboarding, scorecards) becomes a new macro: build its ``org_tabs`` the same way
@@ -53,13 +58,57 @@ CHART_MACROS = [
                 },
                 {
                     "id": "activity-heatmap",
-                    "title": "Contributor activity heatmap",
+                    "title": "Activity heatmaps",
+                    "slideshow": True,
                     "description": (
-                        "Weighted monthly activity for the most active contributors over the last six "
-                        "months (greener = more active that month). This is the ranked, score-based view "
-                        "that complements the networks and the profile tables."
+                        "Weighted monthly activity over the last six months (greener = more active). Slide "
+                        "through the same activity zooming steadily out — from each individual contributor, "
+                        "to their governance team, to their employer, and finally to the repositories the "
+                        "work lands in."
                     ),
-                    "files": [("Activity heatmap", "contributor_activity_heatmap.png")],
+                    "files": [
+                        ("By contributor", "contributor_activity_heatmap.png"),
+                        ("By team", "team_activity_heatmap.png"),
+                        ("By organisation", "org_activity_heatmap.png"),
+                        ("By repository", "repo_activity_heatmap.png"),
+                    ],
+                },
+                {
+                    "id": "org-diversity",
+                    "title": "Organisation diversity",
+                    "description": (
+                        "Where maintainer authority sits — org-wide and per repo. The first chart is the "
+                        "ecosystem-wide split of maintainers by employer (solo contributors pooled as "
+                        "'Independent'); the second is each repo's maintainer mix, so single-employer repos "
+                        "(an organisational bus-factor) stand out. See the affiliations and repo-diversity "
+                        "tables for the underlying detail."
+                    ),
+                    # Each chart offers an All / Active (last 90 days) tab so the roster
+                    # and the day-to-day active core can be compared in place.
+                    # The compact charts share the top rows; the two wide
+                    # composition charts then stack full-width, one row each.
+                    "files": [
+                        ("Maintainers by organisation", [
+                            ("All", "affiliation_donut.png"),
+                            ("Active 90d", "affiliation_donut_active.png"),
+                        ]),
+                        ("Single-employer teams by org", [
+                            ("All", "single_employer_teams_by_org.png"),
+                            ("Active 90d", "single_employer_teams_by_org_active.png"),
+                        ]),
+                        ("Single-employer repos by org", [
+                            ("All", "single_employer_repos_by_org.png"),
+                            ("Active 90d", "single_employer_repos_by_org_active.png"),
+                        ]),
+                        ("Organisation mix by repo", [
+                            ("All", "repo_affiliation_composition.png"),
+                            ("Active 90d", "repo_affiliation_composition_active.png"),
+                        ]),
+                        ("Organisation mix by team", [
+                            ("All", "team_affiliation_composition.png"),
+                            ("Active 90d", "team_affiliation_composition_active.png"),
+                        ]),
+                    ],
                 },
             ],
             "hiero-hackers": [
@@ -297,6 +346,73 @@ SECTION_SPECS = [
         ],
     },
     {
+        "id": "affiliations",
+        "file": "maintainer_affiliations.csv",
+        "title": "Maintainer affiliations — reference",
+        "description": (
+            "Reference: each maintainer, the organisation they were mapped to, and how it was decided — "
+            "'automated' (the resolver placed them from public signals) or 'manual' (a hand-correction). "
+            "Status is 'affiliated' (named employer), 'independent' (solo / personal-email only), or "
+            "'unknown' (no public signal). To fix a mapping or resolve an unknown, edit its row in "
+            "data/affiliations.yaml and append '# manual: reason' (it then survives regeneration and reads "
+            "'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo."
+        ),
+        "action_url": AFFILIATION_ISSUE_URL,
+        "action_label": "Suggest a correction",
+        "columns": [
+            ("login", "maintainer"),
+            ("organisation", "organisation"),
+            ("status", "status"),
+            ("method", "method"),
+        ],
+    },
+    {
+        "id": "repodiversity",
+        "file": "repo_affiliation_diversity.csv",
+        "title": "Maintainer organisation diversity by repo",
+        "description": (
+            "Per repo: how many maintainers it has, how many distinct employers they span, the largest "
+            "employer and its share, and the independent / unknown counts. Repos where one employer holds "
+            "every maintainer seat ('distinct orgs' = 1) are an organisational bus-factor. Single-employer "
+            "repos first."
+        ),
+        "columns": [
+            ("repo", "repo"),
+            ("maintainers", "maintainers"),
+            ("distinct_orgs", "distinct orgs"),
+            ("top_org", "largest org"),
+            ("top_org_pct", "largest org %"),
+            ("independent", "independent"),
+            ("unknown", "unknown"),
+            ("organisations", "organisations"),
+        ],
+    },
+    {
+        "id": "teamdiversity",
+        "file": "team_affiliation_diversity.csv",
+        "title": "Team organisation concentration",
+        "description": (
+            "Per governance team: how many members resolve to an employer, how many distinct employers "
+            "they span, the largest employer and its share, and the concentration (HHI, 10000 = one "
+            "employer). 'single employer' = one employer holds every resolved seat — a capture / "
+            "bus-factor risk, most serious for admin, release, security, and maintainer teams. 'unknown' "
+            "is how many members aren't in the affiliations map (mostly non-maintainers), so read a flag "
+            "on a mostly-unknown team with caution. Most concentrated first."
+        ),
+        "columns": [
+            ("team", "team"),
+            ("members", "members"),
+            ("resolved", "resolved"),
+            ("distinct_orgs", "distinct orgs"),
+            ("top_org", "largest org"),
+            ("top_org_pct", "largest org %"),
+            ("hhi", "HHI"),
+            ("unknown", "unknown"),
+            ("single_employer", "single employer"),
+            ("organisations", "organisation mix"),
+        ],
+    },
+    {
         "id": "gonedark",
         "file": "role_coverage_globally_quiet.csv",
         "title": "Permission-holders with no recent activity (180+ days)",
@@ -380,6 +496,9 @@ SECTION_SPECS = [
 SECTION_GROUPS = [
     # The actionable headlines — where coverage is thin or work is concentrated.
     ("Coverage & risk", ["repoactivity", "understaffed", "loadshare", "gonedark"]),
+    # Who is affiliated with which organisation, and how concentrated that is — the
+    # table companions to the Organisation-diversity charts.
+    ("Organisation diversity", ["affiliations", "repodiversity", "teamdiversity"]),
     # Reference: who holds which role, per repo and per team.
     ("Roles & teams", ["repo", "account", "tscrepo", "teams", "teamrepo"]),
     # The full per-person list.
@@ -388,6 +507,15 @@ SECTION_GROUPS = [
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 CHARTS_GROUP = "Charts"
+
+# Wide charts (vertical bars across many items): the dashboard scrolls these
+# horizontally at a readable height instead of squashing them to the card width.
+WIDE_CHARTS = {
+    "repo_affiliation_composition.png",
+    "repo_affiliation_composition_active.png",
+    "team_affiliation_composition.png",
+    "team_affiliation_composition_active.png",
+}
 
 # "How to read this" notes, keyed by chart filename. These describe how to read the
 # chart (its encoding and window) — never the current data values — so they stay
@@ -429,6 +557,76 @@ CHART_NOTES = {
         "Rows are the 25 busiest contributors over the last six months; columns are those months. The "
         "colour and number in each cell are a weighted activity score (issues ×2, reviews ×3, PRs opened "
         "×3, merges ×2) for that month — greener = more active, redder = less. Bots are excluded."
+    ),
+    "org_activity_heatmap.png": (
+        "Rows are organisations, columns are the last six months; each cell is that org's people's "
+        "weighted activity that month (issues ×2, reviews ×3, PRs opened ×3, merges ×2) — greener = more "
+        "active. It shows which employers carry the work over time, the activity counterpart to the "
+        "head-count chart. Bots and contributors not mapped to an organisation are excluded."
+    ),
+    "team_activity_heatmap.png": (
+        "Rows are governance teams, columns are the last six months; each cell is the weighted activity of "
+        "the team's members that month (same weights as the other heatmaps). A contributor on several teams "
+        "counts toward each, so team totals overlap — this measures each team's activity, not a partition. "
+        "The 25 busiest teams are shown; bots are excluded."
+    ),
+    "repo_activity_heatmap.png": (
+        "Rows are repositories, columns are the last six months; each cell is the repo's weighted activity "
+        "that month (issues ×2, reviews ×3, PRs opened ×3, merges ×2) — greener = more active. Aggregated "
+        "straight from the events, so each counts once. The 25 busiest repositories are shown; bots are "
+        "excluded."
+    ),
+    "affiliation_donut.png": (
+        "The share of maintainers held by the two largest employers, with everyone else (smaller orgs and "
+        "solo 'Independent' contributors) pooled into 'Other' — the concentration at a glance; the full "
+        "breakdown is in the affiliations table. Switch to the Active tab to count only maintainers active "
+        "in the last 90 days, where the largest employer's slice grows."
+    ),
+    "single_employer_donut.png": (
+        "Of the governance teams controlled by a single employer, the share each organisation controls. A "
+        "dominant slice means one employer holds most single-vendor teams — concentrated governance-capture "
+        "risk. The Active tab restricts teams to their active members."
+    ),
+    "affiliation_distribution_active.png": (
+        "The same employer split, but limited to maintainers with recorded activity in the last 90 days — "
+        "who actually holds the keys day-to-day, rather than the full roster (which includes people who "
+        "have gone quiet). Comparing this with the org-wide chart shows whether the active core is more "
+        "concentrated than the roster suggests."
+    ),
+    "affiliation_distribution.png": (
+        "Each bar is an organisation; bar length is how many of the org's maintainers it employs "
+        "(distinct people). Solo contributors with no corporate employer are pooled into 'Independent', "
+        "which counts toward diversity rather than concentration. Maintainers with no public signal are "
+        "excluded. Affiliation is resolved from public signals — GPG-key email, profile email, company "
+        "field, org membership — with Swirlds Labs counted as its present-day name, Hashgraph."
+    ),
+    "repo_affiliation_composition.png": (
+        "Each bar is a repository, normalised to 100% so the segments show each employer's share of that "
+        "repo's maintainers. The dashed line marks 50%: a segment reaching past it means one employer holds "
+        "the majority (an organisational bus-factor). Largest employers get their own colour, smaller ones "
+        "pool into 'Other orgs', and solo or unmapped maintainers show as 'Independent' and 'Unknown'. Repos "
+        "are ordered most-concentrated first — by the largest single employer's share — and repos with the "
+        "same concentration are grouped by their leading organisation (colour), so like sits next to like."
+    ),
+    "team_affiliation_composition.png": (
+        "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the "
+        "team's members. The dashed line marks 50%: a segment past it means one employer holds the majority "
+        "(a capture / bus-factor risk). Largest employers get their own colour, smaller ones pool into "
+        "'Other orgs', and solo or unmapped members show as 'Independent' and 'Unknown'. Limited to teams "
+        "with at least four resolved members and ordered most-concentrated first; teams with the same "
+        "concentration are grouped by their leading organisation (colour). Every team is in the concentration table."
+    ),
+    "single_employer_teams_by_org.png": (
+        "Each bar is an organisation; bar height is how many governance teams it solely controls — every "
+        "resolved member of that team shares this one employer. Taller bars mean more single-employer "
+        "teams, a governance-capture / bus-factor risk. Teams are counted only where their members "
+        "resolve to an employer, so teams dominated by unmapped members are not over-counted here."
+    ),
+    "single_employer_repos_by_org.png": (
+        "Each bar is an organisation; bar height is how many repositories it solely maintains — every "
+        "resolved maintainer of that repo shares this one employer (at least two of them, no independents). "
+        "Taller bars mean more single-employer repos, an organisational bus-factor. Repos dominated by "
+        "unmapped maintainers are not counted here. The Active tab restricts to maintainers active in the last 90 days."
     ),
     "contributor_counts.png": (
         "The 20 repositories with the most distinct contributors over the last six months; bar height is "
@@ -497,4 +695,89 @@ CHART_NOTES = {
         "The five Discord channels with the most messages in the last 30 days (relative to the export "
         "snapshot date)."
     ),
+}
+
+
+# Step-by-step "how this was built" methodology, keyed by chart filename. Shown as
+# an expandable list in the zoom (lightbox) view, under the short note. Like the
+# notes these describe the method, never the current values, so they stay accurate.
+# A chart with no entry simply shows no methodology block.
+CHART_METHODOLOGY = {
+    "affiliation_donut.png": [
+        "Collect every maintainer from the governance config — anyone holding the maintainer role in any repo.",
+        "Look up each maintainer's organisation in the curated affiliations file.",
+        "That file resolves each person from public signals in priority order: GPG-key email, profile email, "
+        "the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then "
+        "commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph.",
+        "Count distinct maintainers per organisation; people with an identity but no employer are pooled as "
+        "'Independent'; people with no public signal are excluded.",
+        "Keep the two largest employers, fold everyone else (smaller orgs and independents) into 'Other', "
+        "and draw a filled pie of their shares.",
+    ],
+    "single_employer_teams_by_org.png": [
+        "Take every team in the governance config and list its members.",
+        "Map each member to an organisation via the affiliations file (same resolution as the other org charts).",
+        "Flag a team 'single-employer' when every member that resolves to an organisation shares the same one "
+        "(at least two such members, and no independents).",
+        "Group those single-employer teams by the organisation that controls them.",
+        "Plot one bar per organisation — its height is how many teams it solely controls.",
+    ],
+    "single_employer_repos_by_org.png": [
+        "For each repository, take the maintainers holding the maintainer role there.",
+        "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
+        "Flag a repo 'single-employer' when every resolved maintainer shares the same organisation "
+        "(at least two such maintainers, and no independents).",
+        "Group those single-employer repos by the organisation that maintains them.",
+        "Plot one bar per organisation — its height is how many repos it solely maintains.",
+    ],
+    "repo_affiliation_composition.png": [
+        "For each repository, take the maintainers holding the maintainer role there.",
+        "Map each to an organisation via the affiliations file.",
+        "Count maintainers per organisation within the repo; the largest employers across all repos get their "
+        "own colour, the rest pool into 'Other orgs', and solo/unmapped maintainers show as "
+        "'Independent'/'Unknown'.",
+        "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first "
+        "(by the largest single employer's share); ties are grouped by the leading organisation's colour.",
+        "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
+        "bars are single-employer repos; multi-colour bars are cross-org.",
+    ],
+    "team_affiliation_composition.png": [
+        "For each governance team, take its members.",
+        "Map each member to an organisation via the affiliations file.",
+        "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus "
+        "'Independent' and 'Unknown').",
+        "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with "
+        "same-concentration teams grouped by their leading organisation's colour; only teams with at least "
+        "four resolved members are shown (the full set is in the team-concentration table).",
+        "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
+        "bars are employer-controlled teams; multi-colour bars are cross-org.",
+    ],
+    "contributor_activity_heatmap.png": [
+        "Take every tracked event in the last six months — issues opened, PRs opened, reviews, merges — "
+        "excluding bots.",
+        "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket it by the month it "
+        "happened.",
+        "Sum the weighted score per contributor per month.",
+        "Rank contributors by their six-month total and keep the top 25.",
+        "Colour each cell by its monthly score (greener = more active).",
+    ],
+    "org_activity_heatmap.png": [
+        "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
+        "Map each contributor to an organisation via the affiliations file; drop those with no organisation.",
+        "Sum the contributors' monthly scores within each organisation.",
+        "Rank organisations by total and colour each cell by its monthly score.",
+    ],
+    "team_activity_heatmap.png": [
+        "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
+        "For each governance team, add up the monthly scores of its members.",
+        "A contributor on several teams counts toward each, so team totals overlap — this measures each "
+        "team's activity, not a partition.",
+        "Rank teams by total, show the busiest 25, and colour each cell by its monthly score.",
+    ],
+    "repo_activity_heatmap.png": [
+        "Take every tracked event in the last six months (bots excluded), keyed by the repository it occurred in.",
+        "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket by month.",
+        "Sum the weighted score per repository per month — each event counts once.",
+        "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score.",
+    ],
 }

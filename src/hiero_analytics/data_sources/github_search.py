@@ -14,9 +14,10 @@ from typing import Any
 
 import yaml
 
+from hiero_analytics.config.github import SEARCH_REQUEST_DELAY_SECONDS
+
 from .github_client import GitHubClient
 from .pagination import paginate_page_number
-from hiero_analytics.config.github import SEARCH_REQUEST_DELAY_SECONDS
 
 logger = logging.getLogger(__name__)
 

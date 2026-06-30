@@ -1,0 +1,273 @@
+# Maintainer / governance participant -> organisation, for the diversity charts.
+# Regenerate with examples/build_affiliations.py. Seeded from public signals
+# (GPG-key email, profile email, MAINTAINERS.md, company field, profile bio,
+# org membership, solo domain, commit-author email), in that precedence.
+# Obfuscated noreply addresses never count. Lineage: Swirlds Labs was renamed
+# to Hashgraph; Hedera and Hgraph stay separate.
+#
+# Values: an organisation name | "Independent" (solo / personal-email only) |
+# "?" (unknown — no public signal).
+#
+# Each row's comment is 'governance-role · name' (maintainer | committer |
+# triage | team). Only the 104 maintainers feed the maintainer-org charts;
+# the rest are here so the team-concentration view is fully covered.
+#
+# TO HAND-CORRECT a row so it STANDS OUT and survives regeneration: change the
+# value and append '# manual' (or '# manual: your reason'). It is re-flagged
+# below as 'MANUAL' with the resolver's competing guess, and never overwritten.
+0x-ds: "Hashgraph"  # triage · Denys Sinyakov
+0xivanov: "LimeChain"  # maintainer · Ivan Ivanov
+a-saksena: "Hashgraph"  # maintainer
+abhijeet2409: "Independent"  # triage · Abhijeet
+abies: "Hashgraph"  # committer · Artur Biesiadowski
+aceppaluni: "Independent"  # maintainer
+acuarica: "Hashgraph"  # maintainer · Luis Mastrangelo
+aderevets: "LimeChain"  # committer · aderevets
+adityarya11: "Independent"  # committer · Adi.11
+afaling0725: "?"  # team
+agadzhalov: "LimeChain"  # maintainer · Alexander Gadzhalov
+akdev: "Hashgraph"  # committer · Akram AbouEmara
+akshat8510: "Independent"  # committer · Akshat Kumar
+akugal: "Hashgraph"  # committer · Artur Kugal
+alex-kuzmin-hg: "Hashgraph"  # committer · Alex Kuzmin
+alexandershenshin: "DSR Corporation"  # maintainer · Alexander Shenshin
+alexkehayov: "LimeChain"  # committer · Alex Kehayov
+alfredog87: "Hashgraph"  # maintainer · Alfredo Gutierrez
+alinik4n: "?"  # committer · Ali
+allison-hashgraph: "Hashgraph"  # committer # manual
+anastasiya-kovaliova: "LimeChain"  # committer
+andrewb1269: "Hashgraph"  # maintainer · Andrew Brandt
+anighanta: "Hedera"  # committer · Anirudh Ghanta
+anthony-swirldslabs: "Hashgraph"  # maintainer
+antonioceppellini: "Independent"  # committer
+anvabr: "?"  # committer · Andrey (Envision)
+artemananiev: "Hashgraph"  # maintainer
+artemkaaas: "DSR Corporation"  # maintainer · artem.ivanov
+arturre: "Hashgraph"  # team · Artur
+ashcherbakov: "DSR Corporation"  # maintainer · Alexander Shcherbakov
+ashe-oro: "?"  # committer · Ashe Oro
+ashumahajan: "Hashgraph"  # committer
+ata-nas: "LimeChain"  # committer · Atanas Atanasov
+atul-hedera: "?"  # team
+bartoszsolkabd: "BlockyDevs"  # triage
+beeradb: "Hashgraph"  # committer · Brad Bowman
+berryware: "?"  # committer · David Berry
+bguiz: "?"  # committer · Brendan Graetz
+bilyana-gospodinova: "Independent"  # committer · Bilyana Gospodinova
+bootcodes: "Hashgraph"  # triage · Thomas Boot
+boris-bonin: "?"  # committer · Boris Bonin
+brunodam: "Hashgraph"  # team · Bruno Marques
+bubo: "LimeChain"  # maintainer · Lyuben Ivanov
+bugbytesinc: "BugBytes, Inc."  # committer · Jason Fabritz
+cacampbell: "Launchbadge"  # committer · Chris Campbell
+changobuitrago: "The Hashgraph Association"  # maintainer · Pablo Buitrago (w3n:buitrago)
+cheese-cakee: "Independent"  # triage · Cheese Cake
+chelleswf: "Hashgraph Online"  # maintainer
+chinnmay: "Independent"  # triage · Chinmay Chaudhari
+christinaharter: "Linux Foundation"  # maintainer · Christina Harter
+chung-chao: "?"  # committer · Chung
+cijujohn: "Independent"  # committer · Ciju John # manual
+cliffclick: "Independent"  # committer · Cliff Click # manual
+cmiville42: "Hashgraph"  # committer
+cooper-kunz: "?"  # committer · Cooper Kunz # manual
+cweagans: "Hashgraph"  # committer · Cameron Eagans
+dalvizu: "Hashgraph"  # committer · Dan Alvizu
+daniel-k-ivanov: "Independent"  # committer · Daniel Ivanov
+daniela-barbosa: "Linux Foundation"  # maintainer # manual· Daniela Barbosa
+danielmarv: "OpenElements"  # maintainer · Daniel Ntege
+danielnorkin: "Envision Blockchain"  # committer · danielnorkin
+david-bakin-sl: "Hashgraph"  # committer · David Bakin
+davidwboswell: "Linux Foundation"  # maintainer # manual
+ddeskov-limechain: "LimeChain"  # maintainer · Dian Deskov
+derektriley: "Hashgraph"  # committer · Derek Riley
+deshmukhpranali: "Hashgraph"  # maintainer · Pranali Deshmukh
+devmab: "BlockyDevs"  # maintainer · Mike Abrams
+diegoescalonaro: "The Hashgraph Association"  # maintainer · MANUAL — says so on profile
+dimitar-dinev: "Independent"  # committer · Dimitar Dinev
+diogper: "Independent"  # team · Diogo Pereira
+djsplice: "lmnt"  # team · Jeff Barrows
+dmueller2001: "Hedera"  # maintainer · Diane Mueller
+donaldthibeau: "?"  # committer
+dosik13: "LimeChain"  # maintainer · Dosi Kolev
+dr20240304: "Hashgraph"  # team
+drgorb: "Hashgraph"  # maintainer · Micha Roon
+drtoxic69: "SMVIT"  # triage · Shivakumar
+ebadiere: "Independent"  # committer · Eric Badiere
+edward-swirldslabs: "Hashgraph"  # committer · Edward Wertz
+elijahlynn: "Hashgraph"  # committer · Elijah Lynn
+emiliyank: "Independent"  # maintainer · Emiliyan Kadiyski
+ericleponner: "Hashgraph"  # maintainer · Eric Le Ponner
+evdokia-georgieva: "LimeChain"  # committer
+evelynlwong: "Independent"  # committer · Evelyn Wong
+exploreriii: "Independent"  # maintainer # manual
+failfmi: "Independent"  # committer
+ferparishuertas: "Hashgraph"  # maintainer
+fessmm: "Independent"  # committer · Furkan
+filev94: "LimeChain"  # committer
+georgi-l95: "LimeChain"  # maintainer · Georgi Lazarov
+gerbert-vandenberghe: "FundRequest"  # committer · Gerbert
+gkozyryatskyy: "Hashgraph"  # maintainer · Glib Kozyryatskyy
+gregscullard: "Hashgraph"  # committer · Greg Scullard
+grigorov-georgi: "LimeChain"  # triage · Georgi Grigorov
+gsstoykov: "LimeChain"  # maintainer
+h-bart: "?"  # committer
+harasz: "Jitty Labs"  # maintainer · Jakub Sydor
+hartm: "Linux Foundation"  # maintainer # manual
+hendrikebbers: "OpenElements"  # maintainer · Hendrik Ebbers
+hgraphpunks: "Turtle Moon"  # maintainer · Patches
+ibankov: "LimeChain"  # committer · Ivan Bankov
+imalygin: "Hashgraph"  # committer · Ivan Malygin
+isavov: "?"  # committer · Iliya Savov
+itsbrandondev: "Hgraph"  # maintainer · itsbrandond
+ivankavaldzhiev: "Independent"  # committer
+ivannov: "Independent"  # committer · Ivan St. Ivanov
+ivaylogarnev-limechain: "LimeChain"  # maintainer · ivaylogarnev
+ivaylonikolov7: "LimeChain"  # maintainer
+ivo-yankov: "DevLabs"  # maintainer · Ivo Yankov
+iwsimon: "Hashgraph"  # committer · Iris Simon
+izik: "?"  # committer
+jan-milenkov: "Independent"  # maintainer · Jan Milenkov
+janaakhterov: "VSP"  # committer · Jana Akhterov
+jascks: "?"  # committer · Jeff Schmidt
+jasperpotts: "Hashgraph"  # maintainer · Jasper Potts
+jasuwienas: "Independent"  # committer
+jaycoolh: "Hashgraph"  # maintainer
+jayv80: "?"  # committer
+jeffrey-morgan34: "Hashgraph"  # maintainer · Jeffrey Morgan
+jeffreydallas: "Hashgraph"  # maintainer
+jeromy-cannon: "Hashgraph"  # maintainer · Jeromy Cannon
+jexsie: "OpenElements"  # committer · Jessy
+jivkokelchev: "LimeChain"  # committer · Zhivko Kelchev
+jjohannes: "Onepiece Software"  # maintainer · Jendrik Johannes
+jnels124: "Hashgraph"  # committer · Jesse Nelson
+joshmarinacci: "Independent"  # committer · Josh Marinacci # manual
+jsync-swirlds: "Hashgraph"  # maintainer · Joseph S.
+justin-atwell: "?"  # committer · Justin Atwell
+justynspooner: "dovuofficial"  # committer · Justyn Spooner
+jwagantall: "Linux Foundation"  # maintainer · Jessica G
+kantorcodes: "Hashgraph Online"  # maintainer · Michael Kantor
+kenthejr: "Launchbadge"  # committer · Ken Anderson
+kfbr: "Hashgraph"  # committer · Keifer Furzland
+kononovandrey: "DSR Corporation"  # maintainer · Andrey Kononov
+konstantinabl: "LimeChain"  # maintainer
+kselveliev: "LimeChain"  # committer · Kristiyan Selveliev
+lbaird: "Hashgraph"  # maintainer · Leemon Baird
+leninmehedy: "Hashgraph"  # maintainer · Lenin Mehedy
+litt3: "?"  # committer · litt
+littletarzan: "?"  # committer
+lpetrovic05: "Hashgraph"  # maintainer · Lazar Petrovic
+lucashenning: "suku.world"  # committer · Lucas H.
+lukasz-hashgraph: "Hashgraph"  # maintainer · Lukasz Gasior
+lukelee-sl: "Hashgraph"  # maintainer
+mahmoudian1: "Hashgraph"  # committer · mmahmoudian
+manishdait: "Independent"  # maintainer · Manish Dait
+mariodimitrovv: "LimeChain"  # committer · Mario
+mark-swirlds: "Hashgraph"  # committer · Mark Blackman
+martingeorgiev1: "LimeChain"  # committer
+matevszm: "BlockyDevs"  # committer
+matteriben: "Hashgraph"  # committer · Matt Riben
+mattp-swirldslabs: "Hashgraph"  # committer · Matt Peterson
+mehcode: "Launchbadge"  # committer · Ryan Leckey
+mgarbs: "Hashgraph"  # maintainer · Michael Garber
+mhess-swl: "Hashgraph"  # committer · Matt Hess
+milanwr: "8bees"  # maintainer · Milan Wiercx van Rhijn
+minyu66: "Linux Foundation"  # maintainer · Min Yu
+miroslavgatsanoga: "?"  # committer · Miroslav Gatsanoga
+misiek-blocky: "?"  # maintainer
+mmyslblocky: "BlockyDevs"  # maintainer
+mody-hashgraph: "Hashgraph"  # team
+monaaeid: "Independent"  # committer · MontyPokemon
+mounil2005: "Independent"  # triage · Mounil Kankhara
+mustafauzunn: "LimeChain"  # maintainer · Mustafa Uzun
+mwb-al: "Independent"  # committer · Michał Walczak
+mxtartaglia-sl: "?"  # committer · Maximiliano Tartaglia
+nadineloepfe: "Hashgraph"  # maintainer · Nadine Loepfe
+nana-ec: "Hashgraph"  # maintainer · Nana Essilfie-Conduah
+natanasow: "LimeChain"  # maintainer · Nikolay Atanasow
+nathanklick: "Hashgraph"  # maintainer · Nathan Klick
+naydenovn: "LimeChain"  # committer · Nikola Naydenov
+ndacyayisenga-droid: "OpenElements"  # maintainer · Noah Tayebwa
+neeharika-sompalli: "Hashgraph"  # maintainer · Neeharika Sompalli
+netopyr: "Hashgraph"  # maintainer · Michael Heinrichs
+neurone: "Hashgraph"  # maintainer · Giuseppe Bertone
+nickeynikolovv: "LimeChain"  # committer · Nikolay Nikolov
+nickpoorman: "Independent"  # committer · Nick Poorman
+nirbosl: "Hashgraph"  # committer · Nir Ben-Or
+nlindellalderman: "Hashgraph"  # team
+nmiller-swirlds: "?"  # team · Nate M
+olegmazurov: "Hashgraph"  # maintainer · Oleg Mazurov
+olsentorfinn: "Hashgraph"  # maintainer
+parvninama: "Independent"  # committer
+paulatcalaxy: "?"  # committer
+paulo-caldas: "?"  # committer · Paulo Caldas
+perseverance: "LimeChain"  # committer · George Spasov
+petreze: "LimeChain"  # committer · Petar Tonev
+piotrswierzy: "BlockyDevs"  # maintainer · Peter Swierzy
+popowycz: "Hedera"  # maintainer · Alex Popowycz
+poulok: "Hashgraph"  # maintainer · Kelly Greco
+povolev15: "Hashgraph"  # committer · Lev Povolotsky
+prajeeta15: "Independent"  # triage # manual · prajeeta
+pratyay85: "Hashgraph"  # maintainer · Pratyay
+publu: "contributor"  # committer · Pablo
+qnswirlds: "Hashgraph"  # committer · Quan Nguyen
+quiet-node: "Hashgraph"  # maintainer · Logan Nguyen
+raphaelmessian: "Hashgraph"  # maintainer
+raykhoaza: "Independent"  # committer · Khoa Luong
+rbair23: "Hashgraph"  # maintainer · Richard Bair
+rbarker-dev: "Hashgraph"  # maintainer · Roger Barker
+reachtobhavesh: "Hashgraph"  # team
+reccetech: "Hashgraph"  # maintainer · Keith Kowal
+recdefi: "RECDeFi"  # committer
+rickylb: "Launchbadge"  # maintainer · Ricky Saechao
+rocketmay: "HashPack"  # maintainer · Rocket
+rockysingh: "Hashgraph"  # committer · Rocky Singh
+rozekmichal: "BlockyDevs"  # committer
+rsinha: "Hashgraph"  # maintainer · Rohit Sinha
+rwalworth: "Hashgraph"  # maintainer · Rob Walworth
+ryjones: "Linux Foundation"  # maintainer · Ry Jones
+sam-at-luther: "luthersystems"  # committer · Sam Wood
+san-est: "LimeChain"  # committer · Vasil Boyadzhiev
+scalemaildev: "ScalemaiL"  # committer · Bralz
+sdimitrov9: "LimeChain"  # committer · Stoyan Dimitrov
+se7enarianelabs: "Independent"  # committer
+seanbohan: "?"  # maintainer · Sean Bohan
+sebtiem: "Independent"  # committer · Sebastian Tiemann
+sentx-dev: "?"  # committer
+sergmetelin: "Hashgraph"  # maintainer · Serg Metelin
+sheng-long: "Launchbadge"  # maintainer · Tim Schmidt
+shezaan-hashgraph: "Hashgraph"  # committer
+shivam-batham: "Independent"  # triage · Shivam Batham
+simihunjan: "Hashgraph"  # maintainer
+simzzz: "LimeChain"  # maintainer · Simeon Nakov
+soharang: "?"  # committer · Chris Yang
+som-web23: "?"  # committer
+statop: "?"  # committer · Patrick Staton
+steven-sheehy: "Hashgraph"  # maintainer · Steven Sheehy
+stoqnkpl: "LimeChain"  # maintainer · Stoyan Panayotov
+stoyanov-st: "LimeChain"  # maintainer · Stanimir Stoyanov
+sumanair: "?"  # committer · Sumabala Nair
+superboo: "Robinhood"  # committer · Albert Tam
+svienot: "Hashgraph"  # maintainer · Simon Viénot
+tajang97: "DSR Corporation"  # committer · Nodirbek Parpibayev
+tannerjfco: "Independent"  # committer · Tanner J Ferguson
+teacoat: "Studio Monolith"  # committer · Tyler Cote
+tech0priyanshu: "Independent"  # triage · Priyanshu
+theekrystallee: "Hashgraph"  # maintainer · krystal
+thelinuxfoundation: "Linux Foundation"  # maintainer · The Linux Foundation
+thenswan: "LimeChain"  # committer · Nikita Lebedev
+thomas-swirlds-labs: "Hashgraph"  # committer · Thomas Moran
+tim-mchale: "?"  # committer · Tim McHale
+timfn-hg: "Hashgraph"  # committer · Tim
+timo0: "Hashgraph"  # committer · Timo Brandstätter
+tinker-michaelj: "Hashgraph"  # maintainer · Michael Tinker
+tmctl: "Independent"  # committer · Tyler McDonald
+toktar: "DSR Corporation"  # maintainer · toktar
+tomzhenghedera: "Hashgraph"  # committer · Tom Zheng
+ty-swirldslabs: "Hashgraph"  # committer · Ty
+undefinedismylife: "Independent"  # triage
+venilinvasilev: "LimeChain"  # maintainer
+victor-yanev: "LimeChain"  # committer · Victor Yanev
+viniciusjssouza: "Hashgraph"  # triage · Vinícius Souza
+vmn00b: "?"  # team · Jacob Rodriguez
+vtronkov: "LimeChain"  # committer · Valentin Tronkov
+xin-hedera: "Hashgraph"  # maintainer · Xin Li

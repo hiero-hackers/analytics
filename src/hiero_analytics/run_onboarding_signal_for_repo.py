@@ -123,7 +123,6 @@ def run():
         - GFI cumulative (left axis)
         - unique contributors (right axis)
         """
-
         if gfi_ts.empty or contrib_ts.empty:
             raise ValueError("Input time series cannot be empty")
 
