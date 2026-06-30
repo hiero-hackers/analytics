@@ -203,6 +203,21 @@ def test_label_only_contributor_still_appears():
     assert triager["organizing_share"] == 100
 
 
+def test_bots_are_excluded_from_profiles():
+    """Automation accounts are dropped from both activity and label events."""
+    records = [
+        _event(actor="asha", activity_type="authored_pull_request", target_number=1),
+        _event(actor="dependabot", activity_type="authored_pull_request", target_number=2),
+        _event(actor="coderabbitai", activity_type="reviewed_pull_request", target_number=3),
+        _event(actor="github-actions", activity_type="authored_pull_request", target_number=4),
+    ]
+    labels = [_label("renovate[bot]", 5), _label("maria", 6)]
+
+    profiles = build_contributor_profiles(records, labels)
+
+    assert set(profiles["contributor"]) == {"asha", "maria"}  # bots gone, humans kept
+
+
 def test_profiles_by_repo_scope_each_persons_work_to_that_repo():
     """The same person can show a different shape per repo."""
     records = [

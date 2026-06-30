@@ -22,13 +22,14 @@ from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_merged_pr_difficulty_graphql,
 )
 from hiero_analytics.domain.labels import ALL_ONBOARDING, DIFFICULTY_LEVELS
+from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.plotting.base import create_figure, finalize_chart
 from hiero_analytics.plotting.primitives import annotate_endpoint_badge
 from hiero_analytics.plotting.scatter import plot_scatter_with_regression
 
 ORG_NAME = ORG
 REPO = "hiero-sdk-python"
-short_repo = REPO.split("/")[-1]
+short_repo = bare_repo(REPO)
 
 from hiero_analytics.config.paths import ensure_repo_dirs
 

@@ -147,3 +147,14 @@ SCORECARD_CHECK_COLORS = {
     "SAST":               "#ff6361",
     "Vulnerabilities":    "#8b0000",
 }
+
+# Contributor activity heatmap: the intensity colour scale plus the surrounding
+# chrome colours (figure/axes background, cell text, ticks).
+ACTIVITY_HEATMAP_CMAP = "RdYlGn"
+ACTIVITY_HEATMAP_PALETTE = {
+    "figure_bg": "#F6F8FB",
+    "axes_bg": "#FFFFFF",
+    "text_dark": "#0F172A",
+    "text_light": "#FFFFFF",
+    "tick": "#64748B",
+}

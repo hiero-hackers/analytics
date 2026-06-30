@@ -13,7 +13,6 @@ governance roles); here we never name or rank roles.
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 
 from hiero_analytics.analysis.comembership import build_comembership_network
@@ -24,8 +23,8 @@ from hiero_analytics.analysis.contributor_activity_profile import (
 )
 from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import ORG, dataset_path, ensure_org_dirs, ensure_repo_dirs
-from hiero_analytics.data_sources.dataset_store import load_dataset
+from hiero_analytics.config.paths import ORG, ensure_org_dirs, ensure_repo_dirs
+from hiero_analytics.data_sources.dataset_store import load_or_fetch
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_org_contributor_activity_graphql,
@@ -65,26 +64,6 @@ def _build_contributor_network(records, label_events, by_repo, org_charts_dir) -
         logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
-def _load_or_fetch(resource: str, model: type, fetch_fn: Callable[[], list]) -> list:
-    """Reuse the persisted system-of-record dataset when present; fetch otherwise.
-
-    Inside ``run_all`` the maintainer pipeline populates the contributor-activity
-    dataset (same ``all`` fingerprint) earlier in the same run, so this reads it
-    from disk instead of issuing another org-wide fetch — avoiding extra GitHub
-    secondary-rate-limit pressure. Label events are reused from this pipeline's
-    own prior-run dataset. With no dataset yet (first run), it falls back to
-    fetching; the persisted data is then refreshed by the fetch pipelines and the
-    30-day self-heal.
-    """
-    state = load_dataset(dataset_path(resource, ORG, "all"), model)
-    if state is not None:
-        records, _ = state
-        logger.info("Reusing persisted %s dataset (%d records)", resource, len(records))
-        return records
-    logger.info("No persisted %s dataset; fetching from GitHub", resource)
-    return fetch_fn()
-
-
 def main() -> None:
     """Build the informational contributor-activity tables for the org."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
@@ -92,13 +71,17 @@ def main() -> None:
     logger.info("Building contributor activity tables for org: %s", ORG)
 
     client = GitHubClient()
-    records = _load_or_fetch(
+    # Reuse the datasets the maintainer/fetch pipelines persisted earlier in run_all
+    # (avoiding extra org-wide fetches); falls back to fetching on a cold start.
+    records = load_or_fetch(
         "contributor_activity",
+        ORG,
         ContributorActivityRecord,
         lambda: fetch_org_contributor_activity_graphql(client, org=ORG, lookback_days=None),
     )
-    label_events = _load_or_fetch(
+    label_events = load_or_fetch(
         "issue_label_events",
+        ORG,
         IssueTimelineEventRecord,
         lambda: fetch_org_issue_label_events_graphql(client, org=ORG),
     )

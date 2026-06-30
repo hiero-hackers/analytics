@@ -7,6 +7,8 @@ to colour the maintainer network and reusable for any other per-repo grouping.
 
 from __future__ import annotations
 
+from hiero_analytics.domain.repos import bare_repo
+
 # Curated map. Keys are bare repo names (the part after the last '/'), lowercased.
 REPO_CATEGORIES = {
     # SDKs
@@ -112,7 +114,7 @@ def categorize_repo(repo: str) -> str:
 
     Checks the curated map first, then ordered keyword rules, else ``"Other"``.
     """
-    name = str(repo).split("/")[-1].lower()
+    name = bare_repo(str(repo)).lower()
     if name in REPO_CATEGORIES:
         return REPO_CATEGORIES[name]
     for keyword, category in _KEYWORD_RULES:

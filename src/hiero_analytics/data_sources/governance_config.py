@@ -10,6 +10,7 @@ import requests
 import yaml
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
+from hiero_analytics.domain.bots import is_bot_login
 
 GOVERNANCE_CONFIG_URL = os.getenv(
     "GOVERNANCE_CONFIG_URL",
@@ -32,18 +33,9 @@ BLANKET_TEAMS = frozenset(
     {"github-maintainers", "security-maintainers", "lf-staff", "tsc", "hiero-triage"}
 )
 
-# Automation accounts that hold team grants but aren't people.
-_BOT_LOGINS = frozenset({"swirlds-automation", "hedera-github-bot", "hedera-local-node-bot"})
-
-
 def _normalize_username(user: str) -> str:
     """Normalize GitHub logins for case-insensitive matching."""
     return user.strip().lower()
-
-
-def _looks_like_bot_login(login: str) -> bool:
-    """Whether a (normalized) login is an automation account, not a person."""
-    return login in _BOT_LOGINS or login.endswith("-bot") or login.endswith("[bot]")
 
 
 def _resolve_roles(
@@ -70,7 +62,7 @@ def _resolve_roles(
         if role is None:
             continue
         for user in team_members.get(team_name, set()):
-            if _looks_like_bot_login(user):
+            if is_bot_login(user):
                 continue
             current = roles.get(user)
             if current is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current]:

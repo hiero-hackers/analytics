@@ -1,4 +1,4 @@
-"""Tests for the contributor-activity heatmap build."""
+"""Tests for the contributor-activity heatmap matrix build."""
 
 from __future__ import annotations
 
@@ -6,12 +6,12 @@ from datetime import UTC, datetime
 
 import pandas as pd
 
-from hiero_analytics.data_sources.models import ContributorActivityRecord
-from hiero_analytics.run_contributor_heatmap_org import (
-    ACTIVITY_WEIGHTS,
-    _build_activity_heatmap_dataframe,
-    _save_activity_heatmap_chart,
+from hiero_analytics.analysis.contributor_heatmap import (
+    build_activity_heatmap_dataframe,
+    heatmap_chart_data,
 )
+from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS
+from hiero_analytics.data_sources.models import ContributorActivityRecord
 
 
 def _ev(actor: str, activity_type: str, n: int, *, repo: str = "o/x") -> ContributorActivityRecord:
@@ -36,7 +36,7 @@ def test_heatmap_dataframe_scores_roles_and_sorts():
     ]
     role_lookup = {"x": {"alice": "maintainer"}}
 
-    df = _build_activity_heatmap_dataframe(records, role_lookup)
+    df = build_activity_heatmap_dataframe(records, role_lookup)
 
     month_cols = [c for c in df.columns if c not in {"contributor name", "role", "activity score"}]
     assert len(month_cols) == 6  # six-month window
@@ -50,37 +50,37 @@ def test_heatmap_dataframe_scores_roles_and_sorts():
 
 
 def test_heatmap_excludes_bots():
-    """Automation accounts (named bots and any [bot]-suffixed login) are dropped."""
+    """Automation accounts (named bots and any [bot]/-bot login) are dropped."""
     records = [
         _ev("alice", "authored_pull_request", 1),
         _ev("dependabot", "authored_pull_request", 2),
         _ev("coderabbitai", "reviewed_pull_request", 3),
         _ev("github-actions", "authored_pull_request", 4),
         _ev("renovate[bot]", "authored_pull_request", 5),
-        _ev("CodeRabbit", "reviewed_pull_request", 6),  # case-insensitive
+        _ev("some-bot", "authored_pull_request", 6),  # -bot suffix
+        _ev("CodeRabbit", "reviewed_pull_request", 7),  # case-insensitive
     ]
-    df = _build_activity_heatmap_dataframe(records, {})
+    df = build_activity_heatmap_dataframe(records, {})
     assert list(df["contributor name"]) == ["alice"]  # only the human remains
 
 
 def test_heatmap_dataframe_empty_records():
     """No records yields an empty frame that still carries the expected columns."""
-    df = _build_activity_heatmap_dataframe([], {})
+    df = build_activity_heatmap_dataframe([], {})
     assert df.empty
     assert "activity score" in df.columns
 
 
-def test_save_heatmap_chart_writes_png(tmp_path):
-    """A non-empty frame renders a PNG file on disk."""
+def test_heatmap_chart_data_extracts_matrix():
+    """Chart data is the top rows as (values, row_labels, col_labels)."""
     records = [_ev("alice", "authored_pull_request", 1), _ev("bob", "authored_issue", 2)]
-    df = _build_activity_heatmap_dataframe(records, {})
-    out = tmp_path / "heatmap.png"
-    _save_activity_heatmap_chart(df, out)
-    assert out.exists() and out.stat().st_size > 0
+    df = build_activity_heatmap_dataframe(records, {})
+    values, row_labels, col_labels = heatmap_chart_data(df)
+    assert row_labels == ["alice", "bob"]
+    assert len(col_labels) == 6
+    assert values.shape == (2, 6)
 
 
-def test_save_heatmap_chart_skips_empty(tmp_path):
-    """An empty frame writes nothing (no chart for no data)."""
-    out = tmp_path / "none.png"
-    _save_activity_heatmap_chart(pd.DataFrame(), out)
-    assert not out.exists()
+def test_heatmap_chart_data_none_when_empty():
+    """An empty frame produces no chart data."""
+    assert heatmap_chart_data(pd.DataFrame()) is None

@@ -26,6 +26,8 @@ from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueTimelineEventRecord,
 )
+from hiero_analytics.domain.bots import is_bot_login
+from hiero_analytics.domain.repos import bare_repo
 
 # Which activity_type belongs to which family. Activity types absent here are
 # ignored by the family rollups (but still counted in the raw event frame).
@@ -76,10 +78,15 @@ _PROFILE_COLUMNS = [
 def contributor_activity_to_dataframe(
     records: list[ContributorActivityRecord],
 ) -> pd.DataFrame:
-    """Flatten activity records into one row per event, tagged with its family."""
+    """Flatten activity records into one row per event, tagged with its family.
+
+    Automation accounts (bots) are dropped — they aren't contributors.
+    """
     return records_to_dataframe(
         records,
-        lambda r: {
+        lambda r: None
+        if not r.actor or is_bot_login(r.actor)
+        else {
             "contributor": r.actor,
             "activity_type": r.activity_type,
             "family": ACTIVITY_FAMILY.get(r.activity_type, "other"),
@@ -108,7 +115,7 @@ def label_events_to_dataframe(
     return records_to_dataframe(
         label_events,
         lambda e: None
-        if not e.actor or e.event_type != "labeled"
+        if not e.actor or e.event_type != "labeled" or is_bot_login(e.actor)
         else {
             "contributor": e.actor,
             "activity_type": "labeled_issue",
@@ -290,7 +297,7 @@ def build_active_membership(
             login = str(contributor).lower()
             if login in exclude:
                 continue
-            rows.append({"repo": repo_full.split("/")[-1], "user": login, "active": login in recent_users})
+            rows.append({"repo": bare_repo(repo_full), "user": login, "active": login in recent_users})
     return pd.DataFrame(rows, columns=["repo", "user", "active"])
 
 

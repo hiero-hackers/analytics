@@ -18,7 +18,6 @@ context of the role they hold.
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
@@ -55,8 +54,8 @@ from hiero_analytics.config.analysis import (
     UNDERSTAFFED_MAX_ACTIVE_MAINTAINERS,
 )
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import ORG, dataset_path, ensure_org_dirs, ensure_repo_dirs
-from hiero_analytics.data_sources.dataset_store import load_dataset
+from hiero_analytics.config.paths import ORG, ensure_org_dirs, ensure_repo_dirs
+from hiero_analytics.data_sources.dataset_store import load_or_fetch
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_org_contributor_activity_graphql,
@@ -68,23 +67,13 @@ from hiero_analytics.data_sources.governance_config import (
     fetch_governance_config,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord, IssueTimelineEventRecord
+from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.network import render_comembership_network
 
 logger = logging.getLogger(__name__)
 # Thresholds live in config.analysis (ROLE_ACTIVE_DAYS, GONE_DARK_DAYS, the network
 # link cutoffs, etc.) so they're discoverable and tunable in one place.
-
-
-def _load_or_fetch(resource: str, model: type, fetch_fn: Callable[[], list]) -> list:
-    """Reuse the persisted dataset if present; fetch otherwise (see run_contributor_activity_org)."""
-    state = load_dataset(dataset_path(resource, ORG, "all"), model)
-    if state is not None:
-        records, _ = state
-        logger.info("Reusing persisted %s dataset (%d records)", resource, len(records))
-        return records
-    logger.info("No persisted %s dataset; fetching from GitHub", resource)
-    return fetch_fn()
 
 
 def _build_profile_sets(records, label_events, now):
@@ -118,7 +107,7 @@ def _write_role_coverage(roles_by_repo, all_time_by_repo, recent_by_repo, repo_l
     all_repo_names = {repo for repo, _ in repo_last_seen} | set(all_time_by_repo) | role_repo_fulls
     coverage_all = []
     for repo_full in sorted(all_repo_names):
-        holders = roles_by_repo.get(repo_full.split("/")[-1])
+        holders = roles_by_repo.get(bare_repo(repo_full))
         if not holders:
             continue
         profiles = all_time_by_repo.get(repo_full, pd.DataFrame())
@@ -229,16 +218,16 @@ def main() -> None:
     config = fetch_governance_config()
     role_lookup = build_repo_role_lookup(config)
     # Governance keys are bare repo names; activity keys are "owner/repo".
-    roles_by_repo = {repo.split("/")[-1]: holders for repo, holders in role_lookup.items()}
+    roles_by_repo = {bare_repo(repo): holders for repo, holders in role_lookup.items()}
     logger.info("Loaded governance roles for %d repos", len(roles_by_repo))
 
     client = GitHubClient()
-    records = _load_or_fetch(
-        "contributor_activity", ContributorActivityRecord,
+    records = load_or_fetch(
+        "contributor_activity", ORG, ContributorActivityRecord,
         lambda: fetch_org_contributor_activity_graphql(client, org=ORG, lookback_days=None),
     )
-    label_events = _load_or_fetch(
-        "issue_label_events", IssueTimelineEventRecord,
+    label_events = load_or_fetch(
+        "issue_label_events", ORG, IssueTimelineEventRecord,
         lambda: fetch_org_issue_label_events_graphql(client, org=ORG),
     )
 

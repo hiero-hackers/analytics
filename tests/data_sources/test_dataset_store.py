@@ -7,11 +7,13 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
+from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.dataset_store import (
     DATASET_VERSION,
     PartialOrgFetchError,
     fetch_incremental,
     load_dataset,
+    load_or_fetch,
     merge_records,
     save_dataset,
 )
@@ -321,3 +323,31 @@ def test_partial_full_refresh_with_baseline_merges_and_holds_watermark(tmp_path)
     assert by_key == {"a": 5, "b": 2}  # 'a' updated from arrivals, 'b' retained
     _, through = load_dataset(path, _Record)
     assert through == datetime(2024, 1, 2, tzinfo=UTC)  # held, not advanced to day 4
+
+
+def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
+    """When a dataset exists on disk, its records are returned without fetching."""
+    persisted = ["rec-a", "rec-b"]
+    monkeypatch.setattr(
+        dataset_store, "load_dataset", lambda _path, _model: (persisted, datetime(2024, 1, 1, tzinfo=UTC))
+    )
+
+    fetched = []
+
+    def fetch_fn():
+        fetched.append(True)
+        return ["fresh"]
+
+    result = load_or_fetch("contributor_activity", "an-org", object, fetch_fn)
+
+    assert result == persisted
+    assert fetched == []  # the network fetch was skipped
+
+
+def test_load_or_fetch_falls_back_to_fetch_when_absent(monkeypatch):
+    """With no persisted dataset, the fetch function is called."""
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: None)
+
+    result = load_or_fetch("issue_label_events", "an-org", object, lambda: ["fresh"])
+
+    assert result == ["fresh"]

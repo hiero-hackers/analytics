@@ -16,6 +16,8 @@ from datetime import datetime
 
 import pandas as pd
 
+from hiero_analytics.domain.repos import bare_repo
+
 # Seniority order, used to pick a holder's highest role across repos.
 ROLE_RANK: dict[str, int] = {"triage": 1, "committer": 2, "maintainer": 3}
 
@@ -290,10 +292,10 @@ def annotate_repo_roles(
         out["repo_role"] = pd.Series(dtype="object")
         return out
 
-    roles_by_bare = {repo.split("/")[-1]: holders for repo, holders in role_lookup.items()}
+    roles_by_bare = {bare_repo(repo): holders for repo, holders in role_lookup.items()}
 
     def _role(row: pd.Series) -> str:
-        holders = roles_by_bare.get(str(row["repo"]).split("/")[-1], {})
+        holders = roles_by_bare.get(bare_repo(str(row["repo"])), {})
         return holders.get(str(row["account"]).lower(), default)
 
     out.insert(2, "repo_role", out.apply(_role, axis=1))

@@ -13,6 +13,7 @@ import pandas as pd
 
 from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
 from hiero_analytics.data_sources.models import ContributorActivityRecord
+from hiero_analytics.domain.repos import bare_repo
 
 STAGE_COLUMNS = ["general_user", "triage", "committer", "maintainer"]
 
@@ -38,7 +39,7 @@ def activity_to_role_dataframe(
         if record.activity_type not in _MAINTAINER_ACTIVITY_TYPES:
             return None
 
-        repo_name = record.repo.split("/")[-1]
+        repo_name = bare_repo(record.repo)
         actor_key = record.actor.strip().lower()
         role = repo_role_lookup.get(repo_name, {}).get(actor_key, "general_user")
 
