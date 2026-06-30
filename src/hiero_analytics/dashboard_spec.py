@@ -706,57 +706,83 @@ CHART_METHODOLOGY = {
     "affiliation_donut.png": [
         "Collect every maintainer from the governance config — anyone holding the maintainer role in any repo.",
         "Look up each maintainer's organisation in the curated affiliations file.",
-        "That file resolves each person from public signals in priority order: GPG-key email, profile email, "
-        "the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then "
-        "commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph.",
-        "Count distinct maintainers per organisation; people with an identity but no employer are pooled as "
-        "'Independent'; people with no public signal are excluded.",
-        "Keep the two largest employers, fold everyone else (smaller orgs and independents) into 'Other', "
-        "and draw a filled pie of their shares.",
+        (
+            "That file resolves each person from public signals in priority order: GPG-key email, profile email, "
+            "the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then "
+            "commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph."
+        ),
+        (
+            "Count distinct maintainers per organisation; people with an identity but no employer are pooled as "
+            "'Independent'; people with no public signal are excluded."
+        ),
+        (
+            "Keep the two largest employers, fold everyone else (smaller orgs and independents) into 'Other', "
+            "and draw a filled pie of their shares."
+        ),
     ],
     "single_employer_teams_by_org.png": [
         "Take every team in the governance config and list its members.",
         "Map each member to an organisation via the affiliations file (same resolution as the other org charts).",
-        "Flag a team 'single-employer' when every member that resolves to an organisation shares the same one "
-        "(at least two such members, and no independents).",
+        (
+            "Flag a team 'single-employer' when every member that resolves to an organisation shares the same one "
+            "(at least two such members, and no independents)."
+        ),
         "Group those single-employer teams by the organisation that controls them.",
         "Plot one bar per organisation — its height is how many teams it solely controls.",
     ],
     "single_employer_repos_by_org.png": [
         "For each repository, take the maintainers holding the maintainer role there.",
         "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
-        "Flag a repo 'single-employer' when every resolved maintainer shares the same organisation "
-        "(at least two such maintainers, and no independents).",
+        (
+            "Flag a repo 'single-employer' when every resolved maintainer shares the same organisation "
+            "(at least two such maintainers, and no independents)."
+        ),
         "Group those single-employer repos by the organisation that maintains them.",
         "Plot one bar per organisation — its height is how many repos it solely maintains.",
     ],
     "repo_affiliation_composition.png": [
         "For each repository, take the maintainers holding the maintainer role there.",
         "Map each to an organisation via the affiliations file.",
-        "Count maintainers per organisation within the repo; the largest employers across all repos get their "
-        "own colour, the rest pool into 'Other orgs', and solo/unmapped maintainers show as "
-        "'Independent'/'Unknown'.",
-        "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first "
-        "(by the largest single employer's share); ties are grouped by the leading organisation's colour.",
-        "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
-        "bars are single-employer repos; multi-colour bars are cross-org.",
+        (
+            "Count maintainers per organisation within the repo; the largest employers across all repos get their "
+            "own colour, the rest pool into 'Other orgs', and solo/unmapped maintainers show as "
+            "'Independent'/'Unknown'."
+        ),
+        (
+            "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first "
+            "(by the largest single employer's share); ties are grouped by the leading organisation's colour."
+        ),
+        (
+            "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
+            "bars are single-employer repos; multi-colour bars are cross-org."
+        ),
     ],
     "team_affiliation_composition.png": [
         "For each governance team, take its members.",
         "Map each member to an organisation via the affiliations file.",
-        "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus "
-        "'Independent' and 'Unknown').",
-        "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with "
-        "same-concentration teams grouped by their leading organisation's colour; only teams with at least "
-        "four resolved members are shown (the full set is in the team-concentration table).",
-        "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
-        "bars are employer-controlled teams; multi-colour bars are cross-org.",
+        (
+            "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus "
+            "'Independent' and 'Unknown')."
+        ),
+        (
+            "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with "
+            "same-concentration teams grouped by their leading organisation's colour; only teams with at least "
+            "four resolved members are shown (the full set is in the team-concentration table)."
+        ),
+        (
+            "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
+            "bars are employer-controlled teams; multi-colour bars are cross-org."
+        ),
     ],
     "contributor_activity_heatmap.png": [
-        "Take every tracked event in the last six months — issues opened, PRs opened, reviews, merges — "
-        "excluding bots.",
-        "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket it by the month it "
-        "happened.",
+        (
+            "Take every tracked event in the last six months — issues opened, PRs opened, reviews, merges — "
+            "excluding bots."
+        ),
+        (
+            "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket it by the month it "
+            "happened."
+        ),
         "Sum the weighted score per contributor per month.",
         "Rank contributors by their six-month total and keep the top 25.",
         "Colour each cell by its monthly score (greener = more active).",
@@ -770,8 +796,10 @@ CHART_METHODOLOGY = {
     "team_activity_heatmap.png": [
         "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
         "For each governance team, add up the monthly scores of its members.",
-        "A contributor on several teams counts toward each, so team totals overlap — this measures each "
-        "team's activity, not a partition.",
+        (
+            "A contributor on several teams counts toward each, so team totals overlap — this measures each "
+            "team's activity, not a partition."
+        ),
         "Rank teams by total, show the busiest 25, and colour each cell by its monthly score.",
     ],
     "repo_activity_heatmap.png": [
