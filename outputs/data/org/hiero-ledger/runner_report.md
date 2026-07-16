@@ -7,16 +7,16 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **.github** | 0 | 1 | 0 |
 | **governance** | 3 | 0 | 0 |
 | **heka-identity-platform** | 0 | 7 | 0 |
-| **hiero-block-node** | 22 | 0 | 1 |
+| **hiero-block-node** | 23 | 0 | 1 |
 | **hiero-cli** | 5 | 1 | 0 |
-| **hiero-consensus-node** | 237 | 0 | 5 |
+| **hiero-consensus-node** | 240 | 0 | 5 |
 | **hiero-consensus-specifications** | 0 | 1 | 0 |
 | **hiero-contracts** | 9 | 1 | 0 |
 | **hiero-cryptography** | 9 | 1 | 1 |
 | **hiero-did-sdk-js** | 3 | 1 | 0 |
 | **hiero-did-sdk-python** | 0 | 7 | 0 |
 | **hiero-docs** | 0 | 1 | 0 |
-| **hiero-enterprise-java** | 0 | 8 | 1 |
+| **hiero-enterprise-java** | 0 | 10 | 1 |
 | **hiero-ethereum-execution-spec-tests** | 11 | 14 | 0 |
 | **hiero-gradle-conventions** | 4 | 0 | 0 |
 | **hiero-hederium** | 0 | 5 | 0 |
@@ -37,7 +37,7 @@ This report categorizes runners into **Self-Hosted**, **Standard (GitHub-hosted)
 | **hiero-website** | 0 | 2 | 0 |
 | **homebrew-tools** | 1 | 0 | 3 |
 | **identity-collaboration-hub** | 2 | 0 | 0 |
-| **solo** | 30 | 3 | 2 |
+| **solo** | 30 | 4 | 2 |
 | **solo-docs** | 1 | 0 | 0 |
 | **tsc** | 1 | 0 | 0 |
 
