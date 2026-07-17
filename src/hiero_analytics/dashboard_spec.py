@@ -211,6 +211,7 @@ CHART_MACROS = [
                     "description": "CODEOWNERS coverage and the CI runners configured across repos.",
                     "files": [
                         ("Code-owner coverage", "org_codeowner_summary.png"),
+                        ("Code-owner coverage by repo", "org_codeowner_by_repo.png"),
                         ("Runners", "org_runner_chart.png"),
                     ],
                 },
@@ -671,6 +672,9 @@ CHART_NOTES = {
         "Code-Review, Branch-Protection), so you can see which practices contribute."
     ),
     "org_codeowner_summary.png": ("How many repositories have a CODEOWNERS file (Present) versus none (Missing)."),
+    "org_codeowner_by_repo.png": (
+        "CODEOWNERS file presence per repository. Teal indicates Present, while coral indicates Missing."
+    ),
     "org_runner_chart.png": (
         "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard "
         "(GitHub-hosted), or indeterminate (could not be classified)."
@@ -792,5 +796,9 @@ CHART_METHODOLOGY = {
         "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket by month.",
         "Sum the weighted score per repository per month — each event counts once.",
         "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score.",
+    ],
+    "org_codeowner_by_repo.png": [
+        "Check each repository for the presence of a CODEOWNERS file in standard locations (root, .github/, or docs/).",
+        "Represent presence/absence per repository as a stacked bar chart showing 100% compliance status (Present vs. Missing)."
     ],
 }

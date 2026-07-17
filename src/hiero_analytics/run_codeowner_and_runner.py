@@ -5,9 +5,11 @@ import logging
 from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_org_codeowners_summary,
     prepare_repo_level_codeowner_summary,
+    prepare_stacked_codeowner_summary,
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
+from hiero_analytics.config.charts import CODEOWNER_STATUS_COLORS
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.cache import load_records_cache, save_records_cache
@@ -145,7 +147,7 @@ def main() -> None:
             y_col="count",
             title="Organization Wide Codeowners File Summary",
             output_path=org_charts_dir / "org_codeowner_summary.png",
-            colors={"Present": "#2A9D8F", "Missing": "#E76F51"},
+            colors=CODEOWNER_STATUS_COLORS,
         )
 
     codeowners_repo_df = prepare_repo_level_codeowner_summary(codeowners)
@@ -153,6 +155,19 @@ def main() -> None:
         save_dataframe(df=codeowners_repo_df, path=org_data_dir / "repo_wise_codeowner_status.csv")
 
     generate_codeowners_markdown_report(records=codeowners, output_path=org_data_dir / "codeowners_report.md")
+
+    codeowners_stacked_df = prepare_stacked_codeowner_summary(codeowners)
+    if not codeowners_stacked_df.empty:
+        plot_stacked_bar(
+            df=codeowners_stacked_df,
+            x_col="repo",
+            stack_cols=["Present", "Missing"],
+            labels=["Present", "Missing"],
+            title="Repository Wide Codeowners Status Breakdown",
+            output_path=org_charts_dir / "org_codeowner_by_repo.png",
+            colors=CODEOWNER_STATUS_COLORS,
+            annotate_totals=False,
+        )
 
     runners = get_workflow_for_repos(client, ORG, repos)
 

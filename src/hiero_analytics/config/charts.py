@@ -158,3 +158,10 @@ ACTIVITY_HEATMAP_PALETTE = {
     "text_light": "#FFFFFF",
     "tick": "#64748B",
 }
+
+# Compliance / Codeowners status colors.
+CODEOWNER_STATUS_COLORS = {
+    "Present": "#2A9D8F",  # teal
+    "Missing": "#E76F51",  # coral
+}
+

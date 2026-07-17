@@ -30,6 +30,22 @@ def prepare_repo_level_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> 
     )
 
 
+def prepare_stacked_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> pd.DataFrame:
+    """Aggregates CODEOWNERS presence per repository for stacked bar chart visualization."""
+    if not codeowners:
+        return pd.DataFrame(columns=["repo", "Present", "Missing"])
+
+    rows = []
+    for r in codeowners:
+        rows.append({
+            "repo": r.repo,
+            "Present": 1 if r.status else 0,
+            "Missing": 0 if r.status else 1,
+        })
+
+    return pd.DataFrame(rows)
+
+
 def runner_records_to_dataframe(runners: list[RunnerRecord]) -> pd.DataFrame:
     """Converts a list of RunnerRecords into DataFrame."""
     return records_to_dataframe(

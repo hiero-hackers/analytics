@@ -5,6 +5,7 @@ import pandas as pd
 from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_org_codeowners_summary,
     prepare_repo_level_codeowner_summary,
+    prepare_stacked_codeowner_summary,
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
@@ -115,3 +116,32 @@ def test_prepare_stacked_runner_summary_columns_exist():
     assert df.iloc[0]["Standard"] == 1
     assert df.iloc[0]["Self-Hosted"] == 0
     assert df.iloc[0]["Indeterminate"] == 0
+
+
+def test_prepare_stacked_codeowner_summary_empty():
+    """Test empty list returns empty DataFrame with correct columns."""
+    df = prepare_stacked_codeowner_summary([])
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == ["repo", "Present", "Missing"]
+    assert df.empty
+
+
+def test_prepare_stacked_codeowner_summary_aggregation():
+    """Verify correct mapping of boolean status to Present/Missing columns."""
+    records = [
+        CodeOwnersRecord(repo="repo-a", status=True),
+        CodeOwnersRecord(repo="repo-b", status=False),
+    ]
+    df = prepare_stacked_codeowner_summary(records)
+
+    assert len(df) == 2
+
+    # repo-a check (status=True -> Present=1, Missing=0)
+    row_a = df[df["repo"] == "repo-a"].iloc[0]
+    assert row_a["Present"] == 1
+    assert row_a["Missing"] == 0
+
+    # repo-b check (status=False -> Present=0, Missing=1)
+    row_b = df[df["repo"] == "repo-b"].iloc[0]
+    assert row_b["Present"] == 0
+    assert row_b["Missing"] == 1
