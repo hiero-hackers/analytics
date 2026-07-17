@@ -184,8 +184,6 @@ CHART_MACROS = [
                     ),
                     "files": [
                         ("By repo (30d)", "difficulty_by_repo_30_days.png"),
-                        ("Distribution incl. unknown (30d)", "difficulty_distribution_with_unknown_30_days.png"),
-                        ("Distribution excl. unknown (30d)", "difficulty_distribution_without_unknown_30_days.png"),
                         ("Over time (weekly)", "difficulty_over_time_event_based_weekly.png"),
                     ],
                 },
@@ -649,14 +647,6 @@ CHART_NOTES = {
     "difficulty_by_repo_30_days.png": (
         "Open issues per repository, stacked by difficulty level. Limited to issues labelled with a "
         "difficulty (or newly created) in the last 30 days; 'Unknown' = recent open issues not yet triaged."
-    ),
-    "difficulty_distribution_with_unknown_30_days.png": (
-        "The same last-30-days open issues taken as a whole and split by difficulty level, including "
-        "untriaged ('Unknown') issues."
-    ),
-    "difficulty_distribution_without_unknown_30_days.png": (
-        "Open issues from the last 30 days by difficulty, excluding untriaged ('Unknown') ones — the mix "
-        "among issues that already have a difficulty label."
     ),
     "difficulty_over_time_event_based_weekly.png": (
         "Open issues by difficulty over the last year, reconstructed from when difficulty labels were "

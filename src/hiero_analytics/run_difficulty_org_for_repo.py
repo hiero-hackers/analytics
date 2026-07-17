@@ -29,12 +29,10 @@ from hiero_analytics.data_sources.github_ingest import (
 )
 from hiero_analytics.domain.labels import (
     DIFFICULTY_LEVELS,
-    DIFFICULTY_ORDER,
     UNKNOWN_DIFFICULTY,
 )
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.bars import plot_stacked_bar
-from hiero_analytics.plotting.pie import plot_pie
 
 TIMELINE_MAX_WORKERS = 3
 
@@ -107,34 +105,6 @@ def main() -> None:
         difficulty_counts,
         org_data_dir / "difficulty_distribution_30_days.csv",
     )
-
-    # Pies
-
-    pie_variants = [
-        (
-            difficulty_counts,
-            "Open Issues by Difficulty Distribution (Labeled or Newly Created in Last 30 Days, Including Unknown)",
-            "difficulty_distribution_with_unknown_30_days.png",
-        ),
-        (
-            difficulty_counts[difficulty_counts["difficulty"] != UNKNOWN_DIFFICULTY],
-            "Open Issues by Difficulty Distribution (Labeled in Last 30 Days, Excluding Unknown)",
-            "difficulty_distribution_without_unknown_30_days.png",
-        ),
-    ]
-
-    for data, title, filename in pie_variants:
-        plot_pie(
-            data,
-            label_col="difficulty",
-            value_col="count",
-            title=title,
-            output_path=org_charts_dir / filename,
-            colors=DIFFICULTY_COLORS,
-            label_order=DIFFICULTY_ORDER,
-            legend_title="Difficulty",
-            center_label="Open issues",
-        )
 
     # --------------------------------------------------
     # REPO DIFFICULTY STACKED BAR
