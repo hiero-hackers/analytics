@@ -53,7 +53,10 @@ def _month_key(value: datetime) -> str:
 def _recent_month_keys(months_back: int) -> list[str]:
     """Return the most recent month labels, oldest first."""
     current_month = pd.Period(pd.Timestamp.now(tz="UTC"), freq="M")
-    return [str(period) for period in pd.period_range(end=current_month, periods=months_back, freq="M")]
+    # Shift back by 1 month so the range ends on the last fully completed month
+    last_completed_month = current_month - 1
+
+    return [str(period) for period in pd.period_range(end=last_completed_month, periods=months_back, freq="M")]
 
 
 def _activity_action(activity_type: str) -> str | None:

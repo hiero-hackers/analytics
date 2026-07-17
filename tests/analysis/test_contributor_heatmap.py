@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-
 import pandas as pd
 
 from hiero_analytics.analysis.contributor_heatmap import (
@@ -20,11 +18,14 @@ from hiero_analytics.data_sources.models import ContributorActivityRecord
 def _ev(actor: str, activity_type: str, n: int, *, repo: str = "o/x") -> ContributorActivityRecord:
     """Build a contributor-activity record dated to now (inside the heatmap window)."""
     target_type = "issue" if activity_type == "authored_issue" else "pull_request"
+
+    last_month_timestamp = pd.Timestamp.now(tz="UTC") - pd.DateOffset(months=1)
+
     return ContributorActivityRecord(
         repo=repo,
         activity_type=activity_type,
         actor=actor,
-        occurred_at=datetime.now(UTC),
+        occurred_at=last_month_timestamp.to_pydatetime(),
         target_type=target_type,
         target_number=n,
     )
