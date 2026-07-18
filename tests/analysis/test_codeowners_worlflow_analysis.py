@@ -145,3 +145,26 @@ def test_prepare_stacked_codeowner_summary_aggregation():
     row_b = df[df["repo"] == "repo-b"].iloc[0]
     assert row_b["Present"] == 0
     assert row_b["Missing"] == 1
+
+
+def test_prepare_stacked_codeowner_summary_duplicates():
+    """Verify that duplicate repo entries are aggregated with a presence-wins policy."""
+    records = [
+        CodeOwnersRecord(repo="repo-a", status=False),
+        CodeOwnersRecord(repo="repo-a", status=True),
+        CodeOwnersRecord(repo="repo-b", status=False),
+        CodeOwnersRecord(repo="repo-b", status=False),
+    ]
+    df = prepare_stacked_codeowner_summary(records)
+
+    assert len(df) == 2
+
+    # repo-a check (status False and True -> resolved as Present=1, Missing=0)
+    row_a = df[df["repo"] == "repo-a"].iloc[0]
+    assert row_a["Present"] == 1
+    assert row_a["Missing"] == 0
+
+    # repo-b check (status False and False -> resolved as Present=0, Missing=1)
+    row_b = df[df["repo"] == "repo-b"].iloc[0]
+    assert row_b["Present"] == 0
+    assert row_b["Missing"] == 1

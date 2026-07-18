@@ -31,17 +31,26 @@ def prepare_repo_level_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> 
 
 
 def prepare_stacked_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> pd.DataFrame:
-    """Aggregates CODEOWNERS presence per repository for stacked bar chart visualization."""
+    """Aggregates CODEOWNERS presence per repository for stacked bar chart visualization.
+
+    If duplicate repository entries exist, a presence-wins policy is applied (i.e.
+    if any entry for a repository is marked as Present, the repository is resolved
+    as Present).
+    """
     if not codeowners:
         return pd.DataFrame(columns=["repo", "Present", "Missing"])
 
+    repo_status: dict[str, bool] = {}
+    for r in codeowners:
+        repo_status[r.repo] = repo_status.get(r.repo, False) or r.status
+
     rows = [
         {
-            "repo": r.repo,
-            "Present": 1 if r.status else 0,
-            "Missing": 0 if r.status else 1,
+            "repo": repo,
+            "Present": 1 if has_owners else 0,
+            "Missing": 0 if has_owners else 1,
         }
-        for r in codeowners
+        for repo, has_owners in repo_status.items()
     ]
 
     return pd.DataFrame(rows)
