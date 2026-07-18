@@ -164,4 +164,3 @@ CODEOWNER_STATUS_COLORS = {
     "Present": "#2A9D8F",  # teal
     "Missing": "#E76F51",  # coral
 }
-

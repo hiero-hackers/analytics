@@ -799,6 +799,6 @@ CHART_METHODOLOGY = {
     ],
     "org_codeowner_by_repo.png": [
         "Check each repository for the presence of a CODEOWNERS file in standard locations (root, .github/, or docs/).",
-        "Represent presence/absence per repository as a stacked bar chart showing 100% compliance status (Present vs. Missing)."
+        "Represent presence/absence per repository as a stacked bar chart showing 100% compliance status (Present vs. Missing).",
     ],
 }

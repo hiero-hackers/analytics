@@ -35,13 +35,14 @@ def prepare_stacked_codeowner_summary(codeowners: list[CodeOwnersRecord]) -> pd.
     if not codeowners:
         return pd.DataFrame(columns=["repo", "Present", "Missing"])
 
-    rows = []
-    for r in codeowners:
-        rows.append({
+    rows = [
+        {
             "repo": r.repo,
             "Present": 1 if r.status else 0,
             "Missing": 0 if r.status else 1,
-        })
+        }
+        for r in codeowners
+    ]
 
     return pd.DataFrame(rows)
 
