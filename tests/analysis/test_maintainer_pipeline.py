@@ -238,12 +238,12 @@ def test_yearly_pipeline_historical_bars_are_stable():
 
     with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
         mock_dt.now.return_value = today_apr_2026
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        mock_dt.side_effect = datetime
         yearly_apr = build_maintainer_yearly_pipeline(stage_df)
 
     with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
         mock_dt.now.return_value = today_oct_2026
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        mock_dt.side_effect = datetime
         yearly_oct = build_maintainer_yearly_pipeline(stage_df)
 
     count_apr = yearly_apr[yearly_apr["year"] == 2025]["general_user"].iloc[0]
@@ -263,7 +263,7 @@ def test_yearly_pipeline_current_bar_uses_full_trailing_window():
     today_feb_2026 = datetime(2026, 2, 15, tzinfo=UTC)
     with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
         mock_dt.now.return_value = today_feb_2026
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        mock_dt.side_effect = datetime
         yearly = build_maintainer_yearly_pipeline(stage_df)
 
     current = yearly[yearly["year"] == 2026].iloc[0]
