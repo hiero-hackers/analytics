@@ -32,7 +32,7 @@ classifiers = [
 [project.optional-dependencies]
 
 [project.scripts]
-hiero-analytics = "hiero_analytics.run_all:main"
+hiero-analytics = "hiero_analytics.cli:main"
 
 [dependency-groups]
 dev = [
