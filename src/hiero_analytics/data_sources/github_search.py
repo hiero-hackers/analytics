@@ -198,32 +198,43 @@ def _process_workflow_file(client: GitHubClient, wf: dict, repo: str) -> list[Ru
                     is_self_hosted=final_status,
                 )
             )
+    except requests.RequestException:
+        raise  # network/API failures must not read as "no runners in this file"
     except Exception as e:
+        # A malformed workflow file is data, not an infrastructure failure —
+        # skip it loudly rather than failing the whole repo scan.
         logger.error(f"Failed to parse {wf['name']}: {e}")
 
     return results
 
 
 def fetch_repo_workflows(client: GitHubClient, org: str, repo: str) -> list[RunnerRecord]:
-    """Fetch per-job runner records for a repository's workflow files."""
-    all_job_results: list[RunnerRecord] = []
+    """Fetch per-job runner records for a repository's workflow files.
+
+    Only a 404 counts as "no workflow directory"; any other error propagates so
+    a transient/network/permission failure is never misreported as a repo with
+    no runners.
+    """
+    url = f"https://api.github.com/repos/{org}/{repo}/contents/.github/workflows"
     try:
-        url = f"https://api.github.com/repos/{org}/{repo}/contents/.github/workflows"
         workflows = client.get(url)
-
-        if not isinstance(workflows, list):
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 404:
+            logger.debug("No workflow directory in %s", repo)
             return []
+        raise
 
-        yaml_files = [wf for wf in workflows if wf["name"].endswith((".yml", ".yaml"))]
+    if not isinstance(workflows, list):
+        return []
 
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(_process_workflow_file, client, wf, repo): wf for wf in yaml_files}
-            for future in as_completed(futures):
-                res = future.result()
-                if res:
-                    all_job_results.extend(res)
+    yaml_files = [wf for wf in workflows if wf["name"].endswith((".yml", ".yaml"))]
 
-    except Exception as e:
-        logger.debug(f"Workflow directory not found or error in {repo}: {e}")
+    all_job_results: list[RunnerRecord] = []
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(_process_workflow_file, client, wf, repo): wf for wf in yaml_files}
+        for future in as_completed(futures):
+            res = future.result()
+            if res:
+                all_job_results.extend(res)
 
     return all_job_results

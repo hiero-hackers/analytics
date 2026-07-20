@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import logging
 
+import requests
+
 from hiero_analytics.analysis.scorecard_analysis import (
     CHECK_COLUMNS,
     scorecard_stacked_dataframe,
@@ -28,13 +30,21 @@ def fetch_org_repos(client: GitHubClient, org: str):
 
 
 def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
-    """Fetch scorecards for each repositories in organization."""
+    """Fetch scorecards for each repository in the organization.
+
+    A transient failure is retried once; a second failure propagates, so the
+    run fails loudly rather than publishing a partial scorecard chart.
+    """
     scorecards: list[ScorecardRecord] = []
 
     for i, repo in enumerate(repos, start=1):
         logger.info("Fetching scorecard (%d/%d): %s", i, len(repos), repo.name)
 
-        sc = fetch_repo_scorecard(repo.name)
+        try:
+            sc = fetch_repo_scorecard(repo.name)
+        except requests.RequestException:
+            logger.warning("Scorecard fetch failed for %s; retrying once", repo.name)
+            sc = fetch_repo_scorecard(repo.name)
         if sc:
             scorecards.append(sc)
 
