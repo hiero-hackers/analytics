@@ -4,6 +4,15 @@ knowledge_base: # Enable knowledge base access for up-to-date information
   web_search: # Enable web search for up-to-date information
     enabled: true
 
+issue_enrichment:
+  planning:
+    enabled: true
+    auto_planning:
+      enabled: true
+      labels:
+        - "!no-plan" # the only rule left: an opt-out
+        - "plan-me" # Auto-plan issues with this label
+        
 # Only documents non-default options:
 reviews:
   profile: "chill" # Chill profile yields less feedback, that may be considered lenient.
