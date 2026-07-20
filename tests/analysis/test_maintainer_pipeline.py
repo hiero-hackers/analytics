@@ -251,6 +251,27 @@ def test_yearly_pipeline_historical_bars_are_stable():
     assert count_apr == count_oct, "Historical 2025 count must not change between refreshes"
 
 
+def test_yearly_pipeline_current_bar_uses_full_trailing_window():
+    """Early in a year the current bar's trailing window reaches into last December, as its note says."""
+    role_lookup = {"repo-a": {}}
+    records = [
+        _record("authored_pull_request", "december-dev", "org/repo-a", 2025, month=12),
+        _record("authored_pull_request", "january-dev", "org/repo-a", 2026, month=1),
+    ]
+    stage_df = activity_to_role_dataframe(records, role_lookup)
+
+    today_feb_2026 = datetime(2026, 2, 15, tzinfo=UTC)
+    with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
+        mock_dt.now.return_value = today_feb_2026
+        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        yearly = build_maintainer_yearly_pipeline(stage_df)
+
+    current = yearly[yearly["year"] == 2026].iloc[0]
+    assert current["general_user"] == 2  # window spans Dec 2025 + Jan 2026, not year-to-date
+    past = yearly[yearly["year"] == 2025].iloc[0]
+    assert past["general_user"] == 1  # the Dec event still counts in 2025's fixed H2 bar
+
+
 def test_collapse_repo_pipeline_tail_aggregates_remaining_rows():
     """Long repo tails should collapse into a single aggregated chart row."""
     repo_df = pd.DataFrame(

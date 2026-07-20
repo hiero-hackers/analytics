@@ -12,75 +12,33 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TypeVar
 
+from hiero_analytics.config.env import env_bool, env_int
 from hiero_analytics.config.paths import OUTPUTS_DIR
 
-from .models import (
-    ContributorActivityRecord,
-    IssueRecord,
-    IssueTimelineEventRecord,
-    PullRequestDifficultyRecord,
-    RepositoryRecord,
-)
 from .serialization import deserialize_record, serialize_record
 
 logger = logging.getLogger(__name__)
 
 CACHE_VERSION = 1
-DEFAULT_GITHUB_CACHE_TTL_SECONDS = 60 * 60 * 24 * 5  # 5 days
+DEFAULT_GITHUB_CACHE_TTL_SECONDS = 60 * 60 * 24 * 14  # 14 days
 GITHUB_CACHE_DIR = OUTPUTS_DIR / "cache" / "github"
 
-_TRUE_VALUES = {"1", "true", "yes", "on"}
-_FALSE_VALUES = {"0", "false", "no", "off"}
 
-
-RecordType = TypeVar(
-    "RecordType",
-    RepositoryRecord,
-    IssueRecord,
-    IssueTimelineEventRecord,
-    PullRequestDifficultyRecord,
-    ContributorActivityRecord,
-)
-
-
-def _env_bool(name: str, default: bool) -> bool:
-    """Parse a boolean environment variable with a safe fallback."""
-    value = os.getenv(name)
-    if value is None:
-        return default
-
-    normalized = value.strip().lower()
-    if normalized in _TRUE_VALUES:
-        return True
-    if normalized in _FALSE_VALUES:
-        return False
-    return default
-
-
-def _env_int(name: str, default: int) -> int:
-    """Parse an integer environment variable with a safe fallback."""
-    value = os.getenv(name)
-    if value is None:
-        return default
-
-    try:
-        return int(value.strip())
-    except ValueError:
-        return default
+RecordType = TypeVar("RecordType")
 
 
 def _cache_enabled(use_cache: bool | None) -> bool:
     """Resolve whether cache reads and writes are enabled."""
     if use_cache is not None:
         return use_cache
-    return _env_bool("GITHUB_CACHE_ENABLED", True)
+    return env_bool("GITHUB_CACHE_ENABLED", True)
 
 
 def _cache_ttl_seconds(ttl_seconds: int | None) -> int:
     """Resolve the effective cache TTL in seconds."""
     if ttl_seconds is not None:
         return ttl_seconds
-    return _env_int(
+    return env_int(
         "GITHUB_CACHE_TTL_SECONDS",
         DEFAULT_GITHUB_CACHE_TTL_SECONDS,
     )
@@ -144,6 +102,13 @@ def load_records_cache(  # noqa: UP047
         logger.info("Ignoring cache file with unexpected record type: %s", cache_path)
         return None
 
+    # Echo the stored parameters back instead of trusting the 48-bit filename
+    # fingerprint alone — a hash collision would otherwise serve the wrong dataset.
+    stored_parameters = json.loads(json.dumps(parameters))  # normalize like the saved payload
+    if payload.get("parameters") != stored_parameters:
+        logger.info("Ignoring cache file with mismatched parameters: %s", cache_path)
+        return None
+
     cached_at_raw = payload.get("cached_at")
     if not isinstance(cached_at_raw, str):
         logger.info("Ignoring cache file with missing timestamp: %s", cache_path)
@@ -167,12 +132,21 @@ def load_records_cache(  # noqa: UP047
         logger.info("Ignoring cache file with invalid record payload: %s", cache_path)
         return None
 
+    # A record shape that no longer matches the dataclass (field added/renamed
+    # without a CACHE_VERSION bump) is a cache miss, not a crash — the caller
+    # re-fetches and overwrites the stale file.
+    try:
+        records = [
+            deserialize_record(record_type, dict(record_payload))
+            for record_payload in records_payload
+            if isinstance(record_payload, dict)
+        ]
+    except (TypeError, ValueError, KeyError, AttributeError):
+        logger.warning("Ignoring cache file with incompatible record shape: %s", cache_path)
+        return None
+
     logger.info("Cache hit for %s (%s)", kind, scope)
-    return [
-        deserialize_record(record_type, dict(record_payload))
-        for record_payload in records_payload
-        if isinstance(record_payload, dict)
-    ]
+    return records
 
 
 def save_records_cache(  # noqa: UP047
@@ -212,7 +186,8 @@ def save_records_cache(  # noqa: UP047
             delete=False,
         ) as temp_file:
             temp_path = Path(temp_file.name)
-            json.dump(payload, temp_file, indent=2, sort_keys=True)
+            # Compact separators: cache files are machine-read only.
+            json.dump(payload, temp_file, separators=(",", ":"))
             temp_file.write("\n")
 
         os.replace(temp_path, cache_path)

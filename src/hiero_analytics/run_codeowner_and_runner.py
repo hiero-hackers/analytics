@@ -9,7 +9,7 @@ from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
-from hiero_analytics.config.charts import CODEOWNER_STATUS_COLORS
+from hiero_analytics.config.charts import CODEOWNER_STATUS_COLORS, RUNNER_STATUS_COLORS
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.cache import load_records_cache, save_records_cache
@@ -63,20 +63,10 @@ def get_workflow_for_repos(client: GitHubClient, org: str, repos: list[Repositor
     if cached:
         return cached
 
-    records = []
+    records: list[RunnerRecord] = []
     for r in repos:
         logger.info("Processing runners for: %s", r.name)
-        job_stats = fetch_repo_workflows(client, org, r.name)
-        records.extend(
-            RunnerRecord(
-                repo=r.name,
-                workflow_file=stat["file"],
-                job_name=stat["job"],
-                runner=stat["runner"],
-                is_self_hosted=stat["is_self_hosted"],
-            )
-            for stat in job_stats
-        )
+        records.extend(fetch_repo_workflows(client, org, r.name))
 
     save_records_cache(kind, org, params, RunnerRecord, records)
     return records
@@ -186,7 +176,7 @@ def main() -> None:
             labels=["Self-Hosted", "Standard", "Indeterminate"],
             title="Repository Wide Runner Types Breakdown",
             output_path=org_charts_dir / "org_runner_chart.png",
-            colors={"Self-Hosted": "#2A9D8F", "Standard": "#E76F51", "Indeterminate": "#94A3B8"},
+            colors=RUNNER_STATUS_COLORS,
             annotate_totals=False,
         )
 

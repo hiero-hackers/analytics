@@ -23,8 +23,6 @@ from __future__ import annotations
 
 import logging
 import os
-import subprocess
-import sys
 from collections.abc import Callable
 
 from hiero_analytics.config.logging_config import setup_logging
@@ -83,20 +81,18 @@ def run_pipelines(pipelines: list[tuple[str, Callable[[], None]]]) -> list[str]:
 
 
 def _run_extra_org(org: str) -> bool:
-    """Run contributor-activity for an extra org in a subprocess (clean GITHUB_ORG).
+    """Run contributor-activity for an extra org in-process. Returns True on success.
 
-    A subprocess is used so the org is resolved at import time for that run,
-    without mutating this process's configuration. Returns True on success.
+    The runner takes the org as an explicit argument, so no environment mutation
+    (or subprocess) is needed and the extra org shares this process's fetch cache.
     """
     logger.info("=== Extra org (contributor activity only): %s ===", org)
-    result = subprocess.run(
-        [sys.executable, "-m", "hiero_analytics.run_contributor_activity_org"],
-        env={**os.environ, "GITHUB_ORG": org},
-        check=False,
-    )
-    if result.returncode != 0:
-        logger.error("Extra-org contributor activity failed for %s", org)
-    return result.returncode == 0
+    try:
+        run_contributor_activity(org=org)
+    except Exception:
+        logger.exception("Extra-org contributor activity failed for %s", org)
+        return False
+    return True
 
 
 def main() -> None:

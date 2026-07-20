@@ -1,6 +1,6 @@
 """Tests for GitHub ingest helpers, including issue timeline history fetches."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -9,7 +9,6 @@ import hiero_analytics.data_sources.github_ingest as ingest
 from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
 from hiero_analytics.data_sources.models import (
     IssueRecord,
-    IssueTimelineEventRecord,
     PullRequestDifficultyRecord,
     RepositoryRecord,
 )
@@ -143,131 +142,6 @@ def test_fetch_repo_issues_normalizes_states(mock_client, bypass_pagination):
     assert variables["states"] == ["OPEN"]
 
 
-def test_fetch_repo_issue_timeline_events_rest(mock_client):
-    """Timeline fetches should normalize relevant REST timeline events."""
-    mock_client.get.return_value = [
-        {
-            "event": "labeled",
-            "created_at": "2024-01-02T00:00:00Z",
-            "label": {"name": "Good First Issue"},
-        },
-        {
-            "event": "closed",
-            "created_at": "2024-01-03T00:00:00Z",
-        },
-    ]
-
-    records = ingest.fetch_repo_issue_timeline_events_rest(
-        mock_client,
-        "org",
-        "repo",
-        1,
-        use_cache=False,
-    )
-
-    assert records == [
-        IssueTimelineEventRecord(
-            repo="org/repo",
-            issue_number=1,
-            event_type="labeled",
-            occurred_at=datetime.fromisoformat("2024-01-02T00:00:00+00:00"),
-            label="good first issue",
-        ),
-        IssueTimelineEventRecord(
-            repo="org/repo",
-            issue_number=1,
-            event_type="closed",
-            occurred_at=datetime.fromisoformat("2024-01-03T00:00:00+00:00"),
-            label=None,
-        ),
-    ]
-
-
-def test_fetch_issue_timeline_events_rest_parallel(monkeypatch, mock_client):
-    """Parallel issue timeline fetches should aggregate records across issues."""
-    issues = [
-        IssueRecord(
-            repo="org/repo1",
-            number=1,
-            title="Issue A",
-            state="OPEN",
-            created_at=datetime.fromisoformat("2024-01-01T00:00:00+00:00"),
-            closed_at=None,
-            labels=[],
-        ),
-        IssueRecord(
-            repo="org/repo2",
-            number=2,
-            title="Issue B",
-            state="OPEN",
-            created_at=datetime.fromisoformat("2024-01-01T00:00:00+00:00"),
-            closed_at=None,
-            labels=[],
-        ),
-    ]
-
-    monkeypatch.setattr(
-        ingest.timeline,
-        "fetch_repo_issue_timeline_events_rest",
-        lambda _client, owner, repo, issue_number, **_kwargs: [
-            IssueTimelineEventRecord(
-                repo=f"{owner}/{repo}",
-                issue_number=issue_number,
-                event_type="labeled",
-                occurred_at=datetime.fromisoformat("2024-01-02T00:00:00+00:00"),
-                label="good first issue",
-            )
-        ],
-    )
-
-    records = ingest.fetch_issue_timeline_events_rest(
-        mock_client,
-        issues,
-        max_workers=2,
-        use_cache=False,
-    )
-
-    assert len(records) == 2
-    assert {record.repo for record in records} == {"org/repo1", "org/repo2"}
-
-
-def test_fetch_repo_issue_events_rest_since(mock_client):
-    """Repository issue event fetches should stop once events are older than the cutoff."""
-    mock_client.get.side_effect = [
-        [
-            {
-                "event": "labeled",
-                "created_at": "2025-06-01T00:00:00Z",
-                "issue": {"number": 1},
-                "label": {"name": "Beginner"},
-            },
-            {
-                "event": "closed",
-                "created_at": "2025-04-01T00:00:00Z",
-                "issue": {"number": 2},
-            },
-        ]
-    ]
-
-    records = ingest.fetch_repo_issue_events_rest_since(
-        mock_client,
-        "org",
-        "repo",
-        since=datetime.fromisoformat("2025-04-11T00:00:00+00:00"),
-        use_cache=False,
-    )
-
-    assert records == [
-        IssueTimelineEventRecord(
-            repo="org/repo",
-            issue_number=1,
-            event_type="labeled",
-            occurred_at=datetime.fromisoformat("2025-06-01T00:00:00+00:00"),
-            label="beginner",
-        )
-    ]
-
-
 # ---------------------------------------------------------
 # org issues parallel
 # ---------------------------------------------------------
@@ -289,6 +163,11 @@ def test_fetch_org_issues_graphql_parallel(monkeypatch, mock_client, tmp_path):
         ingest._common,
         "fetch_org_repos_graphql",
         lambda _client, _org: repos,
+    )
+    monkeypatch.setattr(
+        ingest.issues,
+        "fetch_org_records_batched",
+        lambda _client, _org, *, per_repo, **_kwargs: [record for repo in repos for record in per_repo(repo)],
     )
 
     def fetch_repo_issues(_client, owner, repo, **_kwargs):
@@ -379,47 +258,80 @@ def test_fetch_repo_merged_pr_difficulty_graphql(mock_client, bypass_pagination)
 # ---------------------------------------------------------
 
 
-def test_fetch_org_merged_pr_difficulty_graphql(monkeypatch, mock_client):
-    """Org merged-PR difficulty fetches should combine repo-level results."""
-    repos = [
-        RepositoryRecord("org/repo1", "repo1", "org"),
-        RepositoryRecord("org/repo2", "repo2", "org"),
-    ]
-
-    monkeypatch.setattr(
-        ingest._common,
-        "fetch_org_repos_graphql",
-        lambda _client, _org: repos,
+def _pr_record(repo: str, number: int, issue: int | None, updated: datetime) -> PullRequestDifficultyRecord:
+    return PullRequestDifficultyRecord(
+        repo=repo,
+        pr_number=number,
+        pr_created_at=updated,
+        pr_merged_at=updated,
+        pr_additions=1,
+        pr_deletions=1,
+        pr_changed_files=1,
+        issue_number=issue,
+        issue_labels=[],
+        author="alice",
+        updated_at=updated,
     )
 
+
+def test_fetch_org_merged_pr_difficulty_graphql_is_incremental(monkeypatch, tmp_path, mock_client):
+    """Org merged-PR difficulty routes through the dataset store: full fetch, then delta-merge."""
+    repos = [RepositoryRecord("org/repo1", "repo1", "org")]
     monkeypatch.setattr(
         ingest.pull_requests,
-        "fetch_repo_merged_pr_difficulty_graphql",
-        lambda _client, owner, repo: [
-            PullRequestDifficultyRecord(
-                repo=f"{owner}/{repo}",
-                pr_number=1,
-                pr_created_at=None,
-                pr_merged_at=None,
-                pr_additions=1,
-                pr_deletions=1,
-                pr_changed_files=1,
-                issue_number=1,
-                issue_labels=[],
-            )
-        ],
+        "dataset_path",
+        lambda resource, scope, fingerprint="all": tmp_path / f"{resource}_{scope}_{fingerprint}.json",
     )
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda *_a, **_k: repos)
 
-    records = ingest.fetch_org_merged_pr_difficulty_graphql(
-        mock_client,
-        "org",
-        max_workers=2,
-    )
+    def fake_batched(client, org, *, per_repo, **_kwargs):
+        # Route the batched engine through the per-repo fallback so the mocks
+        # below drive the store; batching itself is covered by test_batched.py.
+        return [record for repo in repos for record in per_repo(repo)]
 
-    repos_returned = {r.repo for r in records}
+    monkeypatch.setattr(ingest.pull_requests, "fetch_org_records_batched", fake_batched)
 
-    assert repos_returned == {"org/repo1", "org/repo2"}
-    assert len(records) == 2
+    # Recent timestamps: a watermark older than full_refresh_after would force
+    # a second full fetch instead of exercising the delta path.
+    r1 = _pr_record("org/repo1", 1, 10, datetime.now(UTC))
+    r2 = _pr_record("org/repo1", 2, None, datetime.now(UTC))
+    full = Mock(return_value=[r1])
+    delta = Mock(return_value=[r1, r2])  # re-sends r1 (must dedup) + a new unlinked r2
+    monkeypatch.setattr(ingest.pull_requests, "fetch_repo_merged_pr_difficulty_graphql", full)
+    monkeypatch.setattr(ingest.pull_requests, "fetch_repo_merged_prs_since_graphql", delta)
+
+    first = ingest.fetch_org_merged_pr_difficulty_graphql(mock_client, "org", max_workers=2)
+    assert first == [r1]
+    full.assert_called_once()
+
+    second = ingest.fetch_org_merged_pr_difficulty_graphql(mock_client, "org", max_workers=2)
+    delta.assert_called_once()
+    assert len(second) == 2  # r1 deduped by (repo, pr, issue) key, r2 added
+    assert {r.pr_number for r in second} == {1, 2}
+
+
+def test_merged_pr_without_linked_issue_yields_unlinked_record():
+    """A merged PR with no closing-issue link still yields one (unlinked) record."""
+    node = {
+        "number": 11,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "mergedAt": "2024-01-02T00:00:00Z",
+        "updatedAt": "2024-01-03T00:00:00Z",
+        "additions": 5,
+        "deletions": 3,
+        "changedFiles": 2,
+        "author": {"login": "alice"},
+        "closingIssuesReferences": {"nodes": []},
+    }
+
+    records = PullRequestDifficultyRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.issue_number is None
+    assert record.issue_labels == []
+    assert record.author == "alice"
+    assert record.updated_at == datetime(2024, 1, 3, tzinfo=UTC)
 
 
 # ---------------------------------------------------------
@@ -514,7 +426,7 @@ def _repo(name):
     return repo
 
 
-def test_fetch_org_records_parallel_recovers_transient_then_raises_partial(monkeypatch):
+def test_fetch_org_resource_parallel_recovers_transient_then_raises_partial(monkeypatch):
     """A repo that fails once recovers on retry; one that fails twice raises partial."""
     repos = [_repo("flaky"), _repo("broken"), _repo("ok")]
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda _c, _o: repos)
@@ -530,7 +442,7 @@ def test_fetch_org_records_parallel_recovers_transient_then_raises_partial(monke
         raise RuntimeError("transient/permanent failure")
 
     with pytest.raises(PartialOrgFetchError) as excinfo:
-        ingest._fetch_org_records_parallel(Mock(), "org", 4, per_repo, "test")
+        ingest.fetch_org_resource_parallel(Mock(), "org", per_repo, 4, task_desc="test")
 
     exc = excinfo.value
     # Records that DID arrive are carried so the store can still merge them.
@@ -540,11 +452,28 @@ def test_fetch_org_records_parallel_recovers_transient_then_raises_partial(monke
     assert calls["broken"] == 2  # retried once, then given up
 
 
-def test_fetch_org_records_parallel_returns_all_when_every_repo_succeeds(monkeypatch):
+def test_fetch_org_resource_parallel_returns_all_when_every_repo_succeeds(monkeypatch):
     """With no failures, all records are returned and nothing is raised."""
     repos = [_repo("a"), _repo("b")]
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda _c, _o: repos)
 
-    result = ingest._fetch_org_records_parallel(Mock(), "org", 4, lambda repo: [f"{repo.name}-rec"], "test")
+    result = ingest.fetch_org_resource_parallel(Mock(), "org", lambda repo: [f"{repo.name}-rec"], 4, task_desc="test")
 
     assert set(result) == {"a-rec", "b-rec"}
+
+
+def test_fetch_org_resource_parallel_raises_partial_instead_of_returning_incomplete(monkeypatch):
+    """A repo failing even after the retry raises PartialOrgFetchError, not a partial list."""
+    repos = [_repo("ok"), _repo("broken")]
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda *_a, **_k: repos)
+
+    def fetch_repo(repo):
+        if repo.name == "broken":
+            raise RuntimeError("persistent failure")
+        return [f"{repo.name}-rec"]
+
+    with pytest.raises(PartialOrgFetchError) as excinfo:
+        ingest.fetch_org_resource_parallel(Mock(), "org", fetch_repo, 4)
+
+    assert excinfo.value.records == ["ok-rec"]
+    assert [r.name for r in excinfo.value.failed_repos] == ["broken"]

@@ -1,14 +1,15 @@
 """Tests for contributor merged PR count functionality."""
 
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
 
 import hiero_analytics.data_sources.github_ingest as ingest
-from hiero_analytics.data_sources.models import ContributorMergedPRCountRecord
+from hiero_analytics.data_sources.models import ContributorMergedPRCountRecord, PullRequestDifficultyRecord
 
 # ---------------------------------------------------------
-# fixtures
+# fixtures / helpers
 # ---------------------------------------------------------
 
 
@@ -18,13 +19,19 @@ def mock_client():
     return Mock()
 
 
-@pytest.fixture
-def bypass_pagination(monkeypatch):
-    """Replace paginate_cursor with a single-page execution."""
-    monkeypatch.setattr(
-        ingest._common,
-        "paginate_cursor",
-        lambda f: f(None)[0],
+def _pr(repo: str, number: int, author: str | None, issue: int | None = None) -> PullRequestDifficultyRecord:
+    """Create a merged-PR difficulty record for count derivation tests."""
+    return PullRequestDifficultyRecord(
+        repo=repo,
+        pr_number=number,
+        pr_created_at=datetime(2024, 1, 1, tzinfo=UTC),
+        pr_merged_at=datetime(2024, 1, 2, tzinfo=UTC),
+        pr_additions=1,
+        pr_deletions=1,
+        pr_changed_files=1,
+        issue_number=issue,
+        issue_labels=[],
+        author=author,
     )
 
 
@@ -46,17 +53,6 @@ def test_contributor_merged_pr_count_record_creation():
     assert record.merged_pr_count == 42
 
 
-def test_contributor_merged_pr_count_record_zero():
-    """Test a record with zero merged PRs."""
-    record = ContributorMergedPRCountRecord(
-        repo="hiero-ledger/hiero-sdk-python",
-        login="inactive-user",
-        merged_pr_count=0,
-    )
-
-    assert record.merged_pr_count == 0
-
-
 def test_contributor_merged_pr_count_record_frozen():
     """Test that the record is immutable (frozen)."""
     record = ContributorMergedPRCountRecord(
@@ -70,153 +66,67 @@ def test_contributor_merged_pr_count_record_frozen():
 
 
 # ---------------------------------------------------------
-# fetch_repo_contributor_merged_pr_count_graphql tests
+# fetch_repo_contributor_merged_pr_count_graphql
 # ---------------------------------------------------------
 
 
-def test_fetch_repo_contributor_merged_pr_count_graphql(mock_client):
-    """Test fetching merged PR count for a single repository."""
-    mock_client.graphql.return_value = {
-        "data": {
-            "search": {
-                "issueCount": 15,
-            }
-        }
-    }
+def test_repo_count_derives_from_pr_records_and_dedups(monkeypatch, mock_client):
+    """The count is distinct PR numbers for the login, deduped across linked issues."""
+    records = [
+        _pr("org/repo", 1, "Sami", issue=10),
+        _pr("org/repo", 1, "Sami", issue=11),  # same PR, second linked issue
+        _pr("org/repo", 2, "sami"),  # unlinked PR still counts
+        _pr("org/repo", 3, "bob"),
+        _pr("org/repo", 4, None),  # authorless PRs never count
+    ]
+    monkeypatch.setattr(ingest.contributors, "fetch_repo_merged_pr_difficulty_graphql", Mock(return_value=records))
 
-    record = ingest.fetch_repo_contributor_merged_pr_count_graphql(
-        mock_client,
-        owner="hiero-ledger",
-        repo="hiero-sdk-python",
-        login="sami",
-    )
+    record = ingest.fetch_repo_contributor_merged_pr_count_graphql(mock_client, "org", "repo", login="sami")
 
-    assert isinstance(record, ContributorMergedPRCountRecord)
-    assert record.repo == "hiero-ledger/hiero-sdk-python"
+    assert record.repo == "org/repo"
     assert record.login == "sami"
-    assert record.merged_pr_count == 15
-
-    # Verify the correct search query was used
-    call_args = mock_client.graphql.call_args
-    assert call_args is not None
-    search_query = call_args[0][1]["searchQuery"]
-    assert "is:pr" in search_query
-    assert "is:merged" in search_query
-    assert "author:sami" in search_query
-    assert "repo:hiero-ledger/hiero-sdk-python" in search_query
+    assert record.merged_pr_count == 2  # PRs 1 and 2 (case-insensitive author match)
 
 
-def test_fetch_repo_contributor_merged_pr_count_graphql_zero(mock_client):
-    """Test fetching when contributor has no merged PRs."""
-    mock_client.graphql.return_value = {
-        "data": {
-            "search": {
-                "issueCount": 0,
-            }
-        }
-    }
-
-    record = ingest.fetch_repo_contributor_merged_pr_count_graphql(
-        mock_client,
-        owner="hiero-ledger",
-        repo="hiero-sdk-python",
-        login="bob",
+def test_repo_count_zero_when_login_absent(monkeypatch, mock_client):
+    """A contributor with no merged PRs gets a zero-count record."""
+    monkeypatch.setattr(
+        ingest.contributors, "fetch_repo_merged_pr_difficulty_graphql", Mock(return_value=[_pr("org/repo", 1, "bob")])
     )
+
+    record = ingest.fetch_repo_contributor_merged_pr_count_graphql(mock_client, "org", "repo", login="ghost")
 
     assert record.merged_pr_count == 0
 
 
 # ---------------------------------------------------------
-# fetch_org_contributor_merged_pr_count_graphql tests
+# fetch_org_contributor_merged_pr_count_graphql
 # ---------------------------------------------------------
 
 
-def test_fetch_org_contributor_merged_pr_count_graphql(mock_client, bypass_pagination):
-    """Test fetching merged PR counts across all repositories in an org."""
-    # Mock for fetching repos
-    mock_client.graphql.side_effect = [
-        {
-            "data": {
-                "organization": {
-                    "repositories": {
-                        "nodes": [
-                            {"name": "repo1"},
-                            {"name": "repo2"},
-                        ],
-                        "pageInfo": {
-                            "hasNextPage": False,
-                            "endCursor": None,
-                        },
-                    }
-                }
-            }
-        },
-        # Merged count for repo1
-        {
-            "data": {
-                "search": {
-                    "issueCount": 10,
-                }
-            }
-        },
-        # Merged count for repo2
-        {
-            "data": {
-                "search": {
-                    "issueCount": 5,
-                }
-            }
-        },
+def test_org_counts_derive_from_incremental_dataset(monkeypatch, mock_client):
+    """Org counts come from the merged-PR dataset: one record per repo with activity."""
+    records = [
+        _pr("org/repo1", 1, "carol"),
+        _pr("org/repo1", 2, "carol"),
+        _pr("org/repo2", 7, "Carol", issue=3),
+        _pr("org/repo3", 9, "bob"),
     ]
+    monkeypatch.setattr(ingest.contributors, "fetch_org_merged_pr_difficulty_graphql", Mock(return_value=records))
 
-    records = ingest.fetch_org_contributor_merged_pr_count_graphql(
-        mock_client,
-        org="hiero-ledger",
-        login="carol",
-        max_workers=1,  # Single worker for predictable order
+    results = ingest.fetch_org_contributor_merged_pr_count_graphql(mock_client, org="org", login="carol")
+
+    assert [(r.repo, r.merged_pr_count) for r in results] == [("org/repo1", 2), ("org/repo2", 1)]
+    assert all(r.login == "carol" for r in results)
+
+
+def test_org_counts_respect_repo_filter(monkeypatch, mock_client):
+    """The optional repos filter matches both full names and short names."""
+    records = [_pr("org/repo1", 1, "carol"), _pr("org/repo2", 2, "carol")]
+    monkeypatch.setattr(ingest.contributors, "fetch_org_merged_pr_difficulty_graphql", Mock(return_value=records))
+
+    results = ingest.fetch_org_contributor_merged_pr_count_graphql(
+        mock_client, org="org", login="carol", repos=["repo2"]
     )
 
-    assert len(records) == 2
-
-    # Find records by repo name to ensure order-independent testing
-    repo1_record = next((r for r in records if "repo1" in r.repo), None)
-    repo2_record = next((r for r in records if "repo2" in r.repo), None)
-
-    assert repo1_record is not None
-    assert repo1_record.login == "carol"
-    assert repo1_record.merged_pr_count == 10
-
-    assert repo2_record is not None
-    assert repo2_record.login == "carol"
-    assert repo2_record.merged_pr_count == 5
-
-
-# ---------------------------------------------------------
-# dataclass serialization
-# ---------------------------------------------------------
-
-
-def test_contributor_merged_pr_count_in_list():
-    """Test that records work well in collections."""
-    records = [
-        ContributorMergedPRCountRecord("org/repo1", "alice", 5),
-        ContributorMergedPRCountRecord("org/repo2", "mona", 3),
-        ContributorMergedPRCountRecord("org/repo1", "sophie", 8),
-    ]
-
-    assert len(records) == 3
-    alice_counts = [r.merged_pr_count for r in records if r.login == "alice"]
-    assert sum(alice_counts) == 5
-
-
-def test_contributor_merged_pr_count_comparison():
-    """Test that records can be compared and sorted."""
-    records = [
-        ContributorMergedPRCountRecord("org/repo2", "mona", 3),
-        ContributorMergedPRCountRecord("org/repo1", "mona", 5),
-    ]
-
-    # Sort by merged PR count descending
-    sorted_records = sorted(records, key=lambda r: r.merged_pr_count, reverse=True)
-    assert sorted_records[0].merged_pr_count == 5
-    assert sorted_records[1].merged_pr_count == 3
+    assert [r.repo for r in results] == ["org/repo2"]

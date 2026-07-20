@@ -45,6 +45,14 @@ MAX_RETRIES = 3
 MAX_GRAPHQL_FRESH_RETRIES = 2
 RETRY_STATUS_CODES = {500, 502, 503, 504}
 
+
+def _apply_decision(decision: RateLimitDecision) -> Action:
+    """Apply a policy decision's sleep side effect and return the action."""
+    if decision.sleep_seconds > 0:
+        time.sleep(decision.sleep_seconds)
+    return decision.action
+
+
 # --------------------------------------------------------
 # HEADERS
 # --------------------------------------------------------
@@ -67,67 +75,24 @@ def github_headers() -> dict[str, str]:
 
 
 # --------------------------------------------------------
-# CLIENT
+# REST TRANSPORT
 # --------------------------------------------------------
 
 
-class GitHubClient:
-    """HTTP client for interacting with the GitHub API."""
+class _RestTransport:
+    """Low-level HTTP execution shared by the REST and GraphQL paths.
 
-    def __init__(self) -> None:
-        """Initialise session headers, rate-limit policy, and usage counters."""
-        self.session: requests.Session = requests.Session()
-        self.session.headers.update(github_headers())
+    Owns exactly the transport-layer concerns — network retries, 5xx backoff,
+    REST rate-limit headers, and secondary-rate-limit 403s — so the GraphQL
+    policy loop above it never has to reason about HTTP.
+    """
 
-        # Rate-limit policy: reads signals, returns decisions.
-        self._policy = RateLimitPolicy()
-        # Thread lock to protect usage counters during concurrent execution.
-        self._lock = threading.Lock()
+    def __init__(self, session: requests.Session, policy: RateLimitPolicy) -> None:
+        """Wrap a shared session and rate-limit policy."""
+        self.session = session
+        self._policy = policy
 
-        # usage counters to keep track of API usage
-        self.requests_made: int = 0
-        self.cost_used: int = 0
-
-    # --------------------------------------------------------
-    # USAGE REPORTING
-    # --------------------------------------------------------
-
-    def log_usage(self) -> None:
-        """Log cumulative API usage statistics."""
-        logger.info(
-            "GitHub API usage: %d requests, %d GraphQL points used",
-            self.requests_made,
-            self.cost_used,
-        )
-
-    def _apply_decision(self, decision: RateLimitDecision) -> Action:
-        """Apply policy decision side effects and return the action."""
-        if decision.sleep_seconds > 0:
-            time.sleep(decision.sleep_seconds)
-        return decision.action
-
-    def _record_usage(
-        self,
-        data: JSON,
-        *,
-        is_graphql: bool,
-    ) -> RateLimitSnapshot | None:
-        """Extract rate-limit info from response and update usage counters."""
-        with self._lock:
-            self.requests_made += 1
-            if not is_graphql:
-                return None
-
-            snapshot = RateLimitSnapshot.from_graphql_payload(data)
-            if snapshot and snapshot.cost is not None:
-                self.cost_used += snapshot.cost
-            return snapshot
-
-    # --------------------------------------------------------
-    # REQUEST EXECUTION
-    # --------------------------------------------------------
-
-    def _execute_http_with_retries(
+    def request(
         self,
         method: str,
         url: str,
@@ -200,7 +165,7 @@ class GitHubClient:
                     attempt=attempt,
                     max_retries=MAX_RETRIES,
                 )
-                action = self._apply_decision(rest_decision)
+                action = _apply_decision(rest_decision)
                 if action == Action.DELAY_THEN_RETRY_LOOP:
                     logger.info("Retrying due to REST rate limit...")
                     continue
@@ -237,51 +202,57 @@ class GitHubClient:
 
         raise RuntimeError("Unreachable request state")
 
-    def _request(self, method: str, url: str, **kwargs: Any) -> JSON:
-        """Execute request and apply GraphQL-specific retry policy."""
-        is_graphql = url.endswith("/graphql")
 
-        start_time = time.time()
-        MAX_TOTAL_TIME = 60  # seconds
+# --------------------------------------------------------
+# CLIENT
+# --------------------------------------------------------
 
-        for attempt in range(1, MAX_GRAPHQL_FRESH_RETRIES + 2):
-            if time.time() - start_time > MAX_TOTAL_TIME:
-                raise TimeoutError("GraphQL request exceeded total retry time")
 
-            response = self._execute_http_with_retries(method, url, **kwargs)
-            data: JSON = response.json()
+class GitHubClient:
+    """HTTP client for interacting with the GitHub API.
 
-            # Keep usage accounting for both REST and GraphQL.
-            graphql_snapshot = self._record_usage(data, is_graphql=is_graphql)
+    Two thin request paths — a linear REST path and a GraphQL policy loop —
+    share one session, one rate-limit policy, and one :class:`_RestTransport`,
+    so transport concerns are handled in exactly one place.
+    """
 
+    def __init__(self) -> None:
+        """Initialise session headers, rate-limit policy, and usage counters."""
+        self.session: requests.Session = requests.Session()
+        self.session.headers.update(github_headers())
+
+        # Rate-limit policy: reads signals, returns decisions.
+        self._policy = RateLimitPolicy()
+        self._transport = _RestTransport(self.session, self._policy)
+        # Thread lock to protect usage counters during concurrent execution.
+        self._lock = threading.Lock()
+
+        # usage counters to keep track of API usage
+        self.requests_made: int = 0
+        self.cost_used: int = 0
+
+    def _record_usage(
+        self,
+        data: JSON,
+        *,
+        is_graphql: bool,
+    ) -> RateLimitSnapshot | None:
+        """Extract rate-limit info from response and update usage counters."""
+        with self._lock:
+            self.requests_made += 1
             if not is_graphql:
-                if REQUEST_DELAY_SECONDS > 0:
-                    time.sleep(REQUEST_DELAY_SECONDS)
-                return data
+                return None
 
-            error_decision = self._policy.check_graphql_errors(data, graphql_snapshot)
-            if "errors" in data:
-                logger.warning(
-                    "GraphQL errors (attempt %d): %s",
-                    attempt,
-                    data["errors"],
-                )
-            action = self._apply_decision(error_decision)
+            snapshot = RateLimitSnapshot.from_graphql_payload(data)
+            if snapshot and snapshot.cost is not None:
+                self.cost_used += snapshot.cost
+            return snapshot
 
-            if action == Action.DELAY_THEN_RETRY_FRESH:
-                logger.info("GraphQL retry attempt %d", attempt)
-                continue
-
-            if graphql_snapshot:
-                budget_decision = self._policy.check_graphql_budget(graphql_snapshot)
-                self._apply_decision(budget_decision)
-
-            if REQUEST_DELAY_SECONDS > 0:
-                time.sleep(REQUEST_DELAY_SECONDS)
-
-            return data
-
-        raise RuntimeError("GraphQL fresh retry limit exceeded after RATE_LIMIT responses")
+    @staticmethod
+    def _pace() -> None:
+        """Apply the optional fixed inter-request delay."""
+        if REQUEST_DELAY_SECONDS > 0:
+            time.sleep(REQUEST_DELAY_SECONDS)
 
     # --------------------------------------------------------
     # PUBLIC API
@@ -298,11 +269,18 @@ class GitHubClient:
         Returns:
             Parsed JSON response.
         """
-        return self._request("GET", url, **kwargs)
+        response = self._transport.request("GET", url, **kwargs)
+        data: JSON = response.json()
+        self._record_usage(data, is_graphql=False)
+        self._pace()
+        return data
 
     def graphql(self, query: str, variables: Mapping[str, Any]) -> JSON:
         """
         Execute a GraphQL query against the GitHub API.
+
+        Retries with a fresh request on RATE_LIMIT errors (sleeping until the
+        budget resets); any other GraphQL error raises via the policy.
 
         Args:
             query: GraphQL query string
@@ -312,4 +290,35 @@ class GitHubClient:
             Parsed JSON response
         """
         payload: JSON = {"query": query, "variables": dict(variables)}
-        return self._request("POST", f"{BASE_URL}/graphql", json=payload)
+        url = f"{BASE_URL}/graphql"
+
+        # No wall-clock guard here on purpose: every sleep in this loop and in the
+        # transport below it is legitimate, bounded rate-limit backoff (reset waits,
+        # Retry-After, 5xx backoff), and the loop itself is attempt-bounded. A time
+        # budget would only convert heavy throttling into spurious timeouts.
+        for attempt in range(1, MAX_GRAPHQL_FRESH_RETRIES + 2):
+            response = self._transport.request("POST", url, json=payload)
+            data: JSON = response.json()
+            snapshot = self._record_usage(data, is_graphql=True)
+
+            error_decision = self._policy.check_graphql_errors(data, snapshot)
+            if "errors" in data:
+                logger.warning(
+                    "GraphQL errors (attempt %d): %s",
+                    attempt,
+                    data["errors"],
+                )
+            action = _apply_decision(error_decision)
+
+            if action == Action.DELAY_THEN_RETRY_FRESH:
+                logger.info("GraphQL retry attempt %d", attempt)
+                continue
+
+            if snapshot:
+                budget_decision = self._policy.check_graphql_budget(snapshot)
+                _apply_decision(budget_decision)
+
+            self._pace()
+            return data
+
+        raise RuntimeError("GraphQL fresh retry limit exceeded after RATE_LIMIT responses")

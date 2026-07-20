@@ -41,3 +41,10 @@ ACTIVITY_WEIGHTS = {
     "prs created": 3,
     "prs merged": 2,
 }
+
+# Difficulty pipelines: recent-issues window (days) for the per-repo difficulty
+# snapshot, full window for the difficulty-over-time series, and a low worker
+# count for the event-heavy timeline fetches (they hit the API hardest).
+DIFFICULTY_RECENT_WINDOW_DAYS = 30
+DIFFICULTY_OVER_TIME_WINDOW_DAYS = 365
+TIMELINE_MAX_WORKERS = 3

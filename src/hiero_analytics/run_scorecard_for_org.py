@@ -34,13 +34,9 @@ def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
     for i, repo in enumerate(repos, start=1):
         logger.info("Fetching scorecard (%d/%d): %s", i, len(repos), repo.name)
 
-        try:
-            sc = fetch_repo_scorecard(repo.name)
-            if sc:
-                scorecards.append(sc)
-
-        except Exception as e:
-            logger.error("Failed for %s: %s", repo.name, e)
+        sc = fetch_repo_scorecard(repo.name)
+        if sc:
+            scorecards.append(sc)
 
     return scorecards
 

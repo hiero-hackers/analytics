@@ -169,7 +169,7 @@ def plot_bar(
     df = prepare_dataframe(df, x_col, y_col).copy()
 
     # Sort bars by x-axis for numeric/datetime categories, but keep original order for categorical axes (often already sorted by total count) to preserve readability and avoid reordering issues with long labels. Rotate bars to horizontal if there are many categories or if x-axis labels are long.
-    if not pd.api.types.is_categorical_dtype(df[x_col]):
+    if not isinstance(df[x_col].dtype, pd.CategoricalDtype):
         df = (
             df.sort_values(x_col) if is_numeric_or_datetime(df[x_col]) else df.sort_values(y_col, ascending=False)
         )  # Auto-switch to a more report-like horizontal layout for crowded categories.

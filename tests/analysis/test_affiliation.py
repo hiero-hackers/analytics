@@ -22,7 +22,6 @@ from hiero_analytics.analysis.affiliation import (
     filter_active_logins,
     load_affiliations,
     load_manual_logins,
-    org_heatmap_chart_data,
     summarize_affiliation,
     top_n_with_other,
 )
@@ -182,6 +181,61 @@ def test_repo_diversity_flags_single_vendor_and_excludes_roleless():
 def test_repo_diversity_empty_role_lookup():
     """No maintainers anywhere yields an empty, correctly-typed frame."""
     assert build_repo_affiliation_diversity({}, {}).empty
+
+
+def test_repo_diversity_top_pct_uses_resolved_denominator():
+    """'largest org %' is the share of resolved maintainers — same definition as the team table."""
+    role_lookup = {
+        "org/r": {"alice": "maintainer", "bob": "maintainer", "ghost1": "maintainer", "ghost2": "maintainer"}
+    }
+    affiliations = {"alice": "Hashgraph", "bob": "Hashgraph"}  # ghosts unmapped
+
+    row = build_repo_affiliation_diversity(role_lookup, affiliations).iloc[0]
+
+    assert row["unknown"] == 2
+    assert row["top_org_pct"] == 100  # 2 of 2 resolved, not 2 of 4 members
+
+
+def test_team_capture_flag_requires_resolved_majority():
+    """A team where unmapped members outnumber resolved ones is never flagged as captured."""
+    affiliations = {"a": "Hashgraph", "b": "Hashgraph"}
+    dominated = build_team_affiliation_diversity({"team": {"a", "b", "u1", "u2", "u3"}}, affiliations, min_members=2)
+    balanced = build_team_affiliation_diversity({"team": {"a", "b", "u1"}}, affiliations, min_members=2)
+
+    assert not dominated.iloc[0]["single_employer"]  # 3 unknown > 2 resolved
+    assert balanced.iloc[0]["single_employer"]  # 2 resolved >= 1 unknown
+
+
+def test_single_employer_repo_counts_skip_unknown_dominated_repos():
+    """Repos with more unmapped than resolved maintainers don't count as single-employer."""
+    repo_diversity = pd.DataFrame(
+        [
+            {
+                "repo": "kept",
+                "maintainers": 4,
+                "distinct_orgs": 1,
+                "top_org": "Hashgraph",
+                "top_org_pct": 100,
+                "independent": 0,
+                "unknown": 2,
+                "organisations": "Hashgraph",
+            },
+            {
+                "repo": "skipped",
+                "maintainers": 5,
+                "distinct_orgs": 1,
+                "top_org": "Hashgraph",
+                "top_org_pct": 100,
+                "independent": 0,
+                "unknown": 3,
+                "organisations": "Hashgraph",
+            },
+        ]
+    )
+
+    counts = build_single_employer_repo_counts(repo_diversity)
+
+    assert counts["repos"].tolist() == [1]  # only "kept" (2 resolved >= 2 unknown)
 
 
 def test_repo_org_composition_segments_and_counts():
@@ -393,16 +447,6 @@ def test_org_activity_heatmap_can_include_unknown():
     """With include_unknown, unmapped contributors roll up into an Unknown row."""
     org_hm = build_org_activity_heatmap(_contributor_heatmap(), {}, include_unknown=True)
     assert org_hm.iloc[0]["organisation"] == UNKNOWN_LABEL
-
-
-def test_org_heatmap_chart_data_shape_and_empty():
-    """Chart data returns aligned values/labels, and None on an empty frame."""
-    aff = {"alice": "Hashgraph", "bob": "Hashgraph", "carol": "LimeChain"}
-    values, rows, cols = org_heatmap_chart_data(build_org_activity_heatmap(_contributor_heatmap(), aff))
-    assert rows == ["Hashgraph", "LimeChain"]
-    assert cols == ["2026-01", "2026-02"]
-    assert values.shape == (2, 2)
-    assert org_heatmap_chart_data(pd.DataFrame(columns=["organisation", "activity score"])) is None
 
 
 def test_filter_active_logins_keeps_recently_active():

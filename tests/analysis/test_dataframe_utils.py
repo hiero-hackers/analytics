@@ -1,6 +1,8 @@
-"""Tests for the generic records_to_dataframe helper."""
+"""Tests for the dataframe utility helpers."""
 
-from hiero_analytics.analysis.dataframe_utils import records_to_dataframe
+import pandas as pd
+
+from hiero_analytics.analysis.dataframe_utils import filter_by_labels, records_to_dataframe
 
 
 def test_records_to_dataframe_maps_each_record_to_a_row():
@@ -45,3 +47,27 @@ def test_records_to_dataframe_all_skipped_returns_column_schema():
 
     assert df.empty
     assert list(df.columns) == ["n"]
+
+
+def test_filter_by_labels_matches_case_insensitively():
+    """Mixed-case issue labels match a lowercased label set (as built by LabelSpec)."""
+    df = pd.DataFrame(
+        {
+            "number": [1, 2, 3],
+            "labels": [["Good First Issue"], ["bug"], ["skill: Good First Issue"]],
+        }
+    )
+
+    result = filter_by_labels(df, {"good first issue", "skill: good first issue"})
+
+    assert result["number"].tolist() == [1, 3]
+
+
+def test_filter_by_labels_handles_missing_labels_and_empty_frame():
+    """Rows with None labels never match, and an empty frame passes through."""
+    df = pd.DataFrame({"number": [1, 2], "labels": [None, ["Bug"]]})
+
+    result = filter_by_labels(df, {"bug"})
+
+    assert result["number"].tolist() == [2]
+    assert filter_by_labels(df.iloc[0:0], {"bug"}).empty

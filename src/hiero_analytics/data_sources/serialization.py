@@ -33,6 +33,13 @@ def datetime_fields(record_type: type) -> tuple[str, ...]:
     return tuple(field.name for field in fields(record_type) if annotation_is_datetime(hints.get(field.name)))
 
 
+@cache
+def _required_datetime_fields(record_type: type) -> tuple[str, ...]:
+    """Names of a record's non-optional datetime fields (hint is exactly ``datetime``)."""
+    hints = get_type_hints(record_type)
+    return tuple(field.name for field in fields(record_type) if hints.get(field.name) is datetime)
+
+
 def serialize_value(value: object) -> object:
     """Convert dataclass payload values into JSON-compatible values."""
     if isinstance(value, datetime):
@@ -51,7 +58,13 @@ def serialize_record(record: T) -> dict[str, object]:  # noqa: UP047
 
 
 def deserialize_record(record_type: type[T], payload: dict[str, object]) -> T:  # noqa: UP047
-    """Deserialize a record payload from JSON back into a dataclass."""
+    """Deserialize a record payload from JSON back into a dataclass.
+
+    Raises ``ValueError`` when a non-optional datetime field comes back null —
+    frozen dataclasses validate nothing themselves, so this is the one place a
+    corrupted payload can be rejected before it flows into analyses. Cache and
+    dataset loaders catch the error and treat the file as a miss.
+    """
     restored = dict(payload)
 
     for field_name in datetime_fields(record_type):
@@ -59,4 +72,11 @@ def deserialize_record(record_type: type[T], payload: dict[str, object]) -> T:  
         if raw_value is not None:
             restored[field_name] = datetime.fromisoformat(str(raw_value))
 
-    return record_type(**restored)  # type: ignore[arg-type]
+    record = record_type(**restored)  # type: ignore[arg-type]
+
+    for field_name in _required_datetime_fields(record_type):
+        if not isinstance(getattr(record, field_name), datetime):
+            raise ValueError(
+                f"{record_type.__name__}.{field_name} must be a datetime, got {getattr(record, field_name)!r}"
+            )
+    return record

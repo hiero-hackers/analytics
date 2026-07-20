@@ -203,10 +203,11 @@ def build_maintainer_yearly_pipeline(
     """Build yearly counts of distinct active people by their highest governance role.
 
     Only counts contributors active in the last 6 months of each year (past years use
-    a fixed H2 window, stable across refreshes; the current year uses a trailing
-    ``active_window_days``-day window from today). Each person is counted once per
-    year, under the highest role they held in any repo, so the bands are mutually
-    exclusive and a year's total is the number of distinct active people.
+    a fixed H2 window, stable across refreshes; the current year uses a full trailing
+    ``active_window_days``-day window from today, which early in the year reaches into
+    the previous December — those events count toward the current bar). Each person is
+    counted once per year, under the highest role they held in any repo, so the bands
+    are mutually exclusive and a year's total is the number of distinct active people.
     """
     if stage_df.empty:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
@@ -217,12 +218,14 @@ def build_maintainer_yearly_pipeline(
     filtered_frames: list[pd.DataFrame] = []
     for year in sorted(years):
         window_start, window_end = _active_window_for_year(year, today, active_window_days)
-        mask = (
-            (stage_df["year"] == year)
-            & (stage_df["occurred_at"] >= window_start)
-            & (stage_df["occurred_at"] <= window_end)
-        )
-        filtered_frames.append(stage_df.loc[mask])
+        mask = (stage_df["occurred_at"] >= window_start) & (stage_df["occurred_at"] <= window_end)
+        if year < today.year:
+            filtered_frames.append(stage_df.loc[mask & (stage_df["year"] == year)])
+        else:
+            # The current bar is a full trailing window, as the chart note states.
+            # Early in the year it reaches into last December; those events are
+            # relabelled so they count toward the current bar, not last year's.
+            filtered_frames.append(stage_df.loc[mask].assign(year=year))
 
     active_df = pd.concat(filtered_frames, ignore_index=True) if filtered_frames else stage_df.iloc[0:0]
 

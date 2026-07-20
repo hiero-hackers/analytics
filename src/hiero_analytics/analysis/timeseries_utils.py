@@ -77,10 +77,14 @@ def difficulty_key_for_label(label: str | None):
 
 
 def difficulty_key(labels: set[str]) -> str | None:
-    """Return the first configured difficulty key that matches an active label set."""
+    """Return the difficulty key for an active label set, or None.
+
+    Mirrors :func:`hiero_analytics.analysis.difficulty_analysis.assign_difficulty`:
+    when several difficulty labels are active at once, the highest one wins.
+    """
     normalized = {label.lower() for label in labels or []}
 
-    for key, spec in _DIFFICULTY_OVER_TIME_SPECS:
+    for key, spec in reversed(_DIFFICULTY_OVER_TIME_SPECS):
         if spec.matches(normalized):
             return key
 

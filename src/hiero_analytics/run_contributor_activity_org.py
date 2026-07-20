@@ -40,7 +40,7 @@ from hiero_analytics.plotting.network import render_comembership_network
 logger = logging.getLogger(__name__)
 
 
-def _build_contributor_network(records, label_events, by_repo, org_charts_dir) -> None:
+def _build_contributor_network(records, label_events, by_repo, org_charts_dir, org: str) -> None:
     """Render the all-contributors co-membership network for the org.
 
     Governance-independent (no roles needed), so it runs for every org. Repos are
@@ -60,32 +60,37 @@ def _build_contributor_network(records, label_events, by_repo, org_charts_dir) -
         nodes,
         edges,
         org_charts_dir / "all_network.png",
-        title=f"{ORG} — contributors network (repos linked by shared contributors)",
+        title=f"{org} — contributors network (repos linked by shared contributors)",
         member_label="contributors",
     ):
         logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
-def main() -> None:
-    """Build the informational contributor-activity tables for the org."""
-    org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
+def main(org: str | None = None) -> None:
+    """Build the informational contributor-activity tables for an org.
 
-    logger.info("Building contributor activity tables for org: %s", ORG)
+    ``org`` defaults to the configured primary org; run_all passes each extra org
+    explicitly, so multi-org runs stay in one process.
+    """
+    org = org or ORG
+    org_data_dir, org_charts_dir = ensure_org_dirs(org)
+
+    logger.info("Building contributor activity tables for org: %s", org)
 
     client = GitHubClient()
     # Reuse the datasets the maintainer/fetch pipelines persisted earlier in run_all
     # (avoiding extra org-wide fetches); falls back to fetching on a cold start.
     records = load_or_fetch(
         "contributor_activity",
-        ORG,
+        org,
         ContributorActivityRecord,
-        lambda: fetch_org_contributor_activity_graphql(client, org=ORG, lookback_days=None),
+        lambda: fetch_org_contributor_activity_graphql(client, org=org, lookback_days=None),
     )
     label_events = load_or_fetch(
         "issue_label_events",
-        ORG,
+        org,
         IssueTimelineEventRecord,
-        lambda: fetch_org_issue_label_events_graphql(client, org=ORG),
+        lambda: fetch_org_issue_label_events_graphql(client, org=org),
     )
     logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
 
@@ -103,7 +108,7 @@ def main() -> None:
     logger.info("Wrote per-repo profiles for %d repositories", len(by_repo))
 
     # All-contributors network (no governance needed, so every org gets it).
-    _build_contributor_network(records, label_events, by_repo, org_charts_dir)
+    _build_contributor_network(records, label_events, by_repo, org_charts_dir, org)
 
     logger.info("Contributor activity tables complete")
 

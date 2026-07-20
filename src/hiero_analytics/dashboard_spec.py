@@ -374,9 +374,9 @@ SECTION_SPECS = [
         "title": "Maintainer organisation diversity by repo",
         "description": (
             "Per repo: how many maintainers it has, how many distinct employers they span, the largest "
-            "employer and its share, and the independent / unknown counts. Repos where one employer holds "
-            "every maintainer seat ('distinct orgs' = 1) are an organisational bus-factor. Single-employer "
-            "repos first."
+            "employer and its share of resolved (mapped) maintainers — the same definition as the team "
+            "table — and the independent / unknown counts. Repos where one employer holds every maintainer "
+            "seat ('distinct orgs' = 1) are an organisational bus-factor. Single-employer repos first."
         ),
         "columns": [
             ("repo", "repo"),
@@ -397,7 +397,8 @@ SECTION_SPECS = [
             "Per governance team: how many members resolve to an employer, how many distinct employers "
             "they span, the largest employer and its share, and the concentration (HHI, 10000 = one "
             "employer). 'single employer' = one employer holds every resolved seat — a capture / "
-            "bus-factor risk, most serious for admin, release, security, and maintainer teams. 'unknown' "
+            "bus-factor risk, most serious for admin, release, security, and maintainer teams; teams with "
+            "more unmapped than resolved members are never flagged. 'unknown' "
             "is how many members aren't in the affiliations map (mostly non-maintainers), so read a flag "
             "on a mostly-unknown team with caution. Most concentrated first."
         ),

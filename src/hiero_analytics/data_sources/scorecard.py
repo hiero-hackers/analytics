@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import datetime
 from typing import Any
 
 import requests
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 SCORECARD_API = os.getenv("SCORECARD_API", "https://api.scorecard.dev/projects/github.com/hiero-ledger")
 
 
-def fetch_repo_scorecard(repo: str) -> ScorecardRecord:
+def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
     """
     Fetch latest OpenSSF Scorecard for a repository.
 
@@ -24,34 +25,30 @@ def fetch_repo_scorecard(repo: str) -> ScorecardRecord:
         repo: Repository in format `eg: hiero-python-sdk`
 
     Returns:
-        ScorecardRecord if available, else None
+        ScorecardRecord, or None when the repository has no scorecard (404).
+
+    Raises:
+        requests.RequestException: On network failures or non-404 HTTP errors,
+            so a transient outage is never silently recorded as a missing scorecard.
     """
     url = f"{SCORECARD_API}/{repo}"
 
     try:
         response = requests.get(url, timeout=HTTP_TIMEOUT_SECONDS)
         response.raise_for_status()
-
-        json_data = response.json()
-        return _normalize_scorecard_response(repo, json_data)
-
     except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 404:
+        if e.response is not None and e.response.status_code == 404:
             logger.debug("Scorecard not found for %s", repo)
             return None
+        raise
 
-        logger.error("HTTP error for %s: %s", repo, e)
-        return None
-
-    except requests.exceptions.RequestException as e:
-        logger.error("Network error while fetching scorecard %s: %s", repo, e)
-        return None
+    return _normalize_scorecard_response(repo, response.json())
 
 
 def _normalize_scorecard_response(repo: str, json: dict[str, Any]) -> ScorecardRecord:
     """Normalize raw API response into ScorecardRecord."""
     score = float(json["score"])
-    created_date = json["date"]
+    created_date = datetime.fromisoformat(str(json["date"]).replace("Z", "+00:00"))
     checks: dict[str, int] = {}
 
     for check in json["checks"]:

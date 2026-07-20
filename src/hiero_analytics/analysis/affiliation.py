@@ -18,7 +18,6 @@ from collections import Counter
 import pandas as pd
 import yaml
 
-from hiero_analytics.config.analysis import HEATMAP_TOP_ROWS
 from hiero_analytics.config.paths import SRC
 from hiero_analytics.domain.repos import bare_repo
 
@@ -226,17 +225,6 @@ def build_org_activity_heatmap(contributor_heatmap, affiliations, *, include_unk
     )
 
 
-def org_heatmap_chart_data(org_heatmap, *, top_rows: int = HEATMAP_TOP_ROWS):
-    """Top-N orgs as ``(values, row_labels, col_labels)`` for ``plot_heatmap``, or None."""
-    if org_heatmap.empty:
-        return None
-    month_cols = [c for c in org_heatmap.columns if c not in {"organisation", "activity score"}]
-    chart = org_heatmap.head(top_rows)
-    if chart.empty:
-        return None
-    return chart[month_cols].to_numpy(dtype=float), chart["organisation"].tolist(), month_cols
-
-
 def filter_active_logins(logins, last_active, cutoff):
     """Subset of ``logins`` whose most recent activity is at or after ``cutoff``.
 
@@ -284,7 +272,10 @@ def build_repo_affiliation_diversity(
         independent = int((classified["status"] == "independent").sum())
         unknown = int((classified["status"] == "unknown").sum())
         top_org = employer_counts.index[0] if not employer_counts.empty else None
-        top_pct = round(100 * int(employer_counts.iloc[0]) / len(logins)) if not employer_counts.empty else 0
+        # Share of *resolved* maintainers (unknowns excluded) — the same statistic
+        # as the team table's "largest org %", so the two tables read alike.
+        resolved = len(logins) - unknown
+        top_pct = round(100 * int(employer_counts.iloc[0]) / resolved) if not employer_counts.empty and resolved else 0
         rows.append(
             {
                 "repo": repo,
@@ -424,8 +415,15 @@ def build_team_affiliation_diversity(
                 "top_org_pct": int(summary["top_share_pct"]),
                 "hhi": int(summary["hhi"]),
                 "unknown": int(summary["unknown"]),
-                # One employer holds every resolved seat (no independents) -> capture risk.
-                "single_employer": summary["distinct_orgs"] == 1 and resolved >= 2 and summary["independent"] == 0,
+                # One employer holds every resolved seat (no independents) -> capture
+                # risk. Teams where unmapped members outnumber resolved ones are not
+                # flagged: too little of the team is known to call it captured.
+                "single_employer": (
+                    summary["distinct_orgs"] == 1
+                    and resolved >= 2
+                    and summary["independent"] == 0
+                    and resolved >= int(summary["unknown"])
+                ),
                 "organisations": ", ".join(mix),
             }
         )
@@ -458,13 +456,19 @@ def build_single_employer_repo_counts(repo_diversity: pd.DataFrame) -> pd.DataFr
 
     A repo is single-employer when every *resolved* maintainer shares one employer
     (no independents) and there are at least two of them — the repo-level analogue
-    of a captured team.
+    of a captured team. Repos where unmapped maintainers outnumber resolved ones
+    are not flagged: too little of the repo's roster is known to call it captured.
     """
     cols = ["organisation", "repos"]
     if repo_diversity.empty:
         return pd.DataFrame(columns=cols)
     resolved = repo_diversity["maintainers"] - repo_diversity["unknown"]
-    single = (repo_diversity["distinct_orgs"] == 1) & (repo_diversity["independent"] == 0) & (resolved >= 2)
+    single = (
+        (repo_diversity["distinct_orgs"] == 1)
+        & (repo_diversity["independent"] == 0)
+        & (resolved >= 2)
+        & (resolved >= repo_diversity["unknown"])
+    )
     captured = repo_diversity[single]
     if captured.empty:
         return pd.DataFrame(columns=cols)

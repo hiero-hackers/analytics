@@ -112,8 +112,8 @@ def filter_by_labels(df: pd.DataFrame, labels: set[str]) -> pd.DataFrame:
     """
     Filter issues that contain at least one label from a given label set.
 
-    This function performs a set intersection between the labels attached
-    to each issue and the provided label set.
+    This function performs a case-insensitive set intersection between the
+    labels attached to each issue and the provided label set.
 
     Parameters
     ----------
@@ -130,30 +130,5 @@ def filter_by_labels(df: pd.DataFrame, labels: set[str]) -> pd.DataFrame:
     if df.empty:
         return df.copy()
 
-    return df[df["labels"].map(lambda xs: bool(set(xs or []) & labels))]
-
-
-def count_by(df: pd.DataFrame, *cols: str) -> pd.DataFrame:
-    """
-    Aggregate issue counts by one or more columns.
-
-    Performs a group-by operation over the specified columns and returns
-    the number of issues in each group.
-
-    Parameters
-    ----------
-    df
-        DataFrame produced by `issues_to_dataframe`.
-    *cols
-        One or more column names to group by.
-
-    Returns:
-    -------
-    pd.DataFrame
-        DataFrame containing the grouping columns and a `count` column
-        representing the number of issues in each group.
-    """
-    if df.empty:
-        return pd.DataFrame(columns=[*cols, "count"])
-
-    return df.groupby(list(cols)).size().reset_index(name="count").sort_values(list(cols))
+    normalized = {label.lower() for label in labels}
+    return df[df["labels"].map(lambda xs: any(label.lower() in normalized for label in xs or []))]

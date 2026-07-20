@@ -6,6 +6,9 @@ import os
 import re
 from pathlib import Path
 
+# Import-time *defaults* only — runners that support multiple orgs must accept an
+# explicit org argument (see run_contributor_activity_org.main) rather than lean
+# on these, so one process can serve several orgs without env mutation.
 ORG = os.getenv("GITHUB_ORG", "hiero-ledger")
 REPO = os.getenv("GITHUB_REPO", "hiero-sdk-python")
 

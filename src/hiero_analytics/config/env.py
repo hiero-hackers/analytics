@@ -30,3 +30,21 @@ def env_float(name: str, default: float, *, minimum: float | None = None) -> flo
     except (TypeError, ValueError):  # fmt: skip
         value = default
     return max(minimum, value) if minimum is not None else value
+
+
+_TRUE_VALUES = {"1", "true", "yes", "on"}
+_FALSE_VALUES = {"0", "false", "no", "off"}
+
+
+def env_bool(name: str, default: bool) -> bool:
+    """Read a boolean env var; fall back to ``default`` on missing/unrecognized input."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    normalized = value.strip().lower()
+    if normalized in _TRUE_VALUES:
+        return True
+    if normalized in _FALSE_VALUES:
+        return False
+    return default

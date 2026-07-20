@@ -17,7 +17,7 @@ from hiero_analytics.analysis.prs import (
 from hiero_analytics.analysis.timeseries import cumulative_timeseries
 from hiero_analytics.config.charts import PRIMARY_PALETTE
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.config.paths import ORG, REPO, ensure_repo_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_issues_graphql,
@@ -30,7 +30,6 @@ from hiero_analytics.plotting.primitives import annotate_endpoint_badge
 from hiero_analytics.plotting.scatter import plot_scatter_with_regression
 
 ORG_NAME = ORG
-REPO = "hiero-sdk-python"
 short_repo = bare_repo(REPO)
 
 logger = logging.getLogger(__name__)

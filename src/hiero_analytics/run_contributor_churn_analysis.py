@@ -8,19 +8,15 @@ from hiero_analytics.analysis.contributor_churn import compute_progression_stats
 from hiero_analytics.analysis.difficulty_analysis import assign_difficulty
 from hiero_analytics.analysis.prs import prs_to_dataframe
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.config.paths import ORG, REPO, ensure_repo_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_repo_merged_pr_difficulty_graphql
-from hiero_analytics.domain.labels import DIFFICULTY_LEVELS, DIFFICULTY_ORDER
+from hiero_analytics.domain.labels import DIFFICULTY_ORDER
 from hiero_analytics.plotting.bars import plot_bar
 from hiero_analytics.plotting.lines import plot_line
 
 ORG_NAME = ORG
-REPO = "hiero-sdk-python"
 short_repo = REPO.split("/")[-1]
-
-# Reversed so the highest difficulty wins when a PR closes multiple issues.
-_DIFFICULTY_LEVELS_DESC = tuple(reversed(DIFFICULTY_LEVELS))
 
 
 def run() -> None:
@@ -38,7 +34,7 @@ def run() -> None:
     if df.empty:
         raise ValueError(f"No PR data found for {ORG_NAME}/{REPO}. Cannot perform churn analysis.")
 
-    df["level"] = df["issue_labels"].apply(lambda labels: assign_difficulty(labels, _DIFFICULTY_LEVELS_DESC))
+    df["level"] = df["issue_labels"].apply(assign_difficulty)
 
     df = df.dropna(subset=["author", "pr_merged_at"]).sort_values(["author", "pr_merged_at"])
 

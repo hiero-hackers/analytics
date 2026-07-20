@@ -33,18 +33,19 @@ def bypass_pagination(monkeypatch):
 
 
 def test_search_issues_returns_items(mock_client, bypass_pagination):
-    """Test searching issues returns correctly mapped items."""
+    """Test searching issues returns normalized records."""
     mock_client.get.return_value = {
         "items": [
-            {"id": 1, "title": "Issue A"},
-            {"id": 2, "title": "Issue B"},
+            {"number": 1, "title": "Issue A"},
+            {"number": 2, "title": "Issue B"},
         ]
     }
 
     results = search.search_issues(mock_client, "label:bug")
 
     assert len(results) == 2
-    assert results[0]["id"] == 1
+    assert results[0].number == 1
+    assert results[0].title == "Issue A"
 
 
 # --------------------------------------------------------
@@ -80,17 +81,16 @@ def test_search_issues_filters_non_dict_items(mock_client, bypass_pagination):
     """Test searching issues filters out invalid non-dictionary items."""
     mock_client.get.return_value = {
         "items": [
-            {"id": 1},
+            {"number": 1},
             None,
             "bad",
-            {"id": 2},
+            {"number": 2},
         ]
     }
 
     results = search.search_issues(mock_client, "test")
 
-    assert len(results) == 2
-    assert all(isinstance(i, dict) for i in results)
+    assert [r.number for r in results] == [1, 2]
 
 
 # --------------------------------------------------------

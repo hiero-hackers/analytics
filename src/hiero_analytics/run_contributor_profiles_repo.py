@@ -15,7 +15,7 @@ import pandas as pd
 from hiero_analytics.analysis.difficulty_analysis import assign_difficulty
 from hiero_analytics.analysis.prs import prs_to_dataframe
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.config.paths import ORG, REPO, ensure_repo_dirs
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
     fetch_repo_merged_pr_difficulty_graphql,
@@ -165,7 +165,7 @@ def plot_avg_mix(df: pd.DataFrame, output_path, repo: str):
 
 def main():
     """Fetch PR difficulty data and generate contributor profile charts for a repository."""
-    repo = "hiero-sdk-python"
+    repo = REPO
     repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{ORG}/{repo}")
 
     client = GitHubClient()

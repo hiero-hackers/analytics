@@ -22,8 +22,12 @@ _PR_COLUMNS = [
 def prs_to_dataframe(
     records: list[PullRequestDifficultyRecord],
 ) -> pd.DataFrame:
-    """Convert a list of PullRequestDifficultyRecord objects into a DataFrame."""
-    return records_to_dataframe(
+    """Convert a list of PullRequestDifficultyRecord objects into a DataFrame.
+
+    ``issue_number`` is a nullable integer column (``Int64``): unlinked PRs carry
+    a missing value without silently promoting the linked ones to float.
+    """
+    df = records_to_dataframe(
         records,
         lambda r: {
             "repo": r.repo,
@@ -36,6 +40,8 @@ def prs_to_dataframe(
         },
         _PR_COLUMNS,
     )
+    df["issue_number"] = df["issue_number"].astype("Int64")
+    return df
 
 
 def filter_gfi_prs(df: pd.DataFrame) -> pd.DataFrame:
@@ -47,13 +53,19 @@ def filter_gfi_prs(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def first_time_contributors(df: pd.DataFrame) -> pd.DataFrame:
-    """Keep only first merged PR per contributor."""
+    """Keep only the first merged PR *row* per contributor.
+
+    Uses ``drop_duplicates`` rather than ``groupby(...).first()``: the latter
+    takes the first non-null value per column independently, which can stitch
+    together fields from different PRs when a column (e.g. ``issue_number``)
+    is null on the first row.
+    """
     if df.empty:
         return df
 
     return (
         df.dropna(subset=["author", "pr_merged_at"])
         .sort_values("pr_merged_at")
-        .groupby("author", as_index=False)
-        .first()
+        .drop_duplicates(subset="author", keep="first")
+        .reset_index(drop=True)
     )

@@ -11,6 +11,7 @@ from hiero_analytics.analysis.timeseries import (
     DIFFICULTY_OVER_TIME_COLUMN_ORDER,
     get_difficulty_over_time_event_based,
 )
+from hiero_analytics.config.analysis import DIFFICULTY_OVER_TIME_WINDOW_DAYS, TIMELINE_MAX_WORKERS
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
@@ -28,8 +29,6 @@ from hiero_analytics.domain.labels import (
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.lines import plot_stacked_area
 
-WINDOW_DAYS = 365
-TIMELINE_MAX_WORKERS = 3
 DIFFICULTY_OVER_TIME_LABELS = [
     DIFFICULTY_GOOD_FIRST_ISSUE.name,
     DIFFICULTY_BEGINNER.name,
@@ -45,7 +44,7 @@ def main() -> None:
     """Generate an org-wide event-based difficulty-over-time chart."""
     org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
     end_at = datetime.now(UTC)
-    start_at = end_at - timedelta(days=WINDOW_DAYS)
+    start_at = end_at - timedelta(days=DIFFICULTY_OVER_TIME_WINDOW_DAYS)
 
     logger.info("Running event-based difficulty-over-time analytics for org: %s", ORG)
     logger.info(f"Window: {start_at.date().isoformat()} to {end_at.date().isoformat()}")

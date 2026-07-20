@@ -164,3 +164,9 @@ CODEOWNER_STATUS_COLORS = {
     "Present": "#2A9D8F",  # teal
     "Missing": "#E76F51",  # coral
 }
+
+RUNNER_STATUS_COLORS = {
+    "Self-Hosted": "#2A9D8F",  # teal
+    "Standard": "#E76F51",  # coral
+    "Indeterminate": "#94A3B8",  # slate
+}

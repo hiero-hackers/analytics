@@ -10,16 +10,23 @@ import base64
 import logging
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Any
 
+import requests
 import yaml
 
 from hiero_analytics.config.github import SEARCH_REQUEST_DELAY_SECONDS
 
 from .github_client import GitHubClient
+from .models import RunnerRecord, SearchIssueRecord
 from .pagination import paginate_page_number
 
 logger = logging.getLogger(__name__)
+
+# GitHub's Search API serves at most 1000 results per query; requesting
+# beyond that returns 422, so pagination must stop at this boundary.
+SEARCH_RESULT_LIMIT = 1000
+_SEARCH_PAGE_SIZE = 100
+_SEARCH_MAX_PAGES = SEARCH_RESULT_LIMIT // _SEARCH_PAGE_SIZE
 
 
 GITHUB_HOSTED_PATTERNS = [
@@ -40,7 +47,7 @@ def search_issues(
     query: str,
     *,
     max_pages: int | None = None,
-) -> list[dict[str, Any]]:
+) -> list[SearchIssueRecord]:
     """
     Search GitHub issues and pull requests using the REST search API.
 
@@ -50,14 +57,17 @@ def search_issues(
         max_pages: Optional cap on the number of pages to request.
 
     Returns:
-        A list of issue objects returned by the GitHub API.
+        Normalized :class:`SearchIssueRecord` items. Results are capped at
+        GitHub's 1000-result search limit; a warning is logged when a query
+        matches more than that.
     """
+    truncation_logged = False
 
-    def page(page_number: int) -> list[dict[str, Any]]:
+    def page(page_number: int) -> list[SearchIssueRecord]:
 
         params = {
             "q": query,
-            "per_page": 100,
+            "per_page": _SEARCH_PAGE_SIZE,
             "page": page_number,
         }
 
@@ -66,38 +76,58 @@ def search_issues(
             params=params,
         )
 
+        nonlocal truncation_logged
+        total_count = data.get("total_count")
+        if not truncation_logged and isinstance(total_count, int) and total_count > SEARCH_RESULT_LIMIT:
+            truncation_logged = True
+            logger.warning(
+                "Search query matched %d results but GitHub serves only the first %d: %s",
+                total_count,
+                SEARCH_RESULT_LIMIT,
+                query,
+            )
+        if data.get("incomplete_results"):
+            logger.warning(
+                "GitHub flagged search results as incomplete (query timed out) on page %d: %s",
+                page_number,
+                query,
+            )
+
         items = data.get("items", [])
 
-        return [item for item in items if isinstance(item, dict)]
+        records = (SearchIssueRecord.from_search_item(item) for item in items if isinstance(item, dict))
+        return [record for record in records if record is not None]
 
-    if max_pages is None:
-        return paginate_page_number(
-            page,
-            delay_seconds=SEARCH_REQUEST_DELAY_SECONDS,
-        )
+    effective_max_pages = _SEARCH_MAX_PAGES if max_pages is None else min(max_pages, _SEARCH_MAX_PAGES)
 
     return paginate_page_number(
         page,
-        max_pages=max_pages,
+        max_pages=effective_max_pages,
         delay_seconds=SEARCH_REQUEST_DELAY_SECONDS,
     )
 
 
 def has_codeowners_file(client: GitHubClient, org: str, repo: str) -> bool:
-    """Checks for the existence of a CODEOWNERS file in standard repository locations."""
+    """Checks for the existence of a CODEOWNERS file in standard repository locations.
+
+    Only a 404 counts as "not present"; any other error propagates so that a
+    network or rate-limit failure is never reported as a missing CODEOWNERS file.
+    """
     paths = [".github/CODEOWNERS", "CODEOWNERS", "docs/CODEOWNERS"]
 
     for path in paths:
         logger.info(f"Fetching CODEOWNERS for {repo} at {path}")
 
+        url = f"https://api.github.com/repos/{org}/{repo}/contents/{path}"
         try:
-            url = f"https://api.github.com/repos/{org}/{repo}/contents/{path}"
             response = client.get(url)
+        except requests.HTTPError as exc:
+            if exc.response is not None and exc.response.status_code == 404:
+                continue
+            raise
 
-            if response:
-                return True
-        except Exception:
-            continue
+        if response:
+            return True
 
     return False
 
@@ -122,9 +152,9 @@ def _is_self_hosted(label: str) -> bool | None:
     return True
 
 
-def _process_workflow_file(client: GitHubClient, wf: dict) -> list[dict]:
-    """Process a single yml file and extract job/runner details."""
-    results = []
+def _process_workflow_file(client: GitHubClient, wf: dict, repo: str) -> list[RunnerRecord]:
+    """Process a single yml file and extract job/runner records."""
+    results: list[RunnerRecord] = []
     try:
         resp = client.get(wf["url"])
         if not (resp and "content" in resp):
@@ -160,7 +190,13 @@ def _process_workflow_file(client: GitHubClient, wf: dict) -> list[dict]:
                     final_status = None
 
             results.append(
-                {"file": wf["name"], "job": job_name, "runner": str(runs_on), "is_self_hosted": final_status}
+                RunnerRecord(
+                    repo=repo,
+                    workflow_file=wf["name"],
+                    job_name=job_name,
+                    runner=str(runs_on),
+                    is_self_hosted=final_status,
+                )
             )
     except Exception as e:
         logger.error(f"Failed to parse {wf['name']}: {e}")
@@ -168,9 +204,9 @@ def _process_workflow_file(client: GitHubClient, wf: dict) -> list[dict]:
     return results
 
 
-def fetch_repo_workflows(client: GitHubClient, org: str, repo: str) -> list[dict]:
-    """Fetches workflows using threading for speed."""
-    all_job_results = []
+def fetch_repo_workflows(client: GitHubClient, org: str, repo: str) -> list[RunnerRecord]:
+    """Fetch per-job runner records for a repository's workflow files."""
+    all_job_results: list[RunnerRecord] = []
     try:
         url = f"https://api.github.com/repos/{org}/{repo}/contents/.github/workflows"
         workflows = client.get(url)
@@ -181,7 +217,7 @@ def fetch_repo_workflows(client: GitHubClient, org: str, repo: str) -> list[dict
         yaml_files = [wf for wf in workflows if wf["name"].endswith((".yml", ".yaml"))]
 
         with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(_process_workflow_file, client, wf): wf for wf in yaml_files}
+            futures = {executor.submit(_process_workflow_file, client, wf, repo): wf for wf in yaml_files}
             for future in as_completed(futures):
                 res = future.result()
                 if res:

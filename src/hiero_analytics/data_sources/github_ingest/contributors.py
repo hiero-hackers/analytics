@@ -16,15 +16,14 @@ from hiero_analytics.config.paths import dataset_path, load_query
 from ..cache import load_records_cache, save_records_cache
 from ..dataset_store import PartialOrgFetchError, fetch_incremental
 from ..github_client import GitHubClient
-from ..models import ContributorActivityRecord, ContributorMergedPRCountRecord
+from ..models import ContributorActivityRecord, ContributorMergedPRCountRecord, PullRequestDifficultyRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
 from ._common import (
     _cache_kwargs,
-    _fetch_org_records_parallel,
     _parse_graphql_datetime,
-    fetch_github_resource,
     fetch_org_resource_parallel,
 )
+from .pull_requests import fetch_org_merged_pr_difficulty_graphql, fetch_repo_merged_pr_difficulty_graphql
 
 logger = logging.getLogger(__name__)
 
@@ -236,15 +235,7 @@ def fetch_org_contributor_activity_graphql(
             client,
             org,
             fetch_func,
-            ContributorActivityRecord,
             max_workers,
-            "org_contributor_activity",
-            {
-                "org": org,
-                "repos": sorted(repos) if repos else [],
-                "lookback_days": lookback_days,
-                "activity_types": _CONTRIBUTOR_ACTIVITY_TYPES,
-            },
             repos=repos,
             task_desc="contributor activity",
             **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
@@ -253,22 +244,22 @@ def fetch_org_contributor_activity_graphql(
     # Full history -> incremental (org-wide; the repos subset filter is only
     # honoured for the bounded-window path above).
     def full_fetch() -> list[ContributorActivityRecord]:
-        return _fetch_org_records_parallel(
+        return fetch_org_resource_parallel(
             client,
             org,
-            max_workers,
             lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, None),
-            "contributor activity (full)",
+            max_workers,
+            task_desc="contributor activity (full)",
         )
 
     def since_fetch(since: datetime) -> list[ContributorActivityRecord]:
         try:
-            return _fetch_org_records_parallel(
+            return fetch_org_resource_parallel(
                 client,
                 org,
-                max_workers,
                 lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, since),
-                "contributor activity updates",
+                max_workers,
+                task_desc="contributor activity updates",
             )
         except PartialOrgFetchError:
             raise  # let the store hold the watermark; don't fall back to full
@@ -288,6 +279,16 @@ def fetch_org_contributor_activity_graphql(
     )
 
 
+def _merged_pr_counts(records: list[PullRequestDifficultyRecord]) -> dict[tuple[str, str], int]:
+    """Distinct merged-PR count per (repo, lowercased author), deduped across linked issues."""
+    prs: dict[tuple[str, str], set[int]] = {}
+    for record in records:
+        if not record.author:
+            continue
+        prs.setdefault((record.repo, record.author.lower()), set()).add(record.pr_number)
+    return {key: len(numbers) for key, numbers in prs.items()}
+
+
 def fetch_repo_contributor_merged_pr_count_graphql(
     client: GitHubClient,
     owner: str,
@@ -298,25 +299,17 @@ def fetch_repo_contributor_merged_pr_count_graphql(
     cache_ttl_seconds: int | None = None,
     refresh: bool = False,
 ) -> ContributorMergedPRCountRecord:
-    """Fetch contributor merged pull request count for a specific user in a repository."""
-    CONTRIBUTOR_MERGED_PRS_COUNT_QUERY = load_query("contributor_merged_prs_count")
-    records = fetch_github_resource(
-        client,
-        CONTRIBUTOR_MERGED_PRS_COUNT_QUERY,
-        {"searchQuery": f"is:pr is:merged author:{login} repo:{owner}/{repo}"},
-        ContributorMergedPRCountRecord,
-        ["search"],
-        cache_key="repo_contributor_merged_pr_count",
-        cache_scope=f"{owner}_{repo}_{login}",
-        cache_parameters={"owner": owner, "repo": repo, "login": login},
-        context_builder=lambda _node: {"owner": owner, "repo": repo, "login": login},
-        **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+    """Count a contributor's merged pull requests in a repository.
+
+    Derived from the merged-PR difficulty records (deduped by PR number) rather
+    than a per-(repo, contributor) search query, so the count shares the PR
+    dataset's staleness story instead of adding a second one.
+    """
+    records = fetch_repo_merged_pr_difficulty_graphql(
+        client, owner, repo, **_cache_kwargs(use_cache, cache_ttl_seconds, refresh)
     )
-    return (
-        records[0]
-        if records
-        else ContributorMergedPRCountRecord(repo=f"{owner}/{repo}", login=login, merged_pr_count=0)
-    )
+    count = _merged_pr_counts(records).get((f"{owner}/{repo}", login.lower()), 0)
+    return ContributorMergedPRCountRecord(repo=f"{owner}/{repo}", login=login, merged_pr_count=count)
 
 
 def fetch_org_contributor_merged_pr_count_graphql(
@@ -326,27 +319,24 @@ def fetch_org_contributor_merged_pr_count_graphql(
     repos: list[str] | None = None,
     max_workers: int = GITHUB_MAX_WORKERS,
     *,
-    use_cache: bool | None = None,
-    cache_ttl_seconds: int | None = None,
     refresh: bool = False,
 ) -> list[ContributorMergedPRCountRecord]:
-    """Fetch contributor merged pull request count for a specific user in an org."""
+    """Count a contributor's merged pull requests per repository across an org.
 
-    def fetch_func(repo):
-        """Fetch merged PR counts for a contributor in a repository."""
-        return fetch_repo_contributor_merged_pr_count_graphql(
-            client, repo.owner, repo.name, login=login, **_cache_kwargs(use_cache, cache_ttl_seconds, refresh)
-        )
+    Derived from the incremental merged-PR dataset — no per-repo search queries.
+    Returns one record per repository where the contributor has at least one
+    merged PR (optionally restricted to ``repos``).
+    """
+    all_records = fetch_org_merged_pr_difficulty_graphql(client, org, max_workers, refresh=refresh)
+    counts = _merged_pr_counts(all_records)
+    login_lower = login.lower()
 
-    return fetch_org_resource_parallel(
-        client,
-        org,
-        fetch_func,
-        ContributorMergedPRCountRecord,
-        max_workers,
-        "org_contributor_merged_pr_count",
-        {"org": org, "login": login, "repos": sorted(repos) if repos else []},
-        repos=repos,
-        task_desc=f"merged PR count for {login}",
-        **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
-    )
+    results = [
+        ContributorMergedPRCountRecord(repo=repo_name, login=login, merged_pr_count=count)
+        for (repo_name, author), count in sorted(counts.items())
+        if author == login_lower
+    ]
+    if repos:
+        allowed = set(repos)
+        results = [r for r in results if r.repo in allowed or r.repo.split("/")[-1] in allowed]
+    return results

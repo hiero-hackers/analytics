@@ -2,7 +2,23 @@
 
 from __future__ import annotations
 
+from hiero_analytics.config import env
 from hiero_analytics.config.env import env_float, env_int
+
+
+def test_env_bool_reads_truthy_and_falsy_values(monkeypatch):
+    """Recognized true/false spellings parse; unrecognized input falls back."""
+    monkeypatch.setenv("X_FLAG", "yes")
+    assert env.env_bool("X_FLAG", False) is True
+
+    monkeypatch.setenv("X_FLAG", "off")
+    assert env.env_bool("X_FLAG", True) is False
+
+    monkeypatch.setenv("X_FLAG", "maybe")
+    assert env.env_bool("X_FLAG", True) is True
+
+    monkeypatch.delenv("X_FLAG")
+    assert env.env_bool("X_FLAG", False) is False
 
 
 def test_env_int_reads_value(monkeypatch):

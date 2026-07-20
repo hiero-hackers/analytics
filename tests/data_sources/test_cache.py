@@ -223,6 +223,63 @@ def test_stale_cache_entry_is_ignored(_temp_cache_dir):
     assert loaded is None
 
 
+def test_mismatched_parameters_is_a_cache_miss(_temp_cache_dir):
+    """A stored payload whose parameters differ from the request reads as a miss.
+
+    Guards against a filename-fingerprint collision serving the wrong dataset.
+    """
+    records = [RepositoryRecord(full_name="org/repo", name="repo", owner="org")]
+    parameters = {"org": "org"}
+
+    cache.save_records_cache("org_repos", "org", parameters, RepositoryRecord, records, use_cache=True)
+
+    cache_path = cache._cache_path("org_repos", "org", parameters)
+    payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    payload["parameters"] = {"org": "another-org"}
+    cache_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    loaded = cache.load_records_cache("org_repos", "org", parameters, RepositoryRecord, use_cache=True)
+
+    assert loaded is None
+
+
+def test_deserialize_rejects_null_required_datetime():
+    """A null in a non-optional datetime field raises instead of hydrating silently."""
+    payload = serialization.serialize_record(
+        IssueRecord(
+            repo="org/repo",
+            number=1,
+            title="Issue A",
+            state="open",
+            created_at=datetime(2024, 1, 1, tzinfo=UTC),
+            closed_at=None,
+            labels=[],
+        )
+    )
+    payload["created_at"] = None
+
+    with pytest.raises(ValueError, match="created_at"):
+        serialization.deserialize_record(IssueRecord, payload)
+
+
+def test_incompatible_record_shape_is_a_cache_miss(_temp_cache_dir):
+    """A schema drift without a CACHE_VERSION bump reads as a miss, not a crash."""
+    records = [RepositoryRecord(full_name="org/repo", name="repo", owner="org")]
+    parameters = {"org": "org"}
+
+    cache.save_records_cache("org_repos", "org", parameters, RepositoryRecord, records, use_cache=True)
+
+    # Simulate an old cache written before a field was renamed on the dataclass.
+    cache_path = cache._cache_path("org_repos", "org", parameters)
+    payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    payload["records"] = [{"fullname": "org/repo", "extra_field": 1}]
+    cache_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    loaded = cache.load_records_cache("org_repos", "org", parameters, RepositoryRecord, use_cache=True)
+
+    assert loaded is None
+
+
 def test_naive_cached_at_is_treated_as_utc(_temp_cache_dir):
     """Naive cache timestamps should be normalized to UTC instead of failing."""
     records = [
@@ -331,6 +388,21 @@ def _isolate_dataset_path(monkeypatch, tmp_path):
 
     monkeypatch.setattr(ingest.issues, "dataset_path", fake)
     monkeypatch.setattr(ingest.contributors, "dataset_path", fake)
+    monkeypatch.setattr(ingest.pull_requests, "dataset_path", fake)
+
+
+def _route_batched_through_per_repo(monkeypatch, module):
+    """Make the batched org engine call the per-repo fallback fetcher directly.
+
+    These tests assert store behavior (full vs delta, dedup) via the per-repo
+    fetcher mocks; the aliased-batching transport is covered by test_batched.py.
+    """
+
+    def fake_batched(client, org, *, per_repo, **_kwargs):
+        repos = ingest._common.fetch_org_repos_graphql(client, org)
+        return [record for repo in repos for record in per_repo(repo)]
+
+    monkeypatch.setattr(module, "fetch_org_records_batched", fake_batched)
 
 
 def test_fetch_org_issues_first_run_full_then_incremental(monkeypatch, tmp_path):
@@ -353,6 +425,7 @@ def test_fetch_org_issues_first_run_full_then_incremental(monkeypatch, tmp_path)
     ]
 
     _isolate_dataset_path(monkeypatch, tmp_path)
+    _route_batched_through_per_repo(monkeypatch, ingest.issues)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
     full = Mock(return_value=issues)
     delta = Mock(return_value=[])  # nothing changed since the watermark
@@ -383,6 +456,7 @@ def test_fetch_org_issues_dataset_fingerprint_ignores_state_order(monkeypatch, t
         return path
 
     monkeypatch.setattr(ingest.issues, "dataset_path", fake_path)
+    _route_batched_through_per_repo(monkeypatch, ingest.issues)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=[]))
     monkeypatch.setattr(ingest.issues, "fetch_repo_issues_graphql", Mock(return_value=[]))
     monkeypatch.setattr(ingest.issues, "fetch_repo_issues_since_graphql", Mock(return_value=[]))
@@ -414,6 +488,7 @@ def test_fetch_org_label_events_incremental_dedups_on_merge(monkeypatch, tmp_pat
     )
 
     _isolate_dataset_path(monkeypatch, tmp_path)
+    _route_batched_through_per_repo(monkeypatch, ingest.issues)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
     full = Mock(return_value=[ev1])
     delta = Mock(return_value=[ev1, ev2])  # re-sends ev1 (must dedup) + a new ev2

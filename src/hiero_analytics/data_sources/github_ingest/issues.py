@@ -18,9 +18,9 @@ from ..github_client import GitHubClient
 from ..models import IssueRecord, IssueTimelineEventRecord
 from ._common import (
     _cache_kwargs,
-    _fetch_org_records_parallel,
     fetch_github_resource,
 )
+from .batched import fetch_org_records_batched
 
 logger = logging.getLogger(__name__)
 
@@ -98,22 +98,32 @@ def fetch_org_issues_graphql(
     fingerprint = "-".join(norm_states) if norm_states else "all"
 
     def full_fetch() -> list[IssueRecord]:
-        return _fetch_org_records_parallel(
+        return fetch_org_records_batched(
             client,
             org,
-            max_workers,
-            lambda repo: fetch_repo_issues_graphql(client, repo.owner, repo.name, states=states, use_cache=False),
-            "organization issues",
+            query_text=load_query("issues"),
+            model_class=IssueRecord,
+            nodes_path=["issues"],
+            variables={"states": norm_states or None},
+            per_repo=lambda repo: fetch_repo_issues_graphql(
+                client, repo.owner, repo.name, states=states, use_cache=False
+            ),
+            task_desc="organization issues",
+            max_workers=max_workers,
         )
 
     def since_fetch(since: datetime) -> list[IssueRecord]:
         try:
-            return _fetch_org_records_parallel(
+            return fetch_org_records_batched(
                 client,
                 org,
-                max_workers,
-                lambda repo: fetch_repo_issues_since_graphql(client, repo.owner, repo.name, since, states),
-                "organization issue updates",
+                query_text=load_query("issues_since"),
+                model_class=IssueRecord,
+                nodes_path=["issues"],
+                variables={"states": norm_states or None, "since": since.isoformat()},
+                per_repo=lambda repo: fetch_repo_issues_since_graphql(client, repo.owner, repo.name, since, states),
+                task_desc="organization issue updates",
+                max_workers=max_workers,
             )
         except PartialOrgFetchError:
             raise  # let the store hold the watermark; don't fall back to full
@@ -218,24 +228,34 @@ def fetch_org_issue_label_events_graphql(
     fingerprint = "-".join(norm_states) if norm_states else "all"
 
     def full_fetch() -> list[IssueTimelineEventRecord]:
-        return _fetch_org_records_parallel(
+        return fetch_org_records_batched(
             client,
             org,
-            max_workers,
-            lambda repo: fetch_repo_issue_label_events_graphql(
+            query_text=load_query("issue_label_events"),
+            model_class=IssueTimelineEventRecord,
+            nodes_path=["issues"],
+            variables={"states": norm_states or None},
+            per_repo=lambda repo: fetch_repo_issue_label_events_graphql(
                 client, repo.owner, repo.name, states=states, use_cache=False
             ),
-            "organization issue label events",
+            task_desc="organization issue label events",
+            max_workers=max_workers,
         )
 
     def since_fetch(since: datetime) -> list[IssueTimelineEventRecord]:
         try:
-            return _fetch_org_records_parallel(
+            return fetch_org_records_batched(
                 client,
                 org,
-                max_workers,
-                lambda repo: fetch_repo_issue_label_events_since_graphql(client, repo.owner, repo.name, since, states),
-                "organization issue label event updates",
+                query_text=load_query("issue_label_events_since"),
+                model_class=IssueTimelineEventRecord,
+                nodes_path=["issues"],
+                variables={"states": norm_states or None, "since": since.isoformat()},
+                per_repo=lambda repo: fetch_repo_issue_label_events_since_graphql(
+                    client, repo.owner, repo.name, since, states
+                ),
+                task_desc="organization issue label event updates",
+                max_workers=max_workers,
             )
         except PartialOrgFetchError:
             raise  # let the store hold the watermark; don't fall back to full

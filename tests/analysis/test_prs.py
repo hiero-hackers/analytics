@@ -152,3 +152,26 @@ def test_first_time_contributors_excludes_unmerged_prs():
 
     assert list(result["author"]) == ["alice"]
     assert result["pr_merged_at"].notna().all()
+
+
+def test_first_time_contributors_keeps_whole_first_row_with_null_issue_number():
+    """The first PR row is kept intact even when its issue_number is missing.
+
+    groupby(...).first() would stitch a later PR's issue_number onto the first
+    row; drop_duplicates must not.
+    """
+    df = pd.DataFrame(
+        {
+            "author": ["alice", "alice"],
+            "pr_number": [1, 2],
+            "pr_merged_at": [datetime(2024, 1, 1, tzinfo=UTC), datetime(2024, 2, 1, tzinfo=UTC)],
+            "issue_number": pd.array([None, 42], dtype="Int64"),
+        }
+    )
+
+    result = first_time_contributors(df)
+
+    assert len(result) == 1
+    row = result.iloc[0]
+    assert row["pr_number"] == 1
+    assert pd.isna(row["issue_number"])  # the first row's own (missing) issue, not PR 2's

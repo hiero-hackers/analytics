@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
@@ -9,7 +10,6 @@ import pytest
 
 from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.dataset_store import (
-    DATASET_VERSION,
     PartialOrgFetchError,
     fetch_incremental,
     load_dataset,
@@ -86,11 +86,18 @@ def test_load_returns_none_when_absent(tmp_path):
     assert load_dataset(tmp_path / "missing.json", _Record) is None
 
 
+def _rewrite_payload(path, **overrides):
+    """Load the stored dataset payload, apply field overrides, and write it back."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload.update(overrides)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
 def test_load_returns_none_on_version_mismatch(tmp_path):
     """A dataset written with an incompatible version is ignored."""
     path = tmp_path / "issues.json"
     save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
-    path.write_text(path.read_text().replace(f'"version": {DATASET_VERSION}', '"version": 999'))
+    _rewrite_payload(path, version=999)
     assert load_dataset(path, _Record) is None
 
 
@@ -98,7 +105,7 @@ def test_load_returns_none_on_corrupt_watermark(tmp_path):
     """An unparseable fetched_through is treated as a cache miss, not a crash."""
     path = tmp_path / "issues.json"
     save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
-    path.write_text(path.read_text().replace('"fetched_through": "2024-01-01', '"fetched_through": "not-a-date'))
+    _rewrite_payload(path, fetched_through="not-a-date")
     assert load_dataset(path, _Record) is None
 
 
@@ -327,11 +334,10 @@ def test_partial_full_refresh_with_baseline_merges_and_holds_watermark(tmp_path)
 
 
 def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
-    """When a dataset exists on disk, its records are returned without fetching."""
+    """When a fresh-enough dataset exists on disk, its records are returned without fetching."""
     persisted = ["rec-a", "rec-b"]
-    monkeypatch.setattr(
-        dataset_store, "load_dataset", lambda _path, _model: (persisted, datetime(2024, 1, 1, tzinfo=UTC))
-    )
+    recent = datetime.now(UTC) - timedelta(days=1)
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (persisted, recent))
 
     fetched = []
 
@@ -343,6 +349,26 @@ def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
 
     assert result == persisted
     assert fetched == []  # the network fetch was skipped
+
+
+def test_load_or_fetch_refreshes_stale_dataset(monkeypatch):
+    """A dataset older than max_age triggers a refresh instead of silent reuse."""
+    stale = datetime.now(UTC) - timedelta(days=30)
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (["old"], stale))
+
+    result = load_or_fetch("contributor_activity", "an-org", object, lambda: ["fresh"])
+
+    assert result == ["fresh"]
+
+
+def test_load_or_fetch_max_age_none_disables_staleness_bound(monkeypatch):
+    """max_age=None keeps the old reuse-whatever-is-on-disk behavior."""
+    ancient = datetime(2024, 1, 1, tzinfo=UTC)
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (["old"], ancient))
+
+    result = load_or_fetch("contributor_activity", "an-org", object, lambda: ["fresh"], max_age=None)
+
+    assert result == ["old"]
 
 
 def test_load_or_fetch_falls_back_to_fetch_when_absent(monkeypatch):

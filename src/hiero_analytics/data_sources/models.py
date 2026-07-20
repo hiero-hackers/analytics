@@ -13,6 +13,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 
+from hiero_analytics.domain.bots import is_bot_login
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,12 +28,14 @@ def _parse_dt(value: str | None) -> datetime | None:
 def _extract_login(container: Mapping | None, key: str = "author") -> str | None:
     """Extract a user login (``container[key]["login"]``) defensively.
 
-    Returns ``None`` when the key is missing, the actor node is malformed (GitHub can
-    return a null actor, e.g. a deleted user), or the login is the dependabot bot.
+    Returns ``None`` when the key is missing, the actor node is malformed (GitHub
+    can return a null actor, e.g. a deleted user), or the login is an automation
+    account per the canonical :func:`hiero_analytics.domain.bots.is_bot_login`
+    policy — one bot filter for both ingestion and analysis.
     """
     actor = container.get(key) if isinstance(container, Mapping) else None
     login = actor.get("login") if isinstance(actor, Mapping) else None
-    if not isinstance(login, str) or login in {"dependabot", "dependabot[bot]", "dependabot-preview[bot]"}:
+    if not isinstance(login, str) or is_bot_login(login):
         return None
     return login
 
@@ -73,16 +77,6 @@ class BaseRecord:
     def from_github_node(cls, node: dict, context: dict) -> list[BaseRecord]:
         """Hydrate appropriate model(s) from a GitHub GraphQL node."""
         raise NotImplementedError(f"Mapping not implemented for {cls.__name__}")
-
-    @staticmethod
-    def _login(payload: dict | None) -> str | None:
-        """Extract a login from a payload and filter out dependabot."""
-        if not payload:
-            return None
-        login = payload.get("login")
-        if login == "dependabot":
-            return None
-        return login
 
 
 @dataclass(frozen=True)
@@ -164,81 +158,6 @@ class IssueTimelineEventRecord:
     actor: str | None = None
 
     @classmethod
-    def from_timeline_item(cls, node: dict, context: dict) -> list[IssueTimelineEventRecord]:
-        """Hydrate a normalized timeline event from a GraphQL timeline node."""
-        typename = str(node.get("__typename", "")).lower()
-        event_type_map = {
-            "labeledevent": "labeled",
-            "unlabeledevent": "unlabeled",
-            "closedevent": "closed",
-            "reopenedevent": "reopened",
-        }
-
-        event_type = event_type_map.get(typename)
-        if event_type is None:
-            return []
-
-        occurred_at = _parse_dt(node.get("createdAt"))
-        if occurred_at is None:
-            return []
-
-        since = context.get("since")
-        if isinstance(since, datetime) and occurred_at < since:
-            return []
-
-        label_name: str | None = None
-        label_node = node.get("label")
-        if isinstance(label_node, Mapping):
-            raw_label = label_node.get("name")
-            if isinstance(raw_label, str):
-                label_name = raw_label.lower()
-
-        owner = str(context.get("owner", ""))
-        repo = str(context.get("repo", ""))
-        repo_name = f"{owner}/{repo}" if owner and repo else ""
-
-        return [
-            cls(
-                repo=repo_name,
-                issue_number=int(context.get("issue_number", 0)),
-                event_type=event_type,
-                occurred_at=occurred_at,
-                label=label_name,
-                actor=_extract_login(node, "actor"),
-            )
-        ]
-
-    @classmethod
-    def from_rest_event(
-        cls,
-        event: dict,
-        *,
-        owner: str,
-        repo: str,
-        issue_number: int,
-    ) -> IssueTimelineEventRecord | None:
-        """Hydrate a normalized timeline event from the REST timeline endpoint."""
-        event_type = str(event.get("event", "")).lower()
-
-        if event_type not in {"labeled", "unlabeled", "closed", "reopened"}:
-            return None
-
-        occurred_at = _parse_dt(event.get("created_at"))
-        if occurred_at is None:
-            return None
-
-        label_name = _extract_label_name(event) if event_type in {"labeled", "unlabeled"} else None
-
-        return cls(
-            repo=f"{owner}/{repo}",
-            issue_number=issue_number,
-            event_type=event_type,
-            occurred_at=occurred_at,
-            label=label_name,
-            actor=_extract_login(event, "actor"),
-        )
-
-    @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[IssueTimelineEventRecord]:
         """Hydrate label add/remove events from a GraphQL issue node's timelineItems.
 
@@ -298,7 +217,13 @@ class IssueTimelineEventRecord:
 
 @dataclass(frozen=True)
 class PullRequestDifficultyRecord(BaseRecord):
-    """Metadata linking a merged pull request to the issues it closes."""
+    """Metadata for a merged pull request and the issues it closes (if any).
+
+    Every merged PR yields at least one record: one per linked closing issue, or
+    a single record with ``issue_number`` None when nothing is linked — so the
+    dataset covers all merged PRs, and per-contributor counts derived from it
+    are not biased toward issue-linked work.
+    """
 
     repo: str
     pr_number: int
@@ -307,9 +232,10 @@ class PullRequestDifficultyRecord(BaseRecord):
     pr_additions: int
     pr_deletions: int
     pr_changed_files: int
-    issue_number: int
+    issue_number: int | None
     issue_labels: list[str]
     author: str | None = None
+    updated_at: datetime | None = None
 
     @classmethod
     def from_github_node(cls, node: dict, context: dict) -> list[PullRequestDifficultyRecord]:
@@ -319,24 +245,20 @@ class PullRequestDifficultyRecord(BaseRecord):
         # difficulty/label records (difficulty is about the linked issues, not the actor).
         author = _extract_login(node)
         issues = node.get("closingIssuesReferences", {}).get("nodes", [])
-        records = []
-        for issue in issues:
-            labels = _extract_labels(issue)
-            records.append(
-                cls(
-                    repo=repo_name,
-                    pr_number=node["number"],
-                    pr_created_at=_parse_dt(node["createdAt"]),
-                    pr_merged_at=_parse_dt(node["mergedAt"]),
-                    pr_additions=node["additions"],
-                    pr_deletions=node["deletions"],
-                    pr_changed_files=node["changedFiles"],
-                    issue_number=issue["number"],
-                    issue_labels=labels,
-                    author=author,
-                )
-            )
-        return records
+        base = dict(
+            repo=repo_name,
+            pr_number=node["number"],
+            pr_created_at=_parse_dt(node["createdAt"]),
+            pr_merged_at=_parse_dt(node["mergedAt"]),
+            pr_additions=node["additions"],
+            pr_deletions=node["deletions"],
+            pr_changed_files=node["changedFiles"],
+            author=author,
+            updated_at=_parse_dt(node.get("updatedAt")),
+        )
+        if not issues:
+            return [cls(issue_number=None, issue_labels=[], **base)]
+        return [cls(issue_number=issue["number"], issue_labels=_extract_labels(issue), **base) for issue in issues]
 
 
 @dataclass(frozen=True)
@@ -431,26 +353,15 @@ class ContributorActivityRecord(BaseRecord):
 
 @dataclass(frozen=True)
 class ContributorMergedPRCountRecord(BaseRecord):
-    """Total count of merged pull requests for a contributor in a repository."""
+    """Total count of merged pull requests for a contributor in a repository.
+
+    Derived from :class:`PullRequestDifficultyRecord` datasets (distinct PR
+    numbers per author), not fetched from the API directly.
+    """
 
     repo: str
     login: str
     merged_pr_count: int
-
-    @classmethod
-    def from_github_node(cls, node: dict, context: dict) -> list[ContributorMergedPRCountRecord]:
-        """Hydrate merged-PR count records from a GraphQL search node."""
-        repo_name = cls._repo_name(context)
-        login = cls._login({"login": context.get("login", "")})
-        if not login:
-            return []
-        return [
-            cls(
-                repo=repo_name,
-                login=login,
-                merged_pr_count=node.get("issueCount", 0),
-            )
-        ]
 
 
 @dataclass(frozen=True)
@@ -480,3 +391,42 @@ class RunnerRecord:
     job_name: str
     runner: str
     is_self_hosted: bool | None  # None = undefine/fallback/env-param
+
+
+@dataclass(frozen=True)
+class SearchIssueRecord:
+    """A normalized issue/PR item from the REST search API."""
+
+    repo: str
+    number: int
+    title: str
+    state: str
+    created_at: datetime | None
+    author: str | None
+    labels: list[str]
+    is_pull_request: bool
+    url: str
+
+    @classmethod
+    def from_search_item(cls, item: dict) -> SearchIssueRecord | None:
+        """Hydrate a record from a REST ``/search/issues`` item, or None if malformed."""
+        number = item.get("number")
+        if not isinstance(number, int):
+            return None
+        # ".../repos/OWNER/NAME" -> "OWNER/NAME"
+        repository_url = item.get("repository_url") or ""
+        repo = "/".join(repository_url.rsplit("/", 2)[-2:]) if repository_url else ""
+        user = item.get("user")
+        author = user.get("login") if isinstance(user, Mapping) else None
+        labels = [label["name"] for label in item.get("labels", []) if isinstance(label, Mapping) and "name" in label]
+        return cls(
+            repo=repo,
+            number=number,
+            title=str(item.get("title", "")),
+            state=str(item.get("state", "")),
+            created_at=_parse_dt(item.get("created_at")),
+            author=author if isinstance(author, str) else None,
+            labels=labels,
+            is_pull_request="pull_request" in item,
+            url=str(item.get("html_url", "")),
+        )

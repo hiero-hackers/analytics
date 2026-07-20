@@ -22,14 +22,17 @@ def assign_difficulty(
     labels,
     specs: tuple[LabelSpec, ...] = DIFFICULTY_LEVELS,
 ) -> str:
-    """Return the first matching difficulty label for an issue, or Unknown.
+    """Return the difficulty bucket for an issue's labels, or Unknown.
 
     ``labels`` may be any iterable of label names (or ``None``); matching is
-    delegated to each spec and is case-insensitive.  This is the single
-    per-issue difficulty classifier used across the analytics pipelines.
+    delegated to each spec and is case-insensitive.  ``specs`` is ordered
+    easiest-to-hardest and the **highest matching difficulty wins**, so an
+    issue carrying several difficulty labels classifies the same way in every
+    pipeline.  This is the single per-issue difficulty classifier used across
+    the analytics pipelines.
     """
     label_set = set(labels or [])
-    for spec in specs:
+    for spec in reversed(specs):
         if spec.matches(label_set):
             return spec.name
     return UNKNOWN_DIFFICULTY
@@ -44,7 +47,7 @@ def build_difficulty_dataframe(
     """Aggregate issue counts per difficulty level, including an Unknown bucket.
 
     Each issue is assigned to exactly one bucket via :func:`assign_difficulty`
-    (the first matching spec wins), so counts sum to the number of issues.
+    (the highest matching difficulty wins), so counts sum to the number of issues.
     The result has one row per spec in ``specs`` order followed by an
     ``Unknown`` row, with zero-filled counts for absent buckets.
 

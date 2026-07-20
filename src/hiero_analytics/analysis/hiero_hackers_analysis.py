@@ -12,6 +12,7 @@ import pandas as pd
 
 from hiero_analytics.analysis.dataframe_utils import repos_to_dataframe
 from hiero_analytics.data_sources.models import ContributorActivityRecord
+from hiero_analytics.domain.bots import is_bot_login
 
 __all__ = [
     "repos_to_dataframe",
@@ -107,7 +108,8 @@ def build_contributor_counts(
     """Count unique contributors per repository.
 
     Groups contributor activity records by repository and counts
-    unique actors per repository.
+    unique human actors per repository; automation accounts (bots)
+    are excluded like in every other people metric.
 
     Parameters
     ----------
@@ -119,17 +121,17 @@ def build_contributor_counts(
     pd.DataFrame
         DataFrame with columns: "repo", "contributors"
     """
-    if not activity_records:
+    rows = [
+        {
+            "repo": record.repo,
+            "actor": record.actor,
+        }
+        for record in activity_records
+        if record.actor and not is_bot_login(record.actor)
+    ]
+    if not rows:
         return pd.DataFrame(columns=["repo", "contributors"])
 
-    df = pd.DataFrame(
-        [
-            {
-                "repo": record.repo,
-                "actor": record.actor,
-            }
-            for record in activity_records
-        ]
-    )
+    df = pd.DataFrame(rows)
 
     return df.groupby("repo", as_index=False)["actor"].nunique().rename(columns={"actor": "contributors"})

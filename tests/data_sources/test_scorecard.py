@@ -1,7 +1,9 @@
 """Tests for the scorecard data source module."""
 
+from datetime import datetime
 from unittest.mock import Mock, patch
 
+import pytest
 import requests
 
 from hiero_analytics.data_sources.models import ScorecardRecord
@@ -38,7 +40,8 @@ def test_fetch_repo_scorecard_success(mock_get):
     assert "Maintained" in record.checks
     assert record.checks["Maintained"] == 10
 
-    assert record.date is not None
+    assert isinstance(record.date, datetime)
+    assert record.date.year == 2026
 
 
 @patch("hiero_analytics.data_sources.scorecard.requests.get")
@@ -58,11 +61,21 @@ def test_fetch_repo_scorecard_not_found(mock_get):
 
 
 @patch("hiero_analytics.data_sources.scorecard.requests.get")
-def test_fetch_repo_scorecard_network_error(mock_get):
-    """Test that fetch_scorecard return None on network error."""
+def test_fetch_repo_scorecard_network_error_raises(mock_get):
+    """A network failure propagates instead of masquerading as a missing scorecard."""
     mock_get.side_effect = requests.exceptions.RequestException()
 
-    repo = "hiero-sdk-python"
-    record = fetch_repo_scorecard(repo)
+    with pytest.raises(requests.exceptions.RequestException):
+        fetch_repo_scorecard("hiero-sdk-python")
 
-    assert record is None
+
+@patch("hiero_analytics.data_sources.scorecard.requests.get")
+def test_fetch_repo_scorecard_server_error_raises(mock_get):
+    """A non-404 HTTP error propagates instead of masquerading as a missing scorecard."""
+    mock_response = Mock()
+    mock_response.status_code = 500
+
+    mock_get.side_effect = requests.exceptions.HTTPError(response=mock_response)
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        fetch_repo_scorecard("hiero-sdk-python")

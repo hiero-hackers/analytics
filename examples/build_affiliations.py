@@ -364,7 +364,7 @@ def gpg_uid_emails(login: str) -> list[str]:
             timeout=15,
             check=False,
         ).stdout
-    except OSError, subprocess.SubprocessError:
+    except (OSError, subprocess.SubprocessError):
         return []
     found = {m.group(1).lower() for row in out.splitlines() if row.startswith("uid:") and (m := EMAIL_RE.search(row))}
     return sorted(found)

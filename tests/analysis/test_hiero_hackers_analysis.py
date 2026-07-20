@@ -203,6 +203,21 @@ def test_build_contributor_counts_groups_by_repo():
     assert repo_b == 2  # charlie, diana
 
 
+def test_build_contributor_counts_excludes_bots():
+    """Automation accounts are not counted as contributors."""
+    records = [
+        _activity("hiero-hackers/repo-a", "alice"),
+        _activity("hiero-hackers/repo-a", "dependabot"),
+        _activity("hiero-hackers/repo-a", "renovate[bot]"),
+        _activity("hiero-hackers/repo-b", "github-actions"),
+    ]
+
+    result = build_contributor_counts(records)
+
+    assert result["repo"].tolist() == ["hiero-hackers/repo-a"]
+    assert result["contributors"].tolist() == [1]  # alice only; repo-b was bots-only
+
+
 def test_build_contributor_counts_with_mixed_data():
     """Should handle multiple repos with varying contributor counts."""
     records = [

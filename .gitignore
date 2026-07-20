@@ -45,6 +45,16 @@ outputs/data/datasets/
 # Local-only input data (Discord exports, etc.)
 inputs/
 
+# Local-only SQLite scratch database at the repo root
+# (src/hiero_analytics/data/ package data stays tracked)
+/data/
+
+# Stray Node tooling; this is a Python project
+/node_modules/
+
+# Locally generated report output
+/reports/
+
 # Generated local dashboard (bundles data; regenerable)
 outputs/dashboard.html
 

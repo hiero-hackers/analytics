@@ -19,6 +19,7 @@ from hiero_analytics.analysis.difficulty_analysis import (
     issues_labeled_since,
     issues_unlabeled_created_since,
 )
+from hiero_analytics.config.analysis import DIFFICULTY_RECENT_WINDOW_DAYS, TIMELINE_MAX_WORKERS
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
@@ -36,9 +37,6 @@ from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.plotting.bars import plot_stacked_bar
 from hiero_analytics.plotting.pie import plot_pie
 
-TIMELINE_MAX_WORKERS = 3
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -55,7 +53,7 @@ def main() -> None:
 
     df = issues_to_dataframe(issues)
 
-    cutoff = datetime.now(UTC) - timedelta(days=30)
+    cutoff = datetime.now(UTC) - timedelta(days=DIFFICULTY_RECENT_WINDOW_DAYS)
 
     # Fetch label add/remove events (GraphQL timelineItems) to determine when
     # difficulty labels were applied. Only LABELED/UNLABELED events are

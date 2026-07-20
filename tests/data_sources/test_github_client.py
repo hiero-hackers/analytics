@@ -1,6 +1,7 @@
 """Tests for the GitHubClient HTTP client."""
 
 import threading
+from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
@@ -273,3 +274,52 @@ def test_graphql_fresh_retry_limit_exceeded(monkeypatch, mock_sleep):
 
     with pytest.raises(RuntimeError, match="GraphQL fresh retry limit exceeded"):
         client.graphql("query { viewer { login } }", {})
+
+
+def test_graphql_rate_limit_sleep_never_aborts_the_retry(monkeypatch):
+    """Arbitrarily long rate-limit sleeps (policy or transport) must end in a retry.
+
+    There is deliberately no wall-clock budget on the GraphQL loop — it is
+    attempt-bounded — so even an hour-long reset wait recovers instead of
+    raising TimeoutError.
+    """
+    clock = {"now": 1_000.0}
+    fake_time = SimpleNamespace(
+        time=lambda: clock["now"],
+        sleep=lambda seconds: clock.__setitem__("now", clock["now"] + seconds),
+    )
+    monkeypatch.setattr(github_client, "time", fake_time)
+
+    rate_limited = Mock()
+    rate_limited.raise_for_status = Mock()
+    rate_limited.headers = {}
+    rate_limited.status_code = 200
+    rate_limited.ok = True
+    rate_limited.json.return_value = {
+        "data": {
+            "rateLimit": {
+                "remaining": 0,
+                "limit": 5000,
+                "cost": 1,
+                "resetAt": "2099-01-01T00:00:00Z",
+            }
+        },
+        "errors": [{"type": "RATE_LIMIT"}],
+    }
+
+    recovered = Mock()
+    recovered.raise_for_status = Mock()
+    recovered.headers = {}
+    recovered.status_code = 200
+    recovered.ok = True
+    recovered.json.return_value = {"data": {"viewer": {"login": "octocat"}}}
+
+    client = github_client.GitHubClient()
+
+    request_mock = Mock(side_effect=[rate_limited, recovered])
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    result = client.graphql("query { viewer { login } }", {})
+
+    assert result == {"data": {"viewer": {"login": "octocat"}}}
+    assert request_mock.call_count == 2

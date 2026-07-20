@@ -84,6 +84,12 @@ def test_assign_difficulty_respects_explicit_specs():
     assert assign_difficulty(["advanced"], (DIFFICULTY_BEGINNER,)) == UNKNOWN_DIFFICULTY
 
 
+def test_assign_difficulty_highest_wins_on_multiple_labels():
+    """An issue carrying several difficulty labels classifies as the hardest one, in every pipeline."""
+    assert assign_difficulty(["good first issue", "advanced"]) == "Advanced"
+    assert assign_difficulty(["beginner", "intermediate"]) == "Intermediate"
+
+
 # ---------------------------------------------------------------------------
 # build_difficulty_dataframe
 # ---------------------------------------------------------------------------

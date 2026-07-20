@@ -39,6 +39,10 @@ DATASET_VERSION = 2
 # mid-fetch (or under minor clock skew) are not missed. Re-merges are idempotent.
 DEFAULT_OVERLAP = timedelta(minutes=10)
 
+# How old a persisted dataset's watermark may be before load_or_fetch refreshes it
+# instead of reusing it. Matches the update-analytics CI cadence.
+DEFAULT_REUSE_MAX_AGE = timedelta(days=5)
+
 
 class PartialOrgFetchError(Exception):
     """Signals that an org-wide fetch could not cover every repository.
@@ -94,7 +98,9 @@ def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> Non
         "records": [serialize_record(record) for record in records],
     }
     with NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
-        json.dump(payload, tmp, indent=2, sort_keys=True)
+        # Compact separators: these files are machine-read only, and pretty-printing
+        # a large dataset is meaningfully slower and bigger on disk.
+        json.dump(payload, tmp, separators=(",", ":"))
         tmp_path = Path(tmp.name)
     tmp_path.replace(path)
 
@@ -128,18 +134,34 @@ def load_or_fetch(  # noqa: UP047
     org: str,
     model_class: type[T],
     fetch_fn: Callable[[], list[T]],
+    *,
+    max_age: timedelta | None = DEFAULT_REUSE_MAX_AGE,
 ) -> list[T]:
-    """Reuse the persisted ``(resource, org)`` dataset if present, else build it.
+    """Reuse the persisted ``(resource, org)`` dataset if fresh enough, else build it.
 
     Wraps :func:`load_dataset` with a fetch fallback and consistent logging, so the
     runners don't each re-implement the reuse-or-fetch dance. ``fetch_fn`` produces
-    the full record list when there is no usable dataset on disk.
+    the full record list when there is no usable dataset on disk, and is also called
+    when the stored watermark is older than ``max_age`` — a standalone run therefore
+    never silently serves arbitrarily old data. ``fetch_fn`` is normally an
+    incremental fetcher, so a stale-triggered refresh only pulls the delta (and
+    re-persists the dataset). ``max_age=None`` disables the staleness bound.
     """
     state = load_dataset(dataset_path(resource, org, "all"), model_class)
     if state is not None:
-        records, _ = state
-        logger.info("Reusing persisted %s/%s dataset (%d records)", org, resource, len(records))
-        return records
+        records, fetched_through = state
+        if fetched_through.tzinfo is None:
+            fetched_through = fetched_through.replace(tzinfo=UTC)
+        if max_age is None or fetched_through >= datetime.now(UTC) - max_age:
+            logger.info("Reusing persisted %s/%s dataset (%d records)", org, resource, len(records))
+            return records
+        logger.info(
+            "Persisted %s/%s dataset is stale (fetched through %s); refreshing",
+            org,
+            resource,
+            fetched_through.isoformat(),
+        )
+        return fetch_fn()
     logger.info("No persisted %s/%s dataset; fetching from GitHub", org, resource)
     return fetch_fn()
 

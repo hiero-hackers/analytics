@@ -25,6 +25,26 @@ def test_run_pipelines_runs_all_and_isolates_failures():
     assert failures == ["b"]
 
 
+def test_run_extra_org_calls_runner_in_process_with_org(monkeypatch):
+    """Extra orgs run the contributor-activity runner in-process, passing the org explicitly."""
+    seen = []
+    monkeypatch.setattr(run_all, "run_contributor_activity", lambda org: seen.append(org))
+
+    assert run_all._run_extra_org("other-org") is True
+    assert seen == ["other-org"]
+
+
+def test_run_extra_org_reports_failure(monkeypatch):
+    """A failing extra-org run returns False instead of raising."""
+
+    def boom(org):
+        raise RuntimeError("kaboom")
+
+    monkeypatch.setattr(run_all, "run_contributor_activity", boom)
+
+    assert run_all._run_extra_org("other-org") is False
+
+
 def test_run_pipelines_empty_when_all_succeed():
     """No failures are reported when every pipeline succeeds."""
     failures = run_all.run_pipelines([("a", lambda: None), ("b", lambda: None)])

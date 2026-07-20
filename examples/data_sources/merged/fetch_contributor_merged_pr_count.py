@@ -45,7 +45,7 @@ def main():
     print(f"Fetching merged PR counts for {user} across multiple repositories in {org}...")
 
     multi_records = fetch_org_contributor_merged_pr_count_graphql(
-        client=client, org=org, login=user, repos=repos_to_check, max_workers=3, use_cache=False
+        client=client, org=org, login=user, repos=repos_to_check, max_workers=3
     )
 
     print("\n--- Multi-Repo Results ---")
