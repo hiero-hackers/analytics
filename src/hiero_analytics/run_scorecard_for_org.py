@@ -51,15 +51,16 @@ def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
     return scorecards
 
 
-def main():
+def main(org: str | None = None):
     """Fetch scorecards for all organisation repos and generate bar charts."""
     client = GitHubClient()
-    _, org_charts_dir = ensure_org_dirs(ORG)
+    resolved_org = org or ORG
+    _, org_charts_dir = ensure_org_dirs(resolved_org)
 
-    repos = fetch_org_repos(client, ORG)
+    repos = fetch_org_repos(client, resolved_org)
 
     if not repos:
-        logger.warning("No repositories found for org: %s", ORG)
+        logger.warning("No repositories found for org: %s", resolved_org)
         return
 
     scorecards = fetch_all_scorecards(repos)
