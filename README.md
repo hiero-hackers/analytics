@@ -197,6 +197,20 @@ Available pipelines:
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
 
+### Running using Command-Line Interface (CLI)
+
+The package includes a command-line interface (`hiero-analytics`) to run the complete suite or execute specific pipelines individually with custom arguments.
+
+**Usage**
+```bash
+uv run hiero-analytics <command> --help
+
+# Better way activate your virtual environment first
+source .venv/bin/activate
+hiero-analytics <command> --help
+```
+
+
 ### Incremental data fetching
 
 To avoid re-downloading all of GitHub history on every run, fetching is **incremental**:
