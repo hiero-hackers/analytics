@@ -163,16 +163,15 @@ def plot_avg_mix(df: pd.DataFrame, output_path, repo: str):
 # =========================================================
 
 
-def main():
+def main(org: str = ORG, repo: str = REPO):
     """Fetch PR difficulty data and generate contributor profile charts for a repository."""
-    repo = REPO
-    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{ORG}/{repo}")
+    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{org}/{repo}")
 
     client = GitHubClient()
 
     prs = fetch_repo_merged_pr_difficulty_graphql(
         client,
-        owner=ORG,
+        owner=org,
         repo=repo,
     )
 

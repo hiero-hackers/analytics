@@ -71,23 +71,20 @@ def plot_issue_vs_contributors(
     )
 
 
-def run(org: str | None = None, repo: str | None = None):
+def run(org: str = ORG, repo: str = REPO):
     """Fetch onboarding data for the configured repository and generate charts."""
-    resolved_org = org or ORG
-    resolved_repo = repo or REPO
-
-    short_repo = bare_repo(resolved_repo)
+    short_repo = bare_repo(repo)
 
     client = GitHubClient()
-    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{resolved_org}/{resolved_repo}")
+    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{org}/{repo}")
 
     # ----------------------------------------
     # GFI supply (issues)
     # ----------------------------------------
     issues = fetch_repo_issues_graphql(
         client,
-        owner=resolved_org,
-        repo=resolved_repo,
+        owner=org,
+        repo=repo,
         states=["OPEN", "CLOSED"],
     )
 
@@ -101,8 +98,8 @@ def run(org: str | None = None, repo: str | None = None):
     # ----------------------------------------
     prs = fetch_repo_merged_pr_difficulty_graphql(
         client,
-        owner=resolved_org,
-        repo=resolved_repo,
+        owner=org,
+        repo=repo,
     )
 
     pr_df = prs_to_dataframe(prs)

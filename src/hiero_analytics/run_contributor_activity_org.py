@@ -67,13 +67,12 @@ def _build_contributor_network(records, label_events, by_repo, org_charts_dir, o
         logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
-def main(org: str | None = None) -> None:
+def main(org: str = ORG) -> None:
     """Build the informational contributor-activity tables for an org.
 
     ``org`` defaults to the configured primary org; run_all passes each extra org
     explicitly, so multi-org runs stay in one process.
     """
-    org = org or ORG
     org_data_dir, org_charts_dir = ensure_org_dirs(org)
 
     logger.info("Building contributor activity tables for org: %s", org)

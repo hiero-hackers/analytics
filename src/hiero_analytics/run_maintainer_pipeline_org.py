@@ -30,19 +30,17 @@ STACK_LABELS = ["General User", "Triage", "Committer", "Maintainer"]
 logger = logging.getLogger(__name__)
 
 
-def main(org: str | None = None) -> None:
+def main(org: str = ORG) -> None:
     """Run maintainer pipeline analytics for the configured organization."""
-    resolved_org = org or ORG
+    org_data_dir, org_charts_dir = ensure_org_dirs(org)
 
-    org_data_dir, org_charts_dir = ensure_org_dirs(resolved_org)
-
-    logger.info("Running maintainer pipeline analytics for org: %s", resolved_org)
+    logger.info("Running maintainer pipeline analytics for org: %s", org)
 
     gov_config = fetch_governance_config()
     repo_role_lookup = build_repo_role_lookup(gov_config)
 
     client = GitHubClient()
-    records = fetch_org_contributor_activity_graphql(client, org=resolved_org, lookback_days=None)
+    records = fetch_org_contributor_activity_graphql(client, org=org, lookback_days=None)
 
     logger.info("Fetched %d contributor activity records", len(records))
 

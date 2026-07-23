@@ -38,11 +38,11 @@ from hiero_analytics.plotting.bars import plot_stacked_bar
 logger = logging.getLogger(__name__)
 
 
-def main() -> None:
+def main(org: str = ORG) -> None:
     """Run the difficulty analytics pipeline for the configured organization."""
-    org_data_dir, org_charts_dir = ensure_org_dirs(ORG)
+    org_data_dir, org_charts_dir = ensure_org_dirs(org)
 
-    logger.info("Running difficulty analytics for org: %s", ORG)
+    logger.info("Running difficulty analytics for org: %s", org)
 
     client = GitHubClient()
     issues = fetch_org_issues_graphql(client, org=ORG, states=["OPEN"])
@@ -58,7 +58,7 @@ def main() -> None:
     # transferred, avoiding the repo-wide REST event firehose.
     timeline_events = fetch_org_issue_label_events_graphql(
         client,
-        org=ORG,
+        org=org,
         states=["OPEN"],
         max_workers=TIMELINE_MAX_WORKERS,
     )

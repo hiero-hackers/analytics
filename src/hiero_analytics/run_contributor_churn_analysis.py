@@ -19,20 +19,20 @@ ORG_NAME = ORG
 short_repo = REPO.split("/")[-1]
 
 
-def run() -> None:
+def run(org: str = ORG, repo: str = REPO) -> None:
     """Fetch PR data, compute contributor churn metrics, and write charts to disk."""
-    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{ORG_NAME}/{REPO}")
+    repo_data_dir, repo_charts_dir = ensure_repo_dirs(f"{org}/{repo}")
 
     if not os.getenv("GITHUB_TOKEN"):
         raise OSError("GITHUB_TOKEN not set. Real data is required for churn analysis.")
 
     client = GitHubClient()
-    print(f"Fetching PR data for {ORG_NAME}/{REPO}...")
-    prs = fetch_repo_merged_pr_difficulty_graphql(client, owner=ORG_NAME, repo=REPO, use_cache=True)
+    print(f"Fetching PR data for {org}/{repo}...")
+    prs = fetch_repo_merged_pr_difficulty_graphql(client, owner=org, repo=repo, use_cache=True)
 
     df = prs_to_dataframe(prs)
     if df.empty:
-        raise ValueError(f"No PR data found for {ORG_NAME}/{REPO}. Cannot perform churn analysis.")
+        raise ValueError(f"No PR data found for {org}/{repo}. Cannot perform churn analysis.")
 
     df["level"] = df["issue_labels"].apply(assign_difficulty)
 
