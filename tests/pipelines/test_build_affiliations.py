@@ -335,7 +335,7 @@ def test_fetch_linkedin_returns_url_only_for_linkedin_accounts(monkeypatch):
 def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
     """main() wires resolution to disk: it writes the curated YAML and the audit CSV."""
     monkeypatch.setattr(ba, "GITHUB_TOKEN", "test-token")
-    monkeypatch.setattr(ba, "shared_client", lambda: object())
+    monkeypatch.setattr(ba, "shared_client", object)
     monkeypatch.setattr(ba, "SRC", tmp_path)
     monkeypatch.setattr(ba, "ORG_DATA_DIR", tmp_path / "data")
     monkeypatch.setattr(ba, "ORG", "hiero-ledger")

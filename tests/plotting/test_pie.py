@@ -11,7 +11,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 import hiero_analytics.plotting.pie as pie_module
-from hiero_analytics.plotting.pie import plot_pie
 
 
 def test_plot_pie_writes_chart_file(tmp_path):
@@ -19,7 +18,7 @@ def test_plot_pie_writes_chart_file(tmp_path):
     pie_df = pd.DataFrame({"difficulty": ["Unknown", "Good First Issue", "Beginner"], "count": [7, 9, 4]})
     output = tmp_path / "difficulty_donut.png"
 
-    plot_pie(pie_df, label_col="difficulty", value_col="count", title="Issue Difficulty", output_path=output)
+    pie_module.plot_pie(pie_df, label_col="difficulty", value_col="count", title="Issue Difficulty", output_path=output)
 
     assert output.exists() and output.stat().st_size > 0
 
@@ -29,7 +28,7 @@ def test_plot_pie_rejects_non_positive_totals(tmp_path):
     pie_df = pd.DataFrame({"difficulty": ["Unknown", "Beginner"], "count": [0, 0]})
 
     with pytest.raises(ValueError, match="positive total"):
-        plot_pie(
+        pie_module.plot_pie(
             pie_df,
             label_col="difficulty",
             value_col="count",

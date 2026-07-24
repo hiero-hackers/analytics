@@ -267,7 +267,7 @@ def outputs_root(tmp_path_factory) -> Path:
         for mod in (role_coverage_mod, affiliation_mod, activity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)
         mp.setattr(affiliation_mod, "load_affiliations", lambda: AFFILIATIONS)
-        mp.setattr(affiliation_mod, "load_manual_logins", lambda: set())
+        mp.setattr(affiliation_mod, "load_manual_logins", set)
         mp.setattr(
             scorecard_mod, "fetch_org_repos_graphql", lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")]
         )
