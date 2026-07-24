@@ -23,7 +23,11 @@ query MERGED_PR_QUERY($owner:String!, $repo:String!, $cursor:String) {
         additions
         deletions
         changedFiles
-        closingIssuesReferences(first:10) {
+        # first:5 keeps the rate-limit point cost down: every potential issue node
+        # adds a nested labels connection to the query's score (~11 points/page at
+        # first:10, ~6 at first:5). PRs closing more than 5 issues are vanishingly
+        # rare, and truncated links heal on the periodic full refresh.
+        closingIssuesReferences(first:5) {
           nodes {
             number
             labels(first:10) {

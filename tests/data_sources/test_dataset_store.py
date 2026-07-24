@@ -10,6 +10,7 @@ import pytest
 
 from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.dataset_store import (
+    OfflineDatasetMissingError,
     PartialOrgFetchError,
     fetch_incremental,
     load_dataset,
@@ -279,7 +280,7 @@ def test_offline_incremental_requires_valid_dataset(monkeypatch, tmp_path):
     """Offline mode fails clearly instead of fetching when no snapshot exists."""
     monkeypatch.setenv("HIERO_ANALYTICS_OFFLINE", "true")
 
-    with pytest.raises(RuntimeError, match="Offline mode requires a valid cached dataset"):
+    with pytest.raises(OfflineDatasetMissingError, match="Offline mode requires a valid cached dataset"):
         fetch_incremental(
             path=tmp_path / "missing.json",
             model_class=_Record,
@@ -419,7 +420,7 @@ def test_load_or_fetch_offline_requires_dataset(monkeypatch):
     monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: None)
     monkeypatch.setenv("HIERO_ANALYTICS_OFFLINE", "yes")
 
-    with pytest.raises(RuntimeError, match="cached issue_label_events/an-org dataset"):
+    with pytest.raises(OfflineDatasetMissingError, match="cached issue_label_events/an-org dataset"):
         load_or_fetch(
             "issue_label_events",
             "an-org",

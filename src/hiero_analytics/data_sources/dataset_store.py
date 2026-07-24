@@ -56,6 +56,15 @@ def offline_mode_enabled() -> bool:
     return os.getenv("HIERO_ANALYTICS_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+class OfflineDatasetMissingError(RuntimeError):
+    """Offline mode was requested but no cached dataset exists for the resource.
+
+    Subclasses RuntimeError so existing callers that treat a missing offline
+    dataset as fatal keep working; callers whose output is optional (e.g. a
+    single dashboard tile) can catch this specifically and skip instead.
+    """
+
+
 class PartialOrgFetchError(Exception):
     """Signals that an org-wide fetch could not cover every repository.
 
@@ -183,7 +192,7 @@ def load_or_fetch(  # noqa: UP047
         )
         return fetch_fn()
     if offline_mode_enabled():
-        raise RuntimeError(f"Offline mode requires a cached {resource}/{org} dataset")
+        raise OfflineDatasetMissingError(f"Offline mode requires a cached {resource}/{org} dataset")
     logger.info("No persisted %s/%s dataset; fetching from GitHub", org, resource)
     return fetch_fn()
 
@@ -224,7 +233,7 @@ def fetch_incremental(  # noqa: UP047
     state = load_dataset(path, model_class)
     if offline_mode_enabled():
         if state is None:
-            raise RuntimeError(f"Offline mode requires a valid cached dataset at {path}")
+            raise OfflineDatasetMissingError(f"Offline mode requires a valid cached dataset at {path}")
         records, _ = state
         logger.info("Reusing offline dataset %s (%d records)", path, len(records))
         return records

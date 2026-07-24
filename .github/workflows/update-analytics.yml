@@ -10,9 +10,19 @@ on:
 permissions:
   contents: read
 
+# Never let a manual dispatch overlap a scheduled run: both would draw from the
+# same hourly GraphQL point budget and each would crawl (or time out).
+concurrency:
+  group: update-analytics
+  cancel-in-progress: false
+
 jobs:
   refresh-data:
     runs-on: ubuntu-latest
+    # A first full fetch of a new dataset under the Actions token's 1,000
+    # GraphQL points/hour spends most of its wall time sleeping for budget
+    # resets; give it the whole runner allowance rather than an eager cutoff.
+    timeout-minutes: 355
 
     steps:
       - name: Checkout code
@@ -43,9 +53,20 @@ jobs:
           restore-keys: |
             analytics-datasets-
 
+      # Prefer a PAT when one is configured: the built-in Actions token gets only
+      # 1,000 GraphQL points/hour per repo, so a first full fetch of a new dataset
+      # can rate-limit-sleep past the job timeout. A classic PAT (public_repo is
+      # enough) gets 5,000. Falls back to the Actions token when the secret is
+      # absent, so forks keep working.
       - name: Run all analytics pipelines
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ANALYTICS_PAT || secrets.GITHUB_TOKEN }}
+          # Fewer parallel GraphQL workers = smaller burst load, so fewer 502s
+          # and secondary-rate-limit 403s. A repo chunk that still fails on the
+          # *first* fetch of a dataset fails the whole run (no baseline to hold
+          # a watermark against), so gentleness beats speed here — rate-limit
+          # sleeps dominate wall time anyway.
+          GITHUB_MAX_WORKERS: "3"
         run: uv run hiero-analytics
 
       # Only persist datasets when the run succeeds. Saving after a failed run
