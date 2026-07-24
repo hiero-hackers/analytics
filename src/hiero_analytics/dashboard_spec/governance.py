@@ -39,6 +39,24 @@ CHART_MACRO = {
                 ],
             },
             {
+                "id": "role-networks",
+                "title": "Role networks",
+                "slideshow": True,
+                "description": (
+                    "Repositories linked by the people who hold each governance role — one slide per "
+                    "tier, narrowing from maintainers (the most governance-relevant view) through "
+                    "committers to triage. Each bubble is a repo sized by that role's active holders; "
+                    "links mean shared holders (thicker = more). Colour = repository type. The "
+                    "all-contributors view lives in the Contributors tab. Use Prev/Next; click to "
+                    "enlarge."
+                ),
+                "files": [
+                    ("Maintainers", "maintainer_network.png"),
+                    ("Committers", "committer_network.png"),
+                    ("Triage", "triage_network.png"),
+                ],
+            },
+            {
                 "id": "org-diversity",
                 "title": "Organisation diversity",
                 "description": (
@@ -378,6 +396,15 @@ CHART_NOTES = {
     "maintainer_pipeline_by_repo.png": "Each bar is a repository, counting people active there in the last six months, grouped by the "
     "governance role they hold in that repo (general → triage → committer → maintainer). A person "
     "active in several repos is counted in each; smaller repos are pooled into 'Other Repos'.",
+    "maintainer_network.png": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
+    "linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's "
+    "category.",
+    "committer_network.png": "Each bubble is a repository, sized by how many committers are active in it; two repos are "
+    "linked when they share a committer (thicker line = more shared). Bubble colour is the repo's "
+    "category.",
+    "triage_network.png": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos "
+    "are linked when they share a triage holder (thicker line = more shared). Bubble colour is the "
+    "repo's category.",
     "affiliation_donut.png": "The share of maintainers held by the two largest employers, with everyone else (smaller orgs and "
     "solo 'Independent' contributors) pooled into 'Other' — the concentration at a glance; the full "
     "breakdown is in the affiliations table. Switch to the Active tab to count only maintainers active "

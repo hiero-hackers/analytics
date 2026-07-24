@@ -13,20 +13,15 @@ CHART_MACRO = {
     "charts": {
         "hiero-ledger": [
             {
-                "id": "role-networks",
-                "title": "Activity networks by role",
-                "slideshow": True,
+                "id": "contributor-network",
+                "title": "Contributor network",
                 "description": (
-                    "Repositories linked by the people they share, one slide per group (all "
-                    "contributors first — the widest view — then maintainers, the smallest and most "
-                    "governance-relevant group). Each bubble is a repo sized by that group's active "
-                    "members; links mean shared members (thicker = more). Colour = repository type. "
-                    "Use Prev/Next; click to enlarge."
+                    "The widest view of how work connects the ecosystem: each bubble is a repository "
+                    "sized by its active contributors, and two repos are linked when they share "
+                    "contributors (thicker = more). Colour = repository type. Per-role versions "
+                    "(maintainers, committers, triage) live in the Governance tab. Click to enlarge."
                 ),
-                "files": [
-                    ("All contributors", "all_network.png"),
-                    ("Maintainers", "maintainer_network.png"),
-                ],
+                "files": [("Repositories linked by shared contributors", "all_network.png")],
             },
             {
                 "id": "activity-heatmap",
@@ -117,9 +112,6 @@ WIDE_CHARTS: set[str] = set()
 # chart (its encoding and window) — never the current data values — so they stay
 # accurate across every refresh. A chart with no entry here simply shows no note.
 CHART_NOTES = {
-    "maintainer_network.png": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
-    "linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's "
-    "category.",
     "all_network.png": "Each bubble is a repository, sized by its active contributors; two repos are linked when they "
     "share contributors. Bubble colour is the repo's category; the link threshold scales with org size.",
     "contributor_activity_heatmap.png": "Rows are the 25 busiest contributors over the last six months; columns are those months. The "

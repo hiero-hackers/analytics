@@ -195,10 +195,17 @@ GOVERNANCE = {
         # Five resolved, recently active members so the team-composition charts
         # (which need >= 4 resolved members) render in both All and Active views.
         {"name": "core", "maintainers": [], "members": ["alice", "bob", "carol", "dave", "erin"]},
+        # Write- and triage-permission teams so the committer and triage role
+        # networks (Governance tab) have holders to render.
+        {"name": "sdk-devs", "maintainers": [], "members": ["bob", "dave"]},
+        {"name": "triagers", "maintainers": [], "members": ["erin"]},
     ],
     "repositories": [
-        {"name": "sdk-python", "teams": {"sdk-python-maintainers": "maintain"}},
-        {"name": "sdk-java", "teams": {"sdk-java-maintainers": "maintain"}},
+        {
+            "name": "sdk-python",
+            "teams": {"sdk-python-maintainers": "maintain", "sdk-devs": "write", "triagers": "triage"},
+        },
+        {"name": "sdk-java", "teams": {"sdk-java-maintainers": "maintain", "sdk-devs": "write"}},
     ],
 }
 

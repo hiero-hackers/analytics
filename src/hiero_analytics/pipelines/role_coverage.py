@@ -163,15 +163,17 @@ def _write_repo_summaries(combined, org_data_dir, period: Period | None = None):
 
 
 def _write_role_networks(combined, org_charts_dir, org: str = ORG):
-    """Maintainer co-membership network.
+    """Co-membership networks per governance role (maintainer, committer, triage).
 
-    The most governance-relevant of the role networks — kept alongside the
-    all-contributors network (governance-independent, produced by
-    run_contributor_activity_org for every org) so the dashboard shows the
-    narrowest and widest view without maintaining every role's network chart.
+    The Governance tab shows how each permission tier connects the repos; the
+    all-contributors network (governance-independent, produced by the
+    contributor_activity pipeline for every org) stays the Contributors tab's
+    widest view. A role no repo grants simply renders no chart.
     """
     groups = [
         ("maintainer", "maintainers", role_membership(combined, "maintainer"), ROLE_NETWORK_MIN_SHARED["maintainer"]),
+        ("committer", "committers", role_membership(combined, "committer"), ROLE_NETWORK_MIN_SHARED["committer"]),
+        ("triage", "triage holders", role_membership(combined, "triage"), ROLE_NETWORK_MIN_SHARED["triage"]),
     ]
     for key, label, membership, min_shared in groups:
         nodes, edges = build_comembership_network(membership, min_shared=min_shared)

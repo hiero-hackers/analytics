@@ -19,10 +19,12 @@ LOAD_SHARE_MIN_ACTIONS = 20
 # Maintainer-coverage flag: surface repos with at most this many *active* maintainers.
 UNDERSTAFFED_MAX_ACTIVE_MAINTAINERS = 1
 
-# Maintainer co-membership network: min shared maintainers for a repo-repo link
-# (the only role network still rendered; raise to thin a dense group).
+# Role co-membership networks: min shared members for a repo-repo link, per
+# governance role (raise to thin a dense group into something readable).
 ROLE_NETWORK_MIN_SHARED = {
     "maintainer": env_int("NETWORK_MIN_SHARED", 1, minimum=1),
+    "committer": env_int("NETWORK_MIN_SHARED_COMMITTER", 1, minimum=1),
+    "triage": env_int("NETWORK_MIN_SHARED_TRIAGE", 1, minimum=1),
 }
 
 # All-contributors network: one link per this many repos (scales the threshold to org
