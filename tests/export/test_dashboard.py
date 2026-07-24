@@ -84,9 +84,9 @@ def test_macro_bar_shows_even_for_one_family_and_scales_up():
     )
 
     assert "class='macrobar'" in one  # shown even with a single family
-    assert "switchMacro('governance')" in one
+    assert "href='#governance'" in one  # macro tabs are real, shareable links
     assert "class='macrobar'" in two
-    assert "switchMacro('onboarding')" in two
+    assert "href='#onboarding'" in two
     # macro+org namespacing keeps the repeated org's section ids distinct per macro
     assert "id='governance-hiero-ledger-p'" in two and "id='onboarding-hiero-ledger-p'" in two
 

@@ -296,8 +296,8 @@ def build_dashboard_html(macros: Sequence[Mapping], *, generated_at: str | None 
     macro_bar = ""
     if macros:  # macro bar always shows (even at one family), so the scope is labelled
         buttons = "".join(
-            f"<button class='macro{' active' if i == 0 else ''}' id='macrobtn-{_slug(macro['name'])}' "
-            f"onclick=\"switchMacro('{_slug(macro['name'])}')\">{esc(macro['name'])}</button>"
+            f"<a class='macro{' active' if i == 0 else ''}' id='macrobtn-{_slug(macro['name'])}' "
+            f"href='#{_slug(macro['name'])}'>{esc(macro['name'])}</a>"
             for i, macro in enumerate(macros)
         )
         macro_bar = f"<div class='macrobar'>{buttons}</div>"

@@ -4,6 +4,13 @@ function sortTable(id,col,th){var tb=document.querySelector('#'+id+' tbody');var
 function csvCell(s){s=(s==null?'':String(s)).trim();return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function exportCSV(id,name){var out=[];var ths=document.querySelectorAll('#'+id+' thead th');out.push([].map.call(ths,function(th){return csvCell(th.textContent);}).join(','));document.querySelectorAll('#'+id+' tbody tr').forEach(function(tr){if(tr.style.display==='none')return;out.push([].map.call(tr.children,function(td){return csvCell(td.textContent);}).join(','));});var blob=new Blob([out.join('\n')],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
 function switchMacro(m){document.querySelectorAll('.macropanel').forEach(function(p){p.style.display='none';});document.getElementById('macro-'+m).style.display='';document.querySelectorAll('.macro').forEach(function(b){b.classList.remove('active');});document.getElementById('macrobtn-'+m).classList.add('active');}
+/* The macro tabs are real links (#contributors, #governance, ...): the hash is
+   the source of truth, so tabs are shareable and back/forward work. Hashes that
+   don't name a macro panel (e.g. the jump-bar's section anchors) are left to
+   native anchor behaviour. */
+function applyMacroHash(){var slug=location.hash.replace(/^#/,'');if(document.getElementById('macro-'+slug))switchMacro(slug);}
+window.addEventListener('hashchange',applyMacroHash);
+applyMacroHash();
 function switchTab(m,o){var panel=document.getElementById('macro-'+m);panel.querySelectorAll('.tabpanel').forEach(function(p){p.style.display='none';});document.getElementById('tab-'+m+'-'+o).style.display='';panel.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});document.getElementById('tabbtn-'+m+'-'+o).classList.add('active');}
 function openLightbox(el){var src=(typeof el==='string')?el:el.src;document.getElementById('lightbox-img').src=src;var info='';if(el&&el.closest){var fig=el.closest('figure');if(fig){var di=el.getAttribute?el.getAttribute('data-i'):null;var n=(di!=null)?fig.querySelector(".lbinfo[data-i='"+di+"']"):null;if(!n)n=fig.querySelector('.lbinfo:not([data-i])');if(n)info=n.innerHTML;}}document.getElementById('lightbox-note').innerHTML=info;document.getElementById('lightbox').style.display='flex';}
 function closeLightbox(){var lb=document.getElementById('lightbox');lb.style.display='none';document.getElementById('lightbox-img').src='';document.getElementById('lightbox-note').innerHTML='';}
