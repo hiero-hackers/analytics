@@ -50,3 +50,30 @@ def test_generated_at_reads_sidecar_and_tolerates_absence(tmp_path):
 
     (tmp_path / "table.csv.meta.json").write_text("not json", encoding="utf-8")
     assert dashboard._generated_at(path) is None
+
+
+def test_contributor_metrics_tiles(tmp_path):
+    """The Contributors tiles: counts, shares over the full list, and the 30d active share."""
+    import pandas as pd
+
+    profiles = pd.DataFrame(
+        {
+            "contributor": ["a", "b", "c", "d"],
+            "repos_touched": [3, 1, 2, 1],
+            "issues_opened": [1, 0, 0, 2],
+            "prs_opened": [1, 1, 0, 0],
+            "reviews_given": [0, 4, 0, 0],
+        }
+    )
+    pd.DataFrame({"contributor": ["a"]}).to_csv(tmp_path / "contributor_activity_profiles_30d.csv", index=False)
+    pd.DataFrame({"login": ["a", "b"]}).to_csv(tmp_path / "gfi_completers.csv", index=False)
+
+    metrics = dict(dashboard._contributors_metrics({"profiles": profiles}, tmp_path))
+
+    assert metrics["contributors"] == 4
+    assert metrics["active last month %"] == "25%"
+    assert metrics["multi-repo %"] == "50%"
+    assert metrics["file issues %"] == "50%"
+    assert metrics["open PRs %"] == "50%"
+    assert metrics["give reviews %"] == "25%"
+    assert metrics["completed a GFI %"] == "50%"

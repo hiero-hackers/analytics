@@ -183,6 +183,15 @@ def _contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -
         return []
     metrics = [
         ("contributors", total),
+    ]
+    # "Active last month": the 30d period variant lists exactly the contributors
+    # with activity in that window, so the share is a row-count ratio.
+    month = next((p for p in ACTIVITY_PERIODS if p.key == "30d"), None)
+    if month is not None:
+        active = _load(org_data_dir / month.filename("contributor_activity_profiles"))
+        if not active.empty:
+            metrics.append(("active last month %", _pct(len(active), total)))
+    metrics += [
         ("multi-repo %", _pct(int((profiles["repos_touched"] >= 2).sum()), total)),
         ("file issues %", _pct(int((profiles["issues_opened"] > 0).sum()), total)),
         ("open PRs %", _pct(int((profiles["prs_opened"] > 0).sum()), total)),

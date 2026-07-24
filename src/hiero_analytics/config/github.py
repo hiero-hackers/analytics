@@ -24,7 +24,7 @@ SECONDARY_RATE_LIMIT_FALLBACK_SECONDS = 30
 # Collapses network round-trips (cost in rate-limit points is roughly the sum of
 # the parts either way). Kept moderate so per-query node/complexity limits stay
 # far away even for issue-heavy repos.
-GITHUB_GRAPHQL_BATCH_SIZE = env_int("GITHUB_GRAPHQL_BATCH_SIZE", 10, minimum=1)
+GITHUB_GRAPHQL_BATCH_SIZE = env_int("GITHUB_GRAPHQL_BATCH_SIZE", 5, minimum=1)
 
 # Default concurrency for org-wide parallel fetches. GitHub's secondary (abuse)
 # rate limit is triggered by request burst/concurrency, not just hourly quota,
