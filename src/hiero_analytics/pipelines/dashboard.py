@@ -166,12 +166,35 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
     return sections
 
 
-def _contributors_metrics(loaded: dict[str, pd.DataFrame]) -> list:
-    """Headline tiles for the Contributors macro."""
-    return [("contributors", len(loaded["profiles"]))] if not loaded["profiles"].empty else []
+def _pct(count: int, total: int) -> str:
+    """A whole-number percentage tile value ("37%")."""
+    return f"{round(100 * count / total)}%"
 
 
-def _governance_metrics(loaded: dict[str, pd.DataFrame]) -> list:
+def _contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> list:
+    """Headline tiles for the Contributors macro: who shows up, and how.
+
+    All shares are over the full contributor list (the profiles table). "% commit"
+    is measured as opening PRs — commits themselves aren't ingested.
+    """
+    profiles = loaded["profiles"]
+    total = len(profiles)
+    if total == 0:
+        return []
+    metrics = [
+        ("contributors", total),
+        ("multi-repo %", _pct(int((profiles["repos_touched"] >= 2).sum()), total)),
+        ("file issues %", _pct(int((profiles["issues_opened"] > 0).sum()), total)),
+        ("open PRs %", _pct(int((profiles["prs_opened"] > 0).sum()), total)),
+        ("give reviews %", _pct(int((profiles["reviews_given"] > 0).sum()), total)),
+    ]
+    completers = _load(org_data_dir / "gfi_completers.csv")
+    if "login" in completers:
+        metrics.append(("completed a GFI %", _pct(int(completers["login"].nunique()), total)))
+    return metrics
+
+
+def _governance_metrics(loaded: dict[str, pd.DataFrame], _org_data_dir: Path) -> list:
     """Headline tiles for the Governance macro."""
     metrics: list = []
     role_counts = _holders_by_highest_role(loaded["repo"])
@@ -241,7 +264,7 @@ def _org_table_tab(family: ModuleType, org_name: str, org_data_dir: Path) -> dic
     if not sections:
         return None  # this org has no data for this family
     metrics_builder = _METRICS_BY_MACRO.get(family.CHART_MACRO["name"])
-    metrics = metrics_builder(loaded) if metrics_builder is not None else []
+    metrics = metrics_builder(loaded, org_data_dir) if metrics_builder is not None else []
     return {"org": org_name, "metrics": metrics, "sections": sections}
 
 

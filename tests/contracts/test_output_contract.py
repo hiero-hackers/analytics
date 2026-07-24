@@ -88,6 +88,7 @@ CHART_COMPANION_CSVS = {
     "difficulty_by_repo_30_days.csv",
     "difficulty_over_time_event_based_weekly.csv",
     "maintainer_activity_events.csv",
+    "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
     "maintainer_pipeline_yearly.csv",
     "maintainer_pipeline_monthly.csv",
     "maintainer_pipeline_weekly.csv",
@@ -270,6 +271,7 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(onboarding_mod, "fetch_repo_issues_graphql", lambda _c, **_k: REPO_ISSUES)
         mp.setattr(onboarding_mod, "fetch_repo_merged_pr_difficulty_graphql", lambda _c, **_k: REPO_PRS)
         mp.setattr(profiles_mod, "fetch_repo_merged_pr_difficulty_graphql", lambda _c, **_k: REPO_PRS)
+        mp.setattr(activity_mod, "fetch_org_merged_pr_difficulty_graphql", lambda _c, _org, **_k: REPO_PRS)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod):
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod):

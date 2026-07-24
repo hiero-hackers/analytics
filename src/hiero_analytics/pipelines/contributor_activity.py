@@ -15,14 +15,18 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 
+import pandas as pd
+
 from hiero_analytics.analysis.comembership import build_comembership_network
 from hiero_analytics.analysis.contributor_activity_profile import (
     build_active_membership,
     build_contributor_profiles,
     build_contributor_profiles_by_repo,
 )
+from hiero_analytics.analysis.prs import filter_gfi_prs, prs_to_dataframe
 from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
 from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.data_sources.github_ingest import fetch_org_merged_pr_difficulty_graphql
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
@@ -57,6 +61,19 @@ def _build_contributor_network(records, label_events, by_repo, org_charts_dir, o
         logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
+def _write_gfi_completers(client, org: str, org_data_dir) -> None:
+    """Distinct contributors with a merged PR that closed an onboarding (GFI) issue.
+
+    Feeds the Contributors tab's "completed a GFI %" tile. Backed by the org
+    merged-PR dataset (incremental; offline-capable once the dataset is cached).
+    """
+    prs = fetch_org_merged_pr_difficulty_graphql(client, org)
+    gfi = filter_gfi_prs(prs_to_dataframe(prs))
+    logins = sorted(gfi.dropna(subset=["author"])["author"].str.lower().unique())
+    save_dataframe(pd.DataFrame({"login": logins}), org_data_dir / "gfi_completers.csv")
+    logger.info("GFI completers: %d contributors", len(logins))
+
+
 def main(org: str = ORG) -> None:
     """Build the informational contributor-activity tables for an org.
 
@@ -72,6 +89,8 @@ def main(org: str = ORG) -> None:
     records = load_contributor_activity(client, org)
     label_events = load_issue_label_events(client, org)
     logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
+
+    _write_gfi_completers(client, org, org_data_dir)
 
     # Org-wide: one row per contributor, emitted once for each shared activity period.
     now = datetime.now(UTC)

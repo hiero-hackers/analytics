@@ -103,6 +103,10 @@ def _patch_pipeline(
         "hiero_analytics.pipelines.contributor_activity.load_issue_label_events",
         lambda _client, _org: label_events,
     )
+    monkeypatch.setattr(
+        "hiero_analytics.pipelines.contributor_activity.fetch_org_merged_pr_difficulty_graphql",
+        lambda _client, _org, **_k: [],
+    )
 
     def _fake_repo_dirs(repo: str) -> tuple[Path, Path]:
         """Create and return per-repo output dirs under tmp_path."""
