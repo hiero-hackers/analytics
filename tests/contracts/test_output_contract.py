@@ -40,7 +40,7 @@ import hiero_analytics.pipelines.onboarding as onboarding_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
-from hiero_analytics.dashboard_spec import CHART_MACROS, SECTION_SPECS
+from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -52,6 +52,9 @@ from hiero_analytics.data_sources.models import (
     ScorecardRecord,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
+
+# Every table section across the table-bearing macros (Contributors, Governance).
+ALL_SECTION_SPECS = [spec for family in TABLE_FAMILIES.values() for spec in family.SECTION_SPECS]
 
 PRIMARY = "hiero-ledger"
 HACKERS = "hiero-hackers"
@@ -333,7 +336,7 @@ def test_every_spec_table_csv_is_produced(outputs_root: Path):
     """Each section's CSV (and every derived period variant) exists for the primary org."""
     org_data = outputs_root / "data" / "org" / PRIMARY
     missing = []
-    for spec in SECTION_SPECS:
+    for spec in ALL_SECTION_SPECS:
         expected = [spec["file"]]
         if spec.get("periods"):
             stem = Path(spec["file"]).stem
@@ -357,7 +360,7 @@ def test_every_spec_chart_png_is_produced(outputs_root: Path):
 def test_no_orphan_org_level_outputs(outputs_root: Path):
     """Everything produced at org level is spec-listed or explicitly accounted for."""
     spec_csvs = set()
-    for spec in SECTION_SPECS:
+    for spec in ALL_SECTION_SPECS:
         spec_csvs.add(spec["file"])
         if spec.get("periods"):
             stem = Path(spec["file"]).stem
@@ -388,7 +391,8 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
 
 
 def test_dashboard_html_is_written(outputs_root: Path):
-    """The assembled dashboard exists and carries the macro tabs."""
+    """The assembled dashboard exists and carries both table-bearing macro tabs."""
     html = (outputs_root / "dashboard.html").read_text(encoding="utf-8")
-    assert "Contributors &amp; governance" in html or "Contributors & governance" in html
+    assert ">Contributors<" in html  # the people/activity macro button
+    assert ">Governance<" in html  # the authority/risk macro button
     assert len(html) > 10_000

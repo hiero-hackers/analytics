@@ -32,7 +32,6 @@ src/hiero_sdk_python/hapi
 
 # Pytest
 .pytest_cache
-
 # Lock files
 # uv.lock is committed on purpose: it pins exact transitive versions for
 # reproducible installs and satisfies OpenSSF Scorecard's Pinned-Dependencies.
@@ -58,3 +57,5 @@ inputs/
 
 # Assembled GitHub Pages site (built in CI from the dashboard; never committed)
 _site/
+
+.claude

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from hiero_analytics.dashboard_spec import SECTION_SPECS
+from hiero_analytics.dashboard_spec import TABLE_FAMILIES
 from hiero_analytics.pipelines import dashboard
 
 
@@ -31,7 +31,8 @@ def test_load_period_variants_requires_the_flag(tmp_path):
 
 def test_activity_specs_use_the_shared_period_set():
     """The tabbed activity tables opt in via the flag; filenames derive centrally."""
-    tabbed = {spec["id"]: spec for spec in SECTION_SPECS if spec.get("periods")}
+    all_specs = [spec for family in TABLE_FAMILIES.values() for spec in family.SECTION_SPECS]
+    tabbed = {spec["id"]: spec for spec in all_specs if spec.get("periods")}
 
     assert set(tabbed) == {"profiles", "repoactivity", "understaffed", "loadshare", "repo", "teams"}
     assert all(spec["periods"] is True for spec in tabbed.values())

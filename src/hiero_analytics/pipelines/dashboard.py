@@ -15,6 +15,7 @@ import json
 import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from types import ModuleType
 
 import pandas as pd
 
@@ -24,10 +25,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_METHODOLOGY,
     CHART_NOTES,
     CHARTS_GROUP,
-    MACRO_NAME,
-    SECTION_GROUP_OF,
-    SECTION_ORDER,
-    SECTION_SPECS,
+    TABLE_FAMILIES,
     WIDE_CHARTS,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS, DEFAULT_ACTIVITY_PERIOD
@@ -168,19 +166,38 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
     return sections
 
 
-def _org_tab(org_name: str, org_data_dir: Path) -> dict | None:
-    """Build one org's tab from whatever CSVs it has, or None if it has no data."""
-    loaded = {spec["id"]: _load(org_data_dir / spec["file"]) for spec in SECTION_SPECS}
-    period_variants = {
-        spec["id"]: _load_period_variants(spec, org_data_dir) for spec in SECTION_SPECS if spec.get("periods")
-    }
-    if loaded["profiles"].empty:
-        return None  # no core contributor data for this org
+def _contributors_metrics(loaded: dict[str, pd.DataFrame]) -> list:
+    """Headline tiles for the Contributors macro."""
+    return [("contributors", len(loaded["profiles"]))] if not loaded["profiles"].empty else []
 
-    # High-level → individual order (see SECTION_ORDER), non-empty tables only.
-    specs_by_id = {spec["id"]: spec for spec in SECTION_SPECS}
+
+def _governance_metrics(loaded: dict[str, pd.DataFrame]) -> list:
+    """Headline tiles for the Governance macro."""
+    metrics: list = []
+    role_counts = _holders_by_highest_role(loaded["repo"])
+    for role, label in (("maintainer", "maintainers"), ("committer", "committers"), ("triage", "triage")):
+        if role in role_counts:
+            metrics.append((label, role_counts[role]))
+    if not loaded["gonedark"].empty:
+        metrics.append(("quiet permission-holders (180d+)", len(loaded["gonedark"])))
+    if "status" in loaded["teams"]:
+        metrics.append(("quiet teams", int((loaded["teams"]["status"] == "quiet").sum())))
+    return metrics
+
+
+_METRICS_BY_MACRO = {"Contributors": _contributors_metrics, "Governance": _governance_metrics}
+
+
+def _org_table_tab(family: ModuleType, org_name: str, org_data_dir: Path) -> dict | None:
+    """Build one family's table tab for an org, or None if it has no data."""
+    specs = family.SECTION_SPECS
+    loaded = {spec["id"]: _load(org_data_dir / spec["file"]) for spec in specs}
+    period_variants = {spec["id"]: _load_period_variants(spec, org_data_dir) for spec in specs if spec.get("periods")}
+
+    # High-level → individual order (see the family's SECTION_ORDER), non-empty tables only.
+    specs_by_id = {spec["id"]: spec for spec in specs}
     sections = []
-    for section_id in SECTION_ORDER:
+    for section_id in family.SECTION_ORDER:
         spec = specs_by_id[section_id]
         variants = period_variants.get(section_id, [])
         if loaded[section_id].empty and not variants:
@@ -189,7 +206,7 @@ def _org_tab(org_name: str, org_data_dir: Path) -> dict | None:
             "id": spec["id"],
             "title": spec["title"],
             "description": spec["description"],
-            "group": SECTION_GROUP_OF[section_id],
+            "group": family.SECTION_GROUP_OF[section_id],
             # Optional "Suggest a correction" action link (e.g. the affiliations table).
             **({"action_url": spec["action_url"]} if spec.get("action_url") else {}),
             **({"action_label": spec["action_label"]} if spec.get("action_label") else {}),
@@ -221,16 +238,10 @@ def _org_tab(org_name: str, org_data_dir: Path) -> dict | None:
             section["rows"] = loaded[section_id].to_dict("records")
         sections.append(section)
 
-    metrics = [("contributors", len(loaded["profiles"]))]
-    role_counts = _holders_by_highest_role(loaded["repo"])
-    for role, label in (("maintainer", "maintainers"), ("committer", "committers"), ("triage", "triage")):
-        if role in role_counts:
-            metrics.append((label, role_counts[role]))
-    if not loaded["gonedark"].empty:
-        metrics.append(("quiet permission-holders (180d+)", len(loaded["gonedark"])))
-    if "status" in loaded["teams"]:
-        metrics.append(("quiet teams", int((loaded["teams"]["status"] == "quiet").sum())))
-
+    if not sections:
+        return None  # this org has no data for this family
+    metrics_builder = _METRICS_BY_MACRO.get(family.CHART_MACRO["name"])
+    metrics = metrics_builder(loaded) if metrics_builder is not None else []
     return {"org": org_name, "metrics": metrics, "sections": sections}
 
 
@@ -249,18 +260,16 @@ def main() -> None:
     ORG_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     orgs = _ordered_orgs()
-    table_tabs = {org: tab for org in orgs if (tab := _org_tab(org, ORG_DATA_DIR / org)) is not None}
 
     macros = []
     for macro in CHART_MACROS:
-        is_tables_macro = macro["name"] == MACRO_NAME
+        # A family with table sections renders them inside its own macro.
+        family = TABLE_FAMILIES.get(macro["name"])
         org_tabs = []
         for org in orgs:
-            table_sections: list[dict] = []
-            metrics: list = []
-            if is_tables_macro and org in table_tabs:
-                table_sections = list(table_tabs[org]["sections"])
-                metrics = table_tabs[org]["metrics"]
+            table_tab = _org_table_tab(family, org, ORG_DATA_DIR / org) if family is not None else None
+            table_sections = list(table_tab["sections"]) if table_tab is not None else []
+            metrics = table_tab["metrics"] if table_tab is not None else []
             # Charts first, then tables (high-level → individual within the tables).
             sections = _chart_sections(org, macro["charts"].get(org, [])) + table_sections
             if sections:

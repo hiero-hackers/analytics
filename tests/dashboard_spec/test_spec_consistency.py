@@ -6,8 +6,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
     CHART_METHODOLOGY,
     CHART_NOTES,
-    SECTION_GROUPS,
-    SECTION_SPECS,
+    TABLE_FAMILIES,
     WIDE_CHARTS,
 )
 
@@ -41,11 +40,12 @@ def test_section_groups_match_section_specs():
 
     A drifted id would otherwise only surface as a KeyError mid-dashboard-build.
     """
-    spec_ids = [spec["id"] for spec in SECTION_SPECS]
-    grouped_ids = [section_id for _name, ids in SECTION_GROUPS for section_id in ids]
+    for macro_name, family in TABLE_FAMILIES.items():
+        spec_ids = [spec["id"] for spec in family.SECTION_SPECS]
+        grouped_ids = [section_id for _name, ids in family.SECTION_GROUPS for section_id in ids]
 
-    assert len(set(spec_ids)) == len(spec_ids)  # no duplicate section ids
-    assert sorted(grouped_ids) == sorted(spec_ids)
+        assert len(set(spec_ids)) == len(spec_ids), macro_name  # no duplicate section ids
+        assert sorted(grouped_ids) == sorted(spec_ids), macro_name
 
 
 def test_chart_files_are_canonical():
