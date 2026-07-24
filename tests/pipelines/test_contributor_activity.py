@@ -13,6 +13,7 @@ import pytest
 matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.contributor_activity as runner
+from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingError
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueTimelineEventRecord,
@@ -162,6 +163,31 @@ def test_main_creates_output_files(
     network_chart = tmp_path / "charts" / "all_network.png"
     assert network_chart.exists(), "Contributor network chart not created"
     assert os.path.getsize(network_chart) > 0, "Contributor network chart is empty"
+
+
+def test_main_skips_gfi_completers_when_offline_dataset_missing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_activity,
+    synthetic_label_events,
+):
+    """An offline run without the merged-PR dataset skips the GFI tile, not the pipeline."""
+    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity, synthetic_label_events)
+
+    def _raise_offline_missing(_client, _org, **_k):
+        raise OfflineDatasetMissingError("Offline mode requires a valid cached dataset")
+
+    monkeypatch.setattr(
+        "hiero_analytics.pipelines.contributor_activity.fetch_org_merged_pr_difficulty_graphql",
+        _raise_offline_missing,
+    )
+
+    runner.main(ORG)
+
+    data_dir = tmp_path / "data"
+    assert not (data_dir / "gfi_completers.csv").exists()
+    assert (data_dir / "contributor_activity_profiles.csv").exists()
 
 
 def test_main_handles_empty_inputs(

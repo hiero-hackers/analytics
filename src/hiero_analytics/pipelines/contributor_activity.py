@@ -26,6 +26,7 @@ from hiero_analytics.analysis.contributor_activity_profile import (
 from hiero_analytics.analysis.prs import filter_gfi_prs, prs_to_dataframe
 from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
 from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingError
 from hiero_analytics.data_sources.github_ingest import fetch_org_merged_pr_difficulty_graphql
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
@@ -66,8 +67,15 @@ def _write_gfi_completers(client, org: str, org_data_dir) -> None:
 
     Feeds the Contributors tab's "completed a GFI %" tile. Backed by the org
     merged-PR dataset (incremental; offline-capable once the dataset is cached).
+    The tile is optional: an offline run without the cached dataset skips it
+    (the dashboard tolerates a missing gfi_completers.csv) rather than failing
+    the whole pipeline.
     """
-    prs = fetch_org_merged_pr_difficulty_graphql(client, org)
+    try:
+        prs = fetch_org_merged_pr_difficulty_graphql(client, org)
+    except OfflineDatasetMissingError:
+        logger.warning("No cached merged-PR dataset for %s in offline mode; skipping GFI completers", org)
+        return
     gfi = filter_gfi_prs(prs_to_dataframe(prs))
     logins = sorted(gfi.dropna(subset=["author"])["author"].str.lower().unique())
     save_dataframe(pd.DataFrame({"login": logins}), org_data_dir / "gfi_completers.csv")
