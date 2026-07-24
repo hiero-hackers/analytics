@@ -1,6 +1,9 @@
-blank_issues_enabled: true # Enables blank issue templates.
+blank_issues_enabled: true # Blank issues are the norm here; templates are optional scaffolding.
 
 contact_links:
-  - name: Hiero Discord # TODO: update this name
-    url: https://github.com/hiero-ledger/hiero-sdk-python/blob/main/docs/discord.md # TODO: update this link
-    about: Please ask and answer questions here. # Statement the reader will see
+  - name: Hiero Discord
+    url: https://github.com/hiero-ledger/sdk-collaboration-hub/tree/main/guides/issue-progression/for-developers/discord.md
+    about: Please ask and answer questions here.
+  - name: Contributor guide
+    url: https://github.com/hiero-hackers/analytics/blob/main/CONTRIBUTING.md
+    about: Setup, workflow, skill levels, AI policy, and testing conventions.

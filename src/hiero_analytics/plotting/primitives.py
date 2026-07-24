@@ -8,7 +8,10 @@ import pandas as pd
 from matplotlib.axes import Axes
 
 from hiero_analytics.config.charts import (
+    ANNOTATION_FONT_SIZE,
+    BADGE_FONT_SIZE,
     CARD_BORDER_COLOR,
+    CARD_EDGE_LINE_WIDTH,
     ENDPOINT_LABEL_BOX_STYLE,
     PLOT_BACKGROUND_COLOR,
     PRIMARY_PALETTE,
@@ -38,6 +41,33 @@ def is_numeric_or_datetime(series: pd.Series) -> bool:
     )
 
 
+def styled_text_badge(
+    ax: Axes,
+    *,
+    x: float,
+    y: float,
+    text: str,
+    color: str,
+) -> None:
+    """Render axes-fraction text in the shared white-card pill styling."""
+    ax.text(
+        x,
+        y,
+        text,
+        transform=ax.transAxes,
+        fontsize=ANNOTATION_FONT_SIZE,
+        color=color,
+        va="top",
+        bbox={
+            "boxstyle": ENDPOINT_LABEL_BOX_STYLE,
+            "fc": PLOT_BACKGROUND_COLOR,
+            "ec": CARD_BORDER_COLOR,
+            "lw": CARD_EDGE_LINE_WIDTH,
+        },
+        zorder=5,
+    )
+
+
 def annotate_endpoint_badge(
     ax: Axes,
     *,
@@ -56,13 +86,13 @@ def annotate_endpoint_badge(
         textcoords="offset points",
         ha="left",
         va="center",
-        fontsize=9,
+        fontsize=BADGE_FONT_SIZE,
         color=color,
         bbox={
             "boxstyle": ENDPOINT_LABEL_BOX_STYLE,
             "fc": PLOT_BACKGROUND_COLOR,
             "ec": CARD_BORDER_COLOR,
-            "lw": 0.9,
+            "lw": CARD_EDGE_LINE_WIDTH,
         },
         zorder=5,
     )

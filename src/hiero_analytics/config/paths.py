@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 from pathlib import Path
 
 # Import-time *defaults* only — runners that support multiple orgs must accept an
@@ -11,6 +10,12 @@ from pathlib import Path
 # on these, so one process can serve several orgs without env mutation.
 ORG = os.getenv("GITHUB_ORG", "hiero-ledger")
 REPO = os.getenv("GITHUB_REPO", "hiero-sdk-python")
+
+# Secondary orgs the multi-org pipelines also render (comma-separated) — the
+# single "extra orgs" concept shared by run_all's contributor pass and the
+# contributor heatmap. The default keeps the composition org on every dashboard
+# build; set GITHUB_EXTRA_ORGS="" to disable extras entirely.
+EXTRA_ORGS = [org.strip() for org in os.getenv("GITHUB_EXTRA_ORGS", "hiero-hackers").split(",") if org.strip()]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SRC = PROJECT_ROOT / "src" / "hiero_analytics"
@@ -105,24 +110,3 @@ def ensure_repo_dirs(repo: str) -> tuple[Path, Path]:
     repo_charts_dir.mkdir(parents=True, exist_ok=True)
 
     return repo_data_dir, repo_charts_dir
-
-
-_query_cache: dict[str, str] = {}
-
-
-def load_query(query_name: str) -> str:
-    """Load a GraphQL query, appending any named fragments it references.
-
-    A query may share a node selection by spreading a fragment (``...IssueFields``);
-    the fragment lives once in ``queries/fragments/<Name>.graphql`` and is appended
-    to the document here, so a base query and its ``_since`` variant never drift.
-    """
-    if query_name not in _query_cache:
-        queries_dir = SRC / "data_sources" / "queries"
-        text = (queries_dir / f"{query_name}.graphql").read_text(encoding="utf-8")
-        for fragment in sorted(set(re.findall(r"\.\.\.(\w+)", text))):
-            fragment_path = queries_dir / "fragments" / f"{fragment}.graphql"
-            if fragment_path.exists():
-                text += "\n" + fragment_path.read_text(encoding="utf-8")
-        _query_cache[query_name] = text
-    return _query_cache[query_name]

@@ -10,7 +10,7 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
-from hiero_analytics.analysis.dataframe_utils import repos_to_dataframe
+from hiero_analytics.analysis.dataframe_utils import counts_to_frame, repos_to_dataframe
 from hiero_analytics.data_sources.models import ContributorActivityRecord
 from hiero_analytics.domain.bots import is_bot_login
 
@@ -25,11 +25,13 @@ __all__ = [
 def calculate_push_activity_summary(
     df: pd.DataFrame,
     days: int = 30,
+    *,
+    now: datetime | None = None,
 ) -> pd.DataFrame:
     """Summarize repository push activity over a rolling window.
 
     Categorizes repositories as "Active" if pushed within the last ``days`` days,
-    otherwise "Inactive". Uses UTC now as the reference point.
+    otherwise "Inactive". ``now`` defaults to UTC now (injectable for tests).
 
     Parameters
     ----------
@@ -51,7 +53,7 @@ def calculate_push_activity_summary(
             }
         )
 
-    cutoff = datetime.now(UTC) - timedelta(days=days)
+    cutoff = (now or datetime.now(UTC)) - timedelta(days=days)
 
     # Categorize by push activity
     def get_status(pushed_at: datetime | None) -> str:
@@ -62,13 +64,7 @@ def calculate_push_activity_summary(
     df = df.copy()
     df["status"] = df["pushed_at"].apply(get_status)
 
-    counts = df["status"].value_counts().to_dict()
-    return pd.DataFrame(
-        [
-            {"status": "Active", "count": int(counts.get("Active", 0))},
-            {"status": "Inactive", "count": int(counts.get("Inactive", 0))},
-        ]
-    )
+    return counts_to_frame(df["status"], "status", order=["Active", "Inactive"])
 
 
 def calculate_language_distribution(df: pd.DataFrame) -> pd.DataFrame:
@@ -92,14 +88,7 @@ def calculate_language_distribution(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["language"] = df["language"].fillna("Unknown")
 
-    # Get value counts and convert to DataFrame
-    counts_series = df["language"].value_counts()
-    return pd.DataFrame(
-        {
-            "language": counts_series.index,
-            "count": counts_series.values,
-        }
-    ).reset_index(drop=True)
+    return counts_to_frame(df["language"], "language")
 
 
 def build_contributor_counts(

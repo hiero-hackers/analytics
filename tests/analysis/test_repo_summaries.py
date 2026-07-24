@@ -57,8 +57,9 @@ def test_repo_activity_overview_rolls_up_by_role():
     )
     overview = build_repo_activity_overview(coverage_all)
 
-    assert list(overview["repo"]) == ["o/a", "o/b"]  # o/a is more active recently -> first
-    a = overview[overview["repo"] == "o/a"].iloc[0]
+    # Bare repo names (owner stripped), matching the module's other rollups.
+    assert list(overview["repo"]) == ["a", "b"]  # a is more active recently -> first
+    a = overview[overview["repo"] == "a"].iloc[0]
     assert a["maintainers"] == 1 and a["committers"] == 1 and a["triage"] == 0
     assert a["active_recent"] == 1  # only the maintainer is active
     assert a["maintainer_actions_recent"] == 10  # 3+5+2

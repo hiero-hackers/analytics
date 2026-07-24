@@ -42,6 +42,8 @@ dev = [
 
 lint = [
     "ruff>=0.15.22,<1",
+    "pyright>=1.1.390,<2",
+    "pre-commit>=4.0,<5",
 ]
 
 [tool.uv]
@@ -62,15 +64,17 @@ package-dir = {"" = "src"}
 [tool.pdm.build]
 excludes = ["**/.pytest_cache"]
 
+# Report-only for now (the CI step does not fail the build): establish the
+# baseline, fix incrementally, then ratchet to blocking.
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-addopts = "--cov=hiero_analytics --cov-report=term-missing --cov-fail-under=70"
-
-[tool.coverage.run]
-omit = [
-    "*/examples/*",
-]
+addopts = "--cov=hiero_analytics --cov-report=term-missing --cov-fail-under=70 --import-mode=importlib"
 
 [tool.ruff]
 line-length = 120
@@ -99,7 +103,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"examples/**" = ["D"]  # runnable demo scripts don't need module/function docstrings
 "tests/**/*.py" = ["ARG001"]
 
 [tool.ruff.format]

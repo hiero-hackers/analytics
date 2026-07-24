@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from contextlib import suppress
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +16,7 @@ from matplotlib.legend import Legend
 
 from hiero_analytics.config.charts import (
     CARD_BORDER_COLOR,
+    CARD_EDGE_LINE_WIDTH,
     DEFAULT_DPI,
     DEFAULT_FIGSIZE,
     FIGURE_BACKGROUND_COLOR,
@@ -108,6 +109,33 @@ def create_figure(
     return fig, ax
 
 
+@contextmanager
+def figure_context(
+    figsize: tuple[float, float] = DEFAULT_FIGSIZE,
+) -> Iterator[tuple[Figure, Axes]]:
+    """``create_figure`` with a guaranteed close.
+
+    ``finalize_chart`` closes the figure on the success path; this also closes
+    it when the body raises first, so a failed chart can't leak its figure
+    during a long multi-pipeline run (closing an already-closed figure is a
+    no-op).
+    """
+    fig, ax = create_figure(figsize=figsize)
+    try:
+        yield fig, ax
+    finally:
+        plt.close(fig)
+
+
+def save_and_close(fig: Figure, output_path: Path, *, dpi: int = DEFAULT_DPI) -> None:
+    """Write ``fig`` to ``output_path`` and always close it, even when saving fails."""
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
+    finally:
+        plt.close(fig)
+
+
 def style_axes(ax: Axes, *, grid_axis: str | None = "y") -> None:
     """Apply a clean card-like axis treatment inspired by shadcn charts."""
     # Treat the plotting region like a chart card inside the figure canvas.
@@ -154,7 +182,7 @@ def style_legend(legend: Legend | None) -> None:
     frame = legend.get_frame()
     frame.set_facecolor(LEGEND_BACKGROUND_COLOR)
     frame.set_edgecolor(LEGEND_EDGE_COLOR)
-    frame.set_linewidth(0.9)
+    frame.set_linewidth(CARD_EDGE_LINE_WIDTH)
 
     with suppress(AttributeError):
         frame.set_boxstyle(LEGEND_BOX_STYLE)
@@ -225,11 +253,4 @@ def finalize_chart(
     # Reserve optional outer space for legends or header elements before export.
     fig.tight_layout(rect=layout_rect)
 
-    # Ensure output directory exists
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    # Save chart
-    fig.savefig(output_path, dpi=DEFAULT_DPI, bbox_inches="tight")
-
-    # Close figure to prevent memory leaks during batch runs
-    plt.close(fig)
+    save_and_close(fig, output_path)

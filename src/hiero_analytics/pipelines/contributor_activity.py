@@ -1,0 +1,106 @@
+"""Build the informational contributor-activity tables for an organization.
+
+For each contributor this writes a high-level view of *how they show up* — their
+work split across three neutral families (building & fixing, reviewing & guiding,
+organizing & answering) — as CSV tables only, org-wide and per-repository. It is
+deliberately descriptive: counts and shares, no score and no cross-contributor
+ranking. Rows are ordered by ``last_active`` (recency).
+
+This complements ``run_maintainer_pipeline_org`` (which maps activity onto named
+governance roles); here we never name or rank roles.
+"""
+
+from __future__ import annotations
+
+import logging
+from datetime import UTC, datetime, timedelta
+
+from hiero_analytics.analysis.comembership import build_comembership_network
+from hiero_analytics.analysis.contributor_activity_profile import (
+    build_active_membership,
+    build_contributor_profiles,
+    build_contributor_profiles_by_repo,
+)
+from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
+from hiero_analytics.config.paths import ORG, ensure_repo_dirs
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
+from hiero_analytics.export.save import save_dataframe
+from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
+from hiero_analytics.plotting.network import render_comembership_network
+
+logger = logging.getLogger(__name__)
+
+
+def _build_contributor_network(records, label_events, by_repo, org_charts_dir, org: str) -> None:
+    """Render the all-contributors co-membership network for the org.
+
+    Governance-independent (no roles needed), so it runs for every org. Repos are
+    sized by active contributors and linked when they share contributors; the link
+    threshold scales with org size so a large org stays legible and a small one
+    still shows its overlaps.
+    """
+    cutoff = datetime.now(UTC) - timedelta(days=ROLE_ACTIVE_DAYS)
+    recent_records = [r for r in records if r.occurred_at and r.occurred_at >= cutoff]
+    recent_labels = [e for e in label_events if e.occurred_at and e.occurred_at >= cutoff]
+    recent_by_repo = build_contributor_profiles_by_repo(recent_records, recent_labels)
+
+    membership = build_active_membership(by_repo, recent_by_repo)
+    min_shared = max(1, round(len(by_repo) / CONTRIBUTOR_NETWORK_REPOS_PER_LINK))
+    nodes, edges = build_comembership_network(membership, min_shared=min_shared)
+    if render_comembership_network(
+        nodes,
+        edges,
+        org_charts_dir / "all_network.png",
+        title=f"{org} — contributors network (repos linked by shared contributors)",
+        member_label="contributors",
+    ):
+        logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
+
+
+def main(org: str = ORG) -> None:
+    """Build the informational contributor-activity tables for an org.
+
+    ``org`` defaults to the configured primary org; run_all passes each extra org
+    explicitly, so multi-org runs stay in one process.
+    """
+    client, org_data_dir, org_charts_dir = org_context(org)
+
+    logger.info("Building contributor activity tables for org: %s", org)
+
+    # Reuse the datasets the maintainer/fetch pipelines persisted earlier in run_all
+    # (avoiding extra org-wide fetches); falls back to fetching on a cold start.
+    records = load_contributor_activity(client, org)
+    label_events = load_issue_label_events(client, org)
+    logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
+
+    # Org-wide: one row per contributor, emitted once for each shared activity period.
+    now = datetime.now(UTC)
+    period_profiles = {}
+    for period in ACTIVITY_PERIODS:
+        cutoff = period.cutoff(now)
+        period_records = (
+            records if cutoff is None else [r for r in records if r.occurred_at and r.occurred_at >= cutoff]
+        )
+        period_labels = (
+            label_events if cutoff is None else [e for e in label_events if e.occurred_at and e.occurred_at >= cutoff]
+        )
+        profiles = build_contributor_profiles(period_records, period_labels)
+        period_profiles[period.key] = profiles
+        save_dataframe(profiles, org_data_dir / period.filename("contributor_activity_profiles"))
+
+    profiles = period_profiles["all"]
+    save_dataframe(profiles, org_data_dir / "contributor_activity_profiles.csv")
+    logger.info("Built org-wide profiles for %d contributors", len(profiles))
+
+    # Per-repository: the same table scoped to each repo, so a person's shape can
+    # be seen to shift across repos. Written under each repo's data dir.
+    by_repo = build_contributor_profiles_by_repo(records, label_events)
+    for repo, repo_profiles in by_repo.items():
+        repo_data_dir, _ = ensure_repo_dirs(repo)
+        save_dataframe(repo_profiles, repo_data_dir / "contributor_activity_profiles.csv")
+    logger.info("Wrote per-repo profiles for %d repositories", len(by_repo))
+
+    # All-contributors network (no governance needed, so every org gets it).
+    _build_contributor_network(records, label_events, by_repo, org_charts_dir, org)
+
+    logger.info("Contributor activity tables complete")

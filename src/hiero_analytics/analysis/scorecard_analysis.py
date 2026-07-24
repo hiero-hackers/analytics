@@ -46,18 +46,14 @@ def scorecard_stacked_dataframe(scorecards: list[ScorecardRecord]) -> pd.DataFra
     rows: list[dict] = []
 
     for s in scorecards:
-        row = {
-            "repo": s.repo,
-            "score": s.score,
-            "date": s.date,
-        }
-
-        for check in CHECK_COLUMNS:
-            row[check] = 0.0
-
-        if s.checks:
-            row.update({name: value for name, value in s.checks.items() if name in CHECK_COLUMNS})
-
-        rows.append(row)
+        checks = s.checks or {}
+        rows.append(
+            {
+                "repo": s.repo,
+                "score": s.score,
+                "date": s.date,
+                **{check: checks.get(check, 0.0) for check in CHECK_COLUMNS},
+            }
+        )
 
     return pd.DataFrame(rows)

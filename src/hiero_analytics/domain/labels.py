@@ -55,18 +55,9 @@ GOOD_FIRST_ISSUE_CANDIDATE = LabelSpec(
 
 ALL_ONBOARDING = GOOD_FIRST_ISSUE | GOOD_FIRST_ISSUE_CANDIDATE
 
-BUG = LabelSpec(
-    name="Bug Reports",
-    labels={"bug"},
-)
-
-DIFFICULTY_GOOD_FIRST_ISSUE = LabelSpec(
-    name="Good First Issue",
-    labels={
-        "Good First Issue",
-        "skill: Good First Issue",
-    },
-)
+# Same label set as the onboarding spec, singular display name for the
+# difficulty charts — derived so the two analyses can't drift apart.
+DIFFICULTY_GOOD_FIRST_ISSUE = LabelSpec(name="Good First Issue", labels=GOOD_FIRST_ISSUE.labels)
 
 DIFFICULTY_BEGINNER = LabelSpec(
     name="Beginner",

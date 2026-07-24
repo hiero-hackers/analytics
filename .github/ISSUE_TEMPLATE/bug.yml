@@ -1,5 +1,5 @@
 name: Bug report
-description: Create a report to help us improve
+description: Something in the analytics or dashboard is broken or wrong
 labels: [ bug ]
 body:
   - type: markdown
@@ -8,14 +8,13 @@ body:
         ## Thanks for submitting a bug report!
 
         Before submitting:
-        1. Try searching the existing issues and discussions to see if your issue has already been reported
-        2. Try asking on [Discord's hiero-general channel](discord.hiero.org)
-        3. If you're reporting a security vulnerability, please disclose responsibly via our [bug bounty program](https://hedera.com/bounty)
+        1. Search existing issues to see if it has already been reported
+        2. If you're reporting a security vulnerability, please disclose responsibly via our [bug bounty program](https://hedera.com/bounty)
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: What happened and what you did you expect to happen?
+      description: What happened, and what did you expect to happen? If a chart or number looks wrong, name the chart and say what you expected.
     validations:
       required: true
   - type: textarea
@@ -24,48 +23,19 @@ body:
       label: Steps to reproduce
       description: Steps to reproduce the behavior
       placeholder: |
-        1. Run the program
-        2. Click on '...'
-        3. Scroll down to '...'
+        1. Run `uv run hiero-analytics <pipeline>` (or open the dashboard at ...)
+        2. Look at '...'
+        3. See the error / wrong value
     validations:
       required: true
   - type: textarea
     id: context
     attributes:
       label: Additional context
-      description: Attach any logs or screenshots relevent to the problem.
+      description: Logs, screenshots, or the command output relevant to the problem.
       placeholder: |
         ![Screenshot](bug.png)
 
-        ```bash
-        2021-06-29T13:50:45.008-0600 INFO thread-1 Some logs
         ```
-  - type: dropdown
-    id: network
-    attributes:
-      description: Which network(s) did the issue occur on?
-      label: Hedera network
-      multiple: true
-      options:
-        - mainnet
-        - testnet
-        - previewnet
-        - other
-  - type: input
-    id: version
-    attributes:
-      description: What version of the software are you using?
-      label: Version
-      placeholder: v0.1.0
-    validations:
-      required: true
-  - type: dropdown
-    id: os
-    attributes:
-      description: Which OS did the issue occur on?
-      label: Operating system
-      options:
-        - Linux
-        - macOS
-        - Windows
-        - Other
+        paste terminal output here
+        ```

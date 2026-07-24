@@ -15,6 +15,8 @@ from datetime import UTC, datetime
 from enum import Enum, auto
 from typing import Any
 
+from .serialization import parse_github_datetime
+
 logger = logging.getLogger(__name__)
 
 JSON = dict[str, Any]
@@ -83,7 +85,7 @@ class RateLimitSnapshot:
         reset_at: datetime | None = None
         raw_reset = rate.get("resetAt")
         if raw_reset:
-            reset_at = datetime.fromisoformat(raw_reset.replace("Z", "+00:00"))
+            reset_at = parse_github_datetime(raw_reset, strict=True)
 
         return cls(
             remaining=rate.get("remaining"),

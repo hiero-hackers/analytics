@@ -7,22 +7,36 @@ history and later runs fetch only the delta since the watermark.
 
 from __future__ import annotations
 
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from hiero_analytics.config.github import GITHUB_MAX_WORKERS
-from hiero_analytics.config.paths import dataset_path, load_query
+from hiero_analytics.data_sources.queries import load_query
 
-from ..dataset_store import PartialOrgFetchError, fetch_incremental
 from ..github_client import GitHubClient
 from ..models import IssueRecord, IssueTimelineEventRecord
 from ._common import (
     _cache_kwargs,
     fetch_github_resource,
 )
-from .batched import fetch_org_records_batched
+from .incremental import OrgIncrementalResource, fetch_org_batched_incremental
 
-logger = logging.getLogger(__name__)
+ISSUES_RESOURCE = OrgIncrementalResource(
+    name="issues",
+    model_class=IssueRecord,
+    key_of=lambda record: (record.repo, record.number),
+    updated_at_of=lambda record: record.updated_at,
+    task_desc="issues",
+)
+
+ISSUE_LABEL_EVENTS_RESOURCE = OrgIncrementalResource(
+    name="issue_label_events",
+    model_class=IssueTimelineEventRecord,
+    # Events are immutable, so identity is the full event tuple and the
+    # watermark advances on the event time itself.
+    key_of=lambda event: (event.repo, event.issue_number, event.event_type, event.occurred_at, event.label),
+    updated_at_of=lambda event: event.occurred_at,
+    task_desc="issue label events",
+)
 
 
 def fetch_repo_issues_graphql(
@@ -95,51 +109,21 @@ def fetch_org_issues_graphql(
     ``refresh=True`` forces a full re-fetch (self-heal).
     """
     norm_states = sorted(s.upper() for s in states) if states else []
-    fingerprint = "-".join(norm_states) if norm_states else "all"
-
-    def full_fetch() -> list[IssueRecord]:
-        return fetch_org_records_batched(
-            client,
-            org,
-            query_text=load_query("issues"),
-            model_class=IssueRecord,
-            nodes_path=["issues"],
-            variables={"states": norm_states or None},
-            per_repo=lambda repo: fetch_repo_issues_graphql(
-                client, repo.owner, repo.name, states=states, use_cache=False
-            ),
-            task_desc="organization issues",
-            max_workers=max_workers,
-        )
-
-    def since_fetch(since: datetime) -> list[IssueRecord]:
-        try:
-            return fetch_org_records_batched(
-                client,
-                org,
-                query_text=load_query("issues_since"),
-                model_class=IssueRecord,
-                nodes_path=["issues"],
-                variables={"states": norm_states or None, "since": since.isoformat()},
-                per_repo=lambda repo: fetch_repo_issues_since_graphql(client, repo.owner, repo.name, since, states),
-                task_desc="organization issue updates",
-                max_workers=max_workers,
-            )
-        except PartialOrgFetchError:
-            raise  # let the store hold the watermark; don't fall back to full
-        except Exception:
-            logger.exception("Incremental issue fetch failed; falling back to full fetch")
-            return full_fetch()
-
-    return fetch_incremental(
-        path=dataset_path("issues", org, fingerprint),
-        model_class=IssueRecord,
-        key_of=lambda record: (record.repo, record.number),
-        updated_at_of=lambda record: record.updated_at,
-        full_fetch=full_fetch,
-        since_fetch=since_fetch,
-        force_full=refresh,
-        full_refresh_after=timedelta(days=30),
+    return fetch_org_batched_incremental(
+        client,
+        ISSUES_RESOURCE,
+        org=org,
+        query_name="issues",
+        since_query_name="issues_since",
+        nodes_path=["issues"],
+        variables={"states": norm_states or None},
+        per_repo=lambda repo: fetch_repo_issues_graphql(client, repo.owner, repo.name, states=states, use_cache=False),
+        per_repo_since=lambda repo, since: fetch_repo_issues_since_graphql(
+            client, repo.owner, repo.name, since, states
+        ),
+        fingerprint="-".join(norm_states) if norm_states else "all",
+        max_workers=max_workers,
+        refresh=refresh,
     )
 
 
@@ -225,51 +209,21 @@ def fetch_org_issue_label_events_graphql(
     a full re-fetch.
     """
     norm_states = sorted(s.upper() for s in states) if states else []
-    fingerprint = "-".join(norm_states) if norm_states else "all"
-
-    def full_fetch() -> list[IssueTimelineEventRecord]:
-        return fetch_org_records_batched(
-            client,
-            org,
-            query_text=load_query("issue_label_events"),
-            model_class=IssueTimelineEventRecord,
-            nodes_path=["issues"],
-            variables={"states": norm_states or None},
-            per_repo=lambda repo: fetch_repo_issue_label_events_graphql(
-                client, repo.owner, repo.name, states=states, use_cache=False
-            ),
-            task_desc="organization issue label events",
-            max_workers=max_workers,
-        )
-
-    def since_fetch(since: datetime) -> list[IssueTimelineEventRecord]:
-        try:
-            return fetch_org_records_batched(
-                client,
-                org,
-                query_text=load_query("issue_label_events_since"),
-                model_class=IssueTimelineEventRecord,
-                nodes_path=["issues"],
-                variables={"states": norm_states or None, "since": since.isoformat()},
-                per_repo=lambda repo: fetch_repo_issue_label_events_since_graphql(
-                    client, repo.owner, repo.name, since, states
-                ),
-                task_desc="organization issue label event updates",
-                max_workers=max_workers,
-            )
-        except PartialOrgFetchError:
-            raise  # let the store hold the watermark; don't fall back to full
-        except Exception:
-            logger.exception("Incremental label-event fetch failed; falling back to full fetch")
-            return full_fetch()
-
-    return fetch_incremental(
-        path=dataset_path("issue_label_events", org, fingerprint),
-        model_class=IssueTimelineEventRecord,
-        key_of=lambda e: (e.repo, e.issue_number, e.event_type, e.occurred_at, e.label),
-        updated_at_of=lambda e: e.occurred_at,
-        full_fetch=full_fetch,
-        since_fetch=since_fetch,
-        force_full=refresh,
-        full_refresh_after=timedelta(days=30),
+    return fetch_org_batched_incremental(
+        client,
+        ISSUE_LABEL_EVENTS_RESOURCE,
+        org=org,
+        query_name="issue_label_events",
+        since_query_name="issue_label_events_since",
+        nodes_path=["issues"],
+        variables={"states": norm_states or None},
+        per_repo=lambda repo: fetch_repo_issue_label_events_graphql(
+            client, repo.owner, repo.name, states=states, use_cache=False
+        ),
+        per_repo_since=lambda repo, since: fetch_repo_issue_label_events_since_graphql(
+            client, repo.owner, repo.name, since, states
+        ),
+        fingerprint="-".join(norm_states) if norm_states else "all",
+        max_workers=max_workers,
+        refresh=refresh,
     )

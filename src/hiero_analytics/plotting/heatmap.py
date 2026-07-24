@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import Normalize
 
-from hiero_analytics.config.charts import ACTIVITY_HEATMAP_CMAP, ACTIVITY_HEATMAP_PALETTE
+from hiero_analytics.config.charts import ACTIVITY_HEATMAP_CMAP, ACTIVITY_HEATMAP_PALETTE, FONT_WEIGHT_SEMIBOLD
+from hiero_analytics.plotting.base import save_and_close
+
+_CELL_VALUE_FONT_SIZE = 9
 
 
 def plot_heatmap(
@@ -42,43 +45,44 @@ def plot_heatmap(
     width = max(10.0, len(col_labels) * 1.15 + 4.0)
     height = max(6.0, len(row_labels) * 0.4 + 2.4)
     fig, ax = plt.subplots(figsize=(width, height))
-    fig.patch.set_facecolor(palette["figure_bg"])
-    ax.set_facecolor(palette["axes_bg"])
-    ax.grid(False)  # the project style enables a grid globally; it must not overlay the heatmap
+    try:
+        fig.patch.set_facecolor(palette["figure_bg"])
+        ax.set_facecolor(palette["axes_bg"])
+        ax.grid(False)  # the project style enables a grid globally; it must not overlay the heatmap
 
-    image = ax.imshow(matrix, aspect="auto", cmap=cmap_obj, norm=normalization, interpolation="nearest")
+        image = ax.imshow(matrix, aspect="auto", cmap=cmap_obj, norm=normalization, interpolation="nearest")
 
-    ax.set_xticks(range(len(col_labels)))
-    ax.set_xticklabels(col_labels, rotation=45, ha="right")
-    ax.set_yticks(range(len(row_labels)))
-    ax.set_yticklabels(list(row_labels))
+        ax.set_xticks(range(len(col_labels)))
+        ax.set_xticklabels(col_labels, rotation=45, ha="right")
+        ax.set_yticks(range(len(row_labels)))
+        ax.set_yticklabels(list(row_labels))
 
-    if annotate:
-        for row_index, row_values in enumerate(matrix):
-            for column_index, cell_value in enumerate(row_values):
-                text_color = palette["text_dark"] if normalization(cell_value) < 0.6 else palette["text_light"]
-                ax.text(
-                    column_index,
-                    row_index,
-                    int(cell_value),
-                    ha="center",
-                    va="center",
-                    fontsize=9,
-                    fontweight="semibold",
-                    color=text_color,
-                )
+        if annotate:
+            for row_index, row_values in enumerate(matrix):
+                for column_index, cell_value in enumerate(row_values):
+                    text_color = palette["text_dark"] if normalization(cell_value) < 0.6 else palette["text_light"]
+                    ax.text(
+                        column_index,
+                        row_index,
+                        int(cell_value),
+                        ha="center",
+                        va="center",
+                        fontsize=_CELL_VALUE_FONT_SIZE,
+                        fontweight=FONT_WEIGHT_SEMIBOLD,
+                        color=text_color,
+                    )
 
-    ax.set_title(title, loc="left", color=palette["text_dark"])
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
+        ax.set_title(title, loc="left", color=palette["text_dark"])
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
 
-    ax.tick_params(axis="both", colors=palette["tick"])
-    colorbar = fig.colorbar(image, ax=ax, pad=0.02)
-    colorbar.set_label(value_label)
+        ax.tick_params(axis="both", colors=palette["tick"])
+        colorbar = fig.colorbar(image, ax=ax, pad=0.02)
+        colorbar.set_label(value_label)
 
-    fig.tight_layout()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+        fig.tight_layout()
+        save_and_close(fig, output_path)
+    finally:
+        plt.close(fig)

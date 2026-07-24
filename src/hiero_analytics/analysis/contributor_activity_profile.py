@@ -52,6 +52,11 @@ _EVENT_COLUMNS = [
     "month",
 ]
 
+# The five raw contribution counts every profile table carries, in display
+# order. Downstream tables (team activity, role coverage) aggregate exactly
+# these columns — import this rather than re-listing them.
+CONTRIB_COUNT_FIELDS = ("prs_opened", "reviews_given", "merges_done", "issues_opened", "labels_applied")
+
 _PROFILE_COLUMNS = [
     "contributor",
     "prs_opened",
@@ -334,6 +339,16 @@ def build_account_activity_by_repo(
     return out.sort_values(["account", "_total"], ascending=[True, False]).drop(columns="_total").reset_index(drop=True)
 
 
+def _dated_actor_events(records, label_events):
+    """Yield ``(repo, actor, occurred_at)`` for every attributed, dated event."""
+    for record in records:
+        if record.actor and record.occurred_at is not None:
+            yield record.repo, record.actor, record.occurred_at
+    for event in label_events or []:
+        if event.actor and event.occurred_at is not None:
+            yield event.repo, event.actor, event.occurred_at
+
+
 def latest_activity_by_account(
     records: list[ContributorActivityRecord],
     label_events: list[IssueTimelineEventRecord] | None = None,
@@ -344,11 +359,7 @@ def latest_activity_by_account(
     activity window applied to the contribution counts.
     """
     out: dict[str, tuple] = {}
-    pairs = [(r.actor, r.occurred_at) for r in records]
-    pairs += [(e.actor, e.occurred_at) for e in (label_events or [])]
-    for actor, when in pairs:
-        if not actor or when is None:
-            continue
+    for _repo, actor, when in _dated_actor_events(records, label_events):
         key = actor.lower()
         current = out.get(key)
         if current is None or when > current[0]:
@@ -362,11 +373,7 @@ def latest_activity_by_repo_account(
 ) -> dict[tuple[str, str], object]:
     """All-time recency per repo+account: ``{(repo, account_lower): last_active}``."""
     out: dict[tuple[str, str], object] = {}
-    triples = [(r.repo, r.actor, r.occurred_at) for r in records]
-    triples += [(e.repo, e.actor, e.occurred_at) for e in (label_events or [])]
-    for repo, actor, when in triples:
-        if not actor or when is None:
-            continue
+    for repo, actor, when in _dated_actor_events(records, label_events):
         key = (repo, actor.lower())
         current = out.get(key)
         if current is None or when > current:

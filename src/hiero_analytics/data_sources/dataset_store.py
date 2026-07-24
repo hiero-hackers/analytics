@@ -42,6 +42,12 @@ DEFAULT_OVERLAP = timedelta(minutes=10)
 
 # How old a persisted dataset's watermark may be before load_or_fetch refreshes it
 # instead of reusing it. Matches the update-analytics CI cadence.
+#
+# Two staleness windows layer on the same dataset file, split across two levels:
+# this 5-day *reuse* gate decides whether load_or_fetch calls its fetch_fn at
+# all, and fetch_incremental's ~30-day *full_refresh_after* decides whether that
+# fetch is a cheap since-delta or a full self-healing re-fetch. A normal run
+# therefore reuses (<5d), refreshes incrementally (5-30d), or rebuilds (>30d).
 DEFAULT_REUSE_MAX_AGE = timedelta(days=5)
 
 
@@ -142,6 +148,7 @@ def load_or_fetch(  # noqa: UP047
     fetch_fn: Callable[[], list[T]],
     *,
     max_age: timedelta | None = DEFAULT_REUSE_MAX_AGE,
+    fingerprint: str = "all",
 ) -> list[T]:
     """Reuse the persisted ``(resource, org)`` dataset if fresh enough, else build it.
 
@@ -152,8 +159,12 @@ def load_or_fetch(  # noqa: UP047
     never silently serves arbitrarily old data. ``fetch_fn`` is normally an
     incremental fetcher, so a stale-triggered refresh only pulls the delta (and
     re-persists the dataset). ``max_age=None`` disables the staleness bound.
+
+    ``fingerprint`` must match what ``fetch_fn`` writes (the incremental
+    fetchers derive it from their query variables, e.g. issue states) — a
+    mismatch would read one dataset while writing another.
     """
-    state = load_dataset(dataset_path(resource, org, "all"), model_class)
+    state = load_dataset(dataset_path(resource, org, fingerprint), model_class)
     if state is not None:
         records, fetched_through = state
         if offline_mode_enabled():

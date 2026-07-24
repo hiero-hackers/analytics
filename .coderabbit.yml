@@ -10,9 +10,19 @@ issue_enrichment:
     auto_planning:
       enabled: true
       labels:
-        - "!no-plan" # the only rule left: an opt-out
-        - "plan-me" # Auto-plan issues with this label
-        
+        - "!no-plan" # opt-out: never auto-plan an issue carrying this label
+        # Skill labels applied by the issue templates -> auto-generate a plan.
+        - "good first issue"
+        - "beginner"
+        - "intermediate"
+        - "advanced"
+        # Cross-org "skill:"-prefixed variants, harmless if unused here.
+        - "skill: good first issue"
+        - "skill: beginner"
+        - "skill: intermediate"
+        - "skill: advanced"
+        - "plan-me" # manual opt-in for issues without a skill label
+
 # Only documents non-default options:
 reviews:
   profile: "chill" # Chill profile yields less feedback, that may be considered lenient.
@@ -37,13 +47,23 @@ reviews:
   path_instructions:
     - path: "**"
       instructions: |
-        Review ONLY for critical issues.
+        Review ONLY for major or critical issues. This is an analytics project: the two
+        things that matter most are that the numbers are correct and that the
+        data pipeline is safe.
 
-        Critical issues include:
-        - Bugs
-        - Security vulnerabilities
-        - Data inaccuracy
-        - Performance problems with real impact
+        These issues include:
+        - Bugs that produce wrong output.
+        - Analytics correctness — a change that would make a metric or chart
+          mislead: wrong aggregation or time window, double-counting or a
+          missing de-duplication, timezone / UTC-normalisation mistakes,
+          off-by-one date bucketing, counting bots as people, or a chart whose
+          axes, labels, or scale misrepresent the underlying data.
+        - Security — leaked tokens or secrets, injection (including CSV /
+          spreadsheet-formula injection in exported data), unsafe
+          deserialization, SSRF or unbounded/undisciplined outbound fetches,
+          or following untrusted GitHub-supplied input into file paths.
+        - Performance problems with real impact (e.g. O(n^2) over org-wide
+          data, unbounded API pagination).
 
         Ignore completely:
         - Code style, formatting, naming, or linting
@@ -57,6 +77,24 @@ reviews:
         - Do not provide suggestions unless they fix a critical issue.
         - Do not explain obvious code behavior.
         - Keep responses short and direct.
+
+    - path: "src/hiero_analytics/data_sources/**"
+      instructions: |
+        This is the data-ingestion and transport layer — the most
+        security-sensitive code in the repo. In addition to the global rules,
+        flag as critical: any handling of the GITHUB_TOKEN or other secrets
+        that could log or leak them, outbound requests to hosts derived from
+        untrusted input (SSRF), missing timeouts or unbounded pagination,
+        unsafe parsing/deserialization of API responses, and any path where
+        GitHub-supplied strings reach the filesystem or a shell.
+
+    - path: "src/hiero_analytics/{analysis,plotting,dashboard_spec}/**"
+      instructions: |
+        This is the correctness-sensitive layer — its output is the numbers and
+        charts people trust. In addition to the global rules, flag as critical:
+        aggregation over the wrong window or grouping, missing de-duplication,
+        timezone/UTC errors, off-by-one bucketing, including bots in people
+        metrics, and visualisations whose axes/labels/scale would mislead.
 
 chat:
   auto_reply: false

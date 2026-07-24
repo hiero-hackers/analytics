@@ -155,7 +155,7 @@ def test_fetch_org_issues_graphql_parallel(monkeypatch, mock_client, tmp_path):
     ]
 
     monkeypatch.setattr(
-        ingest.issues,
+        ingest.incremental,
         "dataset_path",
         lambda resource, scope, fingerprint="all": tmp_path / f"{resource}_{scope}_{fingerprint}.json",
     )
@@ -165,7 +165,7 @@ def test_fetch_org_issues_graphql_parallel(monkeypatch, mock_client, tmp_path):
         lambda _client, _org: repos,
     )
     monkeypatch.setattr(
-        ingest.issues,
+        ingest.incremental,
         "fetch_org_records_batched",
         lambda _client, _org, *, per_repo, **_kwargs: [record for repo in repos for record in per_repo(repo)],
     )
@@ -278,7 +278,7 @@ def test_fetch_org_merged_pr_difficulty_graphql_is_incremental(monkeypatch, tmp_
     """Org merged-PR difficulty routes through the dataset store: full fetch, then delta-merge."""
     repos = [RepositoryRecord("org/repo1", "repo1", "org")]
     monkeypatch.setattr(
-        ingest.pull_requests,
+        ingest.incremental,
         "dataset_path",
         lambda resource, scope, fingerprint="all": tmp_path / f"{resource}_{scope}_{fingerprint}.json",
     )
@@ -289,7 +289,7 @@ def test_fetch_org_merged_pr_difficulty_graphql_is_incremental(monkeypatch, tmp_
         # below drive the store; batching itself is covered by test_batched.py.
         return [record for repo in repos for record in per_repo(repo)]
 
-    monkeypatch.setattr(ingest.pull_requests, "fetch_org_records_batched", fake_batched)
+    monkeypatch.setattr(ingest.incremental, "fetch_org_records_batched", fake_batched)
 
     # Recent timestamps: a watermark older than full_refresh_after would force
     # a second full fetch instead of exercising the delta path.
@@ -298,7 +298,7 @@ def test_fetch_org_merged_pr_difficulty_graphql_is_incremental(monkeypatch, tmp_
     full = Mock(return_value=[r1])
     delta = Mock(return_value=[r1, r2])  # re-sends r1 (must dedup) + a new unlinked r2
     monkeypatch.setattr(ingest.pull_requests, "fetch_repo_merged_pr_difficulty_graphql", full)
-    monkeypatch.setattr(ingest.pull_requests, "fetch_repo_merged_prs_since_graphql", delta)
+    monkeypatch.setattr(ingest.pull_requests, "fetch_repo_merged_pr_difficulty_since_graphql", delta)
 
     first = ingest.fetch_org_merged_pr_difficulty_graphql(mock_client, "org", max_workers=2)
     assert first == [r1]
@@ -477,3 +477,58 @@ def test_fetch_org_resource_parallel_raises_partial_instead_of_returning_incompl
 
     assert excinfo.value.records == ["ok-rec"]
     assert [r.name for r in excinfo.value.failed_repos] == ["broken"]
+
+
+# ---------------------------------------------------------
+# merged-PR incremental delta: the real page loop + watermark early-stop
+# ---------------------------------------------------------
+
+
+def _pr_node(number: int, updated: str) -> dict:
+    """A merged-PR GraphQL node with an unlinked closing issue."""
+    return {
+        "number": number,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "mergedAt": updated,
+        "updatedAt": updated,
+        "additions": 1,
+        "deletions": 1,
+        "changedFiles": 1,
+        "author": {"login": "alice"},
+        "closingIssuesReferences": {"nodes": []},
+    }
+
+
+def _pr_page(nodes: list[dict], *, cursor: str | None, has_next: bool) -> dict:
+    """Wrap PR nodes in the repository.pullRequests GraphQL envelope."""
+    return {
+        "data": {
+            "repository": {
+                "pullRequests": {
+                    "nodes": nodes,
+                    "pageInfo": {"endCursor": cursor, "hasNextPage": has_next},
+                }
+            }
+        }
+    }
+
+
+def test_merged_pr_since_stops_paginating_past_the_watermark(mock_client):
+    """The delta fetcher walks UPDATED_AT-descending pages and stops once one predates `since`.
+
+    Boundary-page records older than `since` are still returned (the incremental
+    merge is an idempotent upsert), but no further page is requested.
+    """
+    since = datetime(2024, 6, 1, tzinfo=UTC)
+
+    pages = [
+        _pr_page([_pr_node(1, "2024-07-01T00:00:00Z")], cursor="c1", has_next=True),
+        # This page contains a PR older than the watermark -> pagination must stop here.
+        _pr_page([_pr_node(2, "2024-05-01T00:00:00Z")], cursor="c2", has_next=True),
+    ]
+    mock_client.graphql = Mock(side_effect=pages)
+
+    records = ingest.pull_requests.fetch_repo_merged_pr_difficulty_since_graphql(mock_client, "org", "repo", since)
+
+    assert {r.pr_number for r in records} == {1, 2}  # boundary record still returned
+    assert mock_client.graphql.call_count == 2  # did NOT request a third page

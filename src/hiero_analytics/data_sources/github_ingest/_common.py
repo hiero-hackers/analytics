@@ -14,13 +14,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import TypeVar
 
-from hiero_analytics.config.paths import load_query
+from hiero_analytics.data_sources.queries import load_query
 
 from ..cache import load_records_cache, save_records_cache
 from ..dataset_store import PartialOrgFetchError
 from ..github_client import GitHubClient
 from ..models import BaseRecord, RepositoryRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
+from ..serialization import parse_github_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +47,8 @@ def _cache_kwargs(
 
 
 def _parse_graphql_datetime(value: object) -> datetime | None:
-    """Parse an ISO datetime string from a GitHub GraphQL response."""
-    if not isinstance(value, str):
-        return None
-
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
+    """Parse an ISO datetime from a GraphQL response (lenient: malformed is None)."""
+    return parse_github_datetime(value)
 
 
 def fetch_github_resource(  # noqa: UP047

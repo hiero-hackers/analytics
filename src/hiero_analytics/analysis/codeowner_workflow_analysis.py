@@ -89,10 +89,5 @@ def prepare_stacked_runner_summary(runners: list[RunnerRecord]) -> pd.DataFrame:
 
         counts[r.repo][key] += 1
 
-    summary = pd.DataFrame(list(counts.values()))
-
-    for col in ["Self-Hosted", "Standard", "Indeterminate"]:
-        if col not in summary.columns:
-            summary[col] = 0
-
-    return summary
+    # Every per-repo dict seeds all three keys, so no column back-fill is needed.
+    return pd.DataFrame(list(counts.values()))

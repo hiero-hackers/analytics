@@ -97,3 +97,7 @@ details[open] .tsum::before{transform:rotate(90deg)}
 .wip{margin:36px 0 8px;padding:14px 16px;border-top:1px solid #e6e6e6;font-size:13px;color:#777;line-height:1.5}
 .wipbadge{display:inline-block;background:#fde68a;color:#92400e;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:4px;margin-right:6px}
 @media (prefers-color-scheme:dark){.wip{color:#999;border-color:#2a2a2a}.wipbadge{background:#78350f;color:#fde68a}}
+
+/* Freshness stamps: per-section "data as of" (stale = older than the scheduled refresh). */
+.asof { display: inline-block; font-size: 0.78rem; color: #64748B; margin: 0 0 8px; }
+.asof.stale { color: #B45309; font-weight: 600; }

@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
 import requests
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
 from hiero_analytics.data_sources.models import ScorecardRecord
+
+from .serialization import parse_github_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
 def _normalize_scorecard_response(repo: str, json: dict[str, Any]) -> ScorecardRecord:
     """Normalize raw API response into ScorecardRecord."""
     score = float(json["score"])
-    created_date = datetime.fromisoformat(str(json["date"]).replace("Z", "+00:00"))
+    created_date = parse_github_datetime(str(json["date"]), strict=True)
     checks: dict[str, int] = {}
 
     for check in json["checks"]:

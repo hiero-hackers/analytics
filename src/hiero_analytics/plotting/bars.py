@@ -14,12 +14,13 @@ from hiero_analytics.config.charts import (
     DEFAULT_FIGSIZE,
     FONT_WEIGHT_SEMIBOLD,
     PRIMARY_PALETTE,
+    REFERENCE_LINE_COLOR,
     TITLE_COLOR,
 )
 
 from .base import (
     adaptive_legend_placement,
-    create_figure,
+    figure_context,
     finalize_chart,
     prepare_dataframe,
 )
@@ -77,6 +78,53 @@ def _compute_horizontal_axis_limit(max_value: float, annotation_padding: float) 
         max_value * HORIZONTAL_AXIS_LIMIT_RATIO,
         max_value + annotation_padding + HORIZONTAL_AXIS_MIN_EXTRA,
     )
+
+
+def _apply_bar_axis_layout(ax: Axes, values: pd.Series, *, horizontal: bool) -> None:
+    """Shared axis treatment for bar charts: orientation, margins, value-axis limits.
+
+    Horizontal charts read top-down (inverted y) and reserve room on the right
+    for the end-of-bar total labels; vertical charts pin the value axis to zero.
+    """
+    if horizontal:
+        ax.invert_yaxis()
+        max_value = float(values.max()) if not values.empty else 0.0
+        padding = _compute_annotation_padding(max_value)
+        ax.margins(y=HORIZONTAL_Y_MARGIN, x=HORIZONTAL_X_MARGIN)
+        ax.set_xlim(0, _compute_horizontal_axis_limit(max_value, padding))
+    else:
+        ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
+        ax.set_ylim(bottom=0)
+
+
+def _stacked_bar_figsize(row_count: int, *, horizontal: bool, auto_height_for_horizontal: bool) -> tuple[float, float]:
+    """Scale the figure: tall for many horizontal bars, wide for many vertical bars."""
+    if horizontal and auto_height_for_horizontal:
+        height = max(HORIZONTAL_FIGURE_MIN_HEIGHT, row_count * HORIZONTAL_ROW_HEIGHT + HORIZONTAL_FIGURE_OVERHEAD)
+        return (HORIZONTAL_FIGURE_WIDTH, height)
+    if not horizontal and row_count > VERTICAL_AUTO_WIDTH_AFTER:
+        width = max(VERTICAL_FIGURE_MIN_WIDTH, row_count * VERTICAL_COL_WIDTH + VERTICAL_FIGURE_OVERHEAD)
+        return (width, VERTICAL_FIGURE_HEIGHT)
+    return DEFAULT_FIGSIZE
+
+
+def _draw_reference_line(ax: Axes, value: float, label: str | None, *, horizontal: bool) -> None:
+    """Dashed threshold line on the value axis (e.g. a 50% majority marker)."""
+    line = ax.axvline if horizontal else ax.axhline
+    line(value, color=REFERENCE_LINE_COLOR, linestyle="--", linewidth=1.3, zorder=ANNOTATION_ZORDER)
+    if label:
+        transform = ax.get_xaxis_transform() if horizontal else ax.get_yaxis_transform()
+        pos = (value, 0.995) if horizontal else (0.995, value)
+        ax.text(
+            *pos,
+            label,
+            transform=transform,
+            ha="right",
+            va="bottom",
+            fontsize=ANNOTATION_FONT_SIZE,
+            color=REFERENCE_LINE_COLOR,
+            fontweight=FONT_WEIGHT_SEMIBOLD,
+        )
 
 
 def _annotate_bar_totals(
@@ -175,56 +223,46 @@ def plot_bar(
         )  # Auto-switch to a more report-like horizontal layout for crowded categories.
     horizontal = _should_use_horizontal(df, x_col, rotate_x)
 
-    fig, ax = create_figure()
-
-    bar_colors = (
-        [colors.get(str(x), PRIMARY_PALETTE[0]) for x in df[x_col]] if colors else [PRIMARY_PALETTE[2]] * len(df)
-    )
-
-    bars = (
-        ax.barh(
-            df[x_col].astype(str),
-            df[y_col],
-            color=bar_colors,
-            height=BAR_HEIGHT,
-            linewidth=0,
-            zorder=BAR_ZORDER,
+    with figure_context() as (fig, ax):
+        bar_colors = (
+            [colors.get(str(x), PRIMARY_PALETTE[0]) for x in df[x_col]] if colors else [PRIMARY_PALETTE[2]] * len(df)
         )
-        if horizontal
-        else ax.bar(
-            df[x_col],
-            df[y_col],
-            color=bar_colors,
-            width=BAR_WIDTH,
-            linewidth=0,
-            zorder=BAR_ZORDER,
+
+        bars = (
+            ax.barh(
+                df[x_col].astype(str),
+                df[y_col],
+                color=bar_colors,
+                height=BAR_HEIGHT,
+                linewidth=0,
+                zorder=BAR_ZORDER,
+            )
+            if horizontal
+            else ax.bar(
+                df[x_col],
+                df[y_col],
+                color=bar_colors,
+                width=BAR_WIDTH,
+                linewidth=0,
+                zorder=BAR_ZORDER,
+            )
         )
-    )
-    patches = cast(list[Rectangle], list(bars.patches))
-    _round_bar_patches(ax, patches)
-    _annotate_bar_totals(ax, patches, df[y_col], horizontal=horizontal)
+        patches = cast(list[Rectangle], list(bars.patches))
+        _round_bar_patches(ax, patches)
+        _annotate_bar_totals(ax, patches, df[y_col], horizontal=horizontal)
 
-    if horizontal:
-        ax.invert_yaxis()
-        # Leave room for end labels on the right.
-        max_value = float(df[y_col].max())
-        padding = _compute_annotation_padding(max_value)
-        ax.margins(y=HORIZONTAL_Y_MARGIN, x=HORIZONTAL_X_MARGIN)
-        ax.set_xlim(0, _compute_horizontal_axis_limit(max_value, padding))
-    else:
-        ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
-        ax.set_ylim(bottom=0)
+        _apply_bar_axis_layout(ax, df[y_col], horizontal=horizontal)
 
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=y_col if horizontal else x_col,
-        ylabel="" if horizontal else y_col,
-        output_path=output_path,
-        rotate_x=None if horizontal else rotate_x,
-        grid_axis="x" if horizontal else "y",
-    )
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=y_col if horizontal else x_col,
+            ylabel="" if horizontal else y_col,
+            output_path=output_path,
+            rotate_x=None if horizontal else rotate_x,
+            grid_axis="x" if horizontal else "y",
+        )
 
 
 def plot_stacked_bar(
@@ -302,125 +340,87 @@ def plot_stacked_bar(
         df = df.sort_values("total", ascending=False)
     horizontal = _should_use_horizontal(df, x_col, rotate_x) if force_horizontal is None else force_horizontal
 
-    # Scale the figure: tall for many horizontal bars, wide for many vertical bars.
-    if horizontal and auto_height_for_horizontal:
-        fig_height = max(
-            HORIZONTAL_FIGURE_MIN_HEIGHT,
-            len(df) * HORIZONTAL_ROW_HEIGHT + HORIZONTAL_FIGURE_OVERHEAD,
-        )
-        figsize: tuple[float, float] = (HORIZONTAL_FIGURE_WIDTH, fig_height)
-    elif not horizontal and len(df) > VERTICAL_AUTO_WIDTH_AFTER:
-        fig_width = max(
-            VERTICAL_FIGURE_MIN_WIDTH,
-            len(df) * VERTICAL_COL_WIDTH + VERTICAL_FIGURE_OVERHEAD,
-        )
-        figsize = (fig_width, VERTICAL_FIGURE_HEIGHT)
-    else:
-        figsize = DEFAULT_FIGSIZE
+    figsize = _stacked_bar_figsize(
+        len(df), horizontal=horizontal, auto_height_for_horizontal=auto_height_for_horizontal
+    )
 
-    fig, ax = create_figure(figsize=figsize)
+    with figure_context(figsize=figsize) as (fig, ax):
+        offsets = pd.Series(0, index=df.index, dtype=float)
+        totals = df[stack_cols].sum(axis=1)
+        palette = build_palette(len(stack_cols))
+        legend_handles: list[Patch] = []
+        patches: list[Rectangle] = []
 
-    offsets = pd.Series(0, index=df.index, dtype=float)
-    totals = df[stack_cols].sum(axis=1)
-    palette = build_palette(len(stack_cols))
-    legend_handles: list[Patch] = []
-    patches: list[Rectangle] = []
+        for index, (col, label) in enumerate(zip(stack_cols, labels, strict=True)):
+            color = colors.get(label) if colors else palette[index]
+            legend_handles.append(Patch(facecolor=color, edgecolor="none", label=label))
 
-    for index, (col, label) in enumerate(zip(stack_cols, labels, strict=True)):
-        color = colors.get(label) if colors else palette[index]
-        legend_handles.append(Patch(facecolor=color, edgecolor="none", label=label))
-
-        bars = (
-            ax.barh(
-                df[x_col].astype(str),
-                df[col],
-                left=offsets,
-                label=label,
-                color=color,
-                height=BAR_HEIGHT,
-                linewidth=0,
-                alpha=STACKED_BAR_ALPHA,
-                zorder=BAR_ZORDER,
+            bars = (
+                ax.barh(
+                    df[x_col].astype(str),
+                    df[col],
+                    left=offsets,
+                    label=label,
+                    color=color,
+                    height=BAR_HEIGHT,
+                    linewidth=0,
+                    alpha=STACKED_BAR_ALPHA,
+                    zorder=BAR_ZORDER,
+                )
+                if horizontal
+                else ax.bar(
+                    df[x_col],
+                    df[col],
+                    bottom=offsets,
+                    label=label,
+                    color=color,
+                    width=BAR_WIDTH,
+                    linewidth=0,
+                    alpha=STACKED_BAR_ALPHA,
+                    zorder=BAR_ZORDER,
+                )
             )
-            if horizontal
-            else ax.bar(
-                df[x_col],
-                df[col],
-                bottom=offsets,
-                label=label,
-                color=color,
-                width=BAR_WIDTH,
-                linewidth=0,
-                alpha=STACKED_BAR_ALPHA,
-                zorder=BAR_ZORDER,
-            )
-        )
-        patches = cast(list[Rectangle], list(bars.patches))
-        offsets = offsets.add(df[col], fill_value=0)
+            patches = cast(list[Rectangle], list(bars.patches))
+            offsets = offsets.add(df[col], fill_value=0)
 
-    if horizontal:
-        ax.invert_yaxis()
-        # Place the legend in reserved top whitespace and keep totals at the end
-        # of each stack rather than inside the bars.
-        max_total = float(totals.max()) if not totals.empty else 0.0
-        padding = _compute_annotation_padding(max_total)
-        if annotate_totals:
-            _annotate_bar_totals(ax, patches, totals, horizontal=True)
-        ax.margins(y=HORIZONTAL_Y_MARGIN, x=HORIZONTAL_X_MARGIN)
-        ax.set_xlim(0, _compute_horizontal_axis_limit(max_total, padding))
-    else:
-        if annotate_totals and len(df) <= 12:
-            _annotate_bar_totals(ax, patches, totals, horizontal=False)
-        ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
-        ax.set_ylim(bottom=0)
+        # Totals sit at the end of each stack; vertical charts skip them once
+        # crowded (they overlap), horizontal charts always have room.
+        if annotate_totals and (horizontal or len(df) <= 12):
+            _annotate_bar_totals(ax, patches, totals, horizontal=horizontal)
+        _apply_bar_axis_layout(ax, totals, horizontal=horizontal)
         # Force integer ticks when all x values are whole numbers (e.g. years).
-        if is_numeric_or_datetime(df[x_col]) and (df[x_col] % 1 == 0).all():
+        if not horizontal and is_numeric_or_datetime(df[x_col]) and (df[x_col] % 1 == 0).all():
             ax.set_xticks(df[x_col])
             ax.set_xticklabels([str(int(v)) for v in df[x_col]])
 
-    # Optional reference line on the value axis (e.g. a 50% majority threshold).
-    if reference_value is not None:
-        line = ax.axvline if horizontal else ax.axhline
-        line(reference_value, color="#444", linestyle="--", linewidth=1.3, zorder=ANNOTATION_ZORDER)
-        if reference_label:
-            transform = ax.get_xaxis_transform() if horizontal else ax.get_yaxis_transform()
-            pos = (reference_value, 0.995) if horizontal else (0.995, reference_value)
-            ax.text(
-                *pos,
-                reference_label,
-                transform=transform,
-                ha="right",
-                va="bottom",
-                fontsize=ANNOTATION_FONT_SIZE,
-                color="#444",
-                fontweight=FONT_WEIGHT_SEMIBOLD,
-            )
+        if reference_value is not None:
+            _draw_reference_line(ax, reference_value, reference_label, horizontal=horizontal)
 
-    ## Adaptive Legend placement
-    labels_count = len(labels)
-    placement = adaptive_legend_placement(labels_count)
+        ## Adaptive Legend placement
+        labels_count = len(labels)
+        placement = adaptive_legend_placement(labels_count)
 
-    # Backward-compatible override.
-    if legend_inside_bottom_right:
-        placement = {
-            "legend_loc": "lower right",
-            "legend_bbox_to_anchor": (0.985, 0.02),
-            "legend_ncol": min(labels_count, 4),
-            "layout_rect": (0.0, 0.0, 1.0, 1.0),
-        }
+        # Backward-compatible override.
+        if legend_inside_bottom_right:
+            placement = {
+                "legend_loc": "lower right",
+                "legend_bbox_to_anchor": (0.985, 0.02),
+                "legend_ncol": min(labels_count, 4),
+                "layout_rect": (0.0, 0.0, 1.0, 1.0),
+            }
 
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=value_label if horizontal else x_col,
-        ylabel="" if horizontal else value_label,
-        output_path=output_path,
-        legend=True,
-        rotate_x=None if horizontal else rotate_x,
-        grid_axis="x" if horizontal else "y",
-        legend_handles=legend_handles,
-        legend_labels=labels,
-        legend_kwargs={"borderaxespad": 0.0},
-        **placement,
-    )
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=value_label if horizontal else x_col,
+            ylabel="" if horizontal else value_label,
+            output_path=output_path,
+            legend=True,
+            rotate_x=None if horizontal else rotate_x,
+            grid_axis="x" if horizontal else "y",
+            legend_handles=legend_handles,
+            legend_labels=labels,
+            legend_kwargs={"borderaxespad": 0.0},
+            **placement,
+        )

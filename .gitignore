@@ -34,7 +34,8 @@ src/hiero_sdk_python/hapi
 .pytest_cache
 
 # Lock files
-uv.lock
+# uv.lock is committed on purpose: it pins exact transitive versions for
+# reproducible installs and satisfies OpenSSF Scorecard's Pinned-Dependencies.
 pdm.lock
 pubkey.asc
 

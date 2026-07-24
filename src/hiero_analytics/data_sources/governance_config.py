@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
-from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -12,23 +12,22 @@ import requests
 import yaml
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
-from hiero_analytics.config.paths import DATASETS_DIR
+from hiero_analytics.config.paths import DATASETS_DIR, ORG, dataset_path
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled
 from hiero_analytics.domain.bots import is_bot_login
+from hiero_analytics.domain.roles import ROLE_PRIORITY, permission_to_role
 
-GOVERNANCE_CONFIG_URL = os.getenv(
-    "GOVERNANCE_CONFIG_URL",
-    "https://raw.githubusercontent.com/hiero-ledger/governance/main/config.yaml",
-)
-GOVERNANCE_CONFIG_SNAPSHOT = DATASETS_DIR / "governance_config.json"
+logger = logging.getLogger(__name__)
 
-ROLE_PRIORITY = {
-    "general_user": 0,
-    "triage": 1,
-    "committer": 2,
-    "maintainer": 3,
+# Per-org governance config sources. Only governed orgs appear here; an org
+# without an entry (e.g. the composition org) has no governance roles and
+# fetches an empty config rather than inheriting another org's. The
+# GOVERNANCE_CONFIG_URL env var overrides the configured primary org's source.
+GOVERNANCE_CONFIG_URLS: dict[str, str] = {
+    "hiero-ledger": "https://raw.githubusercontent.com/hiero-ledger/governance/main/config.yaml",
 }
-
+if _url_override := os.getenv("GOVERNANCE_CONFIG_URL"):
+    GOVERNANCE_CONFIG_URLS[ORG] = _url_override
 
 # Org-wide "blanket" teams: assigned to (nearly) every repo, so counting them as a
 # repo's role-holders would stamp the same handful of people onto all repos and
@@ -82,13 +81,31 @@ def _validate_governance_config(data: Any) -> dict[str, Any]:
 
 
 def fetch_governance_config(
-    url: str = GOVERNANCE_CONFIG_URL,
+    org: str = ORG,
     *,
+    url: str | None = None,
     snapshot_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Fetch governance config live, or load its validated snapshot offline."""
-    path = snapshot_path or GOVERNANCE_CONFIG_SNAPSHOT
+    """Fetch ``org``'s governance config live, or load its validated snapshot offline.
+
+    The source resolves from ``GOVERNANCE_CONFIG_URLS`` (or the explicit ``url``);
+    an org with no configured source is ungoverned and gets an empty config.
+    Snapshots are org-scoped so two governed orgs can never collide.
+    """
+    source = url or GOVERNANCE_CONFIG_URLS.get(org)
+    if source is None and snapshot_path is None:
+        logger.info("No governance config source for org %s; treating it as ungoverned", org)
+        return {}
+
+    path = snapshot_path or dataset_path("governance_config", org)
     if offline_mode_enabled():
+        if snapshot_path is None and not path.exists():
+            # Transitional fallback: snapshots written before org-scoping used one
+            # un-scoped filename. Remove once refreshed CI caches carry the
+            # org-scoped name. Never applied to an explicitly given path.
+            legacy = DATASETS_DIR / "governance_config.json"
+            if legacy.exists():
+                path = legacy
         if not path.exists():
             raise RuntimeError(f"Offline mode requires a governance config snapshot at {path}")
         try:
@@ -99,7 +116,7 @@ def fetch_governance_config(
         except (OSError, ValueError) as exc:
             raise RuntimeError(f"Offline governance config snapshot is invalid: {path}") from exc
 
-    response = requests.get(url, timeout=HTTP_TIMEOUT_SECONDS)
+    response = requests.get(source, timeout=HTTP_TIMEOUT_SECONDS)
     response.raise_for_status()
     data = _validate_governance_config(yaml.safe_load(response.text))
 
@@ -162,45 +179,3 @@ def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
         repo_roles[repo_name] = roles
 
     return repo_roles
-
-
-def permission_to_role(permission: Any) -> str | None:
-    """Normalize governance repo permissions into chart roles."""
-    if not isinstance(permission, str):
-        return None
-
-    normalized = permission.lower()
-    if normalized == "triage":
-        return "triage"
-    if normalized == "write":
-        return "committer"
-    if normalized in {"maintain", "admin"}:
-        return "maintainer"
-    return None
-
-
-def summarize_role_counts(repo_role_lookup: dict[str, dict[str, str]]) -> dict[str, int]:
-    """Return distinct user counts by highest role across all repositories."""
-    users: dict[str, str] = {}
-    for repo_lookup in repo_role_lookup.values():
-        for user, role in repo_lookup.items():
-            current_role = users.get(user)
-            if current_role is None or ROLE_PRIORITY[role] > ROLE_PRIORITY[current_role]:
-                users[user] = role
-
-    counts: dict[str, int] = defaultdict(int)
-    for role in users.values():
-        counts[role] += 1
-    return dict(counts)
-
-
-def count_distinct_role_holders_by_role(
-    repo_role_lookup: dict[str, dict[str, str]],
-) -> dict[str, int]:
-    """Return distinct user counts for each role across all repositories."""
-    users_by_role: dict[str, set[str]] = defaultdict(set)
-    for repo_lookup in repo_role_lookup.values():
-        for user, role in repo_lookup.items():
-            users_by_role[role].add(user)
-
-    return {role: len(users) for role, users in users_by_role.items()}

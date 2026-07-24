@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from hiero_analytics.analysis.dataframe_utils import bare_repo_names
+
 # Last-window contribution-count columns, as emitted by build_repo_role_coverage.
 _RECENT_FIELDS = ("prs_recent", "reviews_recent", "merges_recent", "issues_recent", "labels_recent")
 # Roles that can merge pull requests (write access). Triage cannot merge.
@@ -58,6 +60,8 @@ def build_repo_activity_overview(coverage_all: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=_OVERVIEW_COLUMNS)
 
     df = coverage_all.copy()
+    # Bare repo names, matching the other rollups in this module.
+    df["repo"] = bare_repo_names(df["repo"])
     df["_recent"] = df[list(_RECENT_FIELDS)].sum(axis=1)
 
     rows = []
@@ -96,7 +100,7 @@ def find_understaffed_repos(coverage_all: pd.DataFrame, *, max_active_maintainer
         return pd.DataFrame(columns=_UNDERSTAFFED_COLUMNS)
 
     df = coverage_all.copy()
-    df["repo"] = df["repo"].astype(str).str.split("/").str[-1]
+    df["repo"] = bare_repo_names(df["repo"])
     df["user"] = df["user"].astype(str).str.lower()
 
     rows = []
@@ -135,7 +139,7 @@ def build_review_load_share(coverage_all: pd.DataFrame, *, min_actions: int = 20
         return pd.DataFrame(columns=_LOAD_SHARE_COLUMNS)
 
     df = coverage_all.copy()
-    df["repo"] = df["repo"].astype(str).str.split("/").str[-1]
+    df["repo"] = bare_repo_names(df["repo"])
     pool = df[df["granted_role"].isin(_CAN_MERGE)].copy()
     pool["load"] = pool["reviews_recent"] + pool["merges_recent"]
 

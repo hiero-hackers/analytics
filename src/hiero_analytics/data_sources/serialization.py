@@ -16,6 +16,24 @@ from typing import TypeVar, get_args, get_type_hints
 T = TypeVar("T")
 
 
+def parse_github_datetime(value: object, *, strict: bool = False) -> datetime | None:
+    """Parse a GitHub ISO-8601 timestamp (trailing ``Z`` normalized to UTC).
+
+    Missing or non-string input returns None. Malformed strings also return
+    None, unless ``strict`` — for payloads where a bad timestamp means a broken
+    response rather than an absent optional field — in which case the
+    ``ValueError`` propagates.
+    """
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        if strict:
+            raise
+        return None
+
+
 def annotation_is_datetime(annotation: object) -> bool:
     """True for a resolved annotation of ``datetime`` or ``datetime | None``."""
     return annotation is datetime or datetime in get_args(annotation)
@@ -70,7 +88,7 @@ def deserialize_record(record_type: type[T], payload: dict[str, object]) -> T:  
     for field_name in datetime_fields(record_type):
         raw_value = restored.get(field_name)
         if raw_value is not None:
-            restored[field_name] = datetime.fromisoformat(str(raw_value))
+            restored[field_name] = parse_github_datetime(str(raw_value), strict=True)
 
     record = record_type(**restored)  # type: ignore[arg-type]
 

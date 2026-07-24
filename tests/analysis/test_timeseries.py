@@ -8,9 +8,9 @@ import pandas as pd
 
 from hiero_analytics.analysis.timeseries import (
     cumulative_timeseries,
+    difficulty_key,
     get_difficulty_over_time_event_based,
 )
-from hiero_analytics.analysis.timeseries_utils import difficulty_key
 from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
 
 

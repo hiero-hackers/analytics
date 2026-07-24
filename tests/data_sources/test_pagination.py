@@ -7,68 +7,6 @@ import hiero_analytics.data_sources.pagination as pagination
 # ---------------------------------------------------------
 
 
-def test_paginate_page_number_multiple_pages():
-    """Test that multiple full pages are accumulated correctly."""
-    pages = {
-        1: [1, 2, 3],
-        2: [4, 5, 6],
-        3: [],
-    }
-
-    def fetch(page):
-        return pages[page]
-
-    results = pagination.paginate_page_number(fetch, page_size=3)
-
-    assert results == [1, 2, 3, 4, 5, 6]
-
-
-def test_paginate_page_number_partial_page_stops():
-    """Test that pagination stops after a partial page is returned."""
-    pages = {
-        1: [1, 2, 3],
-        2: [4],  # partial page
-    }
-
-    def fetch(page):
-        return pages.get(page, [])
-
-    results = pagination.paginate_page_number(fetch, page_size=3)
-
-    assert results == [1, 2, 3, 4]
-
-
-def test_paginate_page_number_empty_first_page():
-    """Test that an empty first page returns an empty list immediately."""
-
-    def fetch(_page):
-        return []
-
-    results = pagination.paginate_page_number(fetch)
-
-    assert results == []
-
-
-def test_paginate_page_number_max_pages_guard():
-    """Test that max_pages limits the number of pages fetched."""
-
-    def fetch(page):
-        return [page] * 100
-
-    results = pagination.paginate_page_number(
-        fetch,
-        page_size=100,
-        max_pages=2,
-    )
-
-    assert len(results) == 200
-
-
-# ---------------------------------------------------------
-# cursor pagination
-# ---------------------------------------------------------
-
-
 def test_paginate_cursor_multiple_pages():
     """Test that cursor pagination accumulates items across multiple pages."""
     data = {
@@ -120,3 +58,29 @@ def test_paginate_cursor_handles_empty_items():
     results = pagination.paginate_cursor(fetch)
 
     assert results == []
+
+
+# ---------------------------------------------------------
+# extract_graphql_cursor_page: defensive traversal
+# ---------------------------------------------------------
+
+
+def test_extract_returns_empty_when_path_traversal_hits_a_non_dict():
+    """A path that runs into a non-dict value yields no nodes rather than raising."""
+    data = {"data": {"repository": "unexpected-scalar"}}
+    nodes, cursor, has_next = pagination.extract_graphql_cursor_page(data, ["repository", "pullRequests"])
+    assert nodes == [] and cursor is None and has_next is False
+
+
+def test_extract_coerces_non_list_nodes_to_empty():
+    """A 'nodes' that is not a list is treated as empty, not iterated blindly."""
+    data = {"data": {"repository": {"pullRequests": {"nodes": "oops", "pageInfo": {}}}}}
+    nodes, _cursor, _has_next = pagination.extract_graphql_cursor_page(data, ["repository", "pullRequests"])
+    assert nodes == []
+
+
+def test_extract_wraps_a_bare_object_as_a_single_node():
+    """A leaf object with no 'nodes' key is returned as a one-element list."""
+    data = {"data": {"repository": {"owner": {"login": "alice"}}}}
+    nodes, _cursor, _has_next = pagination.extract_graphql_cursor_page(data, ["repository", "owner"])
+    assert nodes == [{"login": "alice"}]

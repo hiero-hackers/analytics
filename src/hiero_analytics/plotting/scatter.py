@@ -9,17 +9,16 @@ import pandas as pd
 
 from hiero_analytics.config.charts import (
     ANNOTATION_FONT_SIZE,
-    CARD_BORDER_COLOR,
     MUTED_TEXT_COLOR,
-    PLOT_BACKGROUND_COLOR,
     PRIMARY_PALETTE,
     TITLE_COLOR,
 )
 from hiero_analytics.plotting.base import (
-    create_figure,
+    figure_context,
     finalize_chart,
     prepare_dataframe,
 )
+from hiero_analytics.plotting.primitives import styled_text_badge
 
 
 def plot_scatter_with_regression(
@@ -50,92 +49,78 @@ def plot_scatter_with_regression(
     y = df[y_col].astype(float)
 
     # -------------------------
-    # Regression
+    # Regression (needs at least two points — a single point cannot determine
+    # a line, and an unguarded polyfit warns "poorly conditioned")
     # -------------------------
-    slope, intercept = np.polyfit(x, y, 1)
-    y_pred = slope * x + intercept
+    has_regression = len(df) > 1
+    if has_regression:
+        slope, intercept = np.polyfit(x, y, 1)
+        y_pred = slope * x + intercept
+        r = np.corrcoef(x, y)[0, 1]
 
-    # correlation (guard small samples)
-    r = np.corrcoef(x, y)[0, 1] if len(df) > 1 else np.nan
-
-    # sort for clean line rendering
-    order = np.argsort(x)
-    x_sorted = x.iloc[order]
-    y_pred_sorted = y_pred.iloc[order]
+        # sort for clean line rendering
+        order = np.argsort(x)
+        x_sorted = x.iloc[order]
+        y_pred_sorted = y_pred.iloc[order]
 
     # -------------------------
     # Plot
     # -------------------------
-    fig, ax = create_figure()
-
-    # Scatter
-    ax.scatter(
-        x,
-        y,
-        color=PRIMARY_PALETTE[2],
-        alpha=0.55,
-        s=38,
-        edgecolors="none",
-        zorder=3,
-    )
-
-    # Regression line
-    ax.plot(
-        x_sorted,
-        y_pred_sorted,
-        color=PRIMARY_PALETTE[0],
-        linewidth=2.4,
-        zorder=4,
-    )
-
-    # -------------------------
-    # Annotations (styled)
-    # -------------------------
-    ax.text(
-        0.02,
-        0.96,
-        f"Slope {slope:.2f}",
-        transform=ax.transAxes,
-        fontsize=ANNOTATION_FONT_SIZE,
-        color=TITLE_COLOR,
-        va="top",
-        bbox={
-            "boxstyle": "round,pad=0.28,rounding_size=0.8",
-            "fc": PLOT_BACKGROUND_COLOR,
-            "ec": CARD_BORDER_COLOR,
-            "lw": 0.9,
-        },
-        zorder=5,
-    )
-
-    if not np.isnan(r):
-        ax.text(
-            0.02,
-            0.88,
-            f"r = {r:.2f}",
-            transform=ax.transAxes,
-            fontsize=ANNOTATION_FONT_SIZE,
-            color=MUTED_TEXT_COLOR,
-            va="top",
-            zorder=5,
+    with figure_context() as (fig, ax):
+        # Scatter
+        ax.scatter(
+            x,
+            y,
+            color=PRIMARY_PALETTE[2],
+            alpha=0.55,
+            s=38,
+            edgecolors="none",
+            zorder=3,
         )
 
-    # -------------------------
-    # Layout polish
-    # -------------------------
-    ax.margins(x=0.05, y=0.08)
-    ax.set_ylim(bottom=0)
+        if has_regression:
+            # Regression line
+            ax.plot(
+                x_sorted,
+                y_pred_sorted,
+                color=PRIMARY_PALETTE[0],
+                linewidth=2.4,
+                zorder=4,
+            )
 
-    # -------------------------
-    # Finalize
-    # -------------------------
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=xlabel,
-        ylabel=ylabel,
-        output_path=output_path,
-        legend=False,
-        grid_axis="both",
-    )
+            # -------------------------
+            # Annotations (styled)
+            # -------------------------
+            styled_text_badge(ax, x=0.02, y=0.96, text=f"Slope {slope:.2f}", color=TITLE_COLOR)
+
+            if not np.isnan(r):
+                ax.text(
+                    0.02,
+                    0.88,
+                    f"r = {r:.2f}",
+                    transform=ax.transAxes,
+                    fontsize=ANNOTATION_FONT_SIZE,
+                    color=MUTED_TEXT_COLOR,
+                    va="top",
+                    zorder=5,
+                )
+
+        # -------------------------
+        # Layout polish
+        # -------------------------
+        ax.margins(x=0.05, y=0.08)
+        ax.set_ylim(bottom=0)
+
+        # -------------------------
+        # Finalize
+        # -------------------------
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            output_path=output_path,
+            legend=False,
+            grid_axis="both",
+        )

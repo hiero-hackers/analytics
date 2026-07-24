@@ -108,6 +108,36 @@ def issues_to_dataframe(issues: list[IssueRecord]) -> pd.DataFrame:
     )
 
 
+def bare_repo_names(series: pd.Series) -> pd.Series:
+    """Vectorized ``domain.repos.bare_repo``: strip any ``owner/`` prefix from repo names."""
+    return series.astype(str).str.split("/").str[-1]
+
+
+def rows_by_login(profiles: pd.DataFrame, column: str = "contributor") -> dict[str, object]:
+    """Index a profile table's rows by lowercased ``column`` for O(1) member lookups."""
+    if profiles.empty:
+        return {}
+    return {str(getattr(row, column)).lower(): row for row in profiles.itertuples()}
+
+
+def staleness_sort_key(days_since_active: pd.Series) -> pd.Series:
+    """Sort key for ``days_since_active`` columns where blank (never active) is infinitely stale."""
+    return days_since_active.fillna(10**9)
+
+
+def counts_to_frame(series: pd.Series, label_col: str, *, order: Sequence[str] | None = None) -> pd.DataFrame:
+    """``value_counts`` as a two-column ``{label_col, count}`` frame.
+
+    With ``order``, one row per listed label in that order (zero-filled);
+    otherwise rows follow value_counts' descending-count order.
+    """
+    counts = series.value_counts()
+    if order is None:
+        frame = pd.DataFrame({label_col: counts.index, "count": counts.to_numpy()})
+        return frame.reset_index(drop=True)
+    return pd.DataFrame([{label_col: label, "count": int(counts.get(label, 0))} for label in order])
+
+
 def filter_by_labels(df: pd.DataFrame, labels: set[str]) -> pd.DataFrame:
     """
     Filter issues that contain at least one label from a given label set.

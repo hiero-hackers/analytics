@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 import hiero_analytics.config.paths as paths
 
 # -- ensure_output_dirs -------------------------------------------------------
@@ -103,56 +101,3 @@ def test_ensure_repo_dirs_sanitizes_slash(monkeypatch, tmp_path):
     assert charts_dir.name == "owner_repo"
     assert data_dir.is_dir()
     assert charts_dir.is_dir()
-
-
-# -- load_query ---------------------------------------------------------------
-
-
-def test_load_query_reads_file_and_caches(monkeypatch, tmp_path):
-    """Queries should be read from disk and cached on subsequent calls."""
-    queries_dir = tmp_path / "data_sources" / "queries"
-    queries_dir.mkdir(parents=True)
-    query_file = queries_dir / "test_query.graphql"
-    query_file.write_text("{ viewer { login } }", encoding="utf-8")
-
-    monkeypatch.setattr(paths, "SRC", tmp_path)
-    paths._query_cache.clear()
-
-    result = paths.load_query("test_query")
-
-    assert result == "{ viewer { login } }"
-    assert "test_query" in paths._query_cache
-
-    # second call should return from cache without re-reading
-    result_cached = paths.load_query("test_query")
-    assert result_cached == result
-
-    paths._query_cache.clear()
-
-
-def test_load_query_appends_referenced_fragments(monkeypatch, tmp_path):
-    """A query spreading a fragment has that fragment's definition appended."""
-    queries_dir = tmp_path / "data_sources" / "queries"
-    (queries_dir / "fragments").mkdir(parents=True)
-    (queries_dir / "q.graphql").write_text("query { repository { ...Foo } }", encoding="utf-8")
-    (queries_dir / "fragments" / "Foo.graphql").write_text("fragment Foo on Repository { name }", encoding="utf-8")
-
-    monkeypatch.setattr(paths, "SRC", tmp_path)
-    paths._query_cache.clear()
-
-    result = paths.load_query("q")
-
-    assert "...Foo" in result  # the spread stays in the query
-    assert "fragment Foo on Repository { name }" in result  # definition appended
-    paths._query_cache.clear()
-
-
-def test_load_query_raises_on_missing_file(monkeypatch, tmp_path):
-    """A non-existent query name should raise FileNotFoundError."""
-    monkeypatch.setattr(paths, "SRC", tmp_path)
-    paths._query_cache.clear()
-
-    with pytest.raises(FileNotFoundError):
-        paths.load_query("nonexistent_query")
-
-    paths._query_cache.clear()

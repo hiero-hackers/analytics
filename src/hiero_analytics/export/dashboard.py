@@ -25,55 +25,9 @@ _JS = _read_asset("dashboard.js")
 
 
 # A fixed legend (no user data) so anyone opening the file knows what each column
-# means. Every table uses the same five raw contribution counts.
-_GLOSSARY = (
-    "<details class='glossary'><summary>How to read this — what each column means</summary>"
-    "<dl>"
-    "<dt>contributor / account / member / user</dt><dd>a GitHub login.</dd>"
-    "<dt>PRs</dt><dd>pull requests this person opened (authored).</dd>"
-    "<dt>reviews</dt><dd>pull-request reviews they submitted on any PR.</dd>"
-    "<dt>merges</dt><dd>pull requests they merged (clicked &lsquo;merge&rsquo;).</dd>"
-    "<dt>issues</dt><dd>issues they opened.</dd>"
-    "<dt>labels</dt><dd>label add/remove actions they performed (triage).</dd>"
-    "<dt>actions</dt><dd>PRs + reviews + merges + issues + labels, summed &mdash; one activity total. "
-    "&ldquo;maint./comm. actions&rdquo; split it by the repo&rsquo;s maintainers / committers / triage.</dd>"
-    "<dt>review+merge</dt><dd>reviews submitted + PRs merged, summed &mdash; the &ldquo;shepherding&rdquo; "
-    "load. Both committers and maintainers can merge (triage cannot).</dd>"
-    "<dt>mergers</dt><dd>how many people (committers + maintainers) reviewed or merged in the repo.</dd>"
-    "<dt>top carrier / top % / top role</dt><dd>the person doing the most review+merge in a repo, their "
-    "share of it (top-2 % = the top two combined), and whether they are a committer or maintainer.</dd>"
-    "<dt>period tabs</dt><dd>activity counts and active / quiet status use the selected rolling period; "
-    "All time includes every tracked event.</dd>"
-    "<dt>repos</dt><dd>number of distinct repositories they were active in.</dd>"
-    "<dt>last active</dt><dd>date of their most recent tracked activity (all-time).</dd>"
-    "<dt>status</dt><dd>active = recent activity within the window; quiet = none in it.</dd>"
-    "<dt>days since active</dt><dd>days since their most recent activity (all-time; blank = never active).</dd>"
-    "<dt>role / role here</dt><dd>governance permission in that repo: triage, committer, or maintainer; "
-    "<em>general</em> = holds no special role there.</dd>"
-    "<dt>maintainers / committers / triage</dt><dd>as a count column (Repository activity), the number of "
-    "people holding that role in the repo.</dd>"
-    "<dt>members</dt><dd>the number of people on the team.</dd>"
-    "<dt>active / members active</dt><dd>how many of the group (team members, role-holders) had activity in "
-    "the window &mdash; vs. the total.</dd>"
-    "<dt>highest role</dt><dd>the most senior role a person holds in any repo (maintainer &gt; committer "
-    "&gt; triage).</dd>"
-    "<dt>roles held</dt><dd>every distinct role the person holds across repos.</dd>"
-    "<dt>how roles are set</dt><dd>a person&rsquo;s role in a repo comes from the governance "
-    "config&rsquo;s team&rarr;permission grants: <em>triage</em> &rarr; triage, <em>write</em> &rarr; "
-    "committer, <em>maintain</em> / <em>admin</em> &rarr; maintainer (<em>read</em> access isn&rsquo;t "
-    "counted). Where someone holds more than one, the highest is shown.</dd>"
-    "<dt>org-wide teams</dt><dd>a few teams (github-maintainers, security-maintainers, lf-staff, tsc, "
-    "hiero-triage) are granted on nearly every repo. To keep each repo&rsquo;s domain maintainers "
-    "visible, these are not counted on domain repos; they&rsquo;re credited only on org/meta repos "
-    "(e.g. .github, governance) that have no domain maintainer team of their own. So members of those "
-    "teams appear on just those few repos.</dd>"
-    "</dl>"
-    "<p class='gnote'>Tabbed activity tables use the selected period; reference tables labelled "
-    "&ldquo;all-time&rdquo; are cumulative. The permission-holder cleanup list uses a fixed 180-day quiet "
-    "threshold. Tracked activities are opening PRs/issues, reviewing, merging, and labeling &mdash; "
-    "comments and reactions are not counted.</p>"
-    "</details>"
-)
+# means. Every table uses the same five raw contribution counts. Lives alongside
+# the CSS/JS in assets/ and is inlined verbatim into the self-contained output.
+_GLOSSARY = _read_asset("glossary.html")
 
 
 def _fmt(value: object) -> str:
@@ -215,6 +169,11 @@ def _section_html(section: Mapping, esc) -> str:
     section_id = section["id"]
     variants = section.get("variants")
     row_count = max((len(variant["rows"]) for variant in variants), default=0) if variants else len(section["rows"])
+    asof = ""
+    if section.get("data_as_of"):
+        stale = section.get("stale")
+        suffix = " — older than the scheduled refresh" if stale else ""
+        asof = f"<span class='asof{' stale' if stale else ''}'>data as of {esc(section['data_as_of'])}{suffix}</span>"
     action = (
         f"<a class='dl' href=\"{esc(section['action_url'])}\" target='_blank' rel='noopener'>"
         f"{esc(section.get('action_label', 'Suggest a correction'))}</a>"
@@ -242,7 +201,7 @@ def _section_html(section: Mapping, esc) -> str:
         f"<span class='sbadge'>{row_count} rows</span></summary>"
         f"<div class='sbody'>"
         f"<div class='shead'><p class='desc'>{esc(section['description'])}</p>"
-        f"{action}"
+        f"{asof}{action}"
         f"</div>"
         f"{content}"
         f"</div></details>"
@@ -314,7 +273,7 @@ def _org_panels_html(mslug: str, org_tabs: Sequence[Mapping], esc) -> str:
     return tab_bar + "".join(panels)
 
 
-def build_dashboard_html(macros: Sequence[Mapping]) -> str:
+def build_dashboard_html(macros: Sequence[Mapping], *, generated_at: str | None = None) -> str:
     """Build a self-contained, two-level (macro → org → section) HTML document.
 
     ``macros`` is a list of ``{name, org_tabs}``; each macro is a dashboard family
@@ -327,9 +286,10 @@ def build_dashboard_html(macros: Sequence[Mapping]) -> str:
     macro+org so filter/sort/export stay independent. All values are HTML-escaped.
     """
     esc = html.escape
+    stamp = f" · generated {esc(generated_at)}" if generated_at else ""
     header = (
         "<h1>Hiero — analytics dashboard</h1>"
-        "<p class='sub'>Generated locally · open in any browser · type to filter tables, "
+        f"<p class='sub'>Generated locally{stamp} · open in any browser · type to filter tables, "
         "click a column header to sort, download any view as CSV, click a chart to enlarge.</p>"
     )
 

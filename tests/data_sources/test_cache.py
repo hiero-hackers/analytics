@@ -379,16 +379,14 @@ def test_fetch_repo_issues_graphql_uses_cache(monkeypatch, _temp_cache_dir):
 def _isolate_dataset_path(monkeypatch, tmp_path):
     """Redirect the committed dataset path into a temp dir for test isolation.
 
-    ``dataset_path`` is imported into both resource submodules that use it, so
-    patch it on each (the org-issues and contributor-activity call sites).
+    Every org-incremental fetcher resolves ``dataset_path`` through the shared
+    ``ingest.incremental`` skeleton, so one patch covers all resources.
     """
 
     def fake(resource, scope, fingerprint="all"):
         return tmp_path / f"{resource}_{scope}_{fingerprint}.json"
 
-    monkeypatch.setattr(ingest.issues, "dataset_path", fake)
-    monkeypatch.setattr(ingest.contributors, "dataset_path", fake)
-    monkeypatch.setattr(ingest.pull_requests, "dataset_path", fake)
+    monkeypatch.setattr(ingest.incremental, "dataset_path", fake)
 
 
 def _route_batched_through_per_repo(monkeypatch, module):
@@ -425,7 +423,7 @@ def test_fetch_org_issues_first_run_full_then_incremental(monkeypatch, tmp_path)
     ]
 
     _isolate_dataset_path(monkeypatch, tmp_path)
-    _route_batched_through_per_repo(monkeypatch, ingest.issues)
+    _route_batched_through_per_repo(monkeypatch, ingest.incremental)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
     full = Mock(return_value=issues)
     delta = Mock(return_value=[])  # nothing changed since the watermark
@@ -455,8 +453,8 @@ def test_fetch_org_issues_dataset_fingerprint_ignores_state_order(monkeypatch, t
         seen_paths.append(path)
         return path
 
-    monkeypatch.setattr(ingest.issues, "dataset_path", fake_path)
-    _route_batched_through_per_repo(monkeypatch, ingest.issues)
+    monkeypatch.setattr(ingest.incremental, "dataset_path", fake_path)
+    _route_batched_through_per_repo(monkeypatch, ingest.incremental)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=[]))
     monkeypatch.setattr(ingest.issues, "fetch_repo_issues_graphql", Mock(return_value=[]))
     monkeypatch.setattr(ingest.issues, "fetch_repo_issues_since_graphql", Mock(return_value=[]))
@@ -488,7 +486,7 @@ def test_fetch_org_label_events_incremental_dedups_on_merge(monkeypatch, tmp_pat
     )
 
     _isolate_dataset_path(monkeypatch, tmp_path)
-    _route_batched_through_per_repo(monkeypatch, ingest.issues)
+    _route_batched_through_per_repo(monkeypatch, ingest.incremental)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=repos))
     full = Mock(return_value=[ev1])
     delta = Mock(return_value=[ev1, ev2])  # re-sends ev1 (must dedup) + a new ev2
@@ -552,7 +550,7 @@ def test_fetch_org_contributor_activity_bounded_window_skips_dataset(monkeypatch
     def fake_path(*_a, **_k):
         raise AssertionError("dataset_path used for the bounded-window path")
 
-    monkeypatch.setattr(ingest.contributors, "dataset_path", fake_path)
+    monkeypatch.setattr(ingest.incremental, "dataset_path", fake_path)
     monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", Mock(return_value=[]))
 
     result = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=183)
@@ -600,3 +598,90 @@ def test_datetime_fields_empty_for_records_without_datetimes():
         active: bool
 
     assert serialization.datetime_fields(_PlainRecord) == ()
+
+
+# ---------------------------------------------------------
+# defensive cache-rejection branches (a bad file is a miss, never a crash)
+# ---------------------------------------------------------
+
+
+def _write_raw_cache(kind, scope, parameters, payload):
+    """Write an arbitrary JSON payload to the cache path for `parameters`."""
+    path = cache._cache_path(kind, scope, parameters)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def _valid_payload(parameters):
+    """A well-formed cache payload for one RepositoryRecord."""
+    record = RepositoryRecord(full_name="org/repo", name="repo", owner="org")
+    return {
+        "version": cache.CACHE_VERSION,
+        "kind": "org_repos",
+        "scope": "org",
+        "parameters": parameters,
+        "record_type": "RepositoryRecord",
+        "cached_at": datetime.now(UTC).isoformat(),
+        "records": [serialization.serialize_record(record)],
+    }
+
+
+def test_unreadable_cache_file_is_a_miss(_temp_cache_dir):
+    """A corrupt (non-JSON) cache file is ignored rather than raising."""
+    params = {"org": "org"}
+    path = cache._cache_path("org_repos", "org", params)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("{ this is not json", encoding="utf-8")
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None
+
+
+def test_unexpected_version_is_a_miss(_temp_cache_dir):
+    """A payload written under a different CACHE_VERSION is not trusted."""
+    params = {"org": "org"}
+    payload = _valid_payload(params)
+    payload["version"] = cache.CACHE_VERSION + 1
+    _write_raw_cache("org_repos", "org", params, payload)
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None
+
+
+def test_unexpected_record_type_is_a_miss(_temp_cache_dir):
+    """A payload whose stored record type differs from the requested one is a miss."""
+    params = {"org": "org"}
+    payload = _valid_payload(params)
+    payload["record_type"] = "IssueRecord"
+    _write_raw_cache("org_repos", "org", params, payload)
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None
+
+
+def test_missing_timestamp_is_a_miss(_temp_cache_dir):
+    """A payload with no usable cached_at string is a miss (age is unknowable)."""
+    params = {"org": "org"}
+    payload = _valid_payload(params)
+    payload["cached_at"] = None
+    _write_raw_cache("org_repos", "org", params, payload)
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None
+
+
+def test_invalid_timestamp_is_a_miss(_temp_cache_dir):
+    """An unparseable cached_at is a miss rather than a crash."""
+    params = {"org": "org"}
+    payload = _valid_payload(params)
+    payload["cached_at"] = "not-a-timestamp"
+    _write_raw_cache("org_repos", "org", params, payload)
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None
+
+
+def test_invalid_records_payload_is_a_miss(_temp_cache_dir):
+    """A payload whose 'records' is not a list is a miss."""
+    params = {"org": "org"}
+    payload = _valid_payload(params)
+    payload["records"] = {"not": "a list"}
+    _write_raw_cache("org_repos", "org", params, payload)
+
+    assert cache.load_records_cache("org_repos", "org", params, RepositoryRecord, use_cache=True) is None

@@ -14,6 +14,8 @@ from collections import Counter
 
 import pandas as pd
 
+from hiero_analytics.analysis.dataframe_utils import bare_repo_names
+
 _NODE_COLUMNS = ["repo", "active_members", "total_members"]
 _EDGE_COLUMNS = ["repo_a", "repo_b", "shared"]
 
@@ -57,7 +59,7 @@ def build_comembership_network(
         return empty
 
     rows = membership.copy()
-    rows["repo"] = rows["repo"].astype(str).str.split("/").str[-1]
+    rows["repo"] = bare_repo_names(rows["repo"])
     rows["user"] = rows["user"].astype(str).str.lower()
 
     total = rows.groupby("repo")["user"].nunique()

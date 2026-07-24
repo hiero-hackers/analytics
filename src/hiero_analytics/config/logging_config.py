@@ -119,31 +119,3 @@ def setup_logging(
         "Logging configured at %s for all modules",
         logging.getLevelName(resolved_level),
     )
-
-
-if __name__ == "__main__":
-    # Example usage and demonstration of filtering
-
-    # 1. Default configuration (INFO level, all modules)
-    setup_logging()
-    logging.getLogger("some.module").info("Default: This should be visible")
-    logging.getLogger("some.module").debug("Default: This should NOT be visible")
-
-    # 2. Focused logging (DEBUG level, but only for specific modules)
-    # This allows deep debugging of one area without being drowned in noise from others.
-    setup_logging(level="DEBUG", modules="hiero_analytics.data_sources")
-
-    # Visible because it matches the module prefix and level
-    logging.getLogger("hiero_analytics.data_sources.client").debug("Focus: Visible DEBUG from filtered module")
-    # Visible because WARNING and above are always shown globally
-    logging.getLogger("other.library").warning("Focus: Visible WARNING from any module")
-    # NOT visible because it doesn't match the module prefix and is below WARNING
-    logging.getLogger("other.library").info("Focus: Hidden INFO from non-filtered module")
-
-    # 3. Environment variable control
-    # You can also control this via LOG_LEVEL and LOG_MODULES env vars
-    os.environ[LOG_LEVEL_ENV_VAR] = "DEBUG"
-    os.environ[LOG_MODULES_ENV_VAR] = "myapp.core,myapp.api"
-    setup_logging()  # Uses env vars when arguments are omitted
-    logging.getLogger("myapp.core").debug("Env: Visible DEBUG from myapp.core")
-    logging.getLogger("myapp.other").debug("Env: Hidden DEBUG from myapp.other")

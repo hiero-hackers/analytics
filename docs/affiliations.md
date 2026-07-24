@@ -26,7 +26,7 @@ The dashboard reads this file directly (offline) — no network needed at render
 
 ## How affiliations are resolved (automated)
 
-The file is **seeded** by [`examples/build_affiliations.py`](../examples/build_affiliations.py),
+The file is **seeded** by [`hiero-analytics build_affiliations`](../`hiero-analytics build_affiliations`),
 which resolves each person from public GitHub signals in **priority order**:
 
 1. **GPG-key email** — the work email on their published signing key (`github.com/<login>.gpg`)
@@ -93,7 +93,7 @@ Hand-resolved unknowns are permanent, so the unknown count only goes down as peo
 pipeline**.
 
 ```bash
-GITHUB_TOKEN=… uv run python examples/build_affiliations.py
+GITHUB_TOKEN=… uv run python `hiero-analytics build_affiliations`
 ```
 
 It rewrites `affiliations.yaml` (preserving all `# manual` rows) and writes a provenance audit

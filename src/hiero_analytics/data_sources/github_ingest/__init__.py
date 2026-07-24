@@ -10,7 +10,7 @@ The implementation is split by resource for readability:
 - ``batched``       — aliased multi-repo batched fetch engine (GraphQL)
 - ``issues``        — issue and issue-label-event ingestion (GraphQL)
 - ``pull_requests`` — merged-PR difficulty ingestion (GraphQL)
-- ``contributors``  — contributor activity + merged-PR-count ingestion (GraphQL)
+- ``contributors``  — contributor activity ingestion (GraphQL)
 
 This module is a thin facade that re-exports the public API, so existing
 ``from ...github_ingest import X`` imports keep working unchanged. Tests that
@@ -27,6 +27,11 @@ from ._common import (
     fetch_org_resource_parallel,
 )
 from .contributors import (
+    CONTRIBUTOR_ACTIVITY_RESOURCE,
+    fetch_org_contributor_activity_graphql,
+    fetch_repo_contributor_activity_graphql,
+)
+from .contributors import (
     _fetch_repo_contributor_activity_at_cutoff as _fetch_repo_contributor_activity_at_cutoff,
 )
 from .contributors import (
@@ -35,13 +40,10 @@ from .contributors import (
 from .contributors import (
     _fetch_repo_pull_request_activity_graphql as _fetch_repo_pull_request_activity_graphql,
 )
-from .contributors import (
-    fetch_org_contributor_activity_graphql,
-    fetch_org_contributor_merged_pr_count_graphql,
-    fetch_repo_contributor_activity_graphql,
-    fetch_repo_contributor_merged_pr_count_graphql,
-)
+from .incremental import OrgIncrementalResource
 from .issues import (
+    ISSUE_LABEL_EVENTS_RESOURCE,
+    ISSUES_RESOURCE,
     fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
     fetch_repo_issue_label_events_graphql,
@@ -50,11 +52,31 @@ from .issues import (
     fetch_repo_issues_since_graphql,
 )
 from .pull_requests import (
+    MERGED_PR_RESOURCE,
     fetch_org_merged_pr_difficulty_graphql,
     fetch_repo_merged_pr_difficulty_graphql,
 )
 
+# Every org-wide incrementally fetched resource, by dataset name — the
+# declarative registry the individual fetchers are built from.
+ORG_INCREMENTAL_RESOURCES: dict[str, OrgIncrementalResource] = {
+    resource.name: resource
+    for resource in (
+        ISSUES_RESOURCE,
+        ISSUE_LABEL_EVENTS_RESOURCE,
+        MERGED_PR_RESOURCE,
+        CONTRIBUTOR_ACTIVITY_RESOURCE,
+    )
+}
+
 __all__ = [
+    # resource declarations
+    "OrgIncrementalResource",
+    "ORG_INCREMENTAL_RESOURCES",
+    "ISSUES_RESOURCE",
+    "ISSUE_LABEL_EVENTS_RESOURCE",
+    "MERGED_PR_RESOURCE",
+    "CONTRIBUTOR_ACTIVITY_RESOURCE",
     # generic engine + repos
     "fetch_github_resource",
     "fetch_org_resource_parallel",
@@ -72,6 +94,4 @@ __all__ = [
     # contributor activity + merged PR count
     "fetch_repo_contributor_activity_graphql",
     "fetch_org_contributor_activity_graphql",
-    "fetch_repo_contributor_merged_pr_count_graphql",
-    "fetch_org_contributor_merged_pr_count_graphql",
 ]

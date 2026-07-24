@@ -50,22 +50,3 @@ def filter_gfi_prs(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     return df[df["issue_labels"].apply(lambda xs: ALL_ONBOARDING.matches(set(xs or [])))]
-
-
-def first_time_contributors(df: pd.DataFrame) -> pd.DataFrame:
-    """Keep only the first merged PR *row* per contributor.
-
-    Uses ``drop_duplicates`` rather than ``groupby(...).first()``: the latter
-    takes the first non-null value per column independently, which can stitch
-    together fields from different PRs when a column (e.g. ``issue_number``)
-    is null on the first row.
-    """
-    if df.empty:
-        return df
-
-    return (
-        df.dropna(subset=["author", "pr_merged_at"])
-        .sort_values("pr_merged_at")
-        .drop_duplicates(subset="author", keep="first")
-        .reset_index(drop=True)
-    )

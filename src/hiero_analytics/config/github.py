@@ -6,11 +6,7 @@ the data-source layer.
 
 import os
 
-from dotenv import load_dotenv
-
 from hiero_analytics.config.env import env_float, env_int
-
-load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 BASE_URL = "https://api.github.com"

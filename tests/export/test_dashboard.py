@@ -307,3 +307,28 @@ def test_dashboard_handles_missing_keys_and_nan():
     # Both the NaN cell and the missing-key cell render empty (not "nan"/"None").
     assert "<td></td><td></td>" in doc
     assert "None" not in doc
+
+
+def test_section_renders_freshness_stamp_and_stale_warning():
+    """Sections carry their "data as of" stamp; stale ones get the warning class."""
+    from hiero_analytics.export.dashboard import build_dashboard_html
+
+    def _macro(section_extra: dict) -> list[dict]:
+        section = {
+            "id": "s1",
+            "title": "T",
+            "description": "D",
+            "columns": [("a", "A")],
+            "rows": [{"a": 1}],
+            **section_extra,
+        }
+        return [{"name": "M", "org_tabs": [{"org": "o", "metrics": [], "sections": [section]}]}]
+
+    fresh = build_dashboard_html(_macro({"data_as_of": "2026-07-24 10:00 UTC"}), generated_at="2026-07-24 11:00 UTC")
+    assert "data as of 2026-07-24 10:00 UTC" in fresh
+    assert "asof stale" not in fresh
+    assert "generated 2026-07-24 11:00 UTC" in fresh
+
+    stale = build_dashboard_html(_macro({"data_as_of": "2026-07-01 10:00 UTC", "stale": True}))
+    assert "asof stale" in stale
+    assert "older than the scheduled refresh" in stale

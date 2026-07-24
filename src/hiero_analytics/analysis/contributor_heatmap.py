@@ -16,9 +16,9 @@ import numpy as np
 import pandas as pd
 
 from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS, HEATMAP_MONTHS, HEATMAP_TOP_ROWS
-from hiero_analytics.data_sources.governance_config import ROLE_PRIORITY
 from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.repos import bare_repo
+from hiero_analytics.domain.roles import ROLE_PRIORITY
 
 ROLE_LABELS = {
     "general_user": "General User",
@@ -64,6 +64,20 @@ def _activity_action(activity_type: str) -> str | None:
     return ACTIVITY_TYPE_TO_ACTION.get(activity_type)
 
 
+def _weighted_events(records):
+    """Yield ``(actor, weight, bare_repo, month_key)`` per countable record.
+
+    The shared gate for every heatmap aggregation: a record counts when it has
+    an actor, a mapped action, and a timestamp, and the actor is not a bot.
+    """
+    for record in records:
+        actor = (record.actor or "").strip()
+        action = _activity_action(record.activity_type)
+        if not actor or action is None or record.occurred_at is None or is_bot_login(actor):
+            continue
+        yield actor, ACTIVITY_WEIGHTS[action], bare_repo(record.repo), _month_key(record.occurred_at)
+
+
 def _build_activity_rollup(
     records,
     repo_role_lookup: dict[str, dict[str, str]],
@@ -79,14 +93,8 @@ def _build_activity_rollup(
         }
     )
 
-    for record in records:
-        actor = (record.actor or "").strip()
-        action = _activity_action(record.activity_type)
-        if not actor or action is None or record.occurred_at is None or is_bot_login(actor):
-            continue
-
+    for actor, weight, repo_name, month in _weighted_events(records):
         actor_key = actor.lower()
-        repo_name = bare_repo(record.repo)
         detected_role = repo_role_lookup.get(repo_name, {}).get(actor_key, "general_user")
 
         row = per_contributor[actor_key]
@@ -97,8 +105,8 @@ def _build_activity_rollup(
             row["role key"] = detected_role
             row["role priority"] = ROLE_PRIORITY[detected_role]
 
-        row["weighted activity score"] = int(row["weighted activity score"]) + ACTIVITY_WEIGHTS[action]
-        row["monthly scores"][_month_key(record.occurred_at)] += ACTIVITY_WEIGHTS[action]
+        row["weighted activity score"] = int(row["weighted activity score"]) + weight
+        row["monthly scores"][month] += weight
 
     return per_contributor
 
@@ -204,16 +212,9 @@ def build_repo_activity_heatmap(records, *, months_back: int = HEATMAP_MONTHS) -
     month_columns = _recent_month_keys(months_back)
     window = set(month_columns)
     per_repo: dict[str, dict[str, int]] = defaultdict(lambda: {"activity score": 0, **dict.fromkeys(month_columns, 0)})
-    for record in records:
-        actor = (record.actor or "").strip()
-        action = _activity_action(record.activity_type)
-        if not actor or action is None or record.occurred_at is None or is_bot_login(actor):
-            continue
-        month = _month_key(record.occurred_at)
+    for _actor, weight, repo, month in _weighted_events(records):
         if month not in window:
             continue
-        repo = bare_repo(record.repo)
-        weight = ACTIVITY_WEIGHTS[action]
         per_repo[repo]["activity score"] += weight
         per_repo[repo][month] += weight
 

@@ -5,7 +5,6 @@ import pytest
 from hiero_analytics.data_sources import governance_config
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
-    count_distinct_role_holders_by_role,
     fetch_governance_config,
     permission_to_role,
 )
@@ -26,7 +25,7 @@ def test_fetch_governance_config_snapshots_valid_live_response(monkeypatch, tmp_
 
     monkeypatch.setattr(governance_config.requests, "get", get_response)
 
-    result = fetch_governance_config("https://example.test/config.yaml", snapshot_path=snapshot)
+    result = fetch_governance_config(url="https://example.test/config.yaml", snapshot_path=snapshot)
 
     assert result == {"teams": [], "repositories": []}
     assert snapshot.exists()
@@ -198,22 +197,3 @@ def test_build_repo_role_lookup_normalizes_usernames():
 
     assert repo_role_lookup["hiero-website"]["leadmaintainer"] == "committer"
     assert repo_role_lookup["hiero-website"]["exploreriii"] == "committer"
-
-
-def test_count_distinct_role_holders_by_role_counts_each_user_once_per_role():
-    """Distinct role-holder counts should deduplicate users within each role."""
-    repo_role_lookup = {
-        "repo-a": {
-            "alice": "maintainer",
-            "bob": "committer",
-        },
-        "repo-b": {
-            "alice": "committer",
-            "carol": "committer",
-        },
-    }
-
-    counts = count_distinct_role_holders_by_role(repo_role_lookup)
-
-    assert counts["maintainer"] == 1
-    assert counts["committer"] == 3

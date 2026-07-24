@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-import pandas as pd
-
 from hiero_analytics.analysis.timeseries import (
     TIMELINE_EVENT_ORDER,
     normalize_datetime,
@@ -36,47 +34,6 @@ def assign_difficulty(
         if spec.matches(label_set):
             return spec.name
     return UNKNOWN_DIFFICULTY
-
-
-def build_difficulty_dataframe(
-    df: pd.DataFrame,
-    specs: tuple[LabelSpec, ...] = DIFFICULTY_LEVELS,
-    *,
-    state: str | None = None,
-) -> pd.DataFrame:
-    """Aggregate issue counts per difficulty level, including an Unknown bucket.
-
-    Each issue is assigned to exactly one bucket via :func:`assign_difficulty`
-    (the highest matching difficulty wins), so counts sum to the number of issues.
-    The result has one row per spec in ``specs`` order followed by an
-    ``Unknown`` row, with zero-filled counts for absent buckets.
-
-    Parameters
-    ----------
-    df
-        Issue dataframe containing a ``labels`` column (and a ``state`` column
-        if ``state`` filtering is requested).
-    specs
-        Ordered difficulty specifications. Defaults to ``DIFFICULTY_LEVELS``.
-    state
-        Optional issue state filter (e.g. ``"open"``); when provided, only
-        rows whose ``state`` column matches are aggregated.
-
-    Returns:
-    -------
-    pd.DataFrame
-        DataFrame with ``difficulty`` and ``count`` columns.
-    """
-    if state:
-        df = df[df["state"] == state]
-
-    assigned = df["labels"].apply(lambda labels: assign_difficulty(labels, specs))
-    counts = assigned.value_counts()
-
-    rows = [{"difficulty": spec.name, "count": int(counts.get(spec.name, 0))} for spec in specs]
-    rows.append({"difficulty": UNKNOWN_DIFFICULTY, "count": int(counts.get(UNKNOWN_DIFFICULTY, 0))})
-
-    return pd.DataFrame(rows)
 
 
 def issues_labeled_since(
@@ -151,7 +108,8 @@ def issues_labeled_since(
         key = (issue.repo, issue.number)
         if key in labeled:
             continue
-        if issue.created_at >= cutoff:
+        created = normalize_datetime(issue.created_at)
+        if cutoff is not None and created is not None and created >= cutoff:
             for spec in difficulty_specs:
                 if spec.matches(set(issue.labels)):
                     labeled.add(key)

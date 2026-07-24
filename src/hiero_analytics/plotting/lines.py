@@ -11,6 +11,7 @@ from matplotlib.patches import Patch
 
 from hiero_analytics.config.charts import (
     ANNOTATION_FONT_SIZE,
+    CARD_EDGE_LINE_WIDTH,
     ENDPOINT_LABEL_BOX_STYLE,
     FIGURE_BACKGROUND_COLOR,
     FONT_WEIGHT_SEMIBOLD,
@@ -25,8 +26,7 @@ from hiero_analytics.config.charts import (
 )
 
 from .base import (
-    adaptive_legend_placement,
-    create_figure,
+    figure_context,
     finalize_chart,
     prepare_dataframe,
 )
@@ -38,7 +38,36 @@ DATE_LINE_Y_HEADROOM = 1.25
 DATE_LINE_X_MARGIN = 0.02
 DATE_LINE_Y_MARGIN = 0.18
 DATE_LINE_LABEL_OFFSET_Y = 14
-DATE_LINE_BBOX_LINEWIDTH = 0.9
+# The total series reads as the headline trend, so it draws slightly heavier.
+TOTAL_LINE_WIDTH = 3.0
+SERIES_LINE_WIDTH = 2.4
+STACKED_AREA_ALPHA = 0.96
+
+
+def _style_numeric_line_axes(ax, x_min: float, x_max: float) -> None:
+    """Integer ticks on both axes plus the shared numeric-line framing."""
+    ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax.set_ylim(bottom=0)
+    ax.set_xlim(x_min - 0.15, x_max + 0.45)
+    ax.margins(x=0.03, y=0.16)
+
+
+def _draw_series_line(ax, x, y, color: str, *, label: str | None = None, linewidth: float = LINE_WIDTH) -> None:
+    """One series in the house marker style — the shared ``ax.plot`` incantation."""
+    ax.plot(
+        x,
+        y,
+        marker="o",
+        label=label,
+        color=color,
+        linewidth=linewidth,
+        markersize=LINE_MARKER_SIZE,
+        markeredgecolor=FIGURE_BACKGROUND_COLOR,
+        markeredgewidth=LINE_MARKER_EDGE_WIDTH,
+        solid_capstyle="round",
+        zorder=3,
+    )
 
 
 def plot_line(
@@ -60,53 +89,37 @@ def plot_line(
     if data.empty:
         raise ValueError("No valid numeric x-axis values")
 
-    fig, ax = create_figure()
+    with figure_context() as (fig, ax):
+        _draw_series_line(ax, data[x_col], data[y_col], PRIMARY_PALETTE[2])
+        ax.fill_between(
+            data[x_col],
+            data[y_col],
+            0,
+            color=PRIMARY_PALETTE[2],
+            alpha=LINE_FILL_ALPHA,
+            zorder=2,
+        )
+        annotate_endpoint_badge(
+            ax,
+            x=float(data[x_col].iloc[-1]),
+            y=float(data[y_col].iloc[-1]),
+            text=f"{y_col} {format_chart_value(float(data[y_col].iloc[-1]))}",
+            color=PRIMARY_PALETTE[2],
+            y_offset=-4,
+        )
 
-    ax.plot(
-        data[x_col],
-        data[y_col],
-        marker="o",
-        color=PRIMARY_PALETTE[2],
-        linewidth=LINE_WIDTH,
-        markersize=LINE_MARKER_SIZE,
-        markeredgecolor=FIGURE_BACKGROUND_COLOR,
-        markeredgewidth=LINE_MARKER_EDGE_WIDTH,
-        solid_capstyle="round",
-        zorder=3,
-    )
-    ax.fill_between(
-        data[x_col],
-        data[y_col],
-        0,
-        color=PRIMARY_PALETTE[2],
-        alpha=LINE_FILL_ALPHA,
-        zorder=2,
-    )
-    annotate_endpoint_badge(
-        ax,
-        x=float(data[x_col].iloc[-1]),
-        y=float(data[y_col].iloc[-1]),
-        text=f"{y_col} {format_chart_value(float(data[y_col].iloc[-1]))}",
-        color=PRIMARY_PALETTE[2],
-        y_offset=-4,
-    )
+        _style_numeric_line_axes(ax, float(data[x_col].min()), float(data[x_col].max()))
 
-    ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    ax.set_ylim(bottom=0)
-    ax.set_xlim(float(data[x_col].min()) - 0.15, float(data[x_col].max()) + 0.45)
-    ax.margins(x=0.03, y=0.16)
-
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=x_col,
-        ylabel=y_col,
-        output_path=output_path,
-        rotate_x=rotate_x,
-        grid_axis="y",
-    )
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=x_col,
+            ylabel=y_col,
+            output_path=output_path,
+            rotate_x=rotate_x,
+            grid_axis="y",
+        )
 
 
 def plot_date_line(
@@ -130,194 +143,61 @@ def plot_date_line(
     """
     df = prepare_dataframe(df, x_col, y_col)
     data = df.sort_values(x_col).copy()
-    data[x_col] = pd.to_datetime(data[x_col], errors="coerce")
+    data[x_col] = pd.to_datetime(data[x_col], format="ISO8601", errors="coerce")
     data = data.dropna(subset=[x_col])
 
     if data.empty:
         raise ValueError("No valid datetime x-axis values")
 
-    fig, ax = create_figure()
-    color = PRIMARY_PALETTE[2]
+    with figure_context() as (fig, ax):
+        color = PRIMARY_PALETTE[2]
 
-    ax.plot(
-        data[x_col],
-        data[y_col],
-        marker="o",
-        color=color,
-        linewidth=LINE_WIDTH,
-        markersize=LINE_MARKER_SIZE,
-        markeredgecolor=FIGURE_BACKGROUND_COLOR,
-        markeredgewidth=LINE_MARKER_EDGE_WIDTH,
-        solid_capstyle="round",
-        zorder=3,
-    )
-    ax.fill_between(data[x_col], data[y_col], 0, color=color, alpha=LINE_FILL_ALPHA, zorder=2)
+        _draw_series_line(ax, data[x_col], data[y_col], color)
+        ax.fill_between(data[x_col], data[y_col], 0, color=color, alpha=LINE_FILL_ALPHA, zorder=2)
 
-    if annotate_peak_and_latest:
-        peak_idx = data[y_col].idxmax()
-        latest_idx = data.index[-1]
-        # Use a set so peak == latest only renders one badge.
-        for idx in {peak_idx, latest_idx}:
-            row = data.loc[idx]
-            label_text = f"{row[x_col]:{date_format}}: {int(row[y_col])}"
-            ax.annotate(
-                label_text,
-                xy=(row[x_col], row[y_col]),
-                xytext=(0, DATE_LINE_LABEL_OFFSET_Y),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                fontsize=ANNOTATION_FONT_SIZE,
-                color=TITLE_COLOR,
-                fontweight=FONT_WEIGHT_SEMIBOLD,
-                bbox={
-                    "boxstyle": ENDPOINT_LABEL_BOX_STYLE,
-                    "facecolor": FIGURE_BACKGROUND_COLOR,
-                    "edgecolor": LEGEND_EDGE_COLOR,
-                    "linewidth": DATE_LINE_BBOX_LINEWIDTH,
-                },
-                zorder=4,
-            )
+        if annotate_peak_and_latest:
+            peak_idx = data[y_col].idxmax()
+            latest_idx = data.index[-1]
+            # Use a set so peak == latest only renders one badge.
+            for idx in {peak_idx, latest_idx}:
+                row = data.loc[idx]
+                label_text = f"{row[x_col]:{date_format}}: {int(row[y_col])}"
+                ax.annotate(
+                    label_text,
+                    xy=(row[x_col], row[y_col]),
+                    xytext=(0, DATE_LINE_LABEL_OFFSET_Y),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    fontsize=ANNOTATION_FONT_SIZE,
+                    color=TITLE_COLOR,
+                    fontweight=FONT_WEIGHT_SEMIBOLD,
+                    bbox={
+                        "boxstyle": ENDPOINT_LABEL_BOX_STYLE,
+                        "facecolor": FIGURE_BACKGROUND_COLOR,
+                        "edgecolor": LEGEND_EDGE_COLOR,
+                        "linewidth": CARD_EDGE_LINE_WIDTH,
+                    },
+                    zorder=4,
+                )
 
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=month_interval))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter(date_format))
-    ax.margins(x=DATE_LINE_X_MARGIN, y=DATE_LINE_Y_MARGIN)
-    # Guard against singular ylim (and matplotlib's warning) on all-zero series.
-    max_y = float(data[y_col].max())
-    ax.set_ylim(0, max_y * DATE_LINE_Y_HEADROOM if max_y > 0 else 1.0)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=month_interval))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter(date_format))
+        ax.margins(x=DATE_LINE_X_MARGIN, y=DATE_LINE_Y_MARGIN)
+        # Guard against singular ylim (and matplotlib's warning) on all-zero series.
+        max_y = float(data[y_col].max())
+        ax.set_ylim(0, max_y * DATE_LINE_Y_HEADROOM if max_y > 0 else 1.0)
 
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=x_col,
-        ylabel=y_col,
-        output_path=output_path,
-        rotate_x=rotate_x,
-        grid_axis="y",
-    )
-
-
-def plot_multiline(
-    df: pd.DataFrame,
-    x_col: str,
-    y_col: str,
-    group_col: str,
-    title: str,
-    output_path: Path,
-    colors: dict[str, str] | None = None,
-    rotate_x: int | None = None,
-) -> None:
-    """
-    Plot a multi-series line chart grouped by a column.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input dataset.
-
-    x_col : str
-        Column used for x-axis.
-
-    y_col : str
-        Column used for y values.
-
-    group_col : str
-        Column defining the separate series.
-
-    title : str
-        Chart title.
-
-    output_path : Path
-        File path where the chart image will be saved.
-
-    colors : dict[str, str] | None
-        Optional mapping of series label -> color.
-
-    rotate_x : int | None
-        Optional x-axis label rotation.
-    """
-    df = prepare_dataframe(df, x_col, y_col, group_col).copy()
-
-    pivot = df.pivot_table(index=x_col, columns=group_col, values=y_col, aggfunc="sum").sort_index()
-
-    if pivot.empty:
-        raise ValueError("Pivot produced an empty dataset")
-
-    pivot.index = pd.to_numeric(pivot.index, errors="coerce")
-    pivot = pivot.dropna(axis=0, how="all")
-    pivot = pivot[~pivot.index.isna()]
-
-    if pivot.empty:
-        raise ValueError("No valid numeric x-axis values")
-
-    fig, ax = create_figure()
-    palette = build_palette(len(pivot.columns))
-    endpoint_offsets = [-14, 0, 14, 28, 42]
-
-    for index, column in enumerate(pivot.columns):
-        color = colors.get(column) if colors else palette[index]
-        is_total = str(column).lower() == "total"
-        series = pivot[column].dropna()
-
-        ax.plot(
-            series.index,
-            series,
-            marker="o",
-            label=str(column),
-            color=color,
-            linewidth=3 if is_total else 2.4,
-            markersize=LINE_MARKER_SIZE,
-            markeredgecolor=FIGURE_BACKGROUND_COLOR,
-            markeredgewidth=LINE_MARKER_EDGE_WIDTH,
-            solid_capstyle="round",
-            zorder=3,
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=x_col,
+            ylabel=y_col,
+            output_path=output_path,
+            rotate_x=rotate_x,
+            grid_axis="y",
         )
-        if is_total:
-            # The total line gets a subtle area fill so it reads as the main
-            # trend without overpowering the other series.
-            ax.fill_between(
-                series.index,
-                series,
-                0,
-                color=color,
-                alpha=LINE_FILL_ALPHA,
-                zorder=2,
-            )
-        annotate_endpoint_badge(
-            ax,
-            x=float(series.index[-1]),
-            y=float(series.iloc[-1]),
-            text=f"{column} {format_chart_value(float(series.iloc[-1]))}",
-            color=color,
-            y_offset=endpoint_offsets[index % len(endpoint_offsets)],
-        )
-
-    ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    ax.set_ylim(bottom=0)
-    ax.set_xlim(float(pivot.index.min()) - 0.15, float(pivot.index.max()) + 0.45)
-    ax.margins(x=0.03, y=0.16)
-
-    placement = adaptive_legend_placement(
-        len(pivot.columns),
-        bottom_anchor=(0.5, -0.18),
-        bottom_rect_bottom=0.12,
-    )
-
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=x_col,
-        ylabel=y_col,
-        output_path=output_path,
-        legend=True,
-        rotate_x=rotate_x,
-        grid_axis="y",
-        legend_kwargs={"borderaxespad": 0.0},
-        **placement,
-    )
 
 
 def plot_stacked_area(
@@ -339,7 +219,7 @@ def plot_stacked_area(
         raise ValueError("stack_cols and labels must have the same length")
 
     if not pd.api.types.is_numeric_dtype(data[x_col]):
-        parsed_x = pd.to_datetime(data[x_col], errors="coerce", utc=True)
+        parsed_x = pd.to_datetime(data[x_col], format="ISO8601", errors="coerce", utc=True)
         if parsed_x.notna().all():
             data[x_col] = parsed_x.dt.tz_convert(None)
         elif not is_numeric_or_datetime(data[x_col]):
@@ -347,54 +227,54 @@ def plot_stacked_area(
 
     data = data.sort_values(x_col)
 
-    fig, ax = create_figure()
-    palette = build_palette(len(stack_cols))
-    series_colors = [
-        colors.get(label, palette[index]) if colors else palette[index] for index, label in enumerate(labels)
-    ]
-    legend_handles = [
-        Patch(facecolor=color, edgecolor="none", label=label)
-        for color, label in zip(series_colors, labels, strict=True)
-    ]
+    with figure_context() as (fig, ax):
+        palette = build_palette(len(stack_cols))
+        series_colors = [
+            colors.get(label, palette[index]) if colors else palette[index] for index, label in enumerate(labels)
+        ]
+        legend_handles = [
+            Patch(facecolor=color, edgecolor="none", label=label)
+            for color, label in zip(series_colors, labels, strict=True)
+        ]
 
-    collections = ax.stackplot(
-        data[x_col],
-        *[data[col].astype(float) for col in stack_cols],
-        colors=series_colors,
-        alpha=0.96,
-        linewidth=0.9,
-        labels=labels,
-        zorder=3,
-    )
+        collections = ax.stackplot(
+            data[x_col],
+            *[data[col].astype(float) for col in stack_cols],
+            colors=series_colors,
+            alpha=STACKED_AREA_ALPHA,
+            linewidth=0.9,
+            labels=labels,
+            zorder=3,
+        )
 
-    for collection in collections:
-        collection.set_edgecolor(PLOT_BACKGROUND_COLOR)
+        for collection in collections:
+            collection.set_edgecolor(PLOT_BACKGROUND_COLOR)
 
-    if pd.api.types.is_datetime64_any_dtype(data[x_col]):
-        locator = mdates.AutoDateLocator(minticks=4, maxticks=8)
-        ax.xaxis.set_major_locator(locator)
-        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
-    else:
-        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+        if pd.api.types.is_datetime64_any_dtype(data[x_col]):
+            locator = mdates.AutoDateLocator(minticks=4, maxticks=8)
+            ax.xaxis.set_major_locator(locator)
+            ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+        else:
+            ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
-    ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
-    ax.margins(x=0.02, y=0.08)
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+        ax.margins(x=0.02, y=0.08)
 
-    finalize_chart(
-        fig=fig,
-        ax=ax,
-        title=title,
-        xlabel=xlabel or x_col,
-        ylabel=ylabel,
-        output_path=output_path,
-        legend=True,
-        rotate_x=rotate_x,
-        grid_axis="y",
-        legend_handles=legend_handles,
-        legend_labels=labels,
-        legend_loc="lower center",
-        legend_bbox_to_anchor=(0.5, -0.14),
-        legend_ncol=min(len(labels), 4),
-        legend_kwargs={"borderaxespad": 0.0},
-        layout_rect=(0, 0.14, 1.0, 1.0),
-    )
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel=xlabel or x_col,
+            ylabel=ylabel,
+            output_path=output_path,
+            legend=True,
+            rotate_x=rotate_x,
+            grid_axis="y",
+            legend_handles=legend_handles,
+            legend_labels=labels,
+            legend_loc="lower center",
+            legend_bbox_to_anchor=(0.5, -0.14),
+            legend_ncol=min(len(labels), 4),
+            legend_kwargs={"borderaxespad": 0.0},
+            layout_rect=(0, 0.14, 1.0, 1.0),
+        )

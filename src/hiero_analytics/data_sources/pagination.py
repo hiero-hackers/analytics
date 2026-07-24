@@ -12,7 +12,6 @@ pagination loops remain observable and debuggable.
 from __future__ import annotations
 
 import logging
-import time
 from collections.abc import Callable
 from typing import Any
 
@@ -23,67 +22,6 @@ DEFAULT_PAGE_SIZE = 100
 
 # --------------------------------------------------------
 # PAGE NUMBER PAGINATION
-# --------------------------------------------------------
-
-
-def paginate_page_number(
-    fetch_page: Callable[[int], list[Any]],
-    page_size: int = DEFAULT_PAGE_SIZE,
-    max_pages: int | None = None,
-    delay_seconds: float = 0.0,
-) -> list[Any]:
-    """
-    Collect items from a page-number-based API.
-
-    Parameters
-    ----------
-    fetch_page:
-        Callback returning items for a given page.
-
-    page_size:
-        Expected number of items per page.
-
-    max_pages:
-        Optional safety limit to stop infinite loops during debugging.
-    """
-    results: list[Any] = []
-    page = 1
-
-    logger.debug("Requesting pages (start_page=%d)", page)
-
-    while True:
-        logger.debug("Requesting page %d", page)
-
-        items = fetch_page(page)
-
-        logger.debug("Page %d returned %d items", page, len(items))
-
-        if not items:
-            logger.debug("Pagination complete (empty page)")
-            break
-
-        results.extend(items)
-
-        if len(items) < page_size:
-            logger.debug("Pagination complete (partial page)")
-            break
-
-        page += 1
-
-        if max_pages is not None and page > max_pages:
-            logger.warning("Pagination stopped after max_pages=%d", max_pages)
-            break
-
-        if delay_seconds > 0:
-            time.sleep(delay_seconds)
-
-    logger.info("Pagination collected %d items total", len(results))
-
-    return results
-
-
-# --------------------------------------------------------
-# CURSOR PAGINATION (GraphQL)
 # --------------------------------------------------------
 
 

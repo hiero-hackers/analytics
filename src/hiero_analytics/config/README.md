@@ -128,4 +128,3 @@ The configuration module follows three principles:
 * **Separation of concerns** – configuration is isolated from business logic
 
 ---
-

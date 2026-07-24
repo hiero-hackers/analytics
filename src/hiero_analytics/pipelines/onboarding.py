@@ -1,0 +1,252 @@
+"""Runner script for onboarding signal analysis: GFI supply vs contributor demand over time."""
+
+import logging
+import pathlib
+
+import pandas as pd
+from matplotlib.axes import Axes
+
+from hiero_analytics.analysis.dataframe_utils import (
+    filter_by_labels,
+    issues_to_dataframe,
+)
+from hiero_analytics.analysis.prs import (
+    filter_gfi_prs,
+    prs_to_dataframe,
+)
+from hiero_analytics.analysis.timeseries import cumulative_timeseries
+from hiero_analytics.config.charts import PRIMARY_PALETTE
+from hiero_analytics.config.paths import ORG, REPO
+from hiero_analytics.data_sources.github_ingest import (
+    fetch_repo_issues_graphql,
+    fetch_repo_merged_pr_difficulty_graphql,
+)
+from hiero_analytics.domain.labels import ALL_ONBOARDING, DIFFICULTY_LEVELS
+from hiero_analytics.domain.repos import bare_repo
+from hiero_analytics.pipelines._shared import repo_context
+from hiero_analytics.plotting.base import create_figure, finalize_chart
+from hiero_analytics.plotting.primitives import annotate_endpoint_badge
+from hiero_analytics.plotting.scatter import plot_scatter_with_regression
+
+logger = logging.getLogger(__name__)
+
+
+def plot_issue_vs_contributors(
+    issues_ts: pd.DataFrame,
+    contrib_ts: pd.DataFrame,
+    output_path: pathlib.Path,
+    *,
+    issue_date_col: str = "created_at",
+    contrib_date_col: str = "pr_merged_at",
+    issue_label: str = "Issues",
+    contrib_label: str = "Contributors",
+    title: str,
+) -> None:
+    """Plot cumulative issues vs cumulative contributors as a scatter + regression chart."""
+    issues = issues_ts.sort_values(issue_date_col).rename(columns={issue_date_col: "date", "count": "issue_count"})
+
+    contrib = contrib_ts.sort_values(contrib_date_col).rename(
+        columns={contrib_date_col: "date", "count": "contrib_count"}
+    )
+
+    df = pd.merge_asof(
+        issues,
+        contrib,
+        on="date",
+        direction="backward",
+    ).dropna()
+
+    if df.empty:
+        raise ValueError("No overlapping data")
+
+    plot_scatter_with_regression(
+        df,
+        x_col="issue_count",
+        y_col="contrib_count",
+        title=title,
+        xlabel=f"Cumulative {issue_label}",
+        ylabel=f"Cumulative {contrib_label}",
+        output_path=output_path,
+    )
+
+
+def plot_onboarding_signal(
+    gfi_ts: pd.DataFrame,
+    contrib_ts: pd.DataFrame,
+    output_path: pathlib.Path,
+    *,
+    title: str,
+) -> None:
+    """Plot the onboarding signal: cumulative GFIs (left axis) vs unique contributors (right axis)."""
+    if gfi_ts.empty or contrib_ts.empty:
+        raise ValueError("Input time series cannot be empty")
+
+    fig, ax1 = create_figure()
+
+    # -------------------------
+    # GFI (left axis)
+    # -------------------------
+    gfi = gfi_ts.sort_values("created_at")
+
+    ax1.plot(
+        gfi["created_at"],
+        gfi["count"],
+        color=PRIMARY_PALETTE[2],
+        linewidth=2.6,
+        zorder=3,
+    )
+
+    annotate_endpoint_badge(
+        ax1,
+        x=gfi["created_at"].iloc[-1],
+        y=gfi["count"].iloc[-1],
+        text=f"GFI {int(gfi['count'].iloc[-1])}",
+        color=PRIMARY_PALETTE[2],
+        y_offset=-6,
+    )
+
+    ax1.set_ylabel("Good First Issues")
+
+    # -------------------------
+    # Contributors (right axis)
+    # -------------------------
+    ax2: Axes = ax1.twinx()
+
+    contrib = contrib_ts.sort_values("pr_merged_at")
+
+    ax2.plot(
+        contrib["pr_merged_at"],
+        contrib["count"],
+        color=PRIMARY_PALETTE[4],
+        linewidth=2.6,
+        zorder=3,
+    )
+
+    annotate_endpoint_badge(
+        ax2,
+        x=contrib["pr_merged_at"].iloc[-1],
+        y=contrib["count"].iloc[-1],
+        text=f"Contrib {int(contrib['count'].iloc[-1])}",
+        color=PRIMARY_PALETTE[4],
+        y_offset=6,
+    )
+
+    ax2.set_ylabel("Cumulative Good First Issue Contributors With a Merged PR")
+
+    # -------------------------
+    # Finalize
+    # -------------------------
+    finalize_chart(
+        fig=fig,
+        ax=ax1,
+        title=title,
+        xlabel="Date",
+        ylabel="Cumulative Good First Issues",
+        output_path=output_path,
+        legend=False,
+        grid_axis="y",
+    )
+
+
+def main(org: str = ORG, repo: str = REPO):
+    """Fetch onboarding data for the configured repository and generate charts."""
+    short_repo = bare_repo(repo)
+
+    client, repo_data_dir, repo_charts_dir = repo_context(org, repo)
+
+    # ----------------------------------------
+    # GFI supply (issues)
+    # ----------------------------------------
+    issues = fetch_repo_issues_graphql(
+        client,
+        owner=org,
+        repo=repo,
+        states=["OPEN", "CLOSED"],
+    )
+
+    issues_df = issues_to_dataframe(issues)
+
+    gfi_df = filter_by_labels(issues_df, ALL_ONBOARDING.labels)
+    gfi_ts = cumulative_timeseries(gfi_df, "created_at")
+
+    # ----------------------------------------
+    # Onboarding demand (unique contributors)
+    # ----------------------------------------
+    prs = fetch_repo_merged_pr_difficulty_graphql(
+        client,
+        owner=org,
+        repo=repo,
+    )
+
+    pr_df = prs_to_dataframe(prs)
+
+    # only PRs that closed onboarding issues
+    gfi_pr_df = filter_gfi_prs(pr_df)
+
+    # unique contributors (first PR only)
+    contrib_df = gfi_pr_df.dropna(subset=["author"]).sort_values("pr_merged_at").drop_duplicates("author")
+
+    contrib_ts = cumulative_timeseries(contrib_df, "pr_merged_at")
+
+    # ----------------------------------------
+    # Plot
+    # ----------------------------------------
+    if gfi_ts.empty or contrib_ts.empty:
+        logger.info("Skipping onboarding signal chart: no onboarding issues or no contributors")
+    else:
+        plot_onboarding_signal(
+            gfi_ts,
+            contrib_ts,
+            pathlib.Path(repo_charts_dir) / "onboarding_signal.png",
+            title=(
+                f"{short_repo}: Cumulative Onboarding Issues (GFIs & Candidates) vs Cumulative Merged PR Contributors"
+            ),
+        )
+    # ----------------------------------------
+    # Per-difficulty plots
+    # ----------------------------------------
+    if issues_df.empty or pr_df.empty:
+        # An empty frame has no labels/issue_labels columns to subset on, and
+        # every per-difficulty chart would be skipped as no-data anyway.
+        logger.info("Skipping per-difficulty charts: no issue or PR data")
+        return
+
+    for spec in DIFFICULTY_LEVELS:
+        safe_name = spec.name.replace(" ", "_").lower()
+
+        # -------------------------
+        # Filter issues by difficulty
+        # -------------------------
+        issues_subset = issues_df[issues_df["labels"].apply(lambda xs, _spec=spec: _spec.matches(set(xs or [])))]
+        issues_ts_subset = cumulative_timeseries(issues_subset, "created_at")
+
+        # -------------------------
+        # Filter PRs by difficulty (via issue_labels)
+        # -------------------------
+        prs_subset = pr_df[pr_df["issue_labels"].apply(lambda xs, _spec=spec: _spec.matches(set(xs or [])))]
+
+        # -------------------------
+        # Unique contributors per difficulty
+        # -------------------------
+        contrib_df_subset = prs_subset.dropna(subset=["author"]).sort_values("pr_merged_at").drop_duplicates("author")
+
+        contrib_ts_subset = cumulative_timeseries(
+            contrib_df_subset,
+            "pr_merged_at",
+        )
+
+        if issues_ts_subset.empty or contrib_ts_subset.empty:
+            logger.info("Skipping %s: no data", spec.name)
+            continue
+
+        # -------------------------
+        # Plot
+        # -------------------------
+        plot_issue_vs_contributors(
+            issues_ts_subset,
+            contrib_ts_subset,
+            output_path=repo_charts_dir / f"{safe_name}.png",
+            issue_label=f"{spec.name} Issues",
+            contrib_label=f"{spec.name} Contributors",
+            title=f"{short_repo}: {spec.name} Onboarding Efficiency",
+        )

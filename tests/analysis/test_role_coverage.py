@@ -13,9 +13,9 @@ from hiero_analytics.analysis.role_coverage import (
     build_repo_role_coverage,
     find_globally_quiet_role_holders,
     find_unbadged_role_work,
-    looks_like_bot,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord
+from hiero_analytics.domain.bots import is_bot_login
 
 
 def _ev(actor, activity_type, n, *, target_author=None, month=1):
@@ -31,12 +31,12 @@ def _ev(actor, activity_type, n, *, target_author=None, month=1):
     )
 
 
-def test_looks_like_bot():
+def test_is_bot_login():
     """Known bot names and common bot suffixes are detected; humans are not."""
-    assert looks_like_bot("coderabbitai")
-    assert looks_like_bot("dependabot[bot]")
-    assert looks_like_bot("some-bot")
-    assert not looks_like_bot("exploreriii")
+    assert is_bot_login("coderabbitai")
+    assert is_bot_login("dependabot[bot]")
+    assert is_bot_login("some-bot")
+    assert not is_bot_login("exploreriii")
 
 
 def _seen(profiles):

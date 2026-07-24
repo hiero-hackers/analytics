@@ -4,11 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 
-import pandas as pd
-
 from hiero_analytics.analysis.difficulty_analysis import (
     assign_difficulty,
-    build_difficulty_dataframe,
     issues_labeled_since,
     issues_unlabeled_created_since,
 )
@@ -91,69 +88,6 @@ def test_assign_difficulty_highest_wins_on_multiple_labels():
 
 
 # ---------------------------------------------------------------------------
-# build_difficulty_dataframe
-# ---------------------------------------------------------------------------
-
-
-def test_build_difficulty_dataframe_orders_specs_then_unknown():
-    """Rows follow spec order and always end with an Unknown bucket."""
-    df = pd.DataFrame(
-        {
-            "labels": [["beginner"], ["advanced"], ["bug"], []],
-            "state": ["open", "open", "open", "open"],
-        }
-    )
-
-    result = build_difficulty_dataframe(df)
-
-    assert list(result["difficulty"]) == [spec.name for spec in DIFFICULTY_LEVELS] + [UNKNOWN_DIFFICULTY]
-    counts = dict(zip(result["difficulty"], result["count"], strict=True))
-    assert counts["Beginner"] == 1
-    assert counts["Advanced"] == 1
-    assert counts["Good First Issue"] == 0
-    assert counts[UNKNOWN_DIFFICULTY] == 2
-
-
-def test_build_difficulty_dataframe_counts_sum_to_total():
-    """Single-assignment means bucket counts sum to the issue total."""
-    df = pd.DataFrame({"labels": [["beginner"], ["advanced"], ["bug"]]})
-
-    result = build_difficulty_dataframe(df)
-
-    assert int(result["count"].sum()) == len(df)
-
-
-def test_build_difficulty_dataframe_filters_by_state():
-    """The optional state filter restricts the aggregation."""
-    df = pd.DataFrame(
-        {
-            "labels": [["beginner"], ["advanced"]],
-            "state": ["open", "closed"],
-        }
-    )
-
-    result = build_difficulty_dataframe(df, state="open")
-    counts = dict(zip(result["difficulty"], result["count"], strict=True))
-
-    assert counts["Beginner"] == 1
-    assert counts["Advanced"] == 0
-
-
-def test_build_difficulty_dataframe_empty_is_all_zero():
-    """An empty frame yields every bucket at zero, not an error."""
-    df = pd.DataFrame({"labels": []})
-
-    result = build_difficulty_dataframe(df)
-
-    assert int(result["count"].sum()) == 0
-    assert list(result["difficulty"]) == [spec.name for spec in DIFFICULTY_LEVELS] + [UNKNOWN_DIFFICULTY]
-
-
-# ---------------------------------------------------------------------------
-# issues_labeled_since (timeline reconstruction)
-# ---------------------------------------------------------------------------
-
-
 def test_labeled_within_window_qualifies():
     """A difficulty label applied inside the window marks the issue as labeled."""
     issues = [_issue(1, created_at=CUTOFF - timedelta(days=10), labels=["beginner"])]

@@ -9,7 +9,6 @@ repository-level views.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from enum import Enum
 
 import pandas as pd
 
@@ -32,14 +31,6 @@ ACTIVE_WINDOW_DAYS = 183
 # hundreds of bars.
 RECENT_MONTHLY_BUCKETS = 24
 RECENT_WEEKLY_BUCKETS = 26
-
-
-class Granularity(Enum):
-    """Supported time-bucketing granularities for the maintainer pipeline."""
-
-    YEAR = "year"
-    MONTH = "month"
-    WEEK = "week"
 
 
 _MAINTAINER_ACTIVITY_TYPES = {
@@ -174,31 +165,11 @@ def build_maintainer_weekly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
     return _counts_by_bucket(labelled, "week")
 
 
-def build_maintainer_pipeline(
-    stage_df: pd.DataFrame,
-    granularity: Granularity = Granularity.YEAR,
-    *,
-    active_window_days: int = ACTIVE_WINDOW_DAYS,
-) -> pd.DataFrame:
-    """Dispatch to the appropriate pipeline builder based on granularity.
-
-    ``active_window_days`` applies only to the yearly view; the monthly and weekly
-    views count activity strictly within each calendar period.
-    """
-    if granularity == Granularity.YEAR:
-        return build_maintainer_yearly_pipeline(stage_df, active_window_days=active_window_days)
-    if granularity == Granularity.MONTH:
-        return build_maintainer_monthly_pipeline(stage_df)
-    if granularity == Granularity.WEEK:
-        return build_maintainer_weekly_pipeline(stage_df)
-    msg = f"Unsupported granularity: {granularity}"
-    raise ValueError(msg)
-
-
 def build_maintainer_yearly_pipeline(
     stage_df: pd.DataFrame,
     *,
     active_window_days: int = ACTIVE_WINDOW_DAYS,
+    today: datetime | None = None,
 ) -> pd.DataFrame:
     """Build yearly counts of distinct active people by their highest governance role.
 
@@ -212,7 +183,7 @@ def build_maintainer_yearly_pipeline(
     if stage_df.empty:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
 
-    today = datetime.now(UTC)
+    today = today or datetime.now(UTC)
     years = stage_df["year"].unique()
 
     filtered_frames: list[pd.DataFrame] = []
@@ -229,31 +200,17 @@ def build_maintainer_yearly_pipeline(
 
     active_df = pd.concat(filtered_frames, ignore_index=True) if filtered_frames else stage_df.iloc[0:0]
 
-    # Keep one row per (year, actor): the highest governance role they held across all
-    # repos that year. This makes the stacked bands mutually exclusive, so a year's
-    # total is the number of distinct active people, not (person, role) pairs.
-    highest = (
-        active_df.assign(_rank=active_df["stage"].map(_STAGE_RANK))
-        .sort_values("_rank")
-        .drop_duplicates(subset=["year", "actor"], keep="last")
-    )
-
-    yearly = (
-        highest.groupby(["year", "stage"])["actor"]
-        .nunique()
-        .unstack(fill_value=0)
-        .reindex(columns=STAGE_COLUMNS, fill_value=0)
-        .reset_index()
-        .sort_values("year")
-    )
-
-    return yearly.astype({column: int for column in STAGE_COLUMNS})
+    # One row per (year, actor) at their highest role — the shared bucket counter
+    # keeps the stacked bands mutually exclusive.
+    labelled = active_df.assign(_bucket=active_df["year"])
+    return _counts_by_bucket(labelled, "year")
 
 
 def build_maintainer_repo_pipeline(
     stage_df: pd.DataFrame,
     *,
     active_window_days: int = ACTIVE_WINDOW_DAYS,
+    today: datetime | None = None,
 ) -> pd.DataFrame:
     """Build repository-level active contributor counts per governance stage.
 
@@ -264,7 +221,7 @@ def build_maintainer_repo_pipeline(
     if stage_df.empty:
         return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
 
-    cutoff = datetime.now(UTC) - timedelta(days=active_window_days)
+    cutoff = (today or datetime.now(UTC)) - timedelta(days=active_window_days)
     active_df = stage_df[stage_df["occurred_at"] >= cutoff]
 
     if active_df.empty:
@@ -282,31 +239,6 @@ def build_maintainer_repo_pipeline(
     by_repo = by_repo.sort_values("total", ascending=False).drop(columns=["total"])
 
     return by_repo.astype({column: int for column in STAGE_COLUMNS})
-
-
-def collapse_repo_pipeline_tail(repo_df: pd.DataFrame, max_repos: int) -> pd.DataFrame:
-    """Return a chart-friendly repo table with the long tail aggregated."""
-    if repo_df.empty or max_repos <= 0 or len(repo_df) <= max_repos:
-        return repo_df.copy()
-
-    head_count = max_repos - 1
-    if head_count <= 0:
-        return repo_df.copy()
-
-    head = repo_df.head(head_count).copy()
-    tail = repo_df.iloc[head_count:]
-
-    other_totals = {column: int(tail[column].sum()) for column in STAGE_COLUMNS}
-    other_row = pd.DataFrame(
-        [
-            {
-                "repo": f"Other Repos ({len(tail)})",
-                **other_totals,
-            }
-        ]
-    )
-
-    return pd.concat([head, other_row], ignore_index=True)
 
 
 def recent_buckets(pipeline_df: pd.DataFrame, max_buckets: int, *, newest_first: bool = False) -> pd.DataFrame:

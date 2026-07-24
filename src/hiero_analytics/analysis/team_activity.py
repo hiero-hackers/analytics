@@ -11,8 +11,9 @@ from datetime import datetime
 
 import pandas as pd
 
-# Raw contribution columns carried from the contributor profiles.
-_CONTRIB_COLS = ("prs_opened", "reviews_given", "merges_done", "issues_opened", "labels_applied")
+from hiero_analytics.analysis.contributor_activity_profile import CONTRIB_COUNT_FIELDS
+from hiero_analytics.analysis.dataframe_utils import rows_by_login, staleness_sort_key
+from hiero_analytics.domain.recency import is_active
 
 _SUMMARY_COLUMNS = [
     "team",
@@ -21,7 +22,7 @@ _SUMMARY_COLUMNS = [
     "status",
     "last_active",
     "days_since_active",
-    *_CONTRIB_COLS,
+    *CONTRIB_COUNT_FIELDS,
 ]
 
 _BY_REPO_COLUMNS = [
@@ -29,19 +30,19 @@ _BY_REPO_COLUMNS = [
     "repo",
     "members_active",
     "last_active",
-    *_CONTRIB_COLS,
+    *CONTRIB_COUNT_FIELDS,
 ]
 
 
 def _aggregate(members, by_login, last_seen, *, now, active_within_days: int | None):
     """Window counts from ``by_login`` + all-time recency from ``last_seen`` per member."""
-    totals = dict.fromkeys(_CONTRIB_COLS, 0)
+    totals = dict.fromkeys(CONTRIB_COUNT_FIELDS, 0)
     last_active = None
     active_members = 0
     for member in members:
         profile = by_login.get(member)
         if profile is not None:
-            for column in _CONTRIB_COLS:
+            for column in CONTRIB_COUNT_FIELDS:
                 totals[column] += int(getattr(profile, column))
         entry = last_seen.get(member)
         if entry is None:
@@ -49,7 +50,7 @@ def _aggregate(members, by_login, last_seen, *, now, active_within_days: int | N
         when = entry[0]
         if last_active is None or when > last_active:
             last_active = when
-        if active_within_days is None or (now - when).days <= active_within_days:
+        if is_active(when, now, active_within_days):
             active_members += 1
     return totals, last_active, active_members
 
@@ -69,9 +70,7 @@ def build_team_activity_summary(
     recency comes from ``last_seen`` (``{account_lower: (last_active, login)}``,
     all-time). Teams with no recent activity sort first.
     """
-    by_login = (
-        {str(row.contributor).lower(): row for row in org_profiles.itertuples()} if not org_profiles.empty else {}
-    )
+    by_login = rows_by_login(org_profiles)
 
     rows = []
     for team, members in sorted(team_members.items()):
@@ -95,7 +94,7 @@ def build_team_activity_summary(
         return summary
 
     summary["_active"] = (summary["status"] == "active").astype(int)
-    summary["_sort"] = summary["days_since_active"].fillna(10**9)
+    summary["_sort"] = staleness_sort_key(summary["days_since_active"])
     return (
         summary.sort_values(["_active", "_sort"], ascending=[True, False])
         .drop(columns=["_active", "_sort"])
@@ -113,15 +112,12 @@ def build_team_activity_by_repo(
     grouped by team, most active repo first. Requires ``now`` only implicitly via
     ``last_active`` (the latest member activity in that repo).
     """
-    repo_maps = {
-        repo: ({str(row.contributor).lower(): row for row in profiles.itertuples()} if not profiles.empty else {})
-        for repo, profiles in by_repo.items()
-    }
+    repo_maps = {repo: rows_by_login(profiles) for repo, profiles in by_repo.items()}
 
     rows = []
     for team, members in sorted(team_members.items()):
         for repo, login_map in repo_maps.items():
-            totals = dict.fromkeys(_CONTRIB_COLS, 0)
+            totals = dict.fromkeys(CONTRIB_COUNT_FIELDS, 0)
             last_active = None
             members_active = 0
             for member in members:
@@ -129,7 +125,7 @@ def build_team_activity_by_repo(
                 if profile is None:
                     continue
                 members_active += 1
-                for column in _CONTRIB_COLS:
+                for column in CONTRIB_COUNT_FIELDS:
                     totals[column] += int(getattr(profile, column))
                 when = profile.last_active
                 if last_active is None or when > last_active:
@@ -144,5 +140,5 @@ def build_team_activity_by_repo(
     if table.empty:
         return table
 
-    table["_total"] = table[list(_CONTRIB_COLS)].sum(axis=1)
+    table["_total"] = table[list(CONTRIB_COUNT_FIELDS)].sum(axis=1)
     return table.sort_values(["team", "_total"], ascending=[True, False]).drop(columns="_total").reset_index(drop=True)

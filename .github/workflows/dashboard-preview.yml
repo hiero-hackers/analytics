@@ -36,7 +36,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       # PRs can restore caches created on the base branch, but this workflow never
       # saves one. Contributor code therefore cannot replace the refresh baseline.
@@ -68,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           HIERO_ANALYTICS_OFFLINE: ${{ steps.data-mode.outputs.offline }}
-        run: uv run python -m hiero_analytics.run_all
+        run: uv run hiero-analytics
 
       # The dashboard embeds its charts and data. Treat HTML from unfamiliar
       # contributors with the same care as any other contributor-authored code.

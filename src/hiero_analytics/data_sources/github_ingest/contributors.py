@@ -1,4 +1,4 @@
-"""Contributor activity and merged-PR-count ingestion via the GraphQL API.
+"""Contributor activity ingestion via the GraphQL API.
 
 Contributor activity combines issue- and PR-lifecycle signals. With a lookback
 window it is a bounded rolling fetch; with full history (``lookback_days=None``,
@@ -7,25 +7,38 @@ needed for stable yearly aggregates) it is incremental via the dataset store.
 
 from __future__ import annotations
 
-import logging
 from datetime import UTC, datetime, timedelta
 
 from hiero_analytics.config.github import GITHUB_MAX_WORKERS
-from hiero_analytics.config.paths import dataset_path, load_query
+from hiero_analytics.data_sources.queries import load_query
 
 from ..cache import load_records_cache, save_records_cache
-from ..dataset_store import PartialOrgFetchError, fetch_incremental
 from ..github_client import GitHubClient
-from ..models import ContributorActivityRecord, ContributorMergedPRCountRecord, PullRequestDifficultyRecord
+from ..models import ContributorActivityRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
 from ._common import (
     _cache_kwargs,
     _parse_graphql_datetime,
     fetch_org_resource_parallel,
 )
-from .pull_requests import fetch_org_merged_pr_difficulty_graphql, fetch_repo_merged_pr_difficulty_graphql
+from .incremental import OrgIncrementalResource, fetch_org_incremental
 
-logger = logging.getLogger(__name__)
+CONTRIBUTOR_ACTIVITY_RESOURCE = OrgIncrementalResource(
+    name="contributor_activity",
+    model_class=ContributorActivityRecord,
+    # Events are immutable, so identity is the full event tuple and the
+    # watermark advances on the event time itself.
+    key_of=lambda event: (
+        event.repo,
+        event.activity_type,
+        event.actor,
+        event.occurred_at,
+        event.target_type,
+        event.target_number,
+    ),
+    updated_at_of=lambda event: event.occurred_at,
+    task_desc="contributor activity",
+)
 
 _CONTRIBUTOR_ACTIVITY_TYPES = [
     "authored_issue",
@@ -212,37 +225,70 @@ def fetch_org_contributor_activity_graphql(
 ) -> list[ContributorActivityRecord]:
     """Fetch contributor activity records across all repositories in an organization.
 
-    With ``lookback_days`` set this is a bounded rolling window, fetched fresh
-    each run. With ``lookback_days=None`` (full history — needed for stable yearly
-    aggregates) it is **incremental**: the persistent dataset store keeps the full
-    history, and later runs fetch only activity since the watermark (using the
-    watermark as the pagination cutoff) and merge it in. The since-fetch falls
-    back to a full fetch on error; ``refresh=True`` forces a full re-fetch.
+    Dispatches between two distinct modes:
+
+    - ``lookback_days`` set — a bounded rolling window, TTL-cached per repo and
+      fetched fresh each run (``repos`` and the cache flags apply here only);
+    - ``lookback_days=None`` — full history (needed for stable yearly
+      aggregates), fetched **incrementally** via the persistent dataset store.
     """
     if lookback_days is not None:
-
-        def fetch_func(repo):
-            """Fetch contributor activity for a repository."""
-            return fetch_repo_contributor_activity_graphql(
-                client,
-                repo.owner,
-                repo.name,
-                lookback_days=lookback_days,
-                **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
-            )
-
-        return fetch_org_resource_parallel(
+        return _fetch_org_activity_window(
             client,
             org,
-            fetch_func,
             max_workers,
             repos=repos,
-            task_desc="contributor activity",
+            lookback_days=lookback_days,
+            use_cache=use_cache,
+            cache_ttl_seconds=cache_ttl_seconds,
+            refresh=refresh,
+        )
+    return _fetch_org_activity_full_history(client, org, max_workers, refresh=refresh)
+
+
+def _fetch_org_activity_window(
+    client: GitHubClient,
+    org: str,
+    max_workers: int,
+    *,
+    repos: list[str] | None,
+    lookback_days: int,
+    use_cache: bool | None,
+    cache_ttl_seconds: int | None,
+    refresh: bool,
+) -> list[ContributorActivityRecord]:
+    """Bounded rolling-window fetch: per-repo TTL cache, re-fetched each run."""
+
+    def fetch_func(repo):
+        """Fetch contributor activity for a repository."""
+        return fetch_repo_contributor_activity_graphql(
+            client,
+            repo.owner,
+            repo.name,
+            lookback_days=lookback_days,
             **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
         )
 
-    # Full history -> incremental (org-wide; the repos subset filter is only
-    # honoured for the bounded-window path above).
+    return fetch_org_resource_parallel(
+        client,
+        org,
+        fetch_func,
+        max_workers,
+        repos=repos,
+        task_desc="contributor activity",
+        **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+    )
+
+
+def _fetch_org_activity_full_history(
+    client: GitHubClient,
+    org: str,
+    max_workers: int,
+    *,
+    refresh: bool,
+) -> list[ContributorActivityRecord]:
+    """Full-history incremental fetch via the dataset store (org-wide only)."""
+
     def full_fetch() -> list[ContributorActivityRecord]:
         return fetch_org_resource_parallel(
             client,
@@ -253,90 +299,18 @@ def fetch_org_contributor_activity_graphql(
         )
 
     def since_fetch(since: datetime) -> list[ContributorActivityRecord]:
-        try:
-            return fetch_org_resource_parallel(
-                client,
-                org,
-                lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, since),
-                max_workers,
-                task_desc="contributor activity updates",
-            )
-        except PartialOrgFetchError:
-            raise  # let the store hold the watermark; don't fall back to full
-        except Exception:
-            logger.exception("Incremental contributor-activity fetch failed; falling back to full fetch")
-            return full_fetch()
+        return fetch_org_resource_parallel(
+            client,
+            org,
+            lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, since),
+            max_workers,
+            task_desc="contributor activity updates",
+        )
 
-    return fetch_incremental(
-        path=dataset_path("contributor_activity", org, "all"),
-        model_class=ContributorActivityRecord,
-        key_of=lambda e: (e.repo, e.activity_type, e.actor, e.occurred_at, e.target_type, e.target_number),
-        updated_at_of=lambda e: e.occurred_at,
+    return fetch_org_incremental(
+        CONTRIBUTOR_ACTIVITY_RESOURCE,
+        org=org,
         full_fetch=full_fetch,
         since_fetch=since_fetch,
-        force_full=refresh,
-        full_refresh_after=timedelta(days=30),
+        refresh=refresh,
     )
-
-
-def _merged_pr_counts(records: list[PullRequestDifficultyRecord]) -> dict[tuple[str, str], int]:
-    """Distinct merged-PR count per (repo, lowercased author), deduped across linked issues."""
-    prs: dict[tuple[str, str], set[int]] = {}
-    for record in records:
-        if not record.author:
-            continue
-        prs.setdefault((record.repo, record.author.lower()), set()).add(record.pr_number)
-    return {key: len(numbers) for key, numbers in prs.items()}
-
-
-def fetch_repo_contributor_merged_pr_count_graphql(
-    client: GitHubClient,
-    owner: str,
-    repo: str,
-    login: str,
-    *,
-    use_cache: bool | None = None,
-    cache_ttl_seconds: int | None = None,
-    refresh: bool = False,
-) -> ContributorMergedPRCountRecord:
-    """Count a contributor's merged pull requests in a repository.
-
-    Derived from the merged-PR difficulty records (deduped by PR number) rather
-    than a per-(repo, contributor) search query, so the count shares the PR
-    dataset's staleness story instead of adding a second one.
-    """
-    records = fetch_repo_merged_pr_difficulty_graphql(
-        client, owner, repo, **_cache_kwargs(use_cache, cache_ttl_seconds, refresh)
-    )
-    count = _merged_pr_counts(records).get((f"{owner}/{repo}", login.lower()), 0)
-    return ContributorMergedPRCountRecord(repo=f"{owner}/{repo}", login=login, merged_pr_count=count)
-
-
-def fetch_org_contributor_merged_pr_count_graphql(
-    client: GitHubClient,
-    org: str,
-    login: str,
-    repos: list[str] | None = None,
-    max_workers: int = GITHUB_MAX_WORKERS,
-    *,
-    refresh: bool = False,
-) -> list[ContributorMergedPRCountRecord]:
-    """Count a contributor's merged pull requests per repository across an org.
-
-    Derived from the incremental merged-PR dataset — no per-repo search queries.
-    Returns one record per repository where the contributor has at least one
-    merged PR (optionally restricted to ``repos``).
-    """
-    all_records = fetch_org_merged_pr_difficulty_graphql(client, org, max_workers, refresh=refresh)
-    counts = _merged_pr_counts(all_records)
-    login_lower = login.lower()
-
-    results = [
-        ContributorMergedPRCountRecord(repo=repo_name, login=login, merged_pr_count=count)
-        for (repo_name, author), count in sorted(counts.items())
-        if author == login_lower
-    ]
-    if repos:
-        allowed = set(repos)
-        results = [r for r in results if r.repo in allowed or r.repo.split("/")[-1] in allowed]
-    return results

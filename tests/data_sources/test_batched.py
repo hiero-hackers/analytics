@@ -4,10 +4,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from hiero_analytics.config.paths import load_query
 from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
 from hiero_analytics.data_sources.github_ingest import batched
 from hiero_analytics.data_sources.models import RepositoryRecord
+from hiero_analytics.data_sources.queries import load_query
 
 _QUERY = """query TEST_QUERY($owner:String!,$repo:String!,$cursor:String,$states:[IssueState!]){
   repository(owner:$owner,name:$repo){

@@ -323,3 +323,100 @@ def test_graphql_rate_limit_sleep_never_aborts_the_retry(monkeypatch):
 
     assert result == {"data": {"viewer": {"login": "octocat"}}}
     assert request_mock.call_count == 2
+
+
+# ---------------------------------------------------------
+# TRANSPORT-ERROR RETRY / EXHAUSTION
+# ---------------------------------------------------------
+
+
+def _ok_response(payload=None):
+    """A 200 response with clean rate-limit headers."""
+    resp = Mock()
+    resp.status_code = 200
+    resp.ok = True
+    resp.headers = {"X-RateLimit-Remaining": "5000"}
+    resp.raise_for_status = Mock()
+    resp.json.return_value = payload or {"ok": True}
+    return resp
+
+
+def test_request_retries_after_a_transport_error(monkeypatch, mock_sleep):
+    """A connection error is retried, and a subsequent success is returned."""
+    client = github_client.GitHubClient()
+    request_mock = Mock(side_effect=[requests.ConnectionError("reset"), _ok_response({"recovered": True})])
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    assert client.get("https://api.github.com/test") == {"recovered": True}
+    assert request_mock.call_count == 2
+
+
+def test_request_raises_after_exhausting_transport_retries(monkeypatch, mock_sleep):
+    """A transport error on every attempt propagates once retries are exhausted."""
+    client = github_client.GitHubClient()
+    request_mock = Mock(side_effect=requests.ConnectionError("down"))
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    with pytest.raises(requests.ConnectionError):
+        client.get("https://api.github.com/test")
+    assert request_mock.call_count == github_client.MAX_RETRIES
+
+
+def test_request_raises_after_exhausting_5xx_retries(monkeypatch, mock_sleep):
+    """A persistent 5xx eventually raises via raise_for_status rather than looping forever."""
+    client = github_client.GitHubClient()
+
+    server_error = Mock()
+    server_error.status_code = 503
+    server_error.ok = False
+    server_error.headers = {}
+    server_error.raise_for_status.side_effect = requests.HTTPError("503 Server Error")
+
+    request_mock = Mock(return_value=server_error)
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    with pytest.raises(requests.HTTPError):
+        client.get("https://api.github.com/test")
+    assert request_mock.call_count == github_client.MAX_RETRIES
+
+
+# ---------------------------------------------------------
+# SECONDARY RATE LIMIT (403)
+# ---------------------------------------------------------
+
+
+def test_secondary_rate_limit_honours_retry_after_header(monkeypatch, mock_sleep):
+    """A 403 carrying Retry-After sleeps for that long, then retries and succeeds."""
+    sleeps: list[float] = []
+    monkeypatch.setattr(github_client.time, "sleep", lambda s: sleeps.append(s))
+
+    client = github_client.GitHubClient()
+
+    throttled = Mock()
+    throttled.status_code = 403
+    throttled.ok = False
+    throttled.headers = {"Retry-After": "7"}
+
+    request_mock = Mock(side_effect=[throttled, _ok_response({"after": "wait"})])
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    assert client.get("https://api.github.com/test") == {"after": "wait"}
+    assert 7 in sleeps  # slept exactly the advertised Retry-After
+    assert request_mock.call_count == 2
+
+
+def test_secondary_rate_limit_detected_from_message_body(monkeypatch, mock_sleep):
+    """A 403 with no Retry-After but a 'rate limit' message body is still retried."""
+    client = github_client.GitHubClient()
+
+    throttled = Mock()
+    throttled.status_code = 403
+    throttled.ok = False
+    throttled.headers = {}
+    throttled.json.return_value = {"message": "You have exceeded a secondary rate limit"}
+
+    request_mock = Mock(side_effect=[throttled, _ok_response({"ok": True})])
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    assert client.get("https://api.github.com/test") == {"ok": True}
+    assert request_mock.call_count == 2

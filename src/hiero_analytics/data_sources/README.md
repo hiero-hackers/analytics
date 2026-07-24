@@ -1,6 +1,6 @@
 # GitHub Data Sources
 
-This module provides the **GitHub ingestion layer** for the analytics pipeline.  
+This module provides the **GitHub ingestion layer** for the analytics pipeline.
 It handles API communication, pagination, normalization of GitHub objects, and parallel ingestion across repositories.
 
 The goal is to expose a **small, stable API that returns typed records**, so downstream analytics code does not need to deal with GitHub API details.
@@ -27,9 +27,12 @@ The module exposes a **small public interface** for retrieving repositories, iss
 data_sources/
 │
 ├── github_client.py        # HTTP client with retry and rate limit handling
-├── github_ingest.py        # GraphQL ingestion and normalization logic
-├── github_queries.py       # GraphQL query definitions
-├── github_search.py        # REST search API utilities
+├── github_ingest/          # GraphQL ingestion + the org-incremental resource registry
+├── github_rest.py          # REST helpers: CODEOWNERS presence, Actions-runner scanning
+├── queries.py              # GraphQL query-document loading (queries/ *.graphql files)
+├── dataset_store.py        # durable incremental datasets (watermarked, self-healing)
+├── cache.py                # short-TTL cache for repeated within-day runs
+├── serialization.py        # record <-> JSON round-tripping shared by both stores
 ├── models.py               # Typed data records
 └── pagination.py           # Generic pagination helpers
 ```
@@ -79,9 +82,7 @@ Example:
 ```python
 client = GitHubClient()
 
-data = client.get(
-    "https://api.github.com/repos/owner/repo"
-)
+data = client.get("https://api.github.com/repos/owner/repo")
 ```
 
 GraphQL example:
@@ -119,22 +120,16 @@ These functions return **typed dataclasses**, not raw API responses.
 
 ---
 
-# REST Search API
+# REST Helpers
 
-`github_search.py`
+`github_rest.py`
 
-Provides utilities for querying GitHub's REST **Search API**, which supports advanced GitHub search syntax.
-
-Example:
-
-```python
-issues = search_issues(
-    client,
-    query="org:hiero-ledger is:issue label:bug",
-)
-```
-
-Search results are paginated automatically using the generic pagination helpers.
+REST-backed checks that have no GraphQL equivalent: CODEOWNERS file presence
+(`has_codeowners_file`) and per-job Actions-runner classification from workflow
+YAML (`fetch_repo_workflows`). Workflow files are fetched through the shared
+fan-out (`fetch_all_with_retry`), so transient failures retry once and a
+persistently failing file raises rather than silently shrinking the scan.
+Only a 404 ever reads as "not present" — other errors propagate.
 
 ---
 

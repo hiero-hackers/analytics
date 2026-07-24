@@ -15,14 +15,14 @@ from datetime import datetime
 
 from hiero_analytics.domain.bots import is_bot_login
 
+from .serialization import parse_github_datetime
+
 logger = logging.getLogger(__name__)
 
 
 def _parse_dt(value: str | None) -> datetime | None:
-    """Parse an ISO datetime string from GitHub GraphQL response."""
-    if value is None:
-        return None
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    """Parse an ISO datetime from a GraphQL node (strict: malformed raises)."""
+    return parse_github_datetime(value, strict=True)
 
 
 def _extract_login(container: Mapping | None, key: str = "author") -> str | None:
@@ -147,7 +147,7 @@ class IssueRecord(BaseRecord):
 
 
 @dataclass(frozen=True)
-class IssueTimelineEventRecord:
+class IssueTimelineEventRecord(BaseRecord):
     """A normalized issue timeline event used for historical state reconstruction."""
 
     repo: str
@@ -166,7 +166,7 @@ class IssueTimelineEventRecord:
         per event, matching the normalization of :meth:`from_rest_event`
         (lower-cased event type and label name).
         """
-        full_repo = BaseRecord._repo_name(context)
+        full_repo = cls._repo_name(context)
 
         issue_number = node.get("number")
         if not isinstance(issue_number, int):
@@ -175,7 +175,7 @@ class IssueTimelineEventRecord:
         type_map = {"LabeledEvent": "labeled", "UnlabeledEvent": "unlabeled"}
         records: list[IssueTimelineEventRecord] = []
 
-        timeline = node.get("timelineItems", {})
+        timeline = node.get("timelineItems") or {}
         if timeline.get("pageInfo", {}).get("hasNextPage"):
             # The fragment caps timelineItems at 100 and does not paginate the
             # inner connection. Surface when an issue actually exceeds that so we
@@ -352,19 +352,6 @@ class ContributorActivityRecord(BaseRecord):
 
 
 @dataclass(frozen=True)
-class ContributorMergedPRCountRecord(BaseRecord):
-    """Total count of merged pull requests for a contributor in a repository.
-
-    Derived from :class:`PullRequestDifficultyRecord` datasets (distinct PR
-    numbers per author), not fetched from the API directly.
-    """
-
-    repo: str
-    login: str
-    merged_pr_count: int
-
-
-@dataclass(frozen=True)
 class ScorecardRecord:
     """Normalized OpenSSF Scorecard record."""
 
@@ -391,42 +378,3 @@ class RunnerRecord:
     job_name: str
     runner: str
     is_self_hosted: bool | None  # None = undefine/fallback/env-param
-
-
-@dataclass(frozen=True)
-class SearchIssueRecord:
-    """A normalized issue/PR item from the REST search API."""
-
-    repo: str
-    number: int
-    title: str
-    state: str
-    created_at: datetime | None
-    author: str | None
-    labels: list[str]
-    is_pull_request: bool
-    url: str
-
-    @classmethod
-    def from_search_item(cls, item: dict) -> SearchIssueRecord | None:
-        """Hydrate a record from a REST ``/search/issues`` item, or None if malformed."""
-        number = item.get("number")
-        if not isinstance(number, int):
-            return None
-        # ".../repos/OWNER/NAME" -> "OWNER/NAME"
-        repository_url = item.get("repository_url") or ""
-        repo = "/".join(repository_url.rsplit("/", 2)[-2:]) if repository_url else ""
-        user = item.get("user")
-        author = user.get("login") if isinstance(user, Mapping) else None
-        labels = [label["name"] for label in item.get("labels", []) if isinstance(label, Mapping) and "name" in label]
-        return cls(
-            repo=repo,
-            number=number,
-            title=str(item.get("title", "")),
-            state=str(item.get("state", "")),
-            created_at=_parse_dt(item.get("created_at")),
-            author=author if isinstance(author, str) else None,
-            labels=labels,
-            is_pull_request="pull_request" in item,
-            url=str(item.get("html_url", "")),
-        )

@@ -59,7 +59,7 @@ jobs:
 
             - name: Install dependencies
               if: matrix.language == 'python'
-              run: uv sync --all-extras --dev
+              run: uv sync --frozen --all-extras --dev
 
             - name: Perform CodeQL Analysis
               uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.3.5

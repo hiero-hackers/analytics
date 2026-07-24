@@ -4,11 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-import pandas as pd
-
 from hiero_analytics.analysis.prs import (
     filter_gfi_prs,
-    first_time_contributors,
     prs_to_dataframe,
 )
 from hiero_analytics.data_sources.models import PullRequestDifficultyRecord
@@ -99,79 +96,3 @@ def test_filter_gfi_prs_keeps_only_onboarding_labelled_rows():
     result = filter_gfi_prs(df)
 
     assert set(result["pr_number"]) == {1, 2}
-
-
-# -- first_time_contributors --------------------------------------------------
-
-
-def test_first_time_contributors_empty_passthrough():
-    """An empty frame is returned unchanged."""
-    empty = prs_to_dataframe([])
-    assert first_time_contributors(empty).empty
-
-
-def test_first_time_contributors_keeps_earliest_merged_per_author():
-    """Each author collapses to their earliest merged PR."""
-    early = _record(pr_number=1, author="alice", labels=[], merged_day=2)
-    late = _record(pr_number=2, author="alice", labels=[], merged_day=9)
-    other = _record(pr_number=3, author="bob", labels=[], merged_day=5)
-
-    df = prs_to_dataframe([late, early, other])
-    result = first_time_contributors(df)
-
-    by_author = result.set_index("author")
-    assert by_author.loc["alice", "pr_number"] == 1
-    assert by_author.loc["bob", "pr_number"] == 3
-
-
-def test_first_time_contributors_drops_null_authors():
-    """Rows without an author are excluded from the result."""
-    named = _record(pr_number=1, author="alice", labels=[], merged_day=1)
-    anon = _record(pr_number=2, author=None, labels=[], merged_day=2)
-
-    df = prs_to_dataframe([named, anon])
-    result = first_time_contributors(df)
-
-    assert list(result["author"]) == ["alice"]
-
-
-def test_first_time_contributors_excludes_unmerged_prs():
-    """A contributor whose only PR is unmerged must not appear with a NaT date.
-
-    Regression: ``first_time_contributors`` is documented as "first merged PR
-    per contributor", but without filtering on ``pr_merged_at`` an author with
-    only an open PR leaked through carrying a ``NaT`` merge date.
-    """
-    merged = _record(pr_number=1, author="alice", labels=[], merged_day=4)
-    unmerged = _record(pr_number=2, author="bob", labels=[], merged_day=4)
-    # Simulate an open PR: build the frame, then null out bob's merge date.
-    df = prs_to_dataframe([merged, unmerged])
-    df.loc[df["author"] == "bob", "pr_merged_at"] = pd.NaT
-
-    result = first_time_contributors(df)
-
-    assert list(result["author"]) == ["alice"]
-    assert result["pr_merged_at"].notna().all()
-
-
-def test_first_time_contributors_keeps_whole_first_row_with_null_issue_number():
-    """The first PR row is kept intact even when its issue_number is missing.
-
-    groupby(...).first() would stitch a later PR's issue_number onto the first
-    row; drop_duplicates must not.
-    """
-    df = pd.DataFrame(
-        {
-            "author": ["alice", "alice"],
-            "pr_number": [1, 2],
-            "pr_merged_at": [datetime(2024, 1, 1, tzinfo=UTC), datetime(2024, 2, 1, tzinfo=UTC)],
-            "issue_number": pd.array([None, 42], dtype="Int64"),
-        }
-    )
-
-    result = first_time_contributors(df)
-
-    assert len(result) == 1
-    row = result.iloc[0]
-    assert row["pr_number"] == 1
-    assert pd.isna(row["issue_number"])  # the first row's own (missing) issue, not PR 2's

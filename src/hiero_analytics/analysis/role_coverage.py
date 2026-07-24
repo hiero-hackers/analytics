@@ -16,11 +16,12 @@ from datetime import datetime
 
 import pandas as pd
 
+from hiero_analytics.analysis.contributor_activity_profile import CONTRIB_COUNT_FIELDS
+from hiero_analytics.analysis.dataframe_utils import rows_by_login, staleness_sort_key
 from hiero_analytics.domain.bots import is_bot_login
+from hiero_analytics.domain.recency import is_active
 from hiero_analytics.domain.repos import bare_repo
-
-# Seniority order, used to pick a holder's highest role across repos.
-ROLE_RANK: dict[str, int] = {"triage": 1, "committer": 2, "maintainer": 3}
+from hiero_analytics.domain.roles import ROLE_PRIORITY
 
 _COVERAGE_COLUMNS = [
     "user",
@@ -41,9 +42,6 @@ _COVERAGE_COLUMNS = [
     "labels_recent",
 ]
 
-# The five raw contribution counts, in display order.
-_COUNT_FIELDS = ("prs_opened", "reviews_given", "merges_done", "issues_opened", "labels_applied")
-
 _UNBADGED_COLUMNS = [
     "user",
     "reviews_given",
@@ -55,16 +53,11 @@ _UNBADGED_COLUMNS = [
 ]
 
 
-def looks_like_bot(login: str) -> bool:
-    """Whether a login is an automation account (delegates to the shared detector)."""
-    return is_bot_login(login)
-
-
 def _counts(profile: object | None) -> list[int]:
     """The five raw contribution counts for a profile row (zeros if absent)."""
     if profile is None:
         return [0, 0, 0, 0, 0]
-    return [int(getattr(profile, field)) for field in _COUNT_FIELDS]
+    return [int(getattr(profile, field)) for field in CONTRIB_COUNT_FIELDS]
 
 
 def build_repo_role_coverage(
@@ -106,21 +99,15 @@ def build_repo_role_coverage(
         all-time; ``*_recent`` are the last ``active_within_days`` days;
         ``last_active`` / ``days_since_active`` are all-time.
     """
-    by_login = {str(row.contributor).lower(): row for row in repo_profiles.itertuples()}
-    by_login_recent = (
-        {str(row.contributor).lower(): row for row in recent_profiles.itertuples()}
-        if recent_profiles is not None and not recent_profiles.empty
-        else {}
-    )
+    by_login = rows_by_login(repo_profiles)
+    by_login_recent = rows_by_login(recent_profiles) if recent_profiles is not None else {}
 
     rows = []
     for user, role in sorted(role_holders.items()):
         login = user.lower()
         last_active = repo_last_seen.get(login)
         days = None if last_active is None else (now - last_active).days
-        status = (
-            "active" if days is not None and (active_within_days is None or days <= active_within_days) else "quiet"
-        )
+        status = "active" if is_active(last_active, now, active_within_days) else "quiet"
 
         prs, reviews, merges, issues, labels = _counts(by_login.get(login))
         r_prs, r_reviews, r_merges, r_issues, r_labels = _counts(by_login_recent.get(login))
@@ -175,10 +162,10 @@ def find_unbadged_role_work(
     rows = []
     for profile in repo_profiles.itertuples():
         login = str(profile.contributor)
-        if login.lower() in holders or looks_like_bot(login):
+        if login.lower() in holders or is_bot_login(login):
             continue
         days = (now - profile.last_active).days
-        if int(profile.reviews_given) >= min_reviews and days <= active_within_days:
+        if int(profile.reviews_given) >= min_reviews and is_active(profile.last_active, now, active_within_days):
             rows.append(
                 {
                     "user": login,
@@ -238,13 +225,13 @@ def find_globally_quiet_role_holders(
         seen = None if entry is None else entry[0]
         display = user if entry is None else entry[1]
         days = None if seen is None else (now - seen).days
-        if days is not None and days <= threshold_days:
+        if is_active(seen, now, threshold_days):
             continue  # active somewhere recently — not globally quiet
         roles = roles_by_user[user]
         rows.append(
             {
                 "user": display,
-                "highest_role": max(roles, key=lambda role: ROLE_RANK.get(role, 0)),
+                "highest_role": max(roles, key=lambda role: ROLE_PRIORITY.get(role, 0)),
                 "roles": ", ".join(sorted(roles)),
                 "repos_held": len(repos_by_user[user]),
                 "last_active": seen,
@@ -255,7 +242,7 @@ def find_globally_quiet_role_holders(
     quiet = pd.DataFrame(rows, columns=_GLOBAL_QUIET_COLUMNS)
     if quiet.empty:
         return quiet
-    quiet["_sort"] = quiet["days_since_active"].fillna(10**9)
+    quiet["_sort"] = staleness_sort_key(quiet["days_since_active"])
     return quiet.sort_values("_sort", ascending=False).drop(columns="_sort").reset_index(drop=True)
 
 

@@ -7,13 +7,11 @@ later runs fetch only PRs updated since the watermark.
 
 from __future__ import annotations
 
-import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from hiero_analytics.config.github import GITHUB_MAX_WORKERS
-from hiero_analytics.config.paths import dataset_path, load_query
+from hiero_analytics.data_sources.queries import load_query
 
-from ..dataset_store import PartialOrgFetchError, fetch_incremental
 from ..github_client import GitHubClient
 from ..models import PullRequestDifficultyRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
@@ -22,9 +20,21 @@ from ._common import (
     _parse_graphql_datetime,
     fetch_github_resource,
 )
-from .batched import fetch_org_records_batched
+from .incremental import OrgIncrementalResource, fetch_org_batched_incremental
 
-logger = logging.getLogger(__name__)
+MERGED_PR_RESOURCE = OrgIncrementalResource(
+    name="merged_pr_difficulty",
+    model_class=PullRequestDifficultyRecord,
+    key_of=lambda record: (record.repo, record.pr_number, record.issue_number),
+    updated_at_of=lambda record: record.updated_at,
+    task_desc="merged PR difficulty",
+)
+
+
+def _node_older_than(node: dict, since: datetime) -> bool:
+    """Early-stop predicate: this PR node was last updated before ``since``."""
+    updated_at = _parse_graphql_datetime(node.get("updatedAt"))
+    return updated_at is not None and updated_at < since
 
 
 def fetch_repo_merged_pr_difficulty_graphql(
@@ -52,7 +62,7 @@ def fetch_repo_merged_pr_difficulty_graphql(
     )
 
 
-def fetch_repo_merged_prs_since_graphql(
+def fetch_repo_merged_pr_difficulty_since_graphql(
     client: GitHubClient,
     owner: str,
     repo: str,
@@ -76,8 +86,7 @@ def fetch_repo_merged_prs_since_graphql(
         records: list[PullRequestDifficultyRecord] = []
         page_has_older_prs = False
         for node in nodes:
-            updated_at = _parse_graphql_datetime(node.get("updatedAt"))
-            if updated_at is not None and updated_at < since:
+            if _node_older_than(node, since):
                 page_has_older_prs = True
             records.extend(PullRequestDifficultyRecord.from_github_node(node, {"owner": owner, "repo": repo}))
 
@@ -101,53 +110,19 @@ def fetch_org_merged_pr_difficulty_graphql(
     rows are upsert-only — both heal on the periodic full refresh.
     ``refresh=True`` forces a full re-fetch (self-heal).
     """
-
-    def full_fetch() -> list[PullRequestDifficultyRecord]:
-        return fetch_org_records_batched(
-            client,
-            org,
-            query_text=load_query("merged_pr"),
-            model_class=PullRequestDifficultyRecord,
-            nodes_path=["pullRequests"],
-            per_repo=lambda repo: fetch_repo_merged_pr_difficulty_graphql(
-                client, repo.owner, repo.name, use_cache=False
-            ),
-            task_desc="organization merged PR difficulty",
-            max_workers=max_workers,
-        )
-
-    def since_fetch(since: datetime) -> list[PullRequestDifficultyRecord]:
-        def older_than_since(node: dict) -> bool:
-            updated_at = _parse_graphql_datetime(node.get("updatedAt"))
-            return updated_at is not None and updated_at < since
-
-        try:
-            # Same query as the full fetch: PRs have no filterBy(since), so the
-            # delta relies on UPDATED_AT-descending order plus an early stop.
-            return fetch_org_records_batched(
-                client,
-                org,
-                query_text=load_query("merged_pr"),
-                model_class=PullRequestDifficultyRecord,
-                nodes_path=["pullRequests"],
-                stop_node=older_than_since,
-                per_repo=lambda repo: fetch_repo_merged_prs_since_graphql(client, repo.owner, repo.name, since),
-                task_desc="organization merged PR updates",
-                max_workers=max_workers,
-            )
-        except PartialOrgFetchError:
-            raise  # let the store hold the watermark; don't fall back to full
-        except Exception:
-            logger.exception("Incremental merged-PR fetch failed; falling back to full fetch")
-            return full_fetch()
-
-    return fetch_incremental(
-        path=dataset_path("merged_pr_difficulty", org),
-        model_class=PullRequestDifficultyRecord,
-        key_of=lambda r: (r.repo, r.pr_number, r.issue_number),
-        updated_at_of=lambda r: r.updated_at,
-        full_fetch=full_fetch,
-        since_fetch=since_fetch,
-        force_full=refresh,
-        full_refresh_after=timedelta(days=30),
+    # PRs have no filterBy(since): the delta reuses the base query, ordered
+    # UPDATED_AT-descending, stopping past the watermark via _node_older_than.
+    return fetch_org_batched_incremental(
+        client,
+        MERGED_PR_RESOURCE,
+        org=org,
+        query_name="merged_pr",
+        nodes_path=["pullRequests"],
+        node_older_than=_node_older_than,
+        per_repo=lambda repo: fetch_repo_merged_pr_difficulty_graphql(client, repo.owner, repo.name, use_cache=False),
+        per_repo_since=lambda repo, since: fetch_repo_merged_pr_difficulty_since_graphql(
+            client, repo.owner, repo.name, since
+        ),
+        max_workers=max_workers,
+        refresh=refresh,
     )

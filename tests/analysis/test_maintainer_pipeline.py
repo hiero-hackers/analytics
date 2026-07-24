@@ -6,15 +6,12 @@ from unittest.mock import patch
 import pandas as pd
 
 from hiero_analytics.analysis.maintainer_pipeline import (
-    Granularity,
     _active_window_for_year,
     activity_to_role_dataframe,
     build_maintainer_monthly_pipeline,
-    build_maintainer_pipeline,
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
-    collapse_repo_pipeline_tail,
     recent_buckets,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -272,43 +269,6 @@ def test_yearly_pipeline_current_bar_uses_full_trailing_window():
     assert past["general_user"] == 1  # the Dec event still counts in 2025's fixed H2 bar
 
 
-def test_collapse_repo_pipeline_tail_aggregates_remaining_rows():
-    """Long repo tails should collapse into a single aggregated chart row."""
-    repo_df = pd.DataFrame(
-        [
-            {"repo": "repo-a", "general_user": 10, "triage": 1, "committer": 2, "maintainer": 3},
-            {"repo": "repo-b", "general_user": 8, "triage": 1, "committer": 2, "maintainer": 1},
-            {"repo": "repo-c", "general_user": 6, "triage": 1, "committer": 1, "maintainer": 1},
-            {"repo": "repo-d", "general_user": 4, "triage": 0, "committer": 1, "maintainer": 1},
-        ]
-    )
-
-    collapsed = collapse_repo_pipeline_tail(repo_df, max_repos=3)
-
-    assert len(collapsed) == 3
-    assert collapsed.iloc[0]["repo"] == "repo-a"
-    assert collapsed.iloc[1]["repo"] == "repo-b"
-    assert collapsed.iloc[2]["repo"] == "Other Repos (2)"
-    assert collapsed.iloc[2]["general_user"] == 10
-    assert collapsed.iloc[2]["triage"] == 1
-    assert collapsed.iloc[2]["committer"] == 2
-    assert collapsed.iloc[2]["maintainer"] == 2
-
-
-def test_collapse_repo_pipeline_tail_noop_when_below_limit():
-    """Short repo tables should remain unchanged when under the chart limit."""
-    repo_df = pd.DataFrame(
-        [
-            {"repo": "repo-a", "general_user": 1, "triage": 0, "committer": 0, "maintainer": 0},
-            {"repo": "repo-b", "general_user": 1, "triage": 0, "committer": 0, "maintainer": 0},
-        ]
-    )
-
-    collapsed = collapse_repo_pipeline_tail(repo_df, max_repos=5)
-
-    assert collapsed.equals(repo_df)
-
-
 # ---------------------------------------------------------------------------
 # build_maintainer_monthly_pipeline
 # ---------------------------------------------------------------------------
@@ -444,41 +404,6 @@ def test_weekly_pipeline_counts_each_week_separately():
     assert set(weekly["general_user"]) == {1}  # each week has only its own contributor
     assert "2024-W27" in weekly["week"].values
     assert "2020-W01" in weekly["week"].values
-
-
-# ---------------------------------------------------------------------------
-# build_maintainer_pipeline (dispatch)
-# ---------------------------------------------------------------------------
-
-
-def test_pipeline_dispatch_year():
-    """Granularity.YEAR should dispatch to yearly builder."""
-    role_lookup = {"repo-a": {}}
-    records = [_h2_record("authored_pull_request", "alice", "org/repo-a", 2024)]
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-
-    result = build_maintainer_pipeline(stage_df, Granularity.YEAR)
-    assert "year" in result.columns
-
-
-def test_pipeline_dispatch_month():
-    """Granularity.MONTH should dispatch to monthly builder."""
-    role_lookup = {"repo-a": {}}
-    records = [_h2_record("authored_pull_request", "alice", "org/repo-a", 2024)]
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-
-    result = build_maintainer_pipeline(stage_df, Granularity.MONTH)
-    assert "month" in result.columns
-
-
-def test_pipeline_dispatch_week():
-    """Granularity.WEEK should dispatch to weekly builder."""
-    role_lookup = {"repo-a": {}}
-    records = [_h2_record("authored_pull_request", "alice", "org/repo-a", 2024)]
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-
-    result = build_maintainer_pipeline(stage_df, Granularity.WEEK)
-    assert "week" in result.columns
 
 
 # ---------------------------------------------------------------------------

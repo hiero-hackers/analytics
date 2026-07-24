@@ -2,25 +2,33 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
+
+
+def write_output_meta(path: Path, *, generated_at: datetime | None = None) -> None:
+    """Write the freshness sidecar (``<name>.meta.json``) for a saved artifact.
+
+    The dashboard reads it to show a per-section "data as of" stamp — without
+    it, a pipeline that fails after previously succeeding leaves yesterday's
+    CSV rendering as current with no visible signal.
+    """
+    stamp = (generated_at or datetime.now(UTC)).isoformat()
+    Path(f"{path}.meta.json").write_text(json.dumps({"generated_at": stamp}), encoding="utf-8")
 
 
 def save_dataframe(
     df: pd.DataFrame,
     path: Path,
 ) -> None:
-    """
-    Save a dataframe to a CSV file.
-
-    Args:
-        df: The dataframe to save.
-        path: The path where the CSV file will be saved.
-    """
+    """Write ``df`` to ``path`` as CSV, creating parent directories and the freshness sidecar."""
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
+    write_output_meta(path)
 
 
 def plot_and_save(
@@ -37,13 +45,8 @@ def plot_and_save(
     Collapses the ``if not df.empty: plot_x(...); save_dataframe(...)`` block
     repeated across runners. ``df`` is passed positionally so any chart helper
     works regardless of its first parameter's name (``df``/``channels``/...).
-
-    Args:
-        df: The data to plot (and save). Nothing happens if it is empty.
-        plot_fn: A chart helper taking the frame positionally plus ``output_path``.
-        output_path: Where the chart image is written.
-        csv_path: If given, the frame is also written there as CSV.
-        **plot_kwargs: Extra keyword arguments forwarded to ``plot_fn``.
+    Extra keyword arguments are forwarded to ``plot_fn``; if ``csv_path`` is
+    given the frame is also written there as CSV. Empty frames are skipped.
     """
     if df.empty:
         return

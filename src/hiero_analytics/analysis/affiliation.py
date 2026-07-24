@@ -19,6 +19,7 @@ import pandas as pd
 import yaml
 
 from hiero_analytics.config.paths import SRC
+from hiero_analytics.domain.recency import is_active_since
 from hiero_analytics.domain.repos import bare_repo
 
 _HEATMAP_META = {"contributor name", "role", "activity score"}
@@ -236,7 +237,7 @@ def filter_active_logins(logins, last_active, cutoff):
     active = set()
     for login in logins:
         entry = last_active.get(login.lower())
-        if entry and entry[0] >= cutoff:
+        if entry and is_active_since(entry[0], cutoff):
             active.add(login)
     return active
 
@@ -295,6 +296,59 @@ def build_repo_affiliation_diversity(
     return df.sort_values(["distinct_orgs", "maintainers"], ascending=[True, False]).reset_index(drop=True)
 
 
+def _build_org_composition(
+    groups: list[tuple[str, set[str]]],
+    affiliations: dict[str, str],
+    *,
+    label_col: str,
+    top_n: int,
+) -> tuple[pd.DataFrame, list[str]]:
+    """Shared engine for the stacked employer-composition charts.
+
+    ``groups`` is ``[(label, member_logins)]`` in the desired row order. The
+    ``top_n`` employers (by total seats across all groups) keep their own
+    segment; the rest pool into ``Other orgs``. Independents and unknowns get
+    their own segments so each bar's length is the group's full member count.
+    Returns ``(frame, segment_columns)`` with segments ordered for stacking.
+    """
+    if not groups:
+        return pd.DataFrame(columns=[label_col]), []
+
+    def segment(login: str) -> str:
+        # INDEPENDENT passes through as its own segment; unmapped logins are Unknown.
+        return affiliations.get(login.lower()) or UNKNOWN_LABEL
+
+    seat_totals: Counter[str] = Counter()
+    for _, members in groups:
+        for login in members:
+            seat_totals[segment(login)] += 1
+
+    named = [org for org, _ in seat_totals.most_common() if org not in {INDEPENDENT, UNKNOWN_LABEL}]
+    kept = named[:top_n]
+    # Stacking order: big employers first, then Other, Independent, and Unknown last.
+    segments = [*kept]
+    if len(named) > top_n:
+        segments.append(OTHER_LABEL)
+    if seat_totals.get(INDEPENDENT):
+        segments.append(INDEPENDENT)
+    if seat_totals.get(UNKNOWN_LABEL):
+        segments.append(UNKNOWN_LABEL)
+
+    kept_set = set(kept)
+    rows: list[dict[str, object]] = []
+    for label, members in groups:
+        counts = dict.fromkeys(segments, 0)
+        for login in members:
+            seg = segment(login)
+            if seg not in kept_set and seg not in {INDEPENDENT, UNKNOWN_LABEL}:
+                seg = OTHER_LABEL
+            counts[seg] += 1
+        rows.append({label_col: label, **counts})
+
+    frame = pd.DataFrame(rows, columns=[label_col, *segments])
+    return _sort_by_concentration(frame, segments, kept), segments
+
+
 def build_repo_org_composition(
     role_lookup: dict[str, dict[str, str]],
     affiliations: dict[str, str],
@@ -309,46 +363,8 @@ def build_repo_org_composition(
     columns so each bar's length is the repo's full maintainer count. Returns
     ``(frame, segment_columns)`` with segments ordered for stacking.
     """
-    repos = _repo_maintainers(role_lookup, role)
-    if not repos:
-        return pd.DataFrame(columns=["repo"]), []
-
-    def segment(login: str) -> str:
-        org = affiliations.get(login.lower())
-        if not org:
-            return UNKNOWN_LABEL
-        return org  # INDEPENDENT passes through as its own segment
-
-    seat_totals: Counter[str] = Counter()
-    for logins in repos.values():
-        for login in logins:
-            seat_totals[segment(login)] += 1
-
-    named = [org for org, _ in seat_totals.most_common() if org not in {INDEPENDENT, UNKNOWN_LABEL}]
-    kept = named[:top_n]
-    has_other = len(named) > top_n
-    # Stacking order: big employers first, then Other, Independent, and Unknown last.
-    segments = [*kept]
-    if has_other:
-        segments.append(OTHER_LABEL)
-    if seat_totals.get(INDEPENDENT):
-        segments.append(INDEPENDENT)
-    if seat_totals.get(UNKNOWN_LABEL):
-        segments.append(UNKNOWN_LABEL)
-
-    kept_set = set(kept)
-    rows: list[dict[str, object]] = []
-    for repo, logins in repos.items():
-        counts = dict.fromkeys(segments, 0)
-        for login in logins:
-            seg = segment(login)
-            if seg not in kept_set and seg not in {INDEPENDENT, UNKNOWN_LABEL}:
-                seg = OTHER_LABEL
-            counts[seg] += 1
-        rows.append({"repo": repo, **counts})
-
-    frame = pd.DataFrame(rows, columns=["repo", *segments])
-    return _sort_by_concentration(frame, segments, kept), segments
+    groups = list(_repo_maintainers(role_lookup, role).items())
+    return _build_org_composition(groups, affiliations, label_col="repo", top_n=top_n)
 
 
 def _sort_by_concentration(frame: pd.DataFrame, segments: list[str], employer_cols: list[str]) -> pd.DataFrame:
@@ -503,37 +519,5 @@ def build_team_org_composition(
     groups = [
         (team, set(members)) for team, members in team_membership.items() if resolved_count(members) >= min_resolved
     ]
-    if not groups:
-        return pd.DataFrame(columns=["team"]), []
     groups.sort(key=lambda g: len(g[1]), reverse=True)
-
-    def segment(login: str) -> str:
-        return affiliations.get(login.lower()) or UNKNOWN_LABEL
-
-    seat_totals: Counter[str] = Counter()
-    for _, members in groups:
-        for login in members:
-            seat_totals[segment(login)] += 1
-
-    named = [org for org, _ in seat_totals.most_common() if org not in {INDEPENDENT, UNKNOWN_LABEL}]
-    kept = named[:top_n]
-    segments = [*kept]
-    if len(named) > top_n:
-        segments.append(OTHER_LABEL)
-    if seat_totals.get(INDEPENDENT):
-        segments.append(INDEPENDENT)
-    if seat_totals.get(UNKNOWN_LABEL):
-        segments.append(UNKNOWN_LABEL)
-
-    kept_set = set(kept)
-    rows: list[dict[str, object]] = []
-    for team, members in groups:
-        counts = dict.fromkeys(segments, 0)
-        for login in members:
-            seg = segment(login)
-            if seg not in kept_set and seg not in {INDEPENDENT, UNKNOWN_LABEL}:
-                seg = OTHER_LABEL
-            counts[seg] += 1
-        rows.append({"team": team, **counts})
-
-    return _sort_by_concentration(pd.DataFrame(rows, columns=["team", *segments]), segments, kept), segments
+    return _build_org_composition(groups, affiliations, label_col="team", top_n=top_n)

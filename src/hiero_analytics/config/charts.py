@@ -65,6 +65,14 @@ LINE_FILL_ALPHA: float = 0.08
 # accent color carries the eye to the recent / live portion of a chart.
 MUTED_HISTORICAL_COLOR = "#CBD5E1"
 
+# Dashed threshold/reference lines (e.g. a 50% majority marker) and their labels.
+REFERENCE_LINE_COLOR = "#444444"
+
+# Small text badges (endpoint pills) and the shared card-edge stroke width used
+# by badge boxes and legend frames.
+BADGE_FONT_SIZE = 9
+CARD_EDGE_LINE_WIDTH = 0.9
+
 # --------------------------------------------------
 # Donut / pie styling
 # --------------------------------------------------
@@ -85,7 +93,7 @@ PRIMARY_PALETTE = [
     "#EF4444",
 ]
 
-# Colours for the semantic repository categories (see analysis.repo_categories),
+# Colours for the semantic repository categories (see domain.repo_categories),
 # used to colour the maintainer network. One distinct hue per category.
 REPO_CATEGORY_COLORS = {
     "SDKs": "#0EA5E9",
@@ -145,7 +153,6 @@ SCORECARD_CHECK_COLORS = {
     "Branch-Protection": "#ffa600",
     "Packaging": "#58508d",
     "SAST": "#ff6361",
-    "Vulnerabilities": "#8b0000",
 }
 
 # Contributor activity heatmap: the intensity colour scale plus the surrounding

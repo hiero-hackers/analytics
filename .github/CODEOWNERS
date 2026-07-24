@@ -1,0 +1,13 @@
+# Code owners for hiero-hackers/analytics.
+#
+# Listed owners are requested for review automatically on any PR that touches a
+# matching path. Owners must have write access to the repository.
+# See https://docs.github.com/articles/about-code-owners.
+
+# Default owners for everything in the repo.
+*       @exploreriii @MonaaEid @danielmarv
+
+# Governance, security, and CI config warrant maintainer eyes explicitly.
+/.github/        @exploreriii @MonaaEid @danielmarv
+/SECURITY.md     @exploreriii @MonaaEid @danielmarv
+/MAINTAINERS.md  @exploreriii @MonaaEid @danielmarv

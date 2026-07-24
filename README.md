@@ -1,5 +1,11 @@
 # Analytics
 
+[![Tests](https://github.com/hiero-hackers/analytics/actions/workflows/test.yml/badge.svg)](https://github.com/hiero-hackers/analytics/actions/workflows/test.yml)
+[![Lint](https://github.com/hiero-hackers/analytics/actions/workflows/lint.yml/badge.svg)](https://github.com/hiero-hackers/analytics/actions/workflows/lint.yml)
+[![CodeQL](https://github.com/hiero-hackers/analytics/actions/workflows/codeql.yml/badge.svg)](https://github.com/hiero-hackers/analytics/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/hiero-hackers/analytics/badge)](https://securityscorecards.dev/viewer/?uri=github.com/hiero-hackers/analytics)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 ## Overview
 
 Stay up to date with hiero organisation activity and contributor diversity
@@ -8,133 +14,35 @@ This repository provides analytics for the [Hiero repositories](https://github.c
 
 **Latest dashboard:** [hiero-hackers.github.io/analytics](https://hiero-hackers.github.io/analytics/)
 
-## Setting Up Analytics Development
+**Contributing?** Start with the [contributor guide](CONTRIBUTING.md) — setup, workflow, skill levels, AI policy, and testing conventions.
 
-## Repository Setup
+## Quickstart
 
-Before you begin, make sure you have:
-- **Git** installed ([Download Git](https://git-scm.com/downloads))
-- **Python 3.10+** installed ([Download Python](https://www.python.org/downloads/))
-- A **GitHub account** ([Sign up](https://github.com/join))
-
-### Step 1: Fork the Repository
-
-Forking creates your own copy of the Hiero Python SDK that you can modify freely.
-
-1. Go to [https://github.com/hiero-hackers/analytics](https://github.com/hiero-hackers/analytics)
-2. Click the **Fork** button in the top-right corner
-3. Select your GitHub account as the destination
-
-You now have your own fork at `https://github.com/YOUR_USERNAME/hiero-hackers/analytics`
-
-### Step 2: Clone Your Fork
-
-Clone your fork to your local machine:
+**Prerequisites:** [Git](https://git-scm.com/downloads), Python 3.11+, and
+[uv](https://docs.astral.sh/uv/getting-started/installation/). `uv` provisions the
+right Python version and all dependencies for you.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/hiero-hackers/analytics.git
-cd hiero-hackers/analytics
+git clone https://github.com/hiero-hackers/analytics.git
+cd analytics
+uv sync          # create the environment and install everything
+uv run pytest    # verify — no credentials needed
 ```
 
-Replace `YOUR_USERNAME` with your actual GitHub username.
-
-### Step 3: Add Upstream Remote
-
-Connect your local repository to the original repository. This allows you to keep your fork synchronized with the latest changes.
+Most work, and the whole test suite, runs without credentials. For pipelines that
+fetch **live** GitHub data, add a `.env` file in the project root with a token that
+has public-repo read access (this only raises your API rate limit):
 
 ```bash
-git remote add upstream https://github.com/hiero-hackers/analytics.git
+GITHUB_TOKEN=<your token>
 ```
 
-**What this does:**
-- `origin` = your fork (where you push your changes)
-- `upstream` = the original repository (where you pull updates from)
-
-### Step 4: Verify Your Remotes
-
-Check that both remotes are configured correctly:
-
-```bash
-git remote -v
-```
-
-You should see:
-```
-origin    https://github.com/YOUR_USERNAME/hiero-hackers/analytics.git (fetch)
-origin    https://github.com/YOUR_USERNAME/hiero-hackers/analytics.git (push)
-upstream  https://github.com/hiero-hackers/analytics.git (fetch)
-upstream  https://github.com/hiero-hackers/analytics.git (push)
-```
-
----
-
-## Installation
-
-#### Install uv
-
-**On macOS/Linux:**
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-**On macOS (using Homebrew):**
-```bash
-brew install uv
-```
-
-**On Windows:**
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-**Other installation methods:** [uv Installation Guide](https://docs.astral.sh/uv/getting-started/installation/)
-
-#### Verify Installation
-
-```bash
-uv --version
-```
-
-## Install Dependencies
-
-`uv` automatically manages the correct Python version based on the `.python-version` file in the project, so you don't need to worry about version conflicts.
-
-Install project dependencies:
-
-```bash
-uv sync
-```
-
-**What this does:**
-- Downloads and installs the correct Python version (if needed)
-- Creates a virtual environment
-- Installs all project dependencies
-- Installs development tools (pytest, ruff, etc.)
-
-## Environment Setup
-
-Create a fine-grained personal access token [Personal Acess Tokens Info](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [Create Personal Access Token](https://github.com/settings/personal-access-tokens). Enable it for public repositorites and do not enable any extra access.
-
-Create a `.env` file in the project root, copy and save your token.
-
-```bash
-GITHUB_TOKEN=yours
-```
-
-You'll need this token to increase your API rate limit when interacting with Github data. 
-
-### Test Setup
-
-Run the test suite to ensure everything is working:
-
-```bash
-uv run pytest
-```
----
+**Contributing?** The [contributor guide](CONTRIBUTING.md) has the full setup, the
+fork workflow, linting and pre-commit, skill levels, and testing conventions.
 
 ## Running the Analytics
 
-With your `GITHUB_TOKEN` configured (see [Environment Setup](#environment-setup)), run **every** analytics pipeline with a single command:
+With your `GITHUB_TOKEN` configured (see [Quickstart](#quickstart)), run **every** analytics pipeline with a single command:
 
 ```bash
 uv run hiero-analytics
@@ -161,7 +69,7 @@ To build it yourself, the single-file dashboard at `outputs/dashboard.html` is *
 - **To rebuild only the dashboard** once the data already exists (e.g. after tweaking a label), run:
 
   ```bash
-  uv run python -m hiero_analytics.run_dashboard
+  uv run hiero-analytics dashboard
   ```
 
 - Open `outputs/dashboard.html` in any browser — it's fully self-contained (no server required) and shows one tab per organization that has data.
@@ -176,40 +84,36 @@ Changes under `src/hiero_analytics/data_sources/` automatically use a live fetch
 
 ### Running a single pipeline
 
-To run just one pipeline, invoke its module directly:
+The same `hiero-analytics` CLI runs each pipeline as a subcommand:
 
 ```bash
-uv run python -m hiero_analytics.run_gfic_gfi_org
+uv run hiero-analytics scorecard
 ```
+
+Repo-scoped pipelines accept `--org` and `--repo` (defaulting to the configured `GITHUB_ORG` / `GITHUB_REPO`); run `uv run hiero-analytics <command> --help` to see a subcommand's options. Each pipeline lives in `src/hiero_analytics/pipelines/<command>.py` and is declared in the registry in `src/hiero_analytics/pipelines/__init__.py`.
 
 Available pipelines:
 
-| Module | What it produces |
+| Command | What it produces |
 |---|---|
-| `run_gfic_gfi_org` | Good First Issue / onboarding pipeline |
-| `run_difficulty_org_for_repo` | Issue difficulty distribution |
-| `run_onboarding_signal_for_repo` | Onboarding signal (issues vs. contributors) |
-| `run_contributor_profiles_repo` | Per-contributor profiles |
-| `run_maintainer_pipeline_org` | Maintainer pipeline by governance role |
-| `run_scorecard_for_org` | OpenSSF Scorecard results |
-| `run_codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
-| `run_hiero_hackers_org` | Hiero Hackers org composition and activity |
+| `difficulty` | Issue difficulty distribution |
+| `difficulty_over_time` | Difficulty trend over time |
+| `onboarding` | Onboarding signal (issues vs. contributors) |
+| `contributor_profiles` | Per-contributor profiles |
+| `maintainer_pipeline` | Maintainer pipeline by governance role |
+| `contributor_activity` | Org-wide contributor activity tables |
+| `contributor_heatmap` | Contributor activity heatmaps |
+| `role_coverage` | Governance roles vs. real activity per repo |
+| `affiliation` | Contributor affiliation mapping |
+| `scorecard` | OpenSSF Scorecard results |
+| `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
+| `hiero_hackers` | Hiero Hackers org composition and activity |
+| `dashboard` | Rebuilds `outputs/dashboard.html` from existing data (the full run does this last) |
+| `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
+| `contributor_churn` | Contributor churn analysis — on-demand, not part of the full run |
+| `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
-
-### Running using Command-Line Interface (CLI)
-
-The package includes a command-line interface (`hiero-analytics`) to run the complete suite or execute specific pipelines individually with custom arguments.
-
-**Usage**
-```bash
-uv run hiero-analytics <command> --help
-
-# Better way activate your virtual environment first
-source .venv/bin/activate
-hiero-analytics <command> --help
-```
-
 
 ### Incremental data fetching
 
@@ -230,6 +134,7 @@ To avoid re-downloading all of GitHub history on every run, fetching is **increm
 
 ## Documentation
 
+- [**Architecture**](docs/architecture.md) — the layer map, the two extensibility registries, the fetch/persistence model, and where new features go. Start here to understand the codebase.
 - [**Maintainer affiliations**](docs/affiliations.md) — how each maintainer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
 
 ---

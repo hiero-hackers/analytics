@@ -2,22 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from collections.abc import Iterable
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
-from hiero_analytics.analysis.timeseries_utils import (
-    DIFFICULTY_OVER_TIME_COLUMN_ORDER as _DIFFICULTY_OVER_TIME_COLUMN_ORDER,
-)
-from hiero_analytics.analysis.timeseries_utils import (
-    difficulty_key,
-    difficulty_key_for_label,
-    init_row_for_sample,
-    normalize_datetime,
-    timeline_events_by_issue,
-    weekly_sample_points,
-)
 from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
+from hiero_analytics.domain.labels import (
+    DIFFICULTY_ADVANCED,
+    DIFFICULTY_BEGINNER,
+    DIFFICULTY_GOOD_FIRST_ISSUE,
+    DIFFICULTY_INTERMEDIATE,
+)
 
 TIMELINE_EVENT_ORDER = {
     "unlabeled": 0,
@@ -25,8 +21,146 @@ TIMELINE_EVENT_ORDER = {
     "closed": 2,
     "reopened": 3,
 }
-# Re-export column order for consumers expecting it from this module.
-DIFFICULTY_OVER_TIME_COLUMN_ORDER = _DIFFICULTY_OVER_TIME_COLUMN_ORDER
+
+DIFFICULTY_OVER_TIME_COLUMN_ORDER = [
+    "gfi",
+    "beginner",
+    "intermediate",
+    "advanced",
+]
+
+_DIFFICULTY_OVER_TIME_SPECS = (
+    ("gfi", DIFFICULTY_GOOD_FIRST_ISSUE),
+    ("beginner", DIFFICULTY_BEGINNER),
+    ("intermediate", DIFFICULTY_INTERMEDIATE),
+    ("advanced", DIFFICULTY_ADVANCED),
+)
+
+
+def normalize_datetime(value: datetime | None) -> datetime | None:
+    """Normalize a datetime to UTC, returning None if the input is None."""
+    if value is None:
+        return None
+
+    if value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+
+    return value.astimezone(UTC)
+
+
+def weekly_sample_points(start_at: datetime, end_at: datetime) -> list[datetime]:
+    """Return a list of UTC datetimes spaced one week apart from start_at to end_at."""
+    points: list[datetime] = []
+    current = start_at
+
+    while current <= end_at:
+        points.append(current)
+        current += timedelta(days=7)
+
+    if not points or points[-1] < end_at:
+        points.append(end_at)
+
+    return points
+
+
+def init_row_for_sample(sample_point: datetime) -> dict[str, int | str]:
+    """Return a zeroed-out difficulty row dict for a given sample point."""
+    return {
+        "date": sample_point.date().isoformat(),
+        "gfi": 0,
+        "beginner": 0,
+        "intermediate": 0,
+        "advanced": 0,
+    }
+
+
+def difficulty_key_for_label(label: str | None):
+    """Return the difficulty bucket key for a single label string, or None if unrecognised."""
+    if not label:
+        return None
+
+    for key, spec in _DIFFICULTY_OVER_TIME_SPECS:
+        if label.lower() in spec.labels:
+            return key
+
+    return None
+
+
+def difficulty_key(labels: set[str]) -> str | None:
+    """Return the difficulty key for an active label set, or None.
+
+    Mirrors :func:`hiero_analytics.analysis.difficulty_analysis.assign_difficulty`:
+    when several difficulty labels are active at once, the highest one wins.
+    """
+    normalized = {label.lower() for label in labels or []}
+
+    for key, spec in reversed(_DIFFICULTY_OVER_TIME_SPECS):
+        if spec.matches(normalized):
+            return key
+
+    return None
+
+
+def timeline_events_by_issue(
+    timeline_events: Iterable[object],
+    *,
+    event_type_order: dict[str, int] | None = None,
+) -> dict[tuple[str, int], list[object]]:
+    """Group timeline events by issue identity and sort them chronologically."""
+    grouped: dict[tuple[str, int], list[object]] = {}
+
+    for event in timeline_events:
+        grouped.setdefault((event.repo, event.issue_number), []).append(event)
+
+    for key in grouped:
+        grouped[key].sort(
+            key=lambda event: (
+                normalize_datetime(event.occurred_at) or datetime.max.replace(tzinfo=UTC),
+                event_type_order.get(event.event_type, 99)
+                if event_type_order is not None
+                else getattr(event, "event_type", ""),
+            )
+        )
+
+    return grouped
+
+
+def _resolve_entry_points(
+    issues: list[IssueRecord],
+    events_by_issue: dict[tuple[str, int], list[IssueTimelineEventRecord]],
+    end_at: datetime,
+) -> dict[tuple[str, int], tuple[str, datetime]]:
+    """Map each issue to the (difficulty bucket, label timestamp) it enters the series with.
+
+    Issues with no current difficulty label, no recorded label event matching it,
+    or a label event after the window are excluded — every entry point must be
+    grounded in a recorded event.
+    """
+    entry_points: dict[tuple[str, int], tuple[str, datetime]] = {}
+
+    for issue in issues:
+        current_difficulty = difficulty_key(set(issue.labels or []))
+        if current_difficulty is None:
+            continue
+
+        issue_events = events_by_issue.get((issue.repo, issue.number), [])
+
+        # Find the most recent labeled event for this difficulty.
+        most_recent_label_event: IssueTimelineEventRecord | None = None
+        for event in reversed(issue_events):
+            if event.event_type == "labeled" and difficulty_key_for_label(event.label) == current_difficulty:
+                most_recent_label_event = event
+                break
+        if most_recent_label_event is None:
+            continue
+
+        label_timestamp = normalize_datetime(most_recent_label_event.occurred_at)
+        if label_timestamp is None or label_timestamp > end_at:
+            continue
+
+        entry_points[(issue.repo, issue.number)] = (current_difficulty, label_timestamp)
+
+    return entry_points
 
 
 def get_difficulty_over_time_event_based(
@@ -79,36 +213,7 @@ def get_difficulty_over_time_event_based(
     )
 
     # For each issue, find the most recent labeled event for its current difficulty.
-    issue_entry_points: dict[tuple[str, int], tuple[str, datetime]] = {}
-
-    for issue in filtered_issues:
-        current_difficulty = difficulty_key(set(issue.labels or []))
-        if current_difficulty is None:
-            # Skip issues with no current difficulty label.
-            continue
-
-        issue_events = events_by_issue.get((issue.repo, issue.number), [])
-
-        # Find the most recent labeled event for this difficulty.
-        most_recent_label_event: IssueTimelineEventRecord | None = None
-        for event in reversed(issue_events):
-            if event.event_type == "labeled" and difficulty_key_for_label(event.label) == current_difficulty:
-                most_recent_label_event = event
-                break
-
-        if most_recent_label_event is None:
-            # Skip issues with no recorded label event.
-            continue
-
-        label_timestamp = normalize_datetime(most_recent_label_event.occurred_at)
-        if label_timestamp is None:
-            continue
-
-        # Only track from the label event onward; skip if label event is after window.
-        if label_timestamp > end_at:
-            continue
-
-        issue_entry_points[(issue.repo, issue.number)] = (current_difficulty, label_timestamp)
+    issue_entry_points = _resolve_entry_points(filtered_issues, events_by_issue, end_at)
 
     if not issue_entry_points:
         return []

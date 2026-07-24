@@ -13,7 +13,7 @@ permissions:
 jobs:
   refresh-data:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -29,7 +29,7 @@ jobs:
           version: "latest"
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       # Persist the incremental-fetch datasets across runs without committing
       # them to git. A unique key per run always saves; restore-keys pulls the
@@ -46,7 +46,7 @@ jobs:
       - name: Run all analytics pipelines
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run python -m hiero_analytics.run_all
+        run: uv run hiero-analytics
 
       # Only persist datasets when the run succeeds. Saving after a failed run
       # would let a partial snapshot become the next incremental baseline
