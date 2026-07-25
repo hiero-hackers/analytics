@@ -28,6 +28,10 @@ PIPELINES: tuple[Pipeline, ...] = (
     Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",)),
     Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",)),
     Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
+    # Offline runs without cached HIP datasets skip cleanly inside the pipeline
+    # (the dashboard omits sections whose CSVs are absent), so it stays
+    # offline-capable for PR previews.
+    Pipeline("hip_implementation", "Map HIPs to the PRs that reference them", args=("org",), offline=True),
     # CLI-only pipelines, excluded from the default run:
     # - dashboard: the full run renders it explicitly, last and once, after all orgs.
     # - discord_analytics: needs manual gitignored Discord CSVs (INPUTS_DIR), so it

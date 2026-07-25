@@ -10,10 +10,9 @@ its images exist. Run after the data pipelines (last step in ``run_all``).
 
 from __future__ import annotations
 
-import base64
-import json
+import importlib
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
 
@@ -25,36 +24,18 @@ from hiero_analytics.dashboard_spec import (
     CHART_METHODOLOGY,
     CHART_NOTES,
     CHARTS_GROUP,
+    CUSTOM_SECTION_MODULES,
+    MACRO_GLOSSARIES,
     TABLE_FAMILIES,
     WIDE_CHARTS,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS, DEFAULT_ACTIVITY_PERIOD
 from hiero_analytics.domain.roles import ROLE_PRIORITY
+from hiero_analytics.export.artifacts import csv_data_uri, load_csv, png_data_uri, stamp_freshness
 from hiero_analytics.export.dashboard import build_dashboard_html
 from hiero_analytics.provenance import git_sha
 
 logger = logging.getLogger(__name__)
-
-
-# A section counts as stale when its data is older than the scheduled refresh
-# cadence (daily) plus slack for a slow run.
-STALE_AFTER = timedelta(hours=36)
-
-
-def _generated_at(path: Path) -> datetime | None:
-    """Read an artifact's freshness sidecar, or None if absent/unreadable."""
-    meta_path = Path(f"{path}.meta.json")
-    if not meta_path.exists():
-        return None
-    try:
-        return datetime.fromisoformat(json.loads(meta_path.read_text(encoding="utf-8"))["generated_at"])
-    except (KeyError, ValueError, json.JSONDecodeError):
-        return None
-
-
-def _load(path: Path) -> pd.DataFrame:
-    """Read a CSV, or an empty frame if it doesn't exist."""
-    return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
 def _load_period_variants(spec: dict, org_data_dir: Path) -> list[dict]:
@@ -94,14 +75,6 @@ def _holders_by_highest_role(coverage: pd.DataFrame) -> dict[str, int]:
     return {role: int(counts.get(role, 0)) for role in _GRANTED_ROLES}
 
 
-def _img_data_uri(path: Path) -> str | None:
-    """Base64 ``data:`` URI for a PNG, or None if missing (keeps the file self-contained)."""
-    if not path.exists():
-        return None
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:image/png;base64,{encoded}"
-
-
 def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
     """Build image-gallery sections for an org from its chart specs (missing files skipped).
 
@@ -118,7 +91,7 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
             # package canonicalizes single-file entries into one-variant lists.
             variants, note, methodology, wide = [], None, None, False
             for label, filename in variant_specs:
-                src = _img_data_uri(chart_dir / filename)
+                src = png_data_uri(chart_dir / filename)
                 if src is None:
                     continue
                 variant = {"label": label, "src": src}
@@ -163,6 +136,12 @@ def _chart_sections(org: str, chart_specs: list[dict]) -> list[dict]:
             }
             if spec.get("slideshow"):
                 section["slideshow"] = True
+            # A chart may declare its companion CSV; it embeds as a data: URI
+            # download so the self-contained page needs no table duplicate.
+            if csv_name := spec.get("csv"):
+                csv_path = ORG_DATA_DIR / org / csv_name
+                if csv_path.exists():
+                    section["download"] = {"name": csv_name, "href": csv_data_uri(csv_path.read_bytes())}
             sections.append(section)
     return sections
 
@@ -189,7 +168,7 @@ def _contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -
     # with activity in that window, so the share is a row-count ratio.
     month = next((p for p in ACTIVITY_PERIODS if p.key == "30d"), None)
     if month is not None:
-        active = _load(org_data_dir / month.filename("contributor_activity_profiles"))
+        active = load_csv(org_data_dir / month.filename("contributor_activity_profiles"))
         if not active.empty:
             metrics.append(("active last month %", _pct(len(active), total)))
     metrics += [
@@ -198,7 +177,7 @@ def _contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -
         ("open PRs %", _pct(int((profiles["prs_opened"] > 0).sum()), total)),
         ("give reviews %", _pct(int((profiles["reviews_given"] > 0).sum()), total)),
     ]
-    completers = _load(org_data_dir / "gfi_completers.csv")
+    completers = load_csv(org_data_dir / "gfi_completers.csv")
     if "login" in completers:
         metrics.append(("completed a GFI %", _pct(int(completers["login"].nunique()), total)))
     return metrics
@@ -224,7 +203,7 @@ _METRICS_BY_MACRO = {"Contributors": _contributors_metrics, "Governance": _gover
 def _org_table_tab(family: ModuleType, org_name: str, org_data_dir: Path) -> dict | None:
     """Build one family's table tab for an org, or None if it has no data."""
     specs = family.SECTION_SPECS
-    loaded = {spec["id"]: _load(org_data_dir / spec["file"]) for spec in specs}
+    loaded = {spec["id"]: load_csv(org_data_dir / spec["file"]) for spec in specs}
     period_variants = {spec["id"]: _load_period_variants(spec, org_data_dir) for spec in specs if spec.get("periods")}
 
     # High-level → individual order (see the family's SECTION_ORDER), non-empty tables only.
@@ -247,10 +226,7 @@ def _org_table_tab(family: ModuleType, org_name: str, org_data_dir: Path) -> dic
         # Freshness: stamp the section from its base CSV's sidecar (period
         # variants are written by the same run) and flag it when older than the
         # scheduled refresh — so a silently-reused stale CSV is visible.
-        generated = _generated_at(org_data_dir / spec["file"])
-        if generated is not None:
-            section["data_as_of"] = generated.strftime("%Y-%m-%d %H:%M UTC")
-            section["stale"] = datetime.now(UTC) - generated > STALE_AFTER
+        stamp_freshness(section, org_data_dir / spec["file"])
         if variants:
             section["variants"] = [
                 {
@@ -278,6 +254,14 @@ def _org_table_tab(family: ModuleType, org_name: str, org_data_dir: Path) -> dic
     return {"org": org_name, "metrics": metrics, "sections": sections}
 
 
+def _custom_sections(macro_name: str, org: str) -> list[dict]:
+    """Prebuilt sections a family builds itself, or [] when it declares none."""
+    module_path = CUSTOM_SECTION_MODULES.get(macro_name)
+    if module_path is None:
+        return []
+    return importlib.import_module(module_path).build_sections(org, ORG_DATA_DIR / org)
+
+
 def _ordered_orgs() -> list[str]:
     """All orgs that have data or charts, the configured ORG first then alphabetical."""
     names: set[str] = set()
@@ -303,12 +287,17 @@ def main() -> None:
             table_tab = _org_table_tab(family, org, ORG_DATA_DIR / org) if family is not None else None
             table_sections = list(table_tab["sections"]) if table_tab is not None else []
             metrics = table_tab["metrics"] if table_tab is not None else []
-            # Charts first, then tables (high-level → individual within the tables).
-            sections = _chart_sections(org, macro["charts"].get(org, [])) + table_sections
+            custom_sections = _custom_sections(macro["name"], org)
+            # A family's prebuilt sections lead its charts, then its tables
+            # (high-level → individual within the tables).
+            sections = custom_sections + _chart_sections(org, macro["charts"].get(org, [])) + table_sections
             if sections:
                 org_tabs.append({"org": org, "metrics": metrics, "sections": sections})
         if org_tabs:
-            macros.append({"name": macro["name"], "org_tabs": org_tabs})
+            entry = {"name": macro["name"], "org_tabs": org_tabs}
+            if glossary_html := MACRO_GLOSSARIES.get(macro["name"]):
+                entry["glossary_html"] = glossary_html
+            macros.append(entry)
 
     if not macros:
         # Still write the (empty) page so the file always exists — callers and the

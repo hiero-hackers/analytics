@@ -48,3 +48,9 @@ ACTIVITY_WEIGHTS = {
 DIFFICULTY_RECENT_WINDOW_DAYS = 30
 DIFFICULTY_OVER_TIME_WINDOW_DAYS = 365
 TIMELINE_MAX_WORKERS = 3
+
+# The Hiero era began when the codebase moved to hiero-ledger (September
+# 2024). HIP-implementation analytics count only PRs from this era — earlier
+# references describe pre-migration (Hedera-era) work and are kept in the
+# evidence tables flagged "pre-Hiero era" rather than counted.
+HIERO_ERA_START = "2024-09-01"

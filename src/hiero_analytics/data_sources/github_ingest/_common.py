@@ -51,6 +51,17 @@ def _parse_graphql_datetime(value: object) -> datetime | None:
     return parse_github_datetime(value)
 
 
+def node_older_than(node: dict, since: datetime) -> bool:
+    """Early-stop predicate for ``UPDATED_AT``-descending PR pagination.
+
+    Shared by every pull-request resource: ``pullRequests`` has no
+    ``filterBy: since``, so a delta walks pages newest-first and stops at the
+    first node last updated before the watermark.
+    """
+    updated_at = _parse_graphql_datetime(node.get("updatedAt"))
+    return updated_at is not None and updated_at < since
+
+
 def fetch_github_resource(  # noqa: UP047
     client: GitHubClient,
     query: str,

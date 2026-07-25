@@ -35,6 +35,7 @@ import hiero_analytics.pipelines.dashboard as dashboard_mod
 import hiero_analytics.pipelines.difficulty as difficulty_mod
 import hiero_analytics.pipelines.difficulty_over_time as difficulty_time_mod
 import hiero_analytics.pipelines.hiero_hackers as hackers_mod
+import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
@@ -44,6 +45,8 @@ from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
+    HipReferenceRecord,
+    HipSpecRecord,
     IssueRecord,
     IssueTimelineEventRecord,
     PullRequestDifficultyRecord,
@@ -98,6 +101,11 @@ CHART_COMPANION_CSVS = {
     "language_distribution.csv",
     "push_activity.csv",
     "contributor_counts.csv",
+    "hip_repo_engagement.csv",  # HIPs-tab engagement chart companion (embedded as its CSV download)
+    "hip_repo_activity.csv",  # long-format source of the coverage matrix (wide CSV embeds in the page)
+    "hip_summary.csv",  # per-HIP ledger data behind the funnel, process checks, and matrix (no table dup)
+    "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
+    "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
 }
 
 
@@ -239,6 +247,53 @@ REPO_PRS = [
 ]
 
 
+def _hip_spec(number: int, status: str, created: str) -> HipSpecRecord:
+    return HipSpecRecord(
+        number=number,
+        title=f"Spec {number}",
+        status=status,
+        category="Service",
+        hip_type="Standards Track",
+        created=created,
+        updated="",
+        updated_at=_NOW,
+    )
+
+
+def _hip_ref(repo: str, pr_number: int, hip: int | None, state: str = "MERGED") -> HipReferenceRecord:
+    return HipReferenceRecord(
+        repo=repo,
+        pr_number=pr_number,
+        pr_title=f"PR {pr_number}",
+        pr_state=state,
+        pr_created_at=_NOW,
+        pr_merged_at=_NOW if state == "MERGED" else None,
+        hip=hip,
+        match_sources="title" if hip is not None else "",
+        snippet=f"HIP-{hip}" if hip is not None else "",
+        author="alice",
+        updated_at=_NOW,
+    )
+
+
+# Recent spec with merged PRs in two SDKs (drives the coverage matrix + both
+# charts), an accepted spec with no activity (drives the attention list), and
+# an unknown-number mention (drives the review table).
+HIP_SPECS = [
+    _hip_spec(551, "Final", f"{_NOW.year}-01-01"),
+    _hip_spec(904, "Approved", f"{_NOW.year}-01-01"),
+    _hip_spec(173, "Accepted", "2021-10-18"),
+]
+
+HIP_REFS = [
+    _hip_ref(f"{PRIMARY}/hiero-sdk-python", 1, 551),
+    _hip_ref(f"{PRIMARY}/hiero-sdk-java", 2, 551),
+    _hip_ref(f"{PRIMARY}/hiero-sdk-java", 3, 904, state="OPEN"),
+    _hip_ref(f"{PRIMARY}/hiero-sdk-python", 4, None),
+    _hip_ref(f"{PRIMARY}/hiero-sdk-python", 5, 9999),
+]
+
+
 # ---------------------------------------------------------------------------
 # The full run, once per module
 # ---------------------------------------------------------------------------
@@ -313,6 +368,8 @@ def outputs_root(tmp_path_factory) -> Path:
             lambda _c, org: [_repo(org, "analytics"), _repo(org, "hips", "Markdown")],
         )
         mp.setattr(hackers_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
+        mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)
+        mp.setattr(hip_mod, "fetch_org_pr_hip_refs_graphql", lambda _c, _org, **_k: HIP_REFS)
 
         mp.setattr(run_all, "setup_logging", lambda: None)
         mp.setattr(run_all, "EXTRA_ORGS", [HACKERS])

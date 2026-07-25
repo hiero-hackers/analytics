@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import importlib
+
 from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
     CHART_METHODOLOGY,
     CHART_NOTES,
+    CUSTOM_SECTION_MODULES,
+    MACRO_GLOSSARIES,
     TABLE_FAMILIES,
     WIDE_CHARTS,
 )
@@ -56,3 +60,28 @@ def test_chart_files_are_canonical():
                 for _caption, variants in spec["files"]:
                     assert isinstance(variants, list) and variants
                     assert all(isinstance(label, str) and filename.endswith(".png") for label, filename in variants)
+
+
+def _macro_names() -> set[str]:
+    """Every macro (family) name the dashboard renders."""
+    return {macro["name"] for macro in CHART_MACROS}
+
+
+def test_custom_section_modules_are_importable_builders():
+    """A declared custom-sections module must exist and expose build_sections.
+
+    The renderer resolves these by import path at render time, so a typo would
+    otherwise surface as a missing dashboard section rather than an error.
+    """
+    assert set(CUSTOM_SECTION_MODULES) <= _macro_names()
+    for macro_name, module_path in CUSTOM_SECTION_MODULES.items():
+        module = importlib.import_module(module_path)
+        builder = getattr(module, "build_sections", None)
+        assert callable(builder), f"{macro_name}: {module_path} has no build_sections()"
+
+
+def test_macro_glossaries_belong_to_real_macros():
+    """A family-specific glossary must attach to a macro that is rendered."""
+    assert set(MACRO_GLOSSARIES) <= _macro_names()
+    for macro_name, glossary in MACRO_GLOSSARIES.items():
+        assert glossary.startswith("<details"), f"{macro_name}: glossary must be its own expander"

@@ -49,15 +49,17 @@ pipelines, cli          orchestration — wire a fetch → analysis → output r
   assembles the single self-contained `dashboard.html`. Both are data-agnostic —
   they import only `config` and `domain`.
 - **`dashboard_spec`** — pure data: one module per dashboard *family*
-  (`contributors`, `onboarding`, `security`, `community`) declaring its chart macro,
-  notes, methodology, and (for contributors) the table sections. The package
-  `__init__` assembles them and fails loudly if two families claim the same chart.
+  (`contributors`, `governance`, `onboarding`, `hips`, `security`, `community`)
+  declaring its chart macro, notes, methodology, and optionally its table sections,
+  its own "how to read this" glossary, and a module that builds views a table or
+  chart gallery cannot express. The package `__init__` assembles them and fails
+  loudly if two families claim the same chart.
 - **`pipelines` / `cli`** — the orchestration layer. Each pipeline reads a fetch,
   runs analysis, and writes outputs.
 
-## The two registries
+## The three registries
 
-Extensibility flows through two declarative registries rather than scattered
+Extensibility flows through three declarative registries rather than scattered
 special-casing. Adding a capability means adding a registry entry, not editing a
 dispatcher.
 
@@ -75,6 +77,16 @@ is `offline`-capable, and whether it is in the default full run. Both the CLI
 since-delta afterwards, periodic forced refresh, dataset-store persistence — so a new
 resource is a declaration plus its query plumbing, not another copy of the skeleton.
 See `ORG_INCREMENTAL_RESOURCES`.
+
+**Dashboard family registry** (`dashboard_spec/__init__.py`). A family module is a
+pure-data description of one dashboard tab; the package discovers what each one
+opts into by attribute, so the renderer never names a family. `SECTION_SPECS` adds
+filterable tables (`TABLE_FAMILIES`); `GLOSSARY_HTML` replaces the shared column
+glossary with the tab's own (`MACRO_GLOSSARIES`); `CUSTOM_SECTIONS_MODULE` names a
+module exposing `build_sections(org, org_data_dir)` for views that are neither a
+table nor a chart gallery (`CUSTOM_SECTION_MODULES`) — the HIPs tab's governance
+board and coverage matrix are built that way, in `export/hip_sections.py`.
+*To add a family:* create the module, list it in `_FAMILIES`.
 
 ## Data flow and persistence
 
@@ -160,6 +172,8 @@ namespace and asserting the output files. Coverage floor is enforced in CI.
 | Task | Touch |
 |---|---|
 | Add a chart | its family module in `dashboard_spec/` + the producing pipeline |
+| Add a chart *form* | a `plot_*` primitive in `plotting/` (pipelines never touch matplotlib) |
+| Add a bespoke dashboard view | `CUSTOM_SECTIONS_MODULE` on the family + a `build_sections()` module |
 | Add a pipeline | `pipelines/<name>.py` + one `Pipeline` entry in `pipelines/__init__.py` |
 | Add a fetched resource | `models` + `queries/` + `github_ingest/<x>.py` + one `OrgIncrementalResource` |
 | A concept two layers share | `domain/` |

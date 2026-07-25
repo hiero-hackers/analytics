@@ -38,20 +38,6 @@ def test_activity_specs_use_the_shared_period_set():
     assert all(spec["periods"] is True for spec in tabbed.values())
 
 
-def test_generated_at_reads_sidecar_and_tolerates_absence(tmp_path):
-    """The sidecar timestamp is read when present; absent or malformed means None."""
-    from datetime import UTC, datetime
-
-    path = tmp_path / "table.csv"
-    assert dashboard._generated_at(path) is None
-
-    (tmp_path / "table.csv.meta.json").write_text('{"generated_at": "2026-07-24T01:02:03+00:00"}', encoding="utf-8")
-    assert dashboard._generated_at(path) == datetime(2026, 7, 24, 1, 2, 3, tzinfo=UTC)
-
-    (tmp_path / "table.csv.meta.json").write_text("not json", encoding="utf-8")
-    assert dashboard._generated_at(path) is None
-
-
 def test_contributor_metrics_tiles(tmp_path):
     """The Contributors tiles: counts, shares over the full list, and the 30d active share."""
     import pandas as pd

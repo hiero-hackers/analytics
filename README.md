@@ -131,6 +131,7 @@ Available pipelines:
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
 | `contributor_churn` | Contributor churn analysis — on-demand, not part of the full run |
 | `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
+| `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
 

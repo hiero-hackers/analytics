@@ -1,0 +1,38 @@
+query PR_HIP_REFS_QUERY($owner:String!, $repo:String!, $cursor:String) {
+  repository(owner:$owner, name:$repo) {
+    pullRequests(
+      first:100
+      after:$cursor
+      states:[MERGED, OPEN]
+      orderBy:{field:UPDATED_AT, direction:DESC}
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        number
+        title
+        # body and headRefName are matched for HIP mentions at hydration time
+        # and never persisted, so the flat query stays ~1 rate-limit point per
+        # page while the stored dataset stays small.
+        body
+        headRefName
+        state
+        createdAt
+        mergedAt
+        updatedAt
+
+        author {
+          login
+        }
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

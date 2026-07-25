@@ -17,8 +17,8 @@ from ..models import PullRequestDifficultyRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
 from ._common import (
     _cache_kwargs,
-    _parse_graphql_datetime,
     fetch_github_resource,
+    node_older_than,
 )
 from .incremental import OrgIncrementalResource, fetch_org_batched_incremental
 
@@ -29,12 +29,6 @@ MERGED_PR_RESOURCE = OrgIncrementalResource(
     updated_at_of=lambda record: record.updated_at,
     task_desc="merged PR difficulty",
 )
-
-
-def _node_older_than(node: dict, since: datetime) -> bool:
-    """Early-stop predicate: this PR node was last updated before ``since``."""
-    updated_at = _parse_graphql_datetime(node.get("updatedAt"))
-    return updated_at is not None and updated_at < since
 
 
 def fetch_repo_merged_pr_difficulty_graphql(
@@ -86,7 +80,7 @@ def fetch_repo_merged_pr_difficulty_since_graphql(
         records: list[PullRequestDifficultyRecord] = []
         page_has_older_prs = False
         for node in nodes:
-            if _node_older_than(node, since):
+            if node_older_than(node, since):
                 page_has_older_prs = True
             records.extend(PullRequestDifficultyRecord.from_github_node(node, {"owner": owner, "repo": repo}))
 
@@ -111,14 +105,14 @@ def fetch_org_merged_pr_difficulty_graphql(
     ``refresh=True`` forces a full re-fetch (self-heal).
     """
     # PRs have no filterBy(since): the delta reuses the base query, ordered
-    # UPDATED_AT-descending, stopping past the watermark via _node_older_than.
+    # UPDATED_AT-descending, stopping past the watermark via node_older_than.
     return fetch_org_batched_incremental(
         client,
         MERGED_PR_RESOURCE,
         org=org,
         query_name="merged_pr",
         nodes_path=["pullRequests"],
-        node_older_than=_node_older_than,
+        node_older_than=node_older_than,
         per_repo=lambda repo: fetch_repo_merged_pr_difficulty_graphql(client, repo.owner, repo.name, use_cache=False),
         per_repo_since=lambda repo, since: fetch_repo_merged_pr_difficulty_since_graphql(
             client, repo.owner, repo.name, since

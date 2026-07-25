@@ -101,3 +101,80 @@ details[open] .tsum::before{transform:rotate(90deg)}
 /* Freshness stamps: per-section "data as of" (stale = older than the scheduled refresh). */
 .asof { display: inline-block; font-size: 0.78rem; color: #64748B; margin: 0 0 8px; }
 .asof.stale { color: #B45309; font-weight: 600; }
+
+/* Formatted table cells (chips, HIP badges, links) */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 9px;border:1px solid #e4e4e4;white-space:nowrap;background:#fff}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dot,#999)}
+.chip-spec{--dot:#2a78d6;color:#255e9e}
+.cell-hip{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cell-link{font-size:12px;color:#2a78d6;text-decoration:none}
+.cell-link:hover{text-decoration:underline}
+
+/* HIP implementation coverage matrix */
+.hipmx-wrap{overflow:auto;max-height:560px;border:1px solid #eee;border-radius:8px;padding:0 6px 6px 0}
+.hipmx thead th{position:sticky;top:0;background:#fff;z-index:1}
+.hipmx{border-collapse:separate;border-spacing:2px;font-size:12px;width:auto}
+.hipmx th{position:static;background:none;border-bottom:none;cursor:default;padding:3px 8px;color:#666;font-weight:600}
+.hipmx th:hover{background:none}
+.hipmx thead th{text-align:center;font-size:11px}
+.hipmx thead .hipmx-grp th{border-bottom:1px solid #ccc;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#888}
+.hipmx tbody th{text-align:left;font-size:12px;color:#1b1b1b;white-space:nowrap}
+.hipmx tbody th small{display:block;font-weight:400;color:#888;font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.hipmx td{width:52px;min-width:52px;height:26px;text-align:center;border-radius:4px;border-bottom:none;padding:0;font-weight:600;font-variant-numeric:tabular-nums;cursor:default;white-space:nowrap}
+.hipmx tr:hover td{background:inherit}
+.hipmx td.m0{border:1px dashed #d5d5d5;color:#999;background:#fff}
+.hipmx td.m1{background:#cde2fb;color:#1b1b1b}
+.hipmx td.m2{background:#9ec5f4;color:#1b1b1b}
+.hipmx td.m3{background:#5598e7;color:#fff}
+.hipmx td.m4{background:#2a78d6;color:#fff}
+.hipmx td.m5{background:#104281;color:#fff}
+.hipmx td.mo{border:1px solid #9ec5f4;color:#2a78d6;background:#fff}
+.hipmx td.hipmx-status{width:auto;min-width:0;text-align:left;font-weight:500;font-size:11px;color:#555;padding:0 8px;white-space:nowrap;background:transparent}
+.hipmx th.hipmx-status-h{text-align:left}
+.hipmx td.hipmx-gaps{width:auto;min-width:0;text-align:left;font-weight:500;font-size:11px;color:#555;padding:0 8px;background:#fff!important}
+.hipmx td.hipmx-gaps .ok{color:#0a7a0a;font-weight:600}
+.hipmx td.hipmx-gaps .none{color:#aaa}
+.hipmx-legend{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:11.5px;color:#777}
+.hipmx-legend i{width:22px;height:10px;border-radius:2px;display:inline-block}
+.hipmx td.ck{cursor:pointer}
+.hipmx td.ck:focus-visible{outline:2px solid #1b1b1b;outline-offset:1px}
+.hipmx td.sel{outline:2px solid #1b1b1b;outline-offset:1px}
+.hipev{margin-top:12px;border:1px solid #e6e6e6;border-radius:8px;padding:12px 14px}
+.hipev-head{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.hipev-head h3{font-size:13.5px;margin:0;font-weight:600}
+.hipev-head .n{color:#888;font-size:12px}
+.hipev-head button{margin-left:auto}
+.hipev ol{list-style:none;margin:0;padding:0;max-height:300px;overflow-y:auto}
+.hipev li{padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12.5px}
+.hipev li:last-child{border-bottom:0}
+.hipev .l1{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.hipev .l1 a{font-weight:600;font-variant-numeric:tabular-nums;color:#2a78d6;text-decoration:none}
+.hipev .l1 a:hover{text-decoration:underline}
+.hipev .t{color:#444}
+.hipev .meta{color:#999;font-size:11.5px;white-space:nowrap}
+.hipev .cue{color:#8a6200;font-size:11.5px;font-weight:600}
+.hipev .snip{color:#999;font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.hipmx-filters{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.hipmx-filters .search{margin-bottom:0}
+.hipmx-fbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:#888}
+.hipmx-fbtn{padding:3px 11px;border:1px solid #ddd;background:#fff;border-radius:999px;cursor:pointer;font-size:12px;color:#444}
+.hipmx-fbtn:hover{border-color:#999}
+.hipmx-fbtn.active{background:#1b1b1b;color:#fff;border-color:#1b1b1b}
+.hipabout{margin:0;padding-left:18px;font-size:13px;color:#444;display:flex;flex-direction:column;gap:8px;max-width:85ch}
+.hipabout strong{color:#1b1b1b}
+.glossary .hipabout{margin:0 0 12px;padding-left:16px}
+.hipboard{display:flex;gap:10px;overflow-x:auto;align-items:flex-start;padding-bottom:4px}
+.hipboard-col{flex:0 0 172px;background:#f7f7f5;border:1px solid #ececec;border-radius:8px;padding:10px 10px 12px}
+.hipboard-col h3{font-size:12px;font-weight:600;margin:0 0 8px;color:#444;display:flex;justify-content:space-between;align-items:baseline}
+.hipboard-col h3 .n{color:#999;font-weight:600;font-size:12px}
+.hipboard-chips{display:flex;flex-wrap:wrap;gap:5px;max-height:300px;overflow-y:auto}
+.hipboard-chips .none{color:#bbb;font-size:12px}
+.hipchip{padding:2px 8px;border:1px solid #d8d8d8;background:#fff;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;color:#255e9e;font-variant-numeric:tabular-nums}
+.hipchip:hover{border-color:#2a78d6}
+.hipmx tr.flash th{background:#fff3d6;border-radius:4px}
+.hipmx tr.flash td.hipmx-status,.hipmx tr.flash td.hipmx-gaps{background:#fff3d6!important}
+.hipchip.active{border-color:#1b1b1b;color:#1b1b1b;background:#f3f3f3}
+.hipboard-info{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 12px;border:1px solid #e6e6e6;border-radius:8px;font-size:13px}
+.hipboard-info strong{font-variant-numeric:tabular-nums}
+.hipboard-info .t{color:#444}
+.hipboard-info button{margin-left:auto}

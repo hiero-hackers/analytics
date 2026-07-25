@@ -33,7 +33,15 @@ def test_dashboard_is_self_contained_html():
     doc = _doc()
     assert doc.startswith("<!DOCTYPE html>")
     assert "<style>" in doc and "<script>" in doc
-    assert "cdn" not in doc.lower() and "http" not in doc  # no external resources
+    # No external *resources*: nothing fetched at render time (scripts, styles,
+    # images). Outbound navigation links (e.g. the HIP evidence panel's
+    # github.com PR anchors, built in the inlined JS) are allowed — they load
+    # nothing unless clicked.
+    assert "cdn" not in doc.lower()
+    assert "<link" not in doc.lower()
+    for attr in ("src=", "srcset="):
+        for quote in ('"', "'"):
+            assert f"{attr}{quote}http" not in doc
 
 
 def test_dashboard_renders_metrics_sections_and_rows():

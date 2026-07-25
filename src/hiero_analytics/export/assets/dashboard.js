@@ -52,3 +52,86 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbo
 function slide(id,dir){var s=document.querySelectorAll('#'+id+'-show .slide');if(!s.length)return;var cur=0;s.forEach(function(f,i){if(f.style.display!=='none')cur=i;});s[cur].style.display='none';var n=(cur+dir+s.length)%s.length;s[n].style.display='';var c=document.getElementById(id+'-counter');if(c)c.textContent=(n+1)+' / '+s.length;}
 function chartTab(btn,i){var fig=btn.closest('figure');if(!fig)return;fig.querySelectorAll('.ctab').forEach(function(b,j){b.classList.toggle('active',j===i);});fig.querySelectorAll('.cimg').forEach(function(img){img.style.display=(+img.getAttribute('data-i')===i)?'':'none';});}
 function periodTab(btn,i){var section=btn.closest('.tsec');if(!section)return;section.querySelectorAll('.periodtab').forEach(function(b,j){b.classList.toggle('active',j===i);});section.querySelectorAll('.periodview').forEach(function(view,j){view.style.display=j===i?'':'none';});}
+
+/* HIP coverage matrix: click a cell to list the PRs behind its count. The data
+   is a JSON blob rendered next to the matrix ("<hip>|<repo>" -> PR rows), so
+   the panel works fully offline like everything else on this page. */
+var __hipEv=null,__hipEvTd=null;
+function hipEv(td,hip,repo){
+  if(__hipEv===null){var el=document.getElementById('hip-ev-data');__hipEv=el?JSON.parse(el.textContent||'{}'):{};}
+  var rows=__hipEv[hip+'|'+repo];var panel=document.getElementById('hip-ev-panel');
+  if(!rows||!panel)return;
+  if(__hipEvTd===td){hipEvClose();return;}
+  if(__hipEvTd)__hipEvTd.classList.remove('sel');
+  __hipEvTd=td;td.classList.add('sel');
+  document.getElementById('hip-ev-title').textContent='HIP-'+hip+' · '+repo;
+  document.getElementById('hip-ev-count').textContent=rows.length+' referencing PR'+(rows.length>1?'s':'');
+  var list=document.getElementById('hip-ev-list');list.textContent='';
+  rows.forEach(function(r){
+    var li=document.createElement('li'),l1=document.createElement('div');l1.className='l1';
+    var a=document.createElement('a');a.href='https://github.com/'+repo+'/pull/'+r.n;a.target='_blank';a.rel='noopener';a.textContent='#'+r.n;
+    var t=document.createElement('span');t.className='t';t.textContent=r.t;
+    var d=document.createElement('span');d.className='meta';d.textContent=r.st==='MERGED'?'merged '+r.d:r.st.toLowerCase();
+    var m=document.createElement('span');m.className='meta';m.textContent='matched in: '+r.m.split('|').join(', ');
+    l1.appendChild(a);l1.appendChild(t);l1.appendChild(d);l1.appendChild(m);
+    if(r.q){var q=document.createElement('span');q.className='cue';q.textContent='not counted — “'+r.q+'”';l1.appendChild(q);}
+    li.appendChild(l1);
+    if(r.x){var x=document.createElement('div');x.className='snip';x.textContent=r.x;li.appendChild(x);}
+    list.appendChild(li);
+  });
+  panel.hidden=false;panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function hipEvClose(){
+  var panel=document.getElementById('hip-ev-panel');if(panel)panel.hidden=true;
+  if(__hipEvTd){__hipEvTd.classList.remove('sel');__hipEvTd=null;}
+}
+document.addEventListener('keydown',function(ev){
+  if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('ck')){ev.preventDefault();ev.target.click();}
+  if(ev.key==='Escape')hipEvClose();
+});
+
+/* Matrix filters: free text and a governance-status pill, combined. */
+var __mxq='',__mxs='';
+function hipMxApply(){
+  var n=0;document.querySelectorAll('#hip-matrix-tbl tbody tr').forEach(function(tr){
+    var st=tr.querySelector('td.hipmx-status');st=st?st.textContent:'';
+    var hit=(__mxs===''||st===__mxs)&&(__mxq===''||tr.textContent.toLowerCase().indexOf(__mxq)>-1);
+    tr.style.display=hit?'':'none';if(hit)n++;});
+  var c=document.getElementById('hip-matrix-tbl-count');if(c)c.textContent=n+' rows';
+}
+function hipMxFilter(q){__mxq=(q||'').toLowerCase();hipMxApply();}
+function hipMxStatus(btn){
+  var s=btn.getAttribute('data-s');__mxs=(__mxs===s?'':s);
+  document.querySelectorAll('.hipmx-fbtn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-s')===__mxs);});
+  hipMxApply();
+}
+
+/* Governance board: a chip jumps to (and flashes) the HIP's matrix row,
+   clearing any matrix filters that would hide it. */
+function hipBoardJump(hip){
+  __mxq='';__mxs='';
+  var mx=document.getElementById('hip-matrix-tbl');
+  if(mx){var wrap=mx.closest('.sbody');if(wrap){var inp=wrap.querySelector('.search');if(inp)inp.value='';}}
+  document.querySelectorAll('.hipmx-fbtn').forEach(function(b){b.classList.remove('active');});
+  hipMxApply();
+  var row=document.getElementById('hipmx-row-'+hip);
+  if(!row)return;
+  row.scrollIntoView({block:'center',behavior:'smooth'});
+  row.classList.add('flash');
+  setTimeout(function(){row.classList.remove('flash');},1800);
+}
+
+/* Board chip click: show the spec's title/status in the info bar; the bar's
+   button jumps to the matrix row. */
+var __hipPick=null;
+function hipBoardPick(btn,hip){
+  document.querySelectorAll('.hipchip.active').forEach(function(b){b.classList.remove('active');});
+  var bar=document.getElementById('hip-board-info');
+  if(__hipPick===btn){bar.hidden=true;__hipPick=null;return;}
+  __hipPick=btn;btn.classList.add('active');
+  document.getElementById('hip-board-info-num').textContent='HIP-'+hip;
+  document.getElementById('hip-board-info-title').textContent=btn.getAttribute('data-t')||'';
+  document.getElementById('hip-board-info-status').textContent=btn.getAttribute('data-st')||'';
+  document.getElementById('hip-board-info-jump').onclick=function(){hipBoardJump(hip);};
+  bar.hidden=false;
+}

@@ -44,6 +44,7 @@ def test_registry_lists_every_org_incremental_resource():
         "issue_label_events",
         "merged_pr_difficulty",
         "contributor_activity",
+        "pr_hip_references",
     }
     for name, resource in ORG_INCREMENTAL_RESOURCES.items():
         assert resource.name == name

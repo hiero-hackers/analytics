@@ -32,3 +32,10 @@ GITHUB_GRAPHQL_BATCH_SIZE = env_int("GITHUB_GRAPHQL_BATCH_SIZE", 5, minimum=1)
 # success, so a moderately higher default is safe. Lower via env
 # (e.g. GITHUB_MAX_WORKERS=3) if a token keeps hitting 403s.
 GITHUB_MAX_WORKERS = env_int("GITHUB_MAX_WORKERS", 6, minimum=1)
+
+# Where HIP specifications live: the proposals repository and the directory of
+# merged spec files inside it. The HIP-implementation pipeline parses each
+# file's frontmatter into the canonical inventory that PR references are
+# validated against.
+HIP_PROPOSALS_REPO = os.getenv("HIP_PROPOSALS_REPO", "hiero-ledger/hiero-improvement-proposals")
+HIP_PROPOSALS_DIR = os.getenv("HIP_PROPOSALS_DIR", "HIP")

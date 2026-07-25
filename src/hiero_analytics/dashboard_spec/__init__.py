@@ -11,11 +11,11 @@ tables inside its own macro.
 
 from __future__ import annotations
 
-from hiero_analytics.dashboard_spec import community, contributors, governance, onboarding, security
+from hiero_analytics.dashboard_spec import community, contributors, governance, hips, onboarding, security
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
 
 # Macro (family) display order.
-_FAMILIES = (contributors, governance, onboarding, security, community)
+_FAMILIES = (contributors, governance, onboarding, hips, security, community)
 
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
 CHARTS_GROUP = "Charts"
@@ -24,6 +24,21 @@ CHARTS_GROUP = "Charts"
 # dashboard pipeline reads SECTION_SPECS / SECTION_ORDER / SECTION_GROUP_OF
 # off each. A family without tables simply isn't listed.
 TABLE_FAMILIES = {family.CHART_MACRO["name"]: family for family in _FAMILIES if hasattr(family, "SECTION_SPECS")}
+
+# Families whose view needs more than tables and chart galleries name a module
+# exposing ``build_sections(org, org_data_dir)``; the renderer imports it the
+# same way the pipeline registry resolves a pipeline module.
+CUSTOM_SECTION_MODULES = {
+    family.CHART_MACRO["name"]: family.CUSTOM_SECTIONS_MODULE
+    for family in _FAMILIES
+    if hasattr(family, "CUSTOM_SECTIONS_MODULE")
+}
+
+# A family may replace the shared column glossary with its own "how to read
+# this" expander; the rest fall back to the shared one.
+MACRO_GLOSSARIES = {
+    family.CHART_MACRO["name"]: family.GLOSSARY_HTML for family in _FAMILIES if hasattr(family, "GLOSSARY_HTML")
+}
 
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]
 CHART_NOTES = merged(_FAMILIES, "CHART_NOTES")

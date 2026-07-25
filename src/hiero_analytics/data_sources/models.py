@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from hiero_analytics.domain.bots import is_bot_login
+from hiero_analytics.domain.hip_references import extract_hip_mentions
 
 from .serialization import parse_github_datetime
 
@@ -259,6 +260,86 @@ class PullRequestDifficultyRecord(BaseRecord):
         if not issues:
             return [cls(issue_number=None, issue_labels=[], **base)]
         return [cls(issue_number=issue["number"], issue_labels=_extract_labels(issue), **base) for issue in issues]
+
+
+@dataclass(frozen=True)
+class HipReferenceRecord(BaseRecord):
+    """A HIP number a pull request mentions (or a no-mention marker).
+
+    Every swept PR yields at least one record: one per distinct HIP number
+    found in its title, branch name, or body — or a single record with ``hip``
+    None when it mentions no HIP. The markers matter: they let the dataset's
+    incremental watermark advance across *all* PRs (not just the rare
+    HIP-citing ones), and they give analysis a per-repo denominator of PRs
+    swept. PR body text is matched at hydration and never stored.
+    """
+
+    repo: str
+    pr_number: int
+    pr_title: str
+    pr_state: str
+    pr_created_at: datetime
+    pr_merged_at: datetime | None
+    hip: int | None
+    match_sources: str  # "|"-joined subset of title/branch/body; "" for markers
+    snippet: str
+    # Distancing cue ("waiting on", "prepares for", ...) found before a
+    # body-only mention — the mechanical false-positive signal. Analysis
+    # excludes qualified references from counts but keeps them as evidence.
+    qualifier: str = ""
+    author: str | None = None
+    updated_at: datetime | None = None
+
+    @classmethod
+    def from_github_node(cls, node: dict, context: dict) -> list[HipReferenceRecord]:
+        """Hydrate HIP-reference records from a GraphQL PR node."""
+        title = node.get("title") or ""
+        mentions = extract_hip_mentions(
+            title=title,
+            branch=node.get("headRefName") or "",
+            body=node.get("body") or "",
+        )
+        base = dict(
+            repo=cls._repo_name(context),
+            pr_number=node["number"],
+            pr_title=title[:200],
+            pr_state=node.get("state") or "",
+            pr_created_at=_parse_dt(node["createdAt"]),
+            pr_merged_at=_parse_dt(node.get("mergedAt")),
+            author=_extract_login(node),
+            updated_at=_parse_dt(node.get("updatedAt")),
+        )
+        if not mentions:
+            # Markers exist only to advance the watermark and give analysis a
+            # swept-PR denominator; dropping the title/author keeps ~97% of the
+            # persisted dataset (the PRs citing no HIP) small.
+            return [cls(hip=None, match_sources="", snippet="", **{**base, "pr_title": "", "author": None})]
+        return [
+            cls(hip=m.number, match_sources="|".join(m.sources), snippet=m.snippet, qualifier=m.qualifier, **base)
+            for m in mentions
+        ]
+
+
+@dataclass(frozen=True)
+class HipSpecRecord(BaseRecord):
+    """One HIP specification from the proposals repository's frontmatter.
+
+    Hydrated from ``HIP/hip-<n>.md`` YAML frontmatter, not from a GraphQL
+    node. Frontmatter dates are kept as the raw strings the spec authors
+    wrote; ``updated_at`` carries the parsed best-effort timestamp so the
+    dataset store has a watermark to advance.
+    """
+
+    number: int
+    title: str
+    status: str
+    category: str
+    hip_type: str
+    created: str
+    updated: str
+    # HIP-1 requires a release number when a Standards Track spec goes Final.
+    release: str = ""
+    updated_at: datetime | None = None
 
 
 @dataclass(frozen=True)

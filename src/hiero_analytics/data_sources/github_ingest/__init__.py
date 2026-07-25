@@ -11,6 +11,7 @@ The implementation is split by resource for readability:
 - ``issues``        — issue and issue-label-event ingestion (GraphQL)
 - ``pull_requests`` — merged-PR difficulty ingestion (GraphQL)
 - ``contributors``  — contributor activity ingestion (GraphQL)
+- ``hip_references`` — PR HIP-mention ingestion + HIP spec inventory (GraphQL)
 
 This module is a thin facade that re-exports the public API, so existing
 ``from ...github_ingest import X`` imports keep working unchanged. Tests that
@@ -40,6 +41,11 @@ from .contributors import (
 from .contributors import (
     _fetch_repo_pull_request_activity_graphql as _fetch_repo_pull_request_activity_graphql,
 )
+from .hip_references import (
+    PR_HIP_REFS_RESOURCE,
+    fetch_hip_inventory,
+    fetch_org_pr_hip_refs_graphql,
+)
 from .incremental import OrgIncrementalResource
 from .issues import (
     ISSUE_LABEL_EVENTS_RESOURCE,
@@ -66,6 +72,7 @@ ORG_INCREMENTAL_RESOURCES: dict[str, OrgIncrementalResource] = {
         ISSUE_LABEL_EVENTS_RESOURCE,
         MERGED_PR_RESOURCE,
         CONTRIBUTOR_ACTIVITY_RESOURCE,
+        PR_HIP_REFS_RESOURCE,
     )
 }
 
@@ -77,6 +84,7 @@ __all__ = [
     "ISSUE_LABEL_EVENTS_RESOURCE",
     "MERGED_PR_RESOURCE",
     "CONTRIBUTOR_ACTIVITY_RESOURCE",
+    "PR_HIP_REFS_RESOURCE",
     # generic engine + repos
     "fetch_github_resource",
     "fetch_org_resource_parallel",
@@ -94,4 +102,7 @@ __all__ = [
     # contributor activity + merged PR count
     "fetch_repo_contributor_activity_graphql",
     "fetch_org_contributor_activity_graphql",
+    # HIP references + inventory
+    "fetch_org_pr_hip_refs_graphql",
+    "fetch_hip_inventory",
 ]

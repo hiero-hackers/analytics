@@ -139,16 +139,40 @@ def _charts_section_html(section: Mapping, esc) -> str:
     if section.get("slideshow"):
         return _slideshow_section_html(section, esc)
     figures = "".join(_figure_html(chart, esc) for chart in section["charts"])
+    download = ""
+    if dl := section.get("download"):
+        download = f'<a class=\'dl\' download="{esc(dl["name"])}" href="{dl["href"]}">Download CSV</a>'
     return (
         f"<section class='card'><h2>{esc(section['title'])}</h2>"
-        f"<p class='desc'>{esc(section['description'])}</p>"
+        f"<div class='shead'><p class='desc'>{esc(section['description'])}</p>{download}</div>"
         f"<div class='gallery'>{figures}</div></section>"
     )
 
 
+# Per-column display formats a section spec may request via a third tuple
+# element, e.g. ("hip", "HIP", "hip"). Plain text stays the default; every
+# format keeps a stable text token in the cell, so the built-in filter, sort,
+# and CSV export keep operating on what the reader sees.
+def _format_cell(value: object, fmt: str, esc) -> str:
+    text = _fmt(value)
+    if not text:
+        return "<td></td>"
+    if fmt == "hip":
+        return f"<td><span class='cell-hip'>HIP-{esc(text)}</span></td>"
+    if fmt == "date":
+        return f"<td>{esc(text[:10])}</td>"
+    if fmt == "link":
+        return f'<td><a class="cell-link" href="{esc(text)}" target="_blank" rel="noopener">open &#8599;</a></td>'
+    if fmt == "status":
+        return f"<td><span class='chip chip-spec'>{esc(text)}</span></td>"
+    if fmt == "flag":
+        return f"<td>{'&#10003;' if text == 'True' else '&mdash;'}</td>"
+    return f"<td>{esc(text)}</td>"
+
+
 def _table_view_html(
     section_id: str,
-    columns: Sequence[tuple[str, str]],
+    columns: Sequence[Sequence[str]],
     rows: Sequence[Mapping],
     esc,
     *,
@@ -161,13 +185,17 @@ def _table_view_html(
     the CSV export can stamp them into the downloaded file. The export takes the
     *visible* rows, so a filtered download is a subset — the total is what lets
     the file say so rather than passing itself off as the whole table.
+
+    ``columns`` entries are ``(key, label)`` or ``(key, label, format)``; the
+    optional third element selects a display format (see ``_format_cell``).
     """
+    specs = [(column[0], column[1], column[2] if len(column) > 2 else "") for column in columns]
     head = "".join(
         f"<th onclick=\"sortTable('{section_id}',{i},this)\">{esc(label)}</th>"
-        for i, (_key, label) in enumerate(columns)
+        for i, (_key, label, _fmt_name) in enumerate(specs)
     )
     body = "".join(
-        "<tr>" + "".join(f"<td>{esc(_fmt(row.get(key)))}</td>" for key, _label in columns) + "</tr>" for row in rows
+        "<tr>" + "".join(_format_cell(row.get(key), fmt, esc) for key, _label, fmt in specs) + "</tr>" for row in rows
     )
     return (
         f"<button class='dl' onclick=\"exportCSV('{section_id}','{section_id}.csv')\">Download CSV</button>"
@@ -180,17 +208,53 @@ def _table_view_html(
     )
 
 
+def _asof_html(section: Mapping, esc) -> str:
+    """The "data as of" stamp, flagged when older than the refresh cadence."""
+    if not section.get("data_as_of"):
+        return ""
+    suffix = " — older than the scheduled refresh" if section.get("stale") else ""
+    stale_cls = " stale" if section.get("stale") else ""
+    return f"<span class='asof{stale_cls}'>data as of {esc(section['data_as_of'])}{suffix}</span>"
+
+
+def _download_html(section: Mapping, esc) -> str:
+    """A section's inlined CSV download link, when it declares one."""
+    dl = section.get("download")
+    if not dl:
+        return ""
+    return f'<a class=\'dl\' download="{esc(dl["name"])}" href="{dl["href"]}">Download CSV</a>'
+
+
+def _html_section_html(section: Mapping, esc) -> str:
+    """A section whose body is a prebuilt HTML fragment (e.g. the HIP matrix).
+
+    The fragment is produced by the dashboard pipeline from this run's own
+    CSVs — trusted content, inlined verbatim inside the standard card chrome.
+    """
+    asof = _asof_html(section, esc)
+    badge = f"<span class='sbadge'>{esc(section['badge'])}</span>" if section.get("badge") else ""
+    download = ""
+    if dl := section.get("download"):
+        download = f'<a class=\'dl\' download="{esc(dl["name"])}" href="{dl["href"]}">Download CSV</a>'
+    return (
+        f"<details class='card tsec' open>"
+        f"<summary class='tsum'><h2>{esc(section['title'])}</h2>{badge}</summary>"
+        f"<div class='sbody'>"
+        f"<div class='shead'><p class='desc'>{esc(section['description'])}</p>{asof}{download}</div>"
+        f"{section['html']}"
+        f"</div></details>"
+    )
+
+
 def _section_html(section: Mapping, esc) -> str:
     if "charts" in section:
         return _charts_section_html(section, esc)
+    if "html" in section:
+        return _html_section_html(section, esc)
     section_id = section["id"]
     variants = section.get("variants")
     row_count = max((len(variant["rows"]) for variant in variants), default=0) if variants else len(section["rows"])
-    asof = ""
-    if section.get("data_as_of"):
-        stale = section.get("stale")
-        suffix = " — older than the scheduled refresh" if stale else ""
-        asof = f"<span class='asof{' stale' if stale else ''}'>data as of {esc(section['data_as_of'])}{suffix}</span>"
+    asof = _asof_html(section, esc)
     action = (
         f"<a class='dl' href=\"{esc(section['action_url'])}\" target='_blank' rel='noopener'>"
         f"{esc(section.get('action_label', 'Suggest a correction'))}</a>"
@@ -350,10 +414,11 @@ def build_dashboard_html(
     for i, macro in enumerate(macros):
         mslug = _slug(macro["name"])
         display = "" if i == 0 else "display:none"
-        # The column glossary applies to tables only, so show it inside a macro
-        # only when that macro actually has a table section (not chart-only macros).
+        # Each macro gets its own "how to read this" expander: a family may
+        # supply tab-specific content (glossary_html); otherwise the shared
+        # column glossary shows for macros that actually have a table section.
         has_table = any("charts" not in section for tab in macro["org_tabs"] for section in tab["sections"])
-        glossary = _GLOSSARY if has_table else ""
+        glossary = macro.get("glossary_html") or (_GLOSSARY if has_table else "")
         macro_panels.append(
             f"<div class='macropanel' id='macro-{mslug}' style='{display}'>"
             f"{glossary}{_org_panels_html(mslug, macro['org_tabs'], esc)}</div>"
