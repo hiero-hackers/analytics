@@ -74,6 +74,25 @@ To build it yourself, the single-file dashboard at `outputs/dashboard.html` is *
 
 - Open `outputs/dashboard.html` in any browser — it's fully self-contained (no server required) and shows one tab per organization that has data.
 
+### Tracing a chart or table back to its data
+
+Nothing generated is committed, and each Pages deploy replaces the last, so every artifact carries its own provenance instead:
+
+- **Charts** have a footer reading `data <watermark> · code <revision> · n=<rows>`. A `-dirty` suffix on the revision means the chart was drawn from uncommitted code and cannot be reproduced from any commit.
+- **The dashboard** stamps the same revision in its header, plus a per-section *data as of* badge.
+- **CSVs on disk** (`outputs/data/`) keep their provenance in a `<name>.csv.meta.json` sidecar — `generated_at`, `git_sha`, `record_count`. The CSV body is left clean so `pd.read_csv` works unchanged.
+- **Each scheduled run** archives its dataset snapshot as a `dataset-snapshot-<run>-<sha>` workflow artifact, including a `SNAPSHOT.json` manifest of per-dataset watermarks and SHA-256s.
+
+**Downloading a table as CSV** from the dashboard writes four `#` comment lines above the header, naming the view, the data watermark, the revision, and the row count. The export takes the rows currently *visible*, so filtering before you download gives you a subset — the preamble says so (`# 2 of 7 rows (filtered: "sdk-j")`).
+
+Those comment lines mean a downloaded file needs the `comment` flag when read programmatically:
+
+```bash
+python -c "import pandas as pd; print(pd.read_csv('maintainers.csv', comment='#'))"
+```
+
+Without it pandas raises `ParserError` rather than mis-reading the header. Spreadsheet apps open the file fine, showing the preamble as four leading text rows. This applies only to browser downloads — the CSVs under `outputs/data/` have no preamble.
+
 ### Pull request dashboard previews
 
 Pull requests that change analytics code build `outputs/dashboard.html` and upload it as a **dashboard-preview** workflow artifact. Download that single HTML file to review the PR's charts and tables without committing generated PNGs or reports.

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from hiero_analytics.export.dashboard import build_dashboard_html
 
 
@@ -332,3 +334,77 @@ def test_section_renders_freshness_stamp_and_stale_warning():
     stale = build_dashboard_html(_macro({"data_as_of": "2026-07-01 10:00 UTC", "stale": True}))
     assert "asof stale" in stale
     assert "older than the scheduled refresh" in stale
+
+
+def test_tables_carry_the_attributes_the_csv_export_stamps():
+    """The export reads title/watermark/total off the table, so they must be emitted."""
+    sections = [
+        {
+            "id": "people",
+            "title": "People",
+            "description": "Who did what.",
+            "columns": [("name", "name"), ("prs", "PRs")],
+            "rows": [{"name": "alice", "prs": 3}, {"name": "bob", "prs": 0}],
+            "data_as_of": "2026-07-24 09:00 UTC",
+        }
+    ]
+    doc = build_dashboard_html(
+        [_macro([_tab("hiero-ledger", sections)])],
+        generated_at="2026-07-25 09:14 UTC",
+        git_sha="abc1234",
+    )
+
+    assert 'data-title="People"' in doc
+    assert 'data-asof="2026-07-24 09:00 UTC"' in doc
+    # The total is what lets a filtered download admit it is a subset.
+    assert "data-total='2'" in doc
+    # Section ids are namespaced per macro+org; the export finds the filter box
+    # by "<table id>-q", so that pairing is the invariant worth pinning.
+    table_id = re.search(r"<table id='([^']+)'", doc).group(1)
+    assert f"id='{table_id}-q'" in doc
+    assert '"sha": "abc1234"' in doc
+
+
+def test_period_variants_name_themselves_in_the_export():
+    """Each period is a different row set, so "People.csv" alone would be ambiguous."""
+    sections = [
+        {
+            "id": "people",
+            "title": "People",
+            "description": "D",
+            "variants": [
+                {"label": "30d", "columns": [("a", "A")], "rows": [{"a": 1}]},
+                {"label": "90d", "columns": [("a", "A")], "rows": [{"a": 1}, {"a": 2}]},
+            ],
+        }
+    ]
+    doc = build_dashboard_html([_macro([_tab("hiero-ledger", sections)])])
+
+    assert 'data-title="People — 30d"' in doc
+    assert 'data-title="People — 90d"' in doc
+    assert "data-total='1'" in doc
+    assert "data-total='2'" in doc
+
+
+def test_provenance_global_is_json_encoded():
+    """The values land inside a <script> block, so they are encoded, not interpolated."""
+    doc = build_dashboard_html([], generated_at='2026 "quoted"', git_sha=None)
+
+    assert 'var PROVENANCE={"generated": "2026 \\"quoted\\"", "sha": ""};' in doc
+
+
+def test_export_stamps_a_preamble_and_admits_a_filtered_subset():
+    """The CSV export must state the subset, not ship a filtered file that looks whole.
+
+    The export takes *visible* rows, so a filtered download is a subset that is
+    indistinguishable from the full table once it leaves the dashboard. Browser
+    behaviour is exercised manually; these guards pin the shape the export
+    depends on so a refactor cannot quietly drop it.
+    """
+    doc = _doc()
+    assert "csvPreamble(table,id,shown)" in doc  # preamble is prepended, not optional
+    assert "data-total" in doc  # the total the subset is measured against
+    assert "shown+' of '+total+' rows'" in doc
+    assert "(filtered: \"'+query+'\")" in doc
+    # An unfiltered export must not carry a spurious "filtered" note.
+    assert "shown===total?total+' rows'" in doc
