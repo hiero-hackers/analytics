@@ -308,11 +308,13 @@ def _funnel_rows(cohort: str, summary: pd.DataFrame) -> list[dict]:
     def row(stage: str, count: int) -> dict:
         return {"cohort": cohort, "stage": stage, "hips": count, "pct_of_proposed": round(100 * count / proposed)}
 
+    # Stage names double as the funnel chart's axis labels, so they stay short;
+    # the dashboard section's description defines each one in full.
     return [
-        row("proposed (any status)", proposed),
-        row("reached TSC approval (approved / accepted / final / active)", len(approved)),
-        row("merged implementation evidence found", len(merged)),
-        row(f"implemented broadly (merged citing PRs in \u2265{_FUNNEL_BREADTH_REPOS} repos)", len(broad)),
+        row("proposed", proposed),
+        row("approved by TSC", len(approved)),
+        row("implementation evidence", len(merged)),
+        row(f"implemented in \u2265{_FUNNEL_BREADTH_REPOS} repos", len(broad)),
     ]
 
 

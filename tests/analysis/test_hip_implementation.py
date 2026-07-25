@@ -193,7 +193,7 @@ def test_adoption_funnel_counts_and_cohorts():
     evidence, _ = build_evidence_tables(refs, inventory)
     funnel = build_adoption_funnel(build_hip_summary(inventory, evidence))
     all_time = funnel[funnel["cohort"] == "all specs"].set_index("stage")["hips"]
-    assert all_time["proposed (any status)"] == 3
+    assert all_time["proposed"] == 3
     assert all_time.iloc[1] == 2  # reached approval: 551 + 173
     assert all_time.iloc[2] == 1  # merged evidence: 551
     assert all_time.iloc[3] == 1  # broad: 551 has merged PRs in 5 repos

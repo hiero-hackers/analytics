@@ -19,7 +19,7 @@ CHART_MACRO = {
                 "title": "Adoption funnel — specs created since Sep 2024",
                 "description": (
                     "How far recent proposals get, mechanically: proposed, approved by the TSC, merged "
-                    "implementation evidence found, implemented broadly (merged citing PRs in three or "
+                    "implementation evidence found, implemented broadly (merged citing PRs in five or "
                     "more repositories). Restricted to specs created since September 2024 because "
                     "citation-based stages undercount older specs; the CSV download also carries the "
                     "all-time cohort."

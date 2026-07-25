@@ -478,6 +478,10 @@ def plot_funnel(
         ax.set_yticks(range(len(df)), [str(stage) for stage in df[stage_col]])
         ax.invert_yaxis()
         ax.set_xlim(0, 100)
+        # No x ticks: the band widths and their in-band labels carry the value,
+        # and an empty tick list means grid_axis="x" draws no gridlines. That
+        # axis choice matters — grid_axis=None takes style_axes' non-cartesian
+        # branch, which hides *all* tick labels including the stage names.
         ax.set_xticks([])
         for spine in ax.spines.values():
             spine.set_visible(False)
@@ -489,6 +493,6 @@ def plot_funnel(
             xlabel="",
             ylabel="",
             output_path=output_path,
-            grid_axis=None,
+            grid_axis="x",
             record_count=len(df),
         )
