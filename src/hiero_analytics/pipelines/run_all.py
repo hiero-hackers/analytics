@@ -112,12 +112,19 @@ def main() -> None:
     # Describe the snapshot before the dashboard renders against it. Written
     # even when pipelines failed — a partial run still produces charts, and the
     # manifest's failure list is what tells a later reader the snapshot the
-    # archive holds is incomplete. Never fatal: losing the manifest must not
-    # discard a successful multi-hour fetch.
+    # archive holds is incomplete.
+    #
+    # A missing manifest is a run failure, not a warning: without it the archived
+    # datasets carry no hashes, watermarks, or failure list, so the charts this
+    # run publishes cannot be traced to their inputs. Recorded as a failure
+    # rather than raised so the dashboard is still built for inspection — the
+    # non-zero exit then keeps the Pages deploy (which needs this job) from
+    # publishing untraceable output.
     try:
         write_snapshot_manifest(DATASETS_DIR / SNAPSHOT_MANIFEST_NAME, failures=failures)
     except Exception:
-        logger.exception("Could not write the snapshot manifest; continuing")
+        logger.exception("Could not write the snapshot manifest")
+        failures.append("snapshot_manifest")
 
     # Dashboard last, once — it renders a tab per org that has data.
     logger.info("=== Running pipeline: dashboard ===")

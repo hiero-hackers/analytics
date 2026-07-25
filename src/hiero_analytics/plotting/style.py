@@ -13,6 +13,7 @@ dozen call sites that render one.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -111,7 +112,7 @@ def apply_style() -> None:
     _STYLE_APPLIED = True
 
 
-def draw_provenance_footer(fig: Figure, *, record_count: int | None = None) -> None:
+def draw_provenance_footer(fig: Figure, *, record_count: int | Mapping[str, int] | None = None) -> None:
     """Stamp ``fig`` with the data watermark, code revision, and row count.
 
     A chart that leaves this module is a standalone PNG: it gets embedded in the

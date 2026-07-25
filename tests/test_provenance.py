@@ -53,21 +53,39 @@ def test_watermark_is_none_without_datasets(tmp_path):
     assert dataset_watermark(tmp_path) is None
 
 
-def test_watermark_skips_files_carrying_none(tmp_path):
-    """A dataset with no watermark is skipped, not treated as current."""
-    _write_dataset(tmp_path, "governance_config.json", None)
+def test_watermark_ignores_files_that_are_not_datasets(tmp_path):
+    """The governance snapshots share this directory but were never watermarked.
+
+    They carry no schema version, which is what separates them from a dataset
+    whose watermark is damaged.
+    """
+    (tmp_path / "governance_config.json").write_text(
+        '{\n  "repositories": [\n    {"name": ".github"}\n  ]\n}', encoding="utf-8"
+    )
     _write_dataset(tmp_path, "issues_org_all.json", "2026-07-22T09:00:00+00:00")
 
     assert dataset_watermark(tmp_path) == datetime(2026, 7, 22, 9, 0, tzinfo=UTC)
 
 
-def test_watermark_skips_corrupt_files_instead_of_raising(tmp_path):
-    """A half-written or unparseable dataset must not take down every chart."""
+def test_a_damaged_dataset_withdraws_the_run_level_claim(tmp_path):
+    """One unreadable dataset means no data-as-of at all, not a bound from the rest.
+
+    Skipping the damaged file would let the surviving datasets set a *newer*
+    bound — but the unreadable one may hold the oldest data of all, so the
+    remaining files cannot support any claim. No stamp beats a false one.
+    """
     (tmp_path / "truncated.json").write_text('{"version":2,"fetched_th', encoding="utf-8")
-    (tmp_path / "garbage.json").write_text("not json at all", encoding="utf-8")
     _write_dataset(tmp_path, "issues_org_all.json", "2026-07-23T09:00:00+00:00")
 
-    assert dataset_watermark(tmp_path) == datetime(2026, 7, 23, 9, 0, tzinfo=UTC)
+    assert dataset_watermark(tmp_path) is None
+
+
+def test_an_unreadable_stamp_withdraws_the_claim_too(tmp_path):
+    """A dataset whose timestamp will not parse is damaged, not absent."""
+    _write_dataset(tmp_path, "bad.json", "the day before yesterday")
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-23T09:00:00+00:00")
+
+    assert dataset_watermark(tmp_path) is None
 
 
 def test_watermark_treats_a_naive_timestamp_as_utc(tmp_path):
@@ -77,11 +95,23 @@ def test_watermark_treats_a_naive_timestamp_as_utc(tmp_path):
     assert dataset_watermark(tmp_path) == datetime(2026, 7, 24, 9, 0, tzinfo=UTC)
 
 
-def test_watermark_rejects_an_unparseable_timestamp(tmp_path):
-    """A malformed stamp is no stamp, not a crash."""
-    _write_dataset(tmp_path, "issues_org_all.json", "the day before yesterday")
+def test_watermark_converts_an_offset_to_the_utc_instant(tmp_path):
+    """An offset stamp must be converted, not relabelled.
 
-    assert dataset_watermark(tmp_path) is None
+    The footer format hard-codes "UTC", so leaving 09:00-04:00 as-is would print
+    "09:00 UTC" — four hours earlier than the instant it names.
+    """
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-20T09:00:00-04:00")
+
+    assert dataset_watermark(tmp_path) == datetime(2026, 7, 20, 13, 0, tzinfo=UTC)
+
+
+def test_oldest_is_chosen_on_true_instants_not_wall_clock(tmp_path):
+    """Comparing un-normalized stamps would pick the wrong dataset as oldest."""
+    _write_dataset(tmp_path, "a.json", "2026-07-20T09:00:00-04:00")  # 13:00 UTC
+    _write_dataset(tmp_path, "b.json", "2026-07-20T11:00:00+00:00")  # 11:00 UTC
+
+    assert dataset_watermark(tmp_path) == datetime(2026, 7, 20, 11, 0, tzinfo=UTC)
 
 
 def test_watermark_ignores_the_manifest_beside_the_datasets(tmp_path):
@@ -253,3 +283,57 @@ def test_manifest_prefers_an_explicit_run_id(tmp_path, monkeypatch):
     path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path, run_id="explicit")
 
     assert json.loads(path.read_text(encoding="utf-8"))["run_id"] == "explicit"
+
+
+def test_footer_reports_each_series_separately():
+    """A single total would hide one series collapsing while the sum held steady."""
+    stamp = Provenance(data_as_of=None, git_sha=None)
+
+    assert stamp.footer({"GFIs": 120, "contributors": 85}) == "n=GFIs 120, contributors 85"
+
+
+def test_footer_omits_an_empty_series_mapping():
+    """No series is not the same as a series of zero; say nothing."""
+    assert Provenance(data_as_of=None, git_sha=None).footer({}) == ""
+
+
+def test_footer_carries_the_run_id():
+    """Watermark, revision, and count can repeat across runs whose archives differ.
+
+    A dataset edited in place moves no watermark, so the run id is what resolves a
+    standalone PNG to exactly one dataset-snapshot artifact.
+    """
+    stamp = Provenance(data_as_of=None, git_sha="abc1234", run_id="17654321")
+
+    assert stamp.footer(5) == "code abc1234 · run 17654321 · n=5"
+
+
+def test_run_id_comes_from_the_ci_environment(tmp_path, monkeypatch):
+    """Locally there is no run id, and the footer simply omits it."""
+    monkeypatch.setenv("GITHUB_RUN_ID", "17654321")
+    assert resolve_provenance(tmp_path).run_id == "17654321"
+
+    monkeypatch.delenv("GITHUB_RUN_ID")
+    assert resolve_provenance(tmp_path).run_id is None
+
+
+def test_manifest_flags_a_damaged_dataset(tmp_path):
+    """The manifest must distinguish "never watermarked" from "watermark broken".
+
+    The second is the reason the run-level data_as_of is null, so a reader of the
+    archive needs to see which file caused it.
+    """
+    _write_dataset(tmp_path, "good.json", "2026-07-25T09:00:00+00:00")
+    (tmp_path / "trunc.json").write_text('{"version":2,"fetched_th', encoding="utf-8")
+
+    path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path)
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    entries = {entry["name"]: entry for entry in manifest["datasets"]}
+
+    assert entries["trunc.json"]["watermark_unreadable"] is True
+    assert entries["trunc.json"]["fetched_through"] is None
+    assert "watermark_unreadable" not in entries["good.json"]
+    # Every file is still hashed — a damaged dataset is exactly what you want to
+    # identify byte-for-byte later.
+    assert all(len(entry["sha256"]) == 64 for entry in manifest["datasets"])
+    assert manifest["data_as_of"] is None

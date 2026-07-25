@@ -408,3 +408,18 @@ def test_export_stamps_a_preamble_and_admits_a_filtered_subset():
     assert "(filtered: \"'+query+'\")" in doc
     # An unfiltered export must not carry a spurious "filtered" note.
     assert "shown===total?total+' rows'" in doc
+
+
+def test_export_defuses_spreadsheet_formulas():
+    """Exported cells must not execute when the download is opened in a spreadsheet.
+
+    Values here are GitHub-sourced (repo descriptions, logins, titles), so a cell
+    opening with =, +, - or @ would run as a formula in Excel or Sheets. CSV
+    quoting does not prevent it — the quotes are parsed off and the contents
+    evaluated — so the cell text itself is prefixed with an apostrophe.
+    """
+    doc = _doc()
+    assert r"/^[=+\-@\t\r]/.test(s)" in doc  # the four formula leaders, plus tab/CR
+    assert 's="\'"+s' in doc  # defused by prefixing, not by quoting
+    # Negative numbers are exempt, or "-5" would become text that will not sum.
+    assert r"!/^-?\d+(?:\.\d+)?$/.test(s)" in doc

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Any
@@ -132,13 +132,14 @@ def save_and_close(
     output_path: Path,
     *,
     dpi: int = DEFAULT_DPI,
-    record_count: int | None = None,
+    record_count: int | Mapping[str, int] | None = None,
 ) -> None:
     """Write ``fig`` to ``output_path`` and always close it, even when saving fails.
 
     Every chart in the codebase reaches disk through here, which makes it the one
     place the provenance footer has to be applied for no figure to escape
-    unstamped. ``record_count`` is the number of rows that drew the chart; pass
+    unstamped. ``record_count`` is the number of rows that drew the chart (or a
+    ``{label: count}`` mapping for a figure plotting more than one series); pass
     it whenever the frame is in hand, since a stamp showing the data and code but
     not the row count cannot distinguish a real decline from a truncated fetch.
     """
@@ -231,7 +232,7 @@ def finalize_chart(
     legend_ncol: int = 1,
     legend_kwargs: dict[str, Any] | None = None,
     layout_rect: tuple[float, float, float, float] | None = None,
-    record_count: int | None = None,
+    record_count: int | Mapping[str, int] | None = None,
 ) -> None:
     """Finalize and save a chart.
 

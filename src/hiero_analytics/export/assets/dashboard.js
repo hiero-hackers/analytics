@@ -1,7 +1,15 @@
 
 function filterTable(id,q){q=q.toLowerCase();var n=0,rows=document.querySelectorAll('#'+id+' tbody tr');rows.forEach(function(tr){var hit=tr.textContent.toLowerCase().indexOf(q)>-1;tr.style.display=hit?'':'none';if(hit)n++;});var c=document.getElementById(id+'-count');if(c)c.textContent=n+' rows';}
 function sortTable(id,col,th){var tb=document.querySelector('#'+id+' tbody');var rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));var asc=th.getAttribute('data-dir')!=='asc';th.setAttribute('data-dir',asc?'asc':'desc');var num=/^-?\d+(?:\.\d+)?$/;rows.sort(function(a,b){var x=a.children[col].textContent.trim(),y=b.children[col].textContent.trim();if(num.test(x)&&num.test(y))return asc?x-y:y-x;return asc?x.localeCompare(y):y.localeCompare(x);});rows.forEach(function(r){tb.appendChild(r);});}
-function csvCell(s){s=(s==null?'':String(s)).trim();return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+/* Spreadsheet apps evaluate any cell whose text opens with =, +, - or @ (also tab
+   and CR), so a GitHub-sourced value such as a repo description reading
+   "=HYPERLINK(...)" or a login "@someone" becomes a live formula the moment the
+   download is opened. CSV quoting does not prevent this — Excel and Sheets parse
+   the quotes off and evaluate what is inside — so the cell text itself has to be
+   defused with a leading apostrophe, which spreadsheets read as "treat as text".
+   Plain numbers are exempt so a negative value stays numeric instead of becoming
+   a text cell that will not sum. */
+function csvCell(s){s=(s==null?'':String(s)).trim();if(/^[=+\-@\t\r]/.test(s)&&!/^-?\d+(?:\.\d+)?$/.test(s))s="'"+s;return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 /* A downloaded CSV leaves the dashboard behind: no "data as of" badge, no page
    header, no way back to the run that produced it. Worse, the export takes the
    *visible* rows, so a filtered download is a subset that looks identical to the
