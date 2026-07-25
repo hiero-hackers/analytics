@@ -262,6 +262,7 @@ def plot_bar(
             output_path=output_path,
             rotate_x=None if horizontal else rotate_x,
             grid_axis="x" if horizontal else "y",
+            record_count=len(df),
         )
 
 
@@ -422,5 +423,6 @@ def plot_stacked_bar(
             legend_handles=legend_handles,
             legend_labels=labels,
             legend_kwargs={"borderaxespad": 0.0},
+            record_count=len(df),
             **placement,
         )

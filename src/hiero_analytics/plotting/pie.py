@@ -145,4 +145,5 @@ def plot_pie(
             legend_loc="center left",
             legend_bbox_to_anchor=(1.02, 0.5),
             layout_rect=(0, 0, 0.82, 1),
+            record_count=len(data),
         )

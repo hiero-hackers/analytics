@@ -4,11 +4,18 @@ Centralized matplotlib styling for analytics charts.
 This module applies a consistent visual style across all charts generated
 by the analytics system. Style configuration values are sourced from
 `hiero_analytics.config.charts`.
+
+It also owns the provenance footer every figure carries, so the stamp is styled
+in the same place as the rest of the chart furniture rather than at each of the
+dozen call sites that render one.
 """
 
 from __future__ import annotations
 
+import logging
+
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 from hiero_analytics.config.charts import (
     AXIS_LINE_COLOR,
@@ -16,6 +23,10 @@ from hiero_analytics.config.charts import (
     DEFAULT_STYLE,
     FIGURE_BACKGROUND_COLOR,
     FONT_FAMILY,
+    FOOTER_ALPHA,
+    FOOTER_FONT_SIZE,
+    FOOTER_X,
+    FOOTER_Y,
     GRID_ALPHA,
     GRID_COLOR,
     GRID_ENABLED,
@@ -32,6 +43,9 @@ from hiero_analytics.config.charts import (
     TITLE_COLOR,
     TITLE_FONT_SIZE,
 )
+from hiero_analytics.provenance import resolve_provenance
+
+logger = logging.getLogger(__name__)
 
 # Prevent applying style multiple times
 _STYLE_APPLIED = False
@@ -95,3 +109,33 @@ def apply_style() -> None:
     )
 
     _STYLE_APPLIED = True
+
+
+def draw_provenance_footer(fig: Figure, *, record_count: int | None = None) -> None:
+    """Stamp ``fig`` with the data watermark, code revision, and row count.
+
+    A chart that leaves this module is a standalone PNG: it gets embedded in the
+    dashboard, pasted into issues, and dropped into slide decks, long outliving
+    the five-day refresh that produced it. The footer is what lets a reader come
+    back to one later and say which dataset snapshot and which revision drew it.
+
+    Never raises. An unstamped chart is a small loss; a provenance lookup that
+    takes down a chart — or a whole multi-hour pipeline run — is a large one, so
+    any failure degrades to no footer and a debug log.
+    """
+    try:
+        text = resolve_provenance().footer(record_count)
+        if not text:
+            return
+        fig.text(
+            FOOTER_X,
+            FOOTER_Y,
+            text,
+            ha="right",
+            va="bottom",
+            fontsize=FOOTER_FONT_SIZE,
+            color=MUTED_TEXT_COLOR,
+            alpha=FOOTER_ALPHA,
+        )
+    except Exception:  # noqa: BLE001 - a cosmetic stamp must never fail a render
+        logger.debug("Could not stamp provenance footer", exc_info=True)

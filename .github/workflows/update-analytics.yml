@@ -79,6 +79,28 @@ jobs:
           path: outputs/data/datasets
           key: analytics-datasets-${{ github.run_id }}
 
+      # Archive the exact snapshot the charts were drawn from. The cache above
+      # serves a different purpose: it is mutable, evictable, and reachable only
+      # by the next run, so it cannot answer "what data produced this chart?".
+      # This artifact is immutable and addressable by run, and it carries
+      # SNAPSHOT.json (revision, per-dataset watermarks and SHA-256s, and any
+      # failed pipelines) so it describes itself without the workflow log.
+      #
+      # Runs even when the pipeline step failed: a partial snapshot is exactly
+      # what you want to inspect when diagnosing a bad refresh, and the manifest
+      # records which pipelines failed.
+      - name: Archive dataset snapshot
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dataset-snapshot-${{ github.run_id }}-${{ github.sha }}
+          path: outputs/data/datasets
+          # Long enough to cover several refresh cycles when tracing a chart back,
+          # short enough that 50+ MB snapshots every 5 days do not accumulate
+          # indefinitely against the repository's storage quota.
+          retention-days: 90
+          if-no-files-found: warn
+
       # Publish the self-contained dashboard to GitHub Pages so anyone can view the
       # latest refresh without cloning or regenerating. The HTML embeds every chart
       # as base64, so the site is a single index.html.

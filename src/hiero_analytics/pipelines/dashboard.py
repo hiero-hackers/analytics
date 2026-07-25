@@ -31,6 +31,7 @@ from hiero_analytics.dashboard_spec import (
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS, DEFAULT_ACTIVITY_PERIOD
 from hiero_analytics.domain.roles import ROLE_PRIORITY
 from hiero_analytics.export.dashboard import build_dashboard_html
+from hiero_analytics.provenance import git_sha
 
 logger = logging.getLogger(__name__)
 
@@ -316,5 +317,11 @@ def main() -> None:
 
     output = OUTPUTS_DIR / "dashboard.html"
     generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
-    output.write_text(build_dashboard_html(macros, generated_at=generated_at), encoding="utf-8")
+    # Each Pages deploy overwrites the last, so the page itself has to say which
+    # revision built it — otherwise a changed dashboard gives no way to tell
+    # whether the data moved or the code did.
+    output.write_text(
+        build_dashboard_html(macros, generated_at=generated_at, git_sha=git_sha()),
+        encoding="utf-8",
+    )
     logger.info("Wrote %s — %d macro(s): %s", output, len(macros), ", ".join(m["name"] for m in macros))

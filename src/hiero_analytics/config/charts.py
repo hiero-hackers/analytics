@@ -74,6 +74,19 @@ BADGE_FONT_SIZE = 9
 CARD_EDGE_LINE_WIDTH = 0.9
 
 # --------------------------------------------------
+# Provenance footer
+# --------------------------------------------------
+# The data/code/row-count stamp every figure carries (see
+# `hiero_analytics.provenance`). Sized and faded to read as a caption: legible
+# when looked for, unobtrusive when reading the data. Positioned in figure
+# coordinates at the bottom-right, inset from the edge so `bbox_inches="tight"`
+# does not crop it flush against the border.
+FOOTER_FONT_SIZE = 7
+FOOTER_ALPHA = 0.8
+FOOTER_X = 0.995
+FOOTER_Y = 0.006
+
+# --------------------------------------------------
 # Donut / pie styling
 # --------------------------------------------------
 DONUT_START_ANGLE = 110

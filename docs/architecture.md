@@ -99,6 +99,27 @@ Fetching is **incremental** and has two persistence layers, by design:
 pipeline can't sink the run; CI still sees a non-zero exit), then renders the
 dashboard once.
 
+## Provenance
+
+Nothing generated is committed, and each Pages deploy overwrites the last, so an
+artifact has to carry its own identity. `provenance` resolves two facts — the
+oldest dataset watermark (`data as of`) and the code revision (`GITHUB_SHA` in
+CI, `git rev-parse` locally, suffixed `-dirty` on an uncommitted tree) — and they
+are applied in three places:
+
+- **Every PNG** gets a footer via `plotting/style.draw_provenance_footer`, applied
+  in `plotting/base.save_and_close` because every chart reaches disk through it.
+  The row count comes from the caller, which already holds the frame. The footer
+  never raises: an unstamped chart beats a failed render.
+- **The dashboard** stamps the generation time and revision in its header, on top
+  of the per-section `data as of` badges fed by the `.meta.json` sidecars that
+  `export/save.write_output_meta` writes next to each CSV.
+- **The dataset snapshot** is archived per CI run as an immutable artifact,
+  carrying a `SNAPSHOT.json` manifest (revision, per-dataset watermark and
+  SHA-256, and any failed pipelines). This is distinct from the Actions *cache*
+  of the same directory: the cache is mutable, evictable, and only reachable by
+  the next run, so it can't answer "which data drew this chart?".
+
 ## Multi-org
 
 Output dirs are per-org, so multiple orgs coexist. `config.paths.EXTRA_ORGS` is the

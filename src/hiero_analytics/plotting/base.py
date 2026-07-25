@@ -31,7 +31,7 @@ from hiero_analytics.config.charts import (
     TITLE_COLOR,
 )
 
-from .style import apply_style
+from .style import apply_style, draw_provenance_footer
 
 
 def _require_non_empty(df: pd.DataFrame) -> None:
@@ -127,9 +127,23 @@ def figure_context(
         plt.close(fig)
 
 
-def save_and_close(fig: Figure, output_path: Path, *, dpi: int = DEFAULT_DPI) -> None:
-    """Write ``fig`` to ``output_path`` and always close it, even when saving fails."""
+def save_and_close(
+    fig: Figure,
+    output_path: Path,
+    *,
+    dpi: int = DEFAULT_DPI,
+    record_count: int | None = None,
+) -> None:
+    """Write ``fig`` to ``output_path`` and always close it, even when saving fails.
+
+    Every chart in the codebase reaches disk through here, which makes it the one
+    place the provenance footer has to be applied for no figure to escape
+    unstamped. ``record_count`` is the number of rows that drew the chart; pass
+    it whenever the frame is in hand, since a stamp showing the data and code but
+    not the row count cannot distinguish a real decline from a truncated fetch.
+    """
     try:
+        draw_provenance_footer(fig, record_count=record_count)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
     finally:
@@ -217,8 +231,13 @@ def finalize_chart(
     legend_ncol: int = 1,
     legend_kwargs: dict[str, Any] | None = None,
     layout_rect: tuple[float, float, float, float] | None = None,
+    record_count: int | None = None,
 ) -> None:
-    """Finalize and save a chart."""
+    """Finalize and save a chart.
+
+    ``record_count`` is forwarded to the provenance footer; see
+    :func:`save_and_close`.
+    """
     # Titles are left-aligned to feel more like dashboard/report headings.
     ax.set_title(title, loc="left")
     style_axes(ax, grid_axis=grid_axis)
@@ -253,4 +272,4 @@ def finalize_chart(
     # Reserve optional outer space for legends or header elements before export.
     fig.tight_layout(rect=layout_rect)
 
-    save_and_close(fig, output_path)
+    save_and_close(fig, output_path, record_count=record_count)

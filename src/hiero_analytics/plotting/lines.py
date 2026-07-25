@@ -119,6 +119,7 @@ def plot_line(
             output_path=output_path,
             rotate_x=rotate_x,
             grid_axis="y",
+            record_count=len(data),
         )
 
 
@@ -197,6 +198,7 @@ def plot_date_line(
             output_path=output_path,
             rotate_x=rotate_x,
             grid_axis="y",
+            record_count=len(data),
         )
 
 
@@ -277,4 +279,5 @@ def plot_stacked_area(
             legend_ncol=min(len(labels), 4),
             legend_kwargs={"borderaxespad": 0.0},
             layout_rect=(0, 0.14, 1.0, 1.0),
+            record_count=len(data),
         )

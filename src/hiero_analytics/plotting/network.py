@@ -200,7 +200,9 @@ def render_comembership_network(
         ax.axis("off")
         fig.tight_layout()
 
-        save_and_close(fig, output_path, dpi=_NETWORK_DPI)
+        # Nodes, not edges: the node count is what a reader checks the stamp
+        # against ("are all the teams here?"), and edges follow from it.
+        save_and_close(fig, output_path, dpi=_NETWORK_DPI, record_count=graph.number_of_nodes())
         return True
     finally:
         plt.close(fig)

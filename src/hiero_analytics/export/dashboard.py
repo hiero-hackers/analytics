@@ -273,7 +273,12 @@ def _org_panels_html(mslug: str, org_tabs: Sequence[Mapping], esc) -> str:
     return tab_bar + "".join(panels)
 
 
-def build_dashboard_html(macros: Sequence[Mapping], *, generated_at: str | None = None) -> str:
+def build_dashboard_html(
+    macros: Sequence[Mapping],
+    *,
+    generated_at: str | None = None,
+    git_sha: str | None = None,
+) -> str:
     """Build a self-contained, two-level (macro → org → section) HTML document.
 
     ``macros`` is a list of ``{name, org_tabs}``; each macro is a dashboard family
@@ -284,9 +289,14 @@ def build_dashboard_html(macros: Sequence[Mapping], *, generated_at: str | None 
     the org tab bar shows only with more than one org. The column glossary appears
     only inside macros that have a table section. Section ids are namespaced per
     macro+org so filter/sort/export stay independent. All values are HTML-escaped.
+
+    ``git_sha`` stamps the revision that built the page. Each deploy overwrites
+    the last and nothing is committed, so without it a reader comparing two
+    dashboards cannot tell whether the data moved or the code did.
     """
     esc = html.escape
     stamp = f" · generated {esc(generated_at)}" if generated_at else ""
+    stamp += f" · code {esc(git_sha)}" if git_sha else ""
     header = (
         "<h1>Hiero — analytics dashboard</h1>"
         f"<p class='sub'>Generated locally{stamp} · open in any browser · type to filter tables, "

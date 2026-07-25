@@ -83,6 +83,7 @@ def plot_heatmap(
         colorbar.set_label(value_label)
 
         fig.tight_layout()
-        save_and_close(fig, output_path)
+        # Matrix rows are the records (one per entity); columns are time buckets.
+        save_and_close(fig, output_path, record_count=matrix.shape[0])
     finally:
         plt.close(fig)

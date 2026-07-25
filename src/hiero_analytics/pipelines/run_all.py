@@ -26,9 +26,10 @@ import logging
 from collections.abc import Callable
 
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import EXTRA_ORGS
+from hiero_analytics.config.paths import DATASETS_DIR, EXTRA_ORGS
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled
 from hiero_analytics.pipelines import PIPELINES_BY_NAME, default_run_pipelines
+from hiero_analytics.provenance import SNAPSHOT_MANIFEST_NAME, write_snapshot_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,16 @@ def main() -> None:
 
     failures = run_pipelines(pipelines_for_current_mode())
     failures += [f"contributor_activity[{org}]" for org in EXTRA_ORGS if not _run_extra_org(org)]
+
+    # Describe the snapshot before the dashboard renders against it. Written
+    # even when pipelines failed — a partial run still produces charts, and the
+    # manifest's failure list is what tells a later reader the snapshot the
+    # archive holds is incomplete. Never fatal: losing the manifest must not
+    # discard a successful multi-hour fetch.
+    try:
+        write_snapshot_manifest(DATASETS_DIR / SNAPSHOT_MANIFEST_NAME, failures=failures)
+    except Exception:
+        logger.exception("Could not write the snapshot manifest; continuing")
 
     # Dashboard last, once — it renders a tab per org that has data.
     logger.info("=== Running pipeline: dashboard ===")

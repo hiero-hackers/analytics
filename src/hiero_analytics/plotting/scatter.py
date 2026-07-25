@@ -123,4 +123,5 @@ def plot_scatter_with_regression(
             output_path=output_path,
             legend=False,
             grid_axis="both",
+            record_count=len(df),
         )

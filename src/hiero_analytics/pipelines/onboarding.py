@@ -145,6 +145,9 @@ def plot_onboarding_signal(
         output_path=output_path,
         legend=False,
         grid_axis="y",
+        # Two series share this figure; the GFI series on the left axis is the
+        # subject and the contributor line is the overlay, so it carries the count.
+        record_count=len(gfi),
     )
 
 
