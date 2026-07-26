@@ -53,7 +53,8 @@ from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingErro
 from hiero_analytics.data_sources.github_ingest import fetch_hip_inventory, fetch_org_pr_hip_refs_graphql
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
-from hiero_analytics.plotting.bars import plot_bar, plot_funnel, plot_stacked_bar
+from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
+from hiero_analytics.plotting.funnel import plot_funnel
 
 logger = logging.getLogger(__name__)
 

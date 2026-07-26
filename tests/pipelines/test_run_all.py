@@ -58,7 +58,7 @@ def test_default_pipelines_come_from_registry():
     assert "difficulty" in names
     assert "scorecard" in names
     # CLI-only pipelines stay out of the default run.
-    assert "dashboard" not in names
+    assert "data_api" not in names
     assert "discord_analytics" not in names
     assert "contributor_churn" not in names
 
@@ -116,19 +116,19 @@ def test_main_succeeds_when_all_pipelines_pass(monkeypatch):
     run_all.main()  # should not raise
 
 
-def test_main_runs_extra_orgs_then_dashboard_once(monkeypatch):
-    """Extra orgs each run contributor-activity; a failed one is reported; dashboard runs once."""
+def test_main_runs_extra_orgs_then_the_data_api_once(monkeypatch):
+    """A failed extra org is reported; the data API still emits once, after all orgs."""
     monkeypatch.setattr(run_all, "setup_logging", lambda: None)
     monkeypatch.setattr(run_all, "default_pipelines", lambda: [("ok", lambda: None)])
     monkeypatch.setattr(run_all, "EXTRA_ORGS", ["good-org", "bad-org"])
 
     attempted = []
     monkeypatch.setattr(run_all, "_run_extra_org", lambda org: attempted.append(org) or org != "bad-org")
-    dashboard_runs = []
-    monkeypatch.setattr(run_all, "_resolve", lambda name: lambda: dashboard_runs.append(name))
+    renderer_runs = []
+    monkeypatch.setattr(run_all, "_resolve", lambda name: lambda: renderer_runs.append(name))
 
     with pytest.raises(SystemExit):  # bad-org failed -> non-zero exit
         run_all.main()
 
     assert attempted == ["good-org", "bad-org"]  # every extra org attempted
-    assert dashboard_runs == ["dashboard"]  # dashboard still ran once, after all orgs
+    assert renderer_runs == ["data_api"]

@@ -1,0 +1,369 @@
+"""Emit the versioned JSON data API from the produced analytics tables.
+
+The CSVs under ``outputs/data/org/<org>/`` are the pipelines' artifacts; this
+module graduates them into a *contract*: one JSON document per spec-listed
+section plus a top-level manifest, under ``outputs/data/api/<version>/``. Any
+frontend (the current dashboard's successor, a notebook, someone else's tool)
+can consume the API without knowing how the tables were produced — and the
+producer↔spec agreement is enforced here, loudly, instead of degrading into
+blank dashboard columns.
+
+Layout::
+
+    outputs/data/api/v1/
+        manifest.json                  # orgs, sections, charts, provenance
+        <org>/<section-id>.json        # columns, rows, period variants
+
+Contract: every column a section spec declares must exist in the produced
+CSV. A missing column raises :class:`DataApiContractError` and fails the run —
+a renamed pipeline output becomes a red build, not a silently empty column.
+
+Versioning: breaking shape changes (renamed keys, removed sections) bump the
+version directory so consumers migrate deliberately; additive changes land in
+place. ``v1`` is additive-only from here.
+"""
+
+from __future__ import annotations
+
+import importlib
+import json
+import logging
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+import pandas as pd
+from PIL import Image
+
+# Paths are read through the module at call time (never bound at import), so
+# the contract tests' path redirection applies no matter the import order.
+from hiero_analytics.config import paths
+from hiero_analytics.dashboard_spec import (
+    CHART_MACROS,
+    CHART_METHODOLOGY,
+    CHART_NOTES,
+    CUSTOM_VIEW_MODULES,
+    MACRO_GLOSSARIES,
+    METRIC_ANNOTATIONS,
+    TABLE_FAMILIES,
+    WIDE_CHARTS,
+)
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
+from hiero_analytics.export.macro_metrics import macro_metrics
+from hiero_analytics.provenance import resolve_provenance
+
+logger = logging.getLogger(__name__)
+
+API_VERSION = "v1"
+
+# A section counts as stale when its data is older than the scheduled refresh
+# cadence plus slack for a slow run — the same policy the legacy dashboard
+# applies, imported from here so the two cannot drift.
+STALE_AFTER = timedelta(hours=36)
+
+
+class DataApiContractError(RuntimeError):
+    """A produced table is missing columns its dashboard spec declares."""
+
+
+def _api_dir() -> Path:
+    """Read the output root at call time so tests can redirect ``DATA_DIR``."""
+    return paths.DATA_DIR / "api" / API_VERSION
+
+
+def _read_meta(csv_path: Path) -> dict:
+    """The artifact's provenance sidecar, or an empty dict if absent/unreadable."""
+    meta_path = Path(f"{csv_path}.meta.json")
+    if not meta_path.exists():
+        return {}
+    try:
+        payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _stamp_freshness(document: dict, csv_path: Path) -> None:
+    """Attach ``generated_at``/``stale`` from the source CSV's sidecar, if any."""
+    generated_at = _read_meta(csv_path).get("generated_at")
+    if not generated_at:
+        return
+    document["generated_at"] = generated_at
+    try:
+        generated = datetime.fromisoformat(generated_at)
+        document["stale"] = datetime.now(UTC) - generated > STALE_AFTER
+    except ValueError:
+        pass
+
+
+def _rows(frame: pd.DataFrame) -> list[dict]:
+    """DataFrame rows as JSON-safe records (NaN -> null, datetimes -> ISO)."""
+    return json.loads(frame.to_json(orient="records", date_format="iso"))
+
+
+def _validate_columns(section: dict, frame: pd.DataFrame, org: str) -> None:
+    """Enforce the producer↔spec column contract for one section table."""
+    declared = [column[0] for column in section["columns"]]
+    missing = [key for key in declared if key not in frame.columns]
+    if missing:
+        raise DataApiContractError(
+            f"{org}/{section['file']} is missing spec-declared column(s) {missing}; "
+            f"produced columns: {list(frame.columns)}"
+        )
+
+
+def _period_variants(section: dict, org_data_dir: Path) -> dict[str, list[dict]]:
+    """Per-period row sets for a ``periods``-flagged section, keyed by period key."""
+    if not section.get("periods"):
+        return {}
+    stem = Path(section["file"]).stem
+    variants: dict[str, list[dict]] = {}
+    for period in ACTIVITY_PERIODS:
+        path = org_data_dir / period.filename(stem)
+        if path.exists():
+            variants[period.key] = _rows(pd.read_csv(path))
+    return variants
+
+
+def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Path) -> dict | None:
+    """Build one section's API document, or None when its table wasn't produced."""
+    csv_path = org_data_dir / section["file"]
+    if not csv_path.exists():
+        return None
+    frame = pd.read_csv(csv_path)
+    _validate_columns(section, frame, org)
+    document = {
+        "id": section["id"],
+        "title": section["title"],
+        "description": section["description"],
+        "group": group_of.get(section["id"], ""),
+        "source": section["file"],
+        # Column entries mirror the spec: (key, label) plus an optional display
+        # format — serialized as objects so consumers need no tuple knowledge.
+        "columns": [
+            {"key": column[0], "label": column[1], **({"format": column[2]} if len(column) > 2 else {})}
+            for column in section["columns"]
+        ],
+        "rows": _rows(frame),
+        "row_count": len(frame),
+    }
+    # A section's call to action (e.g. the affiliations table's "Suggest a
+    # correction" issue link) travels with the document.
+    if action_url := section.get("action_url"):
+        document["action"] = {"url": action_url, "label": section.get("action_label", "Suggest a correction")}
+    _stamp_freshness(document, csv_path)
+    if periods := _period_variants(section, org_data_dir):
+        document["periods"] = periods
+    return document
+
+
+def _chart_variant(org: str, chart_dir: Path, label: str, filename: str) -> dict:
+    """One chart variant, carrying its pixel size when it can be read.
+
+    The dimensions let the browser reserve the image's box before the PNG
+    arrives, so a page of charts doesn't shift under the reader as they load.
+    An unreadable PNG simply ships without them rather than failing the emit.
+    """
+    variant = {"label": label, "file": f"charts/org/{org}/{filename}"}
+    try:
+        with Image.open(chart_dir / filename) as image:
+            variant["width"], variant["height"] = image.width, image.height
+    except (OSError, ValueError):
+        logger.warning("Could not read dimensions for %s", filename)
+    return variant
+
+
+def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
+    """The org's chart sections with their full presentation structure.
+
+    Mirrors what the legacy dashboard renders: each spec entry is a card with
+    a title and description; each chart inside carries its variant tabs
+    (e.g. All / Active 90d), its "how to read this" note, its step-by-step
+    methodology, and the wide flag (rendered as a horizontal scroll). Only
+    variants whose PNG was actually produced are listed.
+    """
+    chart_dir = paths.ORG_CHARTS_DIR / org
+    sections = []
+    for macro in CHART_MACROS:
+        for spec in macro["charts"].get(org, []):
+            charts = []
+            for caption, variant_specs in spec["files"]:
+                variants = [
+                    _chart_variant(org, chart_dir, label, filename)
+                    for label, filename in variant_specs
+                    if (chart_dir / filename).exists()
+                ]
+                if not variants:
+                    continue
+                filenames = [filename for _label, filename in variant_specs]
+                chart = {"title": caption, "variants": variants}
+                if note := next((CHART_NOTES[f] for f in filenames if f in CHART_NOTES), None):
+                    chart["note"] = note
+                if methodology := next((CHART_METHODOLOGY[f] for f in filenames if f in CHART_METHODOLOGY), None):
+                    chart["methodology"] = methodology
+                if any(f in WIDE_CHARTS for f in filenames):
+                    chart["wide"] = True
+                charts.append(chart)
+            if charts:
+                section = {
+                    "id": spec["id"],
+                    "macro": macro["name"],
+                    "title": spec["title"],
+                    "description": spec["description"],
+                    "charts": charts,
+                }
+                if spec.get("slideshow"):
+                    section["slideshow"] = True
+                _attach_download(section, spec, org, org_data_dir, org_dir)
+                sections.append(section)
+    return sections
+
+
+def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, org_dir: Path) -> None:
+    """Copy a chart's declared companion CSV into the API tree and reference it.
+
+    The Pages deploy publishes only the API tree and the chart PNGs, so a CSV
+    the dashboard offers for download has to travel inside the API. The copy
+    keeps the raw ``outputs/data`` artifact untouched.
+    """
+    csv_name = spec.get("csv")
+    if not csv_name:
+        return
+    csv_path = org_data_dir / csv_name
+    if not csv_path.exists():
+        return
+    (org_dir / csv_name).write_bytes(csv_path.read_bytes())
+    download = {"name": csv_name, "path": f"{org}/{csv_name}"}
+    if generated_at := _read_meta(csv_path).get("generated_at"):
+        download["generated_at"] = generated_at
+    section["download"] = download
+
+
+def _org_views(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
+    """Emit each family's bespoke views (board, matrix, …) as documents.
+
+    A family that needs more than tables and chart galleries declares a module
+    exposing ``build_views(org, org_data_dir)``; each returned view is written
+    as its own document (they can run to hundreds of rows) and listed in the
+    manifest by reference, like sections.
+    """
+    refs = []
+    for macro_name, module_path in CUSTOM_VIEW_MODULES.items():
+        module = importlib.import_module(module_path)
+        for view in module.build_views(org, org_data_dir):
+            view["macro"] = macro_name
+            if source := view.get("source"):
+                _stamp_freshness(view, org_data_dir / source)
+            (org_dir / f"{view['id']}.json").write_text(json.dumps(view, indent=1), encoding="utf-8")
+            refs.append(
+                {
+                    "id": view["id"],
+                    "macro": macro_name,
+                    "kind": view["kind"],
+                    "title": view["title"],
+                    "path": f"{org}/{view['id']}.json",
+                }
+            )
+    return refs
+
+
+def _metric_tiles(family, org_data_dir: Path) -> list[dict]:
+    """The macro's headline tiles as JSON objects, [] when none apply.
+
+    Each carries its "how to read this" note and derivation steps: a tile is a
+    lone number with nothing to click through to, so it needs the same
+    explanation a chart gets.
+    """
+    return [
+        {"label": label, "value": value, **METRIC_ANNOTATIONS.get(label, {})}
+        for label, value in macro_metrics(family.CHART_MACRO["name"], family, org_data_dir)
+    ]
+
+
+def _orgs_with_data() -> list[str]:
+    """Orgs with produced tables, primary org first for stable manifests."""
+    if not paths.ORG_DATA_DIR.exists():
+        return []
+    orgs = sorted(path.name for path in paths.ORG_DATA_DIR.iterdir() if path.is_dir())
+    return [paths.ORG, *[org for org in orgs if org != paths.ORG]] if paths.ORG in orgs else orgs
+
+
+def emit_data_api() -> Path:
+    """Write the JSON API for every org with data; returns the manifest path.
+
+    Enforces the column contract for each emitted section — a spec-listed
+    table with missing columns fails the emit (and therefore the run).
+    """
+    api_dir = _api_dir()
+    api_dir.mkdir(parents=True, exist_ok=True)
+
+    provenance = resolve_provenance()
+    manifest: dict = {
+        # Every macro's "how to read this" explainer, keyed by macro name.
+        # Each lists only what its own tab shows; the shared prose behind the
+        # column definitions lives in dashboard_spec.glossary.
+        "macro_glossaries": MACRO_GLOSSARIES,
+        # Display labels for the rolling activity periods ("30d" -> "30 days").
+        "period_labels": {period.key: period.label for period in ACTIVITY_PERIODS},
+        "version": API_VERSION,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "provenance": {
+            "git_sha": provenance.git_sha,
+            "data_as_of": provenance.data_as_of.isoformat() if provenance.data_as_of else None,
+        },
+        "orgs": {},
+    }
+
+    for org in _orgs_with_data():
+        org_dir = api_dir / org
+        org_dir.mkdir(parents=True, exist_ok=True)
+        org_data_dir = paths.ORG_DATA_DIR / org
+        sections = []
+        for family in TABLE_FAMILIES.values():
+            group_of = family.SECTION_GROUP_OF
+            # SECTION_ORDER, not SECTION_SPECS: the order groups sections
+            # contiguously (high-level -> individual), exactly as the legacy
+            # dashboard renders — spec-declaration order interleaves groups.
+            specs_by_id = {spec["id"]: spec for spec in family.SECTION_SPECS}
+            for section_id in family.SECTION_ORDER:
+                section = specs_by_id[section_id]
+                document = _section_document(section, group_of, org, org_data_dir)
+                if document is None:
+                    continue
+                document["macro"] = family.CHART_MACRO["name"]
+                path = org_dir / f"{document['id']}.json"
+                path.write_text(json.dumps(document, indent=1), encoding="utf-8")
+                sections.append(
+                    {
+                        "id": document["id"],
+                        "macro": document["macro"],
+                        "title": document["title"],
+                        "row_count": document["row_count"],
+                        "path": f"{org}/{document['id']}.json",
+                    }
+                )
+        chart_sections = _org_chart_sections(org, org_data_dir, org_dir)
+        views = _org_views(org, org_data_dir, org_dir)
+        if sections or chart_sections or views:
+            metrics = {
+                family.CHART_MACRO["name"]: tiles
+                for family in TABLE_FAMILIES.values()
+                if (tiles := _metric_tiles(family, org_data_dir))
+            }
+            manifest["orgs"][org] = {
+                "sections": sections,
+                "chart_sections": chart_sections,
+                "views": views,
+                "metrics": metrics,
+            }
+
+    manifest_path = api_dir / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    section_count = sum(len(entry["sections"]) for entry in manifest["orgs"].values())
+    logger.info(
+        "Data API %s: %d section document(s) across %d org(s) -> %s",
+        API_VERSION,
+        section_count,
+        len(manifest["orgs"]),
+        api_dir,
+    )
+    return manifest_path

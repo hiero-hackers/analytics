@@ -147,7 +147,7 @@ class _RestTransport:
                     )
                     response.raise_for_status()
 
-                sleep_time = (2**attempt) + random.uniform(0, 1)  # small jitter
+                sleep_time = (2**attempt) + random.uniform(0, 1)  # noqa: S311 — backoff jitter, not crypto
                 logger.warning(
                     "Server error %d. Retrying in %.2fs...",
                     response.status_code,

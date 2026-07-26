@@ -8,6 +8,8 @@ the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.glossary import glossary_of
+
 CHART_MACRO = {
     "name": "Contributors",
     "charts": {
@@ -99,6 +101,27 @@ SECTION_SPECS = [
     },
 ]
 
+# This tab's "how to read this": only the columns the contributor tables show.
+GLOSSARY = glossary_of(
+    (
+        "contributor / account / member / user",
+        "PRs",
+        "reviews",
+        "merges",
+        "issues",
+        "labels",
+        "actions",
+        "repos",
+        "last active",
+        "period tabs",
+    ),
+    note=(
+        "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked "
+        "activities are opening PRs/issues, reviewing, merging, and labeling — comments and reactions "
+        "are not counted."
+    ),
+)
+
 SECTION_GROUPS = [
     # The full per-person list.
     ("All contributors", ["profiles"]),
@@ -142,6 +165,39 @@ CHART_NOTES = {
 # notes these describe the method, never the current values, so they stay accurate.
 # A chart with no entry simply shows no methodology block.
 CHART_METHODOLOGY = {
+    "all_network.png": [
+        (
+            "Take every tracked contributor activity (PRs opened, reviews, merges, issues, labels) and "
+            "reduce it to which people were active in which repositories."
+        ),
+        "Make each repository a node, sized by how many contributors it has.",
+        (
+            "Link two repositories when they share contributors; the link's thickness is how many they "
+            "share. Links use all contributors, active or not, so latent structure shows even in a quiet "
+            "period."
+        ),
+        (
+            "Thin the links with a minimum-shared threshold that scales with the number of repositories, "
+            "so a dense organisation stays readable rather than becoming a hairball."
+        ),
+    ],
+    "contributor_counts.png": [
+        "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
+        "Count the distinct contributors active in each repository.",
+        "Keep the top 20 repositories by that count.",
+    ],
+    "language_distribution.png": [
+        "List the organisation's repositories and read GitHub's primary-language field for each.",
+        (
+            "Count repositories per language. This is GitHub's own per-repository classification — one "
+            "language per repository, not a line-count breakdown."
+        ),
+    ],
+    "push_activity.png": [
+        "List the organisation's repositories with their last-push timestamp.",
+        "Classify each repository by whether it received a push in the last 30 days.",
+        "Count repositories in each state. Pushes are counted, not merged PRs.",
+    ],
     "contributor_activity_heatmap.png": [
         (
             "Take every tracked event in the last six months — issues opened, PRs opened, reviews, merges — "

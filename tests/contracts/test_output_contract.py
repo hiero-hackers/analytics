@@ -1,8 +1,8 @@
 """End-to-end output contract: pipelines must produce what the dashboard spec lists.
 
 Runs the entire default pipeline run (plus the extra-org contributor pass and the
-dashboard) against synthetic fetch results, into a temporary outputs tree, then
-asserts the producer↔spec contract in both directions:
+data API emit) against synthetic fetch results, into a temporary outputs tree,
+then asserts the producer↔spec contract in both directions:
 
 - every CSV a table section lists (including derived period variants) exists;
 - every chart PNG a macro lists exists (except charts owned by CLI-only
@@ -10,13 +10,14 @@ asserts the producer↔spec contract in both directions:
 - every org-level CSV/PNG actually produced is either listed by the spec or
   explicitly accounted for below.
 
-Without this, a renamed pipeline output fails *silently*: the dashboard skips
-missing PNGs, renders blank cells for renamed CSV columns, and drops metric
-tiles — all with zero test failures. Here the drift fails loudly instead.
+Without this, a renamed pipeline output fails *silently*: the web dashboard
+skips missing PNGs, renders blank cells for renamed CSV columns, and drops
+metric tiles — all with zero test failures. Here the drift fails loudly instead.
 """
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -31,7 +32,6 @@ import hiero_analytics.pipelines.codeowner_and_runner as codeowner_mod
 import hiero_analytics.pipelines.contributor_activity as activity_mod
 import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
 import hiero_analytics.pipelines.contributor_profiles as profiles_mod
-import hiero_analytics.pipelines.dashboard as dashboard_mod
 import hiero_analytics.pipelines.difficulty as difficulty_mod
 import hiero_analytics.pipelines.difficulty_over_time as difficulty_time_mod
 import hiero_analytics.pipelines.hiero_hackers as hackers_mod
@@ -97,7 +97,6 @@ CHART_COMPANION_CSVS = {
     "maintainer_pipeline_weekly.csv",
     "maintainer_pipeline_by_repo.csv",
     "org_runner_status.csv",
-    "repo_wise_codeowner_status.csv",
     "language_distribution.csv",
     "push_activity.csv",
     "contributor_counts.csv",
@@ -301,7 +300,7 @@ HIP_REFS = [
 
 @pytest.fixture(scope="module")
 def outputs_root(tmp_path_factory) -> Path:
-    """Run every default pipeline + dashboard into a temp outputs tree."""
+    """Run every default pipeline + the data API emit into a temp outputs tree."""
     root = tmp_path_factory.mktemp("outputs")
     mp = pytest.MonkeyPatch()
     try:
@@ -314,10 +313,6 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(paths, "ORG_CHARTS_DIR", root / "charts" / "org")
         mp.setattr(paths, "REPO_CHARTS_DIR", root / "charts" / "repo")
         mp.setattr(paths, "DATASETS_DIR", root / "data" / "datasets")
-        # dashboard imported the dir constants directly.
-        mp.setattr(dashboard_mod, "OUTPUTS_DIR", root)
-        mp.setattr(dashboard_mod, "ORG_DATA_DIR", root / "data" / "org")
-        mp.setattr(dashboard_mod, "ORG_CHARTS_DIR", root / "charts" / "org")
 
         # Fetch-layer stubs, per pipeline namespace.
         for mod in (difficulty_mod, difficulty_time_mod):
@@ -398,6 +393,69 @@ def _spec_chart_files() -> dict[str, set[str]]:
     return per_org
 
 
+def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
+    """The JSON API lists a document for each spec section whose CSV exists.
+
+    Column validation happened during the run itself (the emitter raises on a
+    missing spec-declared column and run_all would have failed); this asserts
+    the coverage side: nothing produced+spec-listed is missing from the API.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+    org_data = outputs_root / "data" / "org" / PRIMARY
+
+    listed = {section["id"] for section in manifest["orgs"][PRIMARY]["sections"]}
+    for spec in ALL_SECTION_SPECS:
+        if (org_data / spec["file"]).exists():
+            assert spec["id"] in listed, f"{spec['id']} produced but absent from the data API"
+            document = json.loads((api_dir / PRIMARY / f"{spec['id']}.json").read_text())
+            declared = {column[0] for column in spec["columns"]}
+            emitted = {column["key"] for column in document["columns"]}
+            assert declared == emitted
+
+
+def test_data_api_emits_the_hip_views(outputs_root: Path):
+    """The HIP board and coverage matrix ship as view documents for the org.
+
+    These are the bespoke views the frontend renders as components; if the
+    pipeline produced HIP data but the API listed no views, the HIPs tab would
+    silently lose its centrepieces.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    views = manifest["orgs"][PRIMARY]["views"]
+    assert [(view["id"], view["kind"]) for view in views] == [("hip-board", "board"), ("hip-matrix", "matrix")]
+    for view in views:
+        document = json.loads((api_dir / view["path"]).read_text())
+        assert document["macro"] == "HIPs"
+    matrix = json.loads((api_dir / PRIMARY / "hip-matrix.json").read_text())
+    assert matrix["rows"], "matrix emitted with no rows"
+    assert matrix["bands"], "matrix emitted with no header bands"
+
+
+def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
+    """Every chart-declared companion CSV is copied into the API tree.
+
+    The Pages deploy publishes only the API tree and the PNGs, so a download
+    the dashboard offers must travel inside the API or 404 in production.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    missing = []
+    for entry in manifest["orgs"].values():
+        for section in entry["chart_sections"]:
+            download = section.get("download")
+            if download and not (api_dir / download["path"]).exists():
+                missing.append(download["path"])
+    assert not missing, f"chart downloads referenced but not copied: {missing}"
+    # The HIP funnel declares a CSV and its pipeline ran, so at least one
+    # download must exist end to end.
+    hip_charts = [s for s in manifest["orgs"][PRIMARY]["chart_sections"] if s["macro"] == "HIPs"]
+    assert any("download" in section for section in hip_charts)
+
+
 def test_every_spec_table_csv_is_produced(outputs_root: Path):
     """Each section's CSV (and every derived period variant) exists for the primary org."""
     org_data = outputs_root / "data" / "org" / PRIMARY
@@ -456,9 +514,20 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
     assert not orphans, f"outputs the dashboard spec doesn't know about: {sorted(orphans)}"
 
 
-def test_dashboard_html_is_written(outputs_root: Path):
-    """The assembled dashboard exists and carries both table-bearing macro tabs."""
-    html = (outputs_root / "dashboard.html").read_text(encoding="utf-8")
-    assert ">Contributors<" in html  # the people/activity macro button
-    assert ">Governance<" in html  # the authority/risk macro button
-    assert len(html) > 10_000
+def test_every_emitted_kpi_tile_explains_itself(outputs_root: Path):
+    """A tile is a lone number, so it must ship its note and derivation steps.
+
+    Charts are guarded by the spec tests; tiles are produced dynamically from
+    whatever data exists, so the end-to-end run is where their coverage can
+    actually be checked.
+    """
+    manifest = json.loads((outputs_root / "data" / "api" / "v1" / "manifest.json").read_text())
+
+    unexplained = [
+        (org, macro, tile["label"])
+        for org, entry in manifest["orgs"].items()
+        for macro, tiles in entry["metrics"].items()
+        for tile in tiles
+        if not tile.get("note") or not tile.get("methodology")
+    ]
+    assert not unexplained, f"KPI tiles with no explanation: {unexplained}"

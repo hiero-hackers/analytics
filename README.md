@@ -63,27 +63,33 @@ This is the same command the scheduled **Refresh Analytics Data** workflow runs.
 
 **Just want to look?** The latest refresh is published to GitHub Pages — open **https://hiero-hackers.github.io/analytics/** to view it in your browser, no clone or setup required. The scheduled **Refresh Analytics Data** workflow rebuilds and republishes it automatically.
 
-To build it yourself, the single-file dashboard at `outputs/dashboard.html` is **built from the generated data** — it reads the tables in `outputs/data/` and the charts in `outputs/charts/`. Because of that:
+The dashboard is a static Vite + React app in `web/` that renders the versioned
+JSON data API (`outputs/data/api/v1/`) — it is **built from the generated
+data**, so generate the data first or the dashboard will be empty.
+`uv run hiero-analytics` already emits the API as its **last** step, so on a
+fresh checkout that one command gives you data *and* a populated dashboard. To
+develop locally:
 
-- **Generate the data first, or the dashboard will be empty.** Building the dashboard with no data produces a page with nothing in it. `uv run hiero-analytics` already builds the dashboard as its **last** step, so on a fresh checkout that one command gives you data *and* a populated dashboard.
-- **To rebuild only the dashboard** once the data already exists (e.g. after tweaking a label), run:
+```bash
+uv run hiero-analytics data_api        # re-emit the API from existing outputs
+python3 -m http.server 8642 -d outputs # serve data + charts (dev proxy target)
+npm run dev --prefix web               # the app, on http://localhost:5173
+```
 
-  ```bash
-  uv run hiero-analytics dashboard
-  ```
-
-- Open `outputs/dashboard.html` in any browser — it's fully self-contained (no server required) and shows one tab per organization that has data.
+New sections, charts, and orgs appear in the app automatically — it renders
+whatever the API manifest lists (one tab per organization that has data), so
+adding analytics rarely requires frontend changes.
 
 ### Tracing a chart or table back to its data
 
 Nothing generated is committed, and each Pages deploy replaces the last, so every artifact carries its own provenance instead:
 
 - **Charts** have a footer reading `data <watermark> · code <revision> · n=<rows>`. A `-dirty` suffix on the revision means the chart was drawn from uncommitted code and cannot be reproduced from any commit.
-- **The dashboard** stamps the same revision in its header, plus a per-section *data as of* badge.
+- **The dashboard** stamps the same revision in its page footer (from the API manifest's provenance block), plus a per-section *data as of* badge.
 - **CSVs on disk** (`outputs/data/`) keep their provenance in a `<name>.csv.meta.json` sidecar — `generated_at`, `git_sha`, `record_count`. The CSV body is left clean so `pd.read_csv` works unchanged.
 - **Each scheduled run** archives its dataset snapshot as a `dataset-snapshot-<run>-<sha>` workflow artifact, including a `SNAPSHOT.json` manifest of per-dataset watermarks and SHA-256s.
 
-**Downloading a table as CSV** from the dashboard writes four `#` comment lines above the header, naming the view, the data watermark, the revision, and the row count. The export takes the rows currently *visible*, so filtering before you download gives you a subset — the preamble says so (`# 2 of 7 rows (filtered: "sdk-j")`).
+**Downloading a table as CSV** from the dashboard writes `#` comment lines above the header, naming the view, the data watermark, and the revision. The export takes the rows currently *visible*, so filtering before you download gives you a subset — the preamble says so (`# 2 of 7 rows (filtered view)`).
 
 Those comment lines mean a downloaded file needs the `comment` flag when read programmatically:
 
@@ -95,7 +101,13 @@ Without it pandas raises `ParserError` rather than mis-reading the header. Sprea
 
 ### Pull request dashboard previews
 
-Pull requests that change analytics code build `outputs/dashboard.html` and upload it as a **dashboard-preview** workflow artifact. Download that single HTML file to review the PR's charts and tables without committing generated PNGs or reports.
+Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then serve it locally to review the PR's charts and tables without committing generated PNGs or reports:
+
+```bash
+python3 -m http.server 8000 -d dashboard-preview
+```
+
+(The app fetches its JSON over HTTP, so it needs a local server — opening `index.html` from the filesystem won't load data.)
 
 Most previews restore the latest base-branch datasets and set `HIERO_ANALYTICS_OFFLINE=1`. This keeps the input data fixed so the artifact isolates code changes. Offline mode never falls back to a network fetch: it fails clearly when a required dataset or governance snapshot is missing. Pipelines backed only by live repo or third-party APIs are skipped, so Scorecard, CODEOWNERS/runner, repo-only, and Hiero Hackers sections may be absent from an offline preview.
 
@@ -127,11 +139,11 @@ Available pipelines:
 | `scorecard` | OpenSSF Scorecard results |
 | `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
 | `hiero_hackers` | Hiero Hackers org composition and activity |
-| `dashboard` | Rebuilds `outputs/dashboard.html` from existing data (the full run does this last) |
+| `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
+| `data_api` | Emits the versioned JSON data API (`outputs/data/api/v1/`) the web dashboard renders — the full run does this last |
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
 | `contributor_churn` | Contributor churn analysis — on-demand, not part of the full run |
 | `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
-| `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
 

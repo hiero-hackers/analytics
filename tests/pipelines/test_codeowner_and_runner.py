@@ -110,7 +110,6 @@ def test_main_creates_output_files(
 
     expected_charts = [
         "org_codeowner_summary.png",
-        "org_codeowner_by_repo.png",
         "org_runner_chart.png",
     ]
     expected_data = [

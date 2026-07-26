@@ -95,6 +95,7 @@ select = [
     "ARG",  # unused function arguments
     "RET",  # return consistency
     "RSE",  # exception correctness
+    "S",    # flake8-bandit security checks
 ]
 ignore = [
     "D212",     # disable "summary on same line"
@@ -103,7 +104,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["ARG001"]
+# S101: asserts are the point of tests.
+"tests/**/*.py" = ["ARG001", "S101"]
 
 [tool.ruff.format]
 quote-style = "double"

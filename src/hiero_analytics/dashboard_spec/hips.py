@@ -127,38 +127,64 @@ SECTION_GROUPS = [
     ("Evidence", ["hip-evidence", "hip-unknown"]),
 ]
 
-# The tab's "how to read this" expander: documentation, not data. It states
+# The tab's "how to read this" explainer: documentation, not data. It states
 # the interpretation rules from HIP-1 so every number reads the same way for
-# every viewer. The generic macro chrome renders it in place of the shared
-# column glossary.
-GLOSSARY_HTML = (
-    "<details class='glossary'><summary>How to read this tab \u2014 what the numbers mean</summary>"
-    "<ul class='hipabout'>"
-    "<li><strong>What is measured.</strong> PRs across the organisation's repositories that reference a "
-    "HIP number in their title, branch name, or description, validated against the spec inventory. "
-    "Counts are referencing PRs — evidence of where work happened, never proof a HIP is complete.</li>"
-    "<li><strong>Reading a status (per HIP-1).</strong> <em>Review / Last Call</em>: the spec is still in "
-    "governance; any implementation is early prototyping. <em>Approved / Accepted</em>: the TSC said yes — "
-    "implementation is expected next, so a blank row is a real \u201cnot started?\u201d question. "
-    "<em>Final</em>: the reference implementation merged <em>by definition</em> — a blank row is a citation "
-    "gap (PRs that never named the HIP), not missing work. <em>Active</em>: process/informational specs in "
-    "effect; code is not expected. Retired statuses (deferred, withdrawn, \u2026) are not being pursued.</li>"
-    "<li><strong>The Hiero era.</strong> Only PRs from the Hiero era (since September 2024, when the "
-    "codebase moved to hiero-ledger) are counted anywhere on this tab. Earlier references describe "
-    "pre-migration work and are kept in the evidence table flagged \u201cpre-Hiero era\u201d.</li>"
-    "<li><strong>What keeps the numbers honest.</strong> Every count clicks through to its PR list; "
-    "spec-authoring PRs in the proposals repository are excluded; body-only mentions behind a distancing "
-    "cue (\u201cwaiting on\u201d, \u201cprepares for\u201d\u2026) are excluded from counts but listed in the "
-    "evidence table; numbers not in the inventory go to the review table instead of being counted.</li>"
-    "<li><strong>Known blind spots.</strong> PRs that never cite their HIP are invisible; implementations "
-    "predating the hiero-ledger migration live in old repositories; commit-message-only citations are not "
-    "yet matched.</li>"
-    "</ul></details>"
-)
+# every viewer, and replaces the shared column glossary on this tab. Prose only;
+# *asterisks* mark emphasis (the frontend owns the markup). The "notes" layout
+# renders lead-in + prose rather than the shared glossary's term/definition grid.
+GLOSSARY = {
+    "title": "How to read this tab \u2014 what the numbers mean",
+    "layout": "notes",
+    "terms": [
+        {
+            "term": "What is measured.",
+            "definition": (
+                "PRs across the organisation's repositories that reference a HIP number in their title, "
+                "branch name, or description, validated against the spec inventory. Counts are referencing "
+                "PRs \u2014 evidence of where work happened, never proof a HIP is complete."
+            ),
+        },
+        {
+            "term": "Reading a status (per HIP-1).",
+            "definition": (
+                "*Review / Last Call*: the spec is still in governance; any implementation is early "
+                "prototyping. *Approved / Accepted*: the TSC said yes \u2014 implementation is expected "
+                "next, so a blank row is a real \u201cnot started?\u201d question. *Final*: the reference "
+                "implementation merged *by definition* \u2014 a blank row is a citation gap (PRs that never "
+                "named the HIP), not missing work. *Active*: process/informational specs in effect; code is "
+                "not expected. Retired statuses (deferred, withdrawn, \u2026) are not being pursued."
+            ),
+        },
+        {
+            "term": "The Hiero era.",
+            "definition": (
+                "Only PRs from the Hiero era (since September 2024, when the codebase moved to "
+                "hiero-ledger) are counted anywhere on this tab. Earlier references describe pre-migration "
+                "work and are kept in the evidence table flagged \u201cpre-Hiero era\u201d."
+            ),
+        },
+        {
+            "term": "What keeps the numbers honest.",
+            "definition": (
+                "Every count clicks through to its PR list; spec-authoring PRs in the proposals repository "
+                "are excluded; body-only mentions behind a distancing cue (\u201cwaiting on\u201d, "
+                "\u201cprepares for\u201d\u2026) are excluded from counts but listed in the evidence "
+                "table; numbers not in the inventory go to the review table instead of being counted."
+            ),
+        },
+        {
+            "term": "Known blind spots.",
+            "definition": (
+                "PRs that never cite their HIP are invisible; implementations predating the hiero-ledger "
+                "migration live in old repositories; commit-message-only citations are not yet matched."
+            ),
+        },
+    ],
+}
 
-# The generic renderer calls ``build_sections(org, org_data_dir)`` here for the
-# views this family cannot express as a table or chart gallery.
-CUSTOM_SECTIONS_MODULE = "hiero_analytics.export.hip_sections"
+# The data API calls ``build_views(org, org_data_dir)`` here for the views this
+# family cannot express as a table or chart gallery (the board and the matrix).
+CUSTOM_VIEWS_MODULE = "hiero_analytics.export.hip_views"
 
 # Groups render as the matrix's header bands in first-appearance order; the
 # "SDKs" group drives the per-row parity gap list. HIPs land well beyond
@@ -232,6 +258,36 @@ CHART_NOTES = {
 
 # Methodology entries are ordered lists of steps (rendered as <li> items).
 CHART_METHODOLOGY = {
+    "hip_adoption_funnel.png": [
+        (
+            "Take every spec in the inventory created since September 2024 (the Hiero era) — older specs "
+            "are excluded because citation-based stages undercount them."
+        ),
+        "Stage 1, proposed: every spec in that cohort.",
+        "Stage 2, approved: those whose frontmatter status is Approved, Accepted, Final, or Active.",
+        (
+            "Stage 3, implementation evidence: those with at least one merged PR citing them, after "
+            "excluding proposals-repo PRs and body-only mentions behind a distancing cue."
+        ),
+        (
+            "Stage 4, implemented broadly: those with merged citing PRs in five or more repositories. "
+            "Each band's label is its share of stage 1; counts and the all-time cohort are in the CSV."
+        ),
+    ],
+    "hip_repo_engagement.png": [
+        (
+            "Take every counted (HIP, PR) reference — merged PRs only, proposals-repo and "
+            "distancing-cue references already excluded."
+        ),
+        (
+            "For each repository, count the *distinct* HIPs it has merged a referencing PR for, so one PR "
+            "per HIP counts the same as fifty."
+        ),
+        (
+            "Rank repositories by that breadth, keeping zero-reference repositories visible: many are "
+            "tooling or docs where HIPs may not apply, and relevance is a human call."
+        ),
+    ],
     "hip_activity_by_status.png": [
         (
             "Sweep every merged and open PR in the organisation and match HIP references locally from "

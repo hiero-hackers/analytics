@@ -8,6 +8,8 @@ assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
+
 # "Suggest a correction" target for the affiliations reference table — the analytics
 # repo's issues page. The affiliations map is the source of truth, so a correction is
 # either a one-line edit to data/affiliations.yaml (append '# manual') or a new issue here.
@@ -356,6 +358,47 @@ SECTION_SPECS = [
 # long stack. Each group renders under its own heading (with a jump-bar link), and
 # within a group the order goes high-level aggregate → most granular. Groups render
 # after the charts. Order here is the on-screen order.
+# This tab's "how to read this": role and activity columns, plus the
+# affiliation and organisation-diversity vocabulary its reference tables use.
+GLOSSARY = glossary_of(
+    (
+        "contributor / account / member / user",
+        "PRs",
+        "reviews",
+        "merges",
+        "issues",
+        "labels",
+        "actions",
+        "review+merge",
+        "mergers",
+        "top carrier / top % / top role",
+        "role / role here",
+        "highest role",
+        "roles held",
+        "how roles are set",
+        "maintainers / committers / triage",
+        "members",
+        "active / members active",
+        "org-wide teams",
+        "status",
+        "days since active",
+        "last active",
+        "repos",
+        "period tabs",
+        "organisation",
+        "method",
+        "resolved",
+        "distinct orgs",
+        "largest org / largest org %",
+        "HHI",
+        "single employer",
+        "independent",
+        "unknown",
+        "organisation mix",
+    ),
+    note=GLOSSARY_NOTE,
+)
+
 SECTION_GROUPS = [
     # The actionable headlines — where coverage is thin or work is concentrated.
     ("Coverage & risk", ["repoactivity", "understaffed", "loadshare", "gonedark"]),
@@ -436,6 +479,32 @@ CHART_NOTES = {
 # notes these describe the method, never the current values, so they stay accurate.
 # A chart with no entry simply shows no methodology block.
 CHART_METHODOLOGY = {
+    "maintainer_pipeline_yearly.png": [
+        (
+            "Take every tracked activity event (PRs opened, reviews, merges, issues, labels) and attach "
+            "the governance role its actor held: maintainer, committer, triage, or general user."
+        ),
+        (
+            "Bucket events by period (year, month, or week — the variant tabs) and count *distinct* "
+            "people active in each role per bucket, so one very busy person does not inflate a tier."
+        ),
+        (
+            "Stack the tiers to show whether the bench below maintainers is developing; the by-repo "
+            "variant does the same across repositories instead of time."
+        ),
+    ],
+    "maintainer_network.png": [
+        (
+            "Resolve who holds the role in each repository from the governance config's team→permission "
+            "grants (maintain/admin → maintainer, write → committer, triage → triage)."
+        ),
+        "Make each repository a node, sized by how many holders of that role it has.",
+        (
+            "Link two repositories when they share role-holders; thickness is how many they share. Edges "
+            "use all holders, active or not, so shared ownership shows even where the group is quiet."
+        ),
+        ("Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."),
+    ],
     "affiliation_donut.png": [
         "Collect every maintainer from the governance config — anyone holding the maintainer role in any repo.",
         "Look up each maintainer's organisation in the curated affiliations file.",
@@ -508,3 +577,8 @@ CHART_METHODOLOGY = {
         ),
     ],
 }
+
+# The committer and triage networks are the same construction over a different
+# role, so they share the maintainer network's steps rather than restating them.
+CHART_METHODOLOGY["committer_network.png"] = CHART_METHODOLOGY["maintainer_network.png"]
+CHART_METHODOLOGY["triage_network.png"] = CHART_METHODOLOGY["maintainer_network.png"]

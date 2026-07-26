@@ -238,7 +238,7 @@ def gpg_uid_emails(login: str) -> list[str]:
         return []
     try:
         out = subprocess.run(
-            ["gpg", "--show-keys", "--with-colons"],
+            ["gpg", "--show-keys", "--with-colons"],  # noqa: S607 — maintenance CLI; gpg resolved from PATH by design
             input=resp.text,
             capture_output=True,
             text=True,

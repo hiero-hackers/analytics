@@ -35,6 +35,82 @@ CHART_NOTES = {
     "issues sat at that difficulty on that date.",
 }
 
-CHART_METHODOLOGY = {}
+CHART_METHODOLOGY = {
+    "difficulty_by_repo_30_days.png": [
+        "Fetch every open issue across the organisation's repositories, with its labels.",
+        (
+            "Map each issue's labels to a difficulty level using the shared label vocabulary "
+            "(domain/labels.py); an issue carrying no difficulty label becomes 'Unknown'."
+        ),
+        (
+            "Keep only issues labelled with a difficulty — or newly created — within the last 30 days, so "
+            "the chart reflects what triage has touched recently rather than the entire backlog."
+        ),
+        "Count the remaining open issues per repository, stacked by difficulty level.",
+    ],
+    "difficulty_over_time_event_based_weekly.png": [
+        (
+            "Fetch the label timeline for every issue — each 'labeled' and 'unlabeled' event with its "
+            "timestamp — rather than reading only the labels issues carry today."
+        ),
+        (
+            "Replay those events week by week to reconstruct which difficulty each open issue held at each "
+            "point in the past year."
+        ),
+        (
+            "Count open issues at each difficulty for every week; a relabelled issue therefore changes "
+            "history, because the chart reflects what was known then, not now."
+        ),
+    ],
+}
 
 WIDE_CHARTS: set[str] = set()
+
+# This tab's "how to read this". Prose only; *asterisks* mark emphasis.
+GLOSSARY = {
+    "title": "How to read this tab — what the numbers mean",
+    "layout": "notes",
+    "terms": [
+        {
+            "term": "What is measured.",
+            "definition": (
+                "Open issues across the organisation's repositories, grouped by the difficulty label "
+                "they carry. Issues are counted, never people — this tab says what work is waiting, not "
+                "who is doing it."
+            ),
+        },
+        {
+            "term": "Difficulty levels.",
+            "definition": (
+                "Read from each issue's labels. *Unknown* is the important one: a recently opened or "
+                "unlabelled issue nobody has triaged a difficulty onto yet. It is the onboarding signal "
+                "on this tab, because repositories no longer rely on a good-first-issue-candidate label "
+                "to surface approachable work."
+            ),
+        },
+        {
+            "term": "By repo (30 days).",
+            "definition": (
+                "Open issues per repository, stacked by difficulty, limited to issues labelled with a "
+                "difficulty (or newly created) in the last 30 days — a snapshot of what triage has "
+                "touched recently, not the whole backlog."
+            ),
+        },
+        {
+            "term": "Over time (weekly).",
+            "definition": (
+                "The last year reconstructed from *when difficulty labels were actually applied*, not "
+                "from the labels issues carry today. Each band's height is how many open issues sat at "
+                "that difficulty on that date, so relabelling an old issue moves history."
+            ),
+        },
+        {
+            "term": "What this tab cannot tell you.",
+            "definition": (
+                "An issue with no difficulty label is invisible to the difficulty split beyond counting "
+                "as Unknown, and closed issues are out of scope entirely — this is a picture of the open "
+                "queue, not of throughput."
+            ),
+        },
+    ],
+}

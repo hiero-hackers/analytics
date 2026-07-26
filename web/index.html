@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      The dashboard is self-contained: its bundle, JSON, and chart PNGs are all
+      same-origin, so nothing legitimate needs an outside origin. 'unsafe-inline'
+      is granted to styles only (React writes inline style attributes); scripts
+      get no such exemption. Note frame-ancestors cannot be set from a meta tag —
+      clickjacking protection would need a response header, which GitHub Pages
+      does not let us configure.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hiero — analytics dashboard</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

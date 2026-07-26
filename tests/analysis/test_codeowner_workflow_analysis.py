@@ -5,7 +5,6 @@ import pandas as pd
 from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_org_codeowners_summary,
     prepare_repo_level_codeowner_summary,
-    prepare_stacked_codeowner_summary,
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
@@ -118,53 +117,16 @@ def test_prepare_stacked_runner_summary_columns_exist():
     assert df.iloc[0]["Indeterminate"] == 0
 
 
-def test_prepare_stacked_codeowner_summary_empty():
-    """Test empty list returns empty DataFrame with correct columns."""
-    df = prepare_stacked_codeowner_summary([])
-    assert isinstance(df, pd.DataFrame)
-    assert list(df.columns) == ["repo", "Present", "Missing"]
-    assert df.empty
-
-
-def test_prepare_stacked_codeowner_summary_aggregation():
-    """Verify correct mapping of boolean status to Present/Missing columns."""
+def test_repo_level_summary_lists_repos_without_codeowners_first():
+    """The gap is the actionable part, so it leads; covered repos follow."""
     records = [
-        CodeOwnersRecord(repo="repo-a", status=True),
-        CodeOwnersRecord(repo="repo-b", status=False),
+        CodeOwnersRecord(repo="has-owners", status=True),
+        CodeOwnersRecord(repo="zeta-missing", status=False),
+        CodeOwnersRecord(repo="alpha-missing", status=False),
+        CodeOwnersRecord(repo="also-has", status=True),
     ]
-    df = prepare_stacked_codeowner_summary(records)
 
-    assert len(df) == 2
+    frame = prepare_repo_level_codeowner_summary(records)
 
-    # repo-a check (status=True -> Present=1, Missing=0)
-    row_a = df[df["repo"] == "repo-a"].iloc[0]
-    assert row_a["Present"] == 1
-    assert row_a["Missing"] == 0
-
-    # repo-b check (status=False -> Present=0, Missing=1)
-    row_b = df[df["repo"] == "repo-b"].iloc[0]
-    assert row_b["Present"] == 0
-    assert row_b["Missing"] == 1
-
-
-def test_prepare_stacked_codeowner_summary_duplicates():
-    """Verify that duplicate repo entries are aggregated with a presence-wins policy."""
-    records = [
-        CodeOwnersRecord(repo="repo-a", status=False),
-        CodeOwnersRecord(repo="repo-a", status=True),
-        CodeOwnersRecord(repo="repo-b", status=False),
-        CodeOwnersRecord(repo="repo-b", status=False),
-    ]
-    df = prepare_stacked_codeowner_summary(records)
-
-    assert len(df) == 2
-
-    # repo-a check (status False and True -> resolved as Present=1, Missing=0)
-    row_a = df[df["repo"] == "repo-a"].iloc[0]
-    assert row_a["Present"] == 1
-    assert row_a["Missing"] == 0
-
-    # repo-b check (status False and False -> resolved as Present=0, Missing=1)
-    row_b = df[df["repo"] == "repo-b"].iloc[0]
-    assert row_b["Present"] == 0
-    assert row_b["Missing"] == 1
+    assert frame["repo"].tolist() == ["alpha-missing", "zeta-missing", "also-has", "has-owners"]
+    assert frame["status"].tolist() == [False, False, True, True]

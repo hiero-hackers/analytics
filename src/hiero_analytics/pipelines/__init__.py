@@ -33,15 +33,17 @@ PIPELINES: tuple[Pipeline, ...] = (
     # offline-capable for PR previews.
     Pipeline("hip_implementation", "Map HIPs to the PRs that reference them", args=("org",), offline=True),
     # CLI-only pipelines, excluded from the default run:
-    # - dashboard: the full run renders it explicitly, last and once, after all orgs.
+    # - data_api: the full run invokes it explicitly, last and once, after all
+    #   orgs — it is a re-render over every org's outputs, and its column
+    #   contract should fail the run loudly if a pipeline drifts from its spec.
     # - discord_analytics: needs manual gitignored Discord CSVs (INPUTS_DIR), so it
     #   cannot run unattended in CI.
     # - contributor_churn: repo-scoped deep dive whose output no dashboard section
     #   consumes yet; flip in_default_run once one does.
     # - build_affiliations: a maintenance tool, not an analytics pipeline — it
     #   regenerates the curated affiliations.yaml source data (needs GITHUB_TOKEN
-    #   and the gpg CLI), which the dashboard pipelines then read offline.
-    Pipeline("dashboard", "Generate the org analytics dashboard", in_default_run=False),
+    #   and the gpg CLI), which the analytics pipelines then read offline.
+    Pipeline("data_api", "Emit the versioned JSON data API from existing outputs", in_default_run=False, offline=True),
     Pipeline("discord_analytics", "Run discord analysis", in_default_run=False),
     Pipeline("contributor_churn", "Analyze contributor churn", args=("org", "repo"), in_default_run=False),
     Pipeline("build_affiliations", "Regenerate the curated affiliations map from public signals", in_default_run=False),

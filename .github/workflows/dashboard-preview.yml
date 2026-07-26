@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "src/hiero_analytics/**"
+      - "web/**"
       - "pyproject.toml"
       - ".github/workflows/dashboard-preview.yml"
 
@@ -64,23 +65,44 @@ jobs:
             echo "offline=0" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build dashboard
+      - name: Build analytics data
         env:
           GITHUB_TOKEN: ${{ github.token }}
           HIERO_ANALYTICS_OFFLINE: ${{ steps.data-mode.outputs.offline }}
         run: uv run hiero-analytics
 
-      # The dashboard embeds its charts and data. Treat HTML from unfamiliar
+      - name: Set up Node
+        if: ${{ !cancelled() }}
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      # Same layout the Pages deploy publishes: the app at the root with its
+      # data API and charts nested beneath it. Reviewers unzip the artifact and
+      # serve it (python3 -m http.server -d <dir>) — the app fetches JSON over
+      # HTTP, so file:// won't load data. Treat the preview from unfamiliar
       # contributors with the same care as any other contributor-authored code.
-      # run_all writes dashboard.html before it exits non-zero on any pipeline
-      # failure, so upload even on failure (job still goes red) — reviewers get
-      # the partial dashboard instead of nothing.
+      # run_all emits the data API before it exits non-zero on any pipeline
+      # failure, so build and upload even on failure (job still goes red) —
+      # reviewers get the partial site instead of nothing.
+      - name: Build preview site
+        if: ${{ !cancelled() }}
+        run: |
+          npm ci --prefix web
+          npm run build --prefix web
+          mkdir -p preview/data
+          cp -R web/dist/. preview/
+          cp -R outputs/data/api preview/data/api
+          cp -R outputs/charts preview/charts
+
       - name: Upload dashboard preview
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dashboard-preview-${{ github.event.pull_request.number }}
-          path: outputs/dashboard.html
+          path: preview
           if-no-files-found: error
           retention-days: 7
 

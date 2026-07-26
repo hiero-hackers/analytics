@@ -13,12 +13,21 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec import community, contributors, governance, hips, onboarding, security
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
+from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order.
 _FAMILIES = (contributors, governance, onboarding, hips, security, community)
 
+__all__ = ["METRIC_ANNOTATIONS"]  # re-exported for the emitter
+
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
 CHARTS_GROUP = "Charts"
+
+# Display formats a section column may declare, as the third tuple element.
+# The frontend implements exactly these (web/src/components/FormattedCell.tsx);
+# an unlisted value would fall through to plain text, so a typo is caught by
+# tests/dashboard_spec instead of shipping as a silently unformatted column.
+COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence"})
 
 # The families that carry table sections, keyed by their macro name — the
 # dashboard pipeline reads SECTION_SPECS / SECTION_ORDER / SECTION_GROUP_OF
@@ -26,19 +35,17 @@ CHARTS_GROUP = "Charts"
 TABLE_FAMILIES = {family.CHART_MACRO["name"]: family for family in _FAMILIES if hasattr(family, "SECTION_SPECS")}
 
 # Families whose view needs more than tables and chart galleries name a module
-# exposing ``build_sections(org, org_data_dir)``; the renderer imports it the
-# same way the pipeline registry resolves a pipeline module.
-CUSTOM_SECTION_MODULES = {
-    family.CHART_MACRO["name"]: family.CUSTOM_SECTIONS_MODULE
+# exposing ``build_views(org, org_data_dir)``; the data API imports it the same
+# way the pipeline registry resolves a pipeline module.
+CUSTOM_VIEW_MODULES = {
+    family.CHART_MACRO["name"]: family.CUSTOM_VIEWS_MODULE
     for family in _FAMILIES
-    if hasattr(family, "CUSTOM_SECTIONS_MODULE")
+    if hasattr(family, "CUSTOM_VIEWS_MODULE")
 }
 
 # A family may replace the shared column glossary with its own "how to read
-# this" expander; the rest fall back to the shared one.
-MACRO_GLOSSARIES = {
-    family.CHART_MACRO["name"]: family.GLOSSARY_HTML for family in _FAMILIES if hasattr(family, "GLOSSARY_HTML")
-}
+# this" explainer; the rest fall back to the shared one.
+MACRO_GLOSSARIES = {family.CHART_MACRO["name"]: family.GLOSSARY for family in _FAMILIES if hasattr(family, "GLOSSARY")}
 
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]
 CHART_NOTES = merged(_FAMILIES, "CHART_NOTES")

@@ -17,7 +17,8 @@ run, and the process exits non-zero if any pipeline failed so CI surfaces it.
 Multi-org: the full pipeline set runs for the primary org (``GITHUB_ORG``). Any
 ``GITHUB_EXTRA_ORGS`` (comma-separated) additionally get contributor-activity
 only — the governance pipelines are tied to the primary org's config.yaml. The
-org-aware dashboard then runs once and renders a tab per org with data.
+org-aware data API then runs once and emits a per-org entry for every org with
+data, which the web dashboard renders.
 """
 
 from __future__ import annotations
@@ -35,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 # Extra orgs (config.paths.EXTRA_ORGS) get contributor-activity only — running
 # the governance pipelines for an ungoverned org would produce empty role/team
-# data. The dashboard (run once at the end) is org-aware and picks up every org
+# data. The data API (run once at the end) is org-aware and picks up every org
 # that has data.
 
 
@@ -100,16 +101,16 @@ def _run_extra_org(org: str) -> bool:
 
 
 def main() -> None:
-    """Run the primary-org pipelines, extra-org activity, then the dashboard once.
+    """Run the primary-org pipelines, extra-org activity, then the data API once.
 
-    Exits non-zero if any pipeline (or the dashboard) failed.
+    Exits non-zero if any pipeline (or the API emit) failed.
     """
     setup_logging()
 
     failures = run_pipelines(pipelines_for_current_mode())
     failures += [f"contributor_activity[{org}]" for org in EXTRA_ORGS if not _run_extra_org(org)]
 
-    # Describe the snapshot before the dashboard renders against it. Written
+    # Describe the snapshot before the data API emits against it. Written
     # even when pipelines failed — a partial run still produces charts, and the
     # manifest's failure list is what tells a later reader the snapshot the
     # archive holds is incomplete.
@@ -117,7 +118,7 @@ def main() -> None:
     # A missing manifest is a run failure, not a warning: without it the archived
     # datasets carry no hashes, watermarks, or failure list, so the charts this
     # run publishes cannot be traced to their inputs. Recorded as a failure
-    # rather than raised so the dashboard is still built for inspection — the
+    # rather than raised so the API is still emitted for inspection — the
     # non-zero exit then keeps the Pages deploy (which needs this job) from
     # publishing untraceable output.
     try:
@@ -126,13 +127,15 @@ def main() -> None:
         logger.exception("Could not write the snapshot manifest")
         failures.append("snapshot_manifest")
 
-    # Dashboard last, once — it renders a tab per org that has data.
-    logger.info("=== Running pipeline: dashboard ===")
+    # The data API last, once — a re-render over everything above, emitting a
+    # per-org entry for every org that has data. Its column contract fails the
+    # run loudly if any pipeline drifted from its dashboard spec.
+    logger.info("=== Running pipeline: data_api ===")
     try:
-        _resolve("dashboard")()
+        _resolve("data_api")()
     except Exception:
-        logger.exception("Pipeline dashboard failed")
-        failures.append("dashboard")
+        logger.exception("Pipeline data_api failed")
+        failures.append("data_api")
 
     if failures:
         logger.error("%d pipeline(s) failed: %s", len(failures), ", ".join(failures))

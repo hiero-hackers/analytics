@@ -5,7 +5,6 @@ import logging
 from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_org_codeowners_summary,
     prepare_repo_level_codeowner_summary,
-    prepare_stacked_codeowner_summary,
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
@@ -145,18 +144,9 @@ def main(org: str = ORG) -> None:
 
     generate_codeowners_markdown_report(records=codeowners, output_path=org_data_dir / "codeowners_report.md")
 
-    codeowners_stacked_df = prepare_stacked_codeowner_summary(codeowners)
-    if not codeowners_stacked_df.empty:
-        plot_stacked_bar(
-            df=codeowners_stacked_df,
-            x_col="repo",
-            stack_cols=["Present", "Missing"],
-            labels=["Present", "Missing"],
-            title="Repository Wide Codeowners Status Breakdown",
-            output_path=org_charts_dir / "org_codeowner_by_repo.png",
-            colors=CODEOWNER_STATUS_COLORS,
-            annotate_totals=False,
-        )
+    # Per-repository CODEOWNERS presence is a boolean, which a bar chart
+    # encodes badly (41 identical bars, each solid one colour). It ships as a
+    # table section instead, where the missing repos are named and filterable.
 
     runners = get_workflow_for_repos(client, org, repos)
 

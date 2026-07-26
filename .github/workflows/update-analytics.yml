@@ -101,13 +101,31 @@ jobs:
           retention-days: 90
           if-no-files-found: warn
 
-      # Publish the self-contained dashboard to GitHub Pages so anyone can view the
-      # latest refresh without cloning or regenerating. The HTML embeds every chart
-      # as base64, so the site is a single index.html.
+      # The web dashboard (web/): a static Vite build that renders the JSON
+      # data API. The app uses relative URLs, so its data and charts nest
+      # beneath it.
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build web dashboard
+        run: |
+          npm ci --prefix web
+          npm run build --prefix web
+
+      # Publish to GitHub Pages: the web app is the site root. /v2/ (where the
+      # app lived while the legacy generated dashboard held the root) redirects
+      # to the root so previously shared links keep working.
       - name: Assemble Pages site
         run: |
-          mkdir -p _site
-          cp outputs/dashboard.html _site/index.html
+          mkdir -p _site/data _site/v2
+          cp -R web/dist/. _site/
+          cp -R outputs/data/api _site/data/api
+          cp -R outputs/charts _site/charts
+          printf '<!doctype html><meta http-equiv="refresh" content="0; url=../"><link rel="canonical" href="../"><p>Moved to <a href="../">the site root</a>.</p>' > _site/v2/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
