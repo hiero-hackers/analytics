@@ -63,8 +63,10 @@ describe("App shell", () => {
     expect(screen.getByText("maintainers")).toBeInTheDocument();
     expect(screen.getByText("103")).toBeInTheDocument();
     expect(screen.getByText("How to read this — what each column means")).toBeInTheDocument();
-    // Each group appears twice: once in the jump bar, once as its header.
-    expect(screen.getByRole("link", { name: "Charts" })).toHaveAttribute("href", "#grp-Charts");
+    // Each group appears twice: once in the jump bar, once as its header, and
+    // the jump link targets that group's own anchor.
+    const charts = screen.getByRole("link", { name: "Charts" });
+    expect(charts.getAttribute("href")).toMatch(/^#grp-\d+-Charts$/);
     expect(screen.getAllByText("Charts")).toHaveLength(2);
     expect(screen.getAllByText("Roles & teams")).toHaveLength(2);
     expect(screen.getByText(/Work in progress/)).toBeInTheDocument();
@@ -218,5 +220,26 @@ describe("Resilience", () => {
     // …while the rest of the tab still renders.
     expect(screen.getByText("Maintainer pipeline")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /maintainers 103/ })).toBeInTheDocument();
+  });
+});
+
+describe("Section groups", () => {
+  it("gives colliding group names distinct keys and anchors", async () => {
+    const { SectionGroups } = await import("../components/SectionGroups");
+    // Distinct names that slug identically, plus an outright repeat.
+    const { container } = render(
+      <SectionGroups
+        groups={[
+          ["Roles & teams", <p key="a">a</p>],
+          ["Roles  teams", <p key="b">b</p>],
+          ["Roles & teams", <p key="c">c</p>],
+        ]}
+      />,
+    );
+
+    const ids = [...container.querySelectorAll("details.group")].map((el) => el.id);
+    expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
+    const hrefs = [...container.querySelectorAll("a.jbtn")].map((el) => el.getAttribute("href"));
+    expect(hrefs).toEqual(ids.map((id) => `#${id}`)); // every jump link targets its own group
   });
 });

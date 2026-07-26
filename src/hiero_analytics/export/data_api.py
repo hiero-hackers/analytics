@@ -48,6 +48,7 @@ from hiero_analytics.dashboard_spec import (
     WIDE_CHARTS,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
+from hiero_analytics.export.csv_safety import sanitize_csv_text
 from hiero_analytics.export.macro_metrics import macro_metrics
 from hiero_analytics.provenance import resolve_provenance
 
@@ -90,11 +91,18 @@ def _stamp_freshness(document: dict, csv_path: Path) -> None:
     document["generated_at"] = generated_at
     try:
         generated = datetime.fromisoformat(generated_at)
-        document["stale"] = datetime.now(UTC) - generated > STALE_AFTER
     except ValueError:
         # Ship the raw stamp without a staleness verdict, but say so — a sidecar
         # that stops parsing should show up in the run log, not vanish.
         logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
+        return
+    # Sidecars are written UTC-aware, but a hand-edited or legacy one may be
+    # naive; assume UTC rather than letting the subtraction raise TypeError and
+    # fail the entire emit over one stamp.
+    if generated.tzinfo is None:
+        logger.warning("Naive generated_at %r in sidecar for %s; assuming UTC", generated_at, csv_path)
+        generated = generated.replace(tzinfo=UTC)
+    document["stale"] = datetime.now(UTC) - generated > STALE_AFTER
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
@@ -102,18 +110,21 @@ def _rows(frame: pd.DataFrame) -> list[dict]:
     return json.loads(frame.to_json(orient="records", date_format="iso"))
 
 
-def _validate_columns(section: dict, frame: pd.DataFrame, org: str) -> None:
-    """Enforce the producer↔spec column contract for one section table."""
+def _validate_columns(section: dict, frame: pd.DataFrame, where: str) -> None:
+    """Enforce the producer↔spec column contract for one produced table.
+
+    ``where`` names the artifact for the error message — the base table or one
+    of its period variants.
+    """
     declared = [column[0] for column in section["columns"]]
     missing = [key for key in declared if key not in frame.columns]
     if missing:
         raise DataApiContractError(
-            f"{org}/{section['file']} is missing spec-declared column(s) {missing}; "
-            f"produced columns: {list(frame.columns)}"
+            f"{where} is missing spec-declared column(s) {missing}; produced columns: {list(frame.columns)}"
         )
 
 
-def _period_variants(section: dict, org_data_dir: Path) -> dict[str, list[dict]]:
+def _period_variants(section: dict, org: str, org_data_dir: Path) -> dict[str, list[dict]]:
     """Per-period row sets for a ``periods``-flagged section, keyed by period key."""
     if not section.get("periods"):
         return {}
@@ -122,7 +133,12 @@ def _period_variants(section: dict, org_data_dir: Path) -> dict[str, list[dict]]
     for period in ACTIVITY_PERIODS:
         path = org_data_dir / period.filename(stem)
         if path.exists():
-            variants[period.key] = _rows(pd.read_csv(path))
+            frame = pd.read_csv(path)
+            # Period files carry the same columns as their base table, so they
+            # get the same contract: a renamed column here would otherwise ship
+            # a silently incomplete row shape while the base table passed.
+            _validate_columns(section, frame, f"{org}/{path.name}")
+            variants[period.key] = _rows(frame)
     return variants
 
 
@@ -132,7 +148,7 @@ def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Pat
     if not csv_path.exists():
         return None
     frame = pd.read_csv(csv_path)
-    _validate_columns(section, frame, org)
+    _validate_columns(section, frame, f"{org}/{section['file']}")
     document = {
         "id": section["id"],
         "title": section["title"],
@@ -153,7 +169,7 @@ def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Pat
     if action_url := section.get("action_url"):
         document["action"] = {"url": action_url, "label": section.get("action_label", "Suggest a correction")}
     _stamp_freshness(document, csv_path)
-    if periods := _period_variants(section, org_data_dir):
+    if periods := _period_variants(section, org, org_data_dir):
         document["periods"] = periods
     return document
 
@@ -233,7 +249,10 @@ def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, or
     csv_path = org_data_dir / csv_name
     if not csv_path.exists():
         return
-    (org_dir / csv_name).write_bytes(csv_path.read_bytes())
+    # This copy exists to be downloaded and opened in a spreadsheet, so it is
+    # neutralised against formula injection; the artifact under outputs/data
+    # stays verbatim for pandas consumers.
+    (org_dir / csv_name).write_text(sanitize_csv_text(csv_path.read_text(encoding="utf-8")), encoding="utf-8")
     download = {"name": csv_name, "path": f"{org}/{csv_name}"}
     if generated_at := _read_meta(csv_path).get("generated_at"):
         download["generated_at"] = generated_at

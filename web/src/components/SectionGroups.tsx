@@ -7,7 +7,10 @@ import type { ReactNode } from "react";
 
 export type Group = [name: string, content: ReactNode];
 
-const slug = (name: string) => name.replace(/\W+/g, "-");
+// Position-qualified so two groups can never collide on a key or an anchor —
+// distinct names can slug to the same string ("Roles & teams" / "Roles teams"),
+// and a name could in principle repeat.
+const anchorId = (name: string, index: number) => `grp-${index}-${name.replace(/\W+/g, "-")}`;
 
 export function SectionGroups({ groups }: { groups: Group[] }) {
   const showHeaders = groups.length > 1;
@@ -16,21 +19,21 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
       {showHeaders && (
         <div className="jump">
           <span className="jlabel">Jump to</span>
-          {groups.map(([name]) => (
-            <a key={name} className="jbtn" href={`#grp-${slug(name)}`}>
+          {groups.map(([name], index) => (
+            <a key={anchorId(name, index)} className="jbtn" href={`#${anchorId(name, index)}`}>
               {name}
             </a>
           ))}
         </div>
       )}
-      {groups.map(([name, content]) =>
+      {groups.map(([name, content], index) =>
         showHeaders ? (
-          <details className="group" id={`grp-${slug(name)}`} open key={name}>
+          <details className="group" id={anchorId(name, index)} open key={anchorId(name, index)}>
             <summary className="grouphdr">{name}</summary>
             {content}
           </details>
         ) : (
-          <div key={name}>{content}</div>
+          <div key={anchorId(name, index)}>{content}</div>
         ),
       )}
     </>

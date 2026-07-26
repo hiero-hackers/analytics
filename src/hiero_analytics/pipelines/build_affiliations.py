@@ -50,6 +50,7 @@ from hiero_analytics.data_sources.governance_config import (
     fetch_governance_config,
 )
 from hiero_analytics.domain.bots import is_bot_login
+from hiero_analytics.export.csv_safety import csv_safe
 from hiero_analytics.pipelines._affiliation_entities import (
     COMPANY_FULL,
     COMPANY_JUNK,
@@ -101,24 +102,6 @@ def email_domain(addr: str) -> str:
     """
     addr = (addr or "").strip()
     return "@" + addr.split("@", 1)[1] if "@" in addr else ""
-
-
-# Cells that begin with one of these can run as a formula when the CSV is opened in
-# Excel / Google Sheets (CSV injection). Several audit columns carry attacker-controlled
-# GitHub fields (name, company, bio, email domain, LinkedIn URL), so neutralise them.
-_CSV_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
-
-
-def csv_safe(value: object) -> object:
-    """Prefix a formula-triggering cell with ' so spreadsheets treat it as text.
-
-    The lone '-' placeholder used for empty fields is left alone (a bare hyphen is
-    not a formula) so the audit stays readable.
-    """
-    text = str(value)
-    if text and text != "-" and text[0] in _CSV_FORMULA_PREFIXES:
-        return "'" + text
-    return value
 
 
 def org_from_email(raw: str) -> str | None:
