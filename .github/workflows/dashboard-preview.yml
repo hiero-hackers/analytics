@@ -54,12 +54,22 @@ jobs:
       # historical backfill remains the scheduled refresh workflow's responsibility.
       # A three-dot diff compares the PR head against the merge-base, so movement
       # on main after the branch point never forces an unnecessary live fetch.
+      #
+      # Only the field-bearing layer triggers live mode: record shapes (models),
+      # the ingest queries and parsers, and the governance snapshot. Transport
+      # and rate-limit files (github_client, pagination, adaptive_limiter, …)
+      # cannot introduce fields a cached dataset lacks, so touching them keeps
+      # the fast offline path.
       - name: Select data mode
         id: data-mode
         run: |
           if git diff --quiet \
             "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" \
-            -- src/hiero_analytics/data_sources; then
+            -- src/hiero_analytics/data_sources/models.py \
+               src/hiero_analytics/data_sources/github_ingest \
+               src/hiero_analytics/data_sources/governance_config.py \
+               src/hiero_analytics/data_sources/queries.py \
+               src/hiero_analytics/data_sources/queries; then
             echo "offline=1" >> "$GITHUB_OUTPUT"
           else
             echo "offline=0" >> "$GITHUB_OUTPUT"
@@ -94,8 +104,24 @@ jobs:
           npm run build --prefix web
           mkdir -p preview/data
           cp -R web/dist/. preview/
-          cp -R outputs/data/api preview/data/api
-          cp -R outputs/charts preview/charts
+          # A failed or rate-limited data step may leave no API or charts;
+          # ship whatever exists — reviewers get the partial site (the job is
+          # still red from the earlier step), not a missing artifact.
+          if [ -d outputs/data/api ]; then
+            cp -R outputs/data/api preview/data/api
+          else
+            echo "::warning::no data API produced; preview carries the app shell only"
+          fi
+          if [ -d outputs/charts ]; then
+            cp -R outputs/charts preview/charts
+          else
+            echo "::warning::no charts produced"
+          fi
+          # The app loads its data over HTTP, so the artifact can't be opened
+          # straight from the filesystem. Ship the self-starting launcher so a
+          # reviewer's whole job is: unzip, `python3 preview.py`.
+          cp .github/preview-launcher.py preview/preview.py
+          printf 'This is a dashboard preview build.\n\nRun:  python3 preview.py\n\nIt starts a tiny local server (the dashboard loads its data over HTTP,\nso opening index.html directly shows an empty page) and opens your browser.\n' > preview/README.txt
 
       - name: Upload dashboard preview
         if: ${{ !cancelled() }}

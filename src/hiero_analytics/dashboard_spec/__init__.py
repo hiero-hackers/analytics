@@ -18,7 +18,21 @@ from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 # Macro (family) display order.
 _FAMILIES = (contributors, governance, onboarding, hips, security, community)
 
-__all__ = ["METRIC_ANNOTATIONS"]  # re-exported for the emitter
+# The assembled spec surface — everything a consumer (the data API emitter,
+# the contract tests) reads off this package.
+__all__ = [
+    "AFFILIATION_ISSUE_URL",
+    "CHARTS_GROUP",
+    "CHART_MACROS",
+    "CHART_METHODOLOGY",
+    "CHART_NOTES",
+    "COLUMN_FORMATS",
+    "CUSTOM_VIEW_MODULES",
+    "MACRO_GLOSSARIES",
+    "METRIC_ANNOTATIONS",
+    "TABLE_FAMILIES",
+    "WIDE_CHARTS",
+]
 
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
 CHARTS_GROUP = "Charts"

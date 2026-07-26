@@ -101,17 +101,17 @@ Without it pandas raises `ParserError` rather than mis-reading the header. Sprea
 
 ### Pull request dashboard previews
 
-Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then serve it locally to review the PR's charts and tables without committing generated PNGs or reports:
+Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then run the launcher it ships with:
 
 ```bash
-python3 -m http.server 8000 -d dashboard-preview
+python3 preview.py
 ```
 
-(The app fetches its JSON over HTTP, so it needs a local server — opening `index.html` from the filesystem won't load data.)
+It starts a local server and opens the dashboard — needed because the app fetches its JSON over HTTP, so opening `index.html` from the filesystem won't load data.
 
 Most previews restore the latest base-branch datasets and set `HIERO_ANALYTICS_OFFLINE=1`. This keeps the input data fixed so the artifact isolates code changes. Offline mode never falls back to a network fetch: it fails clearly when a required dataset or governance snapshot is missing. Pipelines backed only by live repo or third-party APIs are skipped, so Scorecard, CODEOWNERS/runner, repo-only, and Hiero Hackers sections may be absent from an offline preview.
 
-Changes under `src/hiero_analytics/data_sources/` automatically use a live fetch because a cached dataset cannot contain newly introduced fields. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
+Changes to the field-bearing ingestion layer (`data_sources/models.py`, `github_ingest/`, the queries, the governance snapshot) automatically use a live fetch, because a cached dataset cannot contain newly introduced fields; transport-only changes (client, rate limiting) keep the fast offline path. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
 
 ### Running a single pipeline
 

@@ -92,7 +92,9 @@ def _stamp_freshness(document: dict, csv_path: Path) -> None:
         generated = datetime.fromisoformat(generated_at)
         document["stale"] = datetime.now(UTC) - generated > STALE_AFTER
     except ValueError:
-        pass
+        # Ship the raw stamp without a staleness verdict, but say so — a sidecar
+        # that stops parsing should show up in the run log, not vanish.
+        logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
