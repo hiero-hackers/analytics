@@ -13,6 +13,7 @@ from hiero_analytics.domain.labels import (
     DIFFICULTY_BEGINNER,
     DIFFICULTY_GOOD_FIRST_ISSUE,
     DIFFICULTY_INTERMEDIATE,
+    UNKNOWN_DIFFICULTY,
 )
 
 TIMELINE_EVENT_ORDER = {
@@ -23,6 +24,7 @@ TIMELINE_EVENT_ORDER = {
 }
 
 DIFFICULTY_OVER_TIME_COLUMN_ORDER = [
+    "unknown",
     "gfi",
     "beginner",
     "intermediate",
@@ -67,6 +69,7 @@ def init_row_for_sample(sample_point: datetime) -> dict[str, int | str]:
     """Return a zeroed-out difficulty row dict for a given sample point."""
     return {
         "date": sample_point.date().isoformat(),
+        "unknown": 0,
         "gfi": 0,
         "beginner": 0,
         "intermediate": 0,
@@ -129,6 +132,8 @@ def _resolve_entry_points(
     issues: list[IssueRecord],
     events_by_issue: dict[tuple[str, int], list[IssueTimelineEventRecord]],
     end_at: datetime,
+    *,
+    include_unknown: bool = False,
 ) -> dict[tuple[str, int], tuple[str, datetime]]:
     """Map each issue to the (difficulty bucket, label timestamp) it enters the series with.
 
@@ -141,7 +146,9 @@ def _resolve_entry_points(
     for issue in issues:
         current_difficulty = difficulty_key(set(issue.labels or []))
         if current_difficulty is None:
-            continue
+            if not include_unknown:
+                continue
+            current_difficulty = UNKNOWN_DIFFICULTY
 
         issue_events = events_by_issue.get((issue.repo, issue.number), [])
 
@@ -152,14 +159,19 @@ def _resolve_entry_points(
                 most_recent_label_event = event
                 break
         if most_recent_label_event is None:
-            continue
+            if not include_unknown or current_difficulty != UNKNOWN_DIFFICULTY:
+                continue
+            label_timestamp = normalize_datetime(issue.created_at)
+        else:
+            label_timestamp = normalize_datetime(most_recent_label_event.occurred_at)
 
-        label_timestamp = normalize_datetime(most_recent_label_event.occurred_at)
         if label_timestamp is None or label_timestamp > end_at:
             continue
 
-        entry_points[(issue.repo, issue.number)] = (current_difficulty, label_timestamp)
-
+        entry_points[(issue.repo, issue.number)] = (
+            current_difficulty.lower(),
+            label_timestamp,
+        )
     return entry_points
 
 
@@ -169,6 +181,7 @@ def get_difficulty_over_time_event_based(
     *,
     start_at: datetime,
     today: datetime | None = None,
+    include_unknown: bool = False,
 ) -> list[dict[str, str | int]]:
     """
     Build weekly open-issue counts using only event-based forward tracking.
@@ -213,7 +226,9 @@ def get_difficulty_over_time_event_based(
     )
 
     # For each issue, find the most recent labeled event for its current difficulty.
-    issue_entry_points = _resolve_entry_points(filtered_issues, events_by_issue, end_at)
+    issue_entry_points = _resolve_entry_points(
+        filtered_issues, events_by_issue, end_at, include_unknown=include_unknown
+    )
 
     if not issue_entry_points:
         return []
