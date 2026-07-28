@@ -101,13 +101,13 @@ Without it pandas raises `ParserError` rather than mis-reading the header. Sprea
 
 ### Pull request dashboard previews
 
-Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then run the launcher it ships with:
+Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then serve the folder:
 
 ```bash
-python3 preview.py
+python3 -m http.server -d .
 ```
 
-It starts a local server and opens the dashboard — needed because the app fetches its JSON over HTTP, so opening `index.html` from the filesystem won't load data.
+Open the URL it prints (`http://localhost:8000/`). A server is needed because the app fetches its JSON over HTTP, so opening `index.html` from the filesystem won't load data. The artifact is built from the pull request's own code — treat it as you would any other contributor-authored code.
 
 Most previews restore the latest base-branch datasets and set `HIERO_ANALYTICS_OFFLINE=1`. This keeps the input data fixed so the artifact isolates code changes. Offline mode never falls back to a network fetch: it fails clearly when a required dataset or governance snapshot is missing. Pipelines backed only by live repo or third-party APIs are skipped, so Scorecard, CODEOWNERS/runner, repo-only, and Hiero Hackers sections may be absent from an offline preview.
 

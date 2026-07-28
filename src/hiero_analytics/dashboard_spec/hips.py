@@ -97,6 +97,10 @@ SECTION_SPECS = [
             ("match_sources", "matched in"),
             ("qualifier", "distancing cue"),
             ("counted", "counted", "flag"),
+            # The coverage matrix's evidence popover reads this, and the
+            # description above promises it: declare it so it is part of the
+            # API contract rather than an undeclared column riding along.
+            ("snippet", "matched text"),
             ("url", "link", "link"),
         ],
     },

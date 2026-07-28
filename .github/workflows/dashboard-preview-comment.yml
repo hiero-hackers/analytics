@@ -85,9 +85,9 @@ jobs:
                 ? 'The dashboard was built for this PR.'
                 : '⚠️ The build reported failures, but a partial dashboard may still be attached.',
               '',
-              `➡️ **[Download \`dashboard-preview-${prNumber}\`](${link})**, unzip, then run \`python3 preview.py\` inside it — it starts a local server and opens the dashboard. (The app fetches its data over HTTP, so opening \`index.html\` directly shows an empty page.)`,
+              `➡️ **[Download \`dashboard-preview-${prNumber}\`](${link})**, unzip, then serve it with \`python3 -m http.server -d .\` and open the URL it prints. (The app fetches its data over HTTP, so opening \`index.html\` directly shows an empty page.)`,
               '',
-              '> The artifact is contributor-authored HTML — glance at the diff before opening it. It expires after 7 days and is replaced on each new push.',
+              '> The artifact is built from this PR — treat it as contributor-authored code and glance at the diff before opening it. It expires after 7 days and is replaced on each new push.',
             ].join('\n');
 
             // Paginate: on a busy PR the marker comment may sit past the first

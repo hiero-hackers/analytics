@@ -17,6 +17,9 @@ Layout::
 Contract: every column a section spec declares must exist in the produced
 CSV. A missing column raises :class:`DataApiContractError` and fails the run —
 a renamed pipeline output becomes a red build, not a silently empty column.
+The published rows carry *exactly* the declared columns: an extra column a
+pipeline writes stays in the CSV rather than becoming an undeclared part of
+the API's shape.
 
 Versioning: breaking shape changes (renamed keys, removed sections) bump the
 version directory so consumers migrate deliberately; additive changes land in
@@ -110,11 +113,17 @@ def _rows(frame: pd.DataFrame) -> list[dict]:
     return json.loads(frame.to_json(orient="records", date_format="iso"))
 
 
-def _validate_columns(section: dict, frame: pd.DataFrame, where: str) -> None:
-    """Enforce the producer↔spec column contract for one produced table.
+def _contract_frame(section: dict, frame: pd.DataFrame, where: str) -> pd.DataFrame:
+    """Enforce the producer↔spec column contract, then narrow to the spec.
 
     ``where`` names the artifact for the error message — the base table or one
     of its period variants.
+
+    The returned frame carries exactly the declared columns, in spec order. The
+    API is a versioned contract, so a column a pipeline happens to write must
+    not ride along into the published shape: under ``v1``'s additive-only rule
+    an accidental key becomes a promise we cannot withdraw. Nothing is hidden —
+    the produced CSV under ``outputs/data/org/`` remains the full artifact.
     """
     declared = [column[0] for column in section["columns"]]
     missing = [key for key in declared if key not in frame.columns]
@@ -122,6 +131,7 @@ def _validate_columns(section: dict, frame: pd.DataFrame, where: str) -> None:
         raise DataApiContractError(
             f"{where} is missing spec-declared column(s) {missing}; produced columns: {list(frame.columns)}"
         )
+    return frame[declared]
 
 
 def _period_variants(section: dict, org: str, org_data_dir: Path) -> dict[str, list[dict]]:
@@ -133,11 +143,10 @@ def _period_variants(section: dict, org: str, org_data_dir: Path) -> dict[str, l
     for period in ACTIVITY_PERIODS:
         path = org_data_dir / period.filename(stem)
         if path.exists():
-            frame = pd.read_csv(path)
             # Period files carry the same columns as their base table, so they
             # get the same contract: a renamed column here would otherwise ship
             # a silently incomplete row shape while the base table passed.
-            _validate_columns(section, frame, f"{org}/{path.name}")
+            frame = _contract_frame(section, pd.read_csv(path), f"{org}/{path.name}")
             variants[period.key] = _rows(frame)
     return variants
 
@@ -147,8 +156,7 @@ def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Pat
     csv_path = org_data_dir / section["file"]
     if not csv_path.exists():
         return None
-    frame = pd.read_csv(csv_path)
-    _validate_columns(section, frame, f"{org}/{section['file']}")
+    frame = _contract_frame(section, pd.read_csv(csv_path), f"{org}/{section['file']}")
     document = {
         "id": section["id"],
         "title": section["title"],

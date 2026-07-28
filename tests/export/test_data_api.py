@@ -103,6 +103,46 @@ def test_missing_declared_column_fails_loudly(api_env: Path):
         emit_data_api()
 
 
+def test_undeclared_columns_stay_out_of_the_payload(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Rows carry the spec's columns only \u2014 a pipeline's extra column isn't API.
+
+    Publishing whatever the CSV happens to hold would make every incidental
+    column part of an additive-only contract. Base table and period variants
+    both project down to the declared set.
+    """
+    section = {
+        "id": "widgets",
+        "file": "widgets.csv",
+        "title": "Widgets",
+        "description": "All widgets.",
+        "columns": [("name", "widget"), ("count", "count")],
+        "periods": True,
+    }
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(section)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [3], "scratch": ["internal"]}))
+    period = data_api.ACTIVITY_PERIODS[0]
+    pd.DataFrame({"name": ["a"], "count": [1], "scratch": ["internal"]}).to_csv(
+        api_env / period.filename("widgets"), index=False
+    )
+
+    emit_data_api()
+
+    document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
+    assert document["rows"] == [{"name": "a", "count": 3}]
+    assert document["periods"][period.key] == [{"name": "a", "count": 1}]
+    assert document["row_count"] == 1
+
+
+def test_declared_column_order_wins_over_csv_order(api_env: Path, tmp_path: Path):
+    """Row keys follow the spec's order, not the order the pipeline wrote."""
+    _write_widgets(api_env, pd.DataFrame({"last_seen": ["2026-07-01"], "count": [3], "name": ["a"]}))
+
+    emit_data_api()
+
+    document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
+    assert list(document["rows"][0]) == ["name", "count", "last_seen"]
+
+
 def test_unproduced_table_is_skipped_not_failed(api_env: Path):
     """A section whose pipeline didn't run is absent, and an empty org is omitted."""
     manifest = json.loads(emit_data_api().read_text())

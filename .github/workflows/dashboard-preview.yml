@@ -121,10 +121,11 @@ jobs:
             echo "::warning::no charts produced"
           fi
           # The app loads its data over HTTP, so the artifact can't be opened
-          # straight from the filesystem. Ship the self-starting launcher so a
-          # reviewer's whole job is: unzip, `python3 preview.py`.
-          cp .github/preview-launcher.py preview/preview.py
-          printf 'This is a dashboard preview build.\n\nRun:  python3 preview.py\n\nIt starts a tiny local server (the dashboard loads its data over HTTP,\nso opening index.html directly shows an empty page) and opens your browser.\n' > preview/README.txt
+          # straight from the filesystem. README.txt names the one command that
+          # serves it — deliberately not a script we ship and ask reviewers to
+          # run, since on a fork PR that file is contributor-controlled and
+          # "unzip and run this" is code execution on the reviewer's machine.
+          printf 'This is a dashboard preview build.\n\nRun:  python3 -m http.server -d .\n\nThen open the URL it prints (http://localhost:8000/). A server is needed\nbecause the dashboard loads its data over HTTP: opening index.html directly\nshows an empty page. Treat the contents as contributor-authored code.\n' > preview/README.txt
 
       - name: Upload dashboard preview
         if: ${{ !cancelled() }}

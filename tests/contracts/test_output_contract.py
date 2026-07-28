@@ -412,6 +412,14 @@ def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
             declared = {column[0] for column in spec["columns"]}
             emitted = {column["key"] for column in document["columns"]}
             assert declared == emitted
+            # The column list agreeing is not enough: the rows are what a
+            # consumer actually reads, so an undeclared key leaking into the
+            # payload has to fail here too.
+            if document["rows"]:
+                assert set(document["rows"][0]) == declared
+            for period_rows in document.get("periods", {}).values():
+                if period_rows:
+                    assert set(period_rows[0]) == declared
 
 
 def test_data_api_emits_the_hip_views(outputs_root: Path):
