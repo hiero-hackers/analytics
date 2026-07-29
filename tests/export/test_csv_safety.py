@@ -7,7 +7,7 @@ import pytest
 from hiero_analytics.export.csv_safety import csv_safe, sanitize_csv_text
 
 
-@pytest.mark.parametrize("value", ["=1+1", "+1", "-1+1", "@SUM(A1)", "\tcmd", "\rcmd"])
+@pytest.mark.parametrize("value", ["=1+1", "+1", "-1+1", "@SUM(A1)", "\tcmd", "\rcmd", "\ncmd"])
 def test_formula_triggers_are_prefixed(value):
     """Every prefix a spreadsheet would evaluate is defused."""
     assert csv_safe(value) == f"'{value}"

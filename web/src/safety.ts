@@ -33,8 +33,10 @@ export function safeUrl(value: string): string | null {
 
 // Cells beginning with one of these can execute as a formula when the CSV is
 // opened in Excel or Google Sheets (CSV injection) — the same list the Python
-// side neutralises in its audit exports (pipelines/build_affiliations.csv_safe).
-const FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r"];
+// side neutralises for its spreadsheet copies (export/csv_safety.py). The
+// control characters count because a leading tab, CR or LF is stripped on
+// import, exposing whatever follows it to the formula parser.
+const FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r", "\n"];
 
 /**
  * A cell a spreadsheet will treat as text, never as a formula.

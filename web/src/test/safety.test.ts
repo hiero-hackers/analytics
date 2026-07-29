@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { csvSafe, safeUrl } from "../safety";
 
 describe("csvSafe", () => {
-  it.each(["=1+1", "+1", "-1+1", "@SUM(A1)", "\tcmd", "\rcmd"])(
+  it.each(["=1+1", "+1", "-1+1", "@SUM(A1)", "\tcmd", "\rcmd", "\ncmd"])(
     "neutralises the formula trigger %j",
     (value) => {
       expect(csvSafe(value)).toBe(`'${value}`);
