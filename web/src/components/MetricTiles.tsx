@@ -25,7 +25,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
           const body = (
             <>
               <div className="text-[13px] text-muted">{tile.label}</div>
-              <div className="mt-0.5 text-[26px] font-semibold">{tile.value}</div>
+              <div className="mt-0.5 text-[26px] font-semibold text-ink">{tile.value}</div>
             </>
           );
           const shell = "rounded-[10px] border border-solid border-edge bg-surface px-4 py-3.5 text-left";
