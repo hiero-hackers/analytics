@@ -176,12 +176,12 @@ SCORECARD_CHECK_COLORS = {
 
 # Contributor activity heatmap: the intensity colour scale plus the surrounding
 # chrome colours (figure/axes background, cell text, ticks).
-ACTIVITY_HEATMAP_CMAP = "RdYlGn"
+ACTIVITY_HEATMAP_CMAP = "YlGnBu"
 ACTIVITY_HEATMAP_PALETTE = {
     "figure_bg": "#F6F8FB",
     "axes_bg": "#FFFFFF",
-    "text_dark": "#0F172A",
-    "text_light": "#FFFFFF",
+    "text_dark": "#272829",
+    "text_light": "#EBE5E5",
     "tick": "#64748B",
 }
 
