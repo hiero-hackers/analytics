@@ -221,3 +221,41 @@ def test_get_difficulty_over_time_event_based_excludes_issues_without_label_even
     # Issue 2 should appear from Jan 8 onward (labeled on Jan 7)
     row_jan_8 = next(row for row in series if row["date"] == "2025-01-08")
     assert row_jan_8["advanced"] == 1
+
+
+def test_get_difficulty_over_time_event_based_include_unknown() -> None:
+    """Event-based tracking should include unknown issues only when requested."""
+    issues = [
+        IssueRecord(
+            repo="org/repo",
+            number=1,
+            title="Issue 1",
+            state="OPEN",
+            created_at=datetime(2025, 1, 5, tzinfo=UTC),
+            closed_at=None,
+            labels=[],
+        ),
+    ]
+
+    events = []
+
+    series_without_unknown = get_difficulty_over_time_event_based(
+        issues,
+        events,
+        start_at=datetime(2025, 1, 1, tzinfo=UTC),
+        today=datetime(2025, 1, 15, tzinfo=UTC),
+        include_unknown=False,
+    )
+
+    assert series_without_unknown == []
+
+    series_with_unknown = get_difficulty_over_time_event_based(
+        issues,
+        events,
+        start_at=datetime(2025, 1, 1, tzinfo=UTC),
+        today=datetime(2025, 1, 15, tzinfo=UTC),
+        include_unknown=True,
+    )
+
+    row_jan_8 = next(row for row in series_with_unknown if row["date"] == "2025-01-08")
+    assert row_jan_8["unknown"] == 1
