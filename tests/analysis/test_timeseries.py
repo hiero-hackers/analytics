@@ -27,6 +27,7 @@ def _issue(
     created_at: datetime,
     state: str = "OPEN",
     closed_at: datetime | None = None,
+    labels: list[str] | None = None,
 ) -> IssueRecord:
     """Create an issue record for timeline tests."""
     return IssueRecord(
@@ -36,7 +37,7 @@ def _issue(
         state=state,
         created_at=created_at,
         closed_at=closed_at,
-        labels=[],
+        labels=labels or [],
     )
 
 
@@ -223,28 +224,21 @@ def test_get_difficulty_over_time_event_based_excludes_issues_without_label_even
     assert row_jan_8["advanced"] == 1
 
 
-def test_get_difficulty_over_time_event_based_include_unknown() -> None:
-    """Event-based tracking should include unknown issues only when requested."""
+def test_get_difficulty_over_time_event_based_unknown_counts_from_creation_date() -> None:
+    """Unlabelled issues are excluded by default and enter as unknown at creation when opted in."""
     issues = [
-        IssueRecord(
-            repo="org/repo",
-            number=1,
-            title="Issue 1",
-            state="OPEN",
-            created_at=datetime(2025, 1, 5, tzinfo=UTC),
-            closed_at=None,
-            labels=[],
-        ),
+        _issue(1, created_at=datetime(2025, 1, 5, tzinfo=UTC)),
     ]
-
-    events = []
+    # A non-difficulty label event must not give the issue a difficulty bucket.
+    events = [
+        _event(1, "labeled", datetime(2025, 1, 6, tzinfo=UTC), label="bug"),
+    ]
 
     series_without_unknown = get_difficulty_over_time_event_based(
         issues,
         events,
         start_at=datetime(2025, 1, 1, tzinfo=UTC),
         today=datetime(2025, 1, 15, tzinfo=UTC),
-        include_unknown=False,
     )
 
     assert series_without_unknown == []
@@ -257,5 +251,79 @@ def test_get_difficulty_over_time_event_based_include_unknown() -> None:
         include_unknown=True,
     )
 
+    # Created Jan 5: absent from the Jan 1 sample, present from Jan 8 onward.
+    row_jan_1 = next(row for row in series_with_unknown if row["date"] == "2025-01-01")
     row_jan_8 = next(row for row in series_with_unknown if row["date"] == "2025-01-08")
+    assert row_jan_1["unknown"] == 0
     assert row_jan_8["unknown"] == 1
+
+
+def test_get_difficulty_over_time_event_based_include_unknown_keeps_difficulty_counts() -> None:
+    """Opting into the unknown bucket must not change the labelled-difficulty counts."""
+    issues = [
+        _issue(1, created_at=datetime(2025, 1, 1, tzinfo=UTC), labels=["beginner"]),
+        _issue(2, created_at=datetime(2025, 1, 5, tzinfo=UTC)),
+    ]
+    events = [
+        _event(1, "labeled", datetime(2025, 1, 3, tzinfo=UTC), label="beginner"),
+    ]
+
+    kwargs = {
+        "start_at": datetime(2025, 1, 1, tzinfo=UTC),
+        "today": datetime(2025, 1, 15, tzinfo=UTC),
+    }
+    series_labelled_only = get_difficulty_over_time_event_based(issues, events, **kwargs)
+    series_with_unknown = get_difficulty_over_time_event_based(issues, events, include_unknown=True, **kwargs)
+
+    for row_labelled, row_all in zip(series_labelled_only, series_with_unknown, strict=True):
+        assert row_labelled["date"] == row_all["date"]
+        for bucket in ("gfi", "beginner", "intermediate", "advanced"):
+            assert row_labelled[bucket] == row_all[bucket]
+
+
+def test_get_difficulty_over_time_event_based_undatable_difficulty_counts_as_unknown() -> None:
+    """A difficulty label with no recorded label event falls back to unknown when opted in."""
+    issues = [
+        _issue(1, created_at=datetime(2025, 1, 5, tzinfo=UTC), labels=["beginner"]),
+    ]
+    events: list[IssueTimelineEventRecord] = []
+
+    series = get_difficulty_over_time_event_based(
+        issues,
+        events,
+        start_at=datetime(2025, 1, 1, tzinfo=UTC),
+        today=datetime(2025, 1, 15, tzinfo=UTC),
+        include_unknown=True,
+    )
+
+    # Without a datable label application the issue cannot be placed in the
+    # beginner band; it still counts as unknown from its creation date.
+    row_jan_8 = next(row for row in series if row["date"] == "2025-01-08")
+    assert row_jan_8["beginner"] == 0
+    assert row_jan_8["unknown"] == 1
+
+
+def test_get_difficulty_over_time_event_based_closed_unknown_issue_drops_out() -> None:
+    """Unknown issues stop counting once closed, like any other bucket."""
+    issues = [
+        _issue(
+            1,
+            created_at=datetime(2025, 1, 5, tzinfo=UTC),
+            state="CLOSED",
+            closed_at=datetime(2025, 1, 10, tzinfo=UTC),
+        ),
+    ]
+    events: list[IssueTimelineEventRecord] = []
+
+    series = get_difficulty_over_time_event_based(
+        issues,
+        events,
+        start_at=datetime(2025, 1, 1, tzinfo=UTC),
+        today=datetime(2025, 1, 15, tzinfo=UTC),
+        include_unknown=True,
+    )
+
+    row_jan_8 = next(row for row in series if row["date"] == "2025-01-08")
+    row_jan_15 = next(row for row in series if row["date"] == "2025-01-15")
+    assert row_jan_8["unknown"] == 1
+    assert row_jan_15["unknown"] == 0

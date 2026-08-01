@@ -90,6 +90,7 @@ CHART_COMPANION_CSVS = {
     "difficulty_distribution_30_days.csv",
     "difficulty_by_repo_30_days.csv",
     "difficulty_over_time_event_based_weekly.csv",
+    "difficulty_over_time_all_event_based_weekly.csv",
     "maintainer_activity_events.csv",
     "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
     "maintainer_pipeline_yearly.csv",

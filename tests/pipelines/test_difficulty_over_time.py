@@ -98,6 +98,8 @@ def test_main_creates_output_files(
         # label has a matching recorded ``labeled`` event.
         _test_issue("hiero-ledger/repo-one", 1, ["beginner"], created_days_ago=100),
         _test_issue("hiero-ledger/repo-one", 2, ["advanced"], created_days_ago=200),
+        # Untriaged issue: only the "all issues" outputs should count it.
+        _test_issue("hiero-ledger/repo-one", 3, [], created_days_ago=50),
     ]
     events = [
         _test_label_event("hiero-ledger/repo-one", 1, "beginner", days_ago=90),
@@ -107,13 +109,23 @@ def test_main_creates_output_files(
 
     runner.main()
 
-    csv_path = tmp_path / "data" / "difficulty_over_time_event_based_weekly.csv"
-    chart_path = tmp_path / "charts" / "difficulty_over_time_event_based_weekly.png"
+    for stem in (
+        "difficulty_over_time_event_based_weekly",
+        "difficulty_over_time_all_event_based_weekly",
+    ):
+        csv_path = tmp_path / "data" / f"{stem}.csv"
+        chart_path = tmp_path / "charts" / f"{stem}.png"
 
-    assert csv_path.exists(), "CSV difficulty_over_time_event_based_weekly.csv not created"
-    assert os.path.getsize(csv_path) > 0, "CSV difficulty_over_time_event_based_weekly.csv is empty"
-    assert chart_path.exists(), "Chart difficulty_over_time_event_based_weekly.png not created"
-    assert os.path.getsize(chart_path) > 0, "Chart difficulty_over_time_event_based_weekly.png is empty"
+        assert csv_path.exists(), f"CSV {stem}.csv not created"
+        assert os.path.getsize(csv_path) > 0, f"CSV {stem}.csv is empty"
+        assert chart_path.exists(), f"Chart {stem}.png not created"
+        assert os.path.getsize(chart_path) > 0, f"Chart {stem}.png is empty"
+
+    # Only the "all" variant carries the unknown bucket.
+    labelled_header = (tmp_path / "data" / "difficulty_over_time_event_based_weekly.csv").read_text().splitlines()[0]
+    all_header = (tmp_path / "data" / "difficulty_over_time_all_event_based_weekly.csv").read_text().splitlines()[0]
+    assert labelled_header == "date,gfi,beginner,intermediate,advanced"
+    assert all_header == "date,unknown,gfi,beginner,intermediate,advanced"
 
 
 def test_main_handles_empty_inputs(
@@ -130,3 +142,5 @@ def test_main_handles_empty_inputs(
     # No series data -> the pipeline exits before writing any outputs.
     assert not (tmp_path / "data" / "difficulty_over_time_event_based_weekly.csv").exists()
     assert not (tmp_path / "charts" / "difficulty_over_time_event_based_weekly.png").exists()
+    assert not (tmp_path / "data" / "difficulty_over_time_all_event_based_weekly.csv").exists()
+    assert not (tmp_path / "charts" / "difficulty_over_time_all_event_based_weekly.png").exists()

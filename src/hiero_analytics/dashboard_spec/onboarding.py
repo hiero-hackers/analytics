@@ -21,6 +21,7 @@ CHART_MACRO = {
                 "files": [
                     ("By repo (30d)", "difficulty_by_repo_30_days.png"),
                     ("Over time (weekly)", "difficulty_over_time_event_based_weekly.png"),
+                    ("Over time, all issues (weekly)", "difficulty_over_time_all_event_based_weekly.png"),
                 ],
             },
         ],
@@ -30,9 +31,12 @@ CHART_MACRO = {
 CHART_NOTES = {
     "difficulty_by_repo_30_days.png": "Open issues per repository, stacked by difficulty level. Limited to issues labelled with a "
     "difficulty (or newly created) in the last 30 days; 'Unknown' = recent open issues not yet triaged.",
-    "difficulty_over_time_event_based_weekly.png": "Open issues by difficulty over the last year, reconstructed from when difficulty labels were "
-    "actually applied (label events). Each band is a difficulty level; the height is how many open "
-    "issues sat at that difficulty on that date.",
+    "difficulty_over_time_event_based_weekly.png": "Open difficulty-labelled issues over the last year, reconstructed from when difficulty labels "
+    "were actually applied (label events). Each band is a difficulty level; the height is how many "
+    "open issues sat at that difficulty on that date.",
+    "difficulty_over_time_all_event_based_weekly.png": "Same series with the 'Unknown' band added: open issues with no difficulty label (or whose "
+    "label application date isn't recoverable from events), counted from their creation date. Shows "
+    "how the untriaged backlog moves relative to the triaged one.",
 }
 
 CHART_METHODOLOGY = {}

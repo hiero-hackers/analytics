@@ -275,9 +275,9 @@ def plot_stacked_area(
             legend_handles=legend_handles,
             legend_labels=labels,
             legend_loc="lower center",
-            legend_bbox_to_anchor=(0.5, -0.30),
-            legend_ncol=min(len(labels), 4),
+            legend_bbox_to_anchor=(0.5, -0.22),
+            legend_ncol=min(len(labels), 5),
             legend_kwargs={"borderaxespad": 0.0},
-            layout_rect=(0, 0.28, 1.0, 1.0),
+            layout_rect=(0, 0.18, 1.0, 1.0),
             record_count=len(data),
         )
