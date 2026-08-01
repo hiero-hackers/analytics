@@ -20,28 +20,16 @@ from hiero_analytics.data_sources.github_ingest import (
     fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
 )
-from hiero_analytics.domain.labels import (
-    DIFFICULTY_ADVANCED,
-    DIFFICULTY_BEGINNER,
-    DIFFICULTY_GOOD_FIRST_ISSUE,
-    DIFFICULTY_INTERMEDIATE,
-    UNKNOWN_DIFFICULTY,
-)
+from hiero_analytics.domain.labels import DIFFICULTY_LEVELS, DIFFICULTY_ORDER
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
 from hiero_analytics.plotting.lines import plot_stacked_area
 
-DIFFICULTY_OVER_TIME_LABELS = [
-    DIFFICULTY_GOOD_FIRST_ISSUE.name,
-    DIFFICULTY_BEGINNER.name,
-    DIFFICULTY_INTERMEDIATE.name,
-    DIFFICULTY_ADVANCED.name,
-]
+# Chart legend labels, positionally matched to the analysis column orders:
+# both run easiest-to-hardest, with "Unknown" first in the all-issues view.
+DIFFICULTY_OVER_TIME_LABELS = [spec.name for spec in DIFFICULTY_LEVELS]
 
-DIFFICULTY_OVER_TIME_ALL_LABELS = [
-    UNKNOWN_DIFFICULTY,
-    *DIFFICULTY_OVER_TIME_LABELS,
-]
+DIFFICULTY_OVER_TIME_ALL_LABELS = [*DIFFICULTY_ORDER]
 
 
 logger = logging.getLogger(__name__)

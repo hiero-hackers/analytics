@@ -26,24 +26,21 @@ TIMELINE_EVENT_ORDER = {
 # local column key (like "gfi"), not the display name from domain.labels.
 UNKNOWN_KEY = "unknown"
 
-DIFFICULTY_OVER_TIME_COLUMN_ORDER = [
-    "gfi",
-    "beginner",
-    "intermediate",
-    "advanced",
-]
-
-DIFFICULTY_OVER_TIME_ALL_COLUMN_ORDER = [
-    UNKNOWN_KEY,
-    *DIFFICULTY_OVER_TIME_COLUMN_ORDER,
-]
-
+# Single source for the series' bucket keys: column orders and zeroed rows all
+# derive from this table, so adding a difficulty means adding one entry here.
 _DIFFICULTY_OVER_TIME_SPECS = (
     ("gfi", DIFFICULTY_GOOD_FIRST_ISSUE),
     ("beginner", DIFFICULTY_BEGINNER),
     ("intermediate", DIFFICULTY_INTERMEDIATE),
     ("advanced", DIFFICULTY_ADVANCED),
 )
+
+DIFFICULTY_OVER_TIME_COLUMN_ORDER = [key for key, _ in _DIFFICULTY_OVER_TIME_SPECS]
+
+DIFFICULTY_OVER_TIME_ALL_COLUMN_ORDER = [
+    UNKNOWN_KEY,
+    *DIFFICULTY_OVER_TIME_COLUMN_ORDER,
+]
 
 
 def normalize_datetime(value: datetime | None) -> datetime | None:
@@ -76,11 +73,7 @@ def init_row_for_sample(sample_point: datetime) -> dict[str, int | str]:
     """Return a zeroed-out difficulty row dict for a given sample point."""
     return {
         "date": sample_point.date().isoformat(),
-        UNKNOWN_KEY: 0,
-        "gfi": 0,
-        "beginner": 0,
-        "intermediate": 0,
-        "advanced": 0,
+        **dict.fromkeys(DIFFICULTY_OVER_TIME_ALL_COLUMN_ORDER, 0),
     }
 
 

@@ -19,9 +19,21 @@ CHART_MACRO = {
                     "good-first-issue-candidate label to surface onboarding-friendly work."
                 ),
                 "files": [
-                    ("By repo (30d)", "difficulty_by_repo_30_days.png"),
-                    ("Over time (weekly)", "difficulty_over_time_event_based_weekly.png"),
-                    ("Over time, all issues (weekly)", "difficulty_over_time_all_event_based_weekly.png"),
+                    (
+                        "By repo",
+                        [
+                            ("30 days", "difficulty_by_repo_30_days.png"),
+                            ("90 days", "difficulty_by_repo_90_days.png"),
+                            ("1 year", "difficulty_by_repo_365_days.png"),
+                        ],
+                    ),
+                    (
+                        "Over time (weekly)",
+                        [
+                            ("All issues", "difficulty_over_time_all_event_based_weekly.png"),
+                            ("Labelled", "difficulty_over_time_event_based_weekly.png"),
+                        ],
+                    ),
                 ],
             },
         ],
@@ -29,8 +41,11 @@ CHART_MACRO = {
 }
 
 CHART_NOTES = {
-    "difficulty_by_repo_30_days.png": "Open issues per repository, stacked by difficulty level. Limited to issues labelled with a "
-    "difficulty (or newly created) in the last 30 days; 'Unknown' = recent open issues not yet triaged.",
+    # Shared by all "By repo" window tabs (variants without their own note
+    # inherit the first one).
+    "difficulty_by_repo_30_days.png": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled "
+    "with a difficulty (or newly created) within its window; 'Unknown' = open issues not yet "
+    "triaged. Wider windows are the closest view of a repo's accumulated triage debt.",
     "difficulty_over_time_event_based_weekly.png": "Open difficulty-labelled issues over the last year, reconstructed from when difficulty labels "
     "were actually applied (label events). Each band is a difficulty level; the height is how many "
     "open issues sat at that difficulty on that date.",
