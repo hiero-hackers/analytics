@@ -78,7 +78,7 @@ def apply_style() -> None:
             "savefig.transparent": False,
             "axes.facecolor": PLOT_BACKGROUND_COLOR,
             "axes.titlesize": TITLE_FONT_SIZE,
-            "axes.titleweight": "semibold",
+            "axes.titleweight": 700,
             "axes.titlecolor": TITLE_COLOR,
             "axes.titlepad": 18,
             "axes.labelsize": LABEL_FONT_SIZE,

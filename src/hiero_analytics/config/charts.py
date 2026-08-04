@@ -19,7 +19,7 @@ TICK_FONT_SIZE: int = 10
 LEGEND_FONT_SIZE: int = 10
 ANNOTATION_FONT_SIZE: int = 10
 CENTER_TOTAL_FONT_SIZE: int = 20
-FONT_WEIGHT_SEMIBOLD: str = "semibold"
+FONT_WEIGHT_SEMIBOLD: int = 700
 
 # --------------------------------------------------
 # Surface + typography colors
