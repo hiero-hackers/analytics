@@ -165,20 +165,46 @@ def build_maintainer_weekly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
     return _counts_by_bucket(labelled, "week")
 
 
-def build_maintainer_yearly_pipeline(
+def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
+    """Build calendar-year counts of distinct active people by their highest role.
+
+    Anyone active at any point in the year counts for that year — the same
+    whole-bucket rule the monthly and weekly builders use, so the three tabs
+    finally answer the same question at three resolutions. (The narrower
+    "active near year end" reading is :func:`build_maintainer_yearly_h2_pipeline`.)
+
+    Each person is counted once per year, under the highest role they held in any
+    repo, so the stacked bands stay mutually exclusive and a year's total is the
+    number of distinct active people.
+
+    Past-year bars are stable across refreshes: a completed year's events cannot
+    change, and nothing here depends on the run date. Only the current year moves,
+    and only because the year is still in progress.
+    """
+    if stage_df.empty:
+        return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
+
+    labelled = stage_df.assign(_bucket=stage_df["year"])
+    return _counts_by_bucket(labelled, "year")
+
+
+def build_maintainer_yearly_h2_pipeline(
     stage_df: pd.DataFrame,
     *,
     active_window_days: int = ACTIVE_WINDOW_DAYS,
     today: datetime | None = None,
 ) -> pd.DataFrame:
-    """Build yearly counts of distinct active people by their highest governance role.
+    """Yearly counts restricted to people active *near the end* of each year.
 
-    Only counts contributors active in the last 6 months of each year (past years use
-    a fixed H2 window, stable across refreshes; the current year uses a full trailing
-    ``active_window_days``-day window from today, which early in the year reaches into
-    the previous December — those events count toward the current bar). Each person is
-    counted once per year, under the highest role they held in any repo, so the bands
-    are mutually exclusive and a year's total is the number of distinct active people.
+    The original reading of the yearly chart, kept as its own variant: it answers
+    "who was still active by year end?" rather than "who was active at all?",
+    which is the sharper question for retention and hand-over, and it preserves
+    continuity with how this chart was read historically.
+
+    Past years use a fixed H2 window (Jul 1 – Dec 31), stable across refreshes;
+    the current year uses a full trailing ``active_window_days``-day window from
+    today, which early in the year reaches into the previous December — those
+    events count toward the current bar.
     """
     if stage_df.empty:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])

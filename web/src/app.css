@@ -48,6 +48,20 @@
   --r-input: 8px;
   --r-pill: 999px;
   --dur: 120ms;
+
+  /* Deliberately outside the light/dark flip below.
+     --chart-ground: chart PNGs carry a baked-in light background, so their
+     container must match it in either scheme or the image floats on a slab of
+     the wrong colour. It stops being a constant when the charts themselves
+     become theme-aware (see the chart legibility issue).
+     --lb-*: the lightbox is always dark on purpose, so its greys are scoped to
+     it rather than themed — three roles instead of the six one-off values
+     these replaced. */
+  --chart-ground: #fff;
+  --lb-title: #fff;
+  --lb-text: #e2e2e2;
+  --lb-dim: #bbb;
+  --lb-bright: #eee;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -603,7 +617,7 @@
     background: rgba(255, 255, 255, 0.2);
   }
   .lbtitle {
-    color: #fff;
+    color: var(--lb-title);
     font-size: 18px;
     font-weight: 600;
     margin: 0;

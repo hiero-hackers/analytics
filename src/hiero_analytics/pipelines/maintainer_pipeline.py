@@ -12,6 +12,7 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_monthly_pipeline,
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
+    build_maintainer_yearly_h2_pipeline,
     build_maintainer_yearly_pipeline,
     recent_buckets,
 )
@@ -43,12 +44,14 @@ def main(org: str = ORG) -> None:
 
     stage_df = activity_to_role_dataframe(records, repo_role_lookup)
     yearly_pipeline = build_maintainer_yearly_pipeline(stage_df)
+    yearly_h2_pipeline = build_maintainer_yearly_h2_pipeline(stage_df)
     monthly_pipeline = build_maintainer_monthly_pipeline(stage_df)
     weekly_pipeline = build_maintainer_weekly_pipeline(stage_df)
     repo_pipeline = build_maintainer_repo_pipeline(stage_df)
 
     save_dataframe(stage_df, org_data_dir / "maintainer_activity_events.csv")
     save_dataframe(yearly_pipeline, org_data_dir / "maintainer_pipeline_yearly.csv")
+    save_dataframe(yearly_h2_pipeline, org_data_dir / "maintainer_pipeline_yearly_h2.csv")
     save_dataframe(monthly_pipeline, org_data_dir / "maintainer_pipeline_monthly.csv")
     save_dataframe(weekly_pipeline, org_data_dir / "maintainer_pipeline_weekly.csv")
     save_dataframe(repo_pipeline, org_data_dir / "maintainer_pipeline_by_repo.csv")
@@ -64,6 +67,18 @@ def main(org: str = ORG) -> None:
         labels=STACK_LABELS,
         colors=MAINTAINER_PIPELINE_COLORS,
         title="Maintainer Pipeline: Unique Active Contributors by Role - PR & Issue Activity (Yearly)",
+        annotate_totals=True,
+    )
+
+    plot_and_save(
+        yearly_h2_pipeline,
+        plot_stacked_bar,
+        output_path=org_charts_dir / "maintainer_pipeline_yearly_h2.png",
+        x_col="year",
+        stack_cols=STAGE_COLUMNS,
+        labels=STACK_LABELS,
+        colors=MAINTAINER_PIPELINE_COLORS,
+        title="Maintainer Pipeline: Contributors Active Near Year End by Role (Yearly)",
         annotate_totals=True,
     )
 

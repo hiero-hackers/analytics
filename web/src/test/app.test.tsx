@@ -115,14 +115,22 @@ describe("Section tables", () => {
     expect(screen.getByText("bob")).toBeInTheDocument();
   });
 
-  it("formats number columns with separators and right alignment", async () => {
+  it("formats number columns with separators and tabular figures", async () => {
     await openGovernance();
 
     const cell = screen.getByText("2,490"); // 2490 renders with a separator
+    // Cells centre by default; `num` is what earns a column tabular digits.
     expect(cell.closest("td")).toHaveClass("num");
-    // The header carries the alignment class too, so label and digits agree.
     const table = screen.getByRole("table");
     expect(within(table).getByText("count").closest("th")).toHaveClass("num");
+  });
+
+  it("offers the period windows shortest-first, with all time last", async () => {
+    await openGovernance();
+
+    const tabs = within(screen.getByRole("group", { name: "Time range" })).getAllByRole("button");
+
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["30 days", "All time"]);
   });
 
   it("renders date formats, the freshness badge, and the action link", async () => {

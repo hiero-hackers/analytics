@@ -33,6 +33,7 @@ CHART_MACRO = {
                         "Unique active contributors by role",
                         [
                             ("By year", "maintainer_pipeline_yearly.png"),
+                            ("By year (active at year end)", "maintainer_pipeline_yearly_h2.png"),
                             ("By month", "maintainer_pipeline_monthly.png"),
                             ("By week", "maintainer_pipeline_weekly.png"),
                             ("By repo", "maintainer_pipeline_by_repo.png"),
@@ -424,10 +425,17 @@ WIDE_CHARTS = {
 # chart (its encoding and window) — never the current data values — so they stay
 # accurate across every refresh. A chart with no entry here simply shows no note.
 CHART_NOTES = {
-    "maintainer_pipeline_yearly.png": "Each bar is a calendar year, counting people active in its last six months (a fixed Jul–Dec "
-    "window for past years, so old bars stay put; a trailing six-month window for the current year). "
-    "Each person is counted once, under the highest governance role they hold in any repo "
-    "(general → triage → committer → maintainer), so the bar's total is the distinct people active.",
+    "maintainer_pipeline_yearly.png": "Each bar is a calendar year, counting everyone active at any point in it — the same "
+    "whole-bucket rule as the month and week views, at a coarser resolution. Each person is counted "
+    "once, under the highest governance role they hold in any repo (general → triage → committer → "
+    "maintainer), so the bar's total is the distinct people active. Past bars never move; the current "
+    "year is still in progress, so its bar is partial by definition. For who was still active by the "
+    "end of each year, use the 'active at year end' view.",
+    "maintainer_pipeline_yearly_h2.png": "The same yearly bars narrowed to people active *near the end* of each year — a fixed Jul–Dec "
+    "window for past years (so old bars stay put) and a trailing six-month window for the current one, "
+    "which early in the year reaches back into the previous December. It answers 'who was still here by "
+    "year end?' rather than 'who showed up at all?', so it reads lower than the plain yearly view and "
+    "the gap between them is roughly the people who drifted away mid-year.",
     "maintainer_pipeline_monthly.png": "Each bar is a calendar month, counting the distinct people active that month — once each, under "
     "the highest governance role they hold in any repo (general → triage → committer → maintainer). "
     "Counts are strictly per-month (not a trailing window), so the current month is month-to-date. "
@@ -491,6 +499,28 @@ CHART_METHODOLOGY = {
         (
             "Stack the tiers to show whether the bench below maintainers is developing; the by-repo "
             "variant does the same across repositories instead of time."
+        ),
+        (
+            "Membership in a bucket is whole-bucket: one tracked event anywhere in the year (or month, "
+            "or week) counts. No recency window is applied here — that is what separates this view "
+            "from the 'active at year end' variant, and from the per-repo activity tables, which use "
+            "their own recent-activity window."
+        ),
+    ],
+    "maintainer_pipeline_yearly_h2.png": [
+        "Start from the same role-attached activity events as the plain yearly view.",
+        (
+            "Keep only events inside each year's end-window: a fixed Jul 1 – Dec 31 for completed "
+            "years, so historical bars never move on a refresh; a trailing six-month window from today "
+            "for the year in progress."
+        ),
+        (
+            "Because the current year's window trails from today, early in the year it reaches into the "
+            "previous December; those events are counted toward the current bar, not the previous one."
+        ),
+        (
+            "Count distinct people per year at their highest role, exactly as the other variants do — "
+            "only the membership window differs."
         ),
     ],
     "maintainer_network.png": [
