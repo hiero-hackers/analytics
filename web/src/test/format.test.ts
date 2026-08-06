@@ -1,7 +1,7 @@
 /** Timestamps are labelled UTC wherever they appear, so they must be in UTC. */
 
 import { describe, expect, it } from "vitest";
-import { stamp } from "../format";
+import { dateStamp, stamp } from "../format";
 
 describe("stamp", () => {
   it("keeps a UTC timestamp as-is", () => {
@@ -22,5 +22,23 @@ describe("stamp", () => {
 
   it("shows an unparseable value raw rather than throwing", () => {
     expect(stamp("not-a-date")).toBe("not-a-date");
+  });
+});
+
+describe("dateStamp", () => {
+  it("returns just the UTC date", () => {
+    expect(dateStamp("2026-07-25T10:00:00+00:00")).toBe("2026-07-25");
+    expect(dateStamp("2026-07-25 23:20:25+00:00")).toBe("2026-07-25");
+  });
+
+  it("converts across the day boundary instead of truncating", () => {
+    // Truncating would report the 26th for an instant on the 25th UTC.
+    expect(dateStamp("2026-07-26T01:20:25+03:00")).toBe("2026-07-25");
+    expect(dateStamp("2026-07-25T22:30:00-04:00")).toBe("2026-07-26");
+  });
+
+  it("assumes UTC for a naive timestamp and degrades raw when unparseable", () => {
+    expect(dateStamp("2026-07-25T10:00:00")).toBe("2026-07-25");
+    expect(dateStamp("not-a-date")).toBe("not-a-date");
   });
 });

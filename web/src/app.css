@@ -153,13 +153,19 @@
   td:first-child {
     font-weight: 500;
   }
-  /* Numeric columns (spec format "number"): right-aligned, digits lined up. */
+  /* Column alignment, derived from the spec format: numbers right (digits
+     line up for comparison), short symbolic cells (ticks, presence) centred,
+     text left. */
   th.num {
     text-align: right;
   }
   td.num {
     text-align: right;
     font-variant-numeric: tabular-nums;
+  }
+  th.ctr,
+  td.ctr {
+    text-align: center;
   }
   tr:hover td {
     background: var(--raise);

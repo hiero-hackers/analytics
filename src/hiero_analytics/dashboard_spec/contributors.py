@@ -96,7 +96,7 @@ SECTION_SPECS = [
             ("issues_opened", "issues", "number"),
             ("labels_applied", "labels", "number"),
             ("repos_touched", "repos", "number"),
-            ("last_active", "last active"),
+            ("last_active", "last active", "date"),
         ],
     },
 ]

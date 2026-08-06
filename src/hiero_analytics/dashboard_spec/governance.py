@@ -139,7 +139,7 @@ SECTION_SPECS = [
             ("committer_actions_recent", "comm. actions", "number"),
             ("triage_actions_recent", "triage actions", "number"),
             ("actions_recent", "actions", "number"),
-            ("last_active", "last active"),
+            ("last_active", "last active", "date"),
         ],
     },
     {
@@ -286,9 +286,9 @@ SECTION_SPECS = [
             ("user", "user"),
             ("highest_role", "highest role"),
             ("roles", "roles held"),
-            ("repos_held", "repos"),
-            ("days_since_active", "days since active"),
-            ("last_active", "last active"),
+            ("repos_held", "repos", "number"),
+            ("days_since_active", "days since active", "number"),
+            ("last_active", "last active", "date"),
         ],
     },
     {

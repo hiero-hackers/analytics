@@ -17,3 +17,14 @@ export function stamp(iso: string): string {
   }
   return date.toISOString().slice(0, 16).replace("T", " ");
 }
+
+/**
+ * Just the UTC date, "YYYY-MM-DD" — the table-cell form of `stamp`.
+ *
+ * Same conversion rules: an offset-bearing value is converted, not sliced
+ * (truncating "2026-07-26T01:20:25+03:00" would report the 26th for an
+ * instant that falls on the 25th UTC), and a zoneless value is read as UTC.
+ */
+export function dateStamp(iso: string): string {
+  return stamp(iso).slice(0, 10);
+}

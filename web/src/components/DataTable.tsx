@@ -63,7 +63,9 @@ export function DataTable({ table }: { table: Table<Row> }) {
                   return (
                     <th
                       key={header.id}
-                      className={header.column.columnDef.meta?.numeric ? "num" : undefined}
+                      className={
+                        { right: "num", center: "ctr" }[header.column.columnDef.meta?.align as string] ?? undefined
+                      }
                       aria-sort={sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : undefined}
                     >
                       <button type="button" className="thbtn" onClick={header.column.getToggleSortingHandler()}>
@@ -92,7 +94,10 @@ export function DataTable({ table }: { table: Table<Row> }) {
                 ref={virtualized ? virtualizer.measureElement : undefined}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={cell.column.columnDef.meta?.numeric ? "num" : undefined}>
+                  <td
+                    key={cell.id}
+                    className={{ right: "num", center: "ctr" }[cell.column.columnDef.meta?.align as string] ?? undefined}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

@@ -5,6 +5,7 @@
  * switches.
  */
 
+import { dateStamp } from "../format";
 import { safeUrl } from "../safety";
 
 // Fixed locale: the dashboard's prose is en, and a deterministic separator
@@ -26,7 +27,9 @@ export function FormattedCell({ value, format }: { value: unknown; format?: stri
     case "hip":
       return <span className="cell-hip">HIP-{text}</span>;
     case "date":
-      return <>{text.slice(0, 10)}</>;
+      // UTC-converted date, full raw timestamp on hover. Conversion, not
+      // truncation: slicing an offset-bearing value can misreport the day.
+      return <span title={text}>{dateStamp(text)}</span>;
     case "link": {
       // The href comes from generated data; an unsafe scheme renders as inert
       // text rather than a clickable link.
