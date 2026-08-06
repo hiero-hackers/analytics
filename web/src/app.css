@@ -153,6 +153,14 @@
   td:first-child {
     font-weight: 500;
   }
+  /* Numeric columns (spec format "number"): right-aligned, digits lined up. */
+  th.num {
+    text-align: right;
+  }
+  td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
   tr:hover td {
     background: var(--raise);
   }

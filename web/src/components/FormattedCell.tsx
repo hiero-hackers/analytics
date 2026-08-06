@@ -1,10 +1,15 @@
 /**
  * One table cell rendered per the API's column format — the single place the
- * display formats (hip, date, link, evidence, status, flag) live. The HIP
- * views add their formats here rather than growing their own switches.
+ * display formats (hip, date, link, evidence, status, flag, presence, number)
+ * live. The HIP views add their formats here rather than growing their own
+ * switches.
  */
 
 import { safeUrl } from "../safety";
+
+// Fixed locale: the dashboard's prose is en, and a deterministic separator
+// keeps snapshots and tests stable across viewer locales.
+const NUMBER_FORMAT = new Intl.NumberFormat("en-US");
 
 export function FormattedCell({ value, format }: { value: unknown; format?: string }) {
   if (value === null || value === undefined || value === "") {
@@ -12,6 +17,12 @@ export function FormattedCell({ value, format }: { value: unknown; format?: stri
   }
   const text = String(value);
   switch (format) {
+    case "number": {
+      // Separators for legibility; a non-numeric value (older API, junk row)
+      // degrades to plain text rather than NaN.
+      const numeric = typeof value === "number" ? value : Number(text);
+      return <>{Number.isFinite(numeric) ? NUMBER_FORMAT.format(numeric) : text}</>;
+    }
     case "hip":
       return <span className="cell-hip">HIP-{text}</span>;
     case "date":

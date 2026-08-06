@@ -11,7 +11,7 @@ export interface ColumnSpec {
   label: string;
   /**
    * Optional display format, rendered by `components/FormattedCell`:
-   * hip | date | link | evidence | status | flag | presence.
+   * hip | date | link | evidence | status | flag | presence | number.
    * The valid set is declared once in Python (`dashboard_spec.COLUMN_FORMATS`)
    * and enforced there, so a spec typo fails a test rather than shipping as an
    * unformatted column.

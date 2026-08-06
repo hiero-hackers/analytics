@@ -41,7 +41,7 @@ CHARTS_GROUP = "Charts"
 # The frontend implements exactly these (web/src/components/FormattedCell.tsx);
 # an unlisted value would fall through to plain text, so a typo is caught by
 # tests/dashboard_spec instead of shipping as a silently unformatted column.
-COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence"})
+COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence", "number"})
 
 # The families that carry table sections, keyed by their macro name — the
 # dashboard pipeline reads SECTION_SPECS / SECTION_ORDER / SECTION_GROUP_OF

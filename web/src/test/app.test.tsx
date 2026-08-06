@@ -115,6 +115,16 @@ describe("Section tables", () => {
     expect(screen.getByText("bob")).toBeInTheDocument();
   });
 
+  it("formats number columns with separators and right alignment", async () => {
+    await openGovernance();
+
+    const cell = screen.getByText("2,490"); // 2490 renders with a separator
+    expect(cell.closest("td")).toHaveClass("num");
+    // The header carries the alignment class too, so label and digits agree.
+    const table = screen.getByRole("table");
+    expect(within(table).getByText("count").closest("th")).toHaveClass("num");
+  });
+
   it("renders date formats, the freshness badge, and the action link", async () => {
     await openGovernance();
 

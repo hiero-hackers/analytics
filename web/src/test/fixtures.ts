@@ -17,12 +17,12 @@ export const GOV_DOC: SectionDoc = {
   source: "roles.csv",
   columns: [
     { key: "user", label: "user" },
-    { key: "count", label: "count" },
+    { key: "count", label: "count", format: "number" },
     { key: "last_seen", label: "last seen", format: "date" },
   ],
   rows: [
     { user: "carol", count: 3, last_seen: "2026-07-01T00:00:00" },
-    { user: "alice", count: 10, last_seen: "2026-07-20T00:00:00" },
+    { user: "alice", count: 2490, last_seen: "2026-07-20T00:00:00" },
     { user: "bob", count: 7, last_seen: "2026-07-10T00:00:00" },
   ],
   row_count: 3,
