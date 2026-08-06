@@ -36,13 +36,17 @@ export function SectionCard({
       <div className="sbody">
         <div className="shead">
           <p className="desc">{description}</p>
-          {generatedAt && (
-            <span className={stale ? "asof stale" : "asof"}>
-              data as of {stamp(generatedAt)}
-              {stale ? " — older than the scheduled refresh" : ""}
-            </span>
-          )}
-          {actions}
+          {/* Right column: actions on top, freshness beneath — one place to
+              look instead of three items jostling on a single line. */}
+          <div className="sactions">
+            {actions && <div className="actionrow">{actions}</div>}
+            {generatedAt && (
+              <span className={stale ? "asof stale" : "asof"}>
+                data as of {stamp(generatedAt)}
+                {stale ? " — older than the scheduled refresh" : ""}
+              </span>
+            )}
+          </div>
         </div>
         {children}
       </div>

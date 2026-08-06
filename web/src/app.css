@@ -32,6 +32,22 @@
   --row-line: #f0f0f0; /* table row separators */
   --accent: #1b1b1b; /* active pill background */
   --on-accent: #fff; /* text on the active pill */
+
+  /* Semantic colors: one slot per meaning, dark values in the flip below. */
+  --link: #2a78d6; /* links and link-styled cells */
+  --link-ink: #255e9e; /* link-colored text that must read as text */
+  --ok: #0ca30c; /* positive dot/marker */
+  --ok-ink: #0a6b0a; /* positive text */
+  --warn: #fab219; /* warning dot/marker */
+  --warn-ink: #8a6200; /* warning text */
+  --neg: #b3261e; /* error text */
+
+  /* Shape & motion: shared control geometry, one hover timing everywhere. */
+  --r-card: 12px;
+  --r-control: 6px;
+  --r-input: 8px;
+  --r-pill: 999px;
+  --dur: 120ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -49,6 +65,14 @@
     --row-line: #222;
     --accent: #e6e6e6;
     --on-accent: #0f0f0f;
+
+    --link: #6ba3e8;
+    --link-ink: #8ab4e8;
+    --ok: #34b334;
+    --ok-ink: #7fd08a;
+    --warn: #d9a12e;
+    --warn-ink: #d9b05c;
+    --neg: #e57373;
   }
 }
 
@@ -66,6 +90,13 @@
   --color-row-line: var(--row-line);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-link: var(--link);
+  --color-link-ink: var(--link-ink);
+  --color-ok: var(--ok);
+  --color-ok-ink: var(--ok-ink);
+  --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
+  --color-neg: var(--neg);
 }
 
 /* ---- Page & element defaults --------------------------------------------- */
@@ -80,9 +111,15 @@
     background: var(--page);
   }
   h1 {
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
     margin: 0 0 4px;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
   }
   table {
     border-collapse: collapse;
@@ -97,30 +134,35 @@
     padding: 8px 10px;
     cursor: pointer;
     white-space: nowrap;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--edge);
     font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    transition: color var(--dur);
   }
   th:hover {
-    background: #ececec;
+    color: var(--ink);
   }
   td {
     padding: 6px 10px;
     border-bottom: 1px solid var(--row-line);
     white-space: nowrap;
   }
-  tr:hover td {
-    background: #fbfbfb;
+  td:first-child {
+    font-weight: 500;
   }
-  @media (prefers-color-scheme: dark) {
-    th {
-      background: #222;
-      border-color: #333;
-    }
-    th:hover {
-      background: #2a2a2a;
-    }
-    tr:hover td {
-      background: #1d1d1d;
+  tr:hover td {
+    background: var(--raise);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
@@ -128,6 +170,24 @@
 /* ---- Component vocabulary ------------------------------------------------ */
 
 @layer components {
+  /* Shared control behaviour: one timing, one focus ring, everywhere. */
+  .macro,
+  .tab,
+  .jbtn,
+  .dl,
+  .snav,
+  .ctab,
+  .chip {
+    transition:
+      background var(--dur),
+      border-color var(--dur),
+      color var(--dur);
+  }
+  :is(.macro, .tab, .jbtn, .dl, .snav, .ctab, .thbtn, .search, .lbclose):focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+  }
+
   .sub {
     color: var(--muted);
     font-size: 14px;
@@ -145,11 +205,11 @@
     padding: 9px 18px;
     border: 1px solid var(--edge-input);
     background: var(--surface);
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    color: #444;
+    color: var(--ink);
     text-decoration: none;
     display: inline-block;
   }
@@ -158,8 +218,9 @@
     color: var(--on-accent);
     border-color: var(--accent);
   }
-  .macro:hover {
-    border-color: #999;
+  .macro:hover:not(.active) {
+    border-color: var(--soft);
+    background: var(--raise);
   }
 
   /* Org tabs */
@@ -167,7 +228,7 @@
     display: flex;
     gap: 6px;
     margin-bottom: 18px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--edge);
     flex-wrap: wrap;
   }
   .tab {
@@ -182,7 +243,7 @@
   }
   .tab.active {
     color: var(--ink);
-    border-bottom-color: #555;
+    border-bottom-color: var(--ink);
     font-weight: 600;
   }
   .tab:hover {
@@ -193,7 +254,7 @@
   .card {
     background: var(--surface);
     border: 1px solid var(--edge);
-    border-radius: 12px;
+    border-radius: var(--r-card);
     padding: 16px 18px;
     margin-bottom: 20px;
   }
@@ -206,21 +267,40 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
+    gap: 8px 16px;
+  }
+  .sactions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex: none;
+  }
+  .sactions .actionrow {
+    display: flex;
+    gap: 6px;
   }
   .dl {
     flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 12px;
     padding: 5px 11px;
     border: 1px solid var(--edge-strong);
-    border-radius: 6px;
+    border-radius: var(--r-control);
     background: var(--surface);
-    color: #333;
+    color: var(--ink);
     cursor: pointer;
     text-decoration: none;
   }
   .dl:hover {
     background: var(--raise);
+  }
+  .dl svg {
+    width: 13px;
+    height: 13px;
+    flex: none;
   }
   .desc {
     color: var(--muted);
@@ -256,15 +336,15 @@
   }
   .glossary dt {
     font-weight: 600;
-    color: #333;
+    color: var(--ink);
   }
   .glossary dd {
     margin: 0;
-    color: #555;
+    color: var(--muted);
   }
   .gnote {
     font-size: 12px;
-    color: #777;
+    color: var(--soft);
     margin: 6px 0 12px;
   }
 
@@ -302,7 +382,7 @@
   }
   .tsum::before {
     content: "\25B8";
-    color: #aaa;
+    color: var(--soft);
     font-size: 13px;
     transition: transform 0.15s ease;
   }
@@ -318,9 +398,10 @@
   .sbadge {
     font-size: 12px;
     font-weight: 500;
+    font-variant-numeric: tabular-nums;
     color: var(--soft);
-    background: #f0f0f0;
-    border-radius: 999px;
+    background: var(--raise);
+    border-radius: var(--r-pill);
     padding: 2px 10px;
     white-space: nowrap;
   }
@@ -339,11 +420,12 @@
   .asof {
     display: inline-block;
     font-size: 0.78rem;
-    color: #64748b;
-    margin: 0 0 8px;
+    color: var(--soft);
+    margin: 0;
+    white-space: nowrap;
   }
   .asof.stale {
-    color: #b45309;
+    color: var(--warn-ink);
     font-weight: 600;
   }
 
@@ -365,7 +447,7 @@
     cursor: zoom-in;
   }
   .chart img:hover {
-    border-color: #bbb;
+    border-color: var(--edge-strong);
   }
   .chart figcaption {
     font-size: 12px;
@@ -395,7 +477,7 @@
   .chartnote {
     margin: 6px 0 0;
     font-size: 12px;
-    color: #555;
+    color: var(--muted);
     line-height: 1.45;
     text-align: left;
   }
@@ -409,18 +491,18 @@
     font-size: 12px;
     padding: 3px 11px;
     border: 1px solid var(--edge-strong);
-    border-radius: 6px;
+    border-radius: var(--r-control);
     background: var(--surface);
     color: var(--muted);
     cursor: pointer;
   }
-  .ctab:hover {
+  .ctab:hover:not(.active) {
     background: var(--raise);
   }
   .ctab.active {
-    background: #333;
-    color: #fff;
-    border-color: #333;
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
     font-weight: 500;
   }
 
@@ -435,9 +517,9 @@
     font-size: 13px;
     padding: 6px 14px;
     border: 1px solid var(--edge-strong);
-    border-radius: 6px;
+    border-radius: var(--r-control);
     background: var(--surface);
-    color: #333;
+    color: var(--ink);
     cursor: pointer;
   }
   .snav:hover {
@@ -459,7 +541,7 @@
   }
   .slide figcaption {
     font-size: 13px;
-    color: #444;
+    color: var(--muted);
     margin-top: 8px;
     text-align: center;
     font-weight: 600;
@@ -469,7 +551,8 @@
   .lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(4px);
     display: none;
     flex-direction: column;
     align-items: center;
@@ -489,10 +572,29 @@
   }
   .lightbox .hint {
     position: fixed;
-    top: 16px;
-    right: 20px;
+    top: 20px;
+    right: 64px;
     color: #ccc;
     font-size: 13px;
+    line-height: 28px;
+  }
+  .lbclose {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-pill);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: #eee;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--dur);
+  }
+  .lbclose:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
   .lbtitle {
     color: #fff;
@@ -569,21 +671,22 @@
     font-size: 13px;
     padding: 5px 12px;
     border: 1px solid var(--edge-input);
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     background: var(--surface);
-    color: #444;
+    color: var(--ink);
     cursor: pointer;
     text-decoration: none;
   }
   .jbtn:hover {
-    border-color: #999;
+    border-color: var(--soft);
+    background: var(--raise);
   }
   .grouphdr {
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #999;
+    color: var(--soft);
     margin: 24px 0 12px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--edge);
@@ -599,26 +702,36 @@
     content: "\25be";
     display: inline-block;
     width: 1.1em;
-    color: #bbb;
+    color: var(--soft);
     transition: transform 0.15s;
   }
   .group:not([open]) > summary.grouphdr::before {
     transform: rotate(-90deg);
   }
   .group:not([open]) > summary.grouphdr {
-    color: #bbb;
+    color: var(--edge-strong);
   }
 
   /* App extras (no legacy counterpart) */
   .error {
-    color: #b3261e;
+    color: var(--neg);
     font-size: 14px;
   }
+  .footrow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid var(--edge);
+  }
   .provenance {
-    color: #8a93b2;
+    color: var(--soft);
     font-size: 12px;
     text-align: right;
-    margin: 8px 0 0;
+    margin: 0 0 0 auto;
   }
 
   /* Formatted table cells (chips, HIP badges, links). */
@@ -628,99 +741,71 @@
     gap: 5px;
     font-size: 11.5px;
     font-weight: 600;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     padding: 1px 9px;
-    border: 1px solid #e4e4e4;
-    background: #fff;
+    border: 1px solid var(--edge);
+    background: var(--surface);
   }
   .chip::before {
     content: "";
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--dot, #999);
+    background: var(--dot, var(--soft));
   }
   .chip-merged {
-    --dot: #0ca30c;
-    color: #0a6b0a;
+    --dot: var(--ok);
+    color: var(--ok-ink);
   }
   .chip-open {
-    --dot: #fab219;
-    color: #8a6200;
+    --dot: var(--warn);
+    color: var(--warn-ink);
   }
   .chip-none {
-    --dot: #c2c2c2;
-    color: #888;
+    --dot: var(--edge-strong);
+    color: var(--soft);
   }
   .chip-spec {
-    --dot: #2a78d6;
-    color: #255e9e;
+    --dot: var(--link);
+    color: var(--link-ink);
   }
   .cell-hip {
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
+
+  /* Sortable column headers: a real button, with the sort mark's slot
+     reserved so toggling never shifts the column. */
+  .thbtn {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+  }
+  .sortmark {
+    display: inline-block;
+    width: 1em;
+    color: var(--soft);
+    text-transform: none;
+  }
   .cell-link {
     font-size: 12px;
-    color: #2a78d6;
+    color: var(--link);
     text-decoration: none;
   }
   .cell-link:hover {
     text-decoration: underline;
   }
 
-  /* Dark-mode leftovers: one-off grays that are not (yet) tokens. */
-  @media (prefers-color-scheme: dark) {
-    .macro,
-    .jbtn {
-      color: #ccc;
-    }
-    .macro:hover,
-    .jbtn:hover {
-      border-color: #666;
-    }
-    .tabbar {
-      border-color: #2a2a2a;
-    }
-    .tab.active {
-      border-bottom-color: #888;
-    }
-    .dl,
-    .snav {
-      color: #e6e6e6;
-    }
-    .scount,
-    .slide figcaption {
-      color: #bbb;
-    }
-    .glossary dt {
-      color: #ccc;
-    }
-    .glossary dd,
-    .gnote {
-      color: #999;
-    }
-    .chartnote {
-      color: #aaa;
-    }
-    .ctab.active {
-      background: #e6e6e6;
-      color: #0f0f0f;
-      border-color: #e6e6e6;
-    }
-    .sbadge {
-      background: #262626;
-    }
-    .grouphdr {
-      color: #888;
-    }
-    .chart img,
-    .chartscroll,
-    .slide img {
-      border-color: #333;
-    }
-  }
+  /* (The former dark-mode leftovers block is gone: every rule it patched now
+     reads from the semantic tokens, whose dark values live in the single
+     token flip at the top of this file.) */
 
 
   /* ---- HIP views (coverage matrix, governance board, evidence panel) ----

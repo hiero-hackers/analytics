@@ -49,6 +49,7 @@ export function DataTable({ table }: { table: Table<Row> }) {
       <input
         className="search"
         placeholder="Filter…"
+        aria-label="Filter rows"
         value={(table.getState().globalFilter as string) ?? ""}
         onChange={(event) => table.setGlobalFilter(event.target.value)}
       />
@@ -57,12 +58,23 @@ export function DataTable({ table }: { table: Table<Row> }) {
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} onClick={header.column.getToggleSortingHandler()}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{ asc: " ↑", desc: " ↓" }[header.column.getIsSorted() as string] ?? ""}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted() as string;
+                  return (
+                    <th
+                      key={header.id}
+                      aria-sort={sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : undefined}
+                    >
+                      <button type="button" className="thbtn" onClick={header.column.getToggleSortingHandler()}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {/* The mark's slot is always reserved so toggling sort never shifts the column. */}
+                        <span className="sortmark" aria-hidden="true">
+                          {{ asc: "↑", desc: "↓" }[sorted] ?? ""}
+                        </span>
+                      </button>
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>

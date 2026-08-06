@@ -24,16 +24,18 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
           const explainable = Boolean(tile.note || tile.methodology?.length);
           const body = (
             <>
-              <div className="text-[13px] text-muted">{tile.label}</div>
-              <div className="mt-0.5 text-[26px] font-semibold text-ink">{tile.value}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-soft">{tile.label}</div>
+              <div className="mt-1 text-[26px] font-semibold text-ink tabular-nums">{tile.value}</div>
             </>
           );
-          const shell = "rounded-[10px] border border-solid border-edge bg-surface px-4 py-3.5 text-left";
+          const shell =
+            "rounded-[10px] border border-solid border-edge bg-surface px-4 py-3.5 text-left " +
+            "transition-[border-color,transform,box-shadow] duration-[120ms] motion-reduce:transition-none";
           return explainable ? (
             <button
               key={tile.label}
               type="button"
-              className={`${shell} cursor-pointer hover:border-[#999]`}
+              className={`${shell} cursor-pointer hover:border-soft hover:-translate-y-px hover:shadow-sm motion-reduce:hover:translate-y-0`}
               title="How is this measured?"
               onClick={() =>
                 setExplained({ alt: tile.label, title: tile.label, note: tile.note, methodology: tile.methodology })

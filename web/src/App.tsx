@@ -148,8 +148,11 @@ export default function App() {
       {glossary && <Glossary glossary={glossary} />}
       {orgsForMacro.length > 1 && <TabBar items={orgsForMacro} active={shownOrg} onSelect={setOrg} kind="tab" />}
       <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
-      <WipFooter />
-      <ProvenanceFooter provenance={manifest.provenance} />
+      {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
+      <div className="footrow">
+        <WipFooter />
+        <ProvenanceFooter provenance={manifest.provenance} />
+      </div>
     </div>
   );
 }

@@ -28,6 +28,9 @@ export function ChartLightbox({ content, onClose }: { content: LightboxContent; 
   return (
     <div className="lightbox" style={{ display: "flex" }} onClick={onClose} role="dialog" aria-label={content.alt}>
       <span className="hint">click outside or press Esc to close</span>
+      <button type="button" className="lbclose" aria-label="Close" onClick={onClose}>
+        ✕
+      </button>
       {content.src ? (
         <img src={content.src} alt={content.alt} onClick={(event) => event.stopPropagation()} />
       ) : (

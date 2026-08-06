@@ -2,8 +2,8 @@
 
 export function WipFooter() {
   return (
-    <footer className="mt-9 mb-2 border-t border-solid border-edge px-4 py-3.5 text-[13px] leading-normal text-[#777] dark:text-[#999]">
-      <span className="mr-1.5 inline-block rounded bg-[#fde68a] px-2 py-[2px] text-[11px] font-semibold tracking-[0.04em] uppercase text-[#92400e] dark:bg-[#78350f] dark:text-[#fde68a]">
+    <footer className="mb-2 max-w-[62ch] text-[13px] leading-normal text-muted">
+      <span className="mr-1.5 inline-block rounded bg-warn/20 px-2 py-[2px] text-[11px] font-semibold tracking-[0.04em] uppercase text-warn-ink">
         Work in progress
       </span>{" "}
       This dashboard is under active development. Organisation affiliations are curated and still being
