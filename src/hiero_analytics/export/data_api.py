@@ -46,6 +46,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_NOTES,
     CUSTOM_VIEW_MODULES,
     MACRO_GLOSSARIES,
+    MACRO_PARENTS,
     METRIC_ANNOTATIONS,
     PROJECT_ISSUES_URL,
     TABLE_FAMILIES,
@@ -369,6 +370,13 @@ def emit_data_api() -> Path:
         # Each lists only what its own tab shows; the shared prose behind the
         # column definitions lives in dashboard_spec.glossary.
         "macro_glossaries": MACRO_GLOSSARIES,
+        # Sub-tab macros, macro name -> umbrella tab name. The frontend shows
+        # one top-level tab per umbrella with a second tab row for its members.
+        "macro_parents": MACRO_PARENTS,
+        # Family display order. The frontend otherwise derives tab order from
+        # the sections lists, which puts a chart-only macro after every
+        # table-bearing one regardless of where its family sits.
+        "macro_order": [macro["name"] for macro in CHART_MACROS],
         # Display labels for the rolling activity periods ("30d" -> "30 days").
         "period_labels": {period.key: period.label for period in API_PERIODS},
         # Where the dashboard footer points "spotted something wrong?".

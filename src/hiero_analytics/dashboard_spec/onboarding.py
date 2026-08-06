@@ -22,9 +22,12 @@ CHART_MACRO = {
                     (
                         "By repo",
                         [
-                            ("30 days", "difficulty_by_repo_30_days.png"),
-                            ("90 days", "difficulty_by_repo_90_days.png"),
-                            ("1 year", "difficulty_by_repo_365_days.png"),
+                            # The shared span vocabulary, widest first, matching
+                            # the chart tabs and tables everywhere else.
+                            ("All time", "difficulty_by_repo.png"),
+                            ("1 year", "difficulty_by_repo_365d.png"),
+                            ("1 month", "difficulty_by_repo_30d.png"),
+                            ("Week", "difficulty_by_repo_7d.png"),
                         ],
                     ),
                     (
@@ -41,11 +44,12 @@ CHART_MACRO = {
 }
 
 CHART_NOTES = {
-    # Shared by all "By repo" window tabs (variants without their own note
+    # Shared by all "By repo" span tabs (variants without their own note
     # inherit the first one).
-    "difficulty_by_repo_30_days.png": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled "
-    "with a difficulty (or newly created) within its window; 'Unknown' = open issues not yet "
-    "triaged. Wider windows are the closest view of a repo's accumulated triage debt.",
+    "difficulty_by_repo.png": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled "
+    "with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and "
+    "'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's "
+    "accumulated triage debt.",
     "difficulty_over_time_event_based_weekly.png": "Open difficulty-labelled issues over the last year, reconstructed from when difficulty labels "
     "were actually applied (label events). Each band is a difficulty level; the height is how many "
     "open issues sat at that difficulty on that date.",
@@ -55,15 +59,16 @@ CHART_NOTES = {
 }
 
 CHART_METHODOLOGY = {
-    "difficulty_by_repo_30_days.png": [
+    "difficulty_by_repo.png": [
         "Fetch every open issue across the organisation's repositories, with its labels.",
         (
             "Map each issue's labels to a difficulty level using the shared label vocabulary "
             "(domain/labels.py); an issue carrying no difficulty label becomes 'Unknown'."
         ),
         (
-            "Keep only issues labelled with a difficulty — or newly created — within the last 30 days, so "
-            "the chart reflects what triage has touched recently rather than the entire backlog."
+            "Keep only issues labelled with a difficulty — or newly created — within the selected span, "
+            "so the narrower tabs reflect what triage has touched recently; 'All time' keeps the whole "
+            "open backlog."
         ),
         "Count the remaining open issues per repository, stacked by difficulty level.",
     ],

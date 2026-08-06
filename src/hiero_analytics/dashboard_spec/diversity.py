@@ -18,6 +18,9 @@ from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 # "this looks wrong" everywhere else.
 AFFILIATION_ISSUE_URL = PROJECT_ISSUES_URL
 
+# Renders as a sub-tab under the Governance umbrella tab.
+MACRO_PARENT = "Governance"
+
 CHART_MACRO = {
     "name": "Organisation diversity",
     "charts": {

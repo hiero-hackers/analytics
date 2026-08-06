@@ -171,6 +171,10 @@ export interface Manifest {
   generated_at: string;
   /** Each macro's explainer, keyed by macro name — one per tab. */
   macro_glossaries?: Record<string, Glossary>;
+  /** Sub-tab macros: macro name -> umbrella tab name (e.g. "Teams & TSC" -> "Governance"). */
+  macro_parents?: Record<string, string>;
+  /** Family display order for tabs; macros not listed keep their derived order. */
+  macro_order?: string[];
   /** Display labels for rolling periods ("30d" -> "30 days"). */
   period_labels?: Record<string, string>;
   /** Where the footer sends a reader who spots something wrong. */

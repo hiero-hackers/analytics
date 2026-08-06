@@ -42,15 +42,10 @@ ACTIVITY_WEIGHTS = {
     "prs merged": 2,
 }
 
-# Difficulty pipelines: recent-issues windows (days, tab label) for the
-# per-repo difficulty snapshots, full window for the difficulty-over-time
-# series, and a low worker count for the event-heavy timeline fetches (they
-# hit the API hardest).
-DIFFICULTY_RECENT_WINDOWS = (
-    (30, "30 Days"),
-    (90, "90 Days"),
-    (365, "1 Year"),
-)
+# Difficulty pipelines: full window for the difficulty-over-time series, and a
+# low worker count for the event-heavy timeline fetches (they hit the API
+# hardest). The per-repo difficulty snapshots follow the shared activity
+# periods (domain/periods.py) rather than their own window set.
 DIFFICULTY_OVER_TIME_WINDOW_DAYS = 365
 TIMELINE_MAX_WORKERS = 3
 

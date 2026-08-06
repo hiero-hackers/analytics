@@ -11,10 +11,11 @@ import pytest
 matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.difficulty as runner
-from hiero_analytics.config.analysis import DIFFICULTY_RECENT_WINDOWS
 from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 
-WINDOW_DAYS = [days for days, _ in DIFFICULTY_RECENT_WINDOWS]
+# The shared span vocabulary: the all-time base plus one suffix per period.
+SPAN_SUFFIXES = [""] + [f"_{period.key}" for period in ACTIVITY_PERIODS]
 
 # Test data factories
 
@@ -92,25 +93,25 @@ def test_main_creates_output_files(monkeypatch: pytest.MonkeyPatch, stub_pipelin
 
     runner.main()
 
-    for days in WINDOW_DAYS:
+    for suffix in SPAN_SUFFIXES:
         expected_csvs = [
-            f"difficulty_distribution_{days}_days.csv",
-            f"difficulty_by_repo_{days}_days.csv",
+            f"difficulty_distribution{suffix}.csv",
+            f"difficulty_by_repo{suffix}.csv",
         ]
         for csv_file in expected_csvs:
             csv_path = data_dir / csv_file
             assert csv_path.exists(), f"CSV {csv_file} not created"
             assert os.path.getsize(csv_path) > 0, f"CSV {csv_file} is empty"
 
-        chart_path = charts_dir / f"difficulty_by_repo_{days}_days.png"
-        assert chart_path.exists(), f"Chart difficulty_by_repo_{days}_days.png not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart difficulty_by_repo_{days}_days.png is empty"
+        chart_path = charts_dir / f"difficulty_by_repo{suffix}.png"
+        assert chart_path.exists(), f"Chart difficulty_by_repo{suffix}.png not created"
+        assert os.path.getsize(chart_path) > 0, f"Chart difficulty_by_repo{suffix}.png is empty"
 
 
 def test_windows_scope_their_own_labeling_activity(monkeypatch: pytest.MonkeyPatch, stub_pipeline_context):
-    """An issue labelled outside a window is excluded from it but counted by wider ones."""
+    """An issue labelled outside a span is excluded from it but counted by wider ones."""
     issues = [
-        # Labelled 60 days ago: outside the 30-day window, inside 90d and 1y.
+        # Labelled 60 days ago: outside the 1-month span, inside 1 year and all time.
         _test_issue("hiero-ledger/repo-one", 1, ["good first issue"], created_days_ago=120),
     ]
     events = [
@@ -121,13 +122,14 @@ def test_windows_scope_their_own_labeling_activity(monkeypatch: pytest.MonkeyPat
 
     runner.main()
 
-    def _gfi_count(days: int) -> int:
-        rows = (data_dir / f"difficulty_distribution_{days}_days.csv").read_text().splitlines()[1:]
+    def _gfi_count(suffix: str) -> int:
+        rows = (data_dir / f"difficulty_distribution{suffix}.csv").read_text().splitlines()[1:]
         return sum(int(row.split(",")[1]) for row in rows if row.startswith("Good First Issue,"))
 
-    assert _gfi_count(30) == 0
-    assert _gfi_count(90) == 1
-    assert _gfi_count(365) == 1
+    assert _gfi_count("_7d") == 0
+    assert _gfi_count("_30d") == 0
+    assert _gfi_count("_365d") == 1
+    assert _gfi_count("") == 1
 
 
 def test_main_handles_empty_timeline_events(monkeypatch: pytest.MonkeyPatch, stub_pipeline_context):
@@ -149,6 +151,6 @@ def test_main_handles_empty_timeline_events(monkeypatch: pytest.MonkeyPatch, stu
     # Should not raise an exception
     runner.main()
 
-    for days in WINDOW_DAYS:
-        assert (data_dir / f"difficulty_distribution_{days}_days.csv").exists()
-        assert (charts_dir / f"difficulty_by_repo_{days}_days.png").exists()
+    for suffix in SPAN_SUFFIXES:
+        assert (data_dir / f"difficulty_distribution{suffix}.csv").exists()
+        assert (charts_dir / f"difficulty_by_repo{suffix}.png").exists()

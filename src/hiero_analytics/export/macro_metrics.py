@@ -80,7 +80,7 @@ def contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) ->
 
 
 def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> list:
-    """Headline tiles for the Governance macro."""
+    """Headline tiles for the Roles & coverage macro."""
     metrics: list = []
     role_counts = _holders_by_highest_role(loaded["repo"])
     for role, label in (("maintainer", "maintainers"), ("committer", "committers"), ("triage", "triage")):
@@ -127,7 +127,7 @@ def diversity_metrics(loaded: dict[str, pd.DataFrame], _org_data_dir: Path) -> l
 
 METRICS_BY_MACRO = {
     "Contributors": contributors_metrics,
-    "Governance": governance_metrics,
+    "Roles & coverage": governance_metrics,
     "Teams & TSC": teams_metrics,
     "Organisation diversity": diversity_metrics,
 }

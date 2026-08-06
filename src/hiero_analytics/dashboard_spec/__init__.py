@@ -19,14 +19,17 @@ from hiero_analytics.dashboard_spec import (
     governance,
     hips,
     onboarding,
+    pipeline,
     security,
     teams,
 )
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
-# Macro (family) display order.
-_FAMILIES = (contributors, governance, teams, diversity, onboarding, hips, security, community)
+# Macro (family) display order — the tab order the dashboard shows. The four
+# governance-shaped families declare MACRO_PARENT = "Governance" and render as
+# sub-tabs of one umbrella tab in this same order.
+_FAMILIES = (contributors, pipeline, governance, teams, diversity, hips, security, onboarding, community)
 
 # The assembled spec surface — everything a consumer (the data API emitter,
 # the contract tests) reads off this package.
@@ -39,6 +42,7 @@ __all__ = [
     "COLUMN_FORMATS",
     "CUSTOM_VIEW_MODULES",
     "MACRO_GLOSSARIES",
+    "MACRO_PARENTS",
     "METRIC_ANNOTATIONS",
     "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
@@ -72,6 +76,13 @@ CUSTOM_VIEW_MODULES = {
 # A family may replace the shared column glossary with its own "how to read
 # this" explainer; the rest fall back to the shared one.
 MACRO_GLOSSARIES = {family.CHART_MACRO["name"]: family.GLOSSARY for family in _FAMILIES if hasattr(family, "GLOSSARY")}
+
+# Families that render as sub-tabs of an umbrella tab, macro name -> umbrella
+# name. The frontend shows one top-level tab per umbrella and a second tab row
+# for its members; a family without MACRO_PARENT is a top-level tab itself.
+MACRO_PARENTS = {
+    family.CHART_MACRO["name"]: family.MACRO_PARENT for family in _FAMILIES if hasattr(family, "MACRO_PARENT")
+}
 
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]
 CHART_NOTES = merged(_FAMILIES, "CHART_NOTES")

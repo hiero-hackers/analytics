@@ -10,6 +10,9 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 
+# Renders as a sub-tab under the Governance umbrella tab.
+MACRO_PARENT = "Governance"
+
 # No chart galleries yet — the tab is table-led. The macro still names the tab.
 CHART_MACRO = {
     "name": "Teams & TSC",

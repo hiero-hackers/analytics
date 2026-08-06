@@ -139,7 +139,7 @@ export default function App() {
   }
 
   const orgs = Object.keys(manifest.orgs);
-  const macros = [
+  const derived = [
     ...new Set(
       Object.values(manifest.orgs).flatMap((entry) => [
         ...(entry.sections ?? []).map((section) => section.macro),
@@ -148,7 +148,20 @@ export default function App() {
       ]),
     ),
   ];
+  // The manifest's family order wins where it knows the macro; anything it
+  // doesn't list (older manifest, ad-hoc macro) keeps its derived position.
+  const declared = (manifest.macro_order ?? []).filter((name) => derived.includes(name));
+  const macros = [...declared, ...derived.filter((name) => !declared.includes(name))];
   const activeMacro = macros.includes(macro) ? macro : macros[0];
+  // Umbrella tabs: a macro with a parent renders as a sub-tab of that parent.
+  // The top bar shows one entry per umbrella (in content order); a second tab
+  // row appears for the active umbrella's members. The hash keeps storing the
+  // actual macro, so old links keep working.
+  const parents = manifest.macro_parents ?? {};
+  const topOf = (name: string) => parents[name] ?? name;
+  const topTabs = [...new Set(macros.map(topOf))];
+  const activeTop = topOf(activeMacro);
+  const subTabs = macros.filter((name) => parents[name] === activeTop);
   // The org tab bar appears only on macros where more than one org actually
   // has content (e.g. only Contributors for hiero-hackers).
   const orgsForMacro = orgs.filter((name) => {
@@ -168,7 +181,13 @@ export default function App() {
       <p className="sub">
         Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart to enlarge.
       </p>
-      <TabBar items={macros} active={activeMacro} onSelect={setMacro} kind="macro" />
+      <TabBar
+        items={topTabs}
+        active={activeTop}
+        onSelect={(name) => setMacro(macros.find((candidate) => topOf(candidate) === name) ?? name)}
+        kind="macro"
+      />
+      {subTabs.length > 0 && <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />}
       {/* Every macro ships its own explainer, listing only what that tab
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}

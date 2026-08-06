@@ -20,7 +20,7 @@ from hiero_analytics.analysis.difficulty_analysis import (
     issues_labeled_since,
     issues_unlabeled_created_since,
 )
-from hiero_analytics.config.analysis import DIFFICULTY_RECENT_WINDOWS, TIMELINE_MAX_WORKERS
+from hiero_analytics.config.analysis import TIMELINE_MAX_WORKERS
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest import (
@@ -32,6 +32,7 @@ from hiero_analytics.domain.labels import (
     DIFFICULTY_LEVELS,
     DIFFICULTY_ORDER,
 )
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
 from hiero_analytics.plotting.bars import plot_stacked_bar
@@ -44,15 +45,23 @@ def _run_window(
     issues: list[IssueRecord],
     timeline_events: list[IssueTimelineEventRecord],
     *,
-    window_days: int,
+    window_days: int | None,
     window_label: str,
+    suffix: str,
     org_data_dir: Path,
     org_charts_dir: Path,
 ) -> None:
-    """Produce the difficulty distribution and per-repo bar outputs for one window."""
-    cutoff = datetime.now(UTC) - timedelta(days=window_days)
-    distribution_csv = org_data_dir / f"difficulty_distribution_{window_days}_days.csv"
-    by_repo_csv = org_data_dir / f"difficulty_by_repo_{window_days}_days.csv"
+    """Produce the difficulty distribution and per-repo bar outputs for one span.
+
+    ``window_days=None`` is the all-time span (the whole open backlog); the
+    epoch cutoff makes "labelled or created since" include everything.
+    """
+    if window_days is None:
+        cutoff = datetime(1970, 1, 1, tzinfo=UTC)
+    else:
+        cutoff = datetime.now(UTC) - timedelta(days=window_days)
+    distribution_csv = org_data_dir / f"difficulty_distribution{suffix}.csv"
+    by_repo_csv = org_data_dir / f"difficulty_by_repo{suffix}.csv"
 
     # Identify issues that received a difficulty label within the window.
     labeled_issues = issues_labeled_since(
@@ -119,8 +128,8 @@ def _run_window(
         x_col="repo",
         stack_cols=DIFFICULTY_ORDER,
         labels=DIFFICULTY_ORDER,
-        title=f"Labeled or Newly Created Open Issues By Difficulty (in Last {window_label})",
-        output_path=org_charts_dir / f"difficulty_by_repo_{window_days}_days.png",
+        title=f"Labeled or Newly Created Open Issues By Difficulty ({window_label})",
+        output_path=org_charts_dir / f"difficulty_by_repo{suffix}.png",
         colors=DIFFICULTY_COLORS,
         rotate_x=45,
     )
@@ -149,14 +158,20 @@ def main(org: str = ORG) -> None:
     )
     logger.info("Fetched %d timeline events", len(timeline_events))
 
-    # One fetch, one snapshot per configured window (dashboard tabs).
-    for window_days, window_label in DIFFICULTY_RECENT_WINDOWS:
+    # One fetch, one snapshot per span (dashboard tabs). Spans are the shared
+    # dashboard vocabulary — All time (the base file), then each activity
+    # period widest-first, so the chart tabs match the tables everywhere else.
+    spans = [("All time", None, "")] + [
+        (period.label, period.days, f"_{period.key}") for period in reversed(ACTIVITY_PERIODS)
+    ]
+    for window_label, window_days, suffix in spans:
         _run_window(
             df,
             issues,
             timeline_events,
             window_days=window_days,
             window_label=window_label,
+            suffix=suffix,
             org_data_dir=org_data_dir,
             org_charts_dir=org_charts_dir,
         )
