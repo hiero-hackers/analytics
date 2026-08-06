@@ -384,11 +384,15 @@ def outputs_root(tmp_path_factory) -> Path:
 
 
 def _spec_chart_files() -> dict[str, set[str]]:
-    """Org -> set of chart filenames the spec lists."""
+    """Org -> set of chart filenames the spec lists.
+
+    "*" cards are org-independent and best-effort per org, but the primary org
+    runs every pipeline, so they are pinned against it.
+    """
     per_org: dict[str, set[str]] = {}
     for macro in CHART_MACROS:
         for org, specs in macro["charts"].items():
-            files = per_org.setdefault(org, set())
+            files = per_org.setdefault(PRIMARY if org == "*" else org, set())
             for spec in specs:
                 for _caption, variants in spec["files"]:
                     files.update(filename for _label, filename in variants)

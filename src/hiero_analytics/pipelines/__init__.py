@@ -16,17 +16,22 @@ from __future__ import annotations
 from hiero_analytics.pipelines._registry import Pipeline
 
 PIPELINES: tuple[Pipeline, ...] = (
-    Pipeline("difficulty", "Run repo difficulty analysis", args=("org",), offline=True),
-    Pipeline("difficulty_over_time", "Run difficulty over time analysis", args=("org",), offline=True),
+    # extra_orgs marks the org-independent pipelines: they need no governance
+    # config, so the full run repeats them for each EXTRA_ORGS org and the
+    # per-org dashboard fills in wherever data can exist. The governance-shaped
+    # pipelines (roles, teams, affiliations, HIPs) stay primary-org only, and
+    # onboarding/contributor_profiles are repo-scoped rather than org-scoped.
+    Pipeline("difficulty", "Run repo difficulty analysis", args=("org",), offline=True, extra_orgs=True),
+    Pipeline("difficulty_over_time", "Run difficulty over time analysis", args=("org",), offline=True, extra_orgs=True),
     Pipeline("onboarding", "Analyze repo onboarding signals", args=("org", "repo")),
     Pipeline("contributor_profiles", "Analyze contributor profiles", args=("org", "repo")),
     Pipeline("maintainer_pipeline", "Run maintainer analytics pipeline", args=("org",), offline=True),
-    Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True),
+    Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True, extra_orgs=True),
     Pipeline("contributor_heatmap", "Generate contributor activity heatmaps", args=("org",), offline=True),
     Pipeline("role_coverage", "Analyze role coverage for organization", args=("org",), offline=True),
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
-    Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",)),
-    Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",)),
+    Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
+    Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",), extra_orgs=True),
     Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays

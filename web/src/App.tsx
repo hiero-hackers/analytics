@@ -180,6 +180,9 @@ export default function App() {
       <p className="sub">
         Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart to enlarge.
       </p>
+      {/* The org filter is the outermost scope — everything below it is "this
+          org's view" — so it sits above the content tabs. */}
+      {orgs.length > 1 && <TabBar items={orgs} active={shownOrg} onSelect={setOrg} kind="tab" />}
       <TabBar
         items={topTabs}
         active={activeTop}
@@ -187,7 +190,6 @@ export default function App() {
         kind="macro"
       />
       {subTabs.length > 0 && <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />}
-      {orgs.length > 1 && <TabBar items={orgs} active={shownOrg} onSelect={setOrg} kind="tab" />}
       {/* Every macro ships its own explainer, listing only what that tab
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}

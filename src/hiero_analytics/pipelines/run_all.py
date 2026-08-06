@@ -15,10 +15,11 @@ Each pipeline is isolated: a failure is logged and the remaining pipelines still
 run, and the process exits non-zero if any pipeline failed so CI surfaces it.
 
 Multi-org: the full pipeline set runs for the primary org (``GITHUB_ORG``). Any
-``GITHUB_EXTRA_ORGS`` (comma-separated) additionally get contributor-activity
-only — the governance pipelines are tied to the primary org's config.yaml. The
-org-aware data API then runs once and emits a per-org entry for every org with
-data, which the web dashboard renders.
+``GITHUB_EXTRA_ORGS`` (comma-separated) additionally run every org-independent
+pipeline (the registry's ``extra_orgs`` flag: contributor activity, difficulty,
+scorecards, codeowners) — the governance pipelines stay tied to the primary
+org's config.yaml. The org-aware data API then runs once and emits a per-org
+entry for every org with data, which the web dashboard renders.
 """
 
 from __future__ import annotations
@@ -29,15 +30,15 @@ from collections.abc import Callable
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import DATASETS_DIR, EXTRA_ORGS
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets
-from hiero_analytics.pipelines import PIPELINES_BY_NAME, default_run_pipelines
+from hiero_analytics.pipelines import PIPELINES, PIPELINES_BY_NAME, default_run_pipelines
 from hiero_analytics.provenance import SNAPSHOT_MANIFEST_NAME, write_snapshot_manifest
 
 logger = logging.getLogger(__name__)
 
-# Extra orgs (config.paths.EXTRA_ORGS) get contributor-activity only — running
-# the governance pipelines for an ungoverned org would produce empty role/team
-# data. The data API (run once at the end) is org-aware and picks up every org
-# that has data.
+# Extra orgs (config.paths.EXTRA_ORGS) run only the org-independent pipelines
+# (registry ``extra_orgs`` flag) — running the governance pipelines for an
+# ungoverned org would produce empty role/team data. The data API (run once at
+# the end) is org-aware and picks up every org that has data.
 
 
 def _resolve(name: str) -> Callable[..., None]:
@@ -96,19 +97,26 @@ def pipelines_for_current_mode(
     return selected
 
 
-def _run_extra_org(org: str) -> bool:
-    """Run contributor-activity for an extra org in-process. Returns True on success.
+def _run_extra_org(org: str) -> list[str]:
+    """Run every org-independent pipeline for an extra org in-process.
 
-    The runner takes the org as an explicit argument, so no environment mutation
-    (or subprocess) is needed and the extra org shares this process's fetch cache.
+    Each runner takes the org as an explicit argument, so no environment
+    mutation (or subprocess) is needed and the extra org shares this process's
+    fetch cache. Failures are isolated per pipeline, like the primary run;
+    returns the ``name[org]`` labels of the pipelines that failed.
     """
-    logger.info("=== Extra org (contributor activity only): %s ===", org)
-    try:
-        _resolve("contributor_activity")(org=org)
-    except Exception:
-        logger.exception("Extra-org contributor activity failed for %s", org)
-        return False
-    return True
+    failures: list[str] = []
+    offline = offline_mode_enabled()
+    for pipeline in PIPELINES:
+        if not pipeline.extra_orgs or (offline and not pipeline.offline):
+            continue
+        logger.info("=== Extra org %s: %s ===", org, pipeline.name)
+        try:
+            pipeline.resolve()(org=org)
+        except Exception:
+            logger.exception("Extra-org pipeline %s failed for %s", pipeline.name, org)
+            failures.append(f"{pipeline.name}[{org}]")
+    return failures
 
 
 def main(*, fail_fast: bool = False) -> None:
@@ -125,7 +133,8 @@ def main(*, fail_fast: bool = False) -> None:
         logger.error("%d pipeline(s) failed: %s", len(failures), ", ".join(failures))
         raise SystemExit(1)
 
-    failures += [f"contributor_activity[{org}]" for org in EXTRA_ORGS if not _run_extra_org(org)]
+    for extra_org in EXTRA_ORGS:
+        failures += _run_extra_org(extra_org)
 
     # Reclaim datasets no resource claims any more, before provenance reads the
     # directory: an orphan (a fetch renamed or re-scoped, so nothing rewrites

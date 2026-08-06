@@ -13,7 +13,9 @@ from hiero_analytics.dashboard_spec.glossary import glossary_of
 CHART_MACRO = {
     "name": "Contributors",
     "charts": {
-        "hiero-ledger": [
+        # "*": org-independent — these cards render for any org whose pipelines
+        # produced the files (missing variants drop out per org).
+        "*": [
             {
                 "id": "contributor-network",
                 "title": "Contributor network",

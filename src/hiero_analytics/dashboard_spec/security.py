@@ -7,14 +7,16 @@ from __future__ import annotations
 
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
-    "Not yet generated for this org: the scorecard and repo-compliance pipelines "
-    "are org-independent, but the scheduled run currently covers hiero-ledger only."
+    "Nothing generated for this org yet: the scorecard and repo-compliance "
+    "pipelines are org-independent, so this fills in on the next full run."
 )
 
 CHART_MACRO = {
     "name": "Security & scorecards",
     "charts": {
-        "hiero-ledger": [
+        # "*": org-independent — these cards render for any org whose pipelines
+        # produced the files (missing variants drop out per org).
+        "*": [
             {
                 "id": "scorecard",
                 "title": "OpenSSF scorecard",

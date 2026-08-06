@@ -22,6 +22,10 @@ class Pipeline:
     # datasets; the rest need live network access and are skipped in offline
     # PR previews rather than silently making requests.
     offline: bool = False
+    # Org-independent pipelines (no governance config needed) also run once per
+    # extra org (config.paths.EXTRA_ORGS) during the full run, so every org's
+    # dashboard fills in wherever the data can exist.
+    extra_orgs: bool = False
     # Default-run pipelines execute in registry order during a full run (the
     # order CI used when they were separate steps); the others are CLI-only.
     in_default_run: bool = True

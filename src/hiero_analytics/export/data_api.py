@@ -240,7 +240,10 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
     chart_dir = paths.ORG_CHARTS_DIR / org
     sections = []
     for macro in CHART_MACROS:
-        for spec in macro["charts"].get(org, []):
+        # "*" declares org-independent cards: they apply to any org, and the
+        # per-variant existence filter below drops whatever an org's pipelines
+        # didn't produce. An explicit org key overrides the wildcard.
+        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
             charts = []
             for caption, variant_specs in spec["files"]:
                 variants = [
