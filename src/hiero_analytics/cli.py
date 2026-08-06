@@ -40,7 +40,12 @@ def _build_parser() -> argparse.ArgumentParser:
         metavar="<command>",
     )
 
-    subparsers.add_parser("all", help="Run the full suite of analytics pipelines (the default)")
+    all_parser = subparsers.add_parser("all", help="Run the full suite of analytics pipelines (the default)")
+    all_parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop after the first pipeline failure instead of continuing",
+    )
     for pipeline in PIPELINES:
         subparser = subparsers.add_parser(pipeline.name, help=pipeline.description)
         for option in pipeline.args:
@@ -55,7 +60,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     command = args.command or "all"
 
     if command == "all":
-        run_all.main()  # does its own logging setup; exits non-zero on any failure
+        # Bare `hiero-analytics` has no --fail-fast; only the explicit `all` subcommand does.
+        fail_fast = getattr(args, "fail_fast", False)
+        run_all.main(fail_fast=fail_fast)  # does its own logging setup; exits non-zero on any failure
         return 0
 
     pipeline = PIPELINES_BY_NAME[command]

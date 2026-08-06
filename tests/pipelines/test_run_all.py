@@ -25,6 +25,23 @@ def test_run_pipelines_runs_all_and_isolates_failures():
     assert failures == ["b"]
 
 
+def test_run_pipelines_fail_fast_stops_after_first_failure():
+    """With fail_fast, the first failure aborts the remaining pipelines."""
+    calls = []
+
+    def boom():
+        calls.append("a")
+        raise RuntimeError("kaboom")
+
+    def ok_b():
+        calls.append("b")
+
+    failures = run_all.run_pipelines([("a", boom), ("b", ok_b)], fail_fast=True)
+
+    assert calls == ["a"]
+    assert failures == ["a"]
+
+
 def test_run_extra_org_calls_runner_in_process_with_org(monkeypatch):
     """Extra orgs run the contributor-activity runner in-process, passing the org explicitly."""
     seen = []
@@ -104,6 +121,29 @@ def test_main_exits_nonzero_when_a_pipeline_fails(monkeypatch):
         run_all.main()
 
     assert exc_info.value.code == 1
+
+
+def test_main_fail_fast_skips_remaining_work_after_pipeline_failure(monkeypatch):
+    """With fail_fast, main() exits after the first failure and skips later stages."""
+
+    def boom():
+        raise RuntimeError("fail")
+
+    monkeypatch.setattr(run_all, "setup_logging", lambda: None)
+    monkeypatch.setattr(run_all, "default_pipelines", lambda: [("boom", boom), ("later", lambda: None)])
+    monkeypatch.setattr(run_all, "EXTRA_ORGS", ["extra-org"])
+
+    extra_org_calls = []
+    resolve_calls = []
+    monkeypatch.setattr(run_all, "_run_extra_org", lambda org: extra_org_calls.append(org) or True)
+    monkeypatch.setattr(run_all, "_resolve", lambda name: resolve_calls.append(name) or (lambda: None))
+
+    with pytest.raises(SystemExit) as exc_info:
+        run_all.main(fail_fast=True)
+
+    assert exc_info.value.code == 1
+    assert extra_org_calls == []
+    assert resolve_calls == []
 
 
 def test_main_succeeds_when_all_pipelines_pass(monkeypatch):

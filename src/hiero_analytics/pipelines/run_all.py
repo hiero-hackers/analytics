@@ -50,14 +50,25 @@ def default_pipelines() -> list[tuple[str, Callable[[], None]]]:
     return [(pipeline.name, pipeline.resolve()) for pipeline in default_run_pipelines()]
 
 
-def run_pipelines(pipelines: list[tuple[str, Callable[[], None]]]) -> list[str]:
-    """Run each pipeline, isolating failures. Returns the names that failed."""
+def run_pipelines(
+    pipelines: list[tuple[str, Callable[[], None]]],
+    *,
+    fail_fast: bool = False,
+) -> list[str]:
+    """Run each pipeline, isolating failures. Returns the names that failed.
+
+    With ``fail_fast=True``, stop after the first failure instead of continuing.
+    """
     failures: list[str] = []
     for name, pipeline in pipelines:
         logger.info("=== Running pipeline: %s ===", name)
         try:
             pipeline()
         except Exception:
+            if fail_fast:
+                logger.exception("Pipeline %s failed; stopping due to --fail-fast", name)
+                failures.append(name)
+                return failures
             logger.exception("Pipeline %s failed; continuing with the rest", name)
             failures.append(name)
     return failures
@@ -100,14 +111,20 @@ def _run_extra_org(org: str) -> bool:
     return True
 
 
-def main() -> None:
+def main(*, fail_fast: bool = False) -> None:
     """Run the primary-org pipelines, extra-org activity, then the data API once.
 
-    Exits non-zero if any pipeline (or the API emit) failed.
+    Exits non-zero if any pipeline (or the API emit) failed. With
+    ``fail_fast=True``, stop after the first primary-org pipeline failure and
+    skip the remaining work (extra orgs, snapshot manifest, data API).
     """
     setup_logging()
 
-    failures = run_pipelines(pipelines_for_current_mode())
+    failures = run_pipelines(pipelines_for_current_mode(), fail_fast=fail_fast)
+    if fail_fast and failures:
+        logger.error("%d pipeline(s) failed: %s", len(failures), ", ".join(failures))
+        raise SystemExit(1)
+
     failures += [f"contributor_activity[{org}]" for org in EXTRA_ORGS if not _run_extra_org(org)]
 
     # Describe the snapshot before the data API emits against it. Written

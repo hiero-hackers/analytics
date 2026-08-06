@@ -63,8 +63,17 @@ def test_cli_reports_pipeline_failure_with_exit_code(monkeypatch):
 def test_cli_defaults_to_full_run(monkeypatch):
     """No arguments (and the `all` command) run the full suite."""
     ran = []
-    monkeypatch.setattr(cli.run_all, "main", lambda: ran.append(True))
+    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: ran.append(fail_fast))
 
     assert cli.main([]) == 0
     assert cli.main(["all"]) == 0
-    assert ran == [True, True]
+    assert ran == [False, False]
+
+
+def test_cli_all_forwards_fail_fast(monkeypatch):
+    """The explicit `all --fail-fast` flag is forwarded to run_all.main()."""
+    seen = []
+    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: seen.append(fail_fast))
+
+    assert cli.main(["all", "--fail-fast"]) == 0
+    assert seen == [True]
