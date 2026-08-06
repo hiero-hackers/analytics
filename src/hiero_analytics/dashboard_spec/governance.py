@@ -84,6 +84,9 @@ CHART_MACRO = {
             {
                 "id": "org-diversity",
                 "title": "Organisation diversity",
+                # Renders inside the Organisation-diversity table group, directly
+                # above its companion tables, rather than in the Charts block.
+                "group": "Organisation diversity",
                 "description": (
                     "Where maintainer authority sits — org-wide, per team and per repo. The first chart is "
                     "the ecosystem-wide split of maintainers by employer (solo contributors pooled as "
@@ -92,57 +95,18 @@ CHART_MACRO = {
                     "down each repository's and each team's maintainer mix. See the affiliations and "
                     "repo-diversity tables below for the underlying detail."
                 ),
-                # Each chart drills through the shared spans — the full roster,
-                # then who was active in the last year, month, and week — the
-                # same vocabulary as every other card.
+                # Deliberately not time-filterable: diversity is a property of
+                # the roster, and windowing it mostly re-measures activity,
+                # which the activity cards already do. The diversity *tables*
+                # below do carry period tabs for the drill-down.
                 # The compact charts share the top rows; the two wide
                 # composition charts then stack full-width, one row each.
                 "files": [
-                    (
-                        "Maintainers by organisation",
-                        [
-                            ("All time", "affiliation_donut.png"),
-                            ("1 year", "affiliation_donut_365d.png"),
-                            ("1 month", "affiliation_donut_30d.png"),
-                            ("Week", "affiliation_donut_7d.png"),
-                        ],
-                    ),
-                    (
-                        "Single-employer teams by org",
-                        [
-                            ("All time", "single_employer_teams_by_org.png"),
-                            ("1 year", "single_employer_teams_by_org_365d.png"),
-                            ("1 month", "single_employer_teams_by_org_30d.png"),
-                            ("Week", "single_employer_teams_by_org_7d.png"),
-                        ],
-                    ),
-                    (
-                        "Single-employer repos by org",
-                        [
-                            ("All time", "single_employer_repos_by_org.png"),
-                            ("1 year", "single_employer_repos_by_org_365d.png"),
-                            ("1 month", "single_employer_repos_by_org_30d.png"),
-                            ("Week", "single_employer_repos_by_org_7d.png"),
-                        ],
-                    ),
-                    (
-                        "Organisation mix by repo",
-                        [
-                            ("All time", "repo_affiliation_composition.png"),
-                            ("1 year", "repo_affiliation_composition_365d.png"),
-                            ("1 month", "repo_affiliation_composition_30d.png"),
-                            ("Week", "repo_affiliation_composition_7d.png"),
-                        ],
-                    ),
-                    (
-                        "Organisation mix by team",
-                        [
-                            ("All time", "team_affiliation_composition.png"),
-                            ("1 year", "team_affiliation_composition_365d.png"),
-                            ("1 month", "team_affiliation_composition_30d.png"),
-                            ("Week", "team_affiliation_composition_7d.png"),
-                        ],
-                    ),
+                    ("Maintainers by organisation", "affiliation_donut.png"),
+                    ("Single-employer teams by org", "single_employer_teams_by_org.png"),
+                    ("Single-employer repos by org", "single_employer_repos_by_org.png"),
+                    ("Organisation mix by repo", "repo_affiliation_composition.png"),
+                    ("Organisation mix by team", "team_affiliation_composition.png"),
                 ],
             },
         ],
@@ -201,15 +165,12 @@ SECTION_SPECS = [
         "title": "Who carries the review load",
         "description": (
             "For each repo, the share of review+merge work in the selected period done by the single busiest "
-            "person who can merge — committer or maintainer. 'mergers' is how many reviewed/merged; "
-            "'top role' is whether the busiest is a committer or maintainer; 'top %' is their share, "
-            "'top-2 %' the top two combined. Highest concentration first; repos with under 20 recent "
-            "review+merge actions are omitted."
+            "person who can merge — committer or maintainer. 'top role' is whether the busiest is a "
+            "committer or maintainer; 'top %' is their share, 'top-2 %' the top two combined. Highest "
+            "concentration first; repos with under 20 recent review+merge actions are omitted."
         ),
         "columns": [
             ("repo", "repo"),
-            ("mergers", "mergers", "number"),
-            ("load_recent", "review+merge", "number"),
             ("top_carrier", "top carrier"),
             ("top_role", "top role"),
             ("top_pct", "top %", "number"),
@@ -263,7 +224,8 @@ SECTION_SPECS = [
     {
         "id": "repodiversity",
         "file": "repo_affiliation_diversity.csv",
-        "periods": True,
+        # Deliberately not time-filterable (like the diversity charts):
+        # diversity is a property of the roster, not of a window's activity.
         "title": "Maintainer organisation diversity by repo",
         "description": (
             "Per repo: how many maintainers it has, how many distinct employers they span, the largest "
@@ -285,7 +247,7 @@ SECTION_SPECS = [
     {
         "id": "teamdiversity",
         "file": "team_affiliation_diversity.csv",
-        "periods": True,
+        # Deliberately not time-filterable — see repodiversity above.
         "title": "Team organisation concentration",
         "description": (
             "Per governance team: how many members resolve to an employer, how many distinct employers "
@@ -312,11 +274,14 @@ SECTION_SPECS = [
     {
         "id": "gonedark",
         "file": "role_coverage_globally_quiet.csv",
-        "title": "Permission-holders with no recent activity (180+ days)",
+        "periods": True,
+        "title": "Permission-holders with no recent activity",
         "description": (
-            "Permission-holders with no recorded activity in any repo in the last 180 days. "
-            "Useful for keeping access lists current. A blank 'days since active' means no "
-            "recorded activity yet."
+            "Permission-holders with no recorded activity in any repo within the selected "
+            "period; 'All time' lists those with no recorded activity at all. Useful for "
+            "keeping access lists current. A blank 'days since active' means no recorded "
+            "activity yet. The 'quiet permission-holders' KPI tile above stays at a fixed "
+            "180-day threshold regardless of the tab."
         ),
         "columns": [
             ("user", "user"),
@@ -407,8 +372,6 @@ GLOSSARY = glossary_of(
         "issues",
         "labels",
         "actions",
-        "review+merge",
-        "mergers",
         "top carrier / top % / top role",
         "role / role here",
         "highest role",
@@ -453,13 +416,7 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 # horizontally at a readable height instead of squashing them to the card width.
 WIDE_CHARTS = {
     "repo_affiliation_composition.png",
-    "repo_affiliation_composition_365d.png",
-    "repo_affiliation_composition_30d.png",
-    "repo_affiliation_composition_7d.png",
     "team_affiliation_composition.png",
-    "team_affiliation_composition_365d.png",
-    "team_affiliation_composition_30d.png",
-    "team_affiliation_composition_7d.png",
 }
 
 # "How to read this" notes, keyed by chart filename. These describe how to read the

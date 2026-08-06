@@ -76,20 +76,8 @@ CLI_ONLY_CHARTS = {
 # artifact; the CSV is its exportable source) and non-dashboard reports.
 CHART_COMPANION_CSVS = {
     "affiliation_distribution.csv",
-    "affiliation_distribution_365d.csv",
-    "affiliation_distribution_30d.csv",
-    "affiliation_distribution_7d.csv",
-    "maintainer_affiliations_365d.csv",
-    "maintainer_affiliations_30d.csv",
-    "maintainer_affiliations_7d.csv",
     "repo_affiliation_composition.csv",
-    "repo_affiliation_composition_365d.csv",
-    "repo_affiliation_composition_30d.csv",
-    "repo_affiliation_composition_7d.csv",
     "team_affiliation_composition.csv",
-    "team_affiliation_composition_365d.csv",
-    "team_affiliation_composition_30d.csv",
-    "team_affiliation_composition_7d.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
     "contributor_activity_heatmap.csv",
     "org_activity_heatmap.csv",
@@ -343,7 +331,7 @@ def outputs_root(tmp_path_factory) -> Path:
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
-        for mod in (role_coverage_mod, affiliation_mod, activity_mod):
+        for mod in (role_coverage_mod, activity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)
         mp.setattr(affiliation_mod, "load_affiliations", lambda: AFFILIATIONS)
         mp.setattr(affiliation_mod, "load_manual_logins", set)

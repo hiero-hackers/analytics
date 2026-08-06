@@ -55,6 +55,8 @@ export interface ChartSection {
   macro: string;
   title: string;
   description: string;
+  /** Renders inside this named table group (above its tables) instead of the Charts block. */
+  group?: string;
   slideshow?: boolean;
   charts: ChartSpec[];
   /** A companion CSV copied into the API tree, offered as a download. */

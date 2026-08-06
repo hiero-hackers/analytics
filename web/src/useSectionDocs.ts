@@ -14,19 +14,22 @@ export interface LoadedSections {
   docs: SectionDoc[];
   /** Titles of the sections that could not be loaded. */
   failed: string[];
+  /** True until every ref has settled — lets layout wait rather than reshuffle. */
+  loading: boolean;
 }
 
 export function useSectionDocs(refs: SectionRef[]): LoadedSections {
-  const [state, setState] = useState<LoadedSections>({ docs: [], failed: [] });
+  const [state, setState] = useState<LoadedSections>({ docs: [], failed: [], loading: refs.length > 0 });
 
   useEffect(() => {
     let cancelled = false;
-    setState({ docs: [], failed: [] });
+    setState({ docs: [], failed: [], loading: refs.length > 0 });
     Promise.allSettled(refs.map((ref) => fetchSection(ref))).then((results) => {
       if (cancelled) return;
       setState({
         docs: results.flatMap((result) => (result.status === "fulfilled" ? [result.value] : [])),
         failed: refs.filter((_ref, index) => results[index].status === "rejected").map((ref) => ref.title),
+        loading: false,
       });
     });
     return () => {

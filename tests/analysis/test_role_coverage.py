@@ -194,6 +194,16 @@ def test_globally_quiet_flags_only_dark_everywhere():
     assert bob["days_since_active"] == 182
 
 
+def test_globally_quiet_none_threshold_keeps_only_never_active():
+    """threshold_days=None is the all-time reading: any recorded activity, however old, counts."""
+    last_seen = latest_activity_by_account([_ev("bob", "authored_pull_request", 2, month=1)])
+    role_lookup = {"repoA": {"bob": "triage", "ghost": "maintainer"}}
+    quiet = find_globally_quiet_role_holders(
+        role_lookup, last_seen, now=datetime(2030, 1, 1, tzinfo=UTC), threshold_days=None
+    )
+    assert list(quiet["user"]) == ["ghost"]  # bob acted once, years ago -> still excluded
+
+
 def test_globally_quiet_empty_when_all_recently_active():
     """No quiet rows when every holder is active within the window."""
     last_seen = latest_activity_by_account([_ev("m", "reviewed_pull_request", 1, target_author="x", month=6)])

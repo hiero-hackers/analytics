@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from hiero_analytics.config.analysis import GONE_DARK_DAYS
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.domain.roles import ROLE_PRIORITY
 
@@ -78,15 +79,22 @@ def contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) ->
     return metrics
 
 
-def governance_metrics(loaded: dict[str, pd.DataFrame], _org_data_dir: Path) -> list:
+def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> list:
     """Headline tiles for the Governance macro."""
     metrics: list = []
     role_counts = _holders_by_highest_role(loaded["repo"])
     for role, label in (("maintainer", "maintainers"), ("committer", "committers"), ("triage", "triage")):
         if role in role_counts:
             metrics.append((label, role_counts[role]))
-    if not loaded["gonedark"].empty:
-        metrics.append(("quiet permission-holders (180d+)", len(loaded["gonedark"])))
+    # The gonedark table follows the shared period tabs, but this tile keeps its
+    # fixed 180-day access-hygiene threshold. Quiet-for-a-month is a superset of
+    # quiet-for-180-days, so the 30d variant filters down to it exactly; a blank
+    # days_since_active is a holder with no recorded activity at all.
+    month = next((p for p in ACTIVITY_PERIODS if p.key == "30d"), None)
+    quiet_month = _load(org_data_dir / month.filename("role_coverage_globally_quiet")) if month else pd.DataFrame()
+    if "days_since_active" in quiet_month:
+        days = quiet_month["days_since_active"]
+        metrics.append(("quiet permission-holders (180d+)", int((days.isna() | (days >= GONE_DARK_DAYS)).sum())))
     if "status" in loaded["teams"]:
         metrics.append(("quiet teams", int((loaded["teams"]["status"] == "quiet").sum())))
     return metrics

@@ -7,8 +7,9 @@ are currently active or **quiet in that repo** (no activity in that window) — 
 combined ``role_coverage_all`` table (filter by repo) and the inverse
 promotion-candidate list. Status and days-since-active reflect all-time recency.
 Because roles are granted per repo, the only org-wide quiet list is
-``role_coverage_globally_quiet``: holders with no activity in *any* repo for over
-``GONE_DARK_DAYS`` days. Also emits team-activity and TSC tables.
+``role_coverage_globally_quiet``: holders with no activity in *any* repo within
+the shared activity periods (the base file lists holders never active at all).
+Also emits team-activity and TSC tables.
 
 This complements the role-agnostic contributor-activity tables; here we use the
 role names deliberately, to show each permission-holder's recent activity in the
@@ -196,11 +197,19 @@ def _write_team_tables(
     (``role_coverage_all.csv``) already has repo+user+role+activity at the same
     per-person granularity, filterable to any maintainer.
     """
-    globally_quiet = find_globally_quiet_role_holders(
-        role_lookup, global_last_seen, now=now, threshold_days=GONE_DARK_DAYS
-    )
-    save_dataframe(globally_quiet, org_data_dir / "role_coverage_globally_quiet.csv")
-    logger.info("%d role-holders with no activity in any repo (>%d days)", len(globally_quiet), GONE_DARK_DAYS)
+    # The quiet table follows the shared periods: the base ("All time") lists
+    # holders with no recorded activity at all; each variant lists those with
+    # none inside that window. The fixed-threshold "quiet 180d+" KPI tile is
+    # derived from the 1-month variant in export/macro_metrics (quiet for a
+    # month is a superset of quiet for 180 days).
+    never_active = find_globally_quiet_role_holders(role_lookup, global_last_seen, now=now, threshold_days=None)
+    save_dataframe(never_active, org_data_dir / "role_coverage_globally_quiet.csv")
+    for period in ACTIVITY_PERIODS:
+        globally_quiet = find_globally_quiet_role_holders(
+            role_lookup, global_last_seen, now=now, threshold_days=period.days
+        )
+        save_dataframe(globally_quiet, org_data_dir / period.filename("role_coverage_globally_quiet"))
+    logger.info("%d role-holders with no recorded activity in any repo, ever", len(never_active))
 
     team_members = build_team_membership(config)
     period_summaries = {}

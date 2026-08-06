@@ -101,12 +101,11 @@ def test_activity_specs_use_the_shared_period_set():
         "repoactivity",
         "understaffed",
         "loadshare",
+        "gonedark",
         "repo",
         "teams",
         "teamrepo",
         "tscrepo",
-        "repodiversity",
-        "teamdiversity",
     }
     assert all(spec["periods"] is True for spec in tabbed.values())
 

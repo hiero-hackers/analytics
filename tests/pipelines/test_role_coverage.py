@@ -147,6 +147,8 @@ def test_main_creates_output_files(
         "team_activity_summary.csv",
         "team_activity_by_repo.csv",
         "role_coverage_globally_quiet.csv",
+        "role_coverage_globally_quiet_30d.csv",
+        "role_coverage_globally_quiet_7d.csv",
         "repo_activity_overview.csv",
         "tsc_activity_by_repo.csv",
     ]

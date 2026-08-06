@@ -267,6 +267,10 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                 }
                 if spec.get("slideshow"):
                     section["slideshow"] = True
+                # A grouped chart card renders inside the named table group
+                # (above its tables) instead of the tab-top Charts block.
+                if spec.get("group"):
+                    section["group"] = spec["group"]
                 _attach_download(section, spec, org, org_data_dir, org_dir)
                 sections.append(section)
     return sections

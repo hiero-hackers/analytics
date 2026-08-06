@@ -45,11 +45,15 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     () => (entry.views ?? []).filter((view) => view.macro === macro),
     [entry, macro],
   );
-  const { docs, failed } = useSectionDocs(refs);
+  const { docs, failed, loading: docsLoading } = useSectionDocs(refs);
   const { views, failed: failedViews, loading: viewsLoading } = useViewDocs(viewRefs);
   const unavailable = [...failedViews, ...failed];
 
-  const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
+  const allChartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
+  // A chart section with a `group` renders inside that named table group,
+  // directly above its companion tables; the rest form the tab-top Charts block.
+  const chartSections = allChartSections.filter((section) => !section.group);
+  const groupedCharts = allChartSections.filter((section) => section.group);
   const provenance = manifest.provenance;
   const groups: Group[] = [
     // Legacy order: a family's bespoke views (board, matrix) lead its chart
@@ -76,11 +80,29 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     ...groupSections(docs).map(
       ([name, sections]): Group => [
         name,
-        sections.map((doc) => (
-          <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />
-        )),
+        <>
+          {groupedCharts
+            .filter((section) => section.group === name)
+            .map((section) => (
+              <ChartSectionCard key={section.id} section={section} provenance={provenance} />
+            ))}
+          {sections.map((doc) => (
+            <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />
+          ))}
+        </>,
       ],
     ),
+    // A grouped chart whose group has no (loaded) tables still needs a home:
+    // give it its own group so it never silently disappears. Waits for the
+    // docs to settle so the card doesn't paint alone and then jump into place.
+    ...groupedCharts
+      .filter((section) => !docsLoading && !groupSections(docs).some(([name]) => name === section.group))
+      .map(
+        (section): Group => [
+          section.group ?? "",
+          <ChartSectionCard key={section.id} section={section} provenance={provenance} />,
+        ],
+      ),
   ];
 
   return (

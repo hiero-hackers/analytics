@@ -200,7 +200,7 @@ def find_globally_quiet_role_holders(
     last_seen: dict[str, tuple],
     *,
     now: datetime,
-    threshold_days: int = 90,
+    threshold_days: int | None = 90,
 ) -> pd.DataFrame:
     """Permission-holders who are quiet across *every* repo, not just one.
 
@@ -208,7 +208,9 @@ def find_globally_quiet_role_holders(
     inactive in one repo with heavy activity in another. This instead flags
     holders whose *global* last activity (anywhere in the org) is older than
     ``threshold_days`` — or who have no recorded activity at all — i.e. genuinely
-    gone dark. ``last_seen`` is the all-time recency map
+    gone dark. ``threshold_days=None`` keeps only the never-active holders (any
+    recorded activity, however old, counts as active — the "all time" reading).
+    ``last_seen`` is the all-time recency map
     ``{account_lower: (last_active, display_login)}``. Sorted most-stale first
     (never-active holders at the top); ``days_since_active`` is blank for those.
     """

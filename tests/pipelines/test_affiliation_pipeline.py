@@ -13,10 +13,7 @@ import pytest
 matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.affiliation as runner
-from hiero_analytics.data_sources.models import (
-    ContributorActivityRecord,
-    IssueTimelineEventRecord,
-)
+from hiero_analytics.data_sources.models import ContributorActivityRecord
 
 TEST_ORG = "test-org"
 
@@ -38,18 +35,6 @@ def _test_activity(
         occurred_at=datetime.now(UTC) - timedelta(days=days_ago),
         target_type="pull_request",
         target_number=number,
-    )
-
-
-def _test_label_event(repo: str, actor: str, days_ago: int = 5) -> IssueTimelineEventRecord:
-    """Create a synthetic issue label event ``days_ago`` days in the past."""
-    return IssueTimelineEventRecord(
-        repo=repo,
-        issue_number=1,
-        event_type="labeled",
-        occurred_at=datetime.now(UTC) - timedelta(days=days_ago),
-        label="bug",
-        actor=actor,
     )
 
 
@@ -92,7 +77,7 @@ def synthetic_activity() -> list[ContributorActivityRecord]:
     ]
 
 
-def _patch_pipeline(monkeypatch, tmp_path, config, affiliations, manual_logins, activity, label_events):
+def _patch_pipeline(monkeypatch, tmp_path, config, affiliations, manual_logins, activity):
     """Redirect every external call ``main()`` makes to synthetic in-memory data."""
 
     def _fake_org_dirs(_org: str) -> tuple[Path, Path]:
@@ -111,10 +96,6 @@ def _patch_pipeline(monkeypatch, tmp_path, config, affiliations, manual_logins, 
         "hiero_analytics.pipelines.affiliation.load_contributor_activity",
         lambda _client, _org: activity,
     )
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.affiliation.load_issue_label_events",
-        lambda _client, _org: label_events,
-    )
 
 
 # Tests
@@ -128,7 +109,6 @@ def test_main_creates_output_files(
     synthetic_activity,
 ):
     """Running main() should create the affiliation tables and distribution outputs."""
-    label_events = [_test_label_event(f"{TEST_ORG}/sdk-python", "alice", days_ago=4)]
     _patch_pipeline(
         monkeypatch,
         tmp_path,
@@ -136,7 +116,6 @@ def test_main_creates_output_files(
         affiliations,
         {"alice"},
         synthetic_activity,
-        label_events,
     )
 
     runner.main(TEST_ORG)
@@ -147,13 +126,6 @@ def test_main_creates_output_files(
         "affiliation_distribution.csv",
         "repo_affiliation_diversity.csv",
         "team_affiliation_diversity.csv",
-        "maintainer_affiliations_365d.csv",
-        "maintainer_affiliations_30d.csv",
-        "maintainer_affiliations_7d.csv",
-        "affiliation_distribution_365d.csv",
-        "affiliation_distribution_7d.csv",
-        "repo_affiliation_diversity_30d.csv",
-        "team_affiliation_diversity_7d.csv",
     ]
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file
@@ -177,7 +149,7 @@ def test_main_handles_empty_inputs(
     monkeypatch: pytest.MonkeyPatch,
 ):
     """Running main() with an empty config, affiliation map, and activity should not crash."""
-    _patch_pipeline(monkeypatch, tmp_path, {}, {}, set(), [], [])
+    _patch_pipeline(monkeypatch, tmp_path, {}, {}, set(), [])
 
     runner.main(TEST_ORG)
 
