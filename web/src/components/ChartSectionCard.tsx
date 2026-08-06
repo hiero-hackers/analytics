@@ -15,10 +15,13 @@ function Figure({
   chart,
   onZoom,
   slide = false,
+  stretch = false,
 }: {
   chart: ChartSpec;
   onZoom: (chart: ChartSpec, variant: number) => void;
   slide?: boolean;
+  /** Span the full row even though the chart itself is half-width shaped. */
+  stretch?: boolean;
 }) {
   const [variant, setVariant] = useState(0);
   const active = chart.variants[Math.min(variant, chart.variants.length - 1)];
@@ -27,6 +30,9 @@ function Figure({
   // It gets the full row with natural page flow: the dimensions ship with the
   // variant, so the shape decides — nobody hand-flags heatmaps.
   const tall = Boolean(active.width && active.height && active.width / active.height <= 1.05);
+  // Full row without the scroll box: wide-aspect charts with few bars scale to
+  // fit; only hand-flagged `wide` charts (many bars) get horizontal scrolling.
+  const fullRow = chart.wide || chart.full_row || tall || stretch;
   const img = (
     <img
       src={chartUrl(active.file)}
@@ -41,7 +47,7 @@ function Figure({
     />
   );
   return (
-    <figure className={slide ? "slide" : chart.wide || tall ? "chart wide" : "chart"}>
+    <figure className={slide ? "slide" : fullRow ? "chart wide" : "chart"}>
       {chart.variants.length > 1 && (
         <div className="charttabs">
           {chart.variants.map((option, index) => (
@@ -79,6 +85,29 @@ export function ChartSectionCard({
       methodology: chart.methodology,
     });
   const count = section.charts.length;
+
+  // The gallery lays half-width charts out in pairs; full-row charts break the
+  // pairing. A half-width chart with no partner in its row would render tiny in
+  // a lone cell, so it stretches to the full row instead. Variant 0's shape
+  // decides, keeping the grid stable while variant tabs switch.
+  const isFullRow = (chart: ChartSpec) => {
+    const first = chart.variants[0];
+    const tall = Boolean(first.width && first.height && first.width / first.height <= 1.05);
+    return Boolean(chart.wide || chart.full_row || tall);
+  };
+  const stretched = section.charts.map(isFullRow);
+  let pending = -1;
+  section.charts.forEach((chart, index) => {
+    if (isFullRow(chart)) {
+      if (pending >= 0) {
+        stretched[pending] = true;
+        pending = -1;
+      }
+    } else {
+      pending = pending >= 0 ? -1 : index;
+    }
+  });
+  if (pending >= 0) stretched[pending] = true;
 
   const download = section.download;
   return (
@@ -118,8 +147,8 @@ export function ChartSectionCard({
         </div>
       ) : (
         <div className="gallery">
-          {section.charts.map((chart) => (
-            <Figure key={chart.title} chart={chart} onZoom={onZoom} />
+          {section.charts.map((chart, index) => (
+            <Figure key={chart.title} chart={chart} onZoom={onZoom} stretch={stretched[index]} />
           ))}
         </div>
       )}

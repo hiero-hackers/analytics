@@ -254,8 +254,14 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                     chart["note"] = note
                 if methodology := next((CHART_METHODOLOGY[f] for f in filenames if f in CHART_METHODOLOGY), None):
                     chart["methodology"] = methodology
-                if any(f in WIDE_CHARTS for f in filenames) or _needs_full_row(variants):
+                # Two different treatments: hand-flagged WIDE_CHARTS have many
+                # bars and need the horizontal scroll box; a merely wide-aspect
+                # chart (few bars, long legend) just spans the full row, scaled
+                # to fit — a scroll box would crop its title and legend.
+                if any(f in WIDE_CHARTS for f in filenames):
                     chart["wide"] = True
+                elif _needs_full_row(variants):
+                    chart["full_row"] = True
                 charts.append(chart)
             if charts:
                 section = {

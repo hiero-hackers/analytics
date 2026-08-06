@@ -41,7 +41,10 @@ export interface ChartSpec {
   variants: ChartVariant[];
   note?: string;
   methodology?: string[];
+  /** Many bars: full row with a horizontal scroll box. */
   wide?: boolean;
+  /** Wide aspect, few bars: full row, scaled to fit (no scroll box). */
+  full_row?: boolean;
 }
 
 export interface ChartDownload {
