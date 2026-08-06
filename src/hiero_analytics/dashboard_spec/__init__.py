@@ -15,16 +15,18 @@ from hiero_analytics.dashboard_spec import (
     community,
     constants,
     contributors,
+    diversity,
     governance,
     hips,
     onboarding,
     security,
+    teams,
 )
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order.
-_FAMILIES = (contributors, governance, onboarding, hips, security, community)
+_FAMILIES = (contributors, governance, teams, diversity, onboarding, hips, security, community)
 
 # The assembled spec surface — everything a consumer (the data API emitter,
 # the contract tests) reads off this package.
@@ -43,7 +45,7 @@ __all__ = [
     "WIDE_CHARTS",
 ]
 
-AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
+AFFILIATION_ISSUE_URL = diversity.AFFILIATION_ISSUE_URL
 PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
 CHARTS_GROUP = "Charts"
 

@@ -95,12 +95,42 @@ def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> l
     if "days_since_active" in quiet_month:
         days = quiet_month["days_since_active"]
         metrics.append(("quiet permission-holders (180d+)", int((days.isna() | (days >= GONE_DARK_DAYS)).sum())))
-    if "status" in loaded["teams"]:
-        metrics.append(("quiet teams", int((loaded["teams"]["status"] == "quiet").sum())))
     return metrics
 
 
-METRICS_BY_MACRO = {"Contributors": contributors_metrics, "Governance": governance_metrics}
+def teams_metrics(loaded: dict[str, pd.DataFrame], _org_data_dir: Path) -> list:
+    """Headline tiles for the Teams & TSC macro."""
+    metrics: list = []
+    teams = loaded["teams"]
+    if not teams.empty:
+        metrics.append(("teams", len(teams)))
+    if "status" in teams:
+        metrics.append(("quiet teams", int((teams["status"] == "quiet").sum())))
+    tsc = loaded["tscrepo"]
+    if "account" in tsc:
+        metrics.append(("TSC members with activity", int(tsc["account"].nunique())))
+    return metrics
+
+
+def diversity_metrics(loaded: dict[str, pd.DataFrame], _org_data_dir: Path) -> list:
+    """Headline tiles for the Organisation-diversity macro."""
+    metrics: list = []
+    affiliations = loaded["affiliations"]
+    if {"organisation", "status"} <= set(affiliations.columns):
+        employers = affiliations.loc[affiliations["status"] == "affiliated", "organisation"].nunique()
+        metrics.append(("employers represented", int(employers)))
+    repodiv = loaded["repodiversity"]
+    if "distinct_orgs" in repodiv:
+        metrics.append(("single-employer repos", int((repodiv["distinct_orgs"] == 1).sum())))
+    return metrics
+
+
+METRICS_BY_MACRO = {
+    "Contributors": contributors_metrics,
+    "Governance": governance_metrics,
+    "Teams & TSC": teams_metrics,
+    "Organisation diversity": diversity_metrics,
+}
 
 
 def macro_metrics(macro_name: str, family, org_data_dir: Path) -> list:

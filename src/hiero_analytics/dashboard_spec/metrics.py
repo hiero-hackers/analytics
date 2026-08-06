@@ -136,4 +136,43 @@ METRIC_ANNOTATIONS: dict[str, dict] = {
             "Count the teams where none do.",
         ],
     },
+    "teams": {
+        "note": "Governance teams defined in the org's governance config — the bodies the tables below break down.",
+        "methodology": [
+            "Read every team from the governance config.",
+            "Count them; each is one row of the team-activity overview.",
+        ],
+    },
+    "TSC members with activity": {
+        "note": (
+            "TSC members with any tracked activity on record — the members the TSC table below can show. "
+            "A member with no recorded activity anywhere does not appear."
+        ),
+        "methodology": [
+            "Resolve the TSC membership from the governance config.",
+            "Keep the members with at least one tracked activity event, in any repo, all-time.",
+            "Count the distinct members that remain.",
+        ],
+    },
+    "employers represented": {
+        "note": (
+            "Distinct named employers across all mapped maintainers — the breadth of the ecosystem's "
+            "employer base. Independent and unknown maintainers do not add employers."
+        ),
+        "methodology": [
+            "Take every maintainer in the affiliations reference table.",
+            "Keep those whose status is 'affiliated' (mapped to a named employer).",
+            "Count the distinct organisations among them.",
+        ],
+    },
+    "single-employer repos": {
+        "note": (
+            "Repositories where one employer holds every maintainer seat — an organisational bus-factor. "
+            "The diversity-by-repo table lists them first."
+        ),
+        "methodology": [
+            "For each repository, map its maintainers to employers via the affiliations file.",
+            "Count the repositories whose resolved maintainers span exactly one employer.",
+        ],
+    },
 }

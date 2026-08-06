@@ -41,7 +41,11 @@ TERMS: dict[str, str] = {
     ),
     "repos": "number of distinct repositories they were active in.",
     "last active": "date of their most recent tracked activity (all-time).",
-    "status": "active = recent activity within the window; quiet = none in it.",
+    "status": (
+        "in activity tables: *active* = recent activity within the window, *quiet* = none in it. "
+        "In the affiliations table: *affiliated* / *independent* / *unknown* — whether the person "
+        "maps to a named employer."
+    ),
     "days since active": "days since their most recent activity (all-time; blank = never active).",
     "role / role here": (
         "governance permission in that repo: triage, committer, or maintainer; *general* = holds no special role there."
