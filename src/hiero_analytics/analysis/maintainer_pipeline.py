@@ -14,7 +14,7 @@ question from "how has this moved".
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import pandas as pd
 
@@ -189,20 +189,23 @@ def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
 def build_maintainer_repo_pipeline(
     stage_df: pd.DataFrame,
     *,
-    active_window_days: int = ACTIVE_WINDOW_DAYS,
+    active_window_days: int | None = ACTIVE_WINDOW_DAYS,
     today: datetime | None = None,
 ) -> pd.DataFrame:
     """Build repository-level active contributor counts per governance stage.
 
-    Only counts contributors active within the trailing ``active_window_days``
-    window ending today, so the chart reflects current engagement rather than
-    all-time history.
+    Counts contributors active within the trailing ``active_window_days``
+    window ending today; ``None`` means all recorded time, so the same builder
+    serves every span tab of the by-repository card.
     """
     if stage_df.empty:
         return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
 
-    cutoff = (today or datetime.now(UTC)) - timedelta(days=active_window_days)
-    active_df = stage_df[stage_df["occurred_at"] >= cutoff]
+    if active_window_days is None:
+        active_df = stage_df
+    else:
+        cutoff = (today or datetime.now(UTC)) - timedelta(days=active_window_days)
+        active_df = stage_df[stage_df["occurred_at"] >= cutoff]
 
     if active_df.empty:
         return pd.DataFrame(columns=["repo", *STAGE_COLUMNS])
@@ -248,3 +251,37 @@ def recent_buckets(pipeline_df: pd.DataFrame, max_buckets: int, *, newest_first:
         result = result.iloc[::-1]
 
     return result.reset_index(drop=True)
+
+
+def humanize_month_label(bucket: str) -> str:
+    """``2026-07`` -> ``Jul 2026``. Chart display only; CSVs keep sortable keys."""
+    try:
+        return datetime.strptime(bucket, "%Y-%m").replace(tzinfo=UTC).strftime("%b %Y")
+    except ValueError:
+        return bucket
+
+
+def humanize_week_label(bucket: str) -> str:
+    """``2026-W32`` -> ``w/c 3 Aug 2026``, the week's Monday.
+
+    A date a human can place, unlike an ISO week number. Chart display only.
+    """
+    try:
+        year, week = bucket.split("-W")
+        monday = date.fromisocalendar(int(year), int(week), 1)
+    except (ValueError, AttributeError):
+        return bucket
+    return f"w/c {monday.day} {monday.strftime('%b %Y')}"
+
+
+def humanize_day_label(bucket: str) -> str:
+    """``2026-08-05`` -> ``Wed 5 Aug 2026``.
+
+    The weekday is what makes a weekend dip readable at a glance. Chart
+    display only.
+    """
+    try:
+        day = datetime.strptime(bucket, "%Y-%m-%d").replace(tzinfo=UTC)
+    except ValueError:
+        return bucket
+    return f"{day.strftime('%a')} {day.day} {day.strftime('%b %Y')}"

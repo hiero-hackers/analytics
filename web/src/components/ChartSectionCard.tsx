@@ -22,6 +22,11 @@ function Figure({
 }) {
   const [variant, setVariant] = useState(0);
   const active = chart.variants[Math.min(variant, chart.variants.length - 1)];
+  // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
+  // the `wide` scroll-box treatment would shrink it to the box height instead.
+  // It gets the full row with natural page flow: the dimensions ship with the
+  // variant, so the shape decides — nobody hand-flags heatmaps.
+  const tall = Boolean(active.width && active.height && active.width / active.height <= 1.05);
   const img = (
     <img
       src={chartUrl(active.file)}
@@ -36,7 +41,7 @@ function Figure({
     />
   );
   return (
-    <figure className={slide ? "slide" : chart.wide ? "chart wide" : "chart"}>
+    <figure className={slide ? "slide" : chart.wide || tall ? "chart wide" : "chart"}>
       {chart.variants.length > 1 && (
         <div className="charttabs">
           {chart.variants.map((option, index) => (

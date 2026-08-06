@@ -24,24 +24,41 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "maintainer-pipeline",
-                "title": "Maintainer pipeline",
+                "title": "Maintainer pipeline over time",
                 "description": (
-                    "How the maintainer/committer pipeline has moved over time and across repos — "
-                    "is the bench of future maintainers developing?"
+                    "How the maintainer/committer pipeline has moved over time — is the bench of "
+                    "future maintainers developing? The same spans, per repository, are the next card."
                 ),
-                # One chart, four views: a tab switcher (By year / month / week / repo)
-                # shows a single chart at a time instead of stacking all four.
                 "files": [
                     (
                         "Unique active contributors by role",
                         [
-                            # One rule at four resolutions, widest first, then
-                            # the repo cut. See analysis/maintainer_pipeline.py.
+                            # One rule at four resolutions, widest first.
+                            # See analysis/maintainer_pipeline.py.
                             ("All time", "maintainer_pipeline_yearly.png"),
                             ("1 year", "maintainer_pipeline_monthly.png"),
                             ("1 month", "maintainer_pipeline_weekly.png"),
                             ("Week", "maintainer_pipeline_daily.png"),
-                            ("Repo", "maintainer_pipeline_by_repo.png"),
+                        ],
+                    ),
+                ],
+            },
+            {
+                "id": "maintainer-pipeline-by-repo",
+                "title": "Maintainer pipeline by repository",
+                "description": (
+                    "The same role split, cut by repository instead of time: who is active in each "
+                    "repo over the selected span. Spans match the over-time card, so the two cards "
+                    "answer 'when' and 'where' with one vocabulary."
+                ),
+                "files": [
+                    (
+                        "Active contributors by role and repository",
+                        [
+                            ("All time", "maintainer_pipeline_by_repo.png"),
+                            ("1 year", "maintainer_pipeline_by_repo_365d.png"),
+                            ("1 month", "maintainer_pipeline_by_repo_30d.png"),
+                            ("Week", "maintainer_pipeline_by_repo_7d.png"),
                         ],
                     ),
                 ],
@@ -75,44 +92,55 @@ CHART_MACRO = {
                     "down each repository's and each team's maintainer mix. See the affiliations and "
                     "repo-diversity tables below for the underlying detail."
                 ),
-                # Each chart offers an All / Active (last 90 days) tab so the roster
-                # and the day-to-day active core can be compared in place.
+                # Each chart drills through the shared spans — the full roster,
+                # then who was active in the last year, month, and week — the
+                # same vocabulary as every other card.
                 # The compact charts share the top rows; the two wide
                 # composition charts then stack full-width, one row each.
                 "files": [
                     (
                         "Maintainers by organisation",
                         [
-                            ("All", "affiliation_donut.png"),
-                            ("Active 90d", "affiliation_donut_active.png"),
+                            ("All time", "affiliation_donut.png"),
+                            ("1 year", "affiliation_donut_365d.png"),
+                            ("1 month", "affiliation_donut_30d.png"),
+                            ("Week", "affiliation_donut_7d.png"),
                         ],
                     ),
                     (
                         "Single-employer teams by org",
                         [
-                            ("All", "single_employer_teams_by_org.png"),
-                            ("Active 90d", "single_employer_teams_by_org_active.png"),
+                            ("All time", "single_employer_teams_by_org.png"),
+                            ("1 year", "single_employer_teams_by_org_365d.png"),
+                            ("1 month", "single_employer_teams_by_org_30d.png"),
+                            ("Week", "single_employer_teams_by_org_7d.png"),
                         ],
                     ),
                     (
                         "Single-employer repos by org",
                         [
-                            ("All", "single_employer_repos_by_org.png"),
-                            ("Active 90d", "single_employer_repos_by_org_active.png"),
+                            ("All time", "single_employer_repos_by_org.png"),
+                            ("1 year", "single_employer_repos_by_org_365d.png"),
+                            ("1 month", "single_employer_repos_by_org_30d.png"),
+                            ("Week", "single_employer_repos_by_org_7d.png"),
                         ],
                     ),
                     (
                         "Organisation mix by repo",
                         [
-                            ("All", "repo_affiliation_composition.png"),
-                            ("Active 90d", "repo_affiliation_composition_active.png"),
+                            ("All time", "repo_affiliation_composition.png"),
+                            ("1 year", "repo_affiliation_composition_365d.png"),
+                            ("1 month", "repo_affiliation_composition_30d.png"),
+                            ("Week", "repo_affiliation_composition_7d.png"),
                         ],
                     ),
                     (
                         "Organisation mix by team",
                         [
-                            ("All", "team_affiliation_composition.png"),
-                            ("Active 90d", "team_affiliation_composition_active.png"),
+                            ("All time", "team_affiliation_composition.png"),
+                            ("1 year", "team_affiliation_composition_365d.png"),
+                            ("1 month", "team_affiliation_composition_30d.png"),
+                            ("Week", "team_affiliation_composition_7d.png"),
                         ],
                     ),
                 ],
@@ -235,6 +263,7 @@ SECTION_SPECS = [
     {
         "id": "repodiversity",
         "file": "repo_affiliation_diversity.csv",
+        "periods": True,
         "title": "Maintainer organisation diversity by repo",
         "description": (
             "Per repo: how many maintainers it has, how many distinct employers they span, the largest "
@@ -256,6 +285,7 @@ SECTION_SPECS = [
     {
         "id": "teamdiversity",
         "file": "team_affiliation_diversity.csv",
+        "periods": True,
         "title": "Team organisation concentration",
         "description": (
             "Per governance team: how many members resolve to an employer, how many distinct employers "
@@ -300,7 +330,8 @@ SECTION_SPECS = [
     {
         "id": "tscrepo",
         "file": "tsc_activity_by_repo.csv",
-        "title": "TSC activity by repo (all-time)",
+        "periods": True,
+        "title": "TSC activity by repo",
         "description": "For TSC members with activity, which repos they work in and the role they hold there.",
         "columns": [
             ("account", "member"),
@@ -339,7 +370,8 @@ SECTION_SPECS = [
     {
         "id": "teamrepo",
         "file": "team_activity_by_repo.csv",
-        "title": "Team activity by repo (all-time)",
+        "periods": True,
+        "title": "Team activity by repo",
         "description": (
             "Which repos each team is active in — type a team or repo to filter. This is a team-wide "
             "rollup (headcount + totals per repo); for a named maintainer's own by-repo activity, see the "
@@ -421,9 +453,13 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 # horizontally at a readable height instead of squashing them to the card width.
 WIDE_CHARTS = {
     "repo_affiliation_composition.png",
-    "repo_affiliation_composition_active.png",
+    "repo_affiliation_composition_365d.png",
+    "repo_affiliation_composition_30d.png",
+    "repo_affiliation_composition_7d.png",
     "team_affiliation_composition.png",
-    "team_affiliation_composition_active.png",
+    "team_affiliation_composition_365d.png",
+    "team_affiliation_composition_30d.png",
+    "team_affiliation_composition_7d.png",
 }
 
 # "How to read this" notes, keyed by chart filename. These describe how to read the
@@ -442,14 +478,15 @@ CHART_NOTES = {
     "maintainer_pipeline_monthly.png": "Each bar is a calendar month, counting the distinct people active that month — once each, under "
     "the highest governance role they hold in any repo (general → triage → committer → maintainer). "
     "Counts are strictly per-month (not a trailing window), so the current month is month-to-date. "
-    "Only the most recent 24 months are charted; full history stays in the CSV.",
+    "Only the most recent 12 months are charted — the '1 year' span; full history stays in the CSV.",
     "maintainer_pipeline_weekly.png": "Each bar is an ISO week (Mon–Sun), counting the distinct people active that week — once each, "
     "under the highest governance role they hold in any repo (general → triage → committer → "
     "maintainer). Counts are strictly per-week (not a trailing window), so the current week is "
-    "week-to-date. Only the most recent 26 weeks are charted; full history stays in the CSV.",
-    "maintainer_pipeline_by_repo.png": "Each bar is a repository, counting people active there in the last six months, grouped by the "
-    "governance role they hold in that repo (general → triage → committer → maintainer). A person "
-    "active in several repos is counted in each; smaller repos are pooled into 'Other Repos'.",
+    "week-to-date. Only the most recent 5 weeks are charted — the '1 month' span; full history stays in the CSV.",
+    "maintainer_pipeline_by_repo.png": "Each bar is a repository, counting people active there over the selected span (the tabs match "
+    "the over-time card: all time, 1 year, 1 month, week), grouped by the governance role they hold "
+    "in that repo (general → triage → committer → maintainer). A person active in several repos is "
+    "counted in each; smaller repos are pooled into 'Other Repos'.",
     "maintainer_network.png": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
     "linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's "
     "category.",
@@ -509,6 +546,17 @@ CHART_METHODOLOGY = {
             "from the 'active at year end' variant, and from the per-repo activity tables, which use "
             "their own recent-activity window."
         ),
+    ],
+    "maintainer_pipeline_by_repo.png": [
+        (
+            "Take the same role-attached activity events as the over-time card, filtered to the "
+            "selected span: everything, the last year, the last month, or the last week."
+        ),
+        (
+            "Count distinct people per repository at the highest role they hold in that repo — a "
+            "person active in several repos counts in each, so bars overlap deliberately."
+        ),
+        "Pool repositories below the display threshold into 'Other Repos' so the chart stays readable.",
     ],
     "maintainer_network.png": [
         (

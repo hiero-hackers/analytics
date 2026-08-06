@@ -143,7 +143,7 @@ def test_main_creates_output_files(
     data_dir = tmp_path / "data"
     expected_csvs = [
         "role_coverage_all.csv",
-        "role_coverage_all_90d.csv",
+        "role_coverage_all_30d.csv",
         "team_activity_summary.csv",
         "team_activity_by_repo.csv",
         "role_coverage_globally_quiet.csv",

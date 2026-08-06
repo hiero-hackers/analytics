@@ -143,10 +143,8 @@ def test_main_creates_output_files(
     expected_csvs = [
         "contributor_activity_profiles.csv",
         "contributor_activity_profiles_30d.csv",
-        "contributor_activity_profiles_90d.csv",
-        "contributor_activity_profiles_180d.csv",
+        "contributor_activity_profiles_7d.csv",
         "contributor_activity_profiles_365d.csv",
-        "contributor_activity_profiles_all.csv",
     ]
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file

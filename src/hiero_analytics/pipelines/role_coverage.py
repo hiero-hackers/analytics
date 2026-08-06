@@ -280,6 +280,20 @@ def main(org: str = ORG) -> None:
         save_dataframe(period_coverage, org_data_dir / period.filename("role_coverage_all"))
         _write_repo_summaries(period_coverage, org_data_dir, period)
 
+        # The by-repo team and TSC tables follow the same periods as every
+        # other table: same builders, windowed profiles.
+        team_members = build_team_membership(config)
+        save_dataframe(
+            build_team_activity_by_repo(team_members, period_by_repo),
+            org_data_dir / period.filename("team_activity_by_repo"),
+        )
+        save_dataframe(
+            annotate_repo_roles(
+                build_account_activity_by_repo(team_members.get("tsc", set()), period_by_repo), role_lookup
+            ),
+            org_data_dir / period.filename("tsc_activity_by_repo"),
+        )
+
     _write_team_tables(
         config, role_lookup, all_time_by_repo, all_time_org_profiles, global_last_seen, org_data_dir, now=now
     )

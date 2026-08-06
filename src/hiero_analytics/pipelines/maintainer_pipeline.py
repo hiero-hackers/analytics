@@ -15,11 +15,15 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
+    humanize_day_label,
+    humanize_month_label,
+    humanize_week_label,
     recent_buckets,
 )
 from hiero_analytics.config.charts import MAINTAINER_PIPELINE_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.governance_config import build_repo_role_lookup, fetch_governance_config
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import plot_and_save, save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, org_context
 from hiero_analytics.plotting.bars import plot_stacked_bar
@@ -48,14 +52,12 @@ def main(org: str = ORG) -> None:
     daily_pipeline = build_maintainer_daily_pipeline(stage_df)
     monthly_pipeline = build_maintainer_monthly_pipeline(stage_df)
     weekly_pipeline = build_maintainer_weekly_pipeline(stage_df)
-    repo_pipeline = build_maintainer_repo_pipeline(stage_df)
 
     save_dataframe(stage_df, org_data_dir / "maintainer_activity_events.csv")
     save_dataframe(yearly_pipeline, org_data_dir / "maintainer_pipeline_yearly.csv")
     save_dataframe(daily_pipeline, org_data_dir / "maintainer_pipeline_daily.csv")
     save_dataframe(monthly_pipeline, org_data_dir / "maintainer_pipeline_monthly.csv")
     save_dataframe(weekly_pipeline, org_data_dir / "maintainer_pipeline_weekly.csv")
-    save_dataframe(repo_pipeline, org_data_dir / "maintainer_pipeline_by_repo.csv")
 
     logger.info("Saved maintainer pipeline tables")
 
@@ -72,7 +74,9 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        recent_buckets(daily_pipeline, RECENT_DAILY_BUCKETS, newest_first=True),
+        recent_buckets(daily_pipeline, RECENT_DAILY_BUCKETS).assign(
+            day=lambda frame: frame["day"].map(humanize_day_label)
+        ),
         plot_stacked_bar,
         output_path=org_charts_dir / "maintainer_pipeline_daily.png",
         x_col="day",
@@ -92,7 +96,9 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        recent_buckets(monthly_pipeline, RECENT_MONTHLY_BUCKETS, newest_first=True),
+        recent_buckets(monthly_pipeline, RECENT_MONTHLY_BUCKETS).assign(
+            month=lambda frame: frame["month"].map(humanize_month_label)
+        ),
         plot_stacked_bar,
         output_path=org_charts_dir / "maintainer_pipeline_monthly.png",
         x_col="month",
@@ -104,17 +110,19 @@ def main(org: str = ORG) -> None:
             f"(Monthly, last {RECENT_MONTHLY_BUCKETS} months)"
         ),
         rotate_x=45,
-        annotate_totals=False,
-        # Time series: keep chronological order (newest at top) rather than the
-        # default magnitude sort, which would otherwise treat the string
-        # 'YYYY-MM' labels as categorical and shuffle the timeline. Horizontal
-        # keeps the legend clear of the month labels.
+        annotate_totals=True,
+        # Time series: keep chronological order, oldest first, so time reads
+        # forward (top to bottom when horizontal). The default magnitude sort
+        # would treat the string labels as categorical and shuffle the
+        # timeline. Horizontal keeps the legend clear of the month labels.
         sort_categorical=False,
         force_horizontal=True,
     )
 
     plot_and_save(
-        recent_buckets(weekly_pipeline, RECENT_WEEKLY_BUCKETS, newest_first=True),
+        recent_buckets(weekly_pipeline, RECENT_WEEKLY_BUCKETS).assign(
+            week=lambda frame: frame["week"].map(humanize_week_label)
+        ),
         plot_stacked_bar,
         output_path=org_charts_dir / "maintainer_pipeline_weekly.png",
         x_col="week",
@@ -126,26 +134,38 @@ def main(org: str = ORG) -> None:
             f"(Weekly, last {RECENT_WEEKLY_BUCKETS} weeks)"
         ),
         rotate_x=45,
-        annotate_totals=False,
-        # Time series: keep chronological order (newest at top) instead of the
-        # default magnitude sort. Horizontal keeps the legend clear of the labels.
+        annotate_totals=True,
+        # Time series: chronological, oldest first — time reads forward.
+        # Horizontal keeps the legend clear of the labels.
         sort_categorical=False,
         force_horizontal=True,
     )
 
-    plot_and_save(
-        repo_pipeline,
-        plot_stacked_bar,
-        output_path=org_charts_dir / "maintainer_pipeline_by_repo.png",
-        x_col="repo",
-        stack_cols=STAGE_COLUMNS,
-        labels=STACK_LABELS,
-        colors=MAINTAINER_PIPELINE_COLORS,
-        title="Maintainer Pipeline: Unique Active Contributors by Role - PR & Issue Activity (by Repository)",
-        rotate_x=45,
-        annotate_totals=False,
-        legend_inside_bottom_right=True,
-        auto_height_for_horizontal=False,
-    )
+    # The by-repository card: the same spans as the over-time card (all time,
+    # 1 year, 1 month, week), so the two never offer different windows for the
+    # same idea. All-time keeps the unsuffixed filename.
+    repo_spans = [("All time", None, "")] + [
+        (period.label, period.days, f"_{period.key}") for period in reversed(ACTIVITY_PERIODS)
+    ]
+    for span_label, span_days, suffix in repo_spans:
+        repo_pipeline = build_maintainer_repo_pipeline(stage_df, active_window_days=span_days)
+        save_dataframe(repo_pipeline, org_data_dir / f"maintainer_pipeline_by_repo{suffix}.csv")
+        plot_and_save(
+            repo_pipeline,
+            plot_stacked_bar,
+            output_path=org_charts_dir / f"maintainer_pipeline_by_repo{suffix}.png",
+            x_col="repo",
+            stack_cols=STAGE_COLUMNS,
+            labels=STACK_LABELS,
+            colors=MAINTAINER_PIPELINE_COLORS,
+            title=(
+                "Maintainer Pipeline: Unique Active Contributors by Role - "
+                f"PR & Issue Activity (by Repository, {span_label.lower()})"
+            ),
+            rotate_x=45,
+            annotate_totals=True,
+            legend_inside_bottom_right=True,
+            auto_height_for_horizontal=False,
+        )
 
     logger.info("Maintainer pipeline analytics complete")

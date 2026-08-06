@@ -114,7 +114,7 @@ describe("Section tables", () => {
     await openGovernance();
     expect(screen.getByText("bob")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "30 days" }));
+    await userEvent.click(screen.getByRole("button", { name: "1 month" }));
     expect(screen.queryByText("bob")).not.toBeInTheDocument();
     expect(screen.getByText("alice")).toBeInTheDocument();
 
@@ -137,7 +137,7 @@ describe("Section tables", () => {
 
     const tabs = within(screen.getByRole("group", { name: "Time range" })).getAllByRole("button");
 
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["30 days", "All time"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["1 month", "All time"]);
   });
 
   it("renders date formats, the freshness badge, and the action link", async () => {

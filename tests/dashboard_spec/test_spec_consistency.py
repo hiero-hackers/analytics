@@ -96,7 +96,18 @@ def test_activity_specs_use_the_shared_period_set():
     all_specs = [spec for family in TABLE_FAMILIES.values() for spec in family.SECTION_SPECS]
     tabbed = {spec["id"]: spec for spec in all_specs if spec.get("periods")}
 
-    assert set(tabbed) == {"profiles", "repoactivity", "understaffed", "loadshare", "repo", "teams"}
+    assert set(tabbed) == {
+        "profiles",
+        "repoactivity",
+        "understaffed",
+        "loadshare",
+        "repo",
+        "teams",
+        "teamrepo",
+        "tscrepo",
+        "repodiversity",
+        "teamdiversity",
+    }
     assert all(spec["periods"] is True for spec in tabbed.values())
 
 

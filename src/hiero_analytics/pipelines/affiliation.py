@@ -43,13 +43,13 @@ from hiero_analytics.analysis.contributor_heatmap import (
     build_team_activity_heatmap,
     grouped_heatmap_chart_data,
 )
-from hiero_analytics.config.analysis import ROLE_ACTIVE_DAYS
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
     build_team_membership,
     fetch_governance_config,
 )
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import plot_and_save, save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, shared_client
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
@@ -224,15 +224,18 @@ def _write_active_diversity(
     *,
     all_summary,
     org,
+    suffix,
+    span_label,
+    span_days,
 ):
-    """Diversity over the active maintainer core; returns the active login set."""
+    """Diversity over the maintainers active in one span; returns that login set."""
     active = filter_active_logins(maintainers, last_seen, cutoff)
     classified = classify_maintainers(active, affiliations)
     summary = summarize_affiliation(classified)
-    save_dataframe(classified, org_data_dir / "maintainer_affiliations_active.csv")
+    save_dataframe(classified, org_data_dir / f"maintainer_affiliations{suffix}.csv")
     logger.info(
         "Active maintainers (%dd): %d of %d on the roster; largest is %s at %d%% (roster %d%%); HHI %d (roster %d)",
-        ROLE_ACTIVE_DAYS,
+        span_days,
         summary["maintainers"],
         all_summary["maintainers"],
         summary["top_org"],
@@ -242,14 +245,14 @@ def _write_active_diversity(
         all_summary["hhi"],
     )
     active_distribution = build_affiliation_distribution(classified)
-    save_dataframe(active_distribution, org_data_dir / "affiliation_distribution_active.csv")
+    save_dataframe(active_distribution, org_data_dir / f"affiliation_distribution{suffix}.csv")
     _pie_chart(
         active_distribution,
         "organisation",
         "maintainers",
         "active maintainers",
-        f"{org} — active maintainer diversity (activity in the last {ROLE_ACTIVE_DAYS} days)",
-        org_charts_dir / "affiliation_donut_active.png",
+        f"{org} — maintainer diversity, active in the last {span_label}",
+        org_charts_dir / f"affiliation_donut{suffix}.png",
         top_n=2,
         donut=False,
     )
@@ -303,11 +306,13 @@ def _write_active_composition(
     org_charts_dir,
     *,
     org,
+    suffix,
+    span_label,
 ):
-    """Active variants of the composition charts (same code, active population).
+    """Span variants of the composition charts (same code, windowed population).
 
-    Lets the dashboard toggle All vs Active. Repos use active maintainers; teams
-    use active members of any role.
+    Lets the dashboard drill from the all-time roster down through year, month,
+    and week. Repos use active maintainers; teams use active members of any role.
     """
     active_role_lookup = {
         repo: {u: r for u, r in holders.items() if r == "maintainer" and u in active}
@@ -322,30 +327,40 @@ def _write_active_composition(
         affiliations,
         org_data_dir,
         org_charts_dir,
-        suffix="_active",
-        title=f"{org} — active maintainer organisation mix by repository (last {ROLE_ACTIVE_DAYS}d)",
+        suffix=suffix,
+        title=f"{org} — maintainer organisation mix by repository, active in the last {span_label}",
     )
     _single_employer_chart(
         active_team_membership,
         affiliations,
         org_charts_dir,
-        suffix="_active",
-        title=f"{org} — single-employer teams among active members, by organisation",
+        suffix=suffix,
+        title=f"{org} — single-employer teams among members active in the last {span_label}",
     )
     _single_employer_repo_chart(
         active_role_lookup,
         affiliations,
         org_charts_dir,
-        suffix="_active",
-        title=f"{org} — single-employer repositories among active maintainers, by organisation",
+        suffix=suffix,
+        title=f"{org} — single-employer repositories among maintainers active in the last {span_label}",
     )
     _team_composition_chart(
         active_team_membership,
         affiliations,
         org_data_dir,
         org_charts_dir,
-        suffix="_active",
-        title=f"{org} — active organisation mix by governance team (last {ROLE_ACTIVE_DAYS}d)",
+        suffix=suffix,
+        title=f"{org} — organisation mix by governance team, active in the last {span_label}",
+    )
+
+    # The diversity tables follow the same spans as the charts above them.
+    save_dataframe(
+        build_repo_affiliation_diversity(active_role_lookup, affiliations),
+        org_data_dir / f"repo_affiliation_diversity{suffix}.csv",
+    )
+    save_dataframe(
+        build_team_affiliation_diversity(active_team_membership, affiliations),
+        org_data_dir / f"team_affiliation_diversity{suffix}.csv",
     )
 
 
@@ -375,30 +390,42 @@ def _write_activity_views(
     label_events = load_issue_label_events(client, org)
 
     last_seen = latest_activity_by_account(records, label_events)
-    cutoff = datetime.now(UTC) - timedelta(days=ROLE_ACTIVE_DAYS)
 
-    active = _write_active_diversity(
-        maintainers,
-        affiliations,
-        last_seen,
-        cutoff,
-        org_data_dir,
-        org_charts_dir,
-        all_summary=all_summary,
-        org=org,
-    )
+    # One windowed variant per shared span (1 year -> 1 month -> week), so the
+    # diversity card drills down with the same vocabulary as every other card.
+    # The unsuffixed files remain the all-time roster view.
+    now = datetime.now(UTC)
+    for period in sorted(ACTIVITY_PERIODS, key=lambda p: -p.days):
+        cutoff = now - timedelta(days=period.days)
+        suffix = f"_{period.key}"
+        span_label = period.label.lower()
+        active = _write_active_diversity(
+            maintainers,
+            affiliations,
+            last_seen,
+            cutoff,
+            org_data_dir,
+            org_charts_dir,
+            all_summary=all_summary,
+            org=org,
+            suffix=suffix,
+            span_label=span_label,
+            span_days=period.days,
+        )
+        _write_active_composition(
+            role_lookup,
+            team_membership,
+            affiliations,
+            active,
+            last_seen,
+            cutoff,
+            org_data_dir,
+            org_charts_dir,
+            org=org,
+            suffix=suffix,
+            span_label=span_label,
+        )
     _write_activity_heatmaps(records, role_lookup, team_membership, affiliations, org_data_dir, org_charts_dir, org=org)
-    _write_active_composition(
-        role_lookup,
-        team_membership,
-        affiliations,
-        active,
-        last_seen,
-        cutoff,
-        org_data_dir,
-        org_charts_dir,
-        org=org,
-    )
 
 
 def main(org: str = ORG) -> None:

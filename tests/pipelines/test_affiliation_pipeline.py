@@ -147,8 +147,13 @@ def test_main_creates_output_files(
         "affiliation_distribution.csv",
         "repo_affiliation_diversity.csv",
         "team_affiliation_diversity.csv",
-        "maintainer_affiliations_active.csv",
-        "affiliation_distribution_active.csv",
+        "maintainer_affiliations_365d.csv",
+        "maintainer_affiliations_30d.csv",
+        "maintainer_affiliations_7d.csv",
+        "affiliation_distribution_365d.csv",
+        "affiliation_distribution_7d.csv",
+        "repo_affiliation_diversity_30d.csv",
+        "team_affiliation_diversity_7d.csv",
     ]
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file

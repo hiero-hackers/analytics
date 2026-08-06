@@ -585,8 +585,6 @@
   .slide img {
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: contain;
     cursor: zoom-in;
   }
   .slide figcaption {
@@ -606,7 +604,10 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* Not centered via justify-content: the auto margins below centre content
+       that fits and top-align content that overflows, so a tall heatmap
+       scrolls at readable size instead of shrinking to fit. */
+    overflow-y: auto;
     gap: 14px;
     z-index: 1000;
     cursor: zoom-out;
@@ -614,8 +615,8 @@
     box-sizing: border-box;
   }
   .lightbox img {
+    margin-top: auto;
     max-width: 96vw;
-    max-height: 66vh;
     border-radius: var(--r-frame);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     background: var(--chart-ground);
@@ -655,7 +656,7 @@
   }
   .lbcap {
     max-width: 760px;
-    margin: 0;
+    margin: 0 0 auto;
     color: var(--lb-text);
     font-size: 14px;
     line-height: 1.5;
@@ -850,6 +851,19 @@
   /* (The former dark-mode leftovers block is gone: every rule it patched now
      reads from the semantic tokens, whose dark values live in the single
      token flip at the top of this file.) */
+
+  /* Chart PNGs bake a light ground (config/charts.py), so in dark mode the
+     gallery was a wall of white slabs. Inverting with a hue rotation keeps the
+     series hues recognisable while the ground goes dark — the pragmatic fix
+     for the PNG era; client-rendered charts will retire it. The lightbox is
+     exempt: it is always dark, and readers zoom in for a faithful look. */
+  @media (prefers-color-scheme: dark) {
+    .chart img,
+    .chartscroll img,
+    .slide img {
+      filter: invert(0.9) hue-rotate(180deg);
+    }
+  }
 
 
   /* ---- HIP views (coverage matrix, governance board, evidence panel) ----

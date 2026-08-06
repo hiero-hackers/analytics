@@ -5,7 +5,11 @@ from __future__ import annotations
 # --------------------------------------------------
 # Figure configuration
 # --------------------------------------------------
-DEFAULT_DPI: int = 300
+# 150dpi puts the typical figure at ~2000px — comfortably past the widest
+# display surface (the ~1100px full-row/lightbox view) while quartering the
+# page weight 300dpi cost. Relative text size is unchanged: that is set by
+# font points against figure inches, not by DPI.
+DEFAULT_DPI: int = 150
 DEFAULT_FIGSIZE: tuple[int, int] = (12, 7)
 
 # --------------------------------------------------

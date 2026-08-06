@@ -170,6 +170,9 @@ export interface Manifest {
   period_labels?: Record<string, string>;
   /** Where the footer sends a reader who spots something wrong. */
   issues_url?: string;
+  /** Show the work-in-progress banner. Absent means show — an older cached
+   *  manifest must fail toward warning too long, never hiding too early. */
+  wip?: boolean;
   provenance: { git_sha: string | null; data_as_of: string | null };
   orgs: Record<string, OrgEntry>;
 }

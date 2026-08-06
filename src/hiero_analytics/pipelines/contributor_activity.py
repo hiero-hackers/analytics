@@ -100,23 +100,18 @@ def main(org: str = ORG) -> None:
 
     _write_gfi_completers(client, org, org_data_dir)
 
-    # Org-wide: one row per contributor, emitted once for each shared activity period.
+    # Org-wide: the all-time base table, plus one variant per shared activity
+    # period. All-time is no longer a member of ACTIVITY_PERIODS (it is the
+    # base every table already is), so it is built explicitly.
     now = datetime.now(UTC)
-    period_profiles = {}
+    profiles = build_contributor_profiles(records, label_events)
+    save_dataframe(profiles, org_data_dir / "contributor_activity_profiles.csv")
     for period in ACTIVITY_PERIODS:
         cutoff = period.cutoff(now)
-        period_records = (
-            records if cutoff is None else [r for r in records if r.occurred_at and r.occurred_at >= cutoff]
-        )
-        period_labels = (
-            label_events if cutoff is None else [e for e in label_events if e.occurred_at and e.occurred_at >= cutoff]
-        )
-        profiles = build_contributor_profiles(period_records, period_labels)
-        period_profiles[period.key] = profiles
-        save_dataframe(profiles, org_data_dir / period.filename("contributor_activity_profiles"))
-
-    profiles = period_profiles["all"]
-    save_dataframe(profiles, org_data_dir / "contributor_activity_profiles.csv")
+        period_records = [r for r in records if r.occurred_at and r.occurred_at >= cutoff]
+        period_labels = [e for e in label_events if e.occurred_at and e.occurred_at >= cutoff]
+        period_frame = build_contributor_profiles(period_records, period_labels)
+        save_dataframe(period_frame, org_data_dir / period.filename("contributor_activity_profiles"))
     logger.info("Built org-wide profiles for %d contributors", len(profiles))
 
     # Per-repository: the same table scoped to each repo, so a person's shape can

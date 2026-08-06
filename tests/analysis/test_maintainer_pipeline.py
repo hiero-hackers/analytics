@@ -12,6 +12,9 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
+    humanize_day_label,
+    humanize_month_label,
+    humanize_week_label,
     recent_buckets,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -465,3 +468,11 @@ def test_every_time_view_agrees_on_one_day_of_activity():
     }
 
     assert set(counts.values()) == {2}, counts
+
+
+def test_bucket_labels_humanize_for_charts_and_degrade_raw():
+    """Charts speak human ('w/c 3 Aug'), CSVs keep sortable keys; junk passes through."""
+    assert humanize_month_label("2026-07") == "Jul 2026"
+    assert humanize_week_label("2026-W32") == "w/c 3 Aug 2026"
+    assert humanize_day_label("2026-08-05") == "Wed 5 Aug 2026"
+    assert humanize_week_label("not-a-week") == "not-a-week"

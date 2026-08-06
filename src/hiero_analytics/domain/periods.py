@@ -24,14 +24,17 @@ class Period:
         return f"{stem}_{self.key}.csv"
 
 
+# The dashboard's one period vocabulary: Week, 1 month, 1 year — plus the
+# all-time base every table already is (the period selector's null state, so no
+# "all" entry here; emitting one duplicated every row and doubled the tab).
+# Chart span tabs use the same three labels so tables and charts never offer
+# different windows for the same idea. Windows that are *semantic thresholds*
+# rather than filters (ROLE_ACTIVE_DAYS' 90-day active/quiet line,
+# GONE_DARK_DAYS) deliberately do not live here.
 ACTIVITY_PERIODS = (
-    Period("30d", "30 days", 30),
-    # The tuned active/quiet threshold (ROLE_ACTIVE_DAYS) and most tables' prior window,
-    # so it is the tab shown first; users can switch to any other from there.
-    Period("90d", "90 days", 90, default=True),
-    Period("180d", "180 days", 180),
+    Period("7d", "Week", 7),
+    Period("30d", "1 month", 30, default=True),
     Period("365d", "1 year", 365),
-    Period("all", "All time", None),
 )
 
 # The period whose tab opens active on the dashboard.

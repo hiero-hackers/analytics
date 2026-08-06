@@ -207,6 +207,25 @@ def _chart_variant(org: str, chart_dir: Path, label: str, filename: str) -> dict
     return variant
 
 
+# Aspect ratio beyond which a chart cannot survive a ~340px gallery cell: a
+# panoramic chart (many bars along x) gets illegibly narrow bars, so it earns
+# the full-row scroll treatment `wide` renders as. Derived from the actual PNG
+# rather than hand-set per chart, so a pipeline that changes a chart's shape
+# changes its layout with it; the spec's WIDE_CHARTS remains as the manual
+# override. (Tall charts are the frontend's call — it has the same dimensions
+# per variant and spans them without the scroll box.)
+_WIDE_ASPECT_ABOVE = 2.0
+
+
+def _needs_full_row(variants: list[dict]) -> bool:
+    """Whether any variant is panoramic enough to demand the full-row scroll."""
+    for variant in variants:
+        width, height = variant.get("width"), variant.get("height")
+        if width and height and width / height >= _WIDE_ASPECT_ABOVE:
+            return True
+    return False
+
+
 def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
     """The org's chart sections with their full presentation structure.
 
@@ -235,7 +254,7 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                     chart["note"] = note
                 if methodology := next((CHART_METHODOLOGY[f] for f in filenames if f in CHART_METHODOLOGY), None):
                     chart["methodology"] = methodology
-                if any(f in WIDE_CHARTS for f in filenames):
+                if any(f in WIDE_CHARTS for f in filenames) or _needs_full_row(variants):
                     chart["wide"] = True
                 charts.append(chart)
             if charts:
@@ -344,6 +363,9 @@ def emit_data_api() -> Path:
         "period_labels": {period.key: period.label for period in API_PERIODS},
         # Where the dashboard footer points "spotted something wrong?".
         "issues_url": PROJECT_ISSUES_URL,
+        # The WIP banner is data-side policy like everything else the manifest
+        # carries: flip to False here to retire it, no frontend change needed.
+        "wip": True,
         "version": API_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "provenance": {
