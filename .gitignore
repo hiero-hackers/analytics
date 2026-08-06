@@ -58,7 +58,12 @@ inputs/
 # Assembled GitHub Pages site (built in CI from the dashboard; never committed)
 _site/
 
-.claude
+# Personal Claude Code state (settings.local.json, session scratch) stays local,
+# but checked-in project skills are shared house style and must be committed.
+# Note the trailing /*: excluding `.claude` itself would make the negation
+# below unreachable, since git never descends into an excluded directory.
+.claude/*
+!.claude/skills/
 
 # Web dashboard (Stage 2)
 web/node_modules/
