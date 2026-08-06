@@ -410,3 +410,16 @@ def test_manifest_flags_a_damaged_dataset(tmp_path):
     # identify byte-for-byte later.
     assert all(len(entry["sha256"]) == 64 for entry in manifest["datasets"])
     assert manifest["data_as_of"] is None
+
+
+def test_the_legacy_dataset_notice_is_logged_once_per_run(tmp_path, caplog):
+    """Provenance resolves per figure, so a per-pass warning floods the log."""
+    provenance._warned_legacy_datasets.clear()
+    _write_dataset(tmp_path, "legacy_org_all.json", None, fetched_through="2026-01-01T00:00:00+00:00")
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-08-06T09:00:00+00:00")
+
+    with caplog.at_level("WARNING"):
+        for _ in range(5):  # five charts in one run
+            dataset_watermark(tmp_path)
+
+    assert sum("predates the fetched_at stamp" in record.message for record in caplog.records) == 1

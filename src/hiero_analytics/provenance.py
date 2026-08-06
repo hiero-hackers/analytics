@@ -77,6 +77,10 @@ class _Unknown:
 
 _UNKNOWN = _Unknown()
 
+# Datasets already reported as predating the ``fetched_at`` stamp. The notice is
+# per-file and self-healing, so it is worth saying once a run and never again.
+_warned_legacy_datasets: set[str] = set()
+
 _STAMP_FORMAT = "%Y-%m-%d %H:%M UTC"
 
 # The manifest lives beside the datasets it describes, so that archiving the
@@ -203,11 +207,17 @@ def dataset_watermark(datasets_dir: Path | None = None) -> datetime | None:
         stamp = _read_stamp(path, _FETCHED_AT_RE)
         if stamp is _UNKNOWN:
             if _predates_fetched_at(path):
-                logger.warning(
-                    "Dataset %s predates the fetched_at stamp; excluding it from data-as-of "
-                    "(it will acquire one on the next run that writes it)",
-                    path.name,
-                )
+                # Once per file per process: provenance resolves per *figure*
+                # (deliberately — see the docstring), so warning on every pass
+                # buried a real run's log under hundreds of repeats of the same
+                # transient, self-healing notice.
+                if path.name not in _warned_legacy_datasets:
+                    _warned_legacy_datasets.add(path.name)
+                    logger.warning(
+                        "Dataset %s predates the fetched_at stamp; excluding it from data-as-of "
+                        "(it will acquire one on the next run that writes it)",
+                        path.name,
+                    )
                 continue
             logger.warning(
                 "Dataset %s is unreadable; reporting no data-as-of rather than a bound the "
