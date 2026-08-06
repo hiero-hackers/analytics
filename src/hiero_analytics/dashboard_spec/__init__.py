@@ -15,21 +15,16 @@ from hiero_analytics.dashboard_spec import (
     community,
     constants,
     contributors,
-    diversity,
     governance,
     hips,
     onboarding,
-    pipeline,
     security,
-    teams,
 )
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
-# Macro (family) display order — the tab order the dashboard shows. The four
-# governance-shaped families declare MACRO_PARENT = "Governance" and render as
-# sub-tabs of one umbrella tab in this same order.
-_FAMILIES = (contributors, pipeline, governance, teams, diversity, hips, security, onboarding, community)
+# Macro (family) display order — the tab order the dashboard shows.
+_FAMILIES = (contributors, governance, hips, security, onboarding, community)
 
 # The assembled spec surface — everything a consumer (the data API emitter,
 # the contract tests) reads off this package.
@@ -49,7 +44,7 @@ __all__ = [
     "WIDE_CHARTS",
 ]
 
-AFFILIATION_ISSUE_URL = diversity.AFFILIATION_ISSUE_URL
+AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
 PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
 CHARTS_GROUP = "Charts"
 
