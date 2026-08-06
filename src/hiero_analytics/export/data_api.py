@@ -47,6 +47,7 @@ from hiero_analytics.dashboard_spec import (
     CUSTOM_VIEW_MODULES,
     MACRO_GLOSSARIES,
     METRIC_ANNOTATIONS,
+    PROJECT_ISSUES_URL,
     TABLE_FAMILIES,
     WIDE_CHARTS,
 )
@@ -341,6 +342,8 @@ def emit_data_api() -> Path:
         "macro_glossaries": MACRO_GLOSSARIES,
         # Display labels for the rolling activity periods ("30d" -> "30 days").
         "period_labels": {period.key: period.label for period in API_PERIODS},
+        # Where the dashboard footer points "spotted something wrong?".
+        "issues_url": PROJECT_ISSUES_URL,
         "version": API_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "provenance": {

@@ -188,6 +188,7 @@ export const MANIFEST: Manifest = {
     },
   },
   period_labels: { "30d": "30 days" },
+  issues_url: "https://example.test/issues",
   provenance: { git_sha: "abc1234", data_as_of: "2026-07-25T21:00:00+00:00" },
   orgs: {
     "hiero-ledger": {

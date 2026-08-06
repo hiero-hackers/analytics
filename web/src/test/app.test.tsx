@@ -70,6 +70,13 @@ describe("App shell", () => {
     expect(screen.getAllByText("Charts")).toHaveLength(2);
     expect(screen.getAllByText("Roles & teams")).toHaveLength(2);
     expect(screen.getByText(/Work in progress/)).toBeInTheDocument();
+    // The footer is the general "something looks wrong" route: only the
+    // affiliations table carries a contextual correction link, so pointing
+    // readers at "a table's link" left most tabs with no way to report.
+    expect(screen.getByRole("link", { name: "Open an issue" })).toHaveAttribute(
+      "href",
+      "https://example.test/issues",
+    );
     expect(screen.getByText(/data 2026-07-25 21:00 UTC · code abc1234/)).toBeInTheDocument();
   });
 });

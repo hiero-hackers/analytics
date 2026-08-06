@@ -11,7 +11,15 @@ tables inside its own macro.
 
 from __future__ import annotations
 
-from hiero_analytics.dashboard_spec import community, contributors, governance, hips, onboarding, security
+from hiero_analytics.dashboard_spec import (
+    community,
+    constants,
+    contributors,
+    governance,
+    hips,
+    onboarding,
+    security,
+)
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
@@ -30,11 +38,13 @@ __all__ = [
     "CUSTOM_VIEW_MODULES",
     "MACRO_GLOSSARIES",
     "METRIC_ANNOTATIONS",
+    "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
     "WIDE_CHARTS",
 ]
 
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
+PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
 CHARTS_GROUP = "Charts"
 
 # Display formats a section column may declare, as the third tuple element.

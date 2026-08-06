@@ -8,12 +8,15 @@ assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.constants import PROJECT_ISSUES_URL
 from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 
-# "Suggest a correction" target for the affiliations reference table — the analytics
-# repo's issues page. The affiliations map is the source of truth, so a correction is
-# either a one-line edit to data/affiliations.yaml (append '# manual') or a new issue here.
-AFFILIATION_ISSUE_URL = "https://github.com/hiero-hackers/analytics/issues"
+# "Suggest a correction" target for the affiliations reference table. That table
+# earns a contextual link because its data is hand-curated: a correction is either
+# a one-line edit to data/affiliations.yaml (append '# manual') or an issue. Tables
+# of computed counts get no such link — the footer's general report link covers
+# "this looks wrong" everywhere else.
+AFFILIATION_ISSUE_URL = PROJECT_ISSUES_URL
 
 CHART_MACRO = {
     "name": "Governance",

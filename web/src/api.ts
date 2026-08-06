@@ -168,6 +168,8 @@ export interface Manifest {
   macro_glossaries?: Record<string, Glossary>;
   /** Display labels for rolling periods ("30d" -> "30 days"). */
   period_labels?: Record<string, string>;
+  /** Where the footer sends a reader who spots something wrong. */
+  issues_url?: string;
   provenance: { git_sha: string | null; data_as_of: string | null };
   orgs: Record<string, OrgEntry>;
 }

@@ -155,7 +155,7 @@ export default function App() {
       <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
       {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
       <div className="footrow">
-        <WipFooter />
+        <WipFooter issuesUrl={manifest.issues_url} />
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
     </div>
