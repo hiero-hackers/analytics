@@ -6,12 +6,11 @@ from unittest.mock import patch
 import pandas as pd
 
 from hiero_analytics.analysis.maintainer_pipeline import (
-    _active_window_for_year,
     activity_to_role_dataframe,
+    build_maintainer_daily_pipeline,
     build_maintainer_monthly_pipeline,
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
-    build_maintainer_yearly_h2_pipeline,
     build_maintainer_yearly_pipeline,
     recent_buckets,
 )
@@ -25,13 +24,14 @@ def _record(
     year: int,
     target_type: str = "pull_request",
     month: int = 1,
+    day: int = 1,
 ) -> ContributorActivityRecord:
-    """Create a synthetic ContributorActivityRecord at the given year/month."""
+    """Create a synthetic ContributorActivityRecord at the given year/month/day."""
     return ContributorActivityRecord(
         repo=repo,
         activity_type=activity_type,
         actor=actor,
-        occurred_at=datetime(year, month, 1, tzinfo=UTC),
+        occurred_at=datetime(year, month, day, tzinfo=UTC),
         target_type=target_type,
         target_number=1,
     )
@@ -181,97 +181,6 @@ def test_build_maintainer_repo_pipeline_excludes_inactive():
 
 # ---------------------------------------------------------------------------
 # _active_window_for_year
-# ---------------------------------------------------------------------------
-
-
-def test_active_window_for_completed_year_is_fixed_h2():
-    """Completed years should use a fixed July-1 to Dec-31 window."""
-    today = datetime(2026, 4, 24, tzinfo=UTC)
-    start, end = _active_window_for_year(2025, today)
-
-    assert start == datetime(2025, 7, 1, tzinfo=UTC)
-    assert end == datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC)
-
-
-def test_active_window_for_current_year_is_trailing_183_days():
-    """The current (incomplete) year should use a trailing 183-day window."""
-    today = datetime(2026, 4, 24, tzinfo=UTC)
-    start, end = _active_window_for_year(2026, today)
-
-    assert end == today
-    assert (end - start).days == 183
-
-
-# ---------------------------------------------------------------------------
-# build_maintainer_yearly_h2_pipeline – end-of-year activity window
-# ---------------------------------------------------------------------------
-
-
-def test_yearly_h2_pipeline_excludes_h1_events_for_completed_year():
-    """H1 events (Jan–Jun) in a completed year should not be counted."""
-    role_lookup = {"repo-a": {}}
-    records = [
-        _record("authored_pull_request", "alice", "org/repo-a", 2024, month=3),  # H1 – excluded
-        _h2_record("authored_pull_request", "bob", "org/repo-a", 2024),  # H2 – included
-    ]
-
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-    yearly = build_maintainer_yearly_h2_pipeline(stage_df)
-
-    row = yearly[yearly["year"] == 2024].iloc[0]
-    # Only bob's H2 event should be counted.
-    assert row["general_user"] == 1
-
-
-def test_yearly_h2_pipeline_historical_bars_are_stable():
-    """Re-running the pipeline at a later date must not change completed-year counts."""
-    role_lookup = {"repo-a": {}}
-    records = [_h2_record("authored_pull_request", "alice", "org/repo-a", 2025)]
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-
-    # Simulate pipeline run in April 2026.
-    today_apr_2026 = datetime(2026, 4, 24, tzinfo=UTC)
-    # Simulate pipeline run in October 2026.
-    today_oct_2026 = datetime(2026, 10, 1, tzinfo=UTC)
-
-    with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
-        mock_dt.now.return_value = today_apr_2026
-        mock_dt.side_effect = datetime
-        yearly_apr = build_maintainer_yearly_h2_pipeline(stage_df)
-
-    with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
-        mock_dt.now.return_value = today_oct_2026
-        mock_dt.side_effect = datetime
-        yearly_oct = build_maintainer_yearly_h2_pipeline(stage_df)
-
-    count_apr = yearly_apr[yearly_apr["year"] == 2025]["general_user"].iloc[0]
-    count_oct = yearly_oct[yearly_oct["year"] == 2025]["general_user"].iloc[0]
-    assert count_apr == count_oct, "Historical 2025 count must not change between refreshes"
-
-
-def test_yearly_h2_pipeline_current_bar_uses_full_trailing_window():
-    """Early in a year the current bar's trailing window reaches into last December, as its note says."""
-    role_lookup = {"repo-a": {}}
-    records = [
-        _record("authored_pull_request", "december-dev", "org/repo-a", 2025, month=12),
-        _record("authored_pull_request", "january-dev", "org/repo-a", 2026, month=1),
-    ]
-    stage_df = activity_to_role_dataframe(records, role_lookup)
-
-    today_feb_2026 = datetime(2026, 2, 15, tzinfo=UTC)
-    with patch("hiero_analytics.analysis.maintainer_pipeline.datetime") as mock_dt:
-        mock_dt.now.return_value = today_feb_2026
-        mock_dt.side_effect = datetime
-        yearly = build_maintainer_yearly_h2_pipeline(stage_df)
-
-    current = yearly[yearly["year"] == 2026].iloc[0]
-    assert current["general_user"] == 2  # window spans Dec 2025 + Jan 2026, not year-to-date
-    past = yearly[yearly["year"] == 2025].iloc[0]
-    assert past["general_user"] == 1  # the Dec event still counts in 2025's fixed H2 bar
-
-
-# ---------------------------------------------------------------------------
-# build_maintainer_monthly_pipeline
 # ---------------------------------------------------------------------------
 
 
@@ -523,17 +432,36 @@ def test_yearly_pipeline_bars_do_not_move_with_the_run_date():
     assert april.equals(october)
 
 
-def test_yearly_h2_view_is_a_subset_of_the_plain_yearly_view():
-    """The two variants must be comparable: 'still here' can never exceed 'showed up'."""
+def test_daily_pipeline_buckets_by_calendar_day():
+    """The finest resolution: same whole-bucket rule, one bar per day."""
     role_lookup = {"repo-a": {}}
     records = [
-        _record("authored_pull_request", "spring-only", "org/repo-a", 2024, month=3),
-        _h2_record("authored_pull_request", "stayed", "org/repo-a", 2024),
+        _record("authored_pull_request", "alice", "org/repo-a", 2026, month=3, day=4),
+        _record("reviewed_pull_request", "bob", "org/repo-a", 2026, month=3, day=4),
+        _record("authored_pull_request", "alice", "org/repo-a", 2026, month=3, day=5),
     ]
     stage_df = activity_to_role_dataframe(records, role_lookup)
 
-    whole = build_maintainer_yearly_pipeline(stage_df)
-    year_end = build_maintainer_yearly_h2_pipeline(stage_df)
+    daily = build_maintainer_daily_pipeline(stage_df)
 
-    assert year_end[year_end["year"] == 2024].iloc[0]["general_user"] == 1
-    assert whole[whole["year"] == 2024].iloc[0]["general_user"] == 2
+    assert list(daily["day"]) == ["2026-03-04", "2026-03-05"]
+    assert list(daily["general_user"]) == [2, 1]
+
+
+def test_every_time_view_agrees_on_one_day_of_activity():
+    """The four resolutions are one rule zoomed — they cannot disagree on a single day."""
+    role_lookup = {"repo-a": {}}
+    records = [
+        _record("authored_pull_request", "alice", "org/repo-a", 2026, month=3, day=4),
+        _record("reviewed_pull_request", "bob", "org/repo-a", 2026, month=3, day=4),
+    ]
+    stage_df = activity_to_role_dataframe(records, role_lookup)
+
+    counts = {
+        "day": build_maintainer_daily_pipeline(stage_df)["general_user"].iloc[0],
+        "week": build_maintainer_weekly_pipeline(stage_df)["general_user"].iloc[0],
+        "month": build_maintainer_monthly_pipeline(stage_df)["general_user"].iloc[0],
+        "year": build_maintainer_yearly_pipeline(stage_df)["general_user"].iloc[0],
+    }
+
+    assert set(counts.values()) == {2}, counts

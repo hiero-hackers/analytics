@@ -98,7 +98,7 @@ CHART_COMPANION_CSVS = {
     "maintainer_activity_events.csv",
     "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
     "maintainer_pipeline_yearly.csv",
-    "maintainer_pipeline_yearly_h2.csv",  # the "active at year end" yearly variant
+    "maintainer_pipeline_daily.csv",
     "maintainer_pipeline_monthly.csv",
     "maintainer_pipeline_weekly.csv",
     "maintainer_pipeline_by_repo.csv",

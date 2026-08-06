@@ -5,14 +5,15 @@ from __future__ import annotations
 import logging
 
 from hiero_analytics.analysis.maintainer_pipeline import (
+    RECENT_DAILY_BUCKETS,
     RECENT_MONTHLY_BUCKETS,
     RECENT_WEEKLY_BUCKETS,
     STAGE_COLUMNS,
     activity_to_role_dataframe,
+    build_maintainer_daily_pipeline,
     build_maintainer_monthly_pipeline,
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
-    build_maintainer_yearly_h2_pipeline,
     build_maintainer_yearly_pipeline,
     recent_buckets,
 )
@@ -44,14 +45,14 @@ def main(org: str = ORG) -> None:
 
     stage_df = activity_to_role_dataframe(records, repo_role_lookup)
     yearly_pipeline = build_maintainer_yearly_pipeline(stage_df)
-    yearly_h2_pipeline = build_maintainer_yearly_h2_pipeline(stage_df)
+    daily_pipeline = build_maintainer_daily_pipeline(stage_df)
     monthly_pipeline = build_maintainer_monthly_pipeline(stage_df)
     weekly_pipeline = build_maintainer_weekly_pipeline(stage_df)
     repo_pipeline = build_maintainer_repo_pipeline(stage_df)
 
     save_dataframe(stage_df, org_data_dir / "maintainer_activity_events.csv")
     save_dataframe(yearly_pipeline, org_data_dir / "maintainer_pipeline_yearly.csv")
-    save_dataframe(yearly_h2_pipeline, org_data_dir / "maintainer_pipeline_yearly_h2.csv")
+    save_dataframe(daily_pipeline, org_data_dir / "maintainer_pipeline_daily.csv")
     save_dataframe(monthly_pipeline, org_data_dir / "maintainer_pipeline_monthly.csv")
     save_dataframe(weekly_pipeline, org_data_dir / "maintainer_pipeline_weekly.csv")
     save_dataframe(repo_pipeline, org_data_dir / "maintainer_pipeline_by_repo.csv")
@@ -71,15 +72,23 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        yearly_h2_pipeline,
+        recent_buckets(daily_pipeline, RECENT_DAILY_BUCKETS, newest_first=True),
         plot_stacked_bar,
-        output_path=org_charts_dir / "maintainer_pipeline_yearly_h2.png",
-        x_col="year",
+        output_path=org_charts_dir / "maintainer_pipeline_daily.png",
+        x_col="day",
         stack_cols=STAGE_COLUMNS,
         labels=STACK_LABELS,
         colors=MAINTAINER_PIPELINE_COLORS,
-        title="Maintainer Pipeline: Contributors Active Near Year End by Role (Yearly)",
+        title=(
+            "Maintainer Pipeline: Unique Active Contributors by Role - PR & Issue Activity "
+            f"(Daily, last {RECENT_DAILY_BUCKETS} days)"
+        ),
+        rotate_x=45,
         annotate_totals=True,
+        # Time series: keep chronological order. The default magnitude sort
+        # treats the 'YYYY-MM-DD' labels as categorical and reorders the week
+        # into a descending ranking, which reads as a trend that isn't there.
+        sort_categorical=False,
     )
 
     plot_and_save(

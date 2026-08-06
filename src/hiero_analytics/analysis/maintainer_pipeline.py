@@ -2,8 +2,14 @@
 
 This module classifies contributor activity records, including both
 pull request and issue activity, into governance roles and builds
-aggregated pipeline tables for yearly, monthly, weekly, and
-repository-level views.
+aggregated pipeline tables.
+
+The time views are one rule at four resolutions — a person counts for a bucket
+if they were active anywhere in it — so the tabs zoom rather than disagree:
+all time by year, the last year by month, the last month by week, the last week
+by day. The repository view is the odd one out: it is a trailing activity
+window rather than a bucket, because "which repos are alive now" is a different
+question from "how has this moved".
 """
 
 from __future__ import annotations
@@ -29,8 +35,9 @@ ACTIVE_WINDOW_DAYS = 183
 # Full history is still written to CSV; only the rendered charts are trimmed,
 # so the "By week"/"By month" views stay legible instead of becoming a wall of
 # hundreds of bars.
-RECENT_MONTHLY_BUCKETS = 24
-RECENT_WEEKLY_BUCKETS = 26
+RECENT_MONTHLY_BUCKETS = 12  # the "1 year" tab
+RECENT_WEEKLY_BUCKETS = 5  # the "1 month" tab
+RECENT_DAILY_BUCKETS = 7  # the "week" tab
 
 
 _MAINTAINER_ACTIVITY_TYPES = {
@@ -81,27 +88,6 @@ def activity_to_role_dataframe(
         to_row,
         ["repo", "actor", "occurred_at", "year", "stage"],
     )
-
-
-def _active_window_for_year(
-    year: int, today: datetime, window_days: int = ACTIVE_WINDOW_DAYS
-) -> tuple[datetime, datetime]:
-    """Return the (start, end) activity window for a given year.
-
-    Completed years use a fixed H2 window (Jul 1 – Dec 31) so historical
-    counts never change on refresh.  The current year uses a trailing
-    ``window_days``-day window ending today.
-    """
-    if year < today.year:
-        # Past year: fixed last-6-months window, immune to re-run date.
-        window_start = datetime(year, 7, 1, tzinfo=UTC)
-        window_end = datetime(year, 12, 31, 23, 59, 59, tzinfo=UTC)
-    else:
-        # Current year: trailing window from today.
-        window_end = today
-        window_start = today - timedelta(days=window_days)
-
-    return window_start, window_end
 
 
 def _counts_by_bucket(labelled: pd.DataFrame, bucket_col: str) -> pd.DataFrame:
@@ -165,13 +151,25 @@ def build_maintainer_weekly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
     return _counts_by_bucket(labelled, "week")
 
 
+def build_maintainer_daily_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
+    """Build daily counts of distinct active people by their highest governance role.
+
+    The finest bucket the tab row offers: the last week, one bar per day. Counts
+    are strictly per-day, and today's bar reflects activity so far today.
+    """
+    if stage_df.empty:
+        return pd.DataFrame(columns=["day", *STAGE_COLUMNS])
+
+    labelled = stage_df.assign(_bucket=stage_df["occurred_at"].dt.strftime("%Y-%m-%d"))
+    return _counts_by_bucket(labelled, "day")
+
+
 def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
     """Build calendar-year counts of distinct active people by their highest role.
 
     Anyone active at any point in the year counts for that year — the same
-    whole-bucket rule the monthly and weekly builders use, so the three tabs
-    finally answer the same question at three resolutions. (The narrower
-    "active near year end" reading is :func:`build_maintainer_yearly_h2_pipeline`.)
+    whole-bucket rule the daily, weekly, and monthly builders use, so every tab
+    answers one question at a different resolution.
 
     Each person is counted once per year, under the highest role they held in any
     repo, so the stacked bands stay mutually exclusive and a year's total is the
@@ -185,50 +183,6 @@ def build_maintainer_yearly_pipeline(stage_df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
 
     labelled = stage_df.assign(_bucket=stage_df["year"])
-    return _counts_by_bucket(labelled, "year")
-
-
-def build_maintainer_yearly_h2_pipeline(
-    stage_df: pd.DataFrame,
-    *,
-    active_window_days: int = ACTIVE_WINDOW_DAYS,
-    today: datetime | None = None,
-) -> pd.DataFrame:
-    """Yearly counts restricted to people active *near the end* of each year.
-
-    The original reading of the yearly chart, kept as its own variant: it answers
-    "who was still active by year end?" rather than "who was active at all?",
-    which is the sharper question for retention and hand-over, and it preserves
-    continuity with how this chart was read historically.
-
-    Past years use a fixed H2 window (Jul 1 – Dec 31), stable across refreshes;
-    the current year uses a full trailing ``active_window_days``-day window from
-    today, which early in the year reaches into the previous December — those
-    events count toward the current bar.
-    """
-    if stage_df.empty:
-        return pd.DataFrame(columns=["year", *STAGE_COLUMNS])
-
-    today = today or datetime.now(UTC)
-    years = stage_df["year"].unique()
-
-    filtered_frames: list[pd.DataFrame] = []
-    for year in sorted(years):
-        window_start, window_end = _active_window_for_year(year, today, active_window_days)
-        mask = (stage_df["occurred_at"] >= window_start) & (stage_df["occurred_at"] <= window_end)
-        if year < today.year:
-            filtered_frames.append(stage_df.loc[mask & (stage_df["year"] == year)])
-        else:
-            # The current bar is a full trailing window, as the chart note states.
-            # Early in the year it reaches into last December; those events are
-            # relabelled so they count toward the current bar, not last year's.
-            filtered_frames.append(stage_df.loc[mask].assign(year=year))
-
-    active_df = pd.concat(filtered_frames, ignore_index=True) if filtered_frames else stage_df.iloc[0:0]
-
-    # One row per (year, actor) at their highest role — the shared bucket counter
-    # keeps the stacked bands mutually exclusive.
-    labelled = active_df.assign(_bucket=active_df["year"])
     return _counts_by_bucket(labelled, "year")
 
 
