@@ -16,20 +16,14 @@ import {
 import type { ColumnSpec, Row } from "./api";
 import { FormattedCell } from "./components/FormattedCell";
 
-// Column meta this app attaches: alignment, derived from the column's format.
-// Text scans best left-aligned, numbers compare best right-aligned, and short
-// symbolic cells (ticks, presence chips) sit best centred under their header.
+// Column meta this app attaches: whether the column holds numbers, which earns
+// it tabular figures so digits keep a constant width. Alignment itself is not
+// per-column — every cell centres (see the `th`/`td` rules).
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interface merging requires the type params
   interface ColumnMeta<TData, TValue> {
-    align?: "right" | "center";
+    numeric?: boolean;
   }
-}
-
-function alignFor(format: string | undefined): "right" | "center" | undefined {
-  if (format === "number") return "right";
-  if (format === "flag" || format === "presence") return "center";
-  return undefined;
 }
 
 /** Sortable value: raw for numbers, string otherwise (matches legacy sort). */
@@ -49,7 +43,7 @@ export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: str
           id: spec.key,
           header: spec.label,
           cell: (context) => <FormattedCell value={context.row.original[spec.key]} format={spec.format} />,
-          meta: { align: alignFor(spec.format) },
+          meta: { numeric: spec.format === "number" },
         }),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- columns derive from the key

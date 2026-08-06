@@ -26,14 +26,6 @@ export function PeriodTabs({
       role="group"
       aria-label="Time range"
     >
-      <button
-        type="button"
-        className={active === null ? ACTIVE : IDLE}
-        aria-pressed={active === null}
-        onClick={() => onChange(null)}
-      >
-        All time
-      </button>
       {periods.map((key) => (
         <button
           key={key}
@@ -45,6 +37,17 @@ export function PeriodTabs({
           {labels?.[key] ?? key}
         </button>
       ))}
+      {/* Last, not first: the windows read shortest to longest (30 days →
+          1 year), and all-time is the end of that scale rather than a
+          separate mode sitting before it. */}
+      <button
+        type="button"
+        className={active === null ? ACTIVE : IDLE}
+        aria-pressed={active === null}
+        onClick={() => onChange(null)}
+      >
+        All time
+      </button>
     </div>
   );
 }
