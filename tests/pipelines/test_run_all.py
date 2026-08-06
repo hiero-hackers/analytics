@@ -172,3 +172,51 @@ def test_main_runs_extra_orgs_then_the_data_api_once(monkeypatch):
 
     assert attempted == ["good-org", "bad-org"]  # every extra org attempted
     assert renderer_runs == ["data_api"]
+
+
+def _prune_spy(monkeypatch) -> list[bool]:
+    """Record whether main() reached the dataset prune."""
+    calls: list[bool] = []
+    monkeypatch.setattr(run_all, "prune_untouched_datasets", lambda: calls.append(True))
+    monkeypatch.setattr(run_all, "setup_logging", lambda: None)
+    monkeypatch.setattr(run_all, "_resolve", lambda _name: lambda: None)
+    monkeypatch.setattr(run_all, "EXTRA_ORGS", [])
+    return calls
+
+
+def test_main_prunes_orphaned_datasets_after_a_clean_run(monkeypatch):
+    """A complete online run is the only place an unclaimed dataset means "orphan"."""
+    calls = _prune_spy(monkeypatch)
+    monkeypatch.setattr(run_all, "default_pipelines", lambda: [("ok", lambda: None)])
+    monkeypatch.setattr(run_all, "offline_mode_enabled", lambda: False)
+
+    run_all.main()
+
+    assert calls == [True]
+
+
+def test_main_does_not_prune_when_a_pipeline_failed(monkeypatch):
+    """A pipeline that failed may never have reached its fetch, so nothing is orphaned."""
+    calls = _prune_spy(monkeypatch)
+
+    def boom():
+        raise RuntimeError("fail")
+
+    monkeypatch.setattr(run_all, "default_pipelines", lambda: [("boom", boom)])
+    monkeypatch.setattr(run_all, "offline_mode_enabled", lambda: False)
+
+    with pytest.raises(SystemExit):
+        run_all.main()
+
+    assert calls == []
+
+
+def test_main_does_not_prune_offline(monkeypatch):
+    """Offline runs skip the network pipelines, so most datasets go unclaimed."""
+    calls = _prune_spy(monkeypatch)
+    monkeypatch.setattr(run_all, "default_pipelines", lambda: [("ok", lambda: None)])
+    monkeypatch.setattr(run_all, "offline_mode_enabled", lambda: True)
+
+    run_all.main()
+
+    assert calls == []

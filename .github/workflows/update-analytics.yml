@@ -101,6 +101,29 @@ jobs:
           retention-days: 90
           if-no-files-found: warn
 
+      # Hand-off for the archive-snapshot job: the emitted JSON API plus the
+      # run's provenance manifest, staged as the exact tree the archive branch
+      # carries. Chart PNGs are excluded deliberately — heavy, and the numbers
+      # behind them are already in the JSON.
+      #
+      # Success-only on purpose: the durable archive must contain only what was
+      # actually published, so this shares the pipeline-success gate with the
+      # Pages deploy rather than the always() the diagnostic artifact above uses.
+      - name: Stage API snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot/api
+          cp -R outputs/data/api/v1 snapshot/api/v1
+          cp outputs/data/datasets/SNAPSHOT.json snapshot/SNAPSHOT.json
+
+      - name: Hand off API snapshot
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: api-snapshot-${{ github.run_id }}
+          path: snapshot
+          retention-days: 7
+          if-no-files-found: error
+
       # The web dashboard (web/): a static Vite build that renders the JSON
       # data API. The app uses relative URLs, so its data and charts nest
       # beneath it.
@@ -131,6 +154,82 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _site
+
+  # Append this run's data API to the snapshot archive: an orphan branch whose
+  # working tree only ever holds the latest snapshot, so history lives in the
+  # commits rather than in an ever-growing directory of dated copies. Git is
+  # then the index, the time machine, and the diff engine:
+  #
+  #   latest        git show data/snapshots:api/v1/manifest.json
+  #   by date       git rev-list -1 --before=2026-08-01 data/snapshots
+  #   diff two runs git diff <sha1> <sha2> -- api/v1/
+  #
+  # See docs/snapshots.md. Runs only when refresh-data succeeded, so a run with
+  # failed pipelines never enters the archive.
+  archive-snapshot:
+    name: Archive API snapshot
+    needs: refresh-data
+    runs-on: ubuntu-latest
+    # The only job in this workflow that writes to the repository, and it
+    # writes to one branch that never holds code. The workflow's top-level
+    # permissions stay contents: read.
+    permissions:
+      contents: write
+    concurrency:
+      group: archive-snapshot
+      cancel-in-progress: false
+    steps:
+      - name: Download API snapshot
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: api-snapshot-${{ github.run_id }}
+          path: snapshot
+
+      # Worked in its own throwaway clone rather than a checkout of main: the
+      # archive branch shares no history with the code, and a shallow fetch of
+      # just its tip is all that is needed to add a commit.
+      - name: Commit snapshot to the archive branch
+        env:
+          BRANCH: data/snapshots
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir archive && cd archive
+          git init -q
+          git remote add origin \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          if git fetch -q --depth=1 origin "$BRANCH" 2>/dev/null; then
+            git checkout -q FETCH_HEAD
+            git checkout -qB "$BRANCH"
+            # Clear the tree so a section deleted upstream disappears here too,
+            # rather than lingering as an orphan the next reader mistakes for live.
+            git rm -rq --ignore-unmatch .
+          else
+            echo "Archive branch $BRANCH does not exist yet; creating it."
+            git checkout -q --orphan "$BRANCH"
+          fi
+
+          cp -R ../snapshot/. .
+          git add -A
+
+          # Idempotent: a re-run whose output is byte-identical adds nothing, so
+          # replays and manual dispatches are safe and the log stays meaningful.
+          if git diff --cached --quiet; then
+            echo "Snapshot identical to the archive tip; nothing to commit."
+            exit 0
+          fi
+
+          # gpgsign off explicitly: this is a bot commit on a data branch, and
+          # inheriting a signing config the runner has no key for would fail
+          # the job with a misleading error.
+          git -c commit.gpgsign=false \
+            commit -q -m "snapshot: $(date -u +%Y-%m-%d) run ${GITHUB_RUN_ID} code ${GITHUB_SHA:0:7}"
+          git push -q origin "$BRANCH"
+          echo "Archived $(du -sh . | cut -f1) to $BRANCH."
 
   # Publish the freshly-built dashboard to GitHub Pages. Runs after the data refresh
   # regardless of whether the data changed, so the public page always reflects the

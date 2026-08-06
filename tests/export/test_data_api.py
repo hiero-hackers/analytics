@@ -213,6 +213,35 @@ def test_period_variants_ride_along(api_env: Path, tmp_path: Path, monkeypatch: 
     assert document["periods"][period.key] == [{"name": "a"}]
 
 
+def test_all_time_period_is_not_emitted_as_a_variant(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """The all-time window never rides along: ``rows`` already is that table.
+
+    Emitting it duplicated every row in the payload and gave the dashboard two
+    identical "All time" tabs — the selector's own no-period state plus the
+    variant.
+    """
+    section = {
+        "id": "widgets",
+        "file": "widgets.csv",
+        "title": "Widgets",
+        "description": "All widgets.",
+        "columns": [("name", "widget")],
+        "periods": True,
+    }
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(section)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a", "b"]}))
+    all_time = next(period for period in data_api.ACTIVITY_PERIODS if period.days is None)
+    # Written by the pipelines and present on disk — the emitter still skips it.
+    pd.DataFrame({"name": ["a", "b"]}).to_csv(api_env / all_time.filename("widgets"), index=False)
+
+    emit_data_api()
+
+    document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
+    assert all_time.key not in document.get("periods", {})
+    manifest = json.loads((tmp_path / "data" / "api" / API_VERSION / "manifest.json").read_text())
+    assert all_time.key not in manifest["period_labels"]
+
+
 def test_chart_sections_carry_presentation_structure(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """Chart sections keep their card structure: variants, notes, wide, slideshow."""
     monkeypatch.setattr(

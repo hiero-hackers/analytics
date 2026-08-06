@@ -28,7 +28,7 @@ from collections.abc import Callable
 
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.paths import DATASETS_DIR, EXTRA_ORGS
-from hiero_analytics.data_sources.dataset_store import offline_mode_enabled
+from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets
 from hiero_analytics.pipelines import PIPELINES_BY_NAME, default_run_pipelines
 from hiero_analytics.provenance import SNAPSHOT_MANIFEST_NAME, write_snapshot_manifest
 
@@ -126,6 +126,23 @@ def main(*, fail_fast: bool = False) -> None:
         raise SystemExit(1)
 
     failures += [f"contributor_activity[{org}]" for org in EXTRA_ORGS if not _run_extra_org(org)]
+
+    # Reclaim datasets no resource claims any more, before provenance reads the
+    # directory: an orphan (a fetch renamed or re-scoped, so nothing rewrites
+    # its file) rides the CI cache indefinitely and drags the published
+    # "data as of" back to whenever it was last written.
+    #
+    # Only from here, and only on a complete online run. A single-pipeline CLI
+    # invocation never reaches main(); an offline run deliberately skips the
+    # network pipelines, so most datasets go unclaimed; and a failed pipeline
+    # may simply not have got as far as its fetch. In each of those the
+    # unclaimed set is an artefact of the run, not evidence of an orphan.
+    if failures:
+        logger.info("Skipping the dataset prune: %d pipeline(s) failed, so unclaimed != orphaned", len(failures))
+    elif offline_mode_enabled():
+        logger.info("Skipping the dataset prune: offline runs do not claim the network-backed datasets")
+    else:
+        prune_untouched_datasets()
 
     # Describe the snapshot before the data API emits against it. Written
     # even when pipelines failed — a partial run still produces charts, and the

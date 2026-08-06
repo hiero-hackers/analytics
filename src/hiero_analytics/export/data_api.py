@@ -59,6 +59,13 @@ logger = logging.getLogger(__name__)
 
 API_VERSION = "v1"
 
+# The rolling windows the API publishes as period variants. The all-time period
+# is deliberately excluded: a document's own ``rows`` already are the all-time
+# table, so emitting it again duplicated every such row in the payload and gave
+# the dashboard two identical "All time" tabs (the selector's own no-period
+# state, plus this variant).
+API_PERIODS = tuple(period for period in ACTIVITY_PERIODS if period.days is not None)
+
 # A section counts as stale when its data is older than the scheduled refresh
 # cadence plus slack for a slow run. The analytics refresh runs every 5 days,
 # and we add 12 hours of slack for slow or delayed runs. The legacy dashboard
@@ -141,7 +148,7 @@ def _period_variants(section: dict, org: str, org_data_dir: Path) -> dict[str, l
         return {}
     stem = Path(section["file"]).stem
     variants: dict[str, list[dict]] = {}
-    for period in ACTIVITY_PERIODS:
+    for period in API_PERIODS:
         path = org_data_dir / period.filename(stem)
         if path.exists():
             # Period files carry the same columns as their base table, so they
@@ -333,7 +340,7 @@ def emit_data_api() -> Path:
         # column definitions lives in dashboard_spec.glossary.
         "macro_glossaries": MACRO_GLOSSARIES,
         # Display labels for the rolling activity periods ("30d" -> "30 days").
-        "period_labels": {period.key: period.label for period in ACTIVITY_PERIODS},
+        "period_labels": {period.key: period.label for period in API_PERIODS},
         "version": API_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "provenance": {

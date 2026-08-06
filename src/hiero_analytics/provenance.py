@@ -45,12 +45,20 @@ logger = logging.getLogger(__name__)
 # it must never be the reason a multi-hour analytics run stalls.
 _GIT_TIMEOUT_SECONDS = 5
 
-# `save_dataset` writes {"version", "fetched_through", "records"} in that order,
-# so the watermark always lands in the first few dozen bytes. Reading a fixed
-# prefix and matching it keeps the per-figure stamp cheap — a full `json.load`
-# of every dataset on every chart would dominate the render time.
+# `save_dataset` writes {"version", "fetched_at", "fetched_through", "records"}
+# in that order, so both stamps land in the first few dozen bytes. Reading a
+# fixed prefix and matching it keeps the per-figure stamp cheap — a full
+# `json.load` of every dataset on every chart would dominate the render time.
 _WATERMARK_PREFIX_BYTES = 256
 _WATERMARK_RE = re.compile(r'"fetched_through"\s*:\s*"([^"]+)"')
+# Freshness comes from `fetched_at` (wall clock at write), never from
+# `fetched_through` (a *content* watermark). The HIP inventory watermarks itself
+# from frontmatter `updated:` dates, so a fortnight with no HIP edits used to
+# report the whole dashboard as a fortnight stale.
+_FETCHED_AT_RE = re.compile(r'"fetched_at"\s*:\s*"([^"]+)"')
+# The key alone, to tell "written before this field existed" from "field is
+# there but damaged" — only the first may be skipped.
+_FETCHED_AT_KEY_RE = re.compile(r'"fetched_at"\s*:')
 # Presence of the schema version marks a file as a `save_dataset` product, which
 # is what separates "damaged dataset" from "not a dataset" when no watermark is
 # found. Both keys are written before the records, well inside the prefix.
@@ -167,25 +175,43 @@ def _run_git(*args: str) -> str | None:
 
 
 def dataset_watermark(datasets_dir: Path | None = None) -> datetime | None:
-    """Oldest ``fetched_through`` across the persisted datasets, or None.
+    """Oldest ``fetched_at`` across the persisted datasets, or None.
 
-    The *oldest* rather than newest watermark: it is the only figure that holds
-    for the dashboard as a whole, since a chart may draw on any dataset.
+    This is the run's freshness bound — "every dataset was refreshed at least
+    this recently" — so it reads the wall-clock write stamp, *not*
+    ``fetched_through``. That one is a content watermark: the HIP inventory
+    derives it from frontmatter ``updated:`` dates, so using it here reported a
+    fortnight-old dashboard whenever the HIP repository sat quiet for a
+    fortnight, even though the fetch had just run.
 
-    Returns None — no claim at all — when any dataset's watermark cannot be
-    determined. Skipping the unreadable file instead would let the *remaining*
-    datasets set a newer bound, asserting a freshness the run cannot support:
-    the corrupt file might hold the oldest data of all. Files that were never
-    watermarked (the pretty-printed governance snapshots that share this
-    directory) are not datasets and are ignored.
+    The *oldest* rather than newest stamp: it is the only figure that holds for
+    the dashboard as a whole, since a chart may draw on any dataset.
+
+    Returns None — no claim at all — when a dataset is unreadable. Skipping it
+    instead would let the *remaining* datasets set a newer bound, asserting a
+    freshness the run cannot support: the corrupt file might hold the oldest
+    data of all. Files that were never stamped (the pretty-printed governance
+    snapshots that share this directory) are not datasets and are ignored.
+
+    A dataset written before ``fetched_at`` existed is skipped with a warning
+    rather than voiding the bound: the field is additive, and every live
+    dataset acquires it on the next successful run, so the only files that stay
+    without one are leftovers no pipeline writes any more.
     """
     stamps: list[datetime] = []
     for path in _dataset_files(datasets_dir):
-        stamp = _read_watermark(path)
+        stamp = _read_stamp(path, _FETCHED_AT_RE)
         if stamp is _UNKNOWN:
+            if _predates_fetched_at(path):
+                logger.warning(
+                    "Dataset %s predates the fetched_at stamp; excluding it from data-as-of "
+                    "(it will acquire one on the next run that writes it)",
+                    path.name,
+                )
+                continue
             logger.warning(
-                "Dataset %s has an unreadable watermark; reporting no data-as-of rather than "
-                "a bound the remaining datasets cannot support",
+                "Dataset %s is unreadable; reporting no data-as-of rather than a bound the "
+                "remaining datasets cannot support",
                 path.name,
             )
             return None
@@ -200,8 +226,8 @@ def _dataset_files(datasets_dir: Path | None = None) -> list[Path]:
     return sorted(path for path in directory.glob("*.json") if path.name != SNAPSHOT_MANIFEST_NAME)
 
 
-def _read_watermark(path: Path) -> datetime | None | _Unknown:
-    """Extract ``fetched_through`` from a dataset file's leading bytes.
+def _read_stamp(path: Path, pattern: re.Pattern[str]) -> datetime | None | _Unknown:
+    """Extract a timestamp field from a dataset file's leading bytes.
 
     Three outcomes, because "no watermark" and "unreadable watermark" must not
     collapse into one answer: a :data:`_UNKNOWN` sentinel when the file looks
@@ -216,11 +242,11 @@ def _read_watermark(path: Path) -> datetime | None | _Unknown:
     except OSError:
         # Cannot even read it, so cannot rule out that it is a dataset.
         return _UNKNOWN
-    match = _WATERMARK_RE.search(prefix)
+    match = pattern.search(prefix)
     if match is None:
-        # `save_dataset` writes "version" then "fetched_through", both well inside
-        # the prefix. A "version" with no watermark is therefore a damaged
-        # dataset, while neither key means a file this module does not own.
+        # `save_dataset` writes "version" then both stamps, all well inside the
+        # prefix. A "version" with no stamp is therefore a damaged dataset,
+        # while neither key means a file this module does not own.
         return _UNKNOWN if _VERSION_RE.search(prefix) else None
     try:
         stamp = datetime.fromisoformat(match.group(1))
@@ -230,6 +256,25 @@ def _read_watermark(path: Path) -> datetime | None | _Unknown:
     # "UTC", so an offset-bearing watermark ("...T09:00:00-04:00") would otherwise
     # render as "09:00 UTC" — four hours earlier than the instant it names.
     return stamp.astimezone(UTC) if stamp.tzinfo is not None else stamp.replace(tzinfo=UTC)
+
+
+def _predates_fetched_at(path: Path) -> bool:
+    """True when a readable dataset simply predates the ``fetched_at`` stamp.
+
+    Separates an old-format file — no ``fetched_at`` key, but a content
+    watermark that parses — from a damaged one, where the key is present but
+    unreadable or the file was truncated mid-write. Only the first is safe to
+    skip; a damaged file still withdraws the run-level claim, because it may
+    hold the oldest data of all.
+    """
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            prefix = handle.read(_WATERMARK_PREFIX_BYTES)
+    except OSError:
+        return False
+    if _FETCHED_AT_KEY_RE.search(prefix) is not None:
+        return False
+    return isinstance(_read_stamp(path, _WATERMARK_RE), datetime)
 
 
 def resolve_provenance(datasets_dir: Path | None = None) -> Provenance:
@@ -281,15 +326,21 @@ def write_snapshot_manifest(
 def _manifest_entry(dataset: Path) -> dict[str, object]:
     """Describe one dataset for the manifest.
 
+    Both stamps ride along, because they answer different questions when
+    tracing a chart back: ``fetched_through`` is how far the *content* was read,
+    ``fetched_at`` is when the read happened.
+
     ``watermark_unreadable`` appears only when the watermark could not be
     determined, so the manifest distinguishes a file that was never watermarked
     (null, unremarkable) from one whose watermark is damaged (the reason the
     run-level ``data_as_of`` is null).
     """
-    stamp = _read_watermark(dataset)
+    stamp = _read_stamp(dataset, _WATERMARK_RE)
+    fetched_at = _read_stamp(dataset, _FETCHED_AT_RE)
     entry: dict[str, object] = {
         "name": dataset.name,
         "fetched_through": stamp.isoformat() if isinstance(stamp, datetime) else None,
+        "fetched_at": fetched_at.isoformat() if isinstance(fetched_at, datetime) else None,
         "bytes": dataset.stat().st_size,
         "sha256": _file_sha256(dataset),
     }

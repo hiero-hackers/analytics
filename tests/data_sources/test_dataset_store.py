@@ -13,11 +13,21 @@ from hiero_analytics.data_sources.dataset_store import (
     OfflineDatasetMissingError,
     PartialOrgFetchError,
     fetch_incremental,
+    forget_touched_datasets,
     load_dataset,
     load_or_fetch,
     merge_records,
+    prune_untouched_datasets,
     save_dataset,
 )
+
+
+@pytest.fixture(autouse=True)
+def _clear_touched():
+    """The touch record is process-wide; a real run fills it exactly once."""
+    forget_touched_datasets()
+    yield
+    forget_touched_datasets()
 
 
 @dataclass(frozen=True)
@@ -427,3 +437,114 @@ def test_load_or_fetch_offline_requires_dataset(monkeypatch):
             object,
             lambda: pytest.fail("fetch callback called in offline mode"),
         )
+
+
+# -------------------------
+# Pruning orphaned datasets
+# -------------------------
+def _stamp() -> datetime:
+    return datetime(2026, 8, 6, tzinfo=UTC)
+
+
+def test_prune_removes_a_dataset_no_resource_claimed(tmp_path):
+    """The orphan case: a fetch was renamed, so nothing rewrites its file."""
+    save_dataset(tmp_path / "live_org_all.json", [_rec("a", 1, 1)], _stamp())
+    save_dataset(tmp_path / "orphan_org_all.json", [_rec("b", 2, 1)], _stamp())
+    forget_touched_datasets()
+    # This run claims only the live one.
+    load_dataset(tmp_path / "live_org_all.json", _Record)
+
+    removed = prune_untouched_datasets(tmp_path)
+
+    assert [path.name for path in removed] == ["orphan_org_all.json"]
+    assert (tmp_path / "live_org_all.json").exists()
+    assert not (tmp_path / "orphan_org_all.json").exists()
+
+
+def test_prune_keeps_a_dataset_reused_without_rewriting(tmp_path, monkeypatch):
+    """Reuse must count as live — the reason mtimes cannot be the signal.
+
+    ``load_or_fetch`` serves a dataset straight from disk for up to
+    DEFAULT_REUSE_MAX_AGE, which is the refresh cadence itself, so a live
+    dataset routinely survives a whole run without being written.
+    """
+    # Redirect the store's path builder into the sandbox: the real one resolves
+    # under outputs/, and a prune test must never be able to reach it.
+    path = tmp_path / "widgets_org_all.json"
+    monkeypatch.setattr(dataset_store, "dataset_path", lambda *_args, **_kwargs: path)
+    save_dataset(path, [_rec("a", 1, 1)], datetime.now(UTC))
+    forget_touched_datasets()
+
+    records = load_or_fetch("widgets", "org", _Record, lambda: pytest.fail("should have reused"))
+    removed = prune_untouched_datasets(tmp_path)
+
+    assert len(records) == 1
+    assert removed == []
+    assert path.exists()
+
+
+def test_prune_never_touches_files_it_does_not_own(tmp_path):
+    """The datasets directory also holds the governance config and the manifest."""
+    save_dataset(tmp_path / "live_org_all.json", [_rec("a", 1, 1)], _stamp())
+    forget_touched_datasets()
+    load_dataset(tmp_path / "live_org_all.json", _Record)
+    # Neither is a save_dataset product, and neither is ever "touched".
+    (tmp_path / "governance_config_org_all.json").write_text(
+        json.dumps({"repositories": [{"name": ".github"}]}, indent=2), encoding="utf-8"
+    )
+    (tmp_path / "SNAPSHOT.json").write_text(json.dumps({"data_as_of": None}, indent=2), encoding="utf-8")
+
+    assert prune_untouched_datasets(tmp_path) == []
+    assert (tmp_path / "governance_config_org_all.json").exists()
+    assert (tmp_path / "SNAPSHOT.json").exists()
+
+
+def test_prune_does_nothing_when_no_dataset_was_read(tmp_path):
+    """An empty touch record must never be read as "everything is an orphan"."""
+    save_dataset(tmp_path / "live_org_all.json", [_rec("a", 1, 1)], _stamp())
+    forget_touched_datasets()
+
+    assert prune_untouched_datasets(tmp_path) == []
+    assert (tmp_path / "live_org_all.json").exists()
+
+
+def test_prune_refuses_a_directory_the_run_never_worked_in(tmp_path):
+    """The safety net that matters: a run that read datasets *elsewhere*.
+
+    Without this, a caller whose datasets live in one directory would see every
+    file in an unrelated one as unclaimed and delete a live cache wholesale —
+    which is exactly how this function first destroyed a local dataset dir
+    during its own test run.
+    """
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    target = tmp_path / "target"
+    target.mkdir()
+    save_dataset(target / "live_org_all.json", [_rec("a", 1, 1)], _stamp())
+    forget_touched_datasets()
+    # The run claims a dataset, but not one in `target`.
+    load_dataset(elsewhere / "other_org_all.json", _Record)
+
+    assert prune_untouched_datasets(target) == []
+    assert (target / "live_org_all.json").exists()
+
+
+def test_prune_reclaims_a_legacy_orphan_without_a_version_key(tmp_path):
+    """The orphan that prompted this feature predates the version key.
+
+    Its real file was pretty-printed ``{"fetched_through": ..., "records": [...]}``
+    with no ``version``, so a check keyed on that alone would have shielded the
+    exact file that was understating the dashboard's freshness.
+    """
+    save_dataset(tmp_path / "live_org_all.json", [_rec("a", 1, 1)], _stamp())
+    (tmp_path / "issues_org_all.json").write_text(
+        json.dumps({"fetched_through": "2026-07-11T09:25:33+00:00", "records": []}, indent=2),
+        encoding="utf-8",
+    )
+    forget_touched_datasets()
+    load_dataset(tmp_path / "live_org_all.json", _Record)
+
+    removed = prune_untouched_datasets(tmp_path)
+
+    assert [path.name for path in removed] == ["issues_org_all.json"]
+    assert (tmp_path / "live_org_all.json").exists()

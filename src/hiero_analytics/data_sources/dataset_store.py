@@ -25,6 +25,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TypeVar
 
+from hiero_analytics.config import paths
 from hiero_analytics.config.paths import dataset_path
 
 from .serialization import deserialize_record, serialize_record
@@ -51,9 +52,113 @@ DEFAULT_OVERLAP = timedelta(minutes=10)
 DEFAULT_REUSE_MAX_AGE = timedelta(days=5)
 
 
+# Dataset paths this process read or wrote — what "still live" means for
+# pruning. Deliberately not file mtimes: `load_or_fetch` reuses a dataset
+# without rewriting it for up to DEFAULT_REUSE_MAX_AGE, which is the refresh
+# cadence itself, so a perfectly live dataset can go a whole run untouched on
+# disk. Reading it still registers here.
+_touched_datasets: set[Path] = set()
+
+# How much of a file to inspect when deciding whether it is one of ours.
+_DATASET_PREFIX_BYTES = 256
+
+
 def offline_mode_enabled() -> bool:
     """Return whether analytics must avoid all network-backed fetch callbacks."""
     return os.getenv("HIERO_ANALYTICS_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def touched_datasets() -> frozenset[Path]:
+    """Resolved dataset paths this process has read or written."""
+    return frozenset(_touched_datasets)
+
+
+def forget_touched_datasets() -> None:
+    """Clear the touch record (tests; a process runs the pipelines once)."""
+    _touched_datasets.clear()
+
+
+def _record_touch(path: Path) -> None:
+    """Note that a resource claimed ``path`` this run, whether or not it existed."""
+    _touched_datasets.add(path.resolve())
+
+
+def _is_dataset_file(path: Path) -> bool:
+    """Whether ``path`` looks like a persisted dataset, current or legacy.
+
+    The datasets directory also holds files this module does not own — the
+    pretty-printed governance config, the run's snapshot manifest — and those
+    must survive pruning even though no fetch ever "touches" them.
+
+    Requiring the schema-version key alone would be too strict in exactly the
+    case that matters: the orphan that prompted this prune was written before
+    ``version`` existed, so the check would have shielded it forever. Requiring
+    ``records`` alongside *either* stamp keeps legacy datasets in scope while
+    still excluding the manifest (which carries ``fetched_through`` inside its
+    per-dataset entries, but lists ``datasets`` rather than ``records``) and the
+    governance config (which has neither).
+    """
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            prefix = handle.read(_DATASET_PREFIX_BYTES)
+    except OSError:
+        return False
+    return '"records"' in prefix and ('"version"' in prefix or '"fetched_through"' in prefix)
+
+
+def prune_untouched_datasets(datasets_dir: Path | None = None) -> list[Path]:
+    """Delete persisted datasets no resource claimed this run. Returns what went.
+
+    An orphan — a dataset whose fetch was renamed, re-scoped, or removed — is
+    never rewritten but keeps riding the CI cache forever, and it dragged the
+    run-level ``data_as_of`` back to whenever it was last written. Nothing else
+    reclaims it: the cache restores the whole directory, and the emitter only
+    ever adds.
+
+    Only files this module wrote are considered, and only when the caller has
+    established that the run was complete enough to judge — see
+    :func:`touched_datasets` for why "untouched" cannot mean "old mtime". An
+    empty touch record prunes nothing, so a run that fetched nothing at all can
+    never mistake every dataset for an orphan.
+
+    Note that "live" is relative to the configuration that ran: with
+    ``GITHUB_EXTRA_ORGS`` unset, that org's datasets are genuinely unclaimed and
+    will be removed, costing a full re-fetch if it is configured again later.
+    Every deletion is logged for exactly this reason.
+    """
+    directory = datasets_dir if datasets_dir is not None else paths.DATASETS_DIR
+    if not directory.is_dir():
+        return []
+    # Only prune a directory this run actually worked in. Claiming nothing here
+    # means the run read its datasets somewhere else entirely (a redirected
+    # test sandbox, a rehearsal) and every file in *this* directory would look
+    # orphaned — the one way a correct-looking prune can delete a live cache.
+    resolved = directory.resolve()
+    if not any(path.parent == resolved for path in _touched_datasets):
+        logger.warning(
+            "No dataset in %s was claimed this run; skipping prune rather than treating every file in it as an orphan",
+            directory,
+        )
+        return []
+
+    removed: list[Path] = []
+    for path in sorted(directory.glob("*.json")):
+        if path.resolve() in _touched_datasets or not _is_dataset_file(path):
+            continue
+        logger.warning(
+            "Pruning orphaned dataset %s: no resource claimed it this run (it would otherwise "
+            "keep understating how fresh the published data is)",
+            path.name,
+        )
+        try:
+            path.unlink()
+        except OSError:
+            logger.exception("Could not delete orphaned dataset %s", path)
+            continue
+        removed.append(path)
+    if removed:
+        logger.info("Pruned %d orphaned dataset(s)", len(removed))
+    return removed
 
 
 class OfflineDatasetMissingError(RuntimeError):
@@ -111,10 +216,34 @@ def _max_updated_at(  # noqa: UP047
 
 
 def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> None:  # noqa: UP047
-    """Atomically write the dataset and its watermark to ``path`` as JSON."""
+    """Atomically write the dataset and its two stamps to ``path`` as JSON.
+
+    The two answer different questions and must not be conflated:
+
+    ``fetched_through`` is a *content* watermark — the latest ``updated_at``
+    across the records — and drives incremental fetching ("resume from here").
+    For a resource whose records carry authorship dates rather than API
+    timestamps (the HIP inventory reads frontmatter ``updated:``), it tracks
+    when the upstream content last changed, which may be weeks ago even on a
+    fetch that just completed.
+
+    ``fetched_at`` is wall-clock time of this write, so it answers "when did we
+    last refresh this?" — the freshness question the dashboard's "data as of"
+    stamp asks. Deriving that from ``fetched_through`` made a quiet fortnight in
+    the HIP repository read as a fortnight-old dashboard.
+
+    Added without a ``DATASET_VERSION`` bump on purpose: it is additive, its
+    absence is handled explicitly by readers, and every live dataset gains it on
+    the next successful run — bumping would force a full re-fetch of everything
+    to acquire a field that costs nothing to backfill.
+    """
+    _record_touch(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "version": DATASET_VERSION,
+        # Ordered ahead of the records so both stamps stay inside the fixed
+        # prefix `provenance` reads rather than parsing the whole file.
+        "fetched_at": datetime.now(UTC).isoformat(),
         "fetched_through": fetched_through.isoformat(),
         "records": [serialize_record(record) for record in records],
     }
@@ -128,6 +257,10 @@ def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> Non
 
 def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
     """Load ``(records, fetched_through)``, or None if absent or incompatible."""
+    # Before the existence check on purpose: a resource asking for this path is
+    # what marks it live, whether or not a file is there yet. Every read route
+    # (load_or_fetch's reuse, fetch_incremental's baseline) passes through here.
+    _record_touch(path)
     if not path.exists():
         return None
     try:
