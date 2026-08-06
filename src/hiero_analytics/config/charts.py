@@ -108,10 +108,11 @@ PRIMARY_PALETTE = [
 
 # Colours for the semantic repository categories (see domain.repo_categories),
 # used to colour the maintainer network. One distinct hue per category.
-# Blue ramp shared by the HIP coverage-matrix cells, their legend, and the
-# adoption-funnel bands, light to dark. The matrix's ``.hipmx td.m1``-``.m5``
-# CSS classes in export/assets/dashboard.css mirror these values — keep them
-# in step.
+# Blue ramp for the HIP adoption-funnel bands and the matplotlib charts, light
+# to dark. The web dashboard's coverage matrix no longer reads these: its cells
+# *and* its legend both render the ``--heat-1``..``--heat-5`` tokens in
+# web/src/app.css, which invert for dark mode. Keep the light values here in
+# step with those tokens so a chart and the matrix beside it agree.
 HIP_EVIDENCE_RAMP = ("#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#104281")
 
 REPO_CATEGORY_COLORS = {

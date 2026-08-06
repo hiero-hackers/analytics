@@ -45,7 +45,7 @@
   /* Shape & motion: shared control geometry, one hover timing everywhere. */
   --r-card: 12px;
   --r-control: 6px;
-  --r-input: 8px;
+  --r-frame: 8px; /* inputs, scroll boxes, and framed chart media */
   --r-pill: 999px;
   --dur: 120ms;
 
@@ -62,6 +62,21 @@
   --lb-text: #e2e2e2;
   --lb-dim: #bbb;
   --lb-bright: #eee;
+
+  /* HIP coverage-matrix heat ramp: more merged PRs = more ink. Mirrors
+     HIP_EVIDENCE_RAMP (config/charts.py), which the same values reach the
+     matplotlib charts through; the matrix legend now renders these classes
+     rather than the shipped hex, so cells and legend cannot drift apart. */
+  --heat-1: #cde2fb;
+  --heat-2: #9ec5f4;
+  --heat-3: #5598e7;
+  --heat-4: #2a78d6;
+  --heat-5: #104281;
+  --on-heat-low: #1b1b1b; /* text on the two palest buckets */
+  --on-heat-high: #fff; /* text on the three strongest */
+  --heat-open: #2a78d6; /* outline + text for "open PRs only" */
+  --heat-open-edge: #9ec5f4;
+  --flash: #fff3d6; /* row highlight when the board jumps to a HIP */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,6 +102,21 @@
     --warn: #d9a12e;
     --warn-ink: #d9b05c;
     --neg: #e57373;
+
+    /* The ramp inverts on a dark ground: "more" has to mean *brighter*, since
+       ink-on-white becomes light-on-black. Reusing the light ramp here would
+       put its palest, loudest bucket on the lowest counts and sink the highest
+       into the page. */
+    --heat-1: #16304a;
+    --heat-2: #1d4a75;
+    --heat-3: #2a6fb0;
+    --heat-4: #4a92e2;
+    --heat-5: #8cc0f5;
+    --on-heat-low: #dce9f8;
+    --on-heat-high: #0f0f0f;
+    --heat-open: #6ba3e8;
+    --heat-open-edge: #2a6fb0;
+    --flash: #4a3a12;
   }
 }
 
@@ -354,7 +384,7 @@
   .glossary {
     margin: 0 0 18px;
     border: 1px solid var(--edge);
-    border-radius: 10px;
+    border-radius: var(--r-card);
     background: var(--surface);
     padding: 0 14px;
   }
@@ -391,7 +421,7 @@
     box-sizing: border-box;
     padding: 8px 10px;
     border: 1px solid var(--edge-input);
-    border-radius: 8px;
+    border-radius: var(--r-frame);
     font-size: 14px;
     margin-bottom: 12px;
     background: var(--surface);
@@ -401,7 +431,7 @@
     overflow: auto;
     max-height: 520px;
     border: 1px solid var(--edge-faint);
-    border-radius: 8px;
+    border-radius: var(--r-frame);
   }
   details.tsec {
     padding-top: 14px;
@@ -475,12 +505,18 @@
   .chart {
     margin: 0;
   }
+  /* Framed chart media: the same border/radius/ground wherever a chart PNG
+     is shown, so a change lands once instead of in three places. */
+  .chart img,
+  .chartscroll,
+  .slide img {
+    border: 1px solid var(--edge-faint);
+    border-radius: var(--r-frame);
+    background: var(--chart-ground);
+  }
   .chart img {
     width: 100%;
     height: auto;
-    border: 1px solid var(--edge-faint);
-    border-radius: 8px;
-    background: var(--chart-ground);
     cursor: zoom-in;
   }
   .chart img:hover {
@@ -498,9 +534,6 @@
   .chartscroll {
     overflow-x: auto;
     overflow-y: hidden;
-    border: 1px solid var(--edge-faint);
-    border-radius: 8px;
-    background: var(--chart-ground);
   }
   .chartscroll img {
     width: auto;
@@ -554,9 +587,6 @@
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: contain;
-    border: 1px solid var(--edge-faint);
-    border-radius: 8px;
-    background: var(--chart-ground);
     cursor: zoom-in;
   }
   .slide figcaption {
@@ -586,7 +616,7 @@
   .lightbox img {
     max-width: 96vw;
     max-height: 66vh;
-    border-radius: 8px;
+    border-radius: var(--r-frame);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     background: var(--chart-ground);
   }
@@ -823,16 +853,16 @@
 
 
   /* ---- HIP views (coverage matrix, governance board, evidence panel) ----
-     Ported verbatim from the legacy dashboard, literal values on purpose:
-     these views shipped light-styled in both color schemes on main, and
-     exact parity beats tokenising until the HIP tab gets a designed dark
-     pass. The cell heat colors mirror HIP_EVIDENCE_RAMP (config/charts.py),
-     which the API also ships as each matrix's `ramp`. */
+     Expressed through the semantic tokens like the rest of the stylesheet, so
+     the HIPs tab follows the light/dark flip instead of staying light-styled
+     on a dark page. The heat buckets read from --heat-*, which inverts for
+     dark mode (see the palette); the matrix legend renders the same classes,
+     so cells and legend cannot drift. */
   .hipmx-wrap {
     overflow: auto;
     max-height: 560px;
-    border: 1px solid #eee;
-    border-radius: 8px;
+    border: 1px solid var(--edge-faint);
+    border-radius: var(--r-frame);
     padding: 0 6px 6px 0;
   }
   .hipmx {
@@ -844,7 +874,7 @@
   .hipmx thead th {
     position: sticky;
     top: 0;
-    background: #fff;
+    background: var(--surface);
     z-index: 1;
     text-align: center;
     font-size: 11px;
@@ -853,31 +883,31 @@
     border-bottom: none;
     cursor: default;
     padding: 3px 8px;
-    color: #666;
+    color: var(--muted);
     font-weight: 600;
   }
   .hipmx th:hover {
     background: none;
   }
   .hipmx thead .hipmx-grp th {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--edge-strong);
     font-size: 10px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #888;
+    color: var(--soft);
   }
   .hipmx tbody th {
     position: static;
     background: none;
     text-align: left;
     font-size: 12px;
-    color: #1b1b1b;
+    color: var(--ink);
     white-space: nowrap;
   }
   .hipmx tbody th small {
     display: block;
     font-weight: 400;
-    color: #888;
+    color: var(--soft);
     font-size: 11px;
     max-width: 220px;
     overflow: hidden;
@@ -900,34 +930,39 @@
     background: inherit;
   }
   .hipmx td.m0 {
-    border: 1px dashed #d5d5d5;
-    color: #999;
-    background: #fff;
+    border: 1px dashed var(--edge-strong);
+    color: var(--soft);
+    background: var(--surface);
   }
-  .hipmx td.m1 {
-    background: #cde2fb;
-    color: #1b1b1b;
+  .hipmx td.m1,
+  .hipmx-legend i.m1 {
+    background: var(--heat-1);
+    color: var(--on-heat-low);
   }
-  .hipmx td.m2 {
-    background: #9ec5f4;
-    color: #1b1b1b;
+  .hipmx td.m2,
+  .hipmx-legend i.m2 {
+    background: var(--heat-2);
+    color: var(--on-heat-low);
   }
-  .hipmx td.m3 {
-    background: #5598e7;
-    color: #fff;
+  .hipmx td.m3,
+  .hipmx-legend i.m3 {
+    background: var(--heat-3);
+    color: var(--on-heat-high);
   }
-  .hipmx td.m4 {
-    background: #2a78d6;
-    color: #fff;
+  .hipmx td.m4,
+  .hipmx-legend i.m4 {
+    background: var(--heat-4);
+    color: var(--on-heat-high);
   }
-  .hipmx td.m5 {
-    background: #104281;
-    color: #fff;
+  .hipmx td.m5,
+  .hipmx-legend i.m5 {
+    background: var(--heat-5);
+    color: var(--on-heat-high);
   }
   .hipmx td.mo {
-    border: 1px solid #9ec5f4;
-    color: #2a78d6;
-    background: #fff;
+    border: 1px solid var(--heat-open-edge);
+    color: var(--heat-open);
+    background: var(--surface);
   }
   .hipmx td.hipmx-status {
     width: auto;
@@ -935,7 +970,7 @@
     text-align: left;
     font-weight: 500;
     font-size: 11px;
-    color: #555;
+    color: var(--muted);
     padding: 0 8px;
     white-space: nowrap;
     background: transparent;
@@ -949,16 +984,16 @@
     text-align: left;
     font-weight: 500;
     font-size: 11px;
-    color: #555;
+    color: var(--muted);
     padding: 0 8px;
-    background: #fff !important;
+    background: var(--surface) !important;
   }
   .hipmx td.hipmx-gaps .ok {
-    color: #0a7a0a;
+    color: var(--ok-ink);
     font-weight: 600;
   }
   .hipmx td.hipmx-gaps .none {
-    color: #aaa;
+    color: var(--soft);
   }
   .hipmx-legend {
     display: flex;
@@ -967,7 +1002,7 @@
     gap: 6px;
     margin-top: 10px;
     font-size: 11.5px;
-    color: #777;
+    color: var(--muted);
   }
   .hipmx-legend i {
     width: 22px;
@@ -979,20 +1014,20 @@
     cursor: pointer;
   }
   .hipmx td.ck:focus-visible {
-    outline: 2px solid #1b1b1b;
+    outline: 2px solid var(--ink);
     outline-offset: 1px;
   }
   .hipmx td.sel {
-    outline: 2px solid #1b1b1b;
+    outline: 2px solid var(--ink);
     outline-offset: 1px;
   }
   .hipmx tr.flash th {
-    background: #fff3d6;
+    background: var(--flash);
     border-radius: 4px;
   }
   .hipmx tr.flash td.hipmx-status,
   .hipmx tr.flash td.hipmx-gaps {
-    background: #fff3d6 !important;
+    background: var(--flash) !important;
   }
   .hipmx-filters {
     display: flex;
@@ -1009,29 +1044,29 @@
     gap: 6px;
     flex-wrap: wrap;
     font-size: 12px;
-    color: #888;
+    color: var(--soft);
   }
   .hipmx-fbtn {
     padding: 3px 11px;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 999px;
+    border: 1px solid var(--edge-input);
+    background: var(--surface);
+    border-radius: var(--r-pill);
     cursor: pointer;
     font-size: 12px;
-    color: #444;
+    color: var(--ink);
   }
   .hipmx-fbtn:hover {
-    border-color: #999;
+    border-color: var(--soft);
   }
   .hipmx-fbtn.active {
-    background: #1b1b1b;
-    color: #fff;
-    border-color: #1b1b1b;
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
   }
   .hipev {
     margin-top: 12px;
-    border: 1px solid #e6e6e6;
-    border-radius: 8px;
+    border: 1px solid var(--edge);
+    border-radius: var(--r-frame);
     padding: 12px 14px;
   }
   .hipev-head {
@@ -1046,7 +1081,7 @@
     font-weight: 600;
   }
   .hipev-head .n {
-    color: #888;
+    color: var(--soft);
     font-size: 12px;
   }
   .hipev-head button {
@@ -1061,7 +1096,7 @@
   }
   .hipev li {
     padding: 6px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--row-line);
     font-size: 12.5px;
   }
   .hipev li:last-child {
@@ -1076,27 +1111,27 @@
   .hipev .l1 a {
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: #2a78d6;
+    color: var(--link);
     text-decoration: none;
   }
   .hipev .l1 a:hover {
     text-decoration: underline;
   }
   .hipev .t {
-    color: #444;
+    color: var(--muted);
   }
   .hipev .meta {
-    color: #999;
+    color: var(--soft);
     font-size: 11.5px;
     white-space: nowrap;
   }
   .hipev .cue {
-    color: #8a6200;
+    color: var(--warn-ink);
     font-size: 11.5px;
     font-weight: 600;
   }
   .hipev .snip {
-    color: #999;
+    color: var(--soft);
     font-size: 11px;
     margin-top: 2px;
     overflow: hidden;
@@ -1108,14 +1143,14 @@
     margin: 0;
     padding-left: 18px;
     font-size: 13px;
-    color: #444;
+    color: var(--muted);
     display: flex;
     flex-direction: column;
     gap: 8px;
     max-width: 85ch;
   }
   .hipabout strong {
-    color: #1b1b1b;
+    color: var(--ink);
   }
   .glossary .hipabout {
     margin: 0 0 12px;
@@ -1130,22 +1165,22 @@
   }
   .hipboard-col {
     flex: 0 0 172px;
-    background: #f7f7f5;
-    border: 1px solid #ececec;
-    border-radius: 8px;
+    background: var(--raise);
+    border: 1px solid var(--edge);
+    border-radius: var(--r-frame);
     padding: 10px 10px 12px;
   }
   .hipboard-col h3 {
     font-size: 12px;
     font-weight: 600;
     margin: 0 0 8px;
-    color: #444;
+    color: var(--ink);
     display: flex;
     justify-content: space-between;
     align-items: baseline;
   }
   .hipboard-col h3 .n {
-    color: #999;
+    color: var(--soft);
     font-weight: 600;
     font-size: 12px;
   }
@@ -1157,27 +1192,27 @@
     overflow-y: auto;
   }
   .hipboard-chips .none {
-    color: var(--lb-dim);
+    color: var(--soft);
     font-size: 12px;
   }
   .hipchip {
     padding: 2px 8px;
-    border: 1px solid #d8d8d8;
-    background: #fff;
-    border-radius: 6px;
+    border: 1px solid var(--edge-input);
+    background: var(--surface);
+    border-radius: var(--r-control);
     cursor: pointer;
     font-size: 11.5px;
     font-weight: 600;
-    color: #255e9e;
+    color: var(--link-ink);
     font-variant-numeric: tabular-nums;
   }
   .hipchip:hover {
-    border-color: #2a78d6;
+    border-color: var(--link);
   }
   .hipchip.active {
-    border-color: #1b1b1b;
-    color: #1b1b1b;
-    background: #f3f3f3;
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--raise);
   }
   .hipboard-info {
     display: flex;
@@ -1186,15 +1221,15 @@
     flex-wrap: wrap;
     margin-top: 10px;
     padding: 9px 12px;
-    border: 1px solid #e6e6e6;
-    border-radius: 8px;
+    border: 1px solid var(--edge);
+    border-radius: var(--r-frame);
     font-size: 13px;
   }
   .hipboard-info strong {
     font-variant-numeric: tabular-nums;
   }
   .hipboard-info .t {
-    color: #444;
+    color: var(--muted);
   }
   .hipboard-info button {
     margin-left: auto;

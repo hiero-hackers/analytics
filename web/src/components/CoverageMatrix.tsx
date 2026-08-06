@@ -183,8 +183,11 @@ export function CoverageMatrix({
       </div>
       <div className="hipmx-legend">
         fewer
-        {view.ramp.map((shade) => (
-          <i key={shade} style={{ background: shade }} />
+        {/* Keyed off the ramp's *length*, not its colours: the swatches wear the
+            same m1–m5 classes as the cells, so both follow the theme together.
+            Painting the shipped hex here left the legend light in dark mode. */}
+        {view.ramp.map((_shade, index) => (
+          <i key={index} className={`m${index + 1}`} />
         ))}
         more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no reference found
       </div>
