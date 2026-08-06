@@ -5,6 +5,12 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+# Shown when the selected org has no content for this tab.
+ABSENT_NOTE = (
+    "Discord serves the whole Hiero ecosystem, so community activity is published "
+    "once, under hiero-ledger, rather than per org."
+)
+
 CHART_MACRO = {
     "name": "Community",
     "charts": {

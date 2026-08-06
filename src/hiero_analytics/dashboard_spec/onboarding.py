@@ -5,6 +5,12 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+# Shown when the selected org has no content for this tab.
+ABSENT_NOTE = (
+    "Not yet generated for this org: the issue-difficulty and onboarding pipelines "
+    "are org-independent, but the scheduled run currently covers hiero-ledger only."
+)
+
 CHART_MACRO = {
     "name": "Issues & onboarding",
     "charts": {

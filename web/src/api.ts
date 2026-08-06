@@ -175,6 +175,8 @@ export interface Manifest {
   macro_parents?: Record<string, string>;
   /** Family display order for tabs; macros not listed keep their derived order. */
   macro_order?: string[];
+  /** Why a tab may be empty for an org — shown in place of a blank tab. */
+  macro_absent_notes?: Record<string, string>;
   /** Display labels for rolling periods ("30d" -> "30 days"). */
   period_labels?: Record<string, string>;
   /** Where the footer sends a reader who spots something wrong. */

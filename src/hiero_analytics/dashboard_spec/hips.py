@@ -10,6 +10,12 @@ for assembly.
 
 from __future__ import annotations
 
+# Shown when the selected org has no content for this tab.
+ABSENT_NOTE = (
+    "The HIP process — specs in the hiero-ledger governance repo and the PRs that "
+    "cite them — is specific to hiero-ledger, so this tab only ever has data there."
+)
+
 CHART_MACRO = {
     "name": "HIPs",
     "charts": {

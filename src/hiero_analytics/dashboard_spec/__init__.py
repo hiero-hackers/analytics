@@ -36,6 +36,7 @@ __all__ = [
     "CHART_NOTES",
     "COLUMN_FORMATS",
     "CUSTOM_VIEW_MODULES",
+    "MACRO_ABSENT_NOTES",
     "MACRO_GLOSSARIES",
     "MACRO_PARENTS",
     "METRIC_ANNOTATIONS",
@@ -77,6 +78,13 @@ MACRO_GLOSSARIES = {family.CHART_MACRO["name"]: family.GLOSSARY for family in _F
 # for its members; a family without MACRO_PARENT is a top-level tab itself.
 MACRO_PARENTS = {
     family.CHART_MACRO["name"]: family.MACRO_PARENT for family in _FAMILIES if hasattr(family, "MACRO_PARENT")
+}
+
+# Why a tab may have no content for an org (no governance config, ledger-only
+# process, pipelines not yet enabled). The frontend shows this instead of a
+# blank tab, so absence reads as a property of the data rather than a bug.
+MACRO_ABSENT_NOTES = {
+    family.CHART_MACRO["name"]: family.ABSENT_NOTE for family in _FAMILIES if hasattr(family, "ABSENT_NOTE")
 }
 
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]

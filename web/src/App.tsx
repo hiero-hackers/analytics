@@ -162,18 +162,17 @@ export default function App() {
   const topTabs = [...new Set(macros.map(topOf))];
   const activeTop = topOf(activeMacro);
   const subTabs = macros.filter((name) => parents[name] === activeTop);
-  // The org tab bar appears only on macros where more than one org actually
-  // has content (e.g. only Contributors for hiero-hackers).
-  const orgsForMacro = orgs.filter((name) => {
-    const entry = manifest.orgs[name];
-    return (
-      (entry.sections ?? []).some((section) => section.macro === activeMacro) ||
-      (entry.chart_sections ?? []).some((section) => section.macro === activeMacro) ||
-      (entry.views ?? []).some((view) => view.macro === activeMacro)
-    );
-  });
-  const shownOrg = orgsForMacro.includes(org) ? org : (orgsForMacro[0] ?? orgs[0]);
-  const glossary = manifest.macro_glossaries?.[activeMacro];
+  // The org filter is global: it lists every org and the selection sticks as
+  // tabs change. A tab the selected org has no content for renders a short
+  // explanation (from the manifest) instead of a blank page, so absence reads
+  // as a property of the data rather than a bug.
+  const shownOrg = orgs.includes(org) ? org : orgs[0];
+  const shownEntry = manifest.orgs[shownOrg];
+  const orgHasMacro =
+    (shownEntry.sections ?? []).some((section) => section.macro === activeMacro) ||
+    (shownEntry.chart_sections ?? []).some((section) => section.macro === activeMacro) ||
+    (shownEntry.views ?? []).some((view) => view.macro === activeMacro);
+  const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
 
   return (
     <div className="wrap">
@@ -188,12 +187,18 @@ export default function App() {
         kind="macro"
       />
       {subTabs.length > 0 && <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />}
+      {orgs.length > 1 && <TabBar items={orgs} active={shownOrg} onSelect={setOrg} kind="tab" />}
       {/* Every macro ships its own explainer, listing only what that tab
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}
       {glossary && <Glossary glossary={glossary} />}
-      {orgsForMacro.length > 1 && <TabBar items={orgsForMacro} active={shownOrg} onSelect={setOrg} kind="tab" />}
-      <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
+      {orgHasMacro ? (
+        <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
+      ) : (
+        <p className="empty">
+          {manifest.macro_absent_notes?.[activeMacro] ?? `No ${activeMacro} data for ${shownOrg}.`}
+        </p>
+      )}
       {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
       <div className="footrow">
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}

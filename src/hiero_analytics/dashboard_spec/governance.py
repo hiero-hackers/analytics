@@ -19,6 +19,15 @@ from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 # "this looks wrong" everywhere else.
 AFFILIATION_ISSUE_URL = PROJECT_ISSUES_URL
 
+# Shown when the selected org has no content for this tab (see the manifest's
+# macro_absent_notes): say *why*, so absence reads as a property of the data,
+# not a bug.
+ABSENT_NOTE = (
+    "Governance analytics are derived from the org's published governance config "
+    "(team → permission grants). This org doesn't publish one, so roles, coverage, "
+    "teams, and organisation diversity can't be inferred."
+)
+
 CHART_MACRO = {
     "name": "Governance",
     "charts": {

@@ -34,17 +34,24 @@ describe("App shell", () => {
     expect(screen.getByText("Maintainer pipeline")).toBeInTheDocument();
   });
 
-  it("shows org tabs only on macros where more than one org has content", async () => {
+  it("keeps the org filter global and sticky, explaining tabs the org lacks", async () => {
     render(<App />);
 
-    // Contributors: both orgs -> org tab bar present.
+    // The org filter is present on every tab.
     await userEvent.click(await screen.findByRole("button", { name: "Contributors" }));
     expect(await screen.findByRole("button", { name: "hiero-hackers" })).toBeInTheDocument();
 
-    // Governance: only hiero-ledger -> no org tab bar.
+    // Select hiero-hackers, then open Governance: the selection sticks, and
+    // the tab explains why this org has no governance content.
+    await userEvent.click(screen.getByRole("button", { name: "hiero-hackers" }));
+    await screen.findByText("erin");
     await userEvent.click(screen.getByRole("button", { name: "Governance" }));
-    await screen.findByText("Role holders");
-    expect(screen.queryByRole("button", { name: "hiero-hackers" })).not.toBeInTheDocument();
+    expect(await screen.findByText(/need a published governance config/)).toBeInTheDocument();
+    expect(screen.queryByText("Role holders")).not.toBeInTheDocument();
+
+    // Switching back to hiero-ledger restores the tab's content.
+    await userEvent.click(screen.getByRole("button", { name: "hiero-ledger" }));
+    expect(await screen.findByText("Role holders")).toBeInTheDocument();
   });
 
   it("switching org swaps the rendered rows", async () => {

@@ -270,6 +270,17 @@
     margin: 0 0 20px;
   }
 
+  /* A tab the selected org has no content for: the "why" note in place of
+     the panel, sized to read as information rather than an error. */
+  .empty {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 640px;
+    margin: 48px auto;
+    text-align: center;
+    line-height: 1.6;
+  }
+
   /* Macro (top-level) tabs */
   .macrobar {
     display: flex;

@@ -45,6 +45,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_METHODOLOGY,
     CHART_NOTES,
     CUSTOM_VIEW_MODULES,
+    MACRO_ABSENT_NOTES,
     MACRO_GLOSSARIES,
     MACRO_PARENTS,
     METRIC_ANNOTATIONS,
@@ -373,6 +374,8 @@ def emit_data_api() -> Path:
         # Sub-tab macros, macro name -> umbrella tab name. The frontend shows
         # one top-level tab per umbrella with a second tab row for its members.
         "macro_parents": MACRO_PARENTS,
+        # Why a tab may be empty for an org — shown in place of a blank tab.
+        "macro_absent_notes": MACRO_ABSENT_NOTES,
         # Family display order. The frontend otherwise derives tab order from
         # the sections lists, which puts a chart-only macro after every
         # table-bearing one regardless of where its family sits.
