@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -93,6 +94,36 @@ def test_section_action_link_is_shipped(api_env: Path, tmp_path: Path, monkeypat
 
     document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
     assert document["action"] == {"url": "https://example.test/issues/new", "label": "Suggest a correction"}
+
+
+def test_data_within_stale_after_is_not_stale(api_env: Path, tmp_path: Path):
+    """A section stamped just inside STALE_AFTER is not flagged stale."""
+    generated_at = datetime.now(UTC) - data_api.STALE_AFTER + timedelta(minutes=5)
+    frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
+    frame.to_csv(api_env / "widgets.csv", index=False)
+    Path(f"{api_env / 'widgets.csv'}.meta.json").write_text(
+        json.dumps({"generated_at": generated_at.isoformat(), "record_count": len(frame)})
+    )
+
+    emit_data_api()
+
+    document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
+    assert document["stale"] is False
+
+
+def test_data_past_stale_after_is_stale(api_env: Path, tmp_path: Path):
+    """A section stamped past STALE_AFTER is flagged stale for the dashboard badge."""
+    generated_at = datetime.now(UTC) - data_api.STALE_AFTER - timedelta(minutes=5)
+    frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
+    frame.to_csv(api_env / "widgets.csv", index=False)
+    Path(f"{api_env / 'widgets.csv'}.meta.json").write_text(
+        json.dumps({"generated_at": generated_at.isoformat(), "record_count": len(frame)})
+    )
+
+    emit_data_api()
+
+    document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
+    assert document["stale"] is True
 
 
 def test_missing_declared_column_fails_loudly(api_env: Path):
