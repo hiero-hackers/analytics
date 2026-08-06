@@ -53,6 +53,17 @@ uv run hiero-analytics
 - Writes charts to `outputs/charts/` and data tables to `outputs/data/`
 - Isolates failures — if one pipeline errors it is logged and the rest still run; the command exits non-zero if any failed
 
+For faster local debugging, run the explicit `all` command with `--fail-fast`:
+
+```bash
+uv run hiero-analytics all --fail-fast
+```
+
+This stops after the first pipeline failure and exits non-zero immediately, so
+the original traceback is not buried beneath output from later pipelines.
+Without `--fail-fast`, the default behaviour is unchanged: failures are logged,
+the remaining pipelines continue, and all failures are reported at the end.
+
 Everything under `outputs/` is generated and gitignored. The scheduled workflow publishes the dashboard to GitHub Pages instead of committing generated charts and reports.
 
 This is the same command the scheduled **Refresh Analytics Data** workflow runs.
