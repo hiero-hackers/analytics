@@ -98,6 +98,7 @@ def test_section_action_link_is_shipped(api_env: Path, tmp_path: Path, monkeypat
 
 def test_data_within_stale_after_is_not_stale(api_env: Path, tmp_path: Path):
     """Boundary check: STALE_AFTER minus a few minutes stays fresh."""
+    assert timedelta(hours=132) == data_api.STALE_AFTER
     generated_at = datetime.now(UTC) - data_api.STALE_AFTER + timedelta(minutes=5)
     frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
     frame.to_csv(api_env / "widgets.csv", index=False)

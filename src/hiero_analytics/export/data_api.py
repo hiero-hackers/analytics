@@ -60,8 +60,9 @@ logger = logging.getLogger(__name__)
 API_VERSION = "v1"
 
 # A section counts as stale when its data is older than the scheduled refresh
-# cadence plus slack for a slow run — the same policy the legacy dashboard
-# applies, imported from here so the two cannot drift.
+# cadence plus slack for a slow run. The analytics refresh runs every 5 days,
+# and we add 12 hours of slack for slow or delayed runs. The legacy dashboard
+# imports this value so the two cannot drift.
 STALE_AFTER = timedelta(hours=132)
 
 
