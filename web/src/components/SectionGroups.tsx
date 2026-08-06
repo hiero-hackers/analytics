@@ -20,9 +20,18 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
         <div className="jump">
           <span className="jlabel">Jump to</span>
           {groups.map(([name], index) => (
-            <a key={anchorId(name, index)} className="jbtn" href={`#${anchorId(name, index)}`}>
+            // Deliberately NOT an <a href="#…">: the URL hash is the app's
+            // state store (tab/org via useHashState), and fragment navigation
+            // would overwrite it — resetting the active tab (#342). Scrolling
+            // programmatically leaves the hash, and therefore the tab, alone.
+            <button
+              key={anchorId(name, index)}
+              type="button"
+              className="jbtn"
+              onClick={() => document.getElementById(anchorId(name, index))?.scrollIntoView()}
+            >
               {name}
-            </a>
+            </button>
           ))}
         </div>
       )}

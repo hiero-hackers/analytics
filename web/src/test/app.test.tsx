@@ -63,10 +63,10 @@ describe("App shell", () => {
     expect(screen.getByText("maintainers")).toBeInTheDocument();
     expect(screen.getByText("103")).toBeInTheDocument();
     expect(screen.getByText("How to read this — what each column means")).toBeInTheDocument();
-    // Each group appears twice: once in the jump bar, once as its header, and
-    // the jump link targets that group's own anchor.
-    const charts = screen.getByRole("link", { name: "Charts" });
-    expect(charts.getAttribute("href")).toMatch(/^#grp-\d+-Charts$/);
+    // Each group appears twice: once in the jump bar (a button — deliberately
+    // not a fragment link, which would clobber the tab/org hash state), once
+    // as its header.
+    expect(screen.getByRole("button", { name: "Charts" })).toBeInTheDocument();
     expect(screen.getAllByText("Charts")).toHaveLength(2);
     expect(screen.getAllByText("Roles & teams")).toHaveLength(2);
     expect(screen.getByText(/Work in progress/)).toBeInTheDocument();
@@ -239,7 +239,31 @@ describe("Section groups", () => {
 
     const ids = [...container.querySelectorAll("details.group")].map((el) => el.id);
     expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
-    const hrefs = [...container.querySelectorAll("a.jbtn")].map((el) => el.getAttribute("href"));
-    expect(hrefs).toEqual(ids.map((id) => `#${id}`)); // every jump link targets its own group
+
+    // Every jump button scrolls its own group, even under name collisions.
+    const scrolled: Element[] = [];
+    const spy = vi
+      .spyOn(Element.prototype, "scrollIntoView")
+      .mockImplementation(function (this: Element) {
+        scrolled.push(this);
+      });
+    for (const button of container.querySelectorAll("button.jbtn")) {
+      await userEvent.click(button);
+    }
+    spy.mockRestore();
+    expect(scrolled.map((el) => el.id)).toEqual(ids);
+  });
+
+  it("jumping to a group keeps the active tab and the hash state (#342)", async () => {
+    await openGovernance();
+    expect(window.location.hash).toContain("tab=Governance");
+
+    await userEvent.click(screen.getByRole("button", { name: "Roles & teams" }));
+
+    // The jump must not clobber the hash the app stores its state in: the
+    // Governance content is still on screen and the hash still names the tab.
+    expect(screen.getByText("Role holders")).toBeInTheDocument();
+    expect(window.location.hash).toContain("tab=Governance");
+    expect(window.location.hash).not.toContain("grp-");
   });
 });

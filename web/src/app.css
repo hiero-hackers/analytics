@@ -668,6 +668,8 @@
     margin-right: 2px;
   }
   .jbtn {
+    /* Now a <button> (see SectionGroups): buttons don't inherit the page font. */
+    font: inherit;
     font-size: 13px;
     padding: 5px 12px;
     border: 1px solid var(--edge-input);
