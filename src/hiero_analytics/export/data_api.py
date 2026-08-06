@@ -61,10 +61,7 @@ API_VERSION = "v1"
 
 # A section counts as stale when its data is older than the scheduled refresh
 # cadence plus slack for a slow run — the same policy the legacy dashboard
-# applies, imported from here so the two cannot drift. The workflow runs every
-# 5 days (120h, .github/workflows/update-analytics.yml); 12h slack covers its
-# ~6h job timeout plus room for a delayed run start, while staying well short
-# of a second missed cycle.
+# applies, imported from here so the two cannot drift.
 STALE_AFTER = timedelta(hours=132)
 
 

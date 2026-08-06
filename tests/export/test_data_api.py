@@ -97,7 +97,7 @@ def test_section_action_link_is_shipped(api_env: Path, tmp_path: Path, monkeypat
 
 
 def test_data_within_stale_after_is_not_stale(api_env: Path, tmp_path: Path):
-    """A section stamped just inside STALE_AFTER is not flagged stale."""
+    """Boundary check: STALE_AFTER minus a few minutes stays fresh."""
     generated_at = datetime.now(UTC) - data_api.STALE_AFTER + timedelta(minutes=5)
     frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
     frame.to_csv(api_env / "widgets.csv", index=False)
@@ -112,7 +112,7 @@ def test_data_within_stale_after_is_not_stale(api_env: Path, tmp_path: Path):
 
 
 def test_data_past_stale_after_is_stale(api_env: Path, tmp_path: Path):
-    """A section stamped past STALE_AFTER is flagged stale for the dashboard badge."""
+    """Boundary check: the other side of the same line trips the badge."""
     generated_at = datetime.now(UTC) - data_api.STALE_AFTER - timedelta(minutes=5)
     frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
     frame.to_csv(api_env / "widgets.csv", index=False)
