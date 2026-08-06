@@ -119,16 +119,19 @@ def test_freshness_ignores_the_content_watermark(tmp_path):
     assert dataset_watermark(tmp_path) == datetime(2026, 8, 6, 9, 0, tzinfo=UTC)
 
 
-def test_a_dataset_written_before_fetched_at_is_skipped_not_fatal(tmp_path):
-    """An old-format file is excluded from the bound rather than voiding it.
+def test_a_dataset_written_before_fetched_at_bounds_via_its_watermark(tmp_path):
+    """An old-format file contributes its content watermark, not nothing.
 
-    The field is additive: every live dataset acquires one on the next run that
-    writes it, so the only files that stay without one are leftovers.
+    Skipping it would let the stamped datasets assert a freshness the run
+    cannot support while a chart still reads the unstamped file. The content
+    watermark can only understate the file's freshness, so the bound stays
+    honest — and the field is additive, so the fallback retires itself on the
+    next run that rewrites the file.
     """
     _write_dataset(tmp_path, "legacy_org_all.json", None, fetched_through="2026-01-01T00:00:00+00:00")
     _write_dataset(tmp_path, "issues_org_all.json", "2026-08-06T09:00:00+00:00")
 
-    assert dataset_watermark(tmp_path) == datetime(2026, 8, 6, 9, 0, tzinfo=UTC)
+    assert dataset_watermark(tmp_path) == datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
 
 
 def test_a_damaged_fetched_at_still_withdraws_the_claim(tmp_path):

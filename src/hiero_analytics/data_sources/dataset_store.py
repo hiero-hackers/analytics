@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from collections.abc import Callable, Hashable, Iterable
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -215,7 +216,13 @@ def _max_updated_at(  # noqa: UP047
     return max(stamps) if stamps else None
 
 
-def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> None:  # noqa: UP047
+def save_dataset(  # noqa: UP047
+    path: Path,
+    records: list[T],
+    fetched_through: datetime,
+    *,
+    fetched_at: datetime | None = None,
+) -> None:
     """Atomically write the dataset and its two stamps to ``path`` as JSON.
 
     The two answer different questions and must not be conflated:
@@ -230,7 +237,9 @@ def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> Non
     ``fetched_at`` is wall-clock time of this write, so it answers "when did we
     last refresh this?" — the freshness question the dashboard's "data as of"
     stamp asks. Deriving that from ``fetched_through`` made a quiet fortnight in
-    the HIP repository read as a fortnight-old dashboard.
+    the HIP repository read as a fortnight-old dashboard. A caller persisting a
+    *partial* fetch passes the prior stamp explicitly instead, because "now"
+    would claim a freshness the failed repositories don't have.
 
     Added without a ``DATASET_VERSION`` bump on purpose: it is additive, its
     absence is handled explicitly by readers, and every live dataset gains it on
@@ -243,7 +252,7 @@ def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> Non
         "version": DATASET_VERSION,
         # Ordered ahead of the records so both stamps stay inside the fixed
         # prefix `provenance` reads rather than parsing the whole file.
-        "fetched_at": datetime.now(UTC).isoformat(),
+        "fetched_at": (fetched_at or datetime.now(UTC)).isoformat(),
         "fetched_through": fetched_through.isoformat(),
         "records": [serialize_record(record) for record in records],
     }
@@ -253,6 +262,32 @@ def save_dataset(path: Path, records: list[T], fetched_through: datetime) -> Non
         json.dump(payload, tmp, separators=(",", ":"))
         tmp_path = Path(tmp.name)
     tmp_path.replace(path)
+
+
+_FETCHED_AT_PREFIX_RE = re.compile(r'"fetched_at"\s*:\s*"([^"]+)"')
+_STAMP_PREFIX_BYTES = 256  # both stamps are written at the head of the file
+
+
+def _read_prior_fetched_at(path: Path) -> datetime | None:
+    """The existing file's ``fetched_at`` stamp, or None (absent file or legacy format).
+
+    Read from the fixed prefix ``save_dataset`` writes the stamps into, the
+    same way ``provenance`` reads it — cheap enough to call on the partial-fetch
+    path without re-parsing a large dataset.
+    """
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            prefix = handle.read(_STAMP_PREFIX_BYTES)
+    except OSError:
+        return None
+    match = _FETCHED_AT_PREFIX_RE.search(prefix)
+    if match is None:
+        return None
+    try:
+        stamp = datetime.fromisoformat(match.group(1))
+    except ValueError:
+        return None
+    return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=UTC)
 
 
 def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
@@ -390,5 +425,13 @@ def fetch_incremental(  # noqa: UP047
         records = merge_records(existing, incoming, key_of)
 
     watermark = held_watermark or _max_updated_at(records, updated_at_of) or current
-    save_dataset(path, records, watermark)
+    # A partial fetch holds the freshness stamp as well as the watermark: some
+    # repositories were not covered, so "refreshed now" would overstate what
+    # the dashboard's data-as-of bound can promise. The prior stamp (or, for a
+    # legacy file without one, the held watermark) is the honest claim; both
+    # stamps advance together once a complete fetch succeeds.
+    preserved_fetched_at = None
+    if held_watermark is not None:
+        preserved_fetched_at = _read_prior_fetched_at(path) or held_watermark
+    save_dataset(path, records, watermark, fetched_at=preserved_fetched_at)
     return records

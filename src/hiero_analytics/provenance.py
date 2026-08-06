@@ -197,16 +197,20 @@ def dataset_watermark(datasets_dir: Path | None = None) -> datetime | None:
     data of all. Files that were never stamped (the pretty-printed governance
     snapshots that share this directory) are not datasets and are ignored.
 
-    A dataset written before ``fetched_at`` existed is skipped with a warning
-    rather than voiding the bound: the field is additive, and every live
-    dataset acquires it on the next successful run, so the only files that stay
-    without one are leftovers no pipeline writes any more.
+    A dataset written before ``fetched_at`` existed contributes its
+    ``fetched_through`` content watermark instead: that stamp can only
+    *understate* the file's freshness (content precedes the write), so the
+    bound stays honest for charts still reading the unstamped file, rather
+    than letting the stamped datasets assert a freshness it cannot support.
+    The field is additive, so every live dataset acquires ``fetched_at`` on
+    the next successful run and the fallback retires itself.
     """
     stamps: list[datetime] = []
     for path in _dataset_files(datasets_dir):
         stamp = _read_stamp(path, _FETCHED_AT_RE)
         if stamp is _UNKNOWN:
-            if _predates_fetched_at(path):
+            fallback = _read_stamp(path, _WATERMARK_RE) if _predates_fetched_at(path) else None
+            if isinstance(fallback, datetime):
                 # Once per file per process: provenance resolves per *figure*
                 # (deliberately — see the docstring), so warning on every pass
                 # buried a real run's log under hundreds of repeats of the same
@@ -214,10 +218,11 @@ def dataset_watermark(datasets_dir: Path | None = None) -> datetime | None:
                 if path.name not in _warned_legacy_datasets:
                     _warned_legacy_datasets.add(path.name)
                     logger.warning(
-                        "Dataset %s predates the fetched_at stamp; excluding it from data-as-of "
-                        "(it will acquire one on the next run that writes it)",
+                        "Dataset %s predates the fetched_at stamp; using its fetched_through "
+                        "watermark as a conservative data-as-of bound until the next run stamps it",
                         path.name,
                     )
+                stamps.append(fallback)
                 continue
             logger.warning(
                 "Dataset %s is unreadable; reporting no data-as-of rather than a bound the "

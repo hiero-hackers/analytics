@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 
 from hiero_analytics.analysis.maintainer_pipeline import (
     RECENT_DAILY_BUCKETS,
@@ -15,10 +16,11 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
+    calendar_recent_buckets,
     humanize_day_label,
     humanize_month_label,
     humanize_week_label,
-    recent_buckets,
+    last_calendar_buckets,
 )
 from hiero_analytics.config.charts import MAINTAINER_PIPELINE_COLORS
 from hiero_analytics.config.paths import ORG
@@ -61,6 +63,11 @@ def main(org: str = ORG) -> None:
 
     logger.info("Saved maintainer pipeline tables")
 
+    # One clock for every chart window, so the daily/weekly/monthly views agree
+    # on what "now" is. The windows are complete calendar spans (zero buckets
+    # included), not the last N buckets that happened to have activity.
+    now = datetime.now(UTC)
+
     plot_and_save(
         yearly_pipeline,
         plot_stacked_bar,
@@ -74,7 +81,7 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        recent_buckets(daily_pipeline, RECENT_DAILY_BUCKETS).assign(
+        calendar_recent_buckets(daily_pipeline, last_calendar_buckets(now, RECENT_DAILY_BUCKETS, "day")).assign(
             day=lambda frame: frame["day"].map(humanize_day_label)
         ),
         plot_stacked_bar,
@@ -96,7 +103,7 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        recent_buckets(monthly_pipeline, RECENT_MONTHLY_BUCKETS).assign(
+        calendar_recent_buckets(monthly_pipeline, last_calendar_buckets(now, RECENT_MONTHLY_BUCKETS, "month")).assign(
             month=lambda frame: frame["month"].map(humanize_month_label)
         ),
         plot_stacked_bar,
@@ -120,7 +127,7 @@ def main(org: str = ORG) -> None:
     )
 
     plot_and_save(
-        recent_buckets(weekly_pipeline, RECENT_WEEKLY_BUCKETS).assign(
+        calendar_recent_buckets(weekly_pipeline, last_calendar_buckets(now, RECENT_WEEKLY_BUCKETS, "week")).assign(
             week=lambda frame: frame["week"].map(humanize_week_label)
         ),
         plot_stacked_bar,

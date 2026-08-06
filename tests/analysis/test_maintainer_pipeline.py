@@ -12,10 +12,11 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
+    calendar_recent_buckets,
     humanize_day_label,
     humanize_month_label,
     humanize_week_label,
-    recent_buckets,
+    last_calendar_buckets,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord
 
@@ -320,7 +321,7 @@ def test_weekly_pipeline_counts_each_week_separately():
 
 
 # ---------------------------------------------------------------------------
-# recent_buckets
+# last_calendar_buckets / calendar_recent_buckets
 # ---------------------------------------------------------------------------
 
 
@@ -333,49 +334,49 @@ def _month_pipeline(n: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def test_recent_buckets_keeps_only_most_recent():
-    """recent_buckets should return the tail (newest) rows in chronological order."""
-    pipeline = _month_pipeline(12)
+def test_last_calendar_buckets_daily_weekly_monthly():
+    """Labels are complete calendar spans ending at now's bucket, oldest first."""
+    now = datetime(2024, 12, 15, 12, 0, tzinfo=UTC)  # a Sunday; ISO week 50
 
-    trimmed = recent_buckets(pipeline, 3)
-
-    assert list(trimmed["month"]) == ["2024-10", "2024-11", "2024-12"]
-    assert list(trimmed.index) == [0, 1, 2]  # index reset
-
-
-def test_recent_buckets_newest_first_reverses_order():
-    """newest_first should return the most recent buckets in reverse-chronological order."""
-    pipeline = _month_pipeline(12)
-
-    trimmed = recent_buckets(pipeline, 3, newest_first=True)
-
-    assert list(trimmed["month"]) == ["2024-12", "2024-11", "2024-10"]
-    assert list(trimmed.index) == [0, 1, 2]  # index reset
+    assert last_calendar_buckets(now, 3, "day") == ["2024-12-13", "2024-12-14", "2024-12-15"]
+    assert last_calendar_buckets(now, 3, "week") == ["2024-W48", "2024-W49", "2024-W50"]
+    assert last_calendar_buckets(now, 3, "month") == ["2024-10", "2024-11", "2024-12"]
 
 
-def test_recent_buckets_noop_when_within_limit():
-    """A table already within the limit should be returned unchanged."""
-    pipeline = _month_pipeline(3)
+def test_last_calendar_buckets_cross_boundaries():
+    """Month walking crosses the year boundary; weeks cross ISO years."""
+    now = datetime(2025, 1, 2, tzinfo=UTC)  # ISO week 2025-W01
 
-    trimmed = recent_buckets(pipeline, 24)
+    assert last_calendar_buckets(now, 3, "month") == ["2024-11", "2024-12", "2025-01"]
+    assert last_calendar_buckets(now, 2, "week") == ["2024-W52", "2025-W01"]
 
-    assert trimmed.equals(pipeline)
+
+def test_calendar_recent_buckets_windows_by_calendar_not_by_populated_rows():
+    """A sparse table must not stretch older activity into the window (#coderabbit).
+
+    Only 2024-03 and 2024-12 have activity; a 3-month window ending December
+    contains October and November as zero rows and excludes March entirely.
+    """
+    pipeline = pd.DataFrame(
+        [
+            {"month": "2024-03", "general_user": 7, "triage": 0, "committer": 0, "maintainer": 1},
+            {"month": "2024-12", "general_user": 2, "triage": 0, "committer": 0, "maintainer": 0},
+        ]
+    )
+
+    windowed = calendar_recent_buckets(pipeline, ["2024-10", "2024-11", "2024-12"])
+
+    assert list(windowed["month"]) == ["2024-10", "2024-11", "2024-12"]
+    assert list(windowed["general_user"]) == [0, 0, 2]
+    assert "2024-03" not in set(windowed["month"])
+    assert windowed["maintainer"].dtype.kind == "i"  # zero-fill keeps integer counts
 
 
-def test_recent_buckets_empty_input():
-    """Empty input should be returned as-is."""
+def test_calendar_recent_buckets_empty_input_stays_empty():
+    """An empty pipeline stays empty so the plotting layer still skips the chart."""
     pipeline = pd.DataFrame(columns=["month", "general_user", "triage", "committer", "maintainer"])
 
-    trimmed = recent_buckets(pipeline, 24)
-
-    assert trimmed.empty
-
-
-def test_recent_buckets_non_positive_limit_is_noop():
-    """A non-positive limit should not trim the table."""
-    pipeline = _month_pipeline(5)
-
-    assert recent_buckets(pipeline, 0).equals(pipeline)
+    assert calendar_recent_buckets(pipeline, ["2024-11", "2024-12"]).empty
 
 
 # ---------------------------------------------------------------------------

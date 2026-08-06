@@ -333,6 +333,32 @@ def test_partial_since_fetch_merges_arrivals_but_holds_watermark(tmp_path):
     assert through == datetime(2024, 1, 3, tzinfo=UTC)
 
 
+def test_partial_since_fetch_holds_fetched_at_too(tmp_path):
+    """A partial fetch must not claim "refreshed now" while repos are still failing.
+
+    The failed repositories' records were last covered by the *prior* fetch, so
+    the freshness stamp holds with the watermark and only advances together
+    with it once a complete fetch succeeds.
+    """
+    path = tmp_path / "issues.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 3, tzinfo=UTC))
+    prior_stamp = json.loads(path.read_text())["fetched_at"]
+
+    def since_fetch(_since):
+        raise PartialOrgFetchError([_rec("b", 99, 8)], failed_repos=["o/broken"])
+
+    fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=lambda: pytest.fail("full_fetch must not be called"),
+        since_fetch=since_fetch,
+    )
+
+    assert json.loads(path.read_text())["fetched_at"] == prior_stamp
+
+
 def test_partial_full_fetch_first_run_reraises_and_persists_nothing(tmp_path):
     """A partial full fetch with no baseline re-raises and writes no dataset."""
     path = tmp_path / "issues.json"

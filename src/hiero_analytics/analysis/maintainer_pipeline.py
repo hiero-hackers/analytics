@@ -224,33 +224,49 @@ def build_maintainer_repo_pipeline(
     return by_repo.astype({column: int for column in STAGE_COLUMNS})
 
 
-def recent_buckets(pipeline_df: pd.DataFrame, max_buckets: int, *, newest_first: bool = False) -> pd.DataFrame:
-    """Return the most recent ``max_buckets`` rows of a time-bucketed pipeline table.
+def last_calendar_buckets(now: datetime, count: int, freq: str) -> list[str]:
+    """The last ``count`` calendar bucket labels ending at ``now``'s bucket, oldest first.
 
-    Monthly/weekly bucket labels ('YYYY-MM', 'YYYY-Www') sort lexicographically in
-    chronological order, so the tail is the newest window. Used to keep the
-    fine-grained charts legible while the full history stays in the CSV.
+    ``freq`` is ``"day"`` ('YYYY-MM-DD'), ``"week"`` (ISO 'YYYY-Www'), or
+    ``"month"`` ('YYYY-MM') — the label formats the pipeline builders emit.
+    """
+    if freq == "day":
+        return [(now.date() - timedelta(days=i)).strftime("%Y-%m-%d") for i in reversed(range(count))]
+    if freq == "week":
+        monday = now.date() - timedelta(days=now.date().weekday())
+        weeks = [(monday - timedelta(weeks=i)).isocalendar() for i in reversed(range(count))]
+        return [f"{iso.year:04d}-W{iso.week:02d}" for iso in weeks]
+    if freq == "month":
+        year, month = now.year, now.month
+        labels = []
+        for _ in range(count):
+            labels.append(f"{year:04d}-{month:02d}")
+            year, month = (year - 1, 12) if month == 1 else (year, month - 1)
+        return list(reversed(labels))
+    raise ValueError(f"unknown bucket frequency: {freq!r}")
 
-    With ``newest_first=True`` the rows are returned in reverse-chronological order,
-    which places the latest bucket at the top of a horizontal bar chart. All rows
-    are kept when the table is already within the limit or ``max_buckets`` is not
-    positive.
+
+def calendar_recent_buckets(pipeline_df: pd.DataFrame, labels: list[str]) -> pd.DataFrame:
+    """The chart window as complete calendar buckets: exactly ``labels``, zero-filled.
+
+    Unlike taking the tail of the *populated* buckets, a span with no activity
+    stays in the window as a zero bar — so a chart labelled "1 month" covers
+    exactly the last month's calendar weeks and never stretches back to older
+    activity to fill its bar budget. Full history stays in the CSV; only the
+    rendered chart is windowed. An empty input stays empty so the plotting
+    layer's skip-empty behaviour is preserved.
     """
     if pipeline_df.empty:
         return pipeline_df.copy()
 
-    # Sort by the bucket-label column (always first) so ``tail`` is genuinely the
-    # newest window regardless of the caller's row order.
     bucket_col = pipeline_df.columns[0]
-    result = pipeline_df.sort_values(bucket_col)
-
-    if max_buckets > 0 and len(result) > max_buckets:
-        result = result.tail(max_buckets)
-
-    if newest_first:
-        result = result.iloc[::-1]
-
-    return result.reset_index(drop=True)
+    count_cols = [column for column in pipeline_df.columns if column != bucket_col]
+    return (
+        pipeline_df.set_index(bucket_col)
+        .reindex(labels, fill_value=0)
+        .reset_index(names=bucket_col)
+        .astype({column: int for column in count_cols})
+    )
 
 
 def humanize_month_label(bucket: str) -> str:
