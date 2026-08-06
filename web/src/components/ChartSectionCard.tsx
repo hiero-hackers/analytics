@@ -87,27 +87,19 @@ export function ChartSectionCard({
   const count = section.charts.length;
 
   // The gallery lays half-width charts out in pairs; full-row charts break the
-  // pairing. A half-width chart with no partner in its row would render tiny in
-  // a lone cell, so it stretches to the full row instead. Variant 0's shape
+  // pairing. A half-width chart stretches to the full row only when it is the
+  // *only* half-width chart in the gallery (every sibling is full-row, so it
+  // could never have a partner). With two or more half-width siblings they all
+  // stay half — a trailing odd one out at half width reads better than one
+  // chart rendering huge next to its same-shaped siblings. Variant 0's shape
   // decides, keeping the grid stable while variant tabs switch.
   const isFullRow = (chart: ChartSpec) => {
     const first = chart.variants[0];
     const tall = Boolean(first.width && first.height && first.width / first.height <= 1.05);
     return Boolean(chart.wide || chart.full_row || tall);
   };
-  const stretched = section.charts.map(isFullRow);
-  let pending = -1;
-  section.charts.forEach((chart, index) => {
-    if (isFullRow(chart)) {
-      if (pending >= 0) {
-        stretched[pending] = true;
-        pending = -1;
-      }
-    } else {
-      pending = pending >= 0 ? -1 : index;
-    }
-  });
-  if (pending >= 0) stretched[pending] = true;
+  const halfCount = section.charts.filter((chart) => !isFullRow(chart)).length;
+  const stretched = section.charts.map((chart) => isFullRow(chart) || halfCount === 1);
 
   const download = section.download;
   return (

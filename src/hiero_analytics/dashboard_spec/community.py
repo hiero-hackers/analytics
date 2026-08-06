@@ -17,6 +17,7 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "discord",
+                "group": "Discord",
                 "title": "Discord activity",
                 "description": "Discord channel categories, monthly traffic, and recent activity.",
                 "files": [

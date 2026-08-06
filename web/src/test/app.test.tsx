@@ -72,9 +72,11 @@ describe("App shell", () => {
     expect(screen.getByText("How to read this — what each column means")).toBeInTheDocument();
     // Each group appears twice: once in the jump bar (a button — deliberately
     // not a fragment link, which would clobber the tab/org hash state), once
-    // as its header.
-    expect(screen.getByRole("button", { name: "Charts" })).toBeInTheDocument();
-    expect(screen.getAllByText("Charts")).toHaveLength(2);
+    // as its header. The chart card renders under its own named group — there
+    // is no generic "Charts" section any more.
+    expect(screen.getByRole("button", { name: "Pipeline charts" })).toBeInTheDocument();
+    expect(screen.getAllByText("Pipeline charts")).toHaveLength(2);
+    expect(screen.queryByText("Charts")).not.toBeInTheDocument();
     expect(screen.getAllByText("Roles & teams")).toHaveLength(2);
     expect(screen.getByText(/Work in progress/)).toBeInTheDocument();
     // The footer is the general "something looks wrong" route: only the

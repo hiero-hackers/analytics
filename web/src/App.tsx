@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { fetchManifest, type Manifest, type SectionDoc } from "./api";
+import { fetchManifest, type ChartSection, type Manifest } from "./api";
 import { ChartSectionCard } from "./components/ChartSectionCard";
 import { Glossary } from "./components/Glossary";
 import { MetricTiles } from "./components/MetricTiles";
@@ -19,21 +19,6 @@ import { useHashState } from "./useHashState";
 import { useSectionDocs } from "./useSectionDocs";
 import { useViewDocs } from "./useViewDocs";
 import { ViewCards } from "./components/ViewCards";
-
-/** Sections in order, grouped by their `group` label (order of appearance). */
-function groupSections(docs: SectionDoc[]): [string, SectionDoc[]][] {
-  const groups: [string, SectionDoc[]][] = [];
-  for (const doc of docs) {
-    const name = doc.group || "";
-    const last = groups[groups.length - 1];
-    if (last && last[0] === name) {
-      last[1].push(doc);
-    } else {
-      groups.push([name, [doc]]);
-    }
-  }
-  return groups;
-}
 
 function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; macro: string }) {
   const entry = manifest.orgs[org];
@@ -49,61 +34,53 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
   const { views, failed: failedViews, loading: viewsLoading } = useViewDocs(viewRefs);
   const unavailable = [...failedViews, ...failed];
 
-  const allChartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
-  // A chart section with a `group` renders inside that named table group,
-  // directly above its companion tables; the rest form the tab-top Charts block.
-  const chartSections = allChartSections.filter((section) => !section.group);
-  const groupedCharts = allChartSections.filter((section) => section.group);
+  const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
   const provenance = manifest.provenance;
-  const groups: Group[] = [
-    // Legacy order: a family's bespoke views (board, matrix) lead its chart
-    // galleries, then its tables — governance context first, then the
-    // supporting charts, then the individual evidence.
-    //
-    // Held back until the views settle. Chart sections come off the manifest
-    // and would otherwise paint alone, only for the views to arrive and take
-    // the position above them — the reader watches the page reshuffle. A brief
-    // wait for the whole group in its final order beats content that moves.
-    ...((chartSections.length || views.length) && !viewsLoading
-      ? ([
+
+  // The tab is a sequence of named sections: each group renders its views,
+  // then its chart cards, then its tables, and the jump bar links each one —
+  // there is no generic "Charts" section. Order comes from the manifest's
+  // group_order; anything it doesn't mention (older manifest, ad-hoc group)
+  // is appended in order of appearance. Groups with nothing to show for this
+  // org are dropped entirely.
+  //
+  // Held back until views and tables settle: sections would otherwise paint
+  // partially and then reshuffle as the async pieces arrive. A brief wait for
+  // the whole tab in its final order beats content that moves.
+  const chartGroup = (section: ChartSection) => section.group || section.title;
+  const declaredOrder = manifest.group_order?.[macro] ?? [];
+  const names = [...declaredOrder];
+  for (const section of chartSections) {
+    if (!names.includes(chartGroup(section))) names.push(chartGroup(section));
+  }
+  for (const doc of docs) {
+    if (!names.includes(doc.group || "")) names.push(doc.group || "");
+  }
+  const settled = !viewsLoading && !docsLoading;
+  const groups: Group[] = !settled
+    ? []
+    : names.flatMap((name): Group[] => {
+        const groupViews = views.filter((view) => (view.group ?? names[0]) === name);
+        const groupCharts = chartSections.filter((section) => chartGroup(section) === name);
+        const groupDocs = docs.filter((doc) => (doc.group || "") === name);
+        if (!groupViews.length && !groupCharts.length && !groupDocs.length) return [];
+        return [
           [
-            "Charts",
+            name,
             <>
-              {views.length > 0 && <ViewCards views={views} sectionDocs={docs} provenance={provenance} />}
-              {chartSections.map((section) => (
+              {groupViews.length > 0 && (
+                <ViewCards views={groupViews} sectionDocs={docs} provenance={provenance} />
+              )}
+              {groupCharts.map((section) => (
                 <ChartSectionCard key={section.id} section={section} provenance={provenance} />
+              ))}
+              {groupDocs.map((doc) => (
+                <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />
               ))}
             </>,
           ],
-        ] as Group[])
-      : []),
-    ...groupSections(docs).map(
-      ([name, sections]): Group => [
-        name,
-        <>
-          {groupedCharts
-            .filter((section) => section.group === name)
-            .map((section) => (
-              <ChartSectionCard key={section.id} section={section} provenance={provenance} />
-            ))}
-          {sections.map((doc) => (
-            <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />
-          ))}
-        </>,
-      ],
-    ),
-    // A grouped chart whose group has no (loaded) tables still needs a home:
-    // give it its own group so it never silently disappears. Waits for the
-    // docs to settle so the card doesn't paint alone and then jump into place.
-    ...groupedCharts
-      .filter((section) => !docsLoading && !groupSections(docs).some(([name]) => name === section.group))
-      .map(
-        (section): Group => [
-          section.group ?? "",
-          <ChartSectionCard key={section.id} section={section} provenance={provenance} />,
-        ],
-      ),
-  ];
+        ];
+      });
 
   return (
     <>

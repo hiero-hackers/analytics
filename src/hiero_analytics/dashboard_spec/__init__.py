@@ -30,7 +30,6 @@ _FAMILIES = (contributors, governance, hips, security, onboarding, community)
 # the contract tests) reads off this package.
 __all__ = [
     "AFFILIATION_ISSUE_URL",
-    "CHARTS_GROUP",
     "CHART_MACROS",
     "CHART_METHODOLOGY",
     "CHART_NOTES",
@@ -38,6 +37,7 @@ __all__ = [
     "CUSTOM_VIEW_MODULES",
     "MACRO_ABSENT_NOTES",
     "MACRO_GLOSSARIES",
+    "MACRO_GROUP_ORDER",
     "MACRO_PARENTS",
     "METRIC_ANNOTATIONS",
     "PROJECT_ISSUES_URL",
@@ -47,7 +47,6 @@ __all__ = [
 
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL
 PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
-CHARTS_GROUP = "Charts"
 
 # Display formats a section column may declare, as the third tuple element.
 # The frontend implements exactly these (web/src/components/FormattedCell.tsx);
@@ -86,6 +85,29 @@ MACRO_PARENTS = {
 MACRO_ABSENT_NOTES = {
     family.CHART_MACRO["name"]: family.ABSENT_NOTE for family in _FAMILIES if hasattr(family, "ABSENT_NOTE")
 }
+
+
+def _group_order(family) -> list[str]:
+    """The family's section-group display order, chart-only groups included.
+
+    SECTION_GROUPS is authoritative (it may list chart-only groups as empty
+    entries to place them); any chart card whose group it doesn't mention is
+    appended in card order, so nothing renders unplaced.
+    """
+    names = [name for name, _ids in getattr(family, "SECTION_GROUPS", [])]
+    for specs in family.CHART_MACRO["charts"].values():
+        for spec in specs:
+            group = spec.get("group") or spec["title"]
+            if group not in names:
+                names.append(group)
+    return names
+
+
+# Macro name -> ordered section-group names. The frontend renders each tab as
+# this sequence of named sections (views + chart cards + tables that share the
+# group name), with the jump bar linking each one — there is no generic
+# "Charts" section.
+MACRO_GROUP_ORDER = {family.CHART_MACRO["name"]: _group_order(family) for family in _FAMILIES}
 
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]
 CHART_NOTES = merged(_FAMILIES, "CHART_NOTES")

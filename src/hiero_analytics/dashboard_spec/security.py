@@ -19,6 +19,7 @@ CHART_MACRO = {
         "*": [
             {
                 "id": "scorecard",
+                "group": "Scorecards",
                 "title": "OpenSSF scorecard",
                 "description": "Org-level OpenSSF scorecard and its per-check breakdown.",
                 "files": [
@@ -28,6 +29,7 @@ CHART_MACRO = {
             },
             {
                 "id": "ownership",
+                "group": "Ownership",
                 "title": "Code owners & CI runners",
                 "description": (
                     "How many repositories declare code owners, and which CI runners the rest of the "
@@ -64,6 +66,8 @@ SECTION_SPECS = [
 ]
 
 SECTION_GROUPS = [
+    # Scorecards is chart-only; the ownership card renders above its table.
+    ("Scorecards", []),
     ("Ownership", ["codeowners"]),
 ]
 

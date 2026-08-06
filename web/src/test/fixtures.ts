@@ -215,6 +215,7 @@ export const MANIFEST: Manifest = {
           id: "pipeline",
           macro: "Governance",
           title: "Maintainer pipeline",
+          group: "Pipeline charts",
           description: "How the pipeline moved.",
           charts: [
             {

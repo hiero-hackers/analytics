@@ -47,6 +47,7 @@ from hiero_analytics.dashboard_spec import (
     CUSTOM_VIEW_MODULES,
     MACRO_ABSENT_NOTES,
     MACRO_GLOSSARIES,
+    MACRO_GROUP_ORDER,
     MACRO_PARENTS,
     METRIC_ANNOTATIONS,
     PROJECT_ISSUES_URL,
@@ -278,10 +279,11 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                 }
                 if spec.get("slideshow"):
                     section["slideshow"] = True
-                # A grouped chart card renders inside the named table group
-                # (above its tables) instead of the tab-top Charts block.
-                if spec.get("group"):
-                    section["group"] = spec["group"]
+                # Every chart card belongs to a named section group — the tab
+                # renders as ordered groups (see the manifest's group_order),
+                # never a generic "Charts" block. A card without an explicit
+                # group is its own section, named by its title.
+                section["group"] = spec.get("group") or spec["title"]
                 _attach_download(section, spec, org, org_data_dir, org_dir)
                 sections.append(section)
     return sections
@@ -379,6 +381,9 @@ def emit_data_api() -> Path:
         "macro_parents": MACRO_PARENTS,
         # Why a tab may be empty for an org — shown in place of a blank tab.
         "macro_absent_notes": MACRO_ABSENT_NOTES,
+        # Macro name -> ordered section-group names; the frontend renders each
+        # tab as this sequence of named sections (views + charts + tables).
+        "group_order": MACRO_GROUP_ORDER,
         # Family display order. The frontend otherwise derives tab order from
         # the sections lists, which puts a chart-only macro after every
         # table-bearing one regardless of where its family sits.

@@ -35,6 +35,7 @@ CHART_MACRO = {
             {
                 "id": "maintainer-pipeline",
                 "title": "Maintainer pipeline over time",
+                "group": "Maintainer pipeline",
                 "description": (
                     "How the maintainer/committer pipeline has moved over time — is the bench of "
                     "future maintainers developing? The same spans, per repository, are the next card."
@@ -56,6 +57,7 @@ CHART_MACRO = {
             {
                 "id": "maintainer-pipeline-by-repo",
                 "title": "Maintainer pipeline by repository",
+                "group": "Maintainer pipeline",
                 "description": (
                     "The same role split, cut by repository instead of time: who is active in each "
                     "repo over the selected span. Spans match the over-time card, so the two cards "
@@ -76,6 +78,7 @@ CHART_MACRO = {
             {
                 "id": "role-networks",
                 "title": "Role networks",
+                "group": "Roles",
                 "slideshow": True,
                 "description": (
                     "Repositories linked by the people who hold each governance role — one slide per "
@@ -94,10 +97,9 @@ CHART_MACRO = {
             {
                 "id": "org-diversity",
                 "title": "Organisation diversity",
-                # Renders inside the Organisation-diversity section group,
-                # directly above its companion tables, rather than in the
-                # tab-top Charts block — the jump bar lands on charts + tables
-                # together.
+                # Renders inside the Organisation-diversity section, directly
+                # above its companion tables — the jump bar lands on charts +
+                # tables together.
                 "group": "Organisation diversity",
                 "description": (
                     "Where maintainer authority sits — org-wide, per team and per repo. The first chart is "
@@ -407,15 +409,18 @@ GLOSSARY = glossary_of(
     note=GLOSSARY_NOTE,
 )
 
-# Tables grouped by purpose so viewers get a short, scannable menu instead of one
-# long stack. Each group renders under its own heading (with a jump-bar link), and
-# within a group the order goes high-level aggregate → most granular. Groups render
-# after the charts. Order here is the on-screen order.
+# Everything grouped by purpose so viewers get a short, scannable menu instead
+# of one long stack. Each group renders under its own heading (with a jump-bar
+# link); chart cards join the group they name via their "group" key, and a
+# group with no table ids is chart-only. Within a group the order goes
+# high-level aggregate → most granular. Order here is the on-screen order.
 SECTION_GROUPS = [
+    # The bench of future maintainers, over time and by repo (chart-only).
+    ("Maintainer pipeline", []),
     # The actionable headlines — where coverage is thin or work is concentrated.
     ("Coverage & risk", ["repoactivity", "understaffed", "loadshare", "gonedark"]),
-    # Reference: who holds which role, per repo.
-    ("Roles by repo", ["repo"]),
+    # Who holds which role: the role networks, then per repo.
+    ("Roles", ["repo"]),
     # The governance bodies: teams as groups, then the TSC members individually.
     ("Teams & TSC", ["teams", "teamrepo", "tscrepo"]),
     # Who is affiliated with which organisation, and how concentrated that is —

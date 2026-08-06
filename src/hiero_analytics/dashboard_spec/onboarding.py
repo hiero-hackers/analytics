@@ -19,6 +19,7 @@ CHART_MACRO = {
         "*": [
             {
                 "id": "issue-difficulty",
+                "group": "Issue difficulty",
                 "title": "Issue difficulty",
                 "description": (
                     "Difficulty mix of open issues and how it has shifted over time. 'Unknown' is the "

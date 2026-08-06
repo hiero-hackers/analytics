@@ -153,6 +153,7 @@ def coverage_matrix(org: str, org_data_dir: Path) -> dict | None:
     return {
         "id": MATRIX_ID,
         "kind": "matrix",
+        "group": "Status & coverage",
         "title": MATRIX_TITLE,
         "description": MATRIX_DESCRIPTION,
         "badge": f"{len(hips)} HIPs",
@@ -193,6 +194,7 @@ def governance_board(org_data_dir: Path) -> dict | None:
     return {
         "id": BOARD_ID,
         "kind": "board",
+        "group": "Status & coverage",
         "title": BOARD_TITLE,
         "description": BOARD_DESCRIPTION,
         "badge": f"{specs['hip'].nunique()} specs",

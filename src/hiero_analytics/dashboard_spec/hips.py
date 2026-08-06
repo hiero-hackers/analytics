@@ -22,6 +22,7 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "hip-adoption-funnel",
+                "group": "Adoption",
                 "title": "Adoption funnel — specs created since Sep 2024",
                 "description": (
                     "How far recent proposals get, mechanically: proposed, approved by the TSC, merged "
@@ -35,6 +36,7 @@ CHART_MACRO = {
             },
             {
                 "id": "hip-activity-by-status",
+                "group": "Adoption",
                 "title": "Implementation evidence — approved & final specs",
                 "description": (
                     "Narrowed to the statuses where implementation is expected: each spec split by "
@@ -47,6 +49,7 @@ CHART_MACRO = {
             },
             {
                 "id": "hip-repo-engagement",
+                "group": "Adoption",
                 "title": "Which repositories engage with HIPs",
                 "description": (
                     "Distinct HIPs each repository has merged referencing PRs for — breadth of "
@@ -130,9 +133,10 @@ SECTION_SPECS = [
 ]
 
 SECTION_GROUPS = [
-    # The dashboard pipeline prepends the coverage matrix (group "Coverage")
-    # before the tables, so the coverage tables lead to keep the group
-    # contiguous in the jump bar.
+    # The board and matrix views render under "Status & coverage" (the views
+    # carry that group), the adoption charts under "Adoption", then the tables.
+    ("Status & coverage", []),
+    ("Adoption", []),
     ("What is left to do", ["hip-no-activity"]),
     ("Evidence", ["hip-evidence", "hip-unknown"]),
 ]

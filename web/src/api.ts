@@ -102,6 +102,8 @@ export interface MatrixView {
   id: string;
   kind: "matrix";
   macro: string;
+  /** The named section group this view renders under. */
+  group?: string;
   title: string;
   description: string;
   badge: string;
@@ -131,6 +133,8 @@ export interface BoardView {
   id: string;
   kind: "board";
   macro: string;
+  /** The named section group this view renders under. */
+  group?: string;
   title: string;
   description: string;
   badge: string;
@@ -177,6 +181,8 @@ export interface Manifest {
   macro_order?: string[];
   /** Why a tab may be empty for an org — shown in place of a blank tab. */
   macro_absent_notes?: Record<string, string>;
+  /** Macro name -> ordered section-group names; each tab renders as this sequence. */
+  group_order?: Record<string, string[]>;
   /** Display labels for rolling periods ("30d" -> "30 days"). */
   period_labels?: Record<string, string>;
   /** Where the footer sends a reader who spots something wrong. */
