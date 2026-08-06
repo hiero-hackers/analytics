@@ -95,8 +95,13 @@ def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> l
     if "days_since_active" in quiet_month:
         days = quiet_month["days_since_active"]
         metrics.append(("quiet permission-holders (180d+)", int((days.isna() | (days >= GONE_DARK_DAYS)).sum())))
-    if "status" in loaded["teams"]:
-        metrics.append(("quiet teams", int((loaded["teams"]["status"] == "quiet").sum())))
+    # The teams table follows the shared period tabs, but this tile keeps the
+    # fixed 180-day threshold, derived from the base table's recency column: a
+    # blank days_since_active is a team with no recorded activity at all.
+    teams = loaded["teams"]
+    if "days_since_active" in teams:
+        team_days = pd.to_numeric(teams["days_since_active"], errors="coerce")
+        metrics.append(("quiet teams", int((team_days.isna() | (team_days >= GONE_DARK_DAYS)).sum())))
     return metrics
 
 

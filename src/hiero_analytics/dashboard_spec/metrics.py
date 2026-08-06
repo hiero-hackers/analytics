@@ -127,13 +127,14 @@ METRIC_ANNOTATIONS: dict[str, dict] = {
     },
     "quiet teams": {
         "note": (
-            "Governance teams where no member had tracked activity in the window — a team that exists "
-            "on paper but is not currently doing the work its grants imply."
+            "Governance teams where no member has had tracked activity for 180 days or more — a team "
+            "that exists on paper but is not currently doing the work its grants imply. The threshold "
+            "is fixed, not the tab's selected period."
         ),
         "methodology": [
             "Take each governance team and its resolved members.",
-            "Check whether any member has tracked activity within the window.",
-            "Count the teams where none do.",
+            "Find the team's most recent tracked activity by any member, anywhere.",
+            "Count the teams whose latest activity is 180 days or more ago, or who have none at all.",
         ],
     },
 }
