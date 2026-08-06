@@ -46,7 +46,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     [entry, macro],
   );
   const { docs, failed } = useSectionDocs(refs);
-  const { views, failed: failedViews } = useViewDocs(viewRefs);
+  const { views, failed: failedViews, loading: viewsLoading } = useViewDocs(viewRefs);
   const unavailable = [...failedViews, ...failed];
 
   const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
@@ -55,7 +55,12 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     // Legacy order: a family's bespoke views (board, matrix) lead its chart
     // galleries, then its tables — governance context first, then the
     // supporting charts, then the individual evidence.
-    ...(chartSections.length || views.length
+    //
+    // Held back until the views settle. Chart sections come off the manifest
+    // and would otherwise paint alone, only for the views to arrive and take
+    // the position above them — the reader watches the page reshuffle. A brief
+    // wait for the whole group in its final order beats content that moves.
+    ...((chartSections.length || views.length) && !viewsLoading
       ? ([
           [
             "Charts",
