@@ -40,3 +40,10 @@ def test_sanitize_leaves_a_clean_file_semantically_identical():
     text = "stage,share\nproposed,100\napproved,88\n"
 
     assert sanitize_csv_text(text) == text
+
+
+def test_sanitize_handles_a_bare_carriage_return_in_a_field():
+    """A stray CR must not abort the export with a csv.Error."""
+    text = "name,formula\rvalue"
+
+    assert sanitize_csv_text(text) == "name,formula\nvalue\n"

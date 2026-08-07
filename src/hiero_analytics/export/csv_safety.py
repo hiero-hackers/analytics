@@ -48,7 +48,9 @@ def sanitize_csv_text(text: str) -> str:
     Parses rather than string-munges, so quoted fields containing commas or
     newlines survive intact.
     """
-    rows = list(csv.reader(io.StringIO(text)))
+    # newline="" disables translation, so a bare CR stays inside the field
+    # instead of tripping csv.reader.
+    rows = list(csv.reader(io.StringIO(text, newline="")))
     buffer = io.StringIO()
     writer = csv.writer(buffer, lineterminator="\n")
     writer.writerows([[csv_safe(cell) for cell in row] for row in rows])

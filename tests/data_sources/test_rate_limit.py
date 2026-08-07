@@ -55,6 +55,12 @@ def test_snapshot_from_graphql_payload_without_ratelimit_returns_none():
     assert RateLimitSnapshot.from_graphql_payload({"data": {"viewer": {"login": "x"}}}) is None
 
 
+def test_snapshot_from_graphql_payload_with_malformed_shape_returns_none():
+    """A non-mapping data or rateLimit block is ignored instead of raising."""
+    assert RateLimitSnapshot.from_graphql_payload({"data": {"rateLimit": "throttled"}}) is None
+    assert RateLimitSnapshot.from_graphql_payload({"data": "unavailable"}) is None
+
+
 def test_seconds_until_reset_never_negative():
     """A reset time in the past reports zero seconds remaining, not a negative."""
     past = RateLimitSnapshot(reset_at=datetime.now(UTC) - timedelta(hours=1))

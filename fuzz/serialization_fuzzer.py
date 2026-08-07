@@ -39,12 +39,13 @@ RECORD_TYPES = (
 @atheris.instrument_func
 def test_one_input(data: bytes) -> None:
     """Deserialize arbitrary payloads and verify the round trip when one succeeds."""
-    provider = atheris.FuzzedDataProvider(data)
-    parse_github_datetime(provider.ConsumeUnicodeNoSurrogates(64))
+    # Decode raw input rather than FuzzedDataProvider so JSON seed files survive intact.
+    text = data.decode("utf-8", errors="replace")
+    parse_github_datetime(text[:64])
 
     try:
-        payload = json.loads(provider.ConsumeUnicodeNoSurrogates(4096))
-    except (json.JSONDecodeError, UnicodeDecodeError):
+        payload = json.loads(text)
+    except (json.JSONDecodeError, RecursionError):
         return
     if not isinstance(payload, dict):
         return

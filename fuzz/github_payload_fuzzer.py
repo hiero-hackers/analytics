@@ -1,5 +1,6 @@
 """Fuzz GraphQL payload traversal and record hydration from GitHub responses."""
 
+import contextlib
 import json
 import logging
 import sys
@@ -35,16 +36,18 @@ RECORD_TYPES = (
 @atheris.instrument_func
 def test_one_input(data: bytes) -> None:
     """Feed arbitrary JSON payloads through traversal and hydration helpers."""
-    provider = atheris.FuzzedDataProvider(data)
+    # Decode raw input rather than FuzzedDataProvider so JSON seed files survive intact.
     try:
-        payload = json.loads(provider.ConsumeUnicodeNoSurrogates(8192))
-    except (json.JSONDecodeError, UnicodeDecodeError):
+        payload = json.loads(data.decode("utf-8", errors="replace"))
+    except (json.JSONDecodeError, RecursionError):
         return
     if not isinstance(payload, dict):
         return
 
     extract_graphql_cursor_page(payload, ["repository", "pullRequests"])
-    RateLimitSnapshot.from_graphql_payload(payload)
+    # from_graphql_payload parses resetAt strictly, so malformed values are rejected.
+    with contextlib.suppress(EXPECTED_REJECTIONS):
+        RateLimitSnapshot.from_graphql_payload(payload)
 
     headers = payload.get("headers")
     if isinstance(headers, dict):

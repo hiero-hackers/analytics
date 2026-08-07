@@ -4,7 +4,10 @@ on:
     pull_request:
         branches: ["main"]
 
-permissions: read-all
+permissions:
+    contents: read
+    # Required by output-sarif to upload findings to code scanning.
+    security-events: write
 
 jobs:
     fuzz:

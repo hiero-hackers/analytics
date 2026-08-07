@@ -78,8 +78,9 @@ class RateLimitSnapshot:
 
         Returns None when the query didn't request rateLimit.
         """
-        rate = (data.get("data") or {}).get("rateLimit")
-        if not rate:
+        container = data.get("data")
+        rate = container.get("rateLimit") if isinstance(container, dict) else None
+        if not isinstance(rate, dict):
             return None
 
         reset_at: datetime | None = None

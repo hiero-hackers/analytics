@@ -12,18 +12,14 @@ from hiero_analytics.pipelines.build_affiliations import parse_maintainers_md
 
 def test_one_input(data: bytes) -> None:
     """Drive independent text parsers with bounded arbitrary Unicode."""
-    provider = atheris.FuzzedDataProvider(data)
-    title = provider.ConsumeUnicodeNoSurrogates(512)
-    branch = provider.ConsumeUnicodeNoSurrogates(512)
-    body = provider.ConsumeUnicodeNoSurrogates(2048)
-    csv_text = provider.ConsumeUnicodeNoSurrogates(4096)
-    markdown = provider.ConsumeUnicodeNoSurrogates(4096)
+    # Decode raw input rather than FuzzedDataProvider so seed files survive intact.
+    text = data.decode("utf-8", errors="replace")
 
-    extract_hip_mentions(title, branch, body)
-    sanitized = sanitize_csv_text(csv_text)
+    extract_hip_mentions(text, text, text)
+    sanitized = sanitize_csv_text(text)
     if sanitize_csv_text(sanitized) != sanitized:
         raise RuntimeError("CSV sanitization must be idempotent")
-    list(parse_maintainers_md(markdown))
+    list(parse_maintainers_md(text))
 
 
 def main() -> None:
