@@ -5,6 +5,7 @@
  * switches.
  */
 
+import type { ColumnFormat } from "../api";
 import { dateStamp } from "../format";
 import { safeUrl } from "../safety";
 
@@ -12,7 +13,7 @@ import { safeUrl } from "../safety";
 // keeps snapshots and tests stable across viewer locales.
 const NUMBER_FORMAT = new Intl.NumberFormat("en-US");
 
-export function FormattedCell({ value, format }: { value: unknown; format?: string }) {
+export function FormattedCell({ value, format }: { value: unknown; format?: ColumnFormat }) {
   if (value === null || value === undefined || value === "") {
     return null;
   }

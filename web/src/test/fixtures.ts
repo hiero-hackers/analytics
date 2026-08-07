@@ -90,6 +90,43 @@ export const HIP_EVIDENCE_DOC: SectionDoc = {
   row_count: 2,
 };
 
+/**
+ * One column per `ColumnFormat` value, so every format the union allows is
+ * exercised by at least one fixture column — this is what keeps the TS union
+ * honest against `FormattedCell`'s switch as both evolve.
+ */
+export const ALL_FORMATS_DOC: SectionDoc = {
+  id: "all-formats",
+  title: "All formats",
+  description: "One column per supported display format.",
+  group: "Formats",
+  macro: "Governance",
+  source: "all_formats.csv",
+  columns: [
+    { key: "hip", label: "hip", format: "hip" },
+    { key: "date", label: "date", format: "date" },
+    { key: "link", label: "link", format: "link" },
+    { key: "evidence", label: "evidence", format: "evidence" },
+    { key: "status", label: "status", format: "status" },
+    { key: "flag", label: "flag", format: "flag" },
+    { key: "presence", label: "presence", format: "presence" },
+    { key: "number", label: "number", format: "number" },
+  ],
+  rows: [
+    {
+      hip: 1200,
+      date: "2026-07-20T00:00:00",
+      link: "https://example.test/pr/1",
+      evidence: "merged",
+      status: "Final",
+      flag: "true",
+      presence: "true",
+      number: 2490,
+    },
+  ],
+  row_count: 1,
+};
+
 export const MATRIX_DOC: MatrixView = {
   id: "hip-matrix",
   kind: "matrix",

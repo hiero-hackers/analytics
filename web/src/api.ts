@@ -6,17 +6,23 @@
  * manifest lists, so new sections and orgs appear without frontend changes.
  */
 
+/**
+ * Mirrors `dashboard_spec.COLUMN_FORMATS` in Python — the single source of
+ * truth for the valid set. Keep the two lists in sync; a mismatch is a
+ * compile-time error here and a test failure on the Python side.
+ */
+export type ColumnFormat = "hip" | "date" | "link" | "evidence" | "status" | "flag" | "presence" | "number";
+
 export interface ColumnSpec {
   key: string;
   label: string;
   /**
-   * Optional display format, rendered by `components/FormattedCell`:
-   * hip | date | link | evidence | status | flag | presence | number.
-   * The valid set is declared once in Python (`dashboard_spec.COLUMN_FORMATS`)
-   * and enforced there, so a spec typo fails a test rather than shipping as an
-   * unformatted column.
+   * Optional display format, rendered by `components/FormattedCell`. The
+   * valid set is declared once in Python (`dashboard_spec.COLUMN_FORMATS`)
+   * and enforced there, so a spec typo fails a test rather than shipping as
+   * an unformatted column.
    */
-  format?: string;
+  format?: ColumnFormat;
 }
 
 export interface SectionRef {
