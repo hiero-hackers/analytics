@@ -23,6 +23,10 @@ from hiero_analytics.data_sources.rate_limit import RateLimitSnapshot
 # indicates a real defect.
 EXPECTED_REJECTIONS = (KeyError, TypeError, ValueError)
 
+# from_github_node contracts on a schema-valid node (it raises KeyError for missing
+# required keys), so a field typed as an object arriving as a scalar is out of contract.
+HYDRATION_REJECTIONS = (AttributeError, *EXPECTED_REJECTIONS)
+
 RECORD_TYPES = (
     RepositoryRecord,
     IssueRecord,
@@ -60,7 +64,7 @@ def test_one_input(data: bytes) -> None:
     for record_type in RECORD_TYPES:
         try:
             record_type.from_github_node(node, context)
-        except EXPECTED_REJECTIONS:
+        except HYDRATION_REJECTIONS:
             continue
 
 

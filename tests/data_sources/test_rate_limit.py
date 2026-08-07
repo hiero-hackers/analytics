@@ -41,6 +41,11 @@ def test_snapshot_from_rest_headers_malformed_returns_none():
     assert RateLimitSnapshot.from_rest_headers({"X-RateLimit-Remaining": "not-a-number"}) is None
 
 
+def test_snapshot_from_rest_headers_out_of_range_reset_returns_none():
+    """A reset epoch beyond the platform range is a missing snapshot, not a crash."""
+    assert RateLimitSnapshot.from_rest_headers({"X-RateLimit-Reset": "99999999999999999"}) is None
+
+
 def test_snapshot_from_graphql_payload_reads_ratelimit_block():
     """A GraphQL rateLimit block becomes a snapshot including query cost."""
     snap = RateLimitSnapshot.from_graphql_payload(

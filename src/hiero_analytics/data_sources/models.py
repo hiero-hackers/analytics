@@ -177,7 +177,7 @@ class IssueTimelineEventRecord(BaseRecord):
         records: list[IssueTimelineEventRecord] = []
 
         timeline = node.get("timelineItems") or {}
-        if timeline.get("pageInfo", {}).get("hasNextPage"):
+        if (timeline.get("pageInfo") or {}).get("hasNextPage"):
             # The fragment caps timelineItems at 100 and does not paginate the
             # inner connection. Surface when an issue actually exceeds that so we
             # know whether nested pagination is worth building.
@@ -245,7 +245,7 @@ class PullRequestDifficultyRecord(BaseRecord):
         # Author is optional metadata here — a PR with no author still yields its
         # difficulty/label records (difficulty is about the linked issues, not the actor).
         author = _extract_login(node)
-        issues = node.get("closingIssuesReferences", {}).get("nodes", [])
+        issues = (node.get("closingIssuesReferences") or {}).get("nodes") or []
         base = dict(
             repo=repo_name,
             pr_number=node["number"],
@@ -398,7 +398,7 @@ class ContributorActivityRecord(BaseRecord):
                 )
             )
 
-        for review in node.get("reviews", {}).get("nodes", []):
+        for review in (node.get("reviews") or {}).get("nodes") or []:
             review_author = _extract_login(review)
             reviewed_at = _parse_dt(review.get("submittedAt"))
             if reviewed_at and (cutoff is None or reviewed_at >= cutoff) and review_author:

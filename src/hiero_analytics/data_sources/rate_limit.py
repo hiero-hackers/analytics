@@ -64,10 +64,10 @@ class RateLimitSnapshot:
             remaining = int(raw_remaining) if raw_remaining is not None else None
             reset_epoch = int(raw_reset) if raw_reset is not None else None
             limit = int(raw_limit) if raw_limit is not None else None
-        except (TypeError, ValueError):  # fmt: skip
+            # An out-of-range epoch raises OverflowError/OSError rather than ValueError.
+            reset_at = datetime.fromtimestamp(reset_epoch, tz=UTC) if reset_epoch is not None else None
+        except (OSError, OverflowError, TypeError, ValueError):
             return None
-
-        reset_at = datetime.fromtimestamp(reset_epoch, tz=UTC) if reset_epoch is not None else None
 
         return cls(remaining=remaining, limit=limit, reset_at=reset_at)
 

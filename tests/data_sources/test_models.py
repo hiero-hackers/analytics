@@ -219,6 +219,15 @@ def test_issue_timeline_event_from_github_node_handles_empty():
     assert records == []
 
 
+def test_hydration_tolerates_null_connections():
+    """GraphQL nulls a connection on partial errors, which must not raise."""
+    context = {"owner": "org", "repo": "repo", "target_type": "pull_request"}
+
+    assert IssueTimelineEventRecord.from_github_node({"number": 7, "timelineItems": None}, context) == []
+    node = {"number": 7, "createdAt": None, "author": None, "reviews": None}
+    assert ContributorActivityRecord.from_github_node(node, context) == []
+
+
 # ---------------------------------------------------------
 # dataclass equality
 # ---------------------------------------------------------
