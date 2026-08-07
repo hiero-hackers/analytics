@@ -1,0 +1,9 @@
+.git
+.venv
+.pdm-build
+.pytest_cache
+.ruff_cache
+**/__pycache__
+outputs
+web/node_modules
+web/dist
