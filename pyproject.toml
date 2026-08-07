@@ -68,6 +68,9 @@ excludes = ["**/.pytest_cache"]
 # baseline, fix incrementally, then ratchet to blocking.
 [tool.pyright]
 include = ["src"]
+# Atheris has no macOS wheel and its stubs omit the fuzzing API, so harnesses
+# only type-check inside the OSS-Fuzz Linux image.
+ignore = ["fuzz"]
 pythonVersion = "3.11"
 typeCheckingMode = "basic"
 

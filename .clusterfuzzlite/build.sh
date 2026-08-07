@@ -14,6 +14,9 @@ ASAN_OPTIONS=\$ASAN_OPTIONS:symbolize=1:external_symbolizer_path=\$this_dir/llvm
     \$this_dir/$fuzzer_name.pkg \$@
 EOF
     chmod +x "$OUT/$fuzzer_name"
-done
 
-zip -j "$OUT/hip_frontmatter_fuzzer_seed_corpus.zip" fuzz/corpus/hip_frontmatter_fuzzer/*
+    corpus_dir="fuzz/corpus/$fuzzer_name"
+    if [ -d "$corpus_dir" ]; then
+        zip -j "$OUT/${fuzzer_name}_seed_corpus.zip" "$corpus_dir"/*
+    fi
+done

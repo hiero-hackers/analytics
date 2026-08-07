@@ -5,13 +5,9 @@ import sys
 
 import atheris
 
-with atheris.instrument_imports():
-    from hiero_analytics.data_sources.github_ingest.hip_references import parse_hip_frontmatter
-
-atheris.instrument_func(parse_hip_frontmatter)
+from hiero_analytics.data_sources.github_ingest.hip_references import parse_hip_frontmatter
 
 
-@atheris.instrument_func
 def test_one_input(data: bytes) -> None:
     """Exercise frontmatter parsing; malformed input must be handled without crashing."""
     text = data.decode("utf-8", errors="replace")
@@ -21,6 +17,8 @@ def test_one_input(data: bytes) -> None:
 def main() -> None:
     """Start Atheris with libFuzzer-compatible arguments."""
     logging.disable(logging.CRITICAL)
+    # PyInstaller's loader defeats import hooks, so instrument the loaded modules directly.
+    atheris.instrument_all()
     atheris.Setup(sys.argv, test_one_input)
     atheris.Fuzz()
 
