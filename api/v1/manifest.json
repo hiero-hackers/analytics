@@ -333,9 +333,9 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-07T08:07:39.373980+00:00",
+ "generated_at": "2026-08-07T18:43:48.969817+00:00",
  "provenance": {
-  "git_sha": "68018d8",
+  "git_sha": "53cbc71",
   "data_as_of": "2026-08-06T09:19:03+00:00"
  },
  "orgs": {
@@ -563,6 +563,50 @@
       }
      ],
      "slideshow": true,
+     "group": "Activity & networks"
+    },
+    {
+     "id": "repo-growth",
+     "macro": "Contributors",
+     "title": "Repository growth",
+     "description": "How quickly the organisation is creating new repositories. The monthly view shows new repos per month; the cumulative view shows the total repo count over time. Data comes from each repository's createdAt timestamp.",
+     "charts": [
+      {
+       "title": "New repos per month",
+       "variants": [
+        {
+         "label": "New repos per month",
+         "file": "charts/org/hiero-ledger/repos_created_per_month.png",
+         "width": 1798,
+         "height": 1051
+        }
+       ],
+       "note": "The monthly count of new repositories created in the organisation. Zero-creation months are shown as 0 so the full timeline is visible.",
+       "methodology": [
+        "Fetch every repository in the organisation via the GitHub GraphQL API.",
+        "Extract each repository's createdAt timestamp and bucket it by calendar month.",
+        "Count repos created per month; months with zero creations are filled in so the timeline is continuous.",
+        "The peak month and the latest month are annotated on the chart."
+       ]
+      },
+      {
+       "title": "Cumulative repo count",
+       "variants": [
+        {
+         "label": "Cumulative repo count",
+         "file": "charts/org/hiero-ledger/cumulative_repo_count.png",
+         "width": 1797,
+         "height": 1051
+        }
+       ],
+       "note": "The running total of repositories over time. Flat stretches mean no new repos were created; steps up mark creation months.",
+       "methodology": [
+        "Start from the same monthly creation counts as the per-month chart.",
+        "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
+        "The latest month and its total are annotated on the chart."
+       ]
+      }
+     ],
      "group": "Activity & networks"
     },
     {
@@ -857,7 +901,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-07T08:06:46.633816+00:00"
+      "generated_at": "2026-08-07T18:43:07.120533+00:00"
      }
     },
     {
@@ -917,7 +961,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-07T08:06:46.630440+00:00"
+      "generated_at": "2026-08-07T18:43:07.117463+00:00"
      }
     },
     {
@@ -994,7 +1038,7 @@
          "label": "Runners",
          "file": "charts/org/hiero-ledger/org_runner_chart.png",
          "width": 2093,
-         "height": 2783
+         "height": 2846
         }
        ],
        "note": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard (GitHub-hosted), or indeterminate (could not be classified).",
@@ -1032,13 +1076,13 @@
          "label": "1 month",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_30d.png",
          "width": 2091,
-         "height": 1906
+         "height": 1844
         },
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2093,
-         "height": 1218
+         "height": 1343
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1347,6 +1391,50 @@
      "group": "Activity & networks"
     },
     {
+     "id": "repo-growth",
+     "macro": "Contributors",
+     "title": "Repository growth",
+     "description": "How quickly the organisation is creating new repositories. The monthly view shows new repos per month; the cumulative view shows the total repo count over time. Data comes from each repository's createdAt timestamp.",
+     "charts": [
+      {
+       "title": "New repos per month",
+       "variants": [
+        {
+         "label": "New repos per month",
+         "file": "charts/org/hiero-hackers/repos_created_per_month.png",
+         "width": 1797,
+         "height": 1051
+        }
+       ],
+       "note": "The monthly count of new repositories created in the organisation. Zero-creation months are shown as 0 so the full timeline is visible.",
+       "methodology": [
+        "Fetch every repository in the organisation via the GitHub GraphQL API.",
+        "Extract each repository's createdAt timestamp and bucket it by calendar month.",
+        "Count repos created per month; months with zero creations are filled in so the timeline is continuous.",
+        "The peak month and the latest month are annotated on the chart."
+       ]
+      },
+      {
+       "title": "Cumulative repo count",
+       "variants": [
+        {
+         "label": "Cumulative repo count",
+         "file": "charts/org/hiero-hackers/cumulative_repo_count.png",
+         "width": 1797,
+         "height": 1051
+        }
+       ],
+       "note": "The running total of repositories over time. Flat stretches mean no new repos were created; steps up mark creation months.",
+       "methodology": [
+        "Start from the same monthly creation counts as the per-month chart.",
+        "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
+        "The latest month and its total are annotated on the chart."
+       ]
+      }
+     ],
+     "group": "Activity & networks"
+    },
+    {
      "id": "ownership",
      "macro": "Security & scorecards",
      "title": "Code owners & CI runners",
@@ -1420,7 +1508,7 @@
          "label": "Week",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_7d.png",
          "width": 2095,
-         "height": 904
+         "height": 901
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1519,7 +1607,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "24%",
+      "value": "27%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
