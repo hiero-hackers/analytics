@@ -12,6 +12,7 @@ import { DataTable } from "../components/DataTable";
 import { useDataTable } from "../useDataTable";
 import { ALL_FORMATS_DOC } from "./fixtures";
 
+/** Renders the fixture through the real column-format pipeline for assertions below. */
 function Harness() {
   const table = useDataTable(ALL_FORMATS_DOC.columns, ALL_FORMATS_DOC.rows, "all-formats");
   return <DataTable table={table} />;
