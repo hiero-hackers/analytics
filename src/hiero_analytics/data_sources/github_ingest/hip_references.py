@@ -149,7 +149,7 @@ def parse_hip_frontmatter(filename: str, text: str) -> HipSpecRecord | None:
         return None
     try:
         fields = yaml.safe_load(parts[1])
-    except yaml.YAMLError:
+    except (ValueError, yaml.YAMLError):
         logger.warning("Unparseable frontmatter in %s; skipping", filename)
         return None
     if not isinstance(fields, dict):

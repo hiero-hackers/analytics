@@ -115,6 +115,12 @@ def test_parse_hip_frontmatter_unparseable_yaml_is_skipped():
     assert parse_hip_frontmatter("bad.md", text) is None
 
 
+def test_parse_hip_frontmatter_invalid_yaml_timestamp_is_skipped():
+    """An invalid implicit YAML timestamp is skipped instead of escaping as ValueError."""
+    text = "---\nhip: 1056\ncreated: 2022-06-04\nupdated: 2025-39-28\n---\nbody"
+    assert parse_hip_frontmatter("invalid-date.md", text) is None
+
+
 def test_from_github_node_body_only_cue_is_qualified():
     """A body-only mention behind a distancing cue hydrates with the qualifier."""
     node = _pr_node(
