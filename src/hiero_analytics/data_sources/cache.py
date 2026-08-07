@@ -112,6 +112,7 @@ def load_records_cache(  # noqa: UP047
     if not _cache_enabled(use_cache):
         return None
 
+    effective_ttl_seconds = _cache_ttl_seconds(ttl_seconds)
     cache_path = _cache_path(kind, scope, parameters)
     if refresh or not cache_path.exists():
         return None
@@ -148,7 +149,6 @@ def load_records_cache(  # noqa: UP047
         logger.info("Ignoring cache file with invalid timestamp: %s", cache_path)
         return None
 
-    effective_ttl_seconds = _cache_ttl_seconds(ttl_seconds)
     if effective_ttl_seconds > 0:
         age_seconds = (datetime.now(UTC) - cached_at).total_seconds()
         if age_seconds > effective_ttl_seconds:

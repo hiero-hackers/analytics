@@ -267,7 +267,30 @@ def test_non_positive_ttl_never_expires_and_warns(_temp_cache_dir, caplog, ttl_s
         )
 
     assert loaded == records
-    assert any("never expire" in record.message for record in caplog.records)
+    assert any(
+        record.levelno == logging.WARNING and "Cache TTL resolved to" in record.message for record in caplog.records
+    )
+
+
+def test_non_positive_ttl_warns_with_missing_cache(caplog):
+    """Non-positive TTL emits a warning before any cache-read early return."""
+    parameters = {"owner": "org", "repo": "repo", "states": []}
+
+    with caplog.at_level(
+        logging.WARNING,
+        logger="hiero_analytics.data_sources.cache",
+    ):
+        loaded = cache.load_records_cache(
+            "repo_issues",
+            "org_repo",
+            parameters,
+            IssueRecord,
+            use_cache=True,
+            ttl_seconds=0,
+        )
+
+    assert loaded is None
+    assert any("Cache TTL resolved to" in record.message for record in caplog.records)
 
 
 def test_mismatched_parameters_is_a_cache_miss(_temp_cache_dir):
