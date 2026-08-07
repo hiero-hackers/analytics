@@ -1,0 +1,98 @@
+{
+ "id": "hip-unknown",
+ "title": "Unknown HIP numbers (review)",
+ "description": "References to numbers absent from the spec inventory \u2014 typically HIP numbers assigned to in-flight proposals whose spec file has not merged yet, legacy pre-migration numbers, or the occasional false positive. Kept for review instead of being counted.",
+ "group": "Evidence",
+ "source": "hip_unknown_references.csv",
+ "columns": [
+  {
+   "key": "hip",
+   "label": "number"
+  },
+  {
+   "key": "repo",
+   "label": "repository"
+  },
+  {
+   "key": "pr_number",
+   "label": "PR"
+  },
+  {
+   "key": "pr_title",
+   "label": "PR title"
+  },
+  {
+   "key": "snippet",
+   "label": "matched text"
+  }
+ ],
+ "rows": [
+  {
+   "hip": 1485,
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 13654,
+   "pr_title": "Add new endpoint for debug_traceCall in web3",
+   "snippet": "coverage. The PR will be blocked until [HIP-1485](https://hips.hedera.com/#hip-1485) is"
+  },
+  {
+   "hip": 1485,
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 13931,
+   "pr_title": "HIP-1485 Add POST /api/v1/contracts/simulate to web3",
+   "snippet": "HIP-1485 Add POST /api/v1/contracts/simulate to"
+  },
+  {
+   "hip": 1424,
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 3299,
+   "pr_title": "feat: Proto Ordinal Streaming Hasher Mapping in BlockHasher",
+   "snippet": "sh with the extension subtree roots per HIP-1424 * Exclude absent extension leaves wi"
+  },
+  {
+   "hip": 1424,
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 3378,
+   "pr_title": "fix: use streaming hasher for block-root Merkle Mountain Top ",
+   "snippet": "streaming-hasher pattern once merged) - HIP-1424, HIP-1056"
+  },
+  {
+   "hip": 1183,
+   "repo": "hiero-ledger/sdk-collaboration-hub",
+   "pr_number": 135,
+   "pr_title": "docs: Add HIP-1081 Block Node SDK Design Document",
+   "snippet": "137) \u2014 On-chain Block Node registry - [HIP-1183: hinTS Threshold Signature Scheme](http"
+  },
+  {
+   "hip": 1023,
+   "repo": "hiero-ledger/hiero-sdk-rust",
+   "pr_number": 907,
+   "pr_title": "feat: Add auto set for auto_renew_account",
+   "snippet": "feat/hip-1023"
+  },
+  {
+   "hip": 879,
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 25061,
+   "pr_title": "fix: signature requirements and other improvements (HIP-1299 and HIP-869)",
+   "snippet": "NodeCreate` signature requirements per `HIP-879` and `HIP-1299` and updates protobuf do"
+  },
+  {
+   "hip": 432,
+   "repo": "hiero-ledger/hiero-sdk-java",
+   "pr_number": 2123,
+   "pr_title": "HIP-423: Long Term Scheduled Transactions",
+   "snippet": "2105-hip-432-Long-Term-Scheduled-Transactions"
+  },
+  {
+   "hip": 432,
+   "repo": "hiero-ledger/hiero-sdk-swift",
+   "pr_number": 417,
+   "pr_title": "`HIP-432`: Long Term Scheduled Transaction",
+   "snippet": "`HIP-432`: Long Term Scheduled Transaction"
+  }
+ ],
+ "row_count": 9,
+ "generated_at": "2026-08-07T08:06:46.627374+00:00",
+ "stale": false,
+ "macro": "HIPs"
+}

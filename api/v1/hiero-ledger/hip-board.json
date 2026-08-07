@@ -1,0 +1,988 @@
+{
+ "id": "hip-board",
+ "kind": "board",
+ "group": "Status & coverage",
+ "title": "Where specs sit in governance",
+ "description": "Every HIP spec, placed by its current lifecycle status \u2014 the columns read left to right as the pipeline, and the Approved / Accepted column is the implementation triage queue. Statuses come from each spec's frontmatter; click a chip to see the spec's title, and jump from there to its row in the coverage matrix below.",
+ "badge": "158 specs",
+ "source": "hip_summary.csv",
+ "columns": [
+  {
+   "title": "In review",
+   "items": [
+    {
+     "key": 1342,
+     "label": "HIP-1342",
+     "title": "Ignore Trailing Calldata for System Contract",
+     "status": "Last Call"
+    },
+    {
+     "key": 1331,
+     "label": "HIP-1331",
+     "title": "An `ExtendedAssetChanges` extra for large atomic swaps",
+     "status": "Review"
+    }
+   ]
+  },
+  {
+   "title": "Approved (incl. legacy Accepted)",
+   "items": [
+    {
+     "key": 1448,
+     "label": "HIP-1448",
+     "title": "Simple Event Broadcast",
+     "status": "Approved"
+    },
+    {
+     "key": 1446,
+     "label": "HIP-1446",
+     "title": "Multiple Other-Parents in Hashgraph Events",
+     "status": "Approved"
+    },
+    {
+     "key": 1427,
+     "label": "HIP-1427",
+     "title": "Historical Record File Wrapping for Block Stream Cutover",
+     "status": "Approved"
+    },
+    {
+     "key": 1341,
+     "label": "HIP-1341",
+     "title": "Support for Ethereum Pectra Release",
+     "status": "Approved"
+    },
+    {
+     "key": 1340,
+     "label": "HIP-1340",
+     "title": "EOA Code Delegation",
+     "status": "Approved"
+    },
+    {
+     "key": 1238,
+     "label": "HIP-1238",
+     "title": "Network Quiescence",
+     "status": "Approved"
+    },
+    {
+     "key": 1200,
+     "label": "HIP-1200",
+     "title": "The hinTS threshold signature scheme",
+     "status": "Approved"
+    },
+    {
+     "key": 1195,
+     "label": "HIP-1195",
+     "title": "Hiero hooks and an application to allowances",
+     "status": "Approved"
+    },
+    {
+     "key": 1193,
+     "label": "HIP-1193",
+     "title": "Record Stream to Block Stream Cutover",
+     "status": "Approved"
+    },
+    {
+     "key": 1126,
+     "label": "HIP-1126",
+     "title": "Delete Allowance without Token Association",
+     "status": "Accepted"
+    },
+    {
+     "key": 1081,
+     "label": "HIP-1081",
+     "title": "Block Node",
+     "status": "Approved"
+    },
+    {
+     "key": 1056,
+     "label": "HIP-1056",
+     "title": "Block Streams",
+     "status": "Approved"
+    },
+    {
+     "key": 1049,
+     "label": "HIP-1049",
+     "title": "Deleted flag in ConsensusGetTopic",
+     "status": "Accepted"
+    },
+    {
+     "key": 1037,
+     "label": "HIP-1037",
+     "title": "Protocol Buffer API Specification",
+     "status": "Accepted"
+    },
+    {
+     "key": 980,
+     "label": "HIP-980",
+     "title": "Enhance mirror node entity rest APIs with timestamp query parameter",
+     "status": "Accepted"
+    },
+    {
+     "key": 796,
+     "label": "HIP-796",
+     "title": "Lockable Fractional Amounts of Fungible Tokens on Hedera",
+     "status": "Accepted"
+    },
+    {
+     "key": 679,
+     "label": "HIP-679",
+     "title": "Bucket restructuring for changing stream data folder structure",
+     "status": "Accepted"
+    },
+    {
+     "key": 639,
+     "label": "HIP-639",
+     "title": "Errata records",
+     "status": "Accepted"
+    },
+    {
+     "key": 631,
+     "label": "HIP-631",
+     "title": "Account Virtual Addresses",
+     "status": "Accepted"
+    },
+    {
+     "key": 394,
+     "label": "HIP-394",
+     "title": "Add Expected Decimal Information to TokenMint, TokenBurn, and TokenWipeAccount",
+     "status": "Accepted"
+    },
+    {
+     "key": 198,
+     "label": "HIP-198",
+     "title": "Ledger ID",
+     "status": "Accepted"
+    },
+    {
+     "key": 173,
+     "label": "HIP-173",
+     "title": "Opt-in merged scheduling",
+     "status": "Accepted"
+    }
+   ]
+  },
+  {
+   "title": "Final",
+   "items": [
+    {
+     "key": 1357,
+     "label": "HIP-1357",
+     "title": "Tier 1 Block Node Operation Rewards",
+     "status": "Final"
+    },
+    {
+     "key": 1313,
+     "label": "HIP-1313",
+     "title": "High-Volume Entity Creation",
+     "status": "Final"
+    },
+    {
+     "key": 1300,
+     "label": "HIP-1300",
+     "title": "Increased Transaction Size for Governance Accounts",
+     "status": "Final"
+    },
+    {
+     "key": 1299,
+     "label": "HIP-1299",
+     "title": "Node Account ID Refinements for Dynamic Address Book",
+     "status": "Final"
+    },
+    {
+     "key": 1261,
+     "label": "HIP-1261",
+     "title": "Simple Fees",
+     "status": "Final"
+    },
+    {
+     "key": 1259,
+     "label": "HIP-1259",
+     "title": "Fee Collection Account",
+     "status": "Final"
+    },
+    {
+     "key": 1249,
+     "label": "HIP-1249",
+     "title": "Precise Smart Contract Throttling",
+     "status": "Final"
+    },
+    {
+     "key": 1215,
+     "label": "HIP-1215",
+     "title": "Generalized Scheduled Contract Calls",
+     "status": "Final"
+    },
+    {
+     "key": 1137,
+     "label": "HIP-1137",
+     "title": "Block Node discoverabilty via on chain registry",
+     "status": "Final"
+    },
+    {
+     "key": 1127,
+     "label": "HIP-1127",
+     "title": "Unified transaction record format",
+     "status": "Final"
+    },
+    {
+     "key": 1086,
+     "label": "HIP-1086",
+     "title": "Jumbo EthereumTransaction",
+     "status": "Final"
+    },
+    {
+     "key": 1084,
+     "label": "HIP-1084",
+     "title": "Zero Cost EthereumTransaction on Success",
+     "status": "Final"
+    },
+    {
+     "key": 1064,
+     "label": "HIP-1064",
+     "title": "Daily Rewards For Active Nodes",
+     "status": "Final"
+    },
+    {
+     "key": 1046,
+     "label": "HIP-1046",
+     "title": "Adding support for gRPC-Web proxy endpoints to the Address Book",
+     "status": "Final"
+    },
+    {
+     "key": 1021,
+     "label": "HIP-1021",
+     "title": "Improve Assignment of Auto-Renew Account ID for Topics",
+     "status": "Final"
+    },
+    {
+     "key": 1010,
+     "label": "HIP-1010",
+     "title": "Update Token Custom Fee Schedules via Smart Contracts",
+     "status": "Final"
+    },
+    {
+     "key": 1008,
+     "label": "HIP-1008",
+     "title": "Enhance Mirror Node Contract Log REST API with transaction hash query parameter",
+     "status": "Final"
+    },
+    {
+     "key": 993,
+     "label": "HIP-993",
+     "title": "Improve record stream legibility and extensibility",
+     "status": "Final"
+    },
+    {
+     "key": 991,
+     "label": "HIP-991",
+     "title": "Permissionless revenue-generating Topic Ids for Topic Operators",
+     "status": "Final"
+    },
+    {
+     "key": 968,
+     "label": "HIP-968",
+     "title": "Enhance mirror node rest API to query by token name",
+     "status": "Final"
+    },
+    {
+     "key": 906,
+     "label": "HIP-906",
+     "title": "Proxy Redirect Contract for Hbar Allowance and Approval",
+     "status": "Final"
+    },
+    {
+     "key": 904,
+     "label": "HIP-904",
+     "title": "Frictionless Airdrops",
+     "status": "Final"
+    },
+    {
+     "key": 874,
+     "label": "HIP-874",
+     "title": "Enhancing Topic Metadata Accessibility in the Hedera REST API",
+     "status": "Final"
+    },
+    {
+     "key": 873,
+     "label": "HIP-873",
+     "title": "Adding Decimal Information to Token Balance Calls in the Hedera REST API",
+     "status": "Final"
+    },
+    {
+     "key": 869,
+     "label": "HIP-869",
+     "title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
+     "status": "Final"
+    },
+    {
+     "key": 868,
+     "label": "HIP-868",
+     "title": "Support Cancun Self-Destruct Semantics in Smart Contract Services",
+     "status": "Final"
+    },
+    {
+     "key": 867,
+     "label": "HIP-867",
+     "title": "Add Smart Contract Services Support for KZG Point Evaluation Precompiled Function",
+     "status": "Final"
+    },
+    {
+     "key": 866,
+     "label": "HIP-866",
+     "title": "Add EVM compatibility for non-supported Cancun blob features.",
+     "status": "Final"
+    },
+    {
+     "key": 865,
+     "label": "HIP-865",
+     "title": "Add EVM Support for transient storage and memory copy Cancun opcodes",
+     "status": "Final"
+    },
+    {
+     "key": 859,
+     "label": "HIP-859",
+     "title": "Add support for gasConsumed field in REST APIs related to contract results",
+     "status": "Final"
+    },
+    {
+     "key": 857,
+     "label": "HIP-857",
+     "title": "NFT Allowances REST API",
+     "status": "Final"
+    },
+    {
+     "key": 850,
+     "label": "HIP-850",
+     "title": "Enhancing Supply Key Functionality for NFT Updates in Treasury Account",
+     "status": "Final"
+    },
+    {
+     "key": 844,
+     "label": "HIP-844",
+     "title": "Handling and externalisation improvements for account nonce updates",
+     "status": "Final"
+    },
+    {
+     "key": 830,
+     "label": "HIP-830",
+     "title": "Event Serialization With Round Number, EventDescriptors, and Multiple Other Parents.",
+     "status": "Final"
+    },
+    {
+     "key": 801,
+     "label": "HIP-801",
+     "title": "Add support for debug_traceTransaction RPC API",
+     "status": "Final"
+    },
+    {
+     "key": 794,
+     "label": "HIP-794",
+     "title": "Sunsetting Balance File",
+     "status": "Final"
+    },
+    {
+     "key": 786,
+     "label": "HIP-786",
+     "title": "Enriched staking metadata exports",
+     "status": "Final"
+    },
+    {
+     "key": 782,
+     "label": "HIP-782",
+     "title": "Smoothing Staking Rewards",
+     "status": "Final"
+    },
+    {
+     "key": 765,
+     "label": "HIP-765",
+     "title": "NFT Collection Token Metadata Field",
+     "status": "Final"
+    },
+    {
+     "key": 756,
+     "label": "HIP-756",
+     "title": "Contract Scheduled Token Create",
+     "status": "Final"
+    },
+    {
+     "key": 755,
+     "label": "HIP-755",
+     "title": "Schedule Service System Contract",
+     "status": "Final"
+    },
+    {
+     "key": 729,
+     "label": "HIP-729",
+     "title": "Contract Accounts Nonce Externalization",
+     "status": "Final"
+    },
+    {
+     "key": 721,
+     "label": "HIP-721",
+     "title": "Add Software Version to Events",
+     "status": "Final"
+    },
+    {
+     "key": 719,
+     "label": "HIP-719",
+     "title": "Associate and Dissociate Tokens via Facade Contract",
+     "status": "Final"
+    },
+    {
+     "key": 657,
+     "label": "HIP-657",
+     "title": "Mutable metadata fields for dynamic NFTs",
+     "status": "Final"
+    },
+    {
+     "key": 646,
+     "label": "HIP-646",
+     "title": "Fungible Token Metadata Field",
+     "status": "Final"
+    },
+    {
+     "key": 632,
+     "label": "HIP-632",
+     "title": "Hedera Account Service (HAS) System Contract",
+     "status": "Final"
+    },
+    {
+     "key": 584,
+     "label": "HIP-584",
+     "title": "Mirror EVM Archive Node",
+     "status": "Final"
+    },
+    {
+     "key": 583,
+     "label": "HIP-583",
+     "title": "Expand alias support in CryptoCreate & CryptoTransfer Transactions",
+     "status": "Final"
+    },
+    {
+     "key": 573,
+     "label": "HIP-573",
+     "title": "Blanket exemptions for custom fee collectors",
+     "status": "Final"
+    },
+    {
+     "key": 564,
+     "label": "HIP-564",
+     "title": "Zero unit token operations in smart contracts",
+     "status": "Final"
+    },
+    {
+     "key": 551,
+     "label": "HIP-551",
+     "title": "Batch transactions",
+     "status": "Final"
+    },
+    {
+     "key": 542,
+     "label": "HIP-542",
+     "title": "Payer-sponsored auto-account creation with HTS assets",
+     "status": "Final"
+    },
+    {
+     "key": 540,
+     "label": "HIP-540",
+     "title": "Change Or Remove Existing Keys From A Token",
+     "status": "Final"
+    },
+    {
+     "key": 514,
+     "label": "HIP-514",
+     "title": "Hedera Token Service Precompiled Contract Token Management Functions",
+     "status": "Final"
+    },
+    {
+     "key": 513,
+     "label": "HIP-513",
+     "title": "Smart Contract Traceability Extension",
+     "status": "Final"
+    },
+    {
+     "key": 475,
+     "label": "HIP-475",
+     "title": "Exchange rate system contract",
+     "status": "Final"
+    },
+    {
+     "key": 449,
+     "label": "HIP-449",
+     "title": "Record stream specification for expiring smart contracts",
+     "status": "Final"
+    },
+    {
+     "key": 435,
+     "label": "HIP-435",
+     "title": "Record Stream V6",
+     "status": "Final"
+    },
+    {
+     "key": 423,
+     "label": "HIP-423",
+     "title": "Long Term Scheduled Transactions",
+     "status": "Final"
+    },
+    {
+     "key": 415,
+     "label": "HIP-415",
+     "title": "Introduction Of Blocks",
+     "status": "Final"
+    },
+    {
+     "key": 410,
+     "label": "HIP-410",
+     "title": "Wrapping Ethereum Transaction Bytes in a Hedera Transaction",
+     "status": "Final"
+    },
+    {
+     "key": 406,
+     "label": "HIP-406",
+     "title": "Staking",
+     "status": "Final"
+    },
+    {
+     "key": 376,
+     "label": "HIP-376",
+     "title": "Support Approve/Allowance/transferFrom standard calls from ERC20 and ERC721",
+     "status": "Final"
+    },
+    {
+     "key": 372,
+     "label": "HIP-372",
+     "title": "Entity Auto-Renewals and Expiry Window",
+     "status": "Final"
+    },
+    {
+     "key": 367,
+     "label": "HIP-367",
+     "title": "Unlimited Token Associations Per Account",
+     "status": "Final"
+    },
+    {
+     "key": 358,
+     "label": "HIP-358",
+     "title": "Allow Token Create Through Hedera Token Service Precompiled Contract",
+     "status": "Final"
+    },
+    {
+     "key": 351,
+     "label": "HIP-351",
+     "title": "Add UtilPrngTransaction",
+     "status": "Final"
+    },
+    {
+     "key": 336,
+     "label": "HIP-336",
+     "title": "Approval and Allowance API for Tokens",
+     "status": "Final"
+    },
+    {
+     "key": 331,
+     "label": "HIP-331",
+     "title": "Mirror REST NFT info balance endpoint",
+     "status": "Final"
+    },
+    {
+     "key": 329,
+     "label": "HIP-329",
+     "title": "Support CREATE2 opcode",
+     "status": "Final"
+    },
+    {
+     "key": 227,
+     "label": "HIP-227",
+     "title": "Mirror Node Search Contract Execution Log REST API",
+     "status": "Final"
+    },
+    {
+     "key": 226,
+     "label": "HIP-226",
+     "title": "Mirror Node Contract Execution Results REST API",
+     "status": "Final"
+    },
+    {
+     "key": 222,
+     "label": "HIP-222",
+     "title": "Support ECDSA(secp256k1) keys",
+     "status": "Final"
+    },
+    {
+     "key": 218,
+     "label": "HIP-218",
+     "title": "Smart Contract interactions with Hedera Token Accounts",
+     "status": "Final"
+    },
+    {
+     "key": 206,
+     "label": "HIP-206",
+     "title": "Hedera Token Service Precompiled Contract for Hedera SmartContract Service",
+     "status": "Final"
+    },
+    {
+     "key": 185,
+     "label": "HIP-185",
+     "title": "Smart Contract Service Gas Based Throttling",
+     "status": "Final"
+    },
+    {
+     "key": 171,
+     "label": "HIP-171",
+     "title": "Add Message Sender's Account Id to Mirror Node API Response",
+     "status": "Final"
+    },
+    {
+     "key": 33,
+     "label": "HIP-33",
+     "title": "Add Network ID Field to Info Responses",
+     "status": "Final"
+    },
+    {
+     "key": 32,
+     "label": "HIP-32",
+     "title": "Auto Account Creation",
+     "status": "Final"
+    },
+    {
+     "key": 31,
+     "label": "HIP-31",
+     "title": "Add Token Transfer Decimal Information",
+     "status": "Final"
+    },
+    {
+     "key": 26,
+     "label": "HIP-26",
+     "title": "Migrate Smart Contract Service EVM to Hyperledger Besu EVM",
+     "status": "Final"
+    },
+    {
+     "key": 25,
+     "label": "HIP-25",
+     "title": "On-disk Virtual Merkle Tree",
+     "status": "Final"
+    },
+    {
+     "key": 24,
+     "label": "HIP-24",
+     "title": "Pause feature on Hedera Token Service",
+     "status": "Final"
+    },
+    {
+     "key": 23,
+     "label": "HIP-23",
+     "title": "Make the need for token association opt-in",
+     "status": "Final"
+    },
+    {
+     "key": 21,
+     "label": "HIP-21",
+     "title": "Free network info query",
+     "status": "Final"
+    },
+    {
+     "key": 19,
+     "label": "HIP-19",
+     "title": "Decentralized Identifiers in Memo Fields",
+     "status": "Final"
+    },
+    {
+     "key": 18,
+     "label": "HIP-18",
+     "title": "Custom Hedera Token Service Fees",
+     "status": "Final"
+    },
+    {
+     "key": 17,
+     "label": "HIP-17",
+     "title": "Non-Fungible Tokens",
+     "status": "Final"
+    },
+    {
+     "key": 16,
+     "label": "HIP-16",
+     "title": "Entity Auto-Renewal",
+     "status": "Final"
+    },
+    {
+     "key": 15,
+     "label": "HIP-15",
+     "title": "Address Checksum",
+     "status": "Final"
+    }
+   ]
+  },
+  {
+   "title": "Active",
+   "items": [
+    {
+     "key": 1398,
+     "label": "HIP-1398",
+     "title": "TSS Ceremony",
+     "status": "Active"
+    },
+    {
+     "key": 1334,
+     "label": "HIP-1334",
+     "title": "Private Message Box Standard for Hiero Accounts",
+     "status": "Active"
+    },
+    {
+     "key": 1292,
+     "label": "HIP-1292",
+     "title": "Hiero AnonCreds Method",
+     "status": "Active"
+    },
+    {
+     "key": 1219,
+     "label": "HIP-1219",
+     "title": "Hedera DID Method v2.0 - W3C Controller Alignment",
+     "status": "Active"
+    },
+    {
+     "key": 1217,
+     "label": "HIP-1217",
+     "title": "Contracts/Calls API Changes",
+     "status": "Active"
+    },
+    {
+     "key": 1190,
+     "label": "HIP-1190",
+     "title": "Improvements to the Wallet Connect implementation for dApps on Hedera",
+     "status": "Active"
+    },
+    {
+     "key": 945,
+     "label": "HIP-945",
+     "title": "Improvements to Hedera DID Method",
+     "status": "Active"
+    },
+    {
+     "key": 920,
+     "label": "HIP-920",
+     "title": "NFT Music Metadata JSON Schema",
+     "status": "Active"
+    },
+    {
+     "key": 820,
+     "label": "HIP-820",
+     "title": "Integration of Wallet Connect 2.0 Protocol for Wallets and dApps on Hedera",
+     "status": "Active"
+    },
+    {
+     "key": 775,
+     "label": "HIP-775",
+     "title": "Filter API in JSON-RPC Relay",
+     "status": "Active"
+    },
+    {
+     "key": 766,
+     "label": "HIP-766",
+     "title": "NFT Collection Metadata JSON Schema",
+     "status": "Active"
+    },
+    {
+     "key": 762,
+     "label": "HIP-762",
+     "title": "AnonCreds Verifiable Data Registry",
+     "status": "Active"
+    },
+    {
+     "key": 745,
+     "label": "HIP-745",
+     "title": "Optionally send transaction data without required transaction fields",
+     "status": "Active"
+    },
+    {
+     "key": 694,
+     "label": "HIP-694",
+     "title": "Real-time events in JSON-RPC Relay",
+     "status": "Active"
+    },
+    {
+     "key": 482,
+     "label": "HIP-482",
+     "title": "JSON-RPC Relay",
+     "status": "Active"
+    },
+    {
+     "key": 478,
+     "label": "HIP-478",
+     "title": "Interoperability Between Smart Contracts and HCS",
+     "status": "Active"
+    },
+    {
+     "key": 412,
+     "label": "HIP-412",
+     "title": "NFT Token Metadata JSON Schema v2",
+     "status": "Active"
+    },
+    {
+     "key": 405,
+     "label": "HIP-405",
+     "title": "Fungible Token Metadata JSON Schema",
+     "status": "Active"
+    },
+    {
+     "key": 338,
+     "label": "HIP-338",
+     "title": "Signature and Wallet Providers",
+     "status": "Active"
+    },
+    {
+     "key": 323,
+     "label": "HIP-323",
+     "title": "C SDK",
+     "status": "Active"
+    },
+    {
+     "key": 254,
+     "label": "HIP-254",
+     "title": "Swift SDK",
+     "status": "Active"
+    },
+    {
+     "key": 213,
+     "label": "HIP-213",
+     "title": "Application Signs for End User",
+     "status": "Active"
+    },
+    {
+     "key": 179,
+     "label": "HIP-179",
+     "title": "External Transaction Signing for SDK and other clients",
+     "status": "Active"
+    },
+    {
+     "key": 30,
+     "label": "HIP-30",
+     "title": "CAIP Identifiers for the Hedera Network",
+     "status": "Active"
+    },
+    {
+     "key": 29,
+     "label": "HIP-29",
+     "title": "JavaScript DID SDK",
+     "status": "Active"
+    },
+    {
+     "key": 28,
+     "label": "HIP-28",
+     "title": "Guardian Type Solution",
+     "status": "Active"
+    },
+    {
+     "key": 27,
+     "label": "HIP-27",
+     "title": "DID improvements to offer a broader support and interoperability for the Hedera DID method",
+     "status": "Active"
+    },
+    {
+     "key": 13,
+     "label": "HIP-13",
+     "title": "Hedera Name Service",
+     "status": "Active"
+    },
+    {
+     "key": 11,
+     "label": "HIP-11",
+     "title": "Layer-2 Smart Contract Network",
+     "status": "Active"
+    },
+    {
+     "key": 1,
+     "label": "HIP-1",
+     "title": "Hiero Improvement Proposal Process",
+     "status": "Active"
+    }
+   ]
+  },
+  {
+   "title": "Retired",
+   "items": [
+    {
+     "key": 1383,
+     "label": "HIP-1383",
+     "title": "Enhanced Error Responses",
+     "status": "Deferred"
+    },
+    {
+     "key": 1139,
+     "label": "HIP-1139",
+     "title": "Enable Immutable Topic Ids and Updatable Submit Keys without an Admin Key.",
+     "status": "Deferred"
+    },
+    {
+     "key": 1028,
+     "label": "HIP-1028",
+     "title": "Metadata management via SmartContracts",
+     "status": "Deferred"
+    },
+    {
+     "key": 791,
+     "label": "HIP-791",
+     "title": "Hedera Name Protocol",
+     "status": "Stagnant"
+    },
+    {
+     "key": 777,
+     "label": "HIP-777",
+     "title": "Pending Token Transfers",
+     "status": "Withdrawn"
+    },
+    {
+     "key": 690,
+     "label": "HIP-690",
+     "title": "Identify Community Nodes in Address Book and Related API",
+     "status": "Rejected"
+    },
+    {
+     "key": 655,
+     "label": "HIP-655",
+     "title": "Token airdrops without explicit associations",
+     "status": "Withdrawn"
+    },
+    {
+     "key": 534,
+     "label": "HIP-534",
+     "title": "REGISTRY CONTRACT for naming structure",
+     "status": "Stagnant"
+    },
+    {
+     "key": 260,
+     "label": "HIP-260",
+     "title": "Smart Contract Traceability",
+     "status": "Replaced"
+    },
+    {
+     "key": 22,
+     "label": "HIP-22",
+     "title": "ZKP-based Selective Attribute Disclosure in the DID SDK",
+     "status": "Stagnant"
+    },
+    {
+     "key": 20,
+     "label": "HIP-20",
+     "title": "Standardized URI scheme to reference Hedera data",
+     "status": "Replaced"
+    },
+    {
+     "key": 14,
+     "label": "HIP-14",
+     "title": "Token Hold Functionality",
+     "status": "Replaced"
+    },
+    {
+     "key": 10,
+     "label": "HIP-10",
+     "title": "Token Metadata JSON Schema",
+     "status": "Replaced"
+    }
+   ]
+  }
+ ],
+ "target_view": "hip-matrix",
+ "macro": "HIPs",
+ "generated_at": "2026-08-07T08:06:46.631925+00:00",
+ "stale": false
+}

@@ -1,0 +1,132 @@
+{
+ "id": "codeowners",
+ "title": "CODEOWNERS by repository",
+ "description": "Whether each repository declares code owners, repositories without a file first \u2014 a yes/no per repository, which is why this is a table and not a chart. A missing file is a lead, not a defect: docs, archive, and meta repositories may have no meaningful owner to name, so relevance is a human call. Checked in the standard locations (root, .github/, docs/).",
+ "group": "Ownership",
+ "source": "repo_wise_codeowner_status.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repository"
+  },
+  {
+   "key": "status",
+   "label": "CODEOWNERS",
+   "format": "presence"
+  }
+ ],
+ "rows": [
+  {
+   "repo": ".github",
+   "status": false
+  },
+  {
+   "repo": "agentic-support-hiero",
+   "status": false
+  },
+  {
+   "repo": "governance",
+   "status": false
+  },
+  {
+   "repo": "hiero-block-verifier-js",
+   "status": false
+  },
+  {
+   "repo": "hiero-did-sdk-rs",
+   "status": false
+  },
+  {
+   "repo": "hiero-differential-fuzz",
+   "status": false
+  },
+  {
+   "repo": "hiero-enterprise-js",
+   "status": false
+  },
+  {
+   "repo": "hiero-enterprise-proxy",
+   "status": false
+  },
+  {
+   "repo": "hiero-hybrid-workflow-app",
+   "status": false
+  },
+  {
+   "repo": "hiero-journal-rs",
+   "status": false
+  },
+  {
+   "repo": "hiero-maintainer-automation-prototype",
+   "status": false
+  },
+  {
+   "repo": "hiero-sdk-csharp",
+   "status": false
+  },
+  {
+   "repo": "hiero-sdk-dart",
+   "status": false
+  },
+  {
+   "repo": "hiero-sdk-v3-prototyping",
+   "status": false
+  },
+  {
+   "repo": "hiero-streams-rs",
+   "status": false
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "status": false
+  },
+  {
+   "repo": "noobisoft",
+   "status": false
+  },
+  {
+   "repo": "rs-hiero-mirror-node",
+   "status": false
+  },
+  {
+   "repo": "vscode-hedera-transaction-viewer",
+   "status": false
+  },
+  {
+   "repo": "analytics",
+   "status": true
+  },
+  {
+   "repo": "hiero-checkout",
+   "status": true
+  },
+  {
+   "repo": "hiero-notifications",
+   "status": true
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "status": true
+  },
+  {
+   "repo": "hiero-receipts",
+   "status": true
+  },
+  {
+   "repo": "hiero-workflow-orchestrator",
+   "status": true
+  },
+  {
+   "repo": "hiero-x402",
+   "status": true
+  },
+  {
+   "repo": "sdk-automations",
+   "status": true
+  }
+ ],
+ "row_count": 27,
+ "generated_at": "2026-08-07T08:07:30.133782+00:00",
+ "stale": false,
+ "macro": "Security & scorecards"
+}

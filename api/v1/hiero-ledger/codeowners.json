@@ -1,0 +1,188 @@
+{
+ "id": "codeowners",
+ "title": "CODEOWNERS by repository",
+ "description": "Whether each repository declares code owners, repositories without a file first \u2014 a yes/no per repository, which is why this is a table and not a chart. A missing file is a lead, not a defect: docs, archive, and meta repositories may have no meaningful owner to name, so relevance is a human call. Checked in the standard locations (root, .github/, docs/).",
+ "group": "Ownership",
+ "source": "repo_wise_codeowner_status.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repository"
+  },
+  {
+   "key": "status",
+   "label": "CODEOWNERS",
+   "format": "presence"
+  }
+ ],
+ "rows": [
+  {
+   "repo": ".github",
+   "status": false
+  },
+  {
+   "repo": "awesome-contributions",
+   "status": false
+  },
+  {
+   "repo": "heka-identity-platform",
+   "status": false
+  },
+  {
+   "repo": "hiero",
+   "status": false
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "status": false
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "status": false
+  },
+  {
+   "repo": "hiero-hederium",
+   "status": false
+  },
+  {
+   "repo": "hiero-identity-standards",
+   "status": false
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "status": false
+  },
+  {
+   "repo": "hiero-solo-action",
+   "status": false
+  },
+  {
+   "repo": "homebrew-tools",
+   "status": false
+  },
+  {
+   "repo": "solo-docs",
+   "status": false
+  },
+  {
+   "repo": "tsc",
+   "status": false
+  },
+  {
+   "repo": "tsc-eligibility-check",
+   "status": false
+  },
+  {
+   "repo": "governance",
+   "status": true
+  },
+  {
+   "repo": "hiero-block-node",
+   "status": true
+  },
+  {
+   "repo": "hiero-cli",
+   "status": true
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "status": true
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "status": true
+  },
+  {
+   "repo": "hiero-contracts",
+   "status": true
+  },
+  {
+   "repo": "hiero-cryptography",
+   "status": true
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "status": true
+  },
+  {
+   "repo": "hiero-docs",
+   "status": true
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "status": true
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "status": true
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "status": true
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "status": true
+  },
+  {
+   "repo": "hiero-local-node",
+   "status": true
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "status": true
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "status": true
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "status": true
+  },
+  {
+   "repo": "hiero-website",
+   "status": true
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "status": true
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "status": true
+  },
+  {
+   "repo": "solo",
+   "status": true
+  }
+ ],
+ "row_count": 41,
+ "generated_at": "2026-08-07T08:06:01.857444+00:00",
+ "stale": false,
+ "macro": "Security & scorecards"
+}

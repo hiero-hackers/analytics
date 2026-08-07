@@ -1,0 +1,58 @@
+{
+ "id": "hip-no-activity",
+ "title": "Approved, no implementation PRs found",
+ "description": "Approved or accepted specs created in the Hiero era (since September 2024) with zero referencing PRs anywhere, newest first. Older approved specs are deliberately excluded: the sweep cannot see pre-era implementation history, so the claim would be unreliable \u2014 they remain visible in the governance board's Approved column.",
+ "group": "What is left to do",
+ "source": "hip_approved_no_activity.csv",
+ "columns": [
+  {
+   "key": "hip",
+   "label": "HIP",
+   "format": "hip"
+  },
+  {
+   "key": "hip_title",
+   "label": "title"
+  },
+  {
+   "key": "hip_status",
+   "label": "spec status",
+   "format": "status"
+  },
+  {
+   "key": "hip_created",
+   "label": "spec created",
+   "format": "date"
+  }
+ ],
+ "rows": [
+  {
+   "hip": 1448,
+   "hip_title": "Simple Event Broadcast",
+   "hip_status": "Approved",
+   "hip_created": "2025-10-01"
+  },
+  {
+   "hip": 1446,
+   "hip_title": "Multiple Other-Parents in Hashgraph Events",
+   "hip_status": "Approved",
+   "hip_created": "2026-04-02"
+  },
+  {
+   "hip": 1126,
+   "hip_title": "Delete Allowance without Token Association",
+   "hip_status": "Accepted",
+   "hip_created": "2025-02-17"
+  },
+  {
+   "hip": 1049,
+   "hip_title": "Deleted flag in ConsensusGetTopic",
+   "hip_status": "Accepted",
+   "hip_created": "2024-09-19"
+  }
+ ],
+ "row_count": 4,
+ "generated_at": "2026-08-07T08:06:46.632476+00:00",
+ "stale": false,
+ "macro": "HIPs"
+}

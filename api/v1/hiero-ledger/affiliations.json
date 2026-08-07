@@ -1,0 +1,653 @@
+{
+ "id": "affiliations",
+ "title": "Maintainer affiliations \u2014 reference",
+ "description": "Reference: each maintainer, the organisation they were mapped to, and how it was decided \u2014 'automated' (the resolver placed them from public signals) or 'manual' (a hand-correction). Status is 'affiliated' (named employer), 'independent' (solo / personal-email only), or 'unknown' (no public signal). To fix a mapping or resolve an unknown, edit its row in data/affiliations.yaml and append '# manual: reason' (it then survives regeneration and reads 'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo.",
+ "group": "Organisation diversity",
+ "source": "maintainer_affiliations.csv",
+ "columns": [
+  {
+   "key": "login",
+   "label": "maintainer"
+  },
+  {
+   "key": "organisation",
+   "label": "organisation"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "method",
+   "label": "method"
+  }
+ ],
+ "rows": [
+  {
+   "login": "0xivanov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "a-saksena",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "aceppaluni",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "acuarica",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "agadzhalov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "alexandershenshin",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "alfredog87",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "andrewb1269",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "anthony-swirldslabs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "artemananiev",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "artemkaaas",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ashcherbakov",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "bubo",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "changobuitrago",
+   "organisation": "The Hashgraph Association",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "chelleswf",
+   "organisation": "Hashgraph Online",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "christinaharter",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "daniela-barbosa",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "danielmarv",
+   "organisation": "OpenElements",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "davidwboswell",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "ddeskov-limechain",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "deshmukhpranali",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "devmab",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "diegoescalonaro",
+   "organisation": "The Hashgraph Association",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "dmueller2001",
+   "organisation": "Hedera",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "dosik13",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "drgorb",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "emiliyank",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "ericleponner",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "exploreriii",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "manual"
+  },
+  {
+   "login": "ferparishuertas",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "georgi-l95",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "gkozyryatskyy",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "gsstoykov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "harasz",
+   "organisation": "Jitty Labs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "hartm",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "hendrikebbers",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "hgraphpunks",
+   "organisation": "Turtle Moon",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "itsbrandondev",
+   "organisation": "Hgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ivaylonikolov7",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ivo-yankov",
+   "organisation": "DevLabs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jan-milenkov",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "jasperpotts",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jaycoolh",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jeffrey-morgan34",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jeffreydallas",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jeromy-cannon",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jjohannes",
+   "organisation": "Onepiece Software",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jsync-swirlds",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jwagantall",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "kantorcodes",
+   "organisation": "Hashgraph Online",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "kononovandrey",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "konstantinabl",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "lbaird",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "leninmehedy",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "lpetrovic05",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "lukasz-hashgraph",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "lukelee-sl",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "manishdait",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "mgarbs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "milanwr",
+   "organisation": "8bees",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "minyu66",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "misiek-blocky",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "mmyslblocky",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "monaaeid",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "mustafauzunn",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "nana-ec",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "natanasow",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "nathanklick",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ndacyayisenga-droid",
+   "organisation": "OpenElements",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "neeharika-sompalli",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "netopyr",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "neurone",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "olegmazurov",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "olsentorfinn",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "piotrswierzy",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "popowycz",
+   "organisation": "Hedera",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "poulok",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "pratyay85",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "quiet-node",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "raphaelmessian",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rbair23",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rbarker-dev",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "reccetech",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rickylb",
+   "organisation": "Launchbadge",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rocketmay",
+   "organisation": "HashPack",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rsinha",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rwalworth",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ryjones",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "seanbohan",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "sergmetelin",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "sheng-long",
+   "organisation": "Launchbadge",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "simihunjan",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "simzzz",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "steven-sheehy",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "stoqnkpl",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "stoyanov-st",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "svienot",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "theekrystallee",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "thelinuxfoundation",
+   "organisation": "Linux Foundation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "tinker-michaelj",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "toktar",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "venilinvasilev",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "xin-hedera",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  }
+ ],
+ "row_count": 103,
+ "action": {
+  "url": "https://github.com/hiero-hackers/analytics/issues",
+  "label": "Suggest a correction"
+ },
+ "generated_at": "2026-08-07T08:05:41.800429+00:00",
+ "stale": false,
+ "macro": "Governance"
+}

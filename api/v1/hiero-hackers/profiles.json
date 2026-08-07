@@ -1,0 +1,1152 @@
+{
+ "id": "profiles",
+ "title": "All contributors",
+ "description": "Every contributor's org-wide activity in the selected period, most recently active first.",
+ "group": "All contributors",
+ "source": "contributor_activity_profiles.csv",
+ "columns": [
+  {
+   "key": "contributor",
+   "label": "contributor"
+  },
+  {
+   "key": "prs_opened",
+   "label": "PRs",
+   "format": "number"
+  },
+  {
+   "key": "reviews_given",
+   "label": "reviews",
+   "format": "number"
+  },
+  {
+   "key": "merges_done",
+   "label": "merges",
+   "format": "number"
+  },
+  {
+   "key": "issues_opened",
+   "label": "issues",
+   "format": "number"
+  },
+  {
+   "key": "labels_applied",
+   "label": "labels",
+   "format": "number"
+  },
+  {
+   "key": "repos_touched",
+   "label": "repos",
+   "format": "number"
+  },
+  {
+   "key": "last_active",
+   "label": "last active",
+   "format": "date"
+  }
+ ],
+ "rows": [
+  {
+   "contributor": "exploreriii",
+   "prs_opened": 86,
+   "reviews_given": 264,
+   "merges_done": 205,
+   "issues_opened": 266,
+   "labels_applied": 297,
+   "repos_touched": 16,
+   "last_active": "2026-08-06 10:27:48+00:00"
+  },
+  {
+   "contributor": "danielmarv",
+   "prs_opened": 18,
+   "reviews_given": 32,
+   "merges_done": 10,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 5,
+   "last_active": "2026-08-06 08:52:32+00:00"
+  },
+  {
+   "contributor": "slegarraga",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-08-06 07:07:36+00:00"
+  },
+  {
+   "contributor": "oGranny",
+   "prs_opened": 4,
+   "reviews_given": 0,
+   "merges_done": 2,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 2,
+   "last_active": "2026-08-05 17:25:59+00:00"
+  },
+  {
+   "contributor": "aceppaluni",
+   "prs_opened": 8,
+   "reviews_given": 18,
+   "merges_done": 5,
+   "issues_opened": 6,
+   "labels_applied": 12,
+   "repos_touched": 5,
+   "last_active": "2026-08-05 13:39:39+00:00"
+  },
+  {
+   "contributor": "HousniAbdellatife",
+   "prs_opened": 2,
+   "reviews_given": 0,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-08-05 08:05:59+00:00"
+  },
+  {
+   "contributor": "hendrikebbers",
+   "prs_opened": 1,
+   "reviews_given": 4,
+   "merges_done": 4,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 3,
+   "last_active": "2026-08-04 14:40:06+00:00"
+  },
+  {
+   "contributor": "harman-2167",
+   "prs_opened": 4,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-08-04 14:05:33+00:00"
+  },
+  {
+   "contributor": "MonaaEid",
+   "prs_opened": 13,
+   "reviews_given": 58,
+   "merges_done": 28,
+   "issues_opened": 1,
+   "labels_applied": 2,
+   "repos_touched": 3,
+   "last_active": "2026-08-03 17:50:05+00:00"
+  },
+  {
+   "contributor": "Rowrow620",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-08-03 12:22:58+00:00"
+  },
+  {
+   "contributor": "Jexsie",
+   "prs_opened": 43,
+   "reviews_given": 42,
+   "merges_done": 73,
+   "issues_opened": 21,
+   "labels_applied": 20,
+   "repos_touched": 1,
+   "last_active": "2026-08-03 05:08:14+00:00"
+  },
+  {
+   "contributor": "leanworld7-netizen",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-08-01 01:23:03+00:00"
+  },
+  {
+   "contributor": "cheese-cakee",
+   "prs_opened": 11,
+   "reviews_given": 2,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-07-31 16:55:22+00:00"
+  },
+  {
+   "contributor": "sudo-anshul",
+   "prs_opened": 5,
+   "reviews_given": 6,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-07-27 04:47:34+00:00"
+  },
+  {
+   "contributor": "github-code-quality",
+   "prs_opened": 0,
+   "reviews_given": 6,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-07-26 15:37:28+00:00"
+  },
+  {
+   "contributor": "github-advanced-security",
+   "prs_opened": 0,
+   "reviews_given": 3,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 3,
+   "last_active": "2026-07-24 16:28:04+00:00"
+  },
+  {
+   "contributor": "jwagantall",
+   "prs_opened": 0,
+   "reviews_given": 6,
+   "merges_done": 2,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 3,
+   "last_active": "2026-07-23 16:21:56+00:00"
+  },
+  {
+   "contributor": "manishdait",
+   "prs_opened": 3,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-07-21 19:58:27+00:00"
+  },
+  {
+   "contributor": "piotrswierzy",
+   "prs_opened": 3,
+   "reviews_given": 1,
+   "merges_done": 4,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 2,
+   "last_active": "2026-07-21 18:05:48+00:00"
+  },
+  {
+   "contributor": "Twiineenock",
+   "prs_opened": 23,
+   "reviews_given": 0,
+   "merges_done": 23,
+   "issues_opened": 21,
+   "labels_applied": 0,
+   "repos_touched": 2,
+   "last_active": "2026-07-20 15:14:24+00:00"
+  },
+  {
+   "contributor": "Mounil2005",
+   "prs_opened": 5,
+   "reviews_given": 2,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 1,
+   "repos_touched": 2,
+   "last_active": "2026-07-18 18:01:19+00:00"
+  },
+  {
+   "contributor": "aashu2006",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-07-17 19:01:17+00:00"
+  },
+  {
+   "contributor": "Jashk120",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 2,
+   "labels_applied": 2,
+   "repos_touched": 3,
+   "last_active": "2026-06-09 09:15:32+00:00"
+  },
+  {
+   "contributor": "darshit2308",
+   "prs_opened": 2,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 3,
+   "labels_applied": 1,
+   "repos_touched": 2,
+   "last_active": "2026-06-08 18:20:32+00:00"
+  },
+  {
+   "contributor": "cweagans",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-05-19 16:41:01+00:00"
+  },
+  {
+   "contributor": "thando-ndlovu",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-05-18 15:01:13+00:00"
+  },
+  {
+   "contributor": "DeathGun44",
+   "prs_opened": 3,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 3,
+   "last_active": "2026-05-09 14:16:18+00:00"
+  },
+  {
+   "contributor": "notjivi",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-05-07 22:07:04+00:00"
+  },
+  {
+   "contributor": "Anxhul10",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-05-03 10:00:38+00:00"
+  },
+  {
+   "contributor": "prajeeta15",
+   "prs_opened": 3,
+   "reviews_given": 7,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-04-30 05:59:24+00:00"
+  },
+  {
+   "contributor": "Adityarya11",
+   "prs_opened": 1,
+   "reviews_given": 8,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-04-15 04:06:15+00:00"
+  },
+  {
+   "contributor": "Omswastik-11",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-04-09 19:12:29+00:00"
+  },
+  {
+   "contributor": "copilot-swe-agent",
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-04-06 15:00:00+00:00"
+  },
+  {
+   "contributor": "undefinedIsMyLife",
+   "prs_opened": 2,
+   "reviews_given": 4,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-03-19 13:03:30+00:00"
+  },
+  {
+   "contributor": "Gmin2",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-03-17 14:31:18+00:00"
+  },
+  {
+   "contributor": "ibishal",
+   "prs_opened": 0,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 1,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-03-17 14:10:12+00:00"
+  },
+  {
+   "contributor": "Leenaa-patil",
+   "prs_opened": 3,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "repos_touched": 1,
+   "last_active": "2026-03-09 19:11:20+00:00"
+  }
+ ],
+ "row_count": 37,
+ "generated_at": "2026-08-07T08:07:19.853575+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [
+   {
+    "contributor": "exploreriii",
+    "prs_opened": 13,
+    "reviews_given": 8,
+    "merges_done": 20,
+    "issues_opened": 51,
+    "labels_applied": 154,
+    "repos_touched": 5,
+    "last_active": "2026-08-06 10:27:48+00:00"
+   },
+   {
+    "contributor": "danielmarv",
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-08-06 08:52:32+00:00"
+   },
+   {
+    "contributor": "slegarraga",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-06 07:07:36+00:00"
+   },
+   {
+    "contributor": "oGranny",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 17:25:59+00:00"
+   },
+   {
+    "contributor": "aceppaluni",
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 3,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 13:39:39+00:00"
+   },
+   {
+    "contributor": "HousniAbdellatife",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 08:05:59+00:00"
+   },
+   {
+    "contributor": "hendrikebbers",
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-04 14:40:06+00:00"
+   },
+   {
+    "contributor": "harman-2167",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-04 14:05:33+00:00"
+   },
+   {
+    "contributor": "MonaaEid",
+    "prs_opened": 1,
+    "reviews_given": 4,
+    "merges_done": 3,
+    "issues_opened": 1,
+    "labels_applied": 1,
+    "repos_touched": 2,
+    "last_active": "2026-08-03 17:50:05+00:00"
+   },
+   {
+    "contributor": "Rowrow620",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 12:22:58+00:00"
+   },
+   {
+    "contributor": "Jexsie",
+    "prs_opened": 0,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 05:08:14+00:00"
+   },
+   {
+    "contributor": "leanworld7-netizen",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-01 01:23:03+00:00"
+   },
+   {
+    "contributor": "cheese-cakee",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-31 16:55:22+00:00"
+   }
+  ],
+  "30d": [
+   {
+    "contributor": "exploreriii",
+    "prs_opened": 57,
+    "reviews_given": 98,
+    "merges_done": 92,
+    "issues_opened": 153,
+    "labels_applied": 207,
+    "repos_touched": 15,
+    "last_active": "2026-08-06 10:27:48+00:00"
+   },
+   {
+    "contributor": "danielmarv",
+    "prs_opened": 9,
+    "reviews_given": 19,
+    "merges_done": 9,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 5,
+    "last_active": "2026-08-06 08:52:32+00:00"
+   },
+   {
+    "contributor": "slegarraga",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-06 07:07:36+00:00"
+   },
+   {
+    "contributor": "oGranny",
+    "prs_opened": 4,
+    "reviews_given": 0,
+    "merges_done": 2,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 17:25:59+00:00"
+   },
+   {
+    "contributor": "aceppaluni",
+    "prs_opened": 5,
+    "reviews_given": 13,
+    "merges_done": 5,
+    "issues_opened": 3,
+    "labels_applied": 7,
+    "repos_touched": 5,
+    "last_active": "2026-08-05 13:39:39+00:00"
+   },
+   {
+    "contributor": "HousniAbdellatife",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 08:05:59+00:00"
+   },
+   {
+    "contributor": "hendrikebbers",
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 2,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-08-04 14:40:06+00:00"
+   },
+   {
+    "contributor": "harman-2167",
+    "prs_opened": 4,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-04 14:05:33+00:00"
+   },
+   {
+    "contributor": "MonaaEid",
+    "prs_opened": 7,
+    "reviews_given": 17,
+    "merges_done": 13,
+    "issues_opened": 1,
+    "labels_applied": 1,
+    "repos_touched": 3,
+    "last_active": "2026-08-03 17:50:05+00:00"
+   },
+   {
+    "contributor": "Rowrow620",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 12:22:58+00:00"
+   },
+   {
+    "contributor": "Jexsie",
+    "prs_opened": 0,
+    "reviews_given": 18,
+    "merges_done": 13,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 05:08:14+00:00"
+   },
+   {
+    "contributor": "leanworld7-netizen",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-01 01:23:03+00:00"
+   },
+   {
+    "contributor": "cheese-cakee",
+    "prs_opened": 6,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-31 16:55:22+00:00"
+   },
+   {
+    "contributor": "sudo-anshul",
+    "prs_opened": 1,
+    "reviews_given": 5,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-27 04:47:34+00:00"
+   },
+   {
+    "contributor": "github-code-quality",
+    "prs_opened": 0,
+    "reviews_given": 3,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-26 15:37:28+00:00"
+   },
+   {
+    "contributor": "github-advanced-security",
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-24 16:28:04+00:00"
+   },
+   {
+    "contributor": "jwagantall",
+    "prs_opened": 0,
+    "reviews_given": 5,
+    "merges_done": 1,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 2,
+    "last_active": "2026-07-23 16:21:56+00:00"
+   },
+   {
+    "contributor": "manishdait",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-21 19:58:27+00:00"
+   },
+   {
+    "contributor": "piotrswierzy",
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 2,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-21 18:05:48+00:00"
+   },
+   {
+    "contributor": "Twiineenock",
+    "prs_opened": 18,
+    "reviews_given": 0,
+    "merges_done": 18,
+    "issues_opened": 17,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-20 15:14:24+00:00"
+   },
+   {
+    "contributor": "Mounil2005",
+    "prs_opened": 2,
+    "reviews_given": 2,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 1,
+    "repos_touched": 2,
+    "last_active": "2026-07-18 18:01:19+00:00"
+   },
+   {
+    "contributor": "aashu2006",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-17 19:01:17+00:00"
+   }
+  ],
+  "365d": [
+   {
+    "contributor": "exploreriii",
+    "prs_opened": 86,
+    "reviews_given": 264,
+    "merges_done": 205,
+    "issues_opened": 266,
+    "labels_applied": 297,
+    "repos_touched": 16,
+    "last_active": "2026-08-06 10:27:48+00:00"
+   },
+   {
+    "contributor": "danielmarv",
+    "prs_opened": 18,
+    "reviews_given": 32,
+    "merges_done": 10,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 5,
+    "last_active": "2026-08-06 08:52:32+00:00"
+   },
+   {
+    "contributor": "slegarraga",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-06 07:07:36+00:00"
+   },
+   {
+    "contributor": "oGranny",
+    "prs_opened": 4,
+    "reviews_given": 0,
+    "merges_done": 2,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 2,
+    "last_active": "2026-08-05 17:25:59+00:00"
+   },
+   {
+    "contributor": "aceppaluni",
+    "prs_opened": 8,
+    "reviews_given": 18,
+    "merges_done": 5,
+    "issues_opened": 6,
+    "labels_applied": 12,
+    "repos_touched": 5,
+    "last_active": "2026-08-05 13:39:39+00:00"
+   },
+   {
+    "contributor": "HousniAbdellatife",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-05 08:05:59+00:00"
+   },
+   {
+    "contributor": "hendrikebbers",
+    "prs_opened": 1,
+    "reviews_given": 4,
+    "merges_done": 4,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-08-04 14:40:06+00:00"
+   },
+   {
+    "contributor": "harman-2167",
+    "prs_opened": 4,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-04 14:05:33+00:00"
+   },
+   {
+    "contributor": "MonaaEid",
+    "prs_opened": 13,
+    "reviews_given": 58,
+    "merges_done": 28,
+    "issues_opened": 1,
+    "labels_applied": 2,
+    "repos_touched": 3,
+    "last_active": "2026-08-03 17:50:05+00:00"
+   },
+   {
+    "contributor": "Rowrow620",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 12:22:58+00:00"
+   },
+   {
+    "contributor": "Jexsie",
+    "prs_opened": 43,
+    "reviews_given": 42,
+    "merges_done": 73,
+    "issues_opened": 21,
+    "labels_applied": 20,
+    "repos_touched": 1,
+    "last_active": "2026-08-03 05:08:14+00:00"
+   },
+   {
+    "contributor": "leanworld7-netizen",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-08-01 01:23:03+00:00"
+   },
+   {
+    "contributor": "cheese-cakee",
+    "prs_opened": 11,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-31 16:55:22+00:00"
+   },
+   {
+    "contributor": "sudo-anshul",
+    "prs_opened": 5,
+    "reviews_given": 6,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-27 04:47:34+00:00"
+   },
+   {
+    "contributor": "github-code-quality",
+    "prs_opened": 0,
+    "reviews_given": 6,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-26 15:37:28+00:00"
+   },
+   {
+    "contributor": "github-advanced-security",
+    "prs_opened": 0,
+    "reviews_given": 3,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-07-24 16:28:04+00:00"
+   },
+   {
+    "contributor": "jwagantall",
+    "prs_opened": 0,
+    "reviews_given": 6,
+    "merges_done": 2,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-07-23 16:21:56+00:00"
+   },
+   {
+    "contributor": "manishdait",
+    "prs_opened": 3,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-21 19:58:27+00:00"
+   },
+   {
+    "contributor": "piotrswierzy",
+    "prs_opened": 3,
+    "reviews_given": 1,
+    "merges_done": 4,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 2,
+    "last_active": "2026-07-21 18:05:48+00:00"
+   },
+   {
+    "contributor": "Twiineenock",
+    "prs_opened": 23,
+    "reviews_given": 0,
+    "merges_done": 23,
+    "issues_opened": 21,
+    "labels_applied": 0,
+    "repos_touched": 2,
+    "last_active": "2026-07-20 15:14:24+00:00"
+   },
+   {
+    "contributor": "Mounil2005",
+    "prs_opened": 5,
+    "reviews_given": 2,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 1,
+    "repos_touched": 2,
+    "last_active": "2026-07-18 18:01:19+00:00"
+   },
+   {
+    "contributor": "aashu2006",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-07-17 19:01:17+00:00"
+   },
+   {
+    "contributor": "Jashk120",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 2,
+    "repos_touched": 3,
+    "last_active": "2026-06-09 09:15:32+00:00"
+   },
+   {
+    "contributor": "darshit2308",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 3,
+    "labels_applied": 1,
+    "repos_touched": 2,
+    "last_active": "2026-06-08 18:20:32+00:00"
+   },
+   {
+    "contributor": "cweagans",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-05-19 16:41:01+00:00"
+   },
+   {
+    "contributor": "thando-ndlovu",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-05-18 15:01:13+00:00"
+   },
+   {
+    "contributor": "DeathGun44",
+    "prs_opened": 3,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-05-09 14:16:18+00:00"
+   },
+   {
+    "contributor": "notjivi",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-05-07 22:07:04+00:00"
+   },
+   {
+    "contributor": "Anxhul10",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-05-03 10:00:38+00:00"
+   },
+   {
+    "contributor": "prajeeta15",
+    "prs_opened": 3,
+    "reviews_given": 7,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-04-30 05:59:24+00:00"
+   },
+   {
+    "contributor": "Adityarya11",
+    "prs_opened": 1,
+    "reviews_given": 8,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-04-15 04:06:15+00:00"
+   },
+   {
+    "contributor": "Omswastik-11",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-04-09 19:12:29+00:00"
+   },
+   {
+    "contributor": "copilot-swe-agent",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-04-06 15:00:00+00:00"
+   },
+   {
+    "contributor": "undefinedIsMyLife",
+    "prs_opened": 2,
+    "reviews_given": 4,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-03-19 13:03:30+00:00"
+   },
+   {
+    "contributor": "Gmin2",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-03-17 14:31:18+00:00"
+   },
+   {
+    "contributor": "ibishal",
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-03-17 14:10:12+00:00"
+   },
+   {
+    "contributor": "Leenaa-patil",
+    "prs_opened": 3,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "repos_touched": 1,
+    "last_active": "2026-03-09 19:11:20+00:00"
+   }
+  ]
+ },
+ "macro": "Contributors"
+}
