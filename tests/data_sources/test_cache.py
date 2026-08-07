@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
@@ -221,6 +222,52 @@ def test_stale_cache_entry_is_ignored(_temp_cache_dir):
     )
 
     assert loaded is None
+
+
+@pytest.mark.parametrize("ttl_seconds", [0, -1, -3600])
+def test_non_positive_ttl_never_expires_and_warns(_temp_cache_dir, caplog, ttl_seconds):
+    """TTL <= 0 is a deliberate 'cache forever' escape hatch, but a loud one."""
+    records = [
+        IssueRecord(
+            repo="org/repo",
+            number=1,
+            title="Issue A",
+            state="OPEN",
+            created_at=datetime(2024, 1, 1, tzinfo=UTC),
+            closed_at=None,
+            labels=["bug"],
+        )
+    ]
+    parameters = {"owner": "org", "repo": "repo", "states": []}
+
+    cache.save_records_cache(
+        "repo_issues",
+        "org_repo",
+        parameters,
+        IssueRecord,
+        records,
+        use_cache=True,
+    )
+
+    # Backdate the entry well past any TTL a positive value could plausibly
+    # allow, so this only passes if expiry was genuinely skipped.
+    cache_path = cache._cache_path("repo_issues", "org_repo", parameters)
+    payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    payload["cached_at"] = (datetime.now(UTC) - timedelta(days=365)).isoformat()
+    cache_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.data_sources.cache"):
+        loaded = cache.load_records_cache(
+            "repo_issues",
+            "org_repo",
+            parameters,
+            IssueRecord,
+            use_cache=True,
+            ttl_seconds=ttl_seconds,
+        )
+
+    assert loaded == records
+    assert any("never expire" in record.message for record in caplog.records)
 
 
 def test_mismatched_parameters_is_a_cache_miss(_temp_cache_dir):

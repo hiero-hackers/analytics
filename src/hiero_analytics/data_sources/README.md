@@ -228,6 +228,11 @@ Environment variables:
 GITHUB_CACHE_ENABLED=true
 GITHUB_CACHE_TTL_SECONDS=900
 ```
+Setting `GITHUB_CACHE_TTL_SECONDS` to `0` or a negative number disables
+expiry entirely — entries are treated as fresh forever and only go away if
+you clear `outputs/cache/github/` by hand. This is intentional (handy for
+offline debugging), but easy to trigger by accident with an empty or
+malformed value, so using it logs a warning rather than failing silently.
 
 You can also override caching per call:
 
