@@ -37,6 +37,7 @@ PIPELINES: tuple[Pipeline, ...] = (
     # (the dashboard omits sections whose CSVs are absent), so it stays
     # offline-capable for PR previews.
     Pipeline("hip_implementation", "Map HIPs to the PRs that reference them", args=("org",), offline=True),
+    Pipeline("repo_growth", "Generate repos-over-time timeline charts", args=("org",), offline=True, extra_orgs=True),
     # CLI-only pipelines, excluded from the default run:
     # - data_api: the full run invokes it explicitly, last and once, after all
     #   orgs — it is a re-render over every org's outputs, and its column

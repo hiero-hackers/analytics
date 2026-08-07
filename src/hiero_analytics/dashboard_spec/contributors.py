@@ -46,6 +46,20 @@ CHART_MACRO = {
                     ("By repository", "repo_activity_heatmap.png"),
                 ],
             },
+            {
+                "id": "repo-growth",
+                "title": "Repository growth",
+                "group": "Activity & networks",
+                "description": (
+                    "How quickly the organisation is creating new repositories. The monthly view shows "
+                    "new repos per month; the cumulative view shows the total repo count over time. Data "
+                    "comes from each repository's createdAt timestamp."
+                ),
+                "files": [
+                    ("New repos per month", "repos_created_per_month.png"),
+                    ("Cumulative repo count", "cumulative_repo_count.png"),
+                ],
+            },
         ],
         "hiero-hackers": [
             {
@@ -81,6 +95,20 @@ CHART_MACRO = {
                     "months (greener = more active that month)."
                 ),
                 "files": [("Activity heatmap", "contributor_activity_heatmap.png")],
+            },
+            {
+                "id": "repo-growth",
+                "title": "Repository growth",
+                "group": "Activity & networks",
+                "description": (
+                    "How quickly the organisation is creating new repositories. The monthly view shows "
+                    "new repos per month; the cumulative view shows the total repo count over time. Data "
+                    "comes from each repository's createdAt timestamp."
+                ),
+                "files": [
+                    ("New repos per month", "repos_created_per_month.png"),
+                    ("Cumulative repo count", "cumulative_repo_count.png"),
+                ],
             },
         ],
     },
@@ -169,6 +197,10 @@ CHART_NOTES = {
     "detected language are grouped as 'Unknown'.",
     "push_activity.png": "The share of repositories that received a push in the last 30 days (active) versus those that "
     "did not (inactive).",
+    "repos_created_per_month.png": "The monthly count of new repositories created in the organisation. "
+    "Zero-creation months are shown as 0 so the full timeline is visible.",
+    "cumulative_repo_count.png": "The running total of repositories over time. "
+    "Flat stretches mean no new repos were created; steps up mark creation months.",
 }
 
 # Step-by-step "how this was built" methodology, keyed by chart filename. Shown as
@@ -239,5 +271,16 @@ CHART_METHODOLOGY = {
         "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket by month.",
         "Sum the weighted score per repository per month — each event counts once.",
         "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score.",
+    ],
+    "repos_created_per_month.png": [
+        "Fetch every repository in the organisation via the GitHub GraphQL API.",
+        "Extract each repository's createdAt timestamp and bucket it by calendar month.",
+        "Count repos created per month; months with zero creations are filled in so the timeline is continuous.",
+        "The peak month and the latest month are annotated on the chart.",
+    ],
+    "cumulative_repo_count.png": [
+        "Start from the same monthly creation counts as the per-month chart.",
+        "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
+        "The latest month and its total are annotated on the chart.",
     ],
 }

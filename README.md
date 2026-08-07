@@ -151,6 +151,7 @@ Available pipelines:
 | `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
 | `hiero_hackers` | Hiero Hackers org composition and activity |
 | `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
+| `repo_growth` | Generate repository-growth timeline charts |
 | `data_api` | Emits the versioned JSON data API (`outputs/data/api/v1/`) the web dashboard renders — the full run does this last |
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
 | `contributor_churn` | Contributor churn analysis — on-demand, not part of the full run |

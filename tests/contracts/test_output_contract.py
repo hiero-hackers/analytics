@@ -38,6 +38,7 @@ import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
+import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
@@ -107,6 +108,7 @@ CHART_COMPANION_CSVS = {
     "hip_summary.csv",  # per-HIP ledger data behind the funnel, process checks, and matrix (no table dup)
     "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
     "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
+    "repo_growth_timeline.csv",  # Repo-growth timeline chart companion
 }
 
 
@@ -171,6 +173,7 @@ def _repo(org: str, name: str, language: str | None = "Python"):
         full_name=f"{org}/{name}",
         name=name,
         owner=org,
+        created_at=_NOW - timedelta(days=120),
         pushed_at=_NOW - timedelta(days=3),
         language=language,
     )
@@ -363,6 +366,11 @@ def outputs_root(tmp_path_factory) -> Path:
             hackers_mod,
             "fetch_org_repos_graphql",
             lambda _c, org: [_repo(org, "analytics"), _repo(org, "hips", "Markdown")],
+        )
+        mp.setattr(
+            repo_growth_mod,
+            "fetch_org_repos_graphql",
+            lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
         )
         mp.setattr(hackers_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
         mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)

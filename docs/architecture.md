@@ -129,6 +129,29 @@ Fetching is **incremental** and has two persistence layers, by design:
 pipeline can't sink the run; CI still sees a non-zero exit), then emits the data
 API once.
 
+### Contributor activity types
+
+`ContributorActivityRecord.activity_type` is the vocabulary the activity heatmaps
+and contributor profiles are scored from:
+
+| Activity type | Source |
+|---|---|
+| `authored_issue`, `authored_pull_request`, `reviewed_pull_request`, `merged_pull_request` | GraphQL (`github_ingest.contributors`) |
+
+### Repository growth timeline
+
+An org-level signal using the `createdAt` timestamp that the repos GraphQL query
+already returns. The `repo_growth` pipeline (`analysis/repo_growth`,
+`pipelines/repo_growth`) aggregates repos by creation month and renders two line
+charts:
+
+- **Repos created per month** — the pace at which the org spins up new work.
+- **Cumulative repo count** — total repos over time (steeper = faster growth).
+
+This needs no extra token, has no retention window, and goes back to the org's
+founding. It answers "how fast is the org growing?" and sits alongside the
+contributor charts.
+
 ## Provenance
 
 Nothing generated is committed, and each Pages deploy overwrites the last, so an

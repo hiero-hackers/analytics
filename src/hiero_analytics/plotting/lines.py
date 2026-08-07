@@ -134,6 +134,8 @@ def plot_date_line(
     date_format: str = "%b %Y",
     annotate_peak_and_latest: bool = True,
     rotate_x: int = 30,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
 ) -> None:
     """Plot a time-series line chart with a datetime x-axis.
 
@@ -193,8 +195,8 @@ def plot_date_line(
             fig=fig,
             ax=ax,
             title=title,
-            xlabel=x_col,
-            ylabel=y_col,
+            xlabel=xlabel if xlabel is not None else x_col,
+            ylabel=ylabel if ylabel is not None else y_col,
             output_path=output_path,
             rotate_x=rotate_x,
             grid_axis="y",
