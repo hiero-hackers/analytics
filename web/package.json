@@ -10,6 +10,9 @@
     "test": "vitest run",
     "preview": "vite preview"
   },
+  "overrides": {
+    "nanoid": "3.3.18"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-table": "^8.21.3",
