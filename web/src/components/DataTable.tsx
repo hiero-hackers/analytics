@@ -28,6 +28,7 @@ export const VIRTUALIZE_ABOVE = 100;
 export function DataTable({ table }: { table: Table<Row> }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
+  const globalFilter = (table.getState().globalFilter as string) ?? "";
   const virtualized = rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
     count: virtualized ? rows.length : 0,
@@ -50,7 +51,7 @@ export function DataTable({ table }: { table: Table<Row> }) {
         className="search"
         placeholder="Filter…"
         aria-label="Filter rows"
-        value={(table.getState().globalFilter as string) ?? ""}
+        value={globalFilter}
         onChange={(event) => table.setGlobalFilter(event.target.value)}
       />
       <div className="tablewrap" ref={scrollRef}>
@@ -82,6 +83,22 @@ export function DataTable({ table }: { table: Table<Row> }) {
             ))}
           </thead>
           <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={columnCount} className="py-6 text-center text-[13px] text-muted">
+                  {globalFilter ? (
+                    <>
+                      No rows match —{" "}
+                      <button type="button" className="underline" onClick={() => table.setGlobalFilter("")}>
+                        clear the filter?
+                      </button>
+                    </>
+                 ) : (
+                  "No rows to show."
+                   )}
+                 </td>
+               </tr>
+             )}
             {paddingTop > 0 && (
               <tr aria-hidden="true">
                 <td colSpan={columnCount} style={{ height: paddingTop, padding: 0, border: 0 }} />

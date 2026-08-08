@@ -12,6 +12,7 @@ import { MetricTiles } from "./components/MetricTiles";
 import { ProvenanceFooter } from "./components/ProvenanceFooter";
 import { SectionGroups, type Group } from "./components/SectionGroups";
 import { SectionTable } from "./components/SectionTable";
+import { Skeleton } from "./components/Skeleton";
 import { TabBar } from "./components/TabBar";
 import { WipFooter } from "./components/WipFooter";
 import { stamp } from "./format";
@@ -93,28 +94,43 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
           {unavailable.join(", ")}. Everything else on this tab is unaffected — reload to try again.
         </p>
       )}
-      <SectionGroups groups={groups} />
+      {settled ? <SectionGroups groups={groups} /> : <Skeleton label="Loading tab" rows={6} />}
     </>
   );
 }
 
-export default function App() {
-  const [manifest, setManifest] = useState<Manifest | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [macro, setMacro] = useHashState("tab", "");
-  const [org, setOrg] = useHashState("org", "");
+/** Human-readable fatal error: retry button up front, raw cause tucked away. */
+function FatalError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="my-6">
+      <p className="error">
+        Failed to load the dashboard data. This is usually temporary — try again in a moment.
+      </p>
+      <button type="button" className="dl mt-2" onClick={onRetry}>
+        Retry
+      </button>
+      <details className="mt-3 text-[13px] text-muted">
+        <summary className="cursor-pointer">Error details</summary>
+        <pre className="mt-2 whitespace-pre-wrap break-all">{message}</pre>
+      </details>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    fetchManifest().then(setManifest).catch((cause: unknown) => setError(String(cause)));
-  }, []);
-
-  if (error) {
-    return <p className="error">Failed to load the data API: {error}</p>;
-  }
-  if (!manifest) {
-    return <p className="sub">Loading…</p>;
-  }
-
+/** Everything that depends on a loaded manifest — tabs, org filter, panels, footer. */
+function Dashboard({
+  manifest,
+  macro,
+  setMacro,
+  org,
+  setOrg,
+}: {
+  manifest: Manifest;
+  macro: string;
+  setMacro: (value: string) => void;
+  org: string;
+  setOrg: (value: string) => void;
+}) {
   const orgs = Object.keys(manifest.orgs);
   const derived = [
     ...new Set(
@@ -152,8 +168,7 @@ export default function App() {
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
 
   return (
-    <div className="wrap">
-      <h1>Hiero — analytics dashboard</h1>
+    <>
       <p className="sub">
         Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart to enlarge.
       </p>
@@ -183,6 +198,53 @@ export default function App() {
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
+    </>
+  );
+}
+
+export default function App() {
+  const [manifest, setManifest] = useState<Manifest | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // Bumped by retry to re-run the fetch below without duplicating its body.
+  const [reloadKey, setReloadKey] = useState(0);
+  const [macro, setMacro] = useHashState("tab", "");
+  const [org, setOrg] = useHashState("org", "");
+
+  useEffect(() => {
+    let cancelled = false;
+    setError(null);
+    fetchManifest()
+      .then((data) => {
+        if (!cancelled) setManifest(data);
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) setError(String(cause));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  const retry = () => {
+    setManifest(null);
+    setReloadKey((key) => key + 1);
+  };
+
+  return (
+    <div className="wrap">
+      <h1>Hiero — analytics dashboard</h1>
+      {/* The header renders in every state below; only the content beneath it
+          changes shape — chrome never pops in after the fact. */}
+      {error ? (
+        <FatalError message={error} onRetry={retry} />
+      ) : !manifest ? (
+        <>
+          <p className="sub">Loading…</p>
+          <Skeleton label="Loading dashboard" rows={5} />
+        </>
+      ) : (
+        <Dashboard manifest={manifest} macro={macro} setMacro={setMacro} org={org} setOrg={setOrg} />
+      )}
     </div>
   );
 }
