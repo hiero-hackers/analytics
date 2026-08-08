@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 
 from hiero_analytics.analysis.repo_growth import build_repo_growth_timeline
+from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest import fetch_org_repos_graphql
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
@@ -23,13 +24,9 @@ from hiero_analytics.plotting.lines import plot_date_line
 
 logger = logging.getLogger(__name__)
 
-ORG = "hiero-ledger"
-
 
 def main(org: str = ORG) -> None:
     """Generate repos-over-time charts for *org*."""
-    title_prefix = org
-
     client, data_dir, charts_dir = org_context(org)
 
     try:
@@ -53,7 +50,7 @@ def main(org: str = ORG) -> None:
         df=timeline,
         x_col="month",
         y_col="repos_created",
-        title=f"{title_prefix} — Repos Created per Month",
+        title=f"{org} — Repos Created per Month",
         output_path=charts_dir / "repos_created_per_month.png",
         month_interval=month_interval,
         xlabel="Month",
@@ -65,7 +62,7 @@ def main(org: str = ORG) -> None:
         df=timeline,
         x_col="month",
         y_col="cumulative_repos",
-        title=f"{title_prefix} — Cumulative Repository Count",
+        title=f"{org} — Cumulative Repository Count",
         output_path=charts_dir / "cumulative_repo_count.png",
         month_interval=month_interval,
         xlabel="Month",
