@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import FrozenInstanceError
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 
@@ -11,6 +11,7 @@ from hiero_analytics.data_sources.models import (
     IssueRecord,
     IssueTimelineEventRecord,
     PullRequestDifficultyRecord,
+    ReleaseRecord,
     RepositoryRecord,
     _extract_label_name,
     _extract_labels,
@@ -81,6 +82,98 @@ def test_issue_record_creation():
     assert issue.title == "Bug"
     assert issue.state == "OPEN"
     assert issue.labels == ["bug"]
+
+
+# ---------------------------------------------------------
+# ReleaseRecord
+# ---------------------------------------------------------
+
+
+def test_release_record_creation():
+    """Release records should store the normalized release payload."""
+    published = datetime(2026, 6, 1)
+
+    release = ReleaseRecord(
+        repo="org/repo",
+        tag_name="v1.0.0",
+        name="v1.0.0",
+        published_at=published,
+        is_prerelease=False,
+    )
+
+    assert release.repo == "org/repo"
+    assert release.tag_name == "v1.0.0"
+    assert release.published_at == published
+    assert release.is_prerelease is False
+
+
+def test_release_record_from_github_node_excludes_drafts():
+    """A draft release hydrates to no records — filtered client-side."""
+    node = {
+        "tagName": "v0.7.0-draft",
+        "name": None,
+        "isPrerelease": False,
+        "isDraft": True,
+        "publishedAt": None,
+        "createdAt": "2026-08-01T09:00:00Z",
+    }
+
+    assert ReleaseRecord.from_github_node(node, {"owner": "org", "repo": "repo"}) == []
+
+
+def test_release_record_from_github_node_hydrates_published_release():
+    """A published release hydrates one record with the repo context applied."""
+    node = {
+        "tagName": "v0.5.0",
+        "name": "v0.5.0",
+        "isPrerelease": False,
+        "isDraft": False,
+        "publishedAt": "2026-06-01T10:00:00Z",
+        "createdAt": "2026-06-01T09:00:00Z",
+    }
+
+    records = ReleaseRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.repo == "org/repo"
+    assert record.tag_name == "v0.5.0"
+    assert record.is_prerelease is False
+    assert record.published_at == datetime(2026, 6, 1, 10, 0, tzinfo=UTC)
+
+
+def test_release_record_from_github_node_flags_prerelease():
+    """The node's isPrerelease field maps straight through to the record."""
+    node = {
+        "tagName": "v0.6.0-rc1",
+        "name": "v0.6.0-rc1",
+        "isPrerelease": True,
+        "isDraft": False,
+        "publishedAt": "2026-07-01T10:00:00Z",
+        "createdAt": "2026-07-01T09:00:00Z",
+    }
+
+    records = ReleaseRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+
+    assert records[0].is_prerelease is True
+
+
+def test_release_record_from_github_node_defensive_on_missing_timestamp():
+    """A non-draft release with no publishedAt hydrates to no records rather than raising.
+
+    Shouldn't happen for a real published release, but a single malformed node
+    shouldn't fail the whole repo's fetch either.
+    """
+    node = {
+        "tagName": "v0.7.0",
+        "name": "v0.7.0",
+        "isPrerelease": False,
+        "isDraft": False,
+        "publishedAt": None,
+        "createdAt": "2026-08-05T09:00:00Z",
+    }
+
+    assert ReleaseRecord.from_github_node(node, {"owner": "org", "repo": "repo"}) == []
 
 
 # ---------------------------------------------------------
