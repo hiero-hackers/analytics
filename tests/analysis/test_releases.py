@@ -70,7 +70,13 @@ class TestBuildReleaseStaleness:
     def test_empty_repo_list(self) -> None:
         """No repos at all returns an empty frame with the correct schema."""
         result = build_release_staleness([], [])
-        assert list(result.columns) == ["repo", "latest_release", "days_since_last_release"]
+        assert list(result.columns) == [
+            "repo",
+            "latest_release",
+            "days_since_last_release",
+            "median_gap_days",
+            "staleness_ratio",
+        ]
         assert result.empty
 
     def test_repo_with_no_releases_still_gets_a_row(self) -> None:
@@ -121,3 +127,76 @@ class TestBuildReleaseStaleness:
 
         assert list(result["repo"]) == ["org/a"]
         assert pd.isna(result.iloc[0]["days_since_last_release"])
+
+
+class TestStalenessRatio:
+    """The cadence-relative signal — validated against real hiero-ledger data on #331."""
+
+    def test_ratio_flags_a_repo_thats_gone_quiet_relative_to_its_own_pace(self) -> None:
+        """A repo with a tight normal cadence that goes quiet gets a high ratio.
+
+        Mirrors the real hiero-json-rpc-relay finding: 38 raw days looked
+        unremarkable, but relative to its own 3-day cadence it was the most
+        overdue repo in the org (ratio ~12.7).
+        """
+        repos = [_repo("relay")]
+        records = [
+            _release("org/relay", "v1", datetime(2026, 5, 20, tzinfo=UTC)),
+            _release("org/relay", "v2", datetime(2026, 5, 23, tzinfo=UTC)),
+            _release("org/relay", "v3", datetime(2026, 5, 26, tzinfo=UTC)),
+            _release("org/relay", "v4", datetime(2026, 7, 2, tzinfo=UTC)),
+        ]
+        now = datetime(2026, 8, 9, tzinfo=UTC)
+
+        result = build_release_staleness(records, repos, now=now)
+
+        assert result.iloc[0]["median_gap_days"] == 3.0
+        assert result.iloc[0]["days_since_last_release"] == 38
+        assert round(float(result.iloc[0]["staleness_ratio"]), 2) == round(38 / 3, 2)
+
+    def test_ratio_is_null_with_fewer_than_two_releases(self) -> None:
+        """No established cadence to compare against — null, not zero or a raw-days fallback."""
+        repos = [_repo("a")]
+        records = [_release("org/a", "v1.0.0", datetime(2026, 1, 1, tzinfo=UTC))]
+
+        result = build_release_staleness(records, repos)
+
+        assert pd.isna(result.iloc[0]["median_gap_days"])
+        assert pd.isna(result.iloc[0]["staleness_ratio"])
+
+    def test_ratio_is_null_for_a_zero_day_median_gap(self) -> None:
+        """Two releases tagged the same day make the ratio undefined, not infinite."""
+        repos = [_repo("sameday")]
+        records = [
+            _release("org/sameday", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/sameday", "v2", datetime(2026, 1, 1, tzinfo=UTC)),
+        ]
+
+        result = build_release_staleness(records, repos)
+
+        assert result.iloc[0]["median_gap_days"] == 0.0
+        assert pd.isna(result.iloc[0]["staleness_ratio"])
+
+    def test_ratio_is_null_for_a_never_released_repo(self) -> None:
+        """No releases at all -> both cadence fields null, consistent with the other staleness fields."""
+        repos = [_repo("never-released")]
+
+        result = build_release_staleness([], repos)
+
+        assert pd.isna(result.iloc[0]["median_gap_days"])
+        assert pd.isna(result.iloc[0]["staleness_ratio"])
+
+    def test_low_ratio_for_a_repo_thats_right_on_its_own_schedule(self) -> None:
+        """A repo currently within its own typical gap gets a ratio near or below 1."""
+        repos = [_repo("steady")]
+        records = [
+            _release("org/steady", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/steady", "v2", datetime(2026, 1, 15, tzinfo=UTC)),
+            _release("org/steady", "v3", datetime(2026, 1, 29, tzinfo=UTC)),
+        ]
+        now = datetime(2026, 2, 3, tzinfo=UTC)  # 5 days since v3, 14-day cadence
+
+        result = build_release_staleness(records, repos, now=now)
+
+        assert result.iloc[0]["median_gap_days"] == 14.0
+        assert float(result.iloc[0]["staleness_ratio"]) < 1.0
