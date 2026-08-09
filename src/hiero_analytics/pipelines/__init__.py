@@ -32,6 +32,11 @@ PIPELINES: tuple[Pipeline, ...] = (
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
     Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
     Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",), extra_orgs=True),
+    # No offline flag: plain network pipeline, skipped cleanly in offline mode
+    # like scorecard/codeowner_and_runner above (see the module docstring for
+    # why this isn't offline-capable like repo_growth). extra_orgs=True:
+    # releases have no governance dependency.
+    Pipeline("releases", "Fetch releases and publish cadence/staleness tables", args=("org",), extra_orgs=True),
     Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays
