@@ -38,6 +38,7 @@ import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
+import hiero_analytics.pipelines.releases as releases_mod
 import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
@@ -51,6 +52,7 @@ from hiero_analytics.data_sources.models import (
     IssueRecord,
     IssueTimelineEventRecord,
     PullRequestDifficultyRecord,
+    ReleaseRecord,
     RepositoryRecord,
     RunnerRecord,
     ScorecardRecord,
@@ -116,6 +118,11 @@ CHART_COMPANION_CSVS = {
     "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
     "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
     "repo_growth_timeline.csv",  # Repo-growth timeline chart companion
+    # Releases pipeline data artifacts — dashboard tab/chart not built yet
+    # (see the design discussion on #331); the pipeline and its tables are
+    # done and tested ahead of the visualization.
+    "release_timeline.csv",
+    "release_repo_summary.csv",
 }
 
 
@@ -261,6 +268,25 @@ REPO_PRS = [
     for n in range(1, 6)
 ]
 
+# One repo with releases (including a prerelease), one deliberately with none —
+# the second is what exercises the honest-denominator staleness join.
+RELEASES = [
+    ReleaseRecord(
+        repo=f"{PRIMARY}/sdk-python",
+        tag_name="v1.0.0",
+        name="v1.0.0",
+        published_at=_NOW - timedelta(days=200),
+        is_prerelease=False,
+    ),
+    ReleaseRecord(
+        repo=f"{PRIMARY}/sdk-python",
+        tag_name="v1.1.0-rc1",
+        name="v1.1.0-rc1",
+        published_at=_NOW - timedelta(days=10),
+        is_prerelease=True,
+    ),
+]
+
 
 def _hip_spec(number: int, status: str, created: str) -> HipSpecRecord:
     return HipSpecRecord(
@@ -383,6 +409,12 @@ def outputs_root(tmp_path_factory) -> Path:
             "fetch_org_repos_graphql",
             lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
         )
+        mp.setattr(
+            releases_mod,
+            "fetch_org_repos_graphql",
+            lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
+        )
+        mp.setattr(releases_mod, "fetch_org_releases_graphql", lambda _c, _org: RELEASES)
         mp.setattr(hackers_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
         mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)
         mp.setattr(hip_mod, "fetch_org_pr_hip_refs_graphql", lambda _c, _org, **_k: HIP_REFS)

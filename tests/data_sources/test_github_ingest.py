@@ -10,6 +10,7 @@ from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
 from hiero_analytics.data_sources.models import (
     IssueRecord,
     PullRequestDifficultyRecord,
+    ReleaseRecord,
     RepositoryRecord,
 )
 
@@ -532,3 +533,88 @@ def test_merged_pr_since_stops_paginating_past_the_watermark(mock_client):
 
     assert {r.pr_number for r in records} == {1, 2}  # boundary record still returned
     assert mock_client.graphql.call_count == 2  # did NOT request a third page
+
+
+# ---------------------------------------------------------
+# releases
+# ---------------------------------------------------------
+
+
+def test_fetch_repo_releases_graphql_excludes_drafts(mock_client, bypass_pagination):
+    """Draft releases are filtered client-side; published and prerelease are kept."""
+    _ = bypass_pagination
+
+    mock_client.graphql.return_value = {
+        "data": {
+            "repository": {
+                "releases": {
+                    "nodes": [
+                        {
+                            "tagName": "v0.5.0",
+                            "name": "v0.5.0",
+                            "isPrerelease": False,
+                            "isDraft": False,
+                            "publishedAt": "2026-06-01T10:00:00Z",
+                            "createdAt": "2026-06-01T09:00:00Z",
+                        },
+                        {
+                            "tagName": "v0.6.0-rc1",
+                            "name": "v0.6.0-rc1",
+                            "isPrerelease": True,
+                            "isDraft": False,
+                            "publishedAt": "2026-07-01T10:00:00Z",
+                            "createdAt": "2026-07-01T09:00:00Z",
+                        },
+                        {
+                            "tagName": "v0.7.0-draft",
+                            "name": None,
+                            "isPrerelease": False,
+                            "isDraft": True,
+                            "publishedAt": None,
+                            "createdAt": "2026-08-01T09:00:00Z",
+                        },
+                    ],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+    }
+
+    records = ingest.fetch_repo_releases_graphql(mock_client, "org", "repo")
+
+    assert len(records) == 2  # the draft is excluded
+    assert all(isinstance(r, ReleaseRecord) for r in records)
+    assert {r.tag_name for r in records} == {"v0.5.0", "v0.6.0-rc1"}
+    stable = next(r for r in records if r.tag_name == "v0.5.0")
+    assert stable.repo == "org/repo"
+    assert stable.is_prerelease is False
+    prerelease = next(r for r in records if r.tag_name == "v0.6.0-rc1")
+    assert prerelease.is_prerelease is True
+
+
+def test_fetch_org_releases_graphql_parallel(monkeypatch, mock_client):
+    """An org release fetch combines per-repo results (no incremental store involved)."""
+    repos = [
+        RepositoryRecord("org/repo1", "repo1", "org"),
+        RepositoryRecord("org/repo2", "repo2", "org"),
+    ]
+
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda _client, _org: repos)
+
+    def fetch_repo_releases(_client, owner, repo, **_kwargs):
+        return [
+            ReleaseRecord(
+                repo=f"{owner}/{repo}",
+                tag_name="v1.0.0",
+                name="v1.0.0",
+                published_at=datetime(2026, 1, 1, tzinfo=UTC),
+                is_prerelease=False,
+            )
+        ]
+
+    monkeypatch.setattr(ingest.releases, "fetch_repo_releases_graphql", fetch_repo_releases)
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org", max_workers=2)
+
+    assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
+    assert len(records) == 2
