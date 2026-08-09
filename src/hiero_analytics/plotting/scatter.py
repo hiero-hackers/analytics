@@ -27,28 +27,16 @@ def plot_release_timeline(
     title: str,
     output_path: Path,
 ) -> None:
-    """Per-repo release dot/strip timeline, y-axis sorted by release count.
+    """Per-repo release timeline, sorted by release count.
 
-    Expects one row per release with ``repo``, ``published_at``, and
-    ``is_prerelease`` columns (i.e. the shape of
-    :func:`hiero_analytics.analysis.releases.build_release_timeline`) —
-    callers apply any date-window filtering before calling this.
+       Expects ``repo``, ``published_at``, and ``is_prerelease`` columns. Callers
+       apply date-window filtering before plotting.
 
-    Design settled against real hiero-ledger data on #331: a per-repo
-    release-count label (not more dots) keeps a high-cadence repo's row
-    legible — the dot pattern reads rhythm/gaps/coordinated release trains
-    qualitatively, while exact volume is precise text instead of something
-    the reader has to count through overlapping markers. The y-axis is
-    sorted by count (busiest at top) so cadence tiers are visible from scan
-    order alone.
-
-    Unlike ``build_release_staleness``, this chart is scoped to repos with
-    at least one release in the given data — a repo with zero releases has
-    nothing to plot, and most zero-release repos turned out to be
-    structurally non-shipping (docs/governance/meta), so an empty row here
-    would mostly be visual noise. The honest-denominator obligation lives in
-    the staleness table/CSV next to this chart, not in the chart itself.
-    """
+        Release counts are shown as labels to keep high-cadence repos readable;
+        markers convey cadence and release patterns. Repos with no releases are
+        omitted from the chart; the full repository denominator is preserved in the
+        staleness table.
+    """ 
     df = prepare_dataframe(df, "repo", "published_at")
 
     order = df.groupby("repo").size().sort_values(ascending=True).index.tolist()
