@@ -18,13 +18,14 @@ from hiero_analytics.dashboard_spec import (
     governance,
     hips,
     onboarding,
+    releases,
     security,
 )
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged, table_variants
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order — the tab order the dashboard shows.
-_FAMILIES = (contributors, governance, hips, security, onboarding, community)
+_FAMILIES = (contributors, governance, hips, security, onboarding, community, releases)
 
 # The assembled spec surface — everything a consumer (the data API emitter,
 # the contract tests) reads off this package.
