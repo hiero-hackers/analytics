@@ -116,6 +116,46 @@ class RepositoryRecord(BaseRecord):
 
 
 @dataclass(frozen=True)
+class ReleaseRecord(BaseRecord):
+    """A published, non-draft GitHub Release for one repository.
+
+    GitHub Releases only — no git-tag fallback (see the ingest module
+    docstring). Drafts are filtered out here, client-side, since the GraphQL
+    releases connection has no server-side draft filter.
+    """
+
+    repo: str
+    tag_name: str
+    name: str | None
+    published_at: datetime
+    is_prerelease: bool
+
+    @classmethod
+    def from_github_node(cls, node: dict, context: dict) -> list[ReleaseRecord]:
+        """Hydrate a release record from a GraphQL releases-connection node.
+
+        Returns ``[]`` for drafts and for the (defensive-only, shouldn't
+        happen for a real published release) case of a missing timestamp,
+        rather than raising — a single malformed release shouldn't fail the
+        whole repo's fetch.
+        """
+        if node.get("isDraft"):
+            return []
+        published_at = parse_github_datetime(node.get("publishedAt"))
+        if published_at is None:
+            return []
+        return [
+            cls(
+                repo=cls._repo_name(context),
+                tag_name=node.get("tagName") or "",
+                name=node.get("name"),
+                published_at=published_at,
+                is_prerelease=bool(node.get("isPrerelease")),
+            )
+        ]
+
+
+@dataclass(frozen=True)
 class IssueRecord(BaseRecord):
     """A normalized GitHub issue record."""
 
