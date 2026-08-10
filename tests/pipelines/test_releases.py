@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import UTC, datetime
 
 import pandas as pd
@@ -44,7 +45,7 @@ def synthetic_releases():
 def test_main_publishes_timeline_and_staleness_tables(
     stub_pipeline_context, monkeypatch, synthetic_repos, synthetic_releases
 ):
-    """A normal run writes both CSVs and both charts, with the never-released repo present but null."""
+    """A normal run writes both CSVs and both charts; the never-released repo ranks maximally stale."""
     _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
@@ -62,6 +63,8 @@ def test_main_publishes_timeline_and_staleness_tables(
     assert pd.isna(staleness.loc["org/repo2-never-released", "latest_release"])
     assert pd.isna(staleness.loc["org/repo2-never-released", "days_since_last_release"])
     assert not pd.isna(staleness.loc["org/repo1", "days_since_last_release"])
+    # Never-released ranks maximally stale (infinite), not null -- see #369 review feedback.
+    assert math.isinf(staleness.loc["org/repo2-never-released", "staleness_ratio"])
 
     timeline_chart = charts_dir / "release_timeline.png"
     assert timeline_chart.exists() and timeline_chart.stat().st_size > 0
@@ -90,12 +93,7 @@ def test_main_skips_cleanly_when_org_has_no_repos(stub_pipeline_context, monkeyp
 def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     stub_pipeline_context, monkeypatch, synthetic_repos
 ):
-    """Repos exist but none has ever released: both CSVs still get written, honestly empty/null.
-
-    No releases at all also means no charts -- both the timeline (nothing to
-    plot) and the staleness bar (no repo has a computable ratio) are skipped
-    rather than raising.
-    """
+    """Repos exist but none have released: both CSVs are written, all rank maximally stale, and no charts are plotted because there are no finite ratios."""
     _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
@@ -109,6 +107,7 @@ def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     staleness = pd.read_csv(data_dir / "release_repo_summary.csv")
     assert len(staleness) == len(synthetic_repos)  # every repo still gets a row
     assert staleness["latest_release"].isna().all()
+    assert staleness["staleness_ratio"].apply(math.isinf).all()  # maximally stale, not null
 
     assert list(charts_dir.glob("*.png")) == []
 
@@ -146,6 +145,45 @@ def test_main_generates_the_staleness_chart_when_a_repo_has_an_established_caden
     monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: records)
 
     releases_pipeline.main(org="org")
+
+    staleness_chart = charts_dir / "release_staleness.png"
+    assert staleness_chart.exists() and staleness_chart.stat().st_size > 0
+
+
+def test_staleness_chart_excludes_never_released_repos_without_crashing(stub_pipeline_context, monkeypatch):
+    """Never-released repos are ranked but excluded from the linear chart."""
+    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
+
+    repos = [
+        RepositoryRecord(full_name="org/steady", name="steady", owner="org"),
+        RepositoryRecord(full_name="org/never-released-a", name="never-released-a", owner="org"),
+        RepositoryRecord(full_name="org/never-released-b", name="never-released-b", owner="org"),
+    ]
+    records = [
+        ReleaseRecord(
+            repo="org/steady",
+            tag_name="v1",
+            name="v1",
+            published_at=datetime(2026, 1, 1, tzinfo=UTC),
+            is_prerelease=False,
+        ),
+        ReleaseRecord(
+            repo="org/steady",
+            tag_name="v2",
+            name="v2",
+            published_at=datetime(2026, 1, 15, tzinfo=UTC),
+            is_prerelease=False,
+        ),
+    ]
+
+    monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: repos)
+    monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: records)
+
+    releases_pipeline.main(org="org")  # must not raise
+
+    staleness = pd.read_csv(data_dir / "release_repo_summary.csv").set_index("repo")
+    assert math.isinf(staleness.loc["org/never-released-a", "staleness_ratio"])
+    assert math.isinf(staleness.loc["org/never-released-b", "staleness_ratio"])
 
     staleness_chart = charts_dir / "release_staleness.png"
     assert staleness_chart.exists() and staleness_chart.stat().st_size > 0

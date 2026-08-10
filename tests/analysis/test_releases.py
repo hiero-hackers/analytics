@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import UTC, datetime
 
 import pandas as pd
@@ -91,7 +92,7 @@ class TestBuildReleaseStaleness:
         assert pd.isna(result.iloc[0]["latest_release"])
         assert pd.isna(result.iloc[0]["days_since_last_release"])
         assert pd.isna(result.iloc[0]["median_gap_days"])
-        assert pd.isna(result.iloc[0]["staleness_ratio"])
+        assert result.iloc[0]["staleness_ratio"] == math.inf
         assert result.iloc[0]["release_status"] == "never_released"
 
     def test_mixed_repos_only_released_ones_get_values(self) -> None:
@@ -121,7 +122,7 @@ class TestBuildReleaseStaleness:
             "never_released",
             "never_released",
         ]
-        assert result["staleness_ratio"].isna().all()
+        assert (result["staleness_ratio"] == math.inf).all()
 
     def test_latest_release_picks_the_most_recent_tag(self) -> None:
         """days_since_last_release is computed from the newest release, not the oldest."""
@@ -199,14 +200,29 @@ class TestStalenessRatio:
         assert result.iloc[0]["median_gap_days"] == 0.0
         assert pd.isna(result.iloc[0]["staleness_ratio"])
 
-    def test_ratio_is_null_for_a_never_released_repo(self) -> None:
-        """No releases at all -> both cadence fields null, consistent with the other staleness fields."""
+    def test_never_released_ranks_as_maximally_stale(self) -> None:
+        """Never-released repos get an infinite ratio and remain null for cadence. Distinguishes "never released" from repos with insufficient history to establish a cadence."""
         repos = [_repo("never-released")]
 
         result = build_release_staleness([], repos)
 
         assert pd.isna(result.iloc[0]["median_gap_days"])
-        assert pd.isna(result.iloc[0]["staleness_ratio"])
+        assert math.isinf(result.iloc[0]["staleness_ratio"])
+
+    def test_never_released_ranks_ahead_of_a_finite_ratio(self) -> None:
+        """Sorting descending by staleness_ratio puts the never-released repo first."""
+        repos = [_repo("never-released"), _repo("relay")]
+        records = [
+            _release("org/relay", "v1", datetime(2026, 5, 20, tzinfo=UTC)),
+            _release("org/relay", "v2", datetime(2026, 5, 23, tzinfo=UTC)),
+            _release("org/relay", "v3", datetime(2026, 7, 2, tzinfo=UTC)),
+        ]
+
+        result = build_release_staleness(records, repos).sort_values("staleness_ratio", ascending=False)
+
+        assert result.iloc[0]["repo"] == "org/never-released"
+        assert math.isinf(result.iloc[0]["staleness_ratio"])
+        assert result.iloc[1]["repo"] == "org/relay"
 
     def test_low_ratio_for_a_repo_thats_right_on_its_own_schedule(self) -> None:
         """A repo currently within its own typical gap gets a ratio near or below 1."""

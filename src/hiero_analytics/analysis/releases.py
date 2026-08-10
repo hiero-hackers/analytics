@@ -6,6 +6,7 @@ file I/O (``pipelines/releases.py`` owns writing these to disk).
 
 from __future__ import annotations
 
+import math
 from datetime import UTC, datetime
 
 import pandas as pd
@@ -75,7 +76,7 @@ def build_release_staleness(
         staleness["latest_release"] = pd.NaT
         staleness["days_since_last_release"] = pd.array([None] * len(staleness), dtype="Int64")
         staleness["median_gap_days"] = pd.array([None] * len(staleness), dtype="Float64")
-        staleness["staleness_ratio"] = pd.array([None] * len(staleness), dtype="Float64")
+        staleness["staleness_ratio"] = pd.array([math.inf] * len(staleness), dtype="Float64")
         staleness["release_status"] = "never_released"
         return staleness[_STALENESS_COLUMNS].reset_index(drop=True)
 
@@ -87,6 +88,7 @@ def build_release_staleness(
     staleness = repo_universe.merge(latest, on="repo", how="left").merge(median_gap, on="repo", how="left")
     staleness["latest_release"] = pd.to_datetime(staleness["latest_release"], utc=True)
     staleness["release_status"] = staleness["latest_release"].notna().map({True: "released", False: "never_released"})
+    never_released = staleness["latest_release"].isna()
     days = (now - staleness["latest_release"]).dt.days
     staleness["days_since_last_release"] = days.astype("Int64")
     staleness["median_gap_days"] = staleness["median_gap_days"].astype("Float64")
@@ -94,6 +96,7 @@ def build_release_staleness(
     # A zero-day median gap (e.g. two releases tagged the same day) makes the
     # ratio undefined, not infinite — treated the same as "no cadence yet".
     safe_gap = staleness["median_gap_days"].where(staleness["median_gap_days"] > 0)
-    staleness["staleness_ratio"] = (staleness["days_since_last_release"] / safe_gap).astype("Float64")
+    ratio = (staleness["days_since_last_release"] / safe_gap).astype("Float64")
+    staleness["staleness_ratio"] = ratio.mask(never_released, math.inf)
 
     return staleness[_STALENESS_COLUMNS].reset_index(drop=True)

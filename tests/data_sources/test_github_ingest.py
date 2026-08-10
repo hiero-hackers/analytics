@@ -619,8 +619,8 @@ def test_fetch_org_releases_graphql_parallel(monkeypatch, mock_client):
     assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
     assert len(records) == 2
 
-def test_fetch_repo_releases_graphql_rejects_excessive_pagination(
-    mock_client, monkeypatch):
+
+def test_fetch_repo_releases_graphql_rejects_excessive_pagination(mock_client, monkeypatch):
     """Release ingestion must not silently return partial data."""
     monkeypatch.setattr(ingest.releases, "MAX_RELEASE_PAGES", 2)
 
