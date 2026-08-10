@@ -4,10 +4,6 @@ on:
     pull_request:
         branches: ["main"]
 
-permissions:
-    contents: read
-    # Required by output-sarif to upload findings to code scanning.
-    security-events: write
 
 jobs:
     fuzz:
@@ -16,7 +12,15 @@ jobs:
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: true
+        permissions:
+          contents: read
+
         steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+              with:
+                egress-policy: audit
+
             - name: Build fuzzers
               uses: google/clusterfuzzlite/actions/build_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
               with:
@@ -27,8 +31,10 @@ jobs:
             - name: Run fuzzers
               uses: google/clusterfuzzlite/actions/run_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
               with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  fuzz-seconds: 300
-                  mode: code-change
-                  sanitizer: address
-                  output-sarif: true
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                fuzz-seconds: 300
+                mode: code-change
+                sanitizer: address
+                output-sarif: true
+              permissions:
+                security-events: write
