@@ -305,12 +305,21 @@ const ROUTES: Record<string, unknown> = {
   "hiero-hackers/profiles.json": HACKERS_DOC,
 };
 
-/** Stub global fetch to serve the fixture API; returns the spy for assertions. */
-export function stubApi() {
+/**
+ * Stub global fetch to serve the fixture API; returns the spy for assertions.
+ * `overrides` lets a test intercept specific routes (e.g. to delay or fail a
+ * request) while every other route still serves its normal fixture — so a
+ * test controlling one request doesn't have to also know every other request
+ * the page happens to make.
+ */
+export function stubApi(overrides: Record<string, () => Response | Promise<Response>> = {}) {
   return vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => {
-      const match = Object.entries(ROUTES).find(([suffix]) => String(url).endsWith(suffix));
+      const key = String(url);
+      const override = Object.entries(overrides).find(([suffix]) => key.endsWith(suffix));
+      if (override) return override[1]();
+      const match = Object.entries(ROUTES).find(([suffix]) => key.endsWith(suffix));
       if (!match) {
         return new Response("not found", { status: 404 });
       }
