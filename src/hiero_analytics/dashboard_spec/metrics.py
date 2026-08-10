@@ -159,4 +159,39 @@ METRIC_ANNOTATIONS: dict[str, dict] = {
             "Count the teams whose latest activity is 180 days or more ago, or who have none at all.",
         ],
     },
+    "repos with releases": {
+        "note": (
+            "How many repos have ever published a GitHub Release, out of the org's full repo count. "
+            "Most zero-release repos are docs/governance/meta repos, not neglected code — this tile is "
+            "the denominator the other release tiles are scoped to, so that scoping is visible."
+        ),
+        "methodology": [
+            "Fetch every published, non-draft GitHub Release for each repo in the org.",
+            "Count repos with at least one release, against the org's full repo count.",
+        ],
+    },
+    "released last 90d %": {
+        "note": (
+            "Of repos that have ever released (not the full repo universe), the share that shipped a "
+            "release in the last 90 days."
+        ),
+        "methodology": [
+            "Take repos with at least one release ever.",
+            "Count those whose most recent release is 90 days old or less.",
+            "Divide by the count of repos that have ever released.",
+        ],
+    },
+    ">3x their own typical gap": {
+        "note": (
+            "Repos currently more than 3x past their own typical release gap — furthest behind "
+            "*relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't "
+            "counted just for having one; only repos with an established cadence (2+ releases) are "
+            "eligible."
+        ),
+        "methodology": [
+            "For each repo with 2+ releases, compute the median gap between consecutive releases.",
+            "Divide days since the most recent release by that median gap.",
+            "Count repos where that ratio exceeds 3.",
+        ],
+    },
 }
