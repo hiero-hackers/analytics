@@ -18,3 +18,13 @@ updates:
       interval: "weekly"
     reviewers:
       - exploreriii
+
+  - package-ecosystem: docker
+    directory: /.clusterfuzzlite
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: daily
