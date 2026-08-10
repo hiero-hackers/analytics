@@ -29,14 +29,14 @@ def plot_release_timeline(
 ) -> None:
     """Per-repo release timeline, sorted by release count.
 
-       Expects ``repo``, ``published_at``, and ``is_prerelease`` columns. Callers
-       apply date-window filtering before plotting.
+    Expects ``repo``, ``published_at``, and ``is_prerelease`` columns. Callers
+    apply date-window filtering before plotting.
 
-        Release counts are shown as labels to keep high-cadence repos readable;
-        markers convey cadence and release patterns. Repos with no releases are
-        omitted from the chart; the full repository denominator is preserved in the
-        staleness table.
-    """ 
+     Release counts are shown as labels to keep high-cadence repos readable;
+     markers convey cadence and release patterns. Repos with no releases are
+     omitted from the chart; the full repository denominator is preserved in the
+     staleness table.
+    """
     df = prepare_dataframe(df, "repo", "published_at")
 
     order = df.groupby("repo").size().sort_values(ascending=True).index.tolist()
