@@ -76,6 +76,7 @@ class TestBuildReleaseStaleness:
             "days_since_last_release",
             "median_gap_days",
             "staleness_ratio",
+            "release_status",
         ]
         assert result.empty
 
@@ -89,6 +90,9 @@ class TestBuildReleaseStaleness:
         assert result.iloc[0]["repo"] == "org/never-released"
         assert pd.isna(result.iloc[0]["latest_release"])
         assert pd.isna(result.iloc[0]["days_since_last_release"])
+        assert pd.isna(result.iloc[0]["median_gap_days"])
+        assert pd.isna(result.iloc[0]["staleness_ratio"])
+        assert result.iloc[0]["release_status"] == "never_released"
 
     def test_mixed_repos_only_released_ones_get_values(self) -> None:
         """Repos with releases get real values; repos without stay null in the same frame."""
@@ -100,6 +104,24 @@ class TestBuildReleaseStaleness:
 
         assert result.loc["org/released", "days_since_last_release"] == 90
         assert pd.isna(result.loc["org/never-released", "days_since_last_release"])
+        assert result.loc["org/released", "release_status"] == "released"
+        assert result.loc["org/never-released", "release_status"] == "never_released"
+
+    def test_all_repositories_never_released(self) -> None:
+        """All repositories are retained and marked never released when no releases exist."""
+        repos = [
+            _repo("a"),
+            _repo("b"),
+        ]
+
+        result = build_release_staleness([], repos)
+
+        assert list(result["repo"]) == ["org/a", "org/b"]
+        assert list(result["release_status"]) == [
+            "never_released",
+            "never_released",
+        ]
+        assert result["staleness_ratio"].isna().all()
 
     def test_latest_release_picks_the_most_recent_tag(self) -> None:
         """days_since_last_release is computed from the newest release, not the oldest."""

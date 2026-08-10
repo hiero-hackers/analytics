@@ -16,10 +16,11 @@ from hiero_analytics.data_sources.queries import load_query
 from ..cache import load_records_cache, save_records_cache
 from ..github_client import GitHubClient
 from ..models import ReleaseRecord
-from ..pagination import extract_graphql_cursor_page, paginate_cursor
+from ..pagination import extract_graphql_cursor_page
 from ._common import _cache_kwargs, fetch_org_resource_parallel
 
 RELEASES_RESOURCE = "repo_releases"
+MAX_RELEASE_PAGES = 100
 
 
 def fetch_repo_releases_graphql(
@@ -62,7 +63,20 @@ def fetch_repo_releases_graphql(
         ]
         return records, next_cursor, has_next
 
-    records = paginate_cursor(page)
+    records: list[ReleaseRecord] = []
+    cursor: str | None = None
+
+    for _ in range(MAX_RELEASE_PAGES):
+        page_records, cursor, has_next = page(cursor)
+        records.extend(page_records)
+
+        if not has_next:
+            break
+    else:
+        raise RuntimeError(
+            f"Release history for {owner}/{repo} exceeds "
+            f"{MAX_RELEASE_PAGES} pages; refusing to emit partial data."
+            )
 
     save_records_cache(RELEASES_RESOURCE, cache_scope, cache_parameters, ReleaseRecord, records, use_cache=use_cache)
     return records
