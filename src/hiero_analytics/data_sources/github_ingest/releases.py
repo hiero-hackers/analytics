@@ -74,9 +74,8 @@ def fetch_repo_releases_graphql(
             break
     else:
         raise RuntimeError(
-            f"Release history for {owner}/{repo} exceeds "
-            f"{MAX_RELEASE_PAGES} pages; refusing to emit partial data."
-            )
+            f"Release history for {owner}/{repo} exceeds {MAX_RELEASE_PAGES} pages; refusing to emit partial data."
+        )
 
     save_records_cache(RELEASES_RESOURCE, cache_scope, cache_parameters, ReleaseRecord, records, use_cache=use_cache)
     return records
