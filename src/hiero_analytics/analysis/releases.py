@@ -20,6 +20,7 @@ _STALENESS_COLUMNS = [
     "days_since_last_release",
     "median_gap_days",
     "staleness_ratio",
+    "release_status",
 ]
 
 
@@ -75,6 +76,7 @@ def build_release_staleness(
         staleness["days_since_last_release"] = pd.array([None] * len(staleness), dtype="Int64")
         staleness["median_gap_days"] = pd.array([None] * len(staleness), dtype="Float64")
         staleness["staleness_ratio"] = pd.array([None] * len(staleness), dtype="Float64")
+        staleness["release_status"] = "never_released"
         return staleness[_STALENESS_COLUMNS].reset_index(drop=True)
 
     releases = releases.sort_values(["repo", "published_at"])
@@ -84,6 +86,7 @@ def build_release_staleness(
 
     staleness = repo_universe.merge(latest, on="repo", how="left").merge(median_gap, on="repo", how="left")
     staleness["latest_release"] = pd.to_datetime(staleness["latest_release"], utc=True)
+    staleness["release_status"] = staleness["latest_release"].notna().map({True: "released", False: "never_released"})
     days = (now - staleness["latest_release"]).dt.days
     staleness["days_since_last_release"] = days.astype("Int64")
     staleness["median_gap_days"] = staleness["median_gap_days"].astype("Float64")
