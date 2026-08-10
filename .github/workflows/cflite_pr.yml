@@ -14,6 +14,8 @@ jobs:
             cancel-in-progress: true
         permissions:
           contents: read
+          security-events: write
+
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -36,5 +38,3 @@ jobs:
                 mode: code-change
                 sanitizer: address
                 output-sarif: true
-              permissions:
-                security-events: write
