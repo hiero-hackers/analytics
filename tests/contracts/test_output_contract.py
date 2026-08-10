@@ -118,11 +118,7 @@ CHART_COMPANION_CSVS = {
     "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
     "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
     "repo_growth_timeline.csv",  # Repo-growth timeline chart companion
-    # Releases pipeline data artifacts — dashboard tab/chart not built yet
-    # (see the design discussion on #331); the pipeline and its tables are
-    # done and tested ahead of the visualization.
-    "release_timeline.csv",
-    "release_repo_summary.csv",
+    "release_timeline.csv",  # Release-timeline chart companion (release_repo_summary.csv has its own table section)
 }
 
 

@@ -44,8 +44,8 @@ def synthetic_releases():
 def test_main_publishes_timeline_and_staleness_tables(
     stub_pipeline_context, monkeypatch, synthetic_repos, synthetic_releases
 ):
-    """A normal run writes both CSVs, with the never-released repo present but null."""
-    _client, data_dir, _charts_dir = stub_pipeline_context(releases_pipeline)
+    """A normal run writes both CSVs and both charts, with the never-released repo present but null."""
+    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
     monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: synthetic_releases)
@@ -63,10 +63,16 @@ def test_main_publishes_timeline_and_staleness_tables(
     assert pd.isna(staleness.loc["org/repo2-never-released", "days_since_last_release"])
     assert not pd.isna(staleness.loc["org/repo1", "days_since_last_release"])
 
+    timeline_chart = charts_dir / "release_timeline.png"
+    assert timeline_chart.exists() and timeline_chart.stat().st_size > 0
+
+    staleness_chart = charts_dir / "release_staleness.png"
+    assert staleness_chart.exists() and staleness_chart.stat().st_size > 0
+
 
 def test_main_skips_cleanly_when_org_has_no_repos(stub_pipeline_context, monkeypatch):
-    """No repos in the org -> no CSVs written, no crash."""
-    _client, data_dir, _charts_dir = stub_pipeline_context(releases_pipeline)
+    """No repos in the org -> no CSVs or charts written, no crash."""
+    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: [])
 
@@ -78,13 +84,19 @@ def test_main_skips_cleanly_when_org_has_no_repos(stub_pipeline_context, monkeyp
     releases_pipeline.main(org="org")
 
     assert list(data_dir.glob("*.csv")) == []
+    assert list(charts_dir.glob("*.png")) == []
 
 
 def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     stub_pipeline_context, monkeypatch, synthetic_repos
 ):
-    """Repos exist but none has ever released: both CSVs still get written, honestly empty/null."""
-    _client, data_dir, _charts_dir = stub_pipeline_context(releases_pipeline)
+    """Repos exist but none has ever released: both CSVs still get written, honestly empty/null.
+
+    No releases at all also means no charts -- both the timeline (nothing to
+    plot) and the staleness bar (no repo has a computable ratio) are skipped
+    rather than raising.
+    """
+    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
     monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: [])
@@ -97,3 +109,43 @@ def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     staleness = pd.read_csv(data_dir / "release_repo_summary.csv")
     assert len(staleness) == len(synthetic_repos)  # every repo still gets a row
     assert staleness["latest_release"].isna().all()
+
+    assert list(charts_dir.glob("*.png")) == []
+
+
+def test_main_generates_the_staleness_chart_when_a_repo_has_an_established_cadence(stub_pipeline_context, monkeypatch):
+    """A repo with 2+ releases (a computable cadence) produces the staleness bar chart."""
+    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
+
+    repos = [RepositoryRecord(full_name="org/steady", name="steady", owner="org")]
+    records = [
+        ReleaseRecord(
+            repo="org/steady",
+            tag_name="v1",
+            name="v1",
+            published_at=datetime(2026, 1, 1, tzinfo=UTC),
+            is_prerelease=False,
+        ),
+        ReleaseRecord(
+            repo="org/steady",
+            tag_name="v2",
+            name="v2",
+            published_at=datetime(2026, 1, 15, tzinfo=UTC),
+            is_prerelease=False,
+        ),
+        ReleaseRecord(
+            repo="org/steady",
+            tag_name="v3",
+            name="v3",
+            published_at=datetime(2026, 1, 29, tzinfo=UTC),
+            is_prerelease=False,
+        ),
+    ]
+
+    monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: repos)
+    monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: records)
+
+    releases_pipeline.main(org="org")
+
+    staleness_chart = charts_dir / "release_staleness.png"
+    assert staleness_chart.exists() and staleness_chart.stat().st_size > 0
