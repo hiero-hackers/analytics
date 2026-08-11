@@ -709,10 +709,6 @@
   .lbmethod li {
     margin: 5px 0;
   }
-  :root {
-    /* existing variables... */
-    --jump-h: 58px;
-  }
 
   /* Jump bar & groups */
   .jump {
@@ -721,7 +717,9 @@
     z-index: 50;
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
     align-items: center;
     background: var(--page);
     padding: 10px 0;
