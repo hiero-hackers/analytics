@@ -1,5 +1,8 @@
 name: ClusterFuzzLite PR fuzzing
 
+permissions:
+    contents: read
+
 on:
     pull_request:
         branches: ["main"]
@@ -13,7 +16,6 @@ jobs:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: true
         permissions:
-          contents: read
           security-events: write
 
 
