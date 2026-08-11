@@ -5048,13 +5048,13 @@
    "hip_title": "Block Streams",
    "repo": "hiero-ledger/hiero-block-node",
    "pr_number": 3378,
-   "pr_title": "fix: use streaming hasher for block-root Merkle Mountain Top ",
+   "pr_title": "feat(hasher): always feed 16 leaves to the Merkle Mountain Top hasher",
    "pr_state": "OPEN",
    "pr_merged_at": null,
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": "hasher pattern once merged) - HIP-1424, HIP-1056",
+   "snippet": "signature review, ongoing) - HIP-1424, HIP-1056",
    "url": "https://github.com/hiero-ledger/hiero-block-node/pull/3378"
   },
   {
@@ -8558,6 +8558,20 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-swift/pull/360"
   },
   {
+   "hip": 904,
+   "hip_title": "Frictionless Airdrops",
+   "repo": "hiero-ledger/hiero-sdk-tck",
+   "pr_number": 682,
+   "pr_title": "feat: Add Hip Tracking",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "no HIP applies * Backfilled hip: HIP-904 into: - ContractCreateTransactio",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-tck/pull/682"
+  },
+  {
    "hip": 869,
    "hip_title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
    "repo": "hiero-ledger/hiero-consensus-node",
@@ -11666,8 +11680,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 829,
- "generated_at": "2026-08-07T18:43:07.113693+00:00",
+ "row_count": 830,
+ "generated_at": "2026-08-11T09:26:45.920972+00:00",
  "stale": false,
  "macro": "HIPs"
 }

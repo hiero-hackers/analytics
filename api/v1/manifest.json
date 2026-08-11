@@ -333,10 +333,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-07T18:43:48.969817+00:00",
+ "generated_at": "2026-08-11T09:27:48.881878+00:00",
  "provenance": {
-  "git_sha": "53cbc71",
-  "data_as_of": "2026-08-06T09:19:03+00:00"
+  "git_sha": "763e887",
+  "data_as_of": "2026-08-06T10:27:46+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -359,14 +359,14 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 16,
+     "row_count": 18,
      "path": "hiero-ledger/understaffed.json"
     },
     {
      "id": "loadshare",
      "macro": "Governance",
      "title": "Who carries the review load",
-     "row_count": 25,
+     "row_count": 22,
      "path": "hiero-ledger/loadshare.json"
     },
     {
@@ -380,7 +380,7 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 748,
+     "row_count": 753,
      "path": "hiero-ledger/repo.json"
     },
     {
@@ -408,7 +408,7 @@
      "id": "affiliations",
      "macro": "Governance",
      "title": "Maintainer affiliations \u2014 reference",
-     "row_count": 103,
+     "row_count": 104,
      "path": "hiero-ledger/affiliations.json"
     },
     {
@@ -436,7 +436,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 829,
+     "row_count": 830,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -685,7 +685,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2206,
+         "width": 2176,
          "height": 1051
         }
        ],
@@ -901,7 +901,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-07T18:43:07.120533+00:00"
+      "generated_at": "2026-08-11T09:26:45.929829+00:00"
      }
     },
     {
@@ -961,7 +961,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-07T18:43:07.117463+00:00"
+      "generated_at": "2026-08-11T09:26:45.925599+00:00"
      }
     },
     {
@@ -1082,7 +1082,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2093,
-         "height": 1343
+         "height": 1280
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1207,7 +1207,7 @@
     "Governance": [
      {
       "label": "maintainers",
-      "value": 103,
+      "value": 104,
       "note": "People whose *highest* role anywhere in the organisation is maintainer. Counted at the highest role so the role tiles partition the permission-holders without double-counting.",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
@@ -1237,7 +1237,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 101,
+      "value": 102,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1607,7 +1607,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "27%",
+      "value": "30%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",

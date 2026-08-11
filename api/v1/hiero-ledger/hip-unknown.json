@@ -52,8 +52,8 @@
    "hip": 1424,
    "repo": "hiero-ledger/hiero-block-node",
    "pr_number": 3378,
-   "pr_title": "fix: use streaming hasher for block-root Merkle Mountain Top ",
-   "snippet": "streaming-hasher pattern once merged) - HIP-1424, HIP-1056"
+   "pr_title": "feat(hasher): always feed 16 leaves to the Merkle Mountain Top hasher",
+   "snippet": "lockHasher signature review, ongoing) - HIP-1424, HIP-1056"
   },
   {
    "hip": 1183,
@@ -92,7 +92,7 @@
   }
  ],
  "row_count": 9,
- "generated_at": "2026-08-07T18:43:07.114598+00:00",
+ "generated_at": "2026-08-11T09:26:45.922190+00:00",
  "stale": false,
  "macro": "HIPs"
 }
