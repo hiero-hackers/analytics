@@ -21,6 +21,9 @@ import { useSectionDocs } from "./useSectionDocs";
 import { useViewDocs } from "./useViewDocs";
 import { ViewCards } from "./components/ViewCards";
 
+
+const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
+
 function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; macro: string }) {
   const entry = manifest.orgs[org];
   const refs = useMemo(
@@ -37,6 +40,8 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
 
   const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
   const provenance = manifest.provenance;
+  // A shared section link names its target here; see the effect below.
+  const [widget] = useHashState("widget", "");
 
   // The tab is a sequence of named sections: each group renders its views,
   // then its chart cards, then its tables, and the jump bar links each one —
@@ -58,6 +63,18 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     if (!names.includes(doc.group || "")) names.push(doc.group || "");
   }
   const settled = !viewsLoading && !docsLoading;
+  // A shared #widget=<section id> link: once the tab settles, scroll to and flash that section
+  useEffect(() => {
+    if (!settled || !widget) return;
+    const target = document.getElementById(widget);
+    target?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    target?.classList.add("flash");
+    const timer = window.setTimeout(() => target?.classList.remove("flash"), FLASH_MS);
+    return () => {
+      window.clearTimeout(timer);
+      target?.classList.remove("flash");
+    };
+  }, [settled, widget]);
   const groups: Group[] = !settled
     ? []
     : names.flatMap((name): Group[] => {

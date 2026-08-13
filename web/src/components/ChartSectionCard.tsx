@@ -10,6 +10,7 @@ import { useState } from "react";
 import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from "../api";
 import { downloadCsvText } from "../csv";
 import { ChartLightbox, type LightboxContent } from "./ChartLightbox";
+import { CopyLinkButton } from "./CopyLinkButton";
 
 function Figure({
   chart,
@@ -103,24 +104,29 @@ export function ChartSectionCard({
 
   const download = section.download;
   return (
-    <section className="card">
+    <section className="card" id={section.id}>
       <h2>{section.title}</h2>
       <div className="shead">
         <p className="desc">{section.description}</p>
-        {download && (
-          <button
-            className="dl"
-            onClick={() =>
-              // The chart's companion table, stamped with the provenance
-              // preamble like every other browser download.
-              fetchApiText(download.path).then((text) =>
-                downloadCsvText(download.name, section.title, text, provenance, download.generated_at),
-              )
-            }
-          >
-            Download CSV
-          </button>
-        )}
+        <div className="sactions">
+          <div className="actionrow">
+            <CopyLinkButton sectionId={section.id} />
+            {download && (
+              <button
+                className="dl"
+                onClick={() =>
+                  // The chart's companion table, stamped with the provenance
+                  // preamble like every other browser download.
+                  fetchApiText(download.path).then((text) =>
+                    downloadCsvText(download.name, section.title, text, provenance, download.generated_at),
+                  )
+                }
+              >
+                Download CSV
+              </button>
+            )}
+          </div>
+        </div>
       </div>
       {section.slideshow && count > 1 ? (
         <div className="slideshow">

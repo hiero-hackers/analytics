@@ -345,6 +345,10 @@
     border-radius: var(--r-card);
     padding: 16px 18px;
     margin-bottom: 20px;
+    scroll-margin-top: var(--jump-h); 
+  }
+  .card.flash {
+    background: var(--flash);
   }
   .card h2 {
     font-size: 16px;
