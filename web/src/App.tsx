@@ -4,7 +4,7 @@
  * groups, chart-section cards, then the table sections.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchManifest, type ChartSection, type Manifest } from "./api";
 import { ChartSectionCard } from "./components/ChartSectionCard";
 import { Glossary } from "./components/Glossary";
@@ -64,15 +64,25 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
   }
   const settled = !viewsLoading && !docsLoading;
   // A shared #widget=<section id> link: once the tab settles, scroll to and flash that section
+  const flashTimer = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!settled || !widget) return;
-    const target = document.getElementById(widget);
-    target?.scrollIntoView?.({ block: "start", behavior: "smooth" });
-    target?.classList.add("flash");
-    const timer = window.setTimeout(() => target?.classList.remove("flash"), FLASH_MS);
+    const jump = () => {
+      const target = document.getElementById(widget);
+      target?.scrollIntoView({ block: "start", behavior: "smooth" });
+      target?.classList.add("flash");
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+      flashTimer.current = window.setTimeout(() => target?.classList.remove("flash"), FLASH_MS);
+    };
+    const canRequestFrame = typeof window.requestAnimationFrame === "function";
+    const raf = canRequestFrame ? window.requestAnimationFrame(jump) : undefined;
+    if (raf === undefined) jump();
     return () => {
-      window.clearTimeout(timer);
-      target?.classList.remove("flash");
+      if (typeof window.cancelAnimationFrame === "function" && raf !== undefined) {
+        window.cancelAnimationFrame(raf as number);
+      }
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+      document.getElementById(widget)?.classList.remove("flash");
     };
   }, [settled, widget]);
   const groups: Group[] = !settled
