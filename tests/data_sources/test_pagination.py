@@ -79,6 +79,13 @@ def test_extract_coerces_non_list_nodes_to_empty():
     assert nodes == []
 
 
+def test_extract_coerces_non_dict_page_info_to_empty():
+    """A malformed 'pageInfo' scalar is treated as absent rather than raising."""
+    data = {"data": {"repository": {"pullRequests": {"nodes": [], "pageInfo": "oops"}}}}
+    nodes, cursor, has_next = pagination.extract_graphql_cursor_page(data, ["repository", "pullRequests"])
+    assert nodes == [] and cursor is None and has_next is False
+
+
 def test_extract_wraps_a_bare_object_as_a_single_node():
     """A leaf object with no 'nodes' key is returned as a one-element list."""
     data = {"data": {"repository": {"owner": {"login": "alice"}}}}
