@@ -74,14 +74,14 @@
   {
    "team": "lf-staff",
    "members": 9,
-   "resolved": 8,
+   "resolved": 9,
    "distinct_orgs": 1,
    "top_org": "Linux Foundation",
    "top_org_pct": 100,
    "hhi": 10000,
-   "unknown": 1,
+   "unknown": 0,
    "single_employer": true,
-   "organisations": "Linux Foundation 8"
+   "organisations": "Linux Foundation 9"
   },
   {
    "team": "hiero-consensus-node-consensus-codeowners",
@@ -94,18 +94,6 @@
    "unknown": 2,
    "single_employer": true,
    "organisations": "Hashgraph 5"
-  },
-  {
-   "team": "github-maintainers",
-   "members": 6,
-   "resolved": 6,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 100,
-   "hhi": 10000,
-   "unknown": 0,
-   "single_employer": true,
-   "organisations": "Hashgraph 6"
   },
   {
    "team": "hiero-performance-engineers",
@@ -444,6 +432,30 @@
    "organisations": "LimeChain 6, Hashgraph 1"
   },
   {
+   "team": "github-maintainers",
+   "members": 7,
+   "resolved": 7,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 86,
+   "hhi": 7551,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 6, Independent 1"
+  },
+  {
+   "team": "hiero-cli-committers",
+   "members": 7,
+   "resolved": 7,
+   "distinct_orgs": 2,
+   "top_org": "BlockyDevs",
+   "top_org_pct": 86,
+   "hhi": 7551,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "BlockyDevs 6, Hashgraph 1"
+  },
+  {
    "team": "hiero-consensus-node-foundation-codeowners",
    "members": 7,
    "resolved": 7,
@@ -478,18 +490,6 @@
    "unknown": 2,
    "single_employer": false,
    "organisations": "Hashgraph 5, LimeChain 1"
-  },
-  {
-   "team": "hiero-cli-committers",
-   "members": 7,
-   "resolved": 6,
-   "distinct_orgs": 2,
-   "top_org": "BlockyDevs",
-   "top_org_pct": 83,
-   "hhi": 7222,
-   "unknown": 1,
-   "single_employer": false,
-   "organisations": "BlockyDevs 5, Hashgraph 1"
   },
   {
    "team": "hiero-cryptography-committers",
@@ -684,6 +684,18 @@
    "organisations": "Hashgraph 7, LimeChain 3"
   },
   {
+   "team": "hiero-cli-maintainers",
+   "members": 6,
+   "resolved": 6,
+   "distinct_orgs": 2,
+   "top_org": "BlockyDevs",
+   "top_org_pct": 67,
+   "hhi": 5556,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "BlockyDevs 4, Hashgraph 2"
+  },
+  {
    "team": "hiero-did-sdk-committers",
    "members": 4,
    "resolved": 3,
@@ -828,18 +840,6 @@
    "organisations": "Hashgraph 7, LimeChain 1, DevLabs 1, Independent 1"
   },
   {
-   "team": "hiero-cli-maintainers",
-   "members": 6,
-   "resolved": 5,
-   "distinct_orgs": 2,
-   "top_org": "BlockyDevs",
-   "top_org_pct": 60,
-   "hhi": 5200,
-   "unknown": 1,
-   "single_employer": false,
-   "organisations": "BlockyDevs 3, Hashgraph 2"
-  },
-  {
    "team": "hiero-contracts-maintainers",
    "members": 12,
    "resolved": 12,
@@ -910,6 +910,18 @@
    "unknown": 1,
    "single_employer": false,
    "organisations": "Hashgraph 1, DSR Corporation 1"
+  },
+  {
+   "team": "hiero-enterprise-java-committers",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 0,
+   "top_org": null,
+   "top_org_pct": 0,
+   "hhi": 5000,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Independent 2"
   },
   {
    "team": "hiero-enterprise-java-triage",
@@ -1308,8 +1320,8 @@
    "organisations": "OpenElements 1, LimeChain 1, Independent 8"
   }
  ],
- "row_count": 105,
- "generated_at": "2026-08-11T09:25:29.016662+00:00",
+ "row_count": 106,
+ "generated_at": "2026-08-14T07:49:15.495995+00:00",
  "stale": false,
  "macro": "Governance"
 }

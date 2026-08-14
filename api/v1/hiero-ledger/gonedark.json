@@ -148,31 +148,23 @@
   }
  ],
  "row_count": 14,
- "generated_at": "2026-08-11T09:25:25.862660+00:00",
+ "generated_at": "2026-08-14T07:49:12.312764+00:00",
  "stale": false,
  "periods": {
   "7d": [
+   {
+    "user": "daniela-barbosa",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 1,
+    "days_since_active": null,
+    "last_active": null
+   },
    {
     "user": "artemkaaas",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": null,
-    "last_active": null
-   },
-   {
-    "user": "davidwboswell",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
-    "days_since_active": null,
-    "last_active": null
-   },
-   {
-    "user": "christinaharter",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
     "days_since_active": null,
     "last_active": null
    },
@@ -185,15 +177,7 @@
     "last_active": null
    },
    {
-    "user": "daniela-barbosa",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
-    "days_since_active": null,
-    "last_active": null
-   },
-   {
-    "user": "hartm",
+    "user": "christinaharter",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
@@ -209,15 +193,15 @@
     "last_active": null
    },
    {
-    "user": "thelinuxfoundation",
+    "user": "drgorb",
     "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
+    "roles": "committer, maintainer",
+    "repos_held": 3,
     "days_since_active": null,
     "last_active": null
    },
    {
-    "user": "seanbohan",
+    "user": "davidwboswell",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
@@ -249,6 +233,14 @@
     "last_active": null
    },
    {
+    "user": "hartm",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 1,
+    "days_since_active": null,
+    "last_active": null
+   },
+   {
     "user": "harasz",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
@@ -257,10 +249,18 @@
     "last_active": null
    },
    {
-    "user": "drgorb",
+    "user": "thelinuxfoundation",
     "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 3,
+    "roles": "maintainer",
+    "repos_held": 1,
+    "days_since_active": null,
+    "last_active": null
+   },
+   {
+    "user": "seanbohan",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 1,
     "days_since_active": null,
     "last_active": null
    },
@@ -269,7 +269,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 2462.0,
+    "days_since_active": 2465.0,
     "last_active": "2019-11-14 01:27:38+00:00"
    },
    {
@@ -277,7 +277,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1994.0,
+    "days_since_active": 1997.0,
     "last_active": "2021-02-24 00:29:27+00:00"
    },
    {
@@ -285,7 +285,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1976.0,
+    "days_since_active": 1979.0,
     "last_active": "2021-03-13 19:05:21+00:00"
    },
    {
@@ -293,7 +293,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1890.0,
+    "days_since_active": 1893.0,
     "last_active": "2021-06-07 18:28:48+00:00"
    },
    {
@@ -301,7 +301,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1890.0,
+    "days_since_active": 1893.0,
     "last_active": "2021-06-07 19:52:03+00:00"
    },
    {
@@ -309,7 +309,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1805.0,
+    "days_since_active": 1808.0,
     "last_active": "2021-08-31 10:08:59+00:00"
    },
    {
@@ -317,7 +317,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1800.0,
+    "days_since_active": 1803.0,
     "last_active": "2021-09-06 04:23:10+00:00"
    },
    {
@@ -325,7 +325,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1782.0,
+    "days_since_active": 1785.0,
     "last_active": "2021-09-23 18:04:31+00:00"
    },
    {
@@ -333,7 +333,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1763.0,
+    "days_since_active": 1766.0,
     "last_active": "2021-10-12 21:33:56+00:00"
    },
    {
@@ -341,7 +341,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1761.0,
+    "days_since_active": 1764.0,
     "last_active": "2021-10-15 01:10:37+00:00"
    },
    {
@@ -349,7 +349,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1694.0,
+    "days_since_active": 1697.0,
     "last_active": "2021-12-20 22:33:44+00:00"
    },
    {
@@ -357,7 +357,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1581.0,
+    "days_since_active": 1584.0,
     "last_active": "2022-04-12 20:11:31+00:00"
    },
    {
@@ -365,7 +365,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1567.0,
+    "days_since_active": 1570.0,
     "last_active": "2022-04-26 21:50:21+00:00"
    },
    {
@@ -373,7 +373,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1533.0,
+    "days_since_active": 1536.0,
     "last_active": "2022-05-30 14:18:20+00:00"
    },
    {
@@ -381,7 +381,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1511.0,
+    "days_since_active": 1514.0,
     "last_active": "2022-06-22 00:12:48+00:00"
    },
    {
@@ -389,7 +389,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1510.0,
+    "days_since_active": 1513.0,
     "last_active": "2022-06-22 14:32:58+00:00"
    },
    {
@@ -397,7 +397,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1473.0,
+    "days_since_active": 1476.0,
     "last_active": "2022-07-29 14:42:41+00:00"
    },
    {
@@ -405,7 +405,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1470.0,
+    "days_since_active": 1473.0,
     "last_active": "2022-08-01 19:31:11+00:00"
    },
    {
@@ -413,7 +413,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1468.0,
+    "days_since_active": 1471.0,
     "last_active": "2022-08-04 00:12:12+00:00"
    },
    {
@@ -421,7 +421,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1432.0,
+    "days_since_active": 1435.0,
     "last_active": "2022-09-08 15:15:26+00:00"
    },
    {
@@ -429,7 +429,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1392.0,
+    "days_since_active": 1395.0,
     "last_active": "2022-10-18 09:59:23+00:00"
    },
    {
@@ -437,7 +437,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1385.0,
+    "days_since_active": 1388.0,
     "last_active": "2022-10-25 13:51:08+00:00"
    },
    {
@@ -445,7 +445,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1382.0,
+    "days_since_active": 1385.0,
     "last_active": "2022-10-28 21:26:24+00:00"
    },
    {
@@ -453,7 +453,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 1285.0,
+    "days_since_active": 1288.0,
     "last_active": "2023-02-03 01:56:23+00:00"
    },
    {
@@ -461,7 +461,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1222.0,
+    "days_since_active": 1225.0,
     "last_active": "2023-04-06 15:35:59+00:00"
    },
    {
@@ -469,7 +469,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1146.0,
+    "days_since_active": 1149.0,
     "last_active": "2023-06-21 14:10:18+00:00"
    },
    {
@@ -477,7 +477,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1138.0,
+    "days_since_active": 1141.0,
     "last_active": "2023-06-29 14:16:07+00:00"
    },
    {
@@ -485,7 +485,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 1095.0,
+    "days_since_active": 1098.0,
     "last_active": "2023-08-11 11:30:31+00:00"
    },
    {
@@ -493,7 +493,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1013.0,
+    "days_since_active": 1015.0,
     "last_active": "2023-11-02 08:56:29+00:00"
    },
    {
@@ -501,7 +501,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 977.0,
+    "days_since_active": 980.0,
     "last_active": "2023-12-07 14:08:50+00:00"
    },
    {
@@ -509,7 +509,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 956.0,
+    "days_since_active": 959.0,
     "last_active": "2023-12-28 09:55:57+00:00"
    },
    {
@@ -517,7 +517,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 880.0,
+    "days_since_active": 883.0,
     "last_active": "2024-03-13 16:23:23+00:00"
    },
    {
@@ -525,7 +525,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 844.0,
+    "days_since_active": 847.0,
     "last_active": "2024-04-18 17:08:42+00:00"
    },
    {
@@ -533,7 +533,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 761.0,
+    "days_since_active": 764.0,
     "last_active": "2024-07-10 15:05:17+00:00"
    },
    {
@@ -541,7 +541,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 705.0,
+    "days_since_active": 708.0,
     "last_active": "2024-09-04 14:32:35+00:00"
    },
    {
@@ -549,7 +549,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 678.0,
+    "days_since_active": 681.0,
     "last_active": "2024-10-01 20:03:15+00:00"
    },
    {
@@ -557,7 +557,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 648.0,
+    "days_since_active": 651.0,
     "last_active": "2024-10-31 15:58:20+00:00"
    },
    {
@@ -565,7 +565,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 637.0,
+    "days_since_active": 640.0,
     "last_active": "2024-11-11 16:39:12+00:00"
    },
    {
@@ -573,7 +573,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 633.0,
+    "days_since_active": 636.0,
     "last_active": "2024-11-15 14:39:58+00:00"
    },
    {
@@ -581,7 +581,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 600.0,
+    "days_since_active": 602.0,
     "last_active": "2024-12-19 09:03:19+00:00"
    },
    {
@@ -589,7 +589,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 577.0,
+    "days_since_active": 580.0,
     "last_active": "2025-01-10 10:26:59+00:00"
    },
    {
@@ -597,7 +597,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 550.0,
+    "days_since_active": 553.0,
     "last_active": "2025-02-06 18:09:28+00:00"
    },
    {
@@ -605,47 +605,47 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 543.0,
+    "days_since_active": 546.0,
     "last_active": "2025-02-13 18:22:06+00:00"
-   },
-   {
-    "user": "povolev15",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 522.0,
-    "last_active": "2025-03-06 14:26:57+00:00"
-   },
-   {
-    "user": "mattp-swirldslabs",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 522.0,
-    "last_active": "2025-03-06 18:07:39+00:00"
-   },
-   {
-    "user": "iwsimon",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 3,
-    "days_since_active": 522.0,
-    "last_active": "2025-03-06 15:58:47+00:00"
    },
    {
     "user": "thomas-swirlds-labs",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 15:24:11+00:00"
+   },
+   {
+    "user": "povolev15",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 525.0,
+    "last_active": "2025-03-06 14:26:57+00:00"
+   },
+   {
+    "user": "iwsimon",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 3,
+    "days_since_active": 525.0,
+    "last_active": "2025-03-06 15:58:47+00:00"
+   },
+   {
+    "user": "mattp-swirldslabs",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 525.0,
+    "last_active": "2025-03-06 18:07:39+00:00"
    },
    {
     "user": "bguiz",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 504.0,
+    "days_since_active": 507.0,
     "last_active": "2025-03-25 01:19:10+00:00"
    },
    {
@@ -653,7 +653,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 495.0,
+    "days_since_active": 498.0,
     "last_active": "2025-04-02 22:52:09+00:00"
    },
    {
@@ -661,7 +661,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 490.0,
+    "days_since_active": 493.0,
     "last_active": "2025-04-07 13:37:23+00:00"
    },
    {
@@ -669,7 +669,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 482.0,
+    "days_since_active": 485.0,
     "last_active": "2025-04-16 00:04:42+00:00"
    },
    {
@@ -677,7 +677,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 474.0,
+    "days_since_active": 477.0,
     "last_active": "2025-04-23 18:28:44+00:00"
    },
    {
@@ -685,31 +685,31 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 459.0,
+    "days_since_active": 462.0,
     "last_active": "2025-05-08 23:06:03+00:00"
-   },
-   {
-    "user": "isavov",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 3,
-    "days_since_active": 458.0,
-    "last_active": "2025-05-09 17:19:42+00:00"
    },
    {
     "user": "matteriben",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 458.0,
+    "days_since_active": 461.0,
     "last_active": "2025-05-09 16:05:30+00:00"
+   },
+   {
+    "user": "isavov",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 3,
+    "days_since_active": 461.0,
+    "last_active": "2025-05-09 17:19:42+00:00"
    },
    {
     "user": "justynspooner",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 453.0,
+    "days_since_active": 456.0,
     "last_active": "2025-05-14 09:51:37+00:00"
    },
    {
@@ -717,7 +717,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 439.0,
+    "days_since_active": 442.0,
     "last_active": "2025-05-28 21:00:44+00:00"
    },
    {
@@ -725,7 +725,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 419.0,
+    "days_since_active": 422.0,
     "last_active": "2025-06-17 22:20:57+00:00"
    },
    {
@@ -733,7 +733,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": 398.0,
+    "days_since_active": 401.0,
     "last_active": "2025-07-08 13:53:17+00:00"
    },
    {
@@ -741,7 +741,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 397.0,
+    "days_since_active": 400.0,
     "last_active": "2025-07-09 18:43:27+00:00"
    },
    {
@@ -749,7 +749,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 396.0,
+    "days_since_active": 399.0,
     "last_active": "2025-07-10 11:34:20+00:00"
    },
    {
@@ -757,7 +757,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 382.0,
+    "days_since_active": 384.0,
     "last_active": "2025-07-25 09:19:44+00:00"
    },
    {
@@ -765,7 +765,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 368.0,
+    "days_since_active": 371.0,
     "last_active": "2025-08-07 14:19:03+00:00"
    },
    {
@@ -773,7 +773,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 366.0,
+    "days_since_active": 369.0,
     "last_active": "2025-08-10 03:00:09+00:00"
    },
    {
@@ -781,7 +781,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 362.0,
+    "days_since_active": 365.0,
     "last_active": "2025-08-13 10:56:59+00:00"
    },
    {
@@ -789,7 +789,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 354.0,
+    "days_since_active": 357.0,
     "last_active": "2025-08-21 14:01:43+00:00"
    },
    {
@@ -797,7 +797,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 350.0,
+    "days_since_active": 353.0,
     "last_active": "2025-08-25 19:37:12+00:00"
    },
    {
@@ -805,7 +805,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 349.0,
+    "days_since_active": 352.0,
     "last_active": "2025-08-26 19:01:21+00:00"
    },
    {
@@ -813,7 +813,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 343.0,
+    "days_since_active": 346.0,
     "last_active": "2025-09-01 16:31:25+00:00"
    },
    {
@@ -821,7 +821,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 341.0,
+    "days_since_active": 344.0,
     "last_active": "2025-09-03 11:56:55+00:00"
    },
    {
@@ -829,7 +829,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 327.0,
+    "days_since_active": 330.0,
     "last_active": "2025-09-17 12:32:13+00:00"
    },
    {
@@ -837,7 +837,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 321.0,
+    "days_since_active": 324.0,
     "last_active": "2025-09-23 15:24:56+00:00"
    },
    {
@@ -845,7 +845,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 314.0,
+    "days_since_active": 317.0,
     "last_active": "2025-10-01 06:22:26+00:00"
    },
    {
@@ -853,7 +853,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 314.0,
+    "days_since_active": 317.0,
     "last_active": "2025-09-30 15:48:44+00:00"
    },
    {
@@ -861,7 +861,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 308.0,
+    "days_since_active": 311.0,
     "last_active": "2025-10-06 11:14:12+00:00"
    },
    {
@@ -869,7 +869,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 283.0,
+    "days_since_active": 286.0,
     "last_active": "2025-10-31 16:42:34+00:00"
    },
    {
@@ -877,7 +877,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 276.0,
+    "days_since_active": 279.0,
     "last_active": "2025-11-07 11:37:23+00:00"
    },
    {
@@ -885,7 +885,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 249.0,
+    "days_since_active": 252.0,
     "last_active": "2025-12-04 20:03:42+00:00"
    },
    {
@@ -893,7 +893,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 247.0,
+    "days_since_active": 250.0,
     "last_active": "2025-12-06 18:19:11+00:00"
    },
    {
@@ -901,7 +901,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 238.0,
+    "days_since_active": 241.0,
     "last_active": "2025-12-15 16:03:40+00:00"
    },
    {
@@ -909,7 +909,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 206.0,
+    "days_since_active": 209.0,
     "last_active": "2026-01-16 09:43:26+00:00"
    },
    {
@@ -917,7 +917,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 201.0,
+    "days_since_active": 204.0,
     "last_active": "2026-01-21 18:12:17+00:00"
    },
    {
@@ -925,7 +925,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 192.0,
+    "days_since_active": 195.0,
     "last_active": "2026-01-30 14:53:01+00:00"
    },
    {
@@ -933,7 +933,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 188.0,
+    "days_since_active": 191.0,
     "last_active": "2026-02-03 15:39:35+00:00"
    },
    {
@@ -941,31 +941,31 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 187.0,
+    "days_since_active": 190.0,
     "last_active": "2026-02-04 15:06:10+00:00"
-   },
-   {
-    "user": "konstantinabl",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 5,
-    "days_since_active": 185.0,
-    "last_active": "2026-02-06 16:09:40+00:00"
    },
    {
     "user": "emiliyank",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 185.0,
+    "days_since_active": 188.0,
     "last_active": "2026-02-06 14:00:54+00:00"
+   },
+   {
+    "user": "konstantinabl",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 5,
+    "days_since_active": 188.0,
+    "last_active": "2026-02-06 16:09:40+00:00"
    },
    {
     "user": "Shivam-Batham",
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 181.0,
+    "days_since_active": 184.0,
     "last_active": "2026-02-10 18:33:40+00:00"
    },
    {
@@ -973,7 +973,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 2,
-    "days_since_active": 165.0,
+    "days_since_active": 167.0,
     "last_active": "2026-02-27 09:13:34+00:00"
    },
    {
@@ -981,7 +981,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 164.0,
+    "days_since_active": 167.0,
     "last_active": "2026-02-27 17:15:42+00:00"
    },
    {
@@ -989,7 +989,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 5,
-    "days_since_active": 160.0,
+    "days_since_active": 163.0,
     "last_active": "2026-03-03 16:02:03+00:00"
    },
    {
@@ -997,7 +997,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 159.0,
+    "days_since_active": 162.0,
     "last_active": "2026-03-04 21:25:35+00:00"
    },
    {
@@ -1005,7 +1005,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 150.0,
+    "days_since_active": 153.0,
     "last_active": "2026-03-13 16:02:21+00:00"
    },
    {
@@ -1013,7 +1013,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 147.0,
+    "days_since_active": 150.0,
     "last_active": "2026-03-16 14:33:42+00:00"
    },
    {
@@ -1021,7 +1021,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 11,
-    "days_since_active": 140.0,
+    "days_since_active": 142.0,
     "last_active": "2026-03-24 08:02:24+00:00"
    },
    {
@@ -1029,7 +1029,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 137.0,
+    "days_since_active": 140.0,
     "last_active": "2026-03-26 17:05:24+00:00"
    },
    {
@@ -1037,7 +1037,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 136.0,
+    "days_since_active": 139.0,
     "last_active": "2026-03-27 15:30:38+00:00"
    },
    {
@@ -1045,7 +1045,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": 131.0,
+    "days_since_active": 134.0,
     "last_active": "2026-04-01 17:35:25+00:00"
    },
    {
@@ -1053,7 +1053,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 11,
-    "days_since_active": 117.0,
+    "days_since_active": 120.0,
     "last_active": "2026-04-15 13:08:37+00:00"
    },
    {
@@ -1061,7 +1061,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 8,
-    "days_since_active": 117.0,
+    "days_since_active": 120.0,
     "last_active": "2026-04-15 14:10:01+00:00"
    },
    {
@@ -1069,7 +1069,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 112.0,
+    "days_since_active": 115.0,
     "last_active": "2026-04-20 11:33:07+00:00"
    },
    {
@@ -1077,7 +1077,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 106.0,
+    "days_since_active": 109.0,
     "last_active": "2026-04-26 19:26:50+00:00"
    },
    {
@@ -1085,7 +1085,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 99.0,
+    "days_since_active": 101.0,
     "last_active": "2026-05-04 08:03:04+00:00"
    },
    {
@@ -1093,7 +1093,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 95.0,
+    "days_since_active": 98.0,
     "last_active": "2026-05-07 16:52:14+00:00"
    },
    {
@@ -1101,7 +1101,7 @@
     "highest_role": "committer",
     "roles": "committer, triage",
     "repos_held": 5,
-    "days_since_active": 94.0,
+    "days_since_active": 97.0,
     "last_active": "2026-05-08 23:19:32+00:00"
    },
    {
@@ -1109,7 +1109,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 91.0,
+    "days_since_active": 94.0,
     "last_active": "2026-05-11 17:27:05+00:00"
    },
    {
@@ -1117,7 +1117,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 12,
-    "days_since_active": 85.0,
+    "days_since_active": 88.0,
     "last_active": "2026-05-17 15:45:57+00:00"
    },
    {
@@ -1125,7 +1125,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 84.0,
+    "days_since_active": 87.0,
     "last_active": "2026-05-18 21:12:39+00:00"
    },
    {
@@ -1133,7 +1133,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 80.0,
+    "days_since_active": 83.0,
     "last_active": "2026-05-23 05:00:02+00:00"
    },
    {
@@ -1141,7 +1141,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 11,
-    "days_since_active": 77.0,
+    "days_since_active": 80.0,
     "last_active": "2026-05-26 04:33:13+00:00"
    },
    {
@@ -1149,7 +1149,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 76.0,
+    "days_since_active": 79.0,
     "last_active": "2026-05-26 16:54:48+00:00"
    },
    {
@@ -1157,7 +1157,7 @@
     "highest_role": "committer",
     "roles": "committer, triage",
     "repos_held": 10,
-    "days_since_active": 70.0,
+    "days_since_active": 73.0,
     "last_active": "2026-06-01 12:02:38+00:00"
    },
    {
@@ -1165,31 +1165,31 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 70.0,
+    "days_since_active": 73.0,
     "last_active": "2026-06-01 10:47:07+00:00"
-   },
-   {
-    "user": "Mark-Swirlds",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 69.0,
-    "last_active": "2026-06-02 22:46:44+00:00"
    },
    {
     "user": "ty-swirldslabs",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 69.0,
+    "days_since_active": 72.0,
     "last_active": "2026-06-02 16:33:20+00:00"
+   },
+   {
+    "user": "Mark-Swirlds",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 72.0,
+    "last_active": "2026-06-02 22:46:44+00:00"
    },
    {
     "user": "diogper",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 67.0,
+    "days_since_active": 70.0,
     "last_active": "2026-06-04 11:04:44+00:00"
    },
    {
@@ -1197,7 +1197,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 57.0,
+    "days_since_active": 60.0,
     "last_active": "2026-06-14 17:20:22+00:00"
    },
    {
@@ -1205,7 +1205,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 53.0,
+    "days_since_active": 56.0,
     "last_active": "2026-06-18 15:43:51+00:00"
    },
    {
@@ -1213,23 +1213,15 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 5,
-    "days_since_active": 49.0,
+    "days_since_active": 52.0,
     "last_active": "2026-06-23 03:14:29+00:00"
-   },
-   {
-    "user": "jasperpotts",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 3,
-    "days_since_active": 46.0,
-    "last_active": "2026-06-25 16:50:39+00:00"
    },
    {
     "user": "devmab",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 41.0,
+    "days_since_active": 44.0,
     "last_active": "2026-07-01 06:09:39+00:00"
    },
    {
@@ -1237,79 +1229,79 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 40.0,
+    "days_since_active": 43.0,
     "last_active": "2026-07-01 17:08:16+00:00"
-   },
-   {
-    "user": "OlegMazurov",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 2,
-    "days_since_active": 40.0,
-    "last_active": "2026-07-01 17:07:41+00:00"
    },
    {
     "user": "piotrswierzy",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 40.0,
+    "days_since_active": 43.0,
     "last_active": "2026-07-01 12:51:22+00:00"
+   },
+   {
+    "user": "OlegMazurov",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 2,
+    "days_since_active": 43.0,
+    "last_active": "2026-07-01 17:07:41+00:00"
    },
    {
     "user": "quiet-node",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 39.0,
+    "days_since_active": 42.0,
     "last_active": "2026-07-02 20:54:46+00:00"
-   },
-   {
-    "user": "mmyslblocky",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
-    "days_since_active": 38.0,
-    "last_active": "2026-07-03 11:11:41+00:00"
    },
    {
     "user": "matevszm",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 38.0,
+    "days_since_active": 41.0,
     "last_active": "2026-07-03 10:57:02+00:00"
    },
    {
-    "user": "mahmoudian1",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 35.0,
-    "last_active": "2026-07-06 19:32:11+00:00"
-   },
-   {
-    "user": "lukasz-hashgraph",
+    "user": "mmyslblocky",
     "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 3,
-    "days_since_active": 35.0,
-    "last_active": "2026-07-06 11:01:48+00:00"
+    "roles": "maintainer",
+    "repos_held": 1,
+    "days_since_active": 41.0,
+    "last_active": "2026-07-03 11:11:41+00:00"
    },
    {
     "user": "simzzz",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 35.0,
+    "days_since_active": 38.0,
     "last_active": "2026-07-06 17:49:04+00:00"
+   },
+   {
+    "user": "lukasz-hashgraph",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 3,
+    "days_since_active": 38.0,
+    "last_active": "2026-07-06 11:01:48+00:00"
+   },
+   {
+    "user": "mahmoudian1",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 38.0,
+    "last_active": "2026-07-06 19:32:11+00:00"
    },
    {
     "user": "rozekmichal",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 33.0,
+    "days_since_active": 36.0,
     "last_active": "2026-07-09 07:29:23+00:00"
    },
    {
@@ -1317,7 +1309,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 27.0,
+    "days_since_active": 30.0,
     "last_active": "2026-07-14 21:25:51+00:00"
    },
    {
@@ -1325,71 +1317,47 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 26.0,
+    "days_since_active": 29.0,
     "last_active": "2026-07-16 05:45:15+00:00"
-   },
-   {
-    "user": "hendrikebbers",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer, triage",
-    "repos_held": 18,
-    "days_since_active": 25.0,
-    "last_active": "2026-07-17 08:22:46+00:00"
    },
    {
     "user": "Mounil2005",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 22.0,
+    "days_since_active": 25.0,
     "last_active": "2026-07-19 21:53:06+00:00"
-   },
-   {
-    "user": "stoqnkpL",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 6,
-    "days_since_active": 20.0,
-    "last_active": "2026-07-22 08:33:32+00:00"
    },
    {
     "user": "gsstoykov",
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 12,
-    "days_since_active": 20.0,
+    "days_since_active": 23.0,
     "last_active": "2026-07-21 15:20:07+00:00"
    },
    {
-    "user": "akugal",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 19.0,
-    "last_active": "2026-07-23 00:01:11+00:00"
-   },
-   {
-    "user": "Ferparishuertas",
+    "user": "stoqnkpL",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
-    "repos_held": 5,
-    "days_since_active": 19.0,
-    "last_active": "2026-07-22 11:04:56+00:00"
+    "repos_held": 6,
+    "days_since_active": 22.0,
+    "last_active": "2026-07-22 08:33:32+00:00"
    },
    {
-    "user": "radkomih",
+    "user": "tomzhenghedera",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 18.0,
-    "last_active": "2026-07-24 07:11:12+00:00"
+    "days_since_active": 21.0,
+    "last_active": "2026-07-24 04:34:40+00:00"
    },
    {
     "user": "SimiHunjan",
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 18,
-    "days_since_active": 18.0,
+    "days_since_active": 21.0,
     "last_active": "2026-07-23 14:54:10+00:00"
    },
    {
@@ -1397,39 +1365,23 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 11,
-    "days_since_active": 18.0,
+    "days_since_active": 21.0,
     "last_active": "2026-07-23 10:50:16+00:00"
-   },
-   {
-    "user": "tomzhenghedera",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 1,
-    "days_since_active": 18.0,
-    "last_active": "2026-07-24 04:34:40+00:00"
    },
    {
     "user": "a-saksena",
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 13,
-    "days_since_active": 17.0,
+    "days_since_active": 20.0,
     "last_active": "2026-07-24 22:12:02+00:00"
-   },
-   {
-    "user": "Adityarya11",
-    "highest_role": "committer",
-    "roles": "committer, triage",
-    "repos_held": 10,
-    "days_since_active": 15.0,
-    "last_active": "2026-07-27 09:23:08+00:00"
    },
    {
     "user": "BartoszSolkaBD",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 14.0,
+    "days_since_active": 17.0,
     "last_active": "2026-07-28 06:59:00+00:00"
    },
    {
@@ -1437,31 +1389,15 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 7,
-    "days_since_active": 14.0,
+    "days_since_active": 17.0,
     "last_active": "2026-07-27 23:28:42+00:00"
-   },
-   {
-    "user": "AntonioCeppellini",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 1,
-    "days_since_active": 13.0,
-    "last_active": "2026-07-28 18:21:07+00:00"
-   },
-   {
-    "user": "tgntr",
-    "highest_role": "triage",
-    "roles": "triage",
-    "repos_held": 3,
-    "days_since_active": 13.0,
-    "last_active": "2026-07-28 12:53:30+00:00"
    },
    {
     "user": "ElijahLynn",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 13.0,
+    "days_since_active": 16.0,
     "last_active": "2026-07-28 23:46:55+00:00"
    },
    {
@@ -1469,107 +1405,91 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 12.0,
+    "days_since_active": 15.0,
     "last_active": "2026-07-29 10:01:05+00:00"
-   },
-   {
-    "user": "ruslanvelkov-beep",
-    "highest_role": "triage",
-    "roles": "triage",
-    "repos_held": 1,
-    "days_since_active": 12.0,
-    "last_active": "2026-07-30 09:16:58+00:00"
    },
    {
     "user": "tajang97",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 12.0,
+    "days_since_active": 15.0,
     "last_active": "2026-07-29 09:41:10+00:00"
-   },
-   {
-    "user": "RaphaelMessian",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 2,
-    "days_since_active": 12.0,
-    "last_active": "2026-07-29 14:09:44+00:00"
-   },
-   {
-    "user": "svienot",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 2,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-31 07:41:18+00:00"
-   },
-   {
-    "user": "kfbr",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-30 16:14:02+00:00"
-   },
-   {
-    "user": "ericleponner",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 2,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-31 08:16:22+00:00"
-   },
-   {
-    "user": "pratyay85",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-31 08:56:12+00:00"
-   },
-   {
-    "user": "tinker-michaelj",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 4,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-30 21:13:09+00:00"
-   },
-   {
-    "user": "timo0",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 11.0,
-    "last_active": "2026-07-30 14:30:32+00:00"
    },
    {
     "user": "viniciusjssouza",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 11.0,
+    "days_since_active": 14.0,
     "last_active": "2026-07-30 18:42:41+00:00"
    },
    {
-    "user": "jjohannes",
+    "user": "kfbr",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 14.0,
+    "last_active": "2026-07-30 16:14:02+00:00"
+   },
+   {
+    "user": "svienot",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
-    "repos_held": 6,
-    "days_since_active": 8.0,
-    "last_active": "2026-08-03 09:12:26+00:00"
-   }
-  ],
-  "30d": [
+    "repos_held": 2,
+    "days_since_active": 14.0,
+    "last_active": "2026-07-31 07:41:18+00:00"
+   },
    {
-    "user": "ashcherbakov",
+    "user": "pratyay85",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 1,
+    "days_since_active": 13.0,
+    "last_active": "2026-07-31 08:56:12+00:00"
+   },
+   {
+    "user": "ashumahajan",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 1,
+    "days_since_active": 10.0,
+    "last_active": "2026-08-03 19:13:57+00:00"
+   },
+   {
+    "user": "mxtartaglia-sl",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 9.0,
+    "last_active": "2026-08-04 13:53:53+00:00"
+   },
+   {
+    "user": "Jeffrey-morgan34",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 2,
+    "days_since_active": 9.0,
+    "last_active": "2026-08-04 16:02:10+00:00"
+   },
+   {
+    "user": "MilanWR",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": null,
-    "last_active": null
+    "days_since_active": 8.0,
+    "last_active": "2026-08-05 18:07:44+00:00"
    },
+   {
+    "user": "Neurone",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 3,
+    "days_since_active": 8.0,
+    "last_active": "2026-08-05 18:47:04+00:00"
+   }
+  ],
+  "30d": [
    {
     "user": "artemkaaas",
     "highest_role": "maintainer",
@@ -1579,10 +1499,10 @@
     "last_active": null
    },
    {
-    "user": "harasz",
+    "user": "ashcherbakov",
     "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 2,
+    "roles": "maintainer",
+    "repos_held": 4,
     "days_since_active": null,
     "last_active": null
    },
@@ -1635,18 +1555,18 @@
     "last_active": null
    },
    {
-    "user": "hartm",
+    "user": "harasz",
     "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 1,
+    "roles": "committer, maintainer",
+    "repos_held": 2,
     "days_since_active": null,
     "last_active": null
    },
    {
-    "user": "drgorb",
+    "user": "hartm",
     "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 3,
+    "roles": "maintainer",
+    "repos_held": 1,
     "days_since_active": null,
     "last_active": null
    },
@@ -1675,11 +1595,19 @@
     "last_active": null
    },
    {
+    "user": "drgorb",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 3,
+    "days_since_active": null,
+    "last_active": null
+   },
+   {
     "user": "publu",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 2462.0,
+    "days_since_active": 2465.0,
     "last_active": "2019-11-14 01:27:38+00:00"
    },
    {
@@ -1687,7 +1615,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1994.0,
+    "days_since_active": 1997.0,
     "last_active": "2021-02-24 00:29:27+00:00"
    },
    {
@@ -1695,31 +1623,31 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1976.0,
+    "days_since_active": 1979.0,
     "last_active": "2021-03-13 19:05:21+00:00"
-   },
-   {
-    "user": "RECDeFi",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 1,
-    "days_since_active": 1890.0,
-    "last_active": "2021-06-07 19:52:03+00:00"
    },
    {
     "user": "donaldthibeau",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1890.0,
+    "days_since_active": 1893.0,
     "last_active": "2021-06-07 18:28:48+00:00"
+   },
+   {
+    "user": "RECDeFi",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 1,
+    "days_since_active": 1893.0,
+    "last_active": "2021-06-07 19:52:03+00:00"
    },
    {
     "user": "gerbert-vandenberghe",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1805.0,
+    "days_since_active": 1808.0,
     "last_active": "2021-08-31 10:08:59+00:00"
    },
    {
@@ -1727,7 +1655,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1800.0,
+    "days_since_active": 1803.0,
     "last_active": "2021-09-06 04:23:10+00:00"
    },
    {
@@ -1735,7 +1663,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1782.0,
+    "days_since_active": 1785.0,
     "last_active": "2021-09-23 18:04:31+00:00"
    },
    {
@@ -1743,7 +1671,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1763.0,
+    "days_since_active": 1766.0,
     "last_active": "2021-10-12 21:33:56+00:00"
    },
    {
@@ -1751,7 +1679,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1761.0,
+    "days_since_active": 1764.0,
     "last_active": "2021-10-15 01:10:37+00:00"
    },
    {
@@ -1759,7 +1687,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1694.0,
+    "days_since_active": 1697.0,
     "last_active": "2021-12-20 22:33:44+00:00"
    },
    {
@@ -1767,7 +1695,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1581.0,
+    "days_since_active": 1584.0,
     "last_active": "2022-04-12 20:11:31+00:00"
    },
    {
@@ -1775,7 +1703,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1567.0,
+    "days_since_active": 1570.0,
     "last_active": "2022-04-26 21:50:21+00:00"
    },
    {
@@ -1783,7 +1711,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1533.0,
+    "days_since_active": 1536.0,
     "last_active": "2022-05-30 14:18:20+00:00"
    },
    {
@@ -1791,7 +1719,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1511.0,
+    "days_since_active": 1514.0,
     "last_active": "2022-06-22 00:12:48+00:00"
    },
    {
@@ -1799,7 +1727,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1510.0,
+    "days_since_active": 1513.0,
     "last_active": "2022-06-22 14:32:58+00:00"
    },
    {
@@ -1807,7 +1735,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1473.0,
+    "days_since_active": 1476.0,
     "last_active": "2022-07-29 14:42:41+00:00"
    },
    {
@@ -1815,7 +1743,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1470.0,
+    "days_since_active": 1473.0,
     "last_active": "2022-08-01 19:31:11+00:00"
    },
    {
@@ -1823,7 +1751,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1468.0,
+    "days_since_active": 1471.0,
     "last_active": "2022-08-04 00:12:12+00:00"
    },
    {
@@ -1831,7 +1759,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1432.0,
+    "days_since_active": 1435.0,
     "last_active": "2022-09-08 15:15:26+00:00"
    },
    {
@@ -1839,7 +1767,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1392.0,
+    "days_since_active": 1395.0,
     "last_active": "2022-10-18 09:59:23+00:00"
    },
    {
@@ -1847,7 +1775,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1385.0,
+    "days_since_active": 1388.0,
     "last_active": "2022-10-25 13:51:08+00:00"
    },
    {
@@ -1855,7 +1783,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1382.0,
+    "days_since_active": 1385.0,
     "last_active": "2022-10-28 21:26:24+00:00"
    },
    {
@@ -1863,7 +1791,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 1285.0,
+    "days_since_active": 1288.0,
     "last_active": "2023-02-03 01:56:23+00:00"
    },
    {
@@ -1871,7 +1799,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1222.0,
+    "days_since_active": 1225.0,
     "last_active": "2023-04-06 15:35:59+00:00"
    },
    {
@@ -1879,7 +1807,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1146.0,
+    "days_since_active": 1149.0,
     "last_active": "2023-06-21 14:10:18+00:00"
    },
    {
@@ -1887,7 +1815,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1138.0,
+    "days_since_active": 1141.0,
     "last_active": "2023-06-29 14:16:07+00:00"
    },
    {
@@ -1895,7 +1823,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 1095.0,
+    "days_since_active": 1098.0,
     "last_active": "2023-08-11 11:30:31+00:00"
    },
    {
@@ -1903,7 +1831,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1013.0,
+    "days_since_active": 1015.0,
     "last_active": "2023-11-02 08:56:29+00:00"
    },
    {
@@ -1911,7 +1839,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 977.0,
+    "days_since_active": 980.0,
     "last_active": "2023-12-07 14:08:50+00:00"
    },
    {
@@ -1919,7 +1847,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 956.0,
+    "days_since_active": 959.0,
     "last_active": "2023-12-28 09:55:57+00:00"
    },
    {
@@ -1927,7 +1855,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 880.0,
+    "days_since_active": 883.0,
     "last_active": "2024-03-13 16:23:23+00:00"
    },
    {
@@ -1935,7 +1863,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 844.0,
+    "days_since_active": 847.0,
     "last_active": "2024-04-18 17:08:42+00:00"
    },
    {
@@ -1943,7 +1871,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 761.0,
+    "days_since_active": 764.0,
     "last_active": "2024-07-10 15:05:17+00:00"
    },
    {
@@ -1951,7 +1879,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 705.0,
+    "days_since_active": 708.0,
     "last_active": "2024-09-04 14:32:35+00:00"
    },
    {
@@ -1959,7 +1887,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 678.0,
+    "days_since_active": 681.0,
     "last_active": "2024-10-01 20:03:15+00:00"
    },
    {
@@ -1967,7 +1895,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 648.0,
+    "days_since_active": 651.0,
     "last_active": "2024-10-31 15:58:20+00:00"
    },
    {
@@ -1975,7 +1903,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 637.0,
+    "days_since_active": 640.0,
     "last_active": "2024-11-11 16:39:12+00:00"
    },
    {
@@ -1983,7 +1911,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 633.0,
+    "days_since_active": 636.0,
     "last_active": "2024-11-15 14:39:58+00:00"
    },
    {
@@ -1991,7 +1919,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 600.0,
+    "days_since_active": 602.0,
     "last_active": "2024-12-19 09:03:19+00:00"
    },
    {
@@ -1999,7 +1927,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 577.0,
+    "days_since_active": 580.0,
     "last_active": "2025-01-10 10:26:59+00:00"
    },
    {
@@ -2007,7 +1935,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 550.0,
+    "days_since_active": 553.0,
     "last_active": "2025-02-06 18:09:28+00:00"
    },
    {
@@ -2015,47 +1943,47 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 543.0,
+    "days_since_active": 546.0,
     "last_active": "2025-02-13 18:22:06+00:00"
-   },
-   {
-    "user": "povolev15",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 522.0,
-    "last_active": "2025-03-06 14:26:57+00:00"
    },
    {
     "user": "thomas-swirlds-labs",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 15:24:11+00:00"
    },
    {
-    "user": "iwsimon",
+    "user": "povolev15",
     "highest_role": "committer",
     "roles": "committer",
-    "repos_held": 3,
-    "days_since_active": 522.0,
-    "last_active": "2025-03-06 15:58:47+00:00"
+    "repos_held": 2,
+    "days_since_active": 525.0,
+    "last_active": "2025-03-06 14:26:57+00:00"
    },
    {
     "user": "mattp-swirldslabs",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 18:07:39+00:00"
+   },
+   {
+    "user": "iwsimon",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 3,
+    "days_since_active": 525.0,
+    "last_active": "2025-03-06 15:58:47+00:00"
    },
    {
     "user": "bguiz",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 504.0,
+    "days_since_active": 507.0,
     "last_active": "2025-03-25 01:19:10+00:00"
    },
    {
@@ -2063,7 +1991,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 495.0,
+    "days_since_active": 498.0,
     "last_active": "2025-04-02 22:52:09+00:00"
    },
    {
@@ -2071,7 +1999,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 490.0,
+    "days_since_active": 493.0,
     "last_active": "2025-04-07 13:37:23+00:00"
    },
    {
@@ -2079,7 +2007,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 482.0,
+    "days_since_active": 485.0,
     "last_active": "2025-04-16 00:04:42+00:00"
    },
    {
@@ -2087,7 +2015,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 474.0,
+    "days_since_active": 477.0,
     "last_active": "2025-04-23 18:28:44+00:00"
    },
    {
@@ -2095,7 +2023,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 459.0,
+    "days_since_active": 462.0,
     "last_active": "2025-05-08 23:06:03+00:00"
    },
    {
@@ -2103,7 +2031,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 458.0,
+    "days_since_active": 461.0,
     "last_active": "2025-05-09 17:19:42+00:00"
    },
    {
@@ -2111,7 +2039,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 458.0,
+    "days_since_active": 461.0,
     "last_active": "2025-05-09 16:05:30+00:00"
    },
    {
@@ -2119,7 +2047,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 453.0,
+    "days_since_active": 456.0,
     "last_active": "2025-05-14 09:51:37+00:00"
    },
    {
@@ -2127,7 +2055,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 439.0,
+    "days_since_active": 442.0,
     "last_active": "2025-05-28 21:00:44+00:00"
    },
    {
@@ -2135,7 +2063,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 419.0,
+    "days_since_active": 422.0,
     "last_active": "2025-06-17 22:20:57+00:00"
    },
    {
@@ -2143,7 +2071,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": 398.0,
+    "days_since_active": 401.0,
     "last_active": "2025-07-08 13:53:17+00:00"
    },
    {
@@ -2151,7 +2079,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 397.0,
+    "days_since_active": 400.0,
     "last_active": "2025-07-09 18:43:27+00:00"
    },
    {
@@ -2159,7 +2087,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 396.0,
+    "days_since_active": 399.0,
     "last_active": "2025-07-10 11:34:20+00:00"
    },
    {
@@ -2167,7 +2095,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 382.0,
+    "days_since_active": 384.0,
     "last_active": "2025-07-25 09:19:44+00:00"
    },
    {
@@ -2175,7 +2103,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 368.0,
+    "days_since_active": 371.0,
     "last_active": "2025-08-07 14:19:03+00:00"
    },
    {
@@ -2183,7 +2111,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 366.0,
+    "days_since_active": 369.0,
     "last_active": "2025-08-10 03:00:09+00:00"
    },
    {
@@ -2191,7 +2119,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 362.0,
+    "days_since_active": 365.0,
     "last_active": "2025-08-13 10:56:59+00:00"
    },
    {
@@ -2199,7 +2127,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 354.0,
+    "days_since_active": 357.0,
     "last_active": "2025-08-21 14:01:43+00:00"
    },
    {
@@ -2207,7 +2135,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 350.0,
+    "days_since_active": 353.0,
     "last_active": "2025-08-25 19:37:12+00:00"
    },
    {
@@ -2215,7 +2143,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 349.0,
+    "days_since_active": 352.0,
     "last_active": "2025-08-26 19:01:21+00:00"
    },
    {
@@ -2223,7 +2151,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 343.0,
+    "days_since_active": 346.0,
     "last_active": "2025-09-01 16:31:25+00:00"
    },
    {
@@ -2231,7 +2159,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 341.0,
+    "days_since_active": 344.0,
     "last_active": "2025-09-03 11:56:55+00:00"
    },
    {
@@ -2239,7 +2167,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 327.0,
+    "days_since_active": 330.0,
     "last_active": "2025-09-17 12:32:13+00:00"
    },
    {
@@ -2247,31 +2175,31 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 321.0,
+    "days_since_active": 324.0,
     "last_active": "2025-09-23 15:24:56+00:00"
-   },
-   {
-    "user": "AliNik4n",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 314.0,
-    "last_active": "2025-09-30 15:48:44+00:00"
    },
    {
     "user": "kselveliev",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 314.0,
+    "days_since_active": 317.0,
     "last_active": "2025-10-01 06:22:26+00:00"
+   },
+   {
+    "user": "AliNik4n",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 317.0,
+    "last_active": "2025-09-30 15:48:44+00:00"
    },
    {
     "user": "se7enarianelabs",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 308.0,
+    "days_since_active": 311.0,
     "last_active": "2025-10-06 11:14:12+00:00"
    },
    {
@@ -2279,7 +2207,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 283.0,
+    "days_since_active": 286.0,
     "last_active": "2025-10-31 16:42:34+00:00"
    },
    {
@@ -2287,7 +2215,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 276.0,
+    "days_since_active": 279.0,
     "last_active": "2025-11-07 11:37:23+00:00"
    },
    {
@@ -2295,7 +2223,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 249.0,
+    "days_since_active": 252.0,
     "last_active": "2025-12-04 20:03:42+00:00"
    },
    {
@@ -2303,7 +2231,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 247.0,
+    "days_since_active": 250.0,
     "last_active": "2025-12-06 18:19:11+00:00"
    },
    {
@@ -2311,7 +2239,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 238.0,
+    "days_since_active": 241.0,
     "last_active": "2025-12-15 16:03:40+00:00"
    },
    {
@@ -2319,7 +2247,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 206.0,
+    "days_since_active": 209.0,
     "last_active": "2026-01-16 09:43:26+00:00"
    },
    {
@@ -2327,7 +2255,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 201.0,
+    "days_since_active": 204.0,
     "last_active": "2026-01-21 18:12:17+00:00"
    },
    {
@@ -2335,7 +2263,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 192.0,
+    "days_since_active": 195.0,
     "last_active": "2026-01-30 14:53:01+00:00"
    },
    {
@@ -2343,7 +2271,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 188.0,
+    "days_since_active": 191.0,
     "last_active": "2026-02-03 15:39:35+00:00"
    },
    {
@@ -2351,31 +2279,31 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 187.0,
+    "days_since_active": 190.0,
     "last_active": "2026-02-04 15:06:10+00:00"
-   },
-   {
-    "user": "konstantinabl",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 5,
-    "days_since_active": 185.0,
-    "last_active": "2026-02-06 16:09:40+00:00"
    },
    {
     "user": "emiliyank",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 185.0,
+    "days_since_active": 188.0,
     "last_active": "2026-02-06 14:00:54+00:00"
+   },
+   {
+    "user": "konstantinabl",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer",
+    "repos_held": 5,
+    "days_since_active": 188.0,
+    "last_active": "2026-02-06 16:09:40+00:00"
    },
    {
     "user": "Shivam-Batham",
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 181.0,
+    "days_since_active": 184.0,
     "last_active": "2026-02-10 18:33:40+00:00"
    },
    {
@@ -2383,7 +2311,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 2,
-    "days_since_active": 165.0,
+    "days_since_active": 167.0,
     "last_active": "2026-02-27 09:13:34+00:00"
    },
    {
@@ -2391,7 +2319,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 164.0,
+    "days_since_active": 167.0,
     "last_active": "2026-02-27 17:15:42+00:00"
    },
    {
@@ -2399,7 +2327,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 5,
-    "days_since_active": 160.0,
+    "days_since_active": 163.0,
     "last_active": "2026-03-03 16:02:03+00:00"
    },
    {
@@ -2407,7 +2335,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 159.0,
+    "days_since_active": 162.0,
     "last_active": "2026-03-04 21:25:35+00:00"
    },
    {
@@ -2415,7 +2343,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 150.0,
+    "days_since_active": 153.0,
     "last_active": "2026-03-13 16:02:21+00:00"
    },
    {
@@ -2423,7 +2351,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 147.0,
+    "days_since_active": 150.0,
     "last_active": "2026-03-16 14:33:42+00:00"
    },
    {
@@ -2431,7 +2359,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 11,
-    "days_since_active": 140.0,
+    "days_since_active": 142.0,
     "last_active": "2026-03-24 08:02:24+00:00"
    },
    {
@@ -2439,7 +2367,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 137.0,
+    "days_since_active": 140.0,
     "last_active": "2026-03-26 17:05:24+00:00"
    },
    {
@@ -2447,7 +2375,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 136.0,
+    "days_since_active": 139.0,
     "last_active": "2026-03-27 15:30:38+00:00"
    },
    {
@@ -2455,31 +2383,31 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": 131.0,
+    "days_since_active": 134.0,
     "last_active": "2026-04-01 17:35:25+00:00"
-   },
-   {
-    "user": "0xivanov",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer, triage",
-    "repos_held": 11,
-    "days_since_active": 117.0,
-    "last_active": "2026-04-15 13:08:37+00:00"
    },
    {
     "user": "rbair23",
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 8,
-    "days_since_active": 117.0,
+    "days_since_active": 120.0,
     "last_active": "2026-04-15 14:10:01+00:00"
+   },
+   {
+    "user": "0xivanov",
+    "highest_role": "maintainer",
+    "roles": "committer, maintainer, triage",
+    "repos_held": 11,
+    "days_since_active": 120.0,
+    "last_active": "2026-04-15 13:08:37+00:00"
    },
    {
     "user": "Evdokia-Georgieva",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 112.0,
+    "days_since_active": 115.0,
     "last_active": "2026-04-20 11:33:07+00:00"
    },
    {
@@ -2487,7 +2415,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 106.0,
+    "days_since_active": 109.0,
     "last_active": "2026-04-26 19:26:50+00:00"
    },
    {
@@ -2495,7 +2423,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 99.0,
+    "days_since_active": 101.0,
     "last_active": "2026-05-04 08:03:04+00:00"
    },
    {
@@ -2503,7 +2431,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 95.0,
+    "days_since_active": 98.0,
     "last_active": "2026-05-07 16:52:14+00:00"
    },
    {
@@ -2511,7 +2439,7 @@
     "highest_role": "committer",
     "roles": "committer, triage",
     "repos_held": 5,
-    "days_since_active": 94.0,
+    "days_since_active": 97.0,
     "last_active": "2026-05-08 23:19:32+00:00"
    },
    {
@@ -2519,7 +2447,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 91.0,
+    "days_since_active": 94.0,
     "last_active": "2026-05-11 17:27:05+00:00"
    },
    {
@@ -2527,7 +2455,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 12,
-    "days_since_active": 85.0,
+    "days_since_active": 88.0,
     "last_active": "2026-05-17 15:45:57+00:00"
    },
    {
@@ -2535,7 +2463,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 84.0,
+    "days_since_active": 87.0,
     "last_active": "2026-05-18 21:12:39+00:00"
    },
    {
@@ -2543,7 +2471,7 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 1,
-    "days_since_active": 80.0,
+    "days_since_active": 83.0,
     "last_active": "2026-05-23 05:00:02+00:00"
    },
    {
@@ -2551,7 +2479,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer, triage",
     "repos_held": 11,
-    "days_since_active": 77.0,
+    "days_since_active": 80.0,
     "last_active": "2026-05-26 04:33:13+00:00"
    },
    {
@@ -2559,7 +2487,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 76.0,
+    "days_since_active": 79.0,
     "last_active": "2026-05-26 16:54:48+00:00"
    },
    {
@@ -2567,7 +2495,7 @@
     "highest_role": "committer",
     "roles": "committer, triage",
     "repos_held": 10,
-    "days_since_active": 70.0,
+    "days_since_active": 73.0,
     "last_active": "2026-06-01 12:02:38+00:00"
    },
    {
@@ -2575,31 +2503,31 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 70.0,
+    "days_since_active": 73.0,
     "last_active": "2026-06-01 10:47:07+00:00"
-   },
-   {
-    "user": "ty-swirldslabs",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 2,
-    "days_since_active": 69.0,
-    "last_active": "2026-06-02 16:33:20+00:00"
    },
    {
     "user": "Mark-Swirlds",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 69.0,
+    "days_since_active": 72.0,
     "last_active": "2026-06-02 22:46:44+00:00"
+   },
+   {
+    "user": "ty-swirldslabs",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 72.0,
+    "last_active": "2026-06-02 16:33:20+00:00"
    },
    {
     "user": "diogper",
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 67.0,
+    "days_since_active": 70.0,
     "last_active": "2026-06-04 11:04:44+00:00"
    },
    {
@@ -2607,7 +2535,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 6,
-    "days_since_active": 57.0,
+    "days_since_active": 60.0,
     "last_active": "2026-06-14 17:20:22+00:00"
    },
    {
@@ -2615,7 +2543,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 53.0,
+    "days_since_active": 56.0,
     "last_active": "2026-06-18 15:43:51+00:00"
    },
    {
@@ -2623,23 +2551,15 @@
     "highest_role": "triage",
     "roles": "triage",
     "repos_held": 5,
-    "days_since_active": 49.0,
+    "days_since_active": 52.0,
     "last_active": "2026-06-23 03:14:29+00:00"
-   },
-   {
-    "user": "jasperpotts",
-    "highest_role": "maintainer",
-    "roles": "committer, maintainer",
-    "repos_held": 3,
-    "days_since_active": 46.0,
-    "last_active": "2026-06-25 16:50:39+00:00"
    },
    {
     "user": "devmab",
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 41.0,
+    "days_since_active": 44.0,
     "last_active": "2026-07-01 06:09:39+00:00"
    },
    {
@@ -2647,7 +2567,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 40.0,
+    "days_since_active": 43.0,
     "last_active": "2026-07-01 17:08:16+00:00"
    },
    {
@@ -2655,7 +2575,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 40.0,
+    "days_since_active": 43.0,
     "last_active": "2026-07-01 17:07:41+00:00"
    },
    {
@@ -2663,7 +2583,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 40.0,
+    "days_since_active": 43.0,
     "last_active": "2026-07-01 12:51:22+00:00"
    },
    {
@@ -2671,7 +2591,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 39.0,
+    "days_since_active": 42.0,
     "last_active": "2026-07-02 20:54:46+00:00"
    },
    {
@@ -2679,7 +2599,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 38.0,
+    "days_since_active": 41.0,
     "last_active": "2026-07-03 10:57:02+00:00"
    },
    {
@@ -2687,7 +2607,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 1,
-    "days_since_active": 38.0,
+    "days_since_active": 41.0,
     "last_active": "2026-07-03 11:11:41+00:00"
    },
    {
@@ -2695,7 +2615,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 35.0,
+    "days_since_active": 38.0,
     "last_active": "2026-07-06 19:32:11+00:00"
    },
    {
@@ -2703,7 +2623,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 35.0,
+    "days_since_active": 38.0,
     "last_active": "2026-07-06 11:01:48+00:00"
    },
    {
@@ -2711,7 +2631,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 4,
-    "days_since_active": 35.0,
+    "days_since_active": 38.0,
     "last_active": "2026-07-06 17:49:04+00:00"
    },
    {
@@ -2719,7 +2639,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 33.0,
+    "days_since_active": 36.0,
     "last_active": "2026-07-09 07:29:23+00:00"
    }
   ],
@@ -2841,7 +2761,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 2462.0,
+    "days_since_active": 2465.0,
     "last_active": "2019-11-14 01:27:38+00:00"
    },
    {
@@ -2849,7 +2769,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1994.0,
+    "days_since_active": 1997.0,
     "last_active": "2021-02-24 00:29:27+00:00"
    },
    {
@@ -2857,7 +2777,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1976.0,
+    "days_since_active": 1979.0,
     "last_active": "2021-03-13 19:05:21+00:00"
    },
    {
@@ -2865,7 +2785,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1890.0,
+    "days_since_active": 1893.0,
     "last_active": "2021-06-07 19:52:03+00:00"
    },
    {
@@ -2873,7 +2793,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1890.0,
+    "days_since_active": 1893.0,
     "last_active": "2021-06-07 18:28:48+00:00"
    },
    {
@@ -2881,7 +2801,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1805.0,
+    "days_since_active": 1808.0,
     "last_active": "2021-08-31 10:08:59+00:00"
    },
    {
@@ -2889,7 +2809,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1800.0,
+    "days_since_active": 1803.0,
     "last_active": "2021-09-06 04:23:10+00:00"
    },
    {
@@ -2897,7 +2817,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1782.0,
+    "days_since_active": 1785.0,
     "last_active": "2021-09-23 18:04:31+00:00"
    },
    {
@@ -2905,7 +2825,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1763.0,
+    "days_since_active": 1766.0,
     "last_active": "2021-10-12 21:33:56+00:00"
    },
    {
@@ -2913,7 +2833,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1761.0,
+    "days_since_active": 1764.0,
     "last_active": "2021-10-15 01:10:37+00:00"
    },
    {
@@ -2921,7 +2841,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1694.0,
+    "days_since_active": 1697.0,
     "last_active": "2021-12-20 22:33:44+00:00"
    },
    {
@@ -2929,7 +2849,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1581.0,
+    "days_since_active": 1584.0,
     "last_active": "2022-04-12 20:11:31+00:00"
    },
    {
@@ -2937,7 +2857,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1567.0,
+    "days_since_active": 1570.0,
     "last_active": "2022-04-26 21:50:21+00:00"
    },
    {
@@ -2945,7 +2865,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1533.0,
+    "days_since_active": 1536.0,
     "last_active": "2022-05-30 14:18:20+00:00"
    },
    {
@@ -2953,7 +2873,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1511.0,
+    "days_since_active": 1514.0,
     "last_active": "2022-06-22 00:12:48+00:00"
    },
    {
@@ -2961,7 +2881,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1510.0,
+    "days_since_active": 1513.0,
     "last_active": "2022-06-22 14:32:58+00:00"
    },
    {
@@ -2969,7 +2889,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1473.0,
+    "days_since_active": 1476.0,
     "last_active": "2022-07-29 14:42:41+00:00"
    },
    {
@@ -2977,7 +2897,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1470.0,
+    "days_since_active": 1473.0,
     "last_active": "2022-08-01 19:31:11+00:00"
    },
    {
@@ -2985,7 +2905,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1468.0,
+    "days_since_active": 1471.0,
     "last_active": "2022-08-04 00:12:12+00:00"
    },
    {
@@ -2993,7 +2913,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1432.0,
+    "days_since_active": 1435.0,
     "last_active": "2022-09-08 15:15:26+00:00"
    },
    {
@@ -3001,7 +2921,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1392.0,
+    "days_since_active": 1395.0,
     "last_active": "2022-10-18 09:59:23+00:00"
    },
    {
@@ -3009,7 +2929,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1385.0,
+    "days_since_active": 1388.0,
     "last_active": "2022-10-25 13:51:08+00:00"
    },
    {
@@ -3017,7 +2937,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1382.0,
+    "days_since_active": 1385.0,
     "last_active": "2022-10-28 21:26:24+00:00"
    },
    {
@@ -3025,7 +2945,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 1285.0,
+    "days_since_active": 1288.0,
     "last_active": "2023-02-03 01:56:23+00:00"
    },
    {
@@ -3033,7 +2953,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1222.0,
+    "days_since_active": 1225.0,
     "last_active": "2023-04-06 15:35:59+00:00"
    },
    {
@@ -3041,7 +2961,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1146.0,
+    "days_since_active": 1149.0,
     "last_active": "2023-06-21 14:10:18+00:00"
    },
    {
@@ -3049,7 +2969,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1138.0,
+    "days_since_active": 1141.0,
     "last_active": "2023-06-29 14:16:07+00:00"
    },
    {
@@ -3057,7 +2977,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 1095.0,
+    "days_since_active": 1098.0,
     "last_active": "2023-08-11 11:30:31+00:00"
    },
    {
@@ -3065,7 +2985,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 1013.0,
+    "days_since_active": 1015.0,
     "last_active": "2023-11-02 08:56:29+00:00"
    },
    {
@@ -3073,7 +2993,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 977.0,
+    "days_since_active": 980.0,
     "last_active": "2023-12-07 14:08:50+00:00"
    },
    {
@@ -3081,7 +3001,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 3,
-    "days_since_active": 956.0,
+    "days_since_active": 959.0,
     "last_active": "2023-12-28 09:55:57+00:00"
    },
    {
@@ -3089,7 +3009,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 880.0,
+    "days_since_active": 883.0,
     "last_active": "2024-03-13 16:23:23+00:00"
    },
    {
@@ -3097,7 +3017,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 844.0,
+    "days_since_active": 847.0,
     "last_active": "2024-04-18 17:08:42+00:00"
    },
    {
@@ -3105,7 +3025,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 761.0,
+    "days_since_active": 764.0,
     "last_active": "2024-07-10 15:05:17+00:00"
    },
    {
@@ -3113,7 +3033,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 705.0,
+    "days_since_active": 708.0,
     "last_active": "2024-09-04 14:32:35+00:00"
    },
    {
@@ -3121,7 +3041,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 678.0,
+    "days_since_active": 681.0,
     "last_active": "2024-10-01 20:03:15+00:00"
    },
    {
@@ -3129,7 +3049,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 648.0,
+    "days_since_active": 651.0,
     "last_active": "2024-10-31 15:58:20+00:00"
    },
    {
@@ -3137,7 +3057,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 637.0,
+    "days_since_active": 640.0,
     "last_active": "2024-11-11 16:39:12+00:00"
    },
    {
@@ -3145,7 +3065,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 633.0,
+    "days_since_active": 636.0,
     "last_active": "2024-11-15 14:39:58+00:00"
    },
    {
@@ -3153,7 +3073,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 4,
-    "days_since_active": 600.0,
+    "days_since_active": 602.0,
     "last_active": "2024-12-19 09:03:19+00:00"
    },
    {
@@ -3161,7 +3081,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 577.0,
+    "days_since_active": 580.0,
     "last_active": "2025-01-10 10:26:59+00:00"
    },
    {
@@ -3169,7 +3089,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 550.0,
+    "days_since_active": 553.0,
     "last_active": "2025-02-06 18:09:28+00:00"
    },
    {
@@ -3177,7 +3097,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 543.0,
+    "days_since_active": 546.0,
     "last_active": "2025-02-13 18:22:06+00:00"
    },
    {
@@ -3185,7 +3105,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 18:07:39+00:00"
    },
    {
@@ -3193,7 +3113,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 15:24:11+00:00"
    },
    {
@@ -3201,7 +3121,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 14:26:57+00:00"
    },
    {
@@ -3209,7 +3129,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 522.0,
+    "days_since_active": 525.0,
     "last_active": "2025-03-06 15:58:47+00:00"
    },
    {
@@ -3217,7 +3137,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 504.0,
+    "days_since_active": 507.0,
     "last_active": "2025-03-25 01:19:10+00:00"
    },
    {
@@ -3225,7 +3145,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 495.0,
+    "days_since_active": 498.0,
     "last_active": "2025-04-02 22:52:09+00:00"
    },
    {
@@ -3233,7 +3153,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 490.0,
+    "days_since_active": 493.0,
     "last_active": "2025-04-07 13:37:23+00:00"
    },
    {
@@ -3241,7 +3161,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 5,
-    "days_since_active": 482.0,
+    "days_since_active": 485.0,
     "last_active": "2025-04-16 00:04:42+00:00"
    },
    {
@@ -3249,7 +3169,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 474.0,
+    "days_since_active": 477.0,
     "last_active": "2025-04-23 18:28:44+00:00"
    },
    {
@@ -3257,7 +3177,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 459.0,
+    "days_since_active": 462.0,
     "last_active": "2025-05-08 23:06:03+00:00"
    },
    {
@@ -3265,7 +3185,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 458.0,
+    "days_since_active": 461.0,
     "last_active": "2025-05-09 17:19:42+00:00"
    },
    {
@@ -3273,7 +3193,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 458.0,
+    "days_since_active": 461.0,
     "last_active": "2025-05-09 16:05:30+00:00"
    },
    {
@@ -3281,7 +3201,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 453.0,
+    "days_since_active": 456.0,
     "last_active": "2025-05-14 09:51:37+00:00"
    },
    {
@@ -3289,7 +3209,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 439.0,
+    "days_since_active": 442.0,
     "last_active": "2025-05-28 21:00:44+00:00"
    },
    {
@@ -3297,7 +3217,7 @@
     "highest_role": "maintainer",
     "roles": "committer, maintainer",
     "repos_held": 2,
-    "days_since_active": 419.0,
+    "days_since_active": 422.0,
     "last_active": "2025-06-17 22:20:57+00:00"
    },
    {
@@ -3305,7 +3225,7 @@
     "highest_role": "maintainer",
     "roles": "maintainer",
     "repos_held": 4,
-    "days_since_active": 398.0,
+    "days_since_active": 401.0,
     "last_active": "2025-07-08 13:53:17+00:00"
    },
    {
@@ -3313,7 +3233,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 397.0,
+    "days_since_active": 400.0,
     "last_active": "2025-07-09 18:43:27+00:00"
    },
    {
@@ -3321,7 +3241,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 3,
-    "days_since_active": 396.0,
+    "days_since_active": 399.0,
     "last_active": "2025-07-10 11:34:20+00:00"
    },
    {
@@ -3329,7 +3249,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 382.0,
+    "days_since_active": 384.0,
     "last_active": "2025-07-25 09:19:44+00:00"
    },
    {
@@ -3337,7 +3257,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 368.0,
+    "days_since_active": 371.0,
     "last_active": "2025-08-07 14:19:03+00:00"
    },
    {
@@ -3345,7 +3265,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 366.0,
+    "days_since_active": 369.0,
     "last_active": "2025-08-10 03:00:09+00:00"
    }
   ]

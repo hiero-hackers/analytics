@@ -333,10 +333,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-11T09:27:48.881878+00:00",
+ "generated_at": "2026-08-14T07:51:28.742726+00:00",
  "provenance": {
-  "git_sha": "763e887",
-  "data_as_of": "2026-08-06T10:27:46+00:00"
+  "git_sha": "1605fc3",
+  "data_as_of": "2026-08-11T09:21:13.100605+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -345,7 +345,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1420,
+     "row_count": 1423,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -359,7 +359,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 18,
+     "row_count": 17,
      "path": "hiero-ledger/understaffed.json"
     },
     {
@@ -380,7 +380,7 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 753,
+     "row_count": 757,
      "path": "hiero-ledger/repo.json"
     },
     {
@@ -394,7 +394,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2540,
+     "row_count": 2552,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -422,7 +422,7 @@
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
-     "row_count": 105,
+     "row_count": 106,
      "path": "hiero-ledger/teamdiversity.json"
     },
     {
@@ -685,7 +685,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2176,
+         "width": 2206,
          "height": 1051
         }
        ],
@@ -901,7 +901,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-11T09:26:45.929829+00:00"
+      "generated_at": "2026-08-14T07:50:30.910650+00:00"
      }
     },
     {
@@ -961,7 +961,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-11T09:26:45.925599+00:00"
+      "generated_at": "2026-08-14T07:50:30.906411+00:00"
      }
     },
     {
@@ -994,8 +994,8 @@
         {
          "label": "Score breakdown",
          "file": "charts/org/hiero-ledger/org_scorecard_breakdown.png",
-         "width": 2094,
-         "height": 2282
+         "width": 2093,
+         "height": 2470
         }
        ],
        "note": "Each repository's OpenSSF score split into its individual checks (one colour per check, e.g. Code-Review, Branch-Protection), so you can see which practices contribute.",
@@ -1140,7 +1140,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1420,
+      "value": 1423,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1264,7 +1264,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 37,
+     "row_count": 43,
      "path": "hiero-hackers/profiles.json"
     },
     {
@@ -1502,7 +1502,7 @@
          "label": "1 month",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_30d.png",
          "width": 2093,
-         "height": 1343
+         "height": 1218
         },
         {
          "label": "Week",
@@ -1552,7 +1552,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 37,
+      "value": 43,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1562,7 +1562,7 @@
      },
      {
       "label": "active last month %",
-      "value": "59%",
+      "value": "65%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1571,7 +1571,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "38%",
+      "value": "33%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1580,7 +1580,7 @@
      },
      {
       "label": "file issues %",
-      "value": "51%",
+      "value": "44%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1589,7 +1589,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "73%",
+      "value": "77%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -1598,7 +1598,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "43%",
+      "value": "42%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -1607,7 +1607,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "30%",
+      "value": "26%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
