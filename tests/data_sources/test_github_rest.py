@@ -15,10 +15,14 @@ import requests
 
 from hiero_analytics.data_sources.github_rest import (
     _is_self_hosted,
+    _parse_purl,
     _process_workflow_file,
+    fetch_org_sbom_data,
+    fetch_repo_sbom,
     fetch_repo_workflows,
     has_codeowners_file,
 )
+from hiero_analytics.data_sources.models import DependencyManifestRecord, SbomCoverageRecord
 
 
 def _http_error(status_code: int) -> requests.HTTPError:
@@ -141,3 +145,126 @@ def test_fetch_repo_workflows_scans_only_yaml_files():
 
     assert [r.workflow_file for r in records] == ["ci.yml"]
     assert records[0].is_self_hosted is True
+
+
+# -- _parse_purl --------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("purl", "expected"),
+    [
+        ("pkg:npm/left-pad@1.0.1", ("npm", "left-pad", "1.0.1")),
+        ("pkg:npm/%40scope/pkg@2.0.0", ("npm", "@scope/pkg", "2.0.0")),
+        ("pkg:maven/com.example/thing@2.0", ("maven", "com.example/thing", "2.0")),
+        ("pkg:pypi/requests@2.31.0", ("pypi", "requests", "2.31.0")),
+        ("pkg:cargo/serde@1.0.0?extra=1", ("cargo", "serde", "1.0.0")),  # qualifiers dropped
+        ("pkg:golang/github.com/org/mod@v1.2.3", ("golang", "github.com/org/mod", "v1.2.3")),
+        ("pkg:npm/no-version", ("npm", "no-version", None)),  # no '@version' segment at all
+    ],
+)
+def test_parse_purl_handles_each_ecosystem_shape(purl, expected):
+    """Each ecosystem's purl shape parses to (ecosystem, name, version), scope/groupId decoded."""
+    assert _parse_purl(purl) == expected
+
+
+@pytest.mark.parametrize("malformed", ["not-a-purl", "pkg:", "pkg:npm-no-slash"])
+def test_parse_purl_returns_none_for_malformed_input(malformed):
+    """Malformed input returns None rather than raising -- one bad purl shouldn't fail a repo's SBOM."""
+    assert _parse_purl(malformed) is None
+
+
+# -- fetch_repo_sbom: the 404/403-vs-error contract, and SBOM parsing ---------
+
+
+def test_fetch_repo_sbom_parses_packages_and_excludes_the_described_root():
+    """Packages parse to DependencyManifestRecord; the repo's own root package is excluded."""
+    client = Mock()
+    client.get.return_value = {
+        "sbom": {
+            "documentDescribes": ["SPDXRef-root"],
+            "packages": [
+                {"SPDXID": "SPDXRef-root", "name": "org/repo"},  # the repo itself -- must be excluded
+                {
+                    "SPDXID": "SPDXRef-1",
+                    "name": "lodash",
+                    "externalRefs": [{"referenceType": "purl", "referenceLocator": "pkg:npm/lodash@4.17.21"}],
+                },
+            ],
+        }
+    }
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="ok", package_count=1)
+    assert records == [DependencyManifestRecord(repo="repo", package_name="lodash", ecosystem="npm", version="4.17.21")]
+
+
+def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl():
+    """A package with no purl external ref is skipped, not fabricated from the raw name."""
+    client = Mock()
+    client.get.return_value = {
+        "sbom": {
+            "documentDescribes": [],
+            "packages": [{"SPDXID": "SPDXRef-1", "name": "mystery-pkg", "externalRefs": []}],
+        }
+    }
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert records == []
+    assert coverage.status == "ok"
+    assert coverage.package_count == 0
+
+
+@pytest.mark.parametrize("status_code", [403, 404])
+def test_fetch_repo_sbom_treats_403_and_404_as_disabled(status_code):
+    """Both 403 and 404 mean 'dependency graph off for this repo', not an error."""
+    client = Mock()
+    client.get.side_effect = _http_error(status_code)
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="disabled", package_count=0)
+    assert records == []
+
+
+def test_fetch_repo_sbom_reports_other_errors_as_error_status_not_disabled():
+    """A genuine failure (5xx, auth, etc.) is status='error', distinguishable from 'disabled'."""
+    client = Mock()
+    client.get.side_effect = _http_error(500)
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage.status == "error"
+    assert records == []
+
+
+# -- fetch_org_sbom_data: the org-wide fan-out --------------------------------
+
+
+def test_fetch_org_sbom_data_returns_one_coverage_row_per_repo():
+    """Every input repo gets exactly one coverage row, regardless of outcome."""
+
+    def fake_get(url):
+        if "repo-a" in url:
+            return {
+                "sbom": {
+                    "documentDescribes": [],
+                    "packages": [
+                        {
+                            "SPDXID": "x",
+                            "externalRefs": [{"referenceType": "purl", "referenceLocator": "pkg:npm/left-pad@1.0.0"}],
+                        }
+                    ],
+                }
+            }
+        raise _http_error(404)
+
+    client = Mock()
+    client.get.side_effect = fake_get
+
+    coverage, packages = fetch_org_sbom_data(client, "org", ["repo-a", "repo-b"], max_workers=2)
+
+    assert {c.repo for c in coverage} == {"repo-a", "repo-b"}
+    assert {c.repo: c.status for c in coverage} == {"repo-a": "ok", "repo-b": "disabled"}
+    assert [p.repo for p in packages] == ["repo-a"]

@@ -443,6 +443,39 @@ class ScorecardRecord:
 
 
 @dataclass(frozen=True)
+class DependencyManifestRecord:
+    """One SBOM package entry for a repo, before org-repo resolution.
+
+    ``package_name`` and ``ecosystem`` are parsed from the package URL
+    (purl) in the SBOM's ``externalRefs``, not the raw SPDX ``name`` field —
+    purl gives a consistent ecosystem+name split across npm/PyPI/Maven/
+    Cargo/Go, where the raw name field's shape varies per ecosystem.
+    """
+
+    repo: str
+    package_name: str
+    ecosystem: str
+    version: str | None
+
+
+@dataclass(frozen=True)
+class SbomCoverageRecord:
+    """Per-repo SBOM fetch outcome — kept distinct from the package list itself.
+
+    ``status`` is one of ``"ok"`` (SBOM available, packages parsed —
+    ``package_count`` may still be 0 for a repo with a genuinely empty
+    manifest), ``"disabled"`` (dependency graph off for this repo, or the
+    endpoint 404/403'd), or ``"error"`` (fetch failed for a reason other
+    than disablement; surfaced rather than silently dropped). This is what
+    makes "no edges" distinguishable from "no data" downstream.
+    """
+
+    repo: str
+    status: str
+    package_count: int
+
+
+@dataclass(frozen=True)
 class CodeOwnersRecord:
     """Represents the presence of a CODEOWNERS file in a repository."""
 
