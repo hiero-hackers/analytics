@@ -7,8 +7,9 @@
  */
 
 import { useState } from "react";
-import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from "../api";
+import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type HeatmapView, type Manifest, type ViewDoc } from "../api";
 import { downloadCsvText } from "../csv";
+import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ChartLightbox, type LightboxContent } from "./ChartLightbox";
 
 function Figure({
@@ -16,12 +17,17 @@ function Figure({
   onZoom,
   slide = false,
   stretch = false,
+  liveView,
 }: {
   chart: ChartSpec;
   onZoom: (chart: ChartSpec, variant: number) => void;
   slide?: boolean;
   /** Span the full row even though the chart itself is half-width shaped. */
   stretch?: boolean;
+  /** The fetched view this slide prefers, if chart.live_view_id matched one
+   *  that loaded successfully. Falls back to the PNG variants below when
+   *  absent — still loading, failed to fetch, or not produced for this org. */
+  liveView?: HeatmapView;
 }) {
   const [variant, setVariant] = useState(0);
   const active = chart.variants[Math.min(variant, chart.variants.length - 1)];
@@ -33,6 +39,26 @@ function Figure({
   // Full row without the scroll box: wide-aspect charts with few bars scale to
   // fit; only hand-flagged `wide` charts (many bars) get horizontal scrolling.
   const fullRow = chart.wide || chart.full_row || tall || stretch;
+
+  if (chart.live_view_id && liveView) {
+    // Live slides render inline where the PNG would've gone — no variant
+    // tabs (there's one dataset, not several PNG files to switch between)
+    // and no zoom-to-lightbox (the live grid is already legible in place).
+    // `active` (the PNG variant) is guaranteed to exist here: this slide only
+    // ever gets a live_view_id attached when its PNG variant survived
+    // _org_chart_sections' existence filter, so linking to it is never a 404
+    // — unlike view.png_fallback, which can genuinely be absent and is why
+    // it isn't used here.
+    return (
+      <figure className={slide ? "slide" : "chart wide"}>
+        <ActivityHeatmap view={liveView} />
+        <figcaption>
+          {chart.title} · <a href={chartUrl(active.file)} target="_blank" rel="noreferrer">View as static image</a>
+        </figcaption>
+      </figure>
+    );
+  }
+
   const img = (
     <img
       src={chartUrl(active.file)}
@@ -70,12 +96,28 @@ function Figure({
 export function ChartSectionCard({
   section,
   provenance,
+  views = [],
 }: {
   section: ChartSection;
   provenance: Manifest["provenance"];
+  /** All of this org's fetched views (any kind) — used to resolve a slide's
+   *  live_view_id, if it has one and that view loaded. Not the group-scoped,
+   *  already-filtered list ViewCards renders; the raw fetched set, so a slide
+   *  can find its view even when ViewCards has excluded it to avoid the
+   *  duplicate render. Optional/defaulted so existing callers compile as-is. */
+  views?: ViewDoc[];
 }) {
   const [slide, setSlide] = useState(0);
   const [zoom, setZoom] = useState<LightboxContent | null>(null);
+  const viewById = new Map(views.map((view) => [view.id, view]));
+  // Only heatmap-kind views can currently be a live slide's target — this
+  // narrows the lookup's return type without assuming every kind qualifies
+  // as future kinds are added to ViewDoc.
+  const liveViewFor = (chart: ChartSpec): HeatmapView | undefined => {
+    if (!chart.live_view_id) return undefined;
+    const view = viewById.get(chart.live_view_id);
+    return view?.kind === "heatmap" ? view : undefined;
+  };
 
   const onZoom = (chart: ChartSpec, variant: number) =>
     setZoom({
@@ -135,12 +177,24 @@ export function ChartSectionCard({
               Next ›
             </button>
           </div>
-          <Figure key={section.charts[slide].title} chart={section.charts[slide]} onZoom={onZoom} slide />
+          <Figure
+            key={section.charts[slide].title}
+            chart={section.charts[slide]}
+            onZoom={onZoom}
+            slide
+            liveView={liveViewFor(section.charts[slide])}
+          />
         </div>
       ) : (
         <div className="gallery">
           {section.charts.map((chart, index) => (
-            <Figure key={chart.title} chart={chart} onZoom={onZoom} stretch={stretched[index]} />
+            <Figure
+              key={chart.title}
+              chart={chart}
+              onZoom={onZoom}
+              stretch={stretched[index]}
+              liveView={liveViewFor(chart)}
+            />
           ))}
         </div>
       )}

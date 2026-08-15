@@ -258,6 +258,8 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 
 WIDE_CHARTS: set[str] = set()
 
+LIVE_VIEW_IDS: dict[str, str] = {}
+
 CHART_NOTES = {
     "hip_adoption_funnel.png": "Each band is a funnel stage for specs created since September 2024; its width and label are "
     "the share of proposed specs. Each stage is a subset of the one above; broad = merged citing PRs "

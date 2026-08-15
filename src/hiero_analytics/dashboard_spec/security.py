@@ -178,3 +178,5 @@ CHART_METHODOLOGY = {
 }
 
 WIDE_CHARTS: set[str] = set()
+
+LIVE_VIEW_IDS: dict[str, str] = {}

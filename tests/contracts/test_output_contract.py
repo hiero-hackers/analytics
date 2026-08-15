@@ -447,13 +447,58 @@ def test_data_api_emits_the_hip_views(outputs_root: Path):
     manifest = json.loads((api_dir / "manifest.json").read_text())
 
     views = manifest["orgs"][PRIMARY]["views"]
-    assert [(view["id"], view["kind"]) for view in views] == [("hip-board", "board"), ("hip-matrix", "matrix")]
+    hip_views = [(view["id"], view["kind"]) for view in views if view["macro"] == "HIPs"]
+    assert hip_views == [("hip-board", "board"), ("hip-matrix", "matrix")]
     for view in views:
+        if view["macro"] != "HIPs":
+            continue
         document = json.loads((api_dir / view["path"]).read_text())
         assert document["macro"] == "HIPs"
     matrix = json.loads((api_dir / PRIMARY / "hip-matrix.json").read_text())
     assert matrix["rows"], "matrix emitted with no rows"
     assert matrix["bands"], "matrix emitted with no header bands"
+
+
+def test_data_api_emits_the_contributor_activity_heatmap_view(outputs_root: Path):
+    """The client-side heatmap (#333) ships as a view document, macro Contributors.
+
+    Same reasoning as the HIP views: if the pipeline produced heatmap data but
+    the API listed no view, the live grid would silently never appear, with
+    only the PNG fallback slide left to notice.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    views = manifest["orgs"][PRIMARY]["views"]
+    heatmap_refs = [view for view in views if view["kind"] == "heatmap"]
+    assert [(view["id"], view["macro"]) for view in heatmap_refs] == [
+        ("contributor-activity-heatmap", "Contributors")
+    ]
+
+    document = json.loads((api_dir / heatmap_refs[0]["path"]).read_text())
+    assert document["rows"], "heatmap emitted with no rows"
+    assert document["columns"], "heatmap emitted with no columns"
+    assert len(document["values"]) == len(document["rows"])
+    assert document["max_value"] == max(cell for row in document["values"] for cell in row)
+    assert document["png_fallback"] == f"charts/org/{PRIMARY}/contributor_activity_heatmap.png"
+
+
+def test_activity_heatmap_slide_declares_its_live_view(outputs_root: Path):
+    """The By-contributor slide is tagged so the frontend prefers the live view.
+
+    The PNG variant must still be present underneath — it's the fallback if
+    the live view fails to load or hasn't been produced for an org, not
+    something this migration removes.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    sections = manifest["orgs"][PRIMARY]["chart_sections"]
+    heatmap_section = next(section for section in sections if section["id"] == "activity-heatmap")
+    contributor_slide = next(chart for chart in heatmap_section["charts"] if chart["title"] == "By contributor")
+
+    assert contributor_slide["live_view_id"] == "contributor-activity-heatmap"
+    assert contributor_slide["variants"][0]["file"].endswith("contributor_activity_heatmap.png")
 
 
 def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):

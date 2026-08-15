@@ -6,7 +6,7 @@
  */
 
 import { vi } from "vitest";
-import type { BoardView, Manifest, MatrixView, SectionDoc } from "../api";
+import type { BoardView, HeatmapView, Manifest, MatrixView, SectionDoc } from "../api";
 
 export const GOV_DOC: SectionDoc = {
   id: "roles",
@@ -191,6 +191,25 @@ export const MATRIX_DOC: MatrixView = {
   generated_at: "2026-07-25T09:00:00+00:00",
 };
 
+export const HEATMAP_DOC: HeatmapView = {
+  id: "contributor-activity-heatmap",
+  kind: "heatmap",
+  macro: "Contributors",
+  title: "Contributor activity heatmap",
+  description: "Weighted monthly activity for the most active contributors over the last six months.",
+  badge: "2 contributors",
+  source: "contributor_activity_heatmap.csv",
+  rows: ["dana", "felix"],
+  columns: ["2026-01", "2026-02"],
+  values: [
+    [8, 4],
+    [2, 3],
+  ],
+  max_value: 8,
+  png_fallback: "charts/org/hiero-ledger/contributor_activity_heatmap.png",
+  generated_at: "2026-07-25T09:00:00+00:00",
+};
+
 export const BOARD_DOC: BoardView = {
   id: "hip-board",
   kind: "board",
@@ -235,6 +254,7 @@ export const MANIFEST: Manifest = {
       views: [
         { id: "hip-board", macro: "HIPs", kind: "board", title: "Where specs sit in governance", path: "hiero-ledger/hip-board.json" },
         { id: "hip-matrix", macro: "HIPs", kind: "matrix", title: "Implementation coverage matrix", path: "hiero-ledger/hip-matrix.json" },
+        { id: "contributor-activity-heatmap", macro: "Contributors", kind: "heatmap", title: "Contributor activity heatmap", path: "hiero-ledger/contributor-activity-heatmap.json" },
       ],
       sections: [
         { id: "roles", macro: "Governance", title: "Role holders", row_count: 3, path: "hiero-ledger/roles.json" },
@@ -263,6 +283,25 @@ export const MANIFEST: Manifest = {
               ],
               note: "How to read this chart.",
               methodology: ["Step one.", "Step two."],
+            },
+          ],
+        },
+        {
+          id: "activity-heatmap",
+          macro: "Contributors",
+          title: "Activity heatmaps",
+          group: "Activity & networks",
+          description: "Weighted monthly activity, zoomed out step by step.",
+          slideshow: true,
+          charts: [
+            {
+              title: "By contributor",
+              variants: [{ label: "By contributor", file: "charts/org/hiero-ledger/contributor_activity_heatmap.png" }],
+              live_view_id: "contributor-activity-heatmap",
+            },
+            {
+              title: "By team",
+              variants: [{ label: "By team", file: "charts/org/hiero-ledger/team_activity_heatmap.png" }],
             },
           ],
         },
@@ -301,16 +340,20 @@ const ROUTES: Record<string, unknown> = {
   "hiero-ledger/hip-evidence.json": HIP_EVIDENCE_DOC,
   "hiero-ledger/hip-board.json": BOARD_DOC,
   "hiero-ledger/hip-matrix.json": MATRIX_DOC,
+  "hiero-ledger/contributor-activity-heatmap.json": HEATMAP_DOC,
   "hiero-ledger/profiles.json": CONTRIB_DOC,
   "hiero-hackers/profiles.json": HACKERS_DOC,
 };
 
-/** Stub global fetch to serve the fixture API; returns the spy for assertions. */
-export function stubApi() {
+/* Stub global fetch to serve the fixture API; returns the spy for assertions.*/
+export function stubApi(overrides: Record<string, () => Response | Promise<Response>> = {}) {
   return vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => {
-      const match = Object.entries(ROUTES).find(([suffix]) => String(url).endsWith(suffix));
+      const key = String(url);
+      const override = Object.entries(overrides).find(([suffix]) => key.endsWith(suffix));
+      if (override) return override[1]();
+      const match = Object.entries(ROUTES).find(([suffix]) => key.endsWith(suffix));
       if (!match) {
         return new Response("not found", { status: 404 });
       }

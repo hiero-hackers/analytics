@@ -51,6 +51,10 @@ export interface ChartSpec {
   wide?: boolean;
   /** Wide aspect, few bars: full row, scaled to fit (no scroll box). */
   full_row?: boolean;
+  /** If set and the matching view (by id, in ViewDoc) loaded successfully,
+   *  this slide renders that live instead of its PNG variants — the variants
+   *  stay in place underneath as the fallback, not removed by this. */
+  live_view_id?: string;
 }
 
 export interface ChartDownload {
@@ -151,7 +155,35 @@ export interface BoardView {
   stale?: boolean;
 }
 
-export type ViewDoc = MatrixView | BoardView;
+/** A contributor-by-month activity grid, rendered client-side instead of a PNG. */
+export interface HeatmapView {
+  id: string;
+  kind: "heatmap";
+  macro: string;
+  /** The named section group this view renders under. */
+  group?: string;
+  title: string;
+  description: string;
+  badge: string;
+  source: string;
+  /** Row labels, e.g. contributor logins, busiest first. */
+  rows: string[];
+  /** Column labels, e.g. "2026-01". */
+  columns: string[];
+  /** [row][column] cell values. Same order as rows/columns. */
+  values: number[][];
+  /** Highest value in this dataset — cells interpolate colour against this,
+   *  not a fixed bucket count, since activity scores are unbounded. */
+  max_value: number;
+  /** Path to the PNG this view supersedes, used if the view fails to load. */
+  /** The PNG this view supersedes, or absent if one was never produced —
+   *  never a path guaranteed to 404. */
+  png_fallback?: string | null;
+  generated_at?: string;
+  stale?: boolean;
+}
+
+export type ViewDoc = MatrixView | BoardView | HeatmapView;
 
 export interface MetricTile {
   label: string;

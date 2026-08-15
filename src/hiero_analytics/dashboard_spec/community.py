@@ -60,6 +60,8 @@ CHART_METHODOLOGY = {
 
 WIDE_CHARTS: set[str] = set()
 
+LIVE_VIEW_IDS: dict[str, str] = {}
+
 # This tab's "how to read this". Prose only; *asterisks* mark emphasis.
 GLOSSARY = {
     "title": "How to read this tab — what the numbers mean",

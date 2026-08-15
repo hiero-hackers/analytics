@@ -437,6 +437,8 @@ WIDE_CHARTS = {
     "team_affiliation_composition.png",
 }
 
+LIVE_VIEW_IDS: dict[str, str] = {}
+
 # "How to read this" notes, keyed by chart filename. These describe how to read the
 # chart (its encoding and window) — never the current data values — so they stay
 # accurate across every refresh. A chart with no entry here simply shows no note.

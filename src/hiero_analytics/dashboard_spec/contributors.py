@@ -10,6 +10,10 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.glossary import glossary_of
 
+# Exposes build_views(org, org_data_dir) -> the client-side contributor
+# activity heatmap. See export/activity_views.py.
+CUSTOM_VIEWS_MODULE = "hiero_analytics.export.activity_views"
+
 CHART_MACRO = {
     "name": "Contributors",
     "charts": {
@@ -169,6 +173,18 @@ SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 
 WIDE_CHARTS: set[str] = set()
+
+# Filenames whose slide renders live from a fetched view (export/activity_views.py)
+# instead of the PNG, with that PNG kept as the fallback. See export/data_api.py's
+# _org_chart_sections, which attaches this the same way it attaches CHART_NOTES.
+# The id below must match activity_views.VIEW_ID exactly — a string, not an
+# import, matching how CUSTOM_VIEWS_MODULE also references export/ by name only
+# rather than importing it, so this module stays declarative/side-effect-free.
+# tests/export/test_activity_views.py pins activity_views.VIEW_ID's value, and
+# tests/dashboard_spec catches drift between the two if either one changes.
+LIVE_VIEW_IDS = {
+    "contributor_activity_heatmap.png": "contributor-activity-heatmap",
+}
 
 # "How to read this" notes, keyed by chart filename. These describe how to read the
 # chart (its encoding and window) — never the current data values — so they stay

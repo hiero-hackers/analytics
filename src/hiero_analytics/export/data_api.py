@@ -45,6 +45,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_METHODOLOGY,
     CHART_NOTES,
     CUSTOM_VIEW_MODULES,
+    LIVE_VIEW_IDS,
     MACRO_ABSENT_NOTES,
     MACRO_GLOSSARIES,
     MACRO_GROUP_ORDER,
@@ -260,6 +261,13 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                     chart["note"] = note
                 if methodology := next((CHART_METHODOLOGY[f] for f in filenames if f in CHART_METHODOLOGY), None):
                     chart["methodology"] = methodology
+                # A slide whose PNG has a registered live view renders that
+                # view instead once it loads, with this same PNG kept as the
+                # fallback (the frontend still needs `variants` below for
+                # that reason — the live view doesn't replace them, it's
+                # tried first). See dashboard_spec.LIVE_VIEW_IDS.
+                if live_view_id := next((LIVE_VIEW_IDS[f] for f in filenames if f in LIVE_VIEW_IDS), None):
+                    chart["live_view_id"] = live_view_id
                 # Two different treatments: hand-flagged WIDE_CHARTS have many
                 # bars and need the horizontal scroll box; a merely wide-aspect
                 # chart (few bars, long legend) just spans the full row, scaled

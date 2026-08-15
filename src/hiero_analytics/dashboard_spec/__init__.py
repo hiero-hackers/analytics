@@ -35,6 +35,7 @@ __all__ = [
     "CHART_NOTES",
     "COLUMN_FORMATS",
     "CUSTOM_VIEW_MODULES",
+    "LIVE_VIEW_IDS",
     "MACRO_ABSENT_NOTES",
     "MACRO_GLOSSARIES",
     "MACRO_GROUP_ORDER",
@@ -112,6 +113,7 @@ MACRO_GROUP_ORDER = {family.CHART_MACRO["name"]: _group_order(family) for family
 CHART_MACROS = [canonical_macro(family.CHART_MACRO) for family in _FAMILIES]
 CHART_NOTES = merged(_FAMILIES, "CHART_NOTES")
 CHART_METHODOLOGY = merged(_FAMILIES, "CHART_METHODOLOGY")
+LIVE_VIEW_IDS = merged(_FAMILIES, "LIVE_VIEW_IDS")
 # Unlike the merged() dicts above, WIDE_CHARTS is a plain union: it holds flags,
 # so two families marking the same chart wide is redundant, not conflicting.
 WIDE_CHARTS = set().union(*(family.WIDE_CHARTS for family in _FAMILIES))

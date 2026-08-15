@@ -60,8 +60,20 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
   const groups: Group[] = !settled
     ? []
     : names.flatMap((name): Group[] => {
-        const groupViews = views.filter((view) => (view.group ?? names[0]) === name);
         const groupCharts = chartSections.filter((section) => chartGroup(section) === name);
+        // A view actually consumed by a present chart slide (live_view_id
+        // matched a chart that made it into chart_sections) is dropped from
+        // ViewCards's own list, so it doesn't render twice. "Actually
+        // present" matters: if that slide's PNG is missing, _org_chart_sections
+        // drops the whole slide and live_view_id never reaches the manifest —
+        // in that edge case the view isn't consumed by anything, so it stays
+        // in groupViews and still gets a home via ViewCards.
+        const consumedViewIds = new Set(
+          groupCharts.flatMap((section) => section.charts.flatMap((chart) => chart.live_view_id ?? [])),
+        );
+        const groupViews = views.filter(
+          (view) => (view.group ?? names[0]) === name && !consumedViewIds.has(view.id),
+        );
         const groupDocs = docs.filter((doc) => (doc.group || "") === name);
         if (!groupViews.length && !groupCharts.length && !groupDocs.length) return [];
         return [
@@ -72,7 +84,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
                 <ViewCards views={groupViews} sectionDocs={docs} provenance={provenance} />
               )}
               {groupCharts.map((section) => (
-                <ChartSectionCard key={section.id} section={section} provenance={provenance} />
+                <ChartSectionCard key={section.id} section={section} provenance={provenance} views={views} />
               ))}
               {groupDocs.map((doc) => (
                 <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />

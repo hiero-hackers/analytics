@@ -6,7 +6,8 @@
  */
 
 import { useMemo, useRef, useState } from "react";
-import type { BoardView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from "../api";
+import type { BoardView, HeatmapView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from "../api";
+import { ActivityHeatmap } from "./ActivityHeatmap";
 import { CoverageMatrix, type JumpRequest } from "./CoverageMatrix";
 import { type CsvExportSource } from "../csv";
 import { CsvDownloadButton } from "./CsvDownloadButton";
@@ -87,6 +88,41 @@ function boardExport(view: BoardView): CsvExportSource {
   };
 }
 
+function heatmapExport(view: HeatmapView): CsvExportSource {
+  return {
+    name: "contributor_activity_heatmap",
+    title: view.title,
+    columns: [{ key: "contributor", label: "contributor" }, ...view.columns.map((c) => ({ key: c, label: c }))],
+    rows: view.rows.map((rowLabel, rowIndex) => {
+      const record: Row = { contributor: rowLabel };
+      view.columns.forEach((column, columnIndex) => {
+        record[column] = view.values[rowIndex][columnIndex];
+      });
+      return record;
+    }),
+  };
+}
+
+/**
+ * Exhaustive over ViewDoc["kind"]. The `never` assignment in default makes
+ * TypeScript refuse to compile if a new kind is added to the ViewDoc union
+ * without a case here — a silent binary ternary can't do that.
+ */
+function exportSourceFor(view: ViewDoc): CsvExportSource {
+  switch (view.kind) {
+    case "board":
+      return boardExport(view);
+    case "matrix":
+      return matrixExport(view);
+    case "heatmap":
+      return heatmapExport(view);
+    default: {
+      const unhandled: never = view;
+      throw new Error(`Unhandled view kind: ${JSON.stringify(unhandled)}`);
+    }
+  }
+}
+
 export function ViewCards({
   views,
   sectionDocs,
@@ -108,7 +144,7 @@ export function ViewCards({
   return (
     <>
       {views.map((view) => {
-        const exportSource = view.kind === "board" ? boardExport(view) : matrixExport(view);
+        const exportSource = exportSourceFor(view);
         return (
           <SectionCard
             key={view.id}
@@ -128,18 +164,29 @@ export function ViewCards({
               />
             }
           >
-            {view.kind === "board" ? (
-              // The board names the view its chips jump to, so a future board
-              // could target something other than the coverage matrix.
-              <StatusBoard
-                view={view}
-                onJump={(hip) =>
-                  view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
+            {(() => {
+              switch (view.kind) {
+                case "board":
+                  // The board names the view its chips jump to, so a future
+                  // board could target something other than the matrix.
+                  return (
+                    <StatusBoard
+                      view={view}
+                      onJump={(hip) =>
+                        view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
+                      }
+                    />
+                  );
+                case "matrix":
+                  return <CoverageMatrix view={view} evidence={evidence} jump={jump} />;
+                case "heatmap":
+                  return <ActivityHeatmap view={view} />;
+                default: {
+                  const unhandled: never = view;
+                  throw new Error(`Unhandled view kind: ${JSON.stringify(unhandled)}`);
                 }
-              />
-            ) : (
-              <CoverageMatrix view={view} evidence={evidence} jump={jump} />
-            )}
+              }
+            })()}
           </SectionCard>
         );
       })}
