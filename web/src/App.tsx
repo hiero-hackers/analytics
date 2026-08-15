@@ -4,7 +4,7 @@
  * groups, chart-section cards, then the table sections.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchManifest, type ChartSection, type Manifest } from "./api";
 import { ChartSectionCard } from "./components/ChartSectionCard";
 import { Glossary } from "./components/Glossary";
@@ -12,6 +12,7 @@ import { MetricTiles } from "./components/MetricTiles";
 import { ProvenanceFooter } from "./components/ProvenanceFooter";
 import { SectionGroups, type Group } from "./components/SectionGroups";
 import { SectionTable } from "./components/SectionTable";
+import { Skeleton } from "./components/Skeleton";
 import { TabBar } from "./components/TabBar";
 import { WipFooter } from "./components/WipFooter";
 import { stamp } from "./format";
@@ -19,6 +20,9 @@ import { useHashState } from "./useHashState";
 import { useSectionDocs } from "./useSectionDocs";
 import { useViewDocs } from "./useViewDocs";
 import { ViewCards } from "./components/ViewCards";
+
+
+const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
 
 function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; macro: string }) {
   const entry = manifest.orgs[org];
@@ -36,6 +40,8 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
 
   const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
   const provenance = manifest.provenance;
+  // A shared section link names its target here; see the effect below.
+  const [widget] = useHashState("widget", "");
 
   // The tab is a sequence of named sections: each group renders its views,
   // then its chart cards, then its tables, and the jump bar links each one —
@@ -57,6 +63,28 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     if (!names.includes(doc.group || "")) names.push(doc.group || "");
   }
   const settled = !viewsLoading && !docsLoading;
+  // A shared #widget=<section id> link: once the tab settles, scroll to and flash that section
+  const flashTimer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!settled || !widget) return;
+    const jump = () => {
+      const target = document.getElementById(widget);
+      target?.scrollIntoView({ block: "start", behavior: "smooth" });
+      target?.classList.add("flash");
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+      flashTimer.current = window.setTimeout(() => target?.classList.remove("flash"), FLASH_MS);
+    };
+    const canRequestFrame = typeof window.requestAnimationFrame === "function";
+    const raf = canRequestFrame ? window.requestAnimationFrame(jump) : undefined;
+    if (raf === undefined) jump();
+    return () => {
+      if (typeof window.cancelAnimationFrame === "function" && raf !== undefined) {
+        window.cancelAnimationFrame(raf as number);
+      }
+      if (flashTimer.current) window.clearTimeout(flashTimer.current);
+      document.getElementById(widget)?.classList.remove("flash");
+    };
+  }, [settled, widget]);
   const groups: Group[] = !settled
     ? []
     : names.flatMap((name): Group[] => {
@@ -105,28 +133,43 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
           {unavailable.join(", ")}. Everything else on this tab is unaffected — reload to try again.
         </p>
       )}
-      <SectionGroups groups={groups} />
+      {settled ? <SectionGroups groups={groups} /> : <Skeleton label="Loading tab" rows={6} />}
     </>
   );
 }
 
-export default function App() {
-  const [manifest, setManifest] = useState<Manifest | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [macro, setMacro] = useHashState("tab", "");
-  const [org, setOrg] = useHashState("org", "");
+/** Human-readable fatal error: retry button up front, raw cause tucked away. */
+function FatalError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="my-6">
+      <p className="error">
+        Failed to load the dashboard data. This is usually temporary — try again in a moment.
+      </p>
+      <button type="button" className="dl mt-2" onClick={onRetry}>
+        Retry
+      </button>
+      <details className="mt-3 text-[13px] text-muted">
+        <summary className="cursor-pointer">Error details</summary>
+        <pre className="mt-2 whitespace-pre-wrap break-all">{message}</pre>
+      </details>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    fetchManifest().then(setManifest).catch((cause: unknown) => setError(String(cause)));
-  }, []);
-
-  if (error) {
-    return <p className="error">Failed to load the data API: {error}</p>;
-  }
-  if (!manifest) {
-    return <p className="sub">Loading…</p>;
-  }
-
+/** Everything that depends on a loaded manifest — tabs, org filter, panels, footer. */
+function Dashboard({
+  manifest,
+  macro,
+  setMacro,
+  org,
+  setOrg,
+}: {
+  manifest: Manifest;
+  macro: string;
+  setMacro: (value: string) => void;
+  org: string;
+  setOrg: (value: string) => void;
+}) {
   const orgs = Object.keys(manifest.orgs);
   const derived = [
     ...new Set(
@@ -164,8 +207,7 @@ export default function App() {
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
 
   return (
-    <div className="wrap">
-      <h1>Hiero — analytics dashboard</h1>
+    <>
       <p className="sub">
         Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart to enlarge.
       </p>
@@ -195,6 +237,53 @@ export default function App() {
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
+    </>
+  );
+}
+
+export default function App() {
+  const [manifest, setManifest] = useState<Manifest | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // Bumped by retry to re-run the fetch below without duplicating its body.
+  const [reloadKey, setReloadKey] = useState(0);
+  const [macro, setMacro] = useHashState("tab", "");
+  const [org, setOrg] = useHashState("org", "");
+
+  useEffect(() => {
+    let cancelled = false;
+    setError(null);
+    fetchManifest()
+      .then((data) => {
+        if (!cancelled) setManifest(data);
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) setError(String(cause));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  const retry = () => {
+    setManifest(null);
+    setReloadKey((key) => key + 1);
+  };
+
+  return (
+    <div className="wrap">
+      <h1>Hiero — analytics dashboard</h1>
+      {/* The header renders in every state below; only the content beneath it
+          changes shape — chrome never pops in after the fact. */}
+      {error ? (
+        <FatalError message={error} onRetry={retry} />
+      ) : !manifest ? (
+        <>
+          <p className="sub">Loading…</p>
+          <Skeleton label="Loading dashboard" rows={5} />
+        </>
+      ) : (
+        <Dashboard manifest={manifest} macro={macro} setMacro={setMacro} org={org} setOrg={setOrg} />
+      )}
     </div>
   );
 }

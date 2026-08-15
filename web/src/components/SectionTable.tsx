@@ -8,6 +8,7 @@ import { useState } from "react";
 import type { Manifest, SectionDoc } from "../api";
 import { safeUrl } from "../safety";
 import { useDataTable } from "../useDataTable";
+import { CopyLinkButton } from "./CopyLinkButton";
 import { CsvDownloadButton } from "./CsvDownloadButton";
 import { DataTable } from "./DataTable";
 import { PeriodTabs } from "./PeriodTabs";
@@ -30,6 +31,7 @@ export function SectionTable({
 
   return (
     <SectionCard
+      id={doc.id}
       title={doc.title}
       badge={shown === rows.length ? `${rows.length} rows` : `${shown} of ${rows.length}`}
       description={doc.description}
@@ -37,6 +39,7 @@ export function SectionTable({
       stale={doc.stale}
       actions={
         <>
+          <CopyLinkButton sectionId={doc.id} />
           {action && (
             <a className="dl" href={action} target="_blank" rel="noopener noreferrer">
               {doc.action?.label}

@@ -301,3 +301,79 @@ describe("Section groups", () => {
     expect(window.location.hash).not.toContain("grp-");
   });
 });
+
+describe("Loading, empty-filter, and error states (#343)", () => {
+  it("shows the header and an initial-load placeholder before the manifest arrives", async () => {
+    vi.unstubAllGlobals();
+    let resolveManifest!: (response: Response) => void;
+    const pending = new Promise<Response>((resolve) => {
+      resolveManifest = resolve;
+    });
+    const { MANIFEST } = await import("./fixtures");
+    stubApi({ "manifest.json": () => pending });
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Hiero — analytics dashboard" })).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading dashboard" })).toBeInTheDocument();
+
+    resolveManifest(new Response(JSON.stringify(MANIFEST)));
+    expect(await screen.findByRole("button", { name: "Governance" })).toBeInTheDocument();
+    expect(screen.queryByRole("status", { name: "Loading dashboard" })).not.toBeInTheDocument();
+  });
+
+  it("shows a tab-switch skeleton while a section is still fetching", async () => {
+    vi.unstubAllGlobals();
+    let resolveRoles!: (response: Response) => void;
+    const pendingRoles = new Promise<Response>((resolve) => {
+      resolveRoles = resolve;
+    });
+    const { GOV_DOC } = await import("./fixtures");
+    stubApi({ "roles.json": () => pendingRoles });
+
+    render(<App />);
+    await userEvent.click(await screen.findByRole("button", { name: "Governance" }));
+
+    expect(screen.getByRole("status", { name: "Loading tab" })).toBeInTheDocument();
+    expect(screen.queryByText("Role holders")).not.toBeInTheDocument();
+
+    resolveRoles(new Response(JSON.stringify(GOV_DOC)));
+    expect(await screen.findByText("Role holders")).toBeInTheDocument();
+    expect(screen.queryByRole("status", { name: "Loading tab" })).not.toBeInTheDocument();
+  });
+
+  it("shows a no-matches message when a filter excludes every row, and clears it", async () => {
+    await openGovernance();
+
+    await userEvent.type(screen.getByPlaceholderText("Filter…"), "nobody-has-this-name");
+    expect(await screen.findByText(/No rows match/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "clear the filter?" })).toBeInTheDocument();
+    expect(screen.queryByText("alice")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "clear the filter?" }));
+    expect(await screen.findByText("alice")).toBeInTheDocument();
+    expect(screen.queryByText(/No rows match/)).not.toBeInTheDocument();
+  });
+
+  it("shows a fatal error with a retry button when the manifest fails to load", async () => {
+    vi.unstubAllGlobals();
+    const { MANIFEST } = await import("./fixtures");
+    let attempt = 0;
+    stubApi({
+      "manifest.json": () => {
+        attempt += 1;
+        return attempt === 1 ? new Response("nope", { status: 500 }) : new Response(JSON.stringify(MANIFEST));
+      },
+    });
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Hiero — analytics dashboard" })).toBeInTheDocument();
+    expect(await screen.findByText(/Failed to load the dashboard data/)).toBeInTheDocument();
+    expect(screen.getByText("Error details")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(await screen.findByRole("button", { name: "Governance" })).toBeInTheDocument();
+    expect(screen.queryByText(/Failed to load the dashboard data/)).not.toBeInTheDocument();
+  });
+});

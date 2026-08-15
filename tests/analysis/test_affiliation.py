@@ -476,3 +476,17 @@ def test_top_n_with_other_noop_when_small():
     folded = top_n_with_other(dist, "organisation", "maintainers", top_n=6)
     assert list(folded["organisation"]) == ["B", "A"]  # sorted desc, no Other row
     assert "Other" not in " ".join(folded["organisation"])
+
+
+def test_load_affiliations_resolves_misiek_blocky_and_seanbohan(tmp_path):
+    """The two contributors from issue #389 resolve to their correct orgs."""
+    path = tmp_path / "affiliations.yaml"
+    path.write_text(
+        'misiek-blocky: "BlockyDevs"  # manual\nseanbohan: "Linux Foundation"  # manual\n',
+        encoding="utf-8",
+    )
+
+    mapping = load_affiliations(path)
+
+    assert mapping == {"misiek-blocky": "BlockyDevs", "seanbohan": "Linux Foundation"}
+    assert load_manual_logins(path) == {"misiek-blocky", "seanbohan"}

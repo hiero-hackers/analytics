@@ -119,6 +119,8 @@ def extract_graphql_cursor_page(
         nodes = []
 
     page_info = container.get("pageInfo", {})
+    if not isinstance(page_info, dict):
+        page_info = {}
     next_cursor = page_info.get("endCursor")
     has_next = bool(page_info.get("hasNextPage", False))
 

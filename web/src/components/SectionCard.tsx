@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { stamp } from "../format";
 
 export function SectionCard({
+  id,
   title,
   badge,
   description,
@@ -19,6 +20,7 @@ export function SectionCard({
   actions,
   children,
 }: {
+  id?: string;
   title: string;
   badge: ReactNode;
   description: string;
@@ -28,7 +30,7 @@ export function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <details className="card tsec" open>
+    <details className="card tsec" open id={id}>
       <summary className="tsum">
         <h2>{title}</h2>
         <span className="sbadge">{badge}</span>

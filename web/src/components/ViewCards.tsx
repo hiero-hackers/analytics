@@ -10,6 +10,7 @@ import type { BoardView, HeatmapView, Manifest, MatrixView, Row, SectionDoc, Vie
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { CoverageMatrix, type JumpRequest } from "./CoverageMatrix";
 import { type CsvExportSource } from "../csv";
+import { CopyLinkButton } from "./CopyLinkButton";
 import { CsvDownloadButton } from "./CsvDownloadButton";
 import type { EvidenceItem } from "./EvidencePanel";
 import { SectionCard } from "./SectionCard";
@@ -148,20 +149,24 @@ export function ViewCards({
         return (
           <SectionCard
             key={view.id}
+            id={view.id}
             title={view.title}
             badge={view.badge}
             description={view.description}
             generatedAt={view.generated_at}
             stale={view.stale}
             actions={
-              <CsvDownloadButton
-                provenance={provenance}
-                payload={() => ({
-                  ...exportSource,
-                  total: exportSource.rows.length,
-                  dataAsOf: view.generated_at,
-                })}
-              />
+              <>
+                <CopyLinkButton sectionId={view.id} />
+                <CsvDownloadButton
+                  provenance={provenance}
+                  payload={() => ({
+                    ...exportSource,
+                    total: exportSource.rows.length,
+                    dataAsOf: view.generated_at,
+                  })}
+                />
+              </>
             }
           >
             {(() => {
