@@ -20,6 +20,7 @@ def isolate_charts_dir(monkeypatch, tmp_path):
 
 
 def _write_heatmap_csv(tmp_path: Path, rows: list[dict]) -> Path:
+    """Write rows to the heatmap's expected source CSV filename in tmp_path."""
     pd.DataFrame(rows).to_csv(tmp_path / activity_views.SOURCE_CSV, index=False)
     return tmp_path
 
