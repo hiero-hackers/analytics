@@ -43,16 +43,6 @@
  ],
  "rows": [
   {
-   "repo": "hiero-sdk-python",
-   "maintainers": 3,
-   "distinct_orgs": 0,
-   "top_org": null,
-   "top_org_pct": 0,
-   "independent": 3,
-   "unknown": 0,
-   "organisations": null
-  },
-  {
    "repo": "awesome-contributions",
    "maintainers": 7,
    "distinct_orgs": 1,
@@ -61,6 +51,16 @@
    "independent": 1,
    "unknown": 0,
    "organisations": "Hashgraph"
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "maintainers": 5,
+   "distinct_orgs": 1,
+   "top_org": "OpenElements",
+   "top_org_pct": 20,
+   "independent": 4,
+   "unknown": 0,
+   "organisations": "OpenElements"
   },
   {
    "repo": "homebrew-tools",
@@ -454,7 +454,7 @@
   }
  ],
  "row_count": 41,
- "generated_at": "2026-08-14T07:49:15.345995+00:00",
+ "generated_at": "2026-08-16T09:17:03.761197+00:00",
  "stale": false,
  "macro": "Governance"
 }

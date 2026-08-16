@@ -1140,18 +1140,6 @@
    "organisations": "Hashgraph 1, OpenElements 1, Independent 1"
   },
   {
-   "team": "hiero-sdk-python-maintainers",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 0,
-   "top_org": null,
-   "top_org_pct": 0,
-   "hhi": 3333,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Independent 3"
-  },
-  {
    "team": "hiero-website-triage",
    "members": 3,
    "resolved": 3,
@@ -1260,6 +1248,18 @@
    "organisations": "Hashgraph 3, LimeChain 2, Hgraph 1, Hashgraph Online 1, 8bees 1, Hedera 1"
   },
   {
+   "team": "hiero-sdk-python-maintainers",
+   "members": 5,
+   "resolved": 5,
+   "distinct_orgs": 1,
+   "top_org": "OpenElements",
+   "top_org_pct": 20,
+   "hhi": 2000,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "OpenElements 1, Independent 4"
+  },
+  {
    "team": "hiero-sdk-python-triage",
    "members": 5,
    "resolved": 5,
@@ -1309,19 +1309,19 @@
   },
   {
    "team": "hiero-sdk-python-committers",
-   "members": 10,
-   "resolved": 10,
-   "distinct_orgs": 2,
-   "top_org": "OpenElements",
-   "top_org_pct": 10,
-   "hhi": 1000,
+   "members": 8,
+   "resolved": 8,
+   "distinct_orgs": 1,
+   "top_org": "LimeChain",
+   "top_org_pct": 12,
+   "hhi": 1250,
    "unknown": 0,
    "single_employer": false,
-   "organisations": "OpenElements 1, LimeChain 1, Independent 8"
+   "organisations": "LimeChain 1, Independent 7"
   }
  ],
  "row_count": 106,
- "generated_at": "2026-08-14T07:49:15.495995+00:00",
+ "generated_at": "2026-08-16T09:17:03.905346+00:00",
  "stale": false,
  "macro": "Governance"
 }

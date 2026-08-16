@@ -333,10 +333,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-14T07:51:28.742726+00:00",
+ "generated_at": "2026-08-16T09:19:32.568487+00:00",
  "provenance": {
-  "git_sha": "1605fc3",
-  "data_as_of": "2026-08-11T09:21:13.100605+00:00"
+  "git_sha": "b7f59fb",
+  "data_as_of": "2026-08-14T07:44:57.301095+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -853,7 +853,7 @@
         {
          "label": "Organisation mix by team",
          "file": "charts/org/hiero-ledger/team_affiliation_composition.png",
-         "width": 4056,
+         "width": 4107,
          "height": 1274
         }
        ],
@@ -901,7 +901,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-14T07:50:30.910650+00:00"
+      "generated_at": "2026-08-16T09:18:26.083020+00:00"
      }
     },
     {
@@ -961,7 +961,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-14T07:50:30.906411+00:00"
+      "generated_at": "2026-08-16T09:18:26.078664+00:00"
      }
     },
     {
@@ -1076,12 +1076,12 @@
          "label": "1 month",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_30d.png",
          "width": 2091,
-         "height": 1844
+         "height": 1781
         },
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
-         "width": 2093,
+         "width": 2091,
          "height": 1280
         }
        ],
@@ -1195,7 +1195,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "21%",
+      "value": "22%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -1607,7 +1607,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "26%",
+      "value": "28%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
