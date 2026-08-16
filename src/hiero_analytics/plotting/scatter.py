@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from matplotlib import dates as mdates
 
 from hiero_analytics.config.charts import (
     ANNOTATION_FONT_SIZE,
@@ -71,6 +72,14 @@ def plot_release_timeline(
         ax.set_yticks(list(y_pos.values()))
         ax.set_yticklabels(list(y_pos.keys()))
         ax.margins(x=0.02, y=0.03)
+
+        # "Nov" with "2025" beneath, not "2025-11" — matplotlib's own
+        # concise-date machinery, not a hand-rolled formatter, so it degrades
+        # sensibly if the plotted span shrinks to under a month (period tabs).
+        locator = mdates.AutoDateLocator()
+        formatter = mdates.ConciseDateFormatter(locator)
+        ax.xaxis.set_major_locator(locator)
+        ax.xaxis.set_major_formatter(formatter)
 
         counts = df.groupby("repo").size()
         for repo, y in y_pos.items():
