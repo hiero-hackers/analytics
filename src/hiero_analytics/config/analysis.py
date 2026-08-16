@@ -54,6 +54,14 @@ ACTIVITY_WEIGHTS = {
 DIFFICULTY_OVER_TIME_WINDOW_DAYS = 365
 TIMELINE_MAX_WORKERS = 3
 
+# Staleness-ratio bucket thresholds for the Releases tab's colored table
+# column (days_since_last_release / a repo's own median release gap). A
+# repo above STALENESS_OVERDUE_RATIO is flagged distinctly from one merely
+# above STALENESS_WATCH_RATIO — "notably behind its own pace" vs "worth
+# keeping an eye on" are different severities, not one bucket.
+STALENESS_WATCH_RATIO = 1.0
+STALENESS_OVERDUE_RATIO = 3.0
+
 # The Hiero era began when the codebase moved to hiero-ledger (September
 # 2024). HIP-implementation analytics count only PRs from this era — earlier
 # references describe pre-migration (Hedera-era) work and are kept in the

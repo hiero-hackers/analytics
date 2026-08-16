@@ -281,6 +281,15 @@ RELEASES = [
         published_at=_NOW - timedelta(days=10),
         is_prerelease=True,
     ),
+    ReleaseRecord(
+        # Within the last 7 days so every period-tab variant of the release
+        # timeline chart (Week/1 month/1 year/All time) actually renders.
+        repo=f"{PRIMARY}/sdk-python",
+        tag_name="v1.1.0",
+        name="v1.1.0",
+        published_at=_NOW - timedelta(days=2),
+        is_prerelease=False,
+    ),
 ]
 
 

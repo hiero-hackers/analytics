@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 import pandas as pd
 
 from hiero_analytics.analysis.dataframe_utils import records_to_dataframe, repos_to_dataframe
+from hiero_analytics.config.analysis import STALENESS_OVERDUE_RATIO, STALENESS_WATCH_RATIO
 from hiero_analytics.data_sources.models import ReleaseRecord, RepositoryRecord
 
 _TIMELINE_COLUMNS = ["repo", "tag_name", "published_at", "is_prerelease"]
@@ -22,7 +23,14 @@ _STALENESS_COLUMNS = [
     "median_gap_days",
     "staleness_ratio",
     "release_status",
+    "staleness_bucket",
 ]
+
+NEVER_RELEASED = "never_released"
+INSUFFICIENT_HISTORY = "insufficient_history"
+OVERDUE = "overdue"
+WATCH = "watch"
+ON_PACE = "on_pace"
 
 
 def build_release_timeline(records: list[ReleaseRecord]) -> pd.DataFrame:
@@ -45,13 +53,31 @@ def build_release_timeline(records: list[ReleaseRecord]) -> pd.DataFrame:
     return timeline.sort_values(["repo", "published_at"]).reset_index(drop=True)
 
 
+def _staleness_bucket(latest_release: pd.Series, staleness_ratio: pd.Series) -> pd.Series:
+    """Classify each row by staleness severity.
+    
+    Never-released repos are checked first so their infinite ratio maps to
+    ``NEVER_RELEASED``. Explicit ``fillna(False)`` keeps nullable comparisons
+    from incorrectly replacing missing values.
+    """
+    bucket = pd.Series(INSUFFICIENT_HISTORY, index=latest_release.index, dtype="object")
+    bucket = bucket.mask((staleness_ratio <= STALENESS_WATCH_RATIO).fillna(False), ON_PACE)
+    bucket = bucket.mask(
+        ((staleness_ratio > STALENESS_WATCH_RATIO) & (staleness_ratio <= STALENESS_OVERDUE_RATIO)).fillna(False),
+        WATCH,
+    )
+    bucket = bucket.mask((staleness_ratio > STALENESS_OVERDUE_RATIO).fillna(False), OVERDUE)
+    return bucket.mask(latest_release.isna(), NEVER_RELEASED)
+
+
 def build_release_staleness(
     records: list[ReleaseRecord],
     all_repos: list[RepositoryRecord],
     *,
     now: datetime | None = None,
 ) -> pd.DataFrame:
-    """Per repo: latest release and days since, across the full repo list.
+    """
+    Per repo: latest release and days since, across the full repo list.
 
     Repos with no releases are retained with null staleness values. Published as
     a standalone artifact because release staleness is neither governance-
@@ -78,6 +104,7 @@ def build_release_staleness(
         staleness["median_gap_days"] = pd.array([None] * len(staleness), dtype="Float64")
         staleness["staleness_ratio"] = pd.array([math.inf] * len(staleness), dtype="Float64")
         staleness["release_status"] = "never_released"
+        staleness["staleness_bucket"] = NEVER_RELEASED
         return staleness[_STALENESS_COLUMNS].reset_index(drop=True)
 
     releases = releases.sort_values(["repo", "published_at"])
@@ -98,5 +125,6 @@ def build_release_staleness(
     safe_gap = staleness["median_gap_days"].where(staleness["median_gap_days"] > 0)
     ratio = (staleness["days_since_last_release"] / safe_gap).astype("Float64")
     staleness["staleness_ratio"] = ratio.mask(never_released, math.inf)
+    staleness["staleness_bucket"] = _staleness_bucket(staleness["latest_release"], staleness["staleness_ratio"])
 
     return staleness[_STALENESS_COLUMNS].reset_index(drop=True)

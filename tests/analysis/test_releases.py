@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from datetime import UTC, datetime
 
@@ -78,6 +79,7 @@ class TestBuildReleaseStaleness:
             "median_gap_days",
             "staleness_ratio",
             "release_status",
+            "staleness_bucket",
         ]
         assert result.empty
 
@@ -94,6 +96,7 @@ class TestBuildReleaseStaleness:
         assert pd.isna(result.iloc[0]["median_gap_days"])
         assert result.iloc[0]["staleness_ratio"] == math.inf
         assert result.iloc[0]["release_status"] == "never_released"
+        assert result.iloc[0]["staleness_bucket"] == "never_released"
 
     def test_mixed_repos_only_released_ones_get_values(self) -> None:
         """Repos with releases get real values; repos without stay null in the same frame."""
@@ -238,3 +241,56 @@ class TestStalenessRatio:
 
         assert result.iloc[0]["median_gap_days"] == 14.0
         assert float(result.iloc[0]["staleness_ratio"]) < 1.0
+
+
+class TestStalenessBucket:
+    """The colored-chip severity bucket -- deliberately a plain string, not derived from staleness_ratio."""
+
+    def test_all_five_buckets_classify_correctly(self) -> None:
+        """never_released, insufficient_history, watch, overdue, on_pace each land where expected."""
+        repos = [_repo(n) for n in ("never", "one", "watch", "overdue", "pace")]
+        records = [
+            _release("org/one", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/watch", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/watch", "v2", datetime(2026, 1, 11, tzinfo=UTC)),  # gap=10
+            _release("org/overdue", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/overdue", "v2", datetime(2026, 1, 3, tzinfo=UTC)),  # gap=2
+            _release("org/pace", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/pace", "v2", datetime(2026, 1, 20, tzinfo=UTC)),  # gap=19
+        ]
+        now = datetime(2026, 2, 1, tzinfo=UTC)
+
+        result = build_release_staleness(records, repos, now=now).set_index("repo")
+
+        assert result.loc["org/never", "staleness_bucket"] == "never_released"
+        assert result.loc["org/one", "staleness_bucket"] == "insufficient_history"
+        assert result.loc["org/watch", "staleness_bucket"] == "watch"
+        assert result.loc["org/overdue", "staleness_bucket"] == "overdue"
+        assert result.loc["org/pace", "staleness_bucket"] == "on_pace"
+
+    def test_bucket_survives_json_export_even_though_ratio_collapses_to_null(self) -> None:
+        """The exact regression this column exists to prevent.
+
+        pandas' to_json (what export/data_api.py's _rows() uses) collapses
+        both inf and NaN to null -- so a never-released repo's numeric
+        staleness_ratio becomes indistinguishable from the "insufficient
+        history" case right before the frontend ever sees it, even though
+        analysis/releases.py correctly gives them different values. The
+        string bucket column is unaffected by that collapse.
+        """
+        repos = [_repo("never"), _repo("one")]
+        records = [_release("org/one", "v1", datetime(2026, 1, 1, tzinfo=UTC))]
+
+        result = build_release_staleness(records, repos)
+        parsed = json.loads(result.to_json(orient="records", date_format="iso"))
+        by_repo = {row["repo"]: row for row in parsed}
+
+        # The bug this column exists to prevent: both ratios collapse to the
+        # same null, so a consumer reading staleness_ratio alone could no
+        # longer tell these two repos apart.
+        assert by_repo["org/never"]["staleness_ratio"] is None
+        assert by_repo["org/one"]["staleness_ratio"] is None
+
+        # The bucket column is what actually distinguishes them post-export.
+        assert by_repo["org/never"]["staleness_bucket"] == "never_released"
+        assert by_repo["org/one"]["staleness_bucket"] == "insufficient_history"
