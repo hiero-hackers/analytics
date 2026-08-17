@@ -15,6 +15,7 @@ from urllib.parse import unquote
 import requests
 import yaml
 
+from .dataset_store import PartialOrgFetchError
 from .github_client import GitHubClient
 from .github_ingest._common import fetch_all_with_retry
 from .models import DependencyManifestRecord, RunnerRecord, SbomCoverageRecord
@@ -90,33 +91,13 @@ def _parse_purl(purl: str) -> tuple[str, str, str | None] | None:
 def fetch_repo_sbom(
     client: GitHubClient, org: str, repo: str
 ) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
-    """Fetch and parse one repo's dependency-graph SBOM.
+    """Fetch and parse one repository's dependency-graph SBOM.
 
-    Only a 404 or 403 counts as "dependency graph disabled" (status
-    ``"disabled"``, empty package list) — mirroring ``has_codeowners_file``'s
-    exact treatment, since GitHub returns 404/403 for repos where the
-    dependency graph feature is off, not for genuine failures. Any other
-    error propagates as status ``"error"`` with the repo's coverage row
-    still returned (never silently dropped), so a network/permission issue
-    reads as "we don't know," not "this repo has no dependencies."
-
-    NOTE: package parsing is based on the documented SPDX/purl shape of the
-    dependency-graph SBOM endpoint; verify against a real response before
-    relying on this for production coverage numbers — see the design note
-    on #338.
+    Treat 403/404 as disabled and other failures as errors so missing data
+    is not confused with an empty dependency set.
     """
     url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
-    try:
-        payload = client.get(url)
-    except requests.HTTPError as exc:
-        if exc.response is not None and exc.response.status_code in (403, 404):
-            logger.debug("Dependency graph disabled for %s", repo)
-            return SbomCoverageRecord(repo=repo, status="disabled", package_count=0), []
-        logger.error("SBOM fetch failed for %s: %s", repo, exc)
-        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
-    except requests.RequestException as exc:
-        logger.error("SBOM fetch failed for %s: %s", repo, exc)
-        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+    payload = client.get(url)
 
     sbom = (payload or {}).get("sbom") or {}
     packages = sbom.get("packages") or []
@@ -263,30 +244,30 @@ def fetch_org_sbom_data(
     repo_names: list[str],
     max_workers: int = _SBOM_FETCH_WORKERS,
 ) -> tuple[list[SbomCoverageRecord], list[DependencyManifestRecord]]:
-    """Fetch SBOM coverage + packages for every repo in ``repo_names``.
+    """Fetch and parse one repo's dependency-graph SBOM.
 
-    Returns ``(coverage, packages)`` — always exactly one coverage row per
-    input repo (``fetch_repo_sbom`` never raises; disabled/error states are
-    returned, not thrown), and zero or more package rows per repo.
-
-    ``fetch_all_with_retry`` expects a flat per-item list, so each repo's
-    ``(coverage, packages)`` pair is flattened into one list (coverage row
-    first) and split back apart here by type after the fan-out completes —
-    simpler than teaching the shared retry helper a second return shape for
-    one caller.
+    HTTP failures propagate so the org-wide retry layer can retry transient
+    failures. Final failures are recorded as ``error`` by the org fan-out;
+    they must not be classified as ``disabled`` from the status code alone.
     """
-
     def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
         coverage, packages = fetch_repo_sbom(client, org, repo)
         return [coverage, *packages]
-
-    combined = fetch_all_with_retry(
-        repo_names,
-        max_workers,
-        per_repo,
-        task_desc="SBOM data",
-        describe=str,
-    )
+    
+    try:
+        combined = fetch_all_with_retry(
+            repo_names,
+            max_workers,
+            per_repo,
+            task_desc="SBOM data",
+            describe=str,
+            )
+    except PartialOrgFetchError as exc:
+        combined = list(exc.records)
+        combined.extend(
+            SbomCoverageRecord(repo=repo, status="error", package_count=0)
+            for repo in exc.failed_repos
+        )
     coverage = [r for r in combined if isinstance(r, SbomCoverageRecord)]
     packages = [r for r in combined if isinstance(r, DependencyManifestRecord)]
     return coverage, packages
