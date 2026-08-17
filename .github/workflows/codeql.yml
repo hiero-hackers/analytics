@@ -41,7 +41,7 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Initialize CodeQL
-              uses: github/codeql-action/init@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.3.5
+              uses: github/codeql-action/init@f205ea1c3313d32999d8dff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd6a48b4f6530d4437b38 # v4.3.5
               with:
                   languages: ${{ matrix.language }}
                   build-mode: ${{ matrix.build-mode }}
