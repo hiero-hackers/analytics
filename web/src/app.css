@@ -19,6 +19,8 @@
 /* ---- Semantic palette ---------------------------------------------------- */
 
 :root {
+  color-scheme: light dark;
+
   --page: #fafafa; /* page background */
   --ink: #1b1b1b; /* primary text */
   --muted: #666; /* secondary text */
