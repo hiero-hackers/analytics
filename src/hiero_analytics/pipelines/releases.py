@@ -52,14 +52,13 @@ def main(org: str = ORG):
         int(staleness["latest_release"].isna().sum()) if not staleness.empty else len(all_repos),
     )
 
-    # Period-tabbed chart spans, matching the same "All time / 1 year /
-    # 1 month / Week" vocabulary every other period-tabbed chart in the
+    # Last 18 months" is intentionally capped at 548 days.
     # dashboard uses (ACTIVITY_PERIODS) — a reader shouldn't have to learn a
     # different set of windows for this one tab. "All time" caps at
     # ALL_TIME_WINDOW_DAYS rather than truly all history, both for legibility
     # and because build_release_timeline's CSV already has the full record.
     now = datetime.now(UTC)
-    spans = [("All time", ALL_TIME_WINDOW_DAYS, "")] + [
+    spans = [("Last 18 months", ALL_TIME_WINDOW_DAYS, "")] + [
         (period.label, period.days, f"_{period.key}") for period in reversed(ACTIVITY_PERIODS)
     ]
     for span_label, span_days, suffix in spans:

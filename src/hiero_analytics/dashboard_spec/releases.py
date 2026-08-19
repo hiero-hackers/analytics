@@ -23,8 +23,8 @@ CHART_MACRO = {
                 "group": _GROUP,
                 "title": "Release timeline",
                 "description": (
-                    "Every release per repo, windowed by the tabs below (matching the same "
-                    "Week / 1 month / 1 year / All time spans used across the dashboard). "
+                    "Every release per repo, windowed by the tabs below (Week / 1 month / "
+                    "1 year / Last 18 months). "
                     "Y-axis sorted by release count in the selected window (busiest at top); "
                     "the number beside each row is that count, so a high-cadence repo's row "
                     "stays readable instead of turning into a solid smear of overlapping dots."
@@ -33,7 +33,7 @@ CHART_MACRO = {
                     (
                         "Release timeline",
                         [
-                            ("All time", "release_timeline.png"),
+                            ("Last 18 months", "release_timeline.png"),
                             ("1 year", "release_timeline_365d.png"),
                             ("1 month", "release_timeline_30d.png"),
                             ("Week", "release_timeline_7d.png"),
@@ -57,7 +57,7 @@ CHART_NOTES = {
 CHART_METHODOLOGY = {
     "release_timeline.png": [
         "Fetch every published, non-draft release for each repo in the org (GitHub Releases only, no git-tag fallback).",
-        "Filter to the selected span (Week / 1 month / 1 year / All time, matching the dashboard's usual period tabs).",
+        "Filter to the selected span (Week / 1 month / 1 year / Last 18 months).",
         "Plot one point per release, sorted top-to-bottom by release count within that span.",
         "Label each row with its exact count instead of relying on dot density, which would distort under high cadence.",
     ],
