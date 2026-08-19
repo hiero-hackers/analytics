@@ -283,7 +283,7 @@ RELEASES = [
     ),
     ReleaseRecord(
         # Within the last 7 days so every period-tab variant of the release
-        # timeline chart (Week/1 month/1 year/All time) actually renders.
+        # timeline chart (Week/1 month/1 year/Last 18 months) actually renders.
         repo=f"{PRIMARY}/sdk-python",
         tag_name="v1.1.0",
         name="v1.1.0",
