@@ -28,6 +28,16 @@ def test_unknown_command_exits_with_error():
         cli.main(["not-a-pipeline"])
 
 
+def test_cli_lists_registered_pipelines(capsys):
+    """The list command prints registered pipeline names and returns success."""
+    assert cli.main(["list"]) == 0
+
+    output = capsys.readouterr().out
+    assert "difficulty" in output
+    assert "discord_analytics" in output
+    assert "[CLI-only]" in output
+
+
 def test_cli_runs_single_pipeline_and_forwards_options(monkeypatch):
     """A subcommand runs its pipeline, forwarding explicitly set options."""
     calls = []
