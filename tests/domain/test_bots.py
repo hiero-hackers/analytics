@@ -32,9 +32,29 @@ def test_suspect_signal_catches_unsuffixed_automation_logins():
 
 
 def test_suspect_signal_catches_bot_as_a_non_suffix_substring():
-    """'bot' appearing mid-login (not as the '-bot'/'[bot]' suffix) still fires."""
-    assert bot_suspect_signal("botrunner") == "bot"
-    assert bot_suspect_signal("sdk-bot-helper") == "bot"
+    """'bot' as a token prefix (not the '-bot'/'[bot]' suffix) still fires."""
+    assert bot_suspect_signal("botrunner") == "bot"  # prefix of the whole (single-token) login
+    assert bot_suspect_signal("sdk-bot-helper") == "bot"  # a whole token on its own
+
+
+def test_suspect_signal_ignores_a_signal_buried_mid_word():
+    """A signal sitting in the middle of a token, touching neither edge, doesn't fire.
+
+    Plain substring matching flagged real people for this (e.g. "viniciusjssouza"
+    contains "ci" mid-word); anchoring to token prefix/suffix rules that out.
+    """
+    assert bot_suspect_signal("viniciusjssouza") is None
+    assert bot_suspect_signal("marcia") is None
+
+
+def test_suspect_signal_still_allows_a_genuine_prefix_or_suffix_match():
+    """A short signal like 'ci' can still be a real prefix/suffix of an unrelated name.
+
+    That's an accepted tradeoff, not a bug — token-boundary matching removes
+    mid-word false positives, not every false positive.
+    """
+    assert bot_suspect_signal("cijujohn") == "ci"
+    assert bot_suspect_signal("joshmarinacci") == "ci"
 
 
 def test_suspect_signal_prefers_the_more_specific_match():

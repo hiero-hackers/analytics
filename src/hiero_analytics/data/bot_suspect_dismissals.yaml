@@ -1,0 +1,13 @@
+# Logins a maintainer has manually reviewed and confirmed are real people, not
+# bots — they trip a weak signal in bot_suspect_signal() (e.g. their login
+# happens to start or end with "ci") but aren't automation accounts. Once a
+# login is here, build_bot_suspects() stops listing it, so a re-run of the
+# pipeline doesn't re-flag the same confirmed-human login every time.
+#
+# Confirmed bots go the other direction: add the login to BOT_LOGINS in
+# domain/bots.py instead, so it's excluded from people metrics entirely rather
+# than just dropped from this review list.
+#
+# One login per line, lowercase, with a comment saying who reviewed it and why.
+# Example (illustrative — nobody has actually reviewed these two yet):
+# cijujohn  # reviewed by <you> on <date> - human login, "ci" is a coincidence
