@@ -471,9 +471,7 @@ def test_data_api_emits_the_contributor_activity_heatmap_view(outputs_root: Path
 
     views = manifest["orgs"][PRIMARY]["views"]
     heatmap_refs = [view for view in views if view["kind"] == "heatmap"]
-    assert [(view["id"], view["macro"]) for view in heatmap_refs] == [
-        ("contributor-activity-heatmap", "Contributors")
-    ]
+    assert [(view["id"], view["macro"]) for view in heatmap_refs] == [("contributor-activity-heatmap", "Contributors")]
 
     document = json.loads((api_dir / heatmap_refs[0]["path"]).read_text())
     assert document["rows"], "heatmap emitted with no rows"
