@@ -144,6 +144,14 @@
      "definition": "how the mapping was decided: *automated* (the resolver placed them from public signals) or *manual* (a hand-correction in affiliations.yaml, which survives regeneration)."
     },
     {
+     "term": "committer",
+     "definition": "in the committer affiliations table, a person whose *highest* role anywhere is committer \u2014 write access in at least one repository and a maintainer seat in none. Disjoint from the maintainer table by construction, so the two role tabs never count the same person twice."
+    },
+    {
+     "term": "role tabs",
+     "definition": "on the organisation-diversity charts, whether you are looking at maintainers or committers. The two populations are disjoint (each person counts at their highest role), so the committer tab is the bench beneath the maintainers \u2014 if it spans more employers than the maintainer tab, diversity is more likely to improve as people are promoted. Curation is thinner for committers, so read its unknown band and stated known-share before drawing conclusions. The team charts have no role tabs: team membership is not a permission."
+    },
+    {
      "term": "resolved",
      "definition": "how many of the group could be mapped to a named employer at all."
     },
@@ -169,7 +177,7 @@
     },
     {
      "term": "unknown",
-     "definition": "people no public signal could place. Not the same as independent \u2014 it means *we could not tell*, so they are excluded from share calculations rather than counted as solo."
+     "definition": "people no public signal could place. Not the same as independent \u2014 it means *we could not tell*, so they are excluded from the share and concentration calculations rather than counted as solo. The organisation-diversity charts still show them as their own band, and state what share of the population is known, so nothing is silently dropped."
     },
     {
      "term": "organisation mix",
@@ -333,10 +341,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-16T09:19:32.568487+00:00",
+ "generated_at": "2026-08-20T21:56:29.868745+00:00",
  "provenance": {
-  "git_sha": "b7f59fb",
-  "data_as_of": "2026-08-14T07:44:57.301095+00:00"
+  "git_sha": "8e0402c",
+  "data_as_of": "2026-08-20T21:47:19.593116+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -345,7 +353,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1423,
+     "row_count": 1432,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -366,7 +374,7 @@
      "id": "loadshare",
      "macro": "Governance",
      "title": "Who carries the review load",
-     "row_count": 22,
+     "row_count": 23,
      "path": "hiero-ledger/loadshare.json"
     },
     {
@@ -419,6 +427,20 @@
      "path": "hiero-ledger/repodiversity.json"
     },
     {
+     "id": "committeraffiliations",
+     "macro": "Governance",
+     "title": "Committer affiliations \u2014 reference",
+     "row_count": 133,
+     "path": "hiero-ledger/committeraffiliations.json"
+    },
+    {
+     "id": "committerrepodiversity",
+     "macro": "Governance",
+     "title": "Committer organisation diversity by repo",
+     "row_count": 29,
+     "path": "hiero-ledger/committerrepodiversity.json"
+    },
+    {
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
@@ -436,7 +458,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 830,
+     "row_count": 835,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -467,8 +489,8 @@
         {
          "label": "Repositories linked by shared contributors",
          "file": "charts/org/hiero-ledger/all_network.png",
-         "width": 2395,
-         "height": 1796
+         "width": 2209,
+         "height": 1666
         }
        ],
        "note": "Each bubble is a repository, sized by its active contributors; two repos are linked when they share contributors. Bubble colour is the repo's category; the link threshold scales with org size.",
@@ -679,13 +701,13 @@
         {
          "label": "1 month",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_30d.png",
-         "width": 2265,
+         "width": 2278,
          "height": 1051
         },
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2206,
+         "width": 2219,
          "height": 1051
         }
        ],
@@ -712,8 +734,8 @@
         {
          "label": "Maintainers",
          "file": "charts/org/hiero-ledger/maintainer_network.png",
-         "width": 2395,
-         "height": 1796
+         "width": 2209,
+         "height": 1666
         }
        ],
        "note": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's category.",
@@ -730,8 +752,8 @@
         {
          "label": "Committers",
          "file": "charts/org/hiero-ledger/committer_network.png",
-         "width": 2395,
-         "height": 1796
+         "width": 2209,
+         "height": 1666
         }
        ],
        "note": "Each bubble is a repository, sized by how many committers are active in it; two repos are linked when they share a committer (thicker line = more shared). Bubble colour is the repo's category.",
@@ -748,8 +770,8 @@
         {
          "label": "Triage",
          "file": "charts/org/hiero-ledger/triage_network.png",
-         "width": 2395,
-         "height": 1796
+         "width": 2209,
+         "height": 1666
         }
        ],
        "note": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos are linked when they share a triage holder (thicker line = more shared). Bubble colour is the repo's category.",
@@ -768,26 +790,33 @@
      "id": "org-diversity",
      "macro": "Governance",
      "title": "Organisation diversity",
-     "description": "Where maintainer authority sits \u2014 org-wide, per team and per repo. The first chart is the ecosystem-wide split of maintainers by employer (solo contributors pooled as 'Independent'); the next two count the governance teams and the repositories that a single employer solely controls (an organisational bus-factor); the last two break down each repository's and each team's maintainer mix. See the affiliations and repo-diversity tables below for the underlying detail.",
+     "description": "Where write authority sits \u2014 org-wide, per team and per repo. The role tabs switch between maintainers (merge rights) and committers (write access, but no maintainer seat anywhere), so the two benches can be compared: a committer bench spread across more employers is the leading indicator that maintainer diversity will follow. The first chart is the ecosystem-wide split by employer (solo contributors pooled as 'Independent', unmapped people shown as their own 'Unknown' band rather than dropped); the next two count the governance teams and the repositories that a single employer solely controls (an organisational bus-factor); the last two break down each repository's and each team's mix. The team charts are membership-based and so have no role tabs. See the affiliations and repo-diversity tables below for the underlying detail.",
      "charts": [
       {
-       "title": "Maintainers by organisation",
+       "title": "Role-holders by organisation",
        "variants": [
         {
-         "label": "Maintainers by organisation",
+         "label": "Maintainers",
          "file": "charts/org/hiero-ledger/affiliation_donut.png",
-         "width": 1596,
+         "width": 2209,
+         "height": 1051
+        },
+        {
+         "label": "Committers",
+         "file": "charts/org/hiero-ledger/affiliation_donut_committers.png",
+         "width": 2166,
          "height": 1051
         }
        ],
-       "note": "The share of maintainers held by the two largest employers, with everyone else (smaller orgs and solo 'Independent' contributors) pooled into 'Other' \u2014 the concentration at a glance; the full breakdown is in the affiliations table.",
+       "note": "The share of role-holders employed by the two largest organisations, with everyone else (smaller orgs and solo 'Independent' contributors) pooled into 'Other' \u2014 the concentration at a glance. People with no curated affiliation are shown as their own 'Unknown' slice rather than dropped, and the title states what share of the population is known, so a small slice can be read against how much of the roster is resolved. The role tabs switch between maintainers and committers; the full breakdown is in the affiliations tables.",
        "methodology": [
-        "Collect every maintainer from the governance config \u2014 anyone holding the maintainer role in any repo.",
-        "Look up each maintainer's organisation in the curated affiliations file.",
+        "Resolve every person's role per repository from the governance config, then reduce each to the most senior role they hold anywhere \u2014 so the maintainer and committer tabs are disjoint populations and can be compared directly.",
+        "Look up each person's organisation in the curated affiliations file.",
         "That file resolves each person from public signals in priority order: GPG-key email, profile email, the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph.",
-        "Count distinct maintainers per organisation; people with an identity but no employer are pooled as 'Independent'; people with no public signal are excluded.",
-        "Keep the two largest employers, fold everyone else (smaller orgs and independents) into 'Other', and draw a filled pie of their shares."
-       ]
+        "Count distinct people per organisation; people with an identity but no employer are pooled as 'Independent', and people with no public signal form their own 'Unknown' slice \u2014 the chart's total is the whole population, never a silently trimmed one.",
+        "Keep the two largest slices, fold everyone else into 'Other', draw a filled pie of their shares, and state the share of the population with a known affiliation in the title."
+       ],
+       "full_row": true
       },
       {
        "title": "Single-employer teams by org",
@@ -812,36 +841,48 @@
        "title": "Single-employer repos by org",
        "variants": [
         {
-         "label": "Single-employer repos by org",
+         "label": "Maintainers",
          "file": "charts/org/hiero-ledger/single_employer_repos_by_org.png",
-         "width": 1796,
+         "width": 1902,
          "height": 1051
+        },
+        {
+         "label": "Committers",
+         "file": "charts/org/hiero-ledger/single_employer_repos_by_org_committers.png",
+         "width": 1798,
+         "height": 1019
         }
        ],
-       "note": "Each bar is an organisation; bar height is how many repositories it solely maintains \u2014 every resolved maintainer of that repo shares this one employer (at least two of them, no independents). Taller bars mean more single-employer repos, an organisational bus-factor. Repos dominated by unmapped maintainers are not counted here.",
+       "note": "Each bar is an organisation; bar height is how many repositories it solely holds \u2014 every resolved holder of that role in the repo shares this one employer (at least two of them, no independents). Taller bars mean more single-employer repos, an organisational bus-factor. Repos dominated by unmapped holders are not counted here. The role tabs switch between maintainers and committers.",
        "methodology": [
-        "For each repository, take the maintainers holding the maintainer role there.",
+        "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
-        "Flag a repo 'single-employer' when every resolved maintainer shares the same organisation (at least two such maintainers, and no independents).",
-        "Group those single-employer repos by the organisation that maintains them.",
-        "Plot one bar per organisation \u2014 its height is how many repos it solely maintains."
+        "Flag a repo 'single-employer' when every resolved holder shares the same organisation (at least two such holders, and no independents).",
+        "Group those single-employer repos by the organisation that holds them.",
+        "Plot one bar per organisation \u2014 its height is how many repos it solely holds."
        ]
       },
       {
        "title": "Organisation mix by repo",
        "variants": [
         {
-         "label": "Organisation mix by repo",
+         "label": "Maintainers",
          "file": "charts/org/hiero-ledger/repo_affiliation_composition.png",
          "width": 2534,
          "height": 1274
+        },
+        {
+         "label": "Committers",
+         "file": "charts/org/hiero-ledger/repo_affiliation_composition_committers.png",
+         "width": 1925,
+         "height": 1274
         }
        ],
-       "note": "Each bar is a repository, normalised to 100% so the segments show each employer's share of that repo's maintainers. The dashed line marks 50%: a segment reaching past it means one employer holds the majority (an organisational bus-factor). Largest employers get their own colour, smaller ones pool into 'Other orgs', and solo or unmapped maintainers show as 'Independent' and 'Unknown'. Repos are ordered most-concentrated first \u2014 by the largest single employer's share \u2014 and repos with the same concentration are grouped by their leading organisation (colour), so like sits next to like.",
+       "note": "Each bar is a repository, normalised to 100% so the segments show each employer's share of that repo's role-holders. The dashed line marks 50%: a segment reaching past it means one employer holds the majority (an organisational bus-factor). Largest employers get their own colour, smaller ones pool into 'Other orgs', and solo or unmapped holders show as 'Independent' and 'Unknown'. Repos are ordered most-concentrated first \u2014 by the largest single employer's share \u2014 and repos with the same concentration are grouped by their leading organisation (colour), so like sits next to like. The role tabs switch between maintainers and committers; a repo counts only where it grants that role.",
        "methodology": [
-        "For each repository, take the maintainers holding the maintainer role there.",
+        "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file.",
-        "Count maintainers per organisation within the repo; the largest employers across all repos get their own colour, the rest pool into 'Other orgs', and solo/unmapped maintainers show as 'Independent'/'Unknown'.",
+        "Count holders per organisation within the repo; the largest employers across all repos get their own colour, the rest pool into 'Other orgs', and solo/unmapped holders show as 'Independent'/'Unknown'.",
         "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first (by the largest single employer's share); ties are grouped by the leading organisation's colour.",
         "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are single-employer repos; multi-colour bars are cross-org."
        ],
@@ -901,7 +942,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-16T09:18:26.083020+00:00"
+      "generated_at": "2026-08-20T21:55:21.183312+00:00"
      }
     },
     {
@@ -961,7 +1002,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-16T09:18:26.078664+00:00"
+      "generated_at": "2026-08-20T21:55:21.180490+00:00"
      }
     },
     {
@@ -1082,7 +1123,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2091,
-         "height": 1280
+         "height": 1468
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1140,7 +1181,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1423,
+      "value": 1432,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1168,7 +1209,7 @@
      },
      {
       "label": "file issues %",
-      "value": "54%",
+      "value": "53%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1237,7 +1278,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 102,
+      "value": 101,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1264,7 +1305,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 43,
+     "row_count": 44,
      "path": "hiero-hackers/profiles.json"
     },
     {
@@ -1347,8 +1388,8 @@
         {
          "label": "Repositories linked by shared contributors",
          "file": "charts/org/hiero-hackers/all_network.png",
-         "width": 2395,
-         "height": 1796
+         "width": 2180,
+         "height": 1666
         }
        ],
        "note": "Each bubble is a repository, sized by its active contributors; two repos are linked when they share contributors. Bubble colour is the repo's category; the link threshold scales with org size.",
@@ -1502,7 +1543,7 @@
          "label": "1 month",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_30d.png",
          "width": 2093,
-         "height": 1218
+         "height": 1030
         },
         {
          "label": "Week",
@@ -1552,7 +1593,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 43,
+      "value": 44,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1562,7 +1603,7 @@
      },
      {
       "label": "active last month %",
-      "value": "65%",
+      "value": "57%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1571,7 +1612,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "33%",
+      "value": "34%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1580,7 +1621,7 @@
      },
      {
       "label": "file issues %",
-      "value": "44%",
+      "value": "43%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1598,7 +1639,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "42%",
+      "value": "45%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -1607,7 +1648,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "28%",
+      "value": "30%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",

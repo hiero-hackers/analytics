@@ -1,0 +1,833 @@
+{
+ "id": "committeraffiliations",
+ "title": "Committer affiliations \u2014 reference",
+ "description": "The same reference as the maintainer table, for people whose highest role anywhere is committer \u2014 write access, but no maintainer seat in any repository. The two populations are disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. To fix a mapping or resolve an unknown, edit its row in data/affiliations.yaml and append '# manual: reason', or use 'Suggest a correction' to open an issue on the analytics repo.",
+ "group": "Organisation diversity",
+ "source": "committer_affiliations.csv",
+ "columns": [
+  {
+   "key": "login",
+   "label": "committer"
+  },
+  {
+   "key": "organisation",
+   "label": "organisation"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "method",
+   "label": "method"
+  }
+ ],
+ "rows": [
+  {
+   "login": "abies",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "aderevets",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "adityarya11",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "akdev",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "akshat8510",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "akugal",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "alex-kuzmin-hg",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "alexkehayov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "alinik4n",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "allison-hashgraph",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "manual"
+  },
+  {
+   "login": "anastasiya-kovaliova",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "anighanta",
+   "organisation": "Hedera",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "antonioceppellini",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "anvabr",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "ashe-oro",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "ashumahajan",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ata-nas",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "bartoszsolkabd",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "beeradb",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "berryware",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "bguiz",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "bilyana-gospodinova",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "bootcodes",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "boris-bonin",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "bugbytesinc",
+   "organisation": "BugBytes, Inc.",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "cacampbell",
+   "organisation": "Launchbadge",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "chung-chao",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "cijujohn",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "manual"
+  },
+  {
+   "login": "cliffclick",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "manual"
+  },
+  {
+   "login": "cmiville42",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "cooper-kunz",
+   "organisation": null,
+   "status": "unknown",
+   "method": "manual"
+  },
+  {
+   "login": "cweagans",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "dalvizu",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "daniel-k-ivanov",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "danielnorkin",
+   "organisation": "Envision Blockchain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "david-bakin-sl",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "derektriley",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "dimitar-dinev",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "diogper",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "donaldthibeau",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "ebadiere",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "edward-swirldslabs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "elijahlynn",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "evdokia-georgieva",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "evelynlwong",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "failfmi",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "fantomasa",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "fessmm",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "filev94",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "gerbert-vandenberghe",
+   "organisation": "FundRequest",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "gregscullard",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "h-bart",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "ibankov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "imalygin",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "isavov",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "ivankavaldzhiev",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "ivannov",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "iwsimon",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "izik",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "janaakhterov",
+   "organisation": "VSP",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jascks",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "jasuwienas",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "jayv80",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "jexsie",
+   "organisation": "OpenElements",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jivkokelchev",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "jnels124",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "joshmarinacci",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "manual"
+  },
+  {
+   "login": "justin-atwell",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "justynspooner",
+   "organisation": "dovuofficial",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "kenthejr",
+   "organisation": "Launchbadge",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "kfbr",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "kselveliev",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "litt3",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "littletarzan",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "lucashenning",
+   "organisation": "suku.world",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mahmoudian1",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mariodimitrovv",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mark-swirlds",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "martingeorgiev1",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "matevszm",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "matteriben",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mattp-swirldslabs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mehcode",
+   "organisation": "Launchbadge",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "mhess-swl",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "miroslavgatsanoga",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "mounil2005",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "mwb-al",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "mxtartaglia-sl",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "nadineloepfe",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "naydenovn",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "nickeynikolovv",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "nickpoorman",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "nirbosl",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "parvninama",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "paulatcalaxy",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "paulo-caldas",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "perseverance",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "petreze",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "povolev15",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "publu",
+   "organisation": "contributor",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "qnswirlds",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "radkomih",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "raykhoaza",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "recdefi",
+   "organisation": "RECDeFi",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rockysingh",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "rozekmichal",
+   "organisation": "BlockyDevs",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "sam-at-luther",
+   "organisation": "luthersystems",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "san-est",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "scalemaildev",
+   "organisation": "ScalemaiL",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "sdimitrov9",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "se7enarianelabs",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "sebtiem",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "sentx-dev",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "shezaan-hashgraph",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "soharang",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "som-web23",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "statop",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "sumanair",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "superboo",
+   "organisation": "Robinhood",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "tajang97",
+   "organisation": "DSR Corporation",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "tannerjfco",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "teacoat",
+   "organisation": "Studio Monolith",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "thenswan",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "thomas-swirlds-labs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "tim-mchale",
+   "organisation": null,
+   "status": "unknown",
+   "method": "automated"
+  },
+  {
+   "login": "timfn-hg",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "timo0",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "tmctl",
+   "organisation": "Independent",
+   "status": "independent",
+   "method": "automated"
+  },
+  {
+   "login": "tomzhenghedera",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "ty-swirldslabs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "victor-yanev",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "viniciusjssouza",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "vtronkov",
+   "organisation": "LimeChain",
+   "status": "affiliated",
+   "method": "automated"
+  }
+ ],
+ "row_count": 133,
+ "action": {
+  "url": "https://github.com/hiero-hackers/analytics/issues",
+  "label": "Suggest a correction"
+ },
+ "generated_at": "2026-08-20T21:54:04.189795+00:00",
+ "stale": false,
+ "macro": "Governance"
+}
