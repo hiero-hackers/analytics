@@ -93,11 +93,19 @@ def fetch_repo_sbom(
 ) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
     """Fetch and parse one repository's dependency-graph SBOM.
 
-    Treat 403/404 as disabled and other failures as errors so missing data
-    is not confused with an empty dependency set.
+    Treat 403/404 as ``"disabled"`` (dependency graph off for this repo) and
+    any other HTTP failure as ``"error"``, so missing data is never confused
+    with an empty dependency set. Non-HTTP request failures (timeouts,
+    connection errors) still propagate so the org-wide fan-out in
+    ``fetch_org_sbom_data`` can retry them.
     """
     url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
-    payload = client.get(url)
+    try:
+        payload = client.get(url)
+    except requests.HTTPError as exc:
+        status_code = exc.response.status_code if exc.response is not None else None
+        status = "disabled" if status_code in (403, 404) else "error"
+        return SbomCoverageRecord(repo=repo, status=status, package_count=0), []
 
     sbom = (payload or {}).get("sbom") or {}
     packages = sbom.get("packages") or []
@@ -244,11 +252,14 @@ def fetch_org_sbom_data(
     repo_names: list[str],
     max_workers: int = _SBOM_FETCH_WORKERS,
 ) -> tuple[list[SbomCoverageRecord], list[DependencyManifestRecord]]:
-    """Fetch and parse one repo's dependency-graph SBOM.
+    """Fetch and parse dependency-graph SBOMs for every repo in ``repo_names``.
 
-    HTTP failures propagate so the org-wide retry layer can retry transient
-    failures. Final failures are recorded as ``error`` by the org fan-out;
-    they must not be classified as ``disabled`` from the status code alone.
+    Fans ``fetch_repo_sbom`` out across the org with retry. ``fetch_repo_sbom``
+    already turns 403/404 into ``"disabled"`` and any other HTTP failure into
+    ``"error"`` for that repo, so those never raise here. Non-HTTP failures
+    (timeouts, connection errors) do propagate, and this layer retries them;
+    a repo that is still failing after retries gets an ``"error"`` coverage
+    row from the fan-out itself instead of being silently dropped.
     """
     def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
         coverage, packages = fetch_repo_sbom(client, org, repo)

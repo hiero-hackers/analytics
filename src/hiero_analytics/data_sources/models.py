@@ -12,6 +12,7 @@ import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 
 from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.hip_references import extract_hip_mentions
@@ -455,7 +456,7 @@ class DependencyManifestRecord:
     repo: str
     package_name: str
     ecosystem: str
-    version: str | None
+    version: str | None = None
 
 
 @dataclass(frozen=True)
@@ -471,7 +472,7 @@ class SbomCoverageRecord:
     """
 
     repo: str
-    status: str
+    status: Literal["ok", "disabled", "error"]
     package_count: int
 
 
