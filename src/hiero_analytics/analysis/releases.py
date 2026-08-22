@@ -55,7 +55,7 @@ def build_release_timeline(records: list[ReleaseRecord]) -> pd.DataFrame:
 
 def _staleness_bucket(latest_release: pd.Series, staleness_ratio: pd.Series) -> pd.Series:
     """Classify each row by staleness severity.
-    
+
     Never-released repos are checked first so their infinite ratio maps to
     ``NEVER_RELEASED``. Explicit ``fillna(False)`` keeps nullable comparisons
     from incorrectly replacing missing values.
