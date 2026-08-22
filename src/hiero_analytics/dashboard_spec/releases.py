@@ -17,7 +17,10 @@ _GROUP = "Release cadence & staleness"
 CHART_MACRO = {
     "name": "Releases",
     "charts": {
-        "hiero-ledger": [
+        # "*": org-independent — this pipeline is extra_orgs=True (releases
+        # have no governance dependency), so the chart must render for any
+        # org whose pipeline produced the files, not just hiero-ledger.
+        "*": [
             {
                 "id": "release-timeline",
                 "group": _GROUP,
