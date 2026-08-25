@@ -21,6 +21,9 @@ query CONTRIBUTOR_ACTIVITY_QUERY($owner:String!, $repo:String!, $cursor:String) 
           login
         }
         reviews(first:100) {
+          pageInfo {
+            hasNextPage
+          }
           nodes {
             state
             submittedAt

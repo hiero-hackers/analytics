@@ -1,5 +1,6 @@
 """Tests for normalized GitHub data record models."""
 
+import logging
 from dataclasses import FrozenInstanceError
 from datetime import datetime
 
@@ -159,6 +160,51 @@ def test_contributor_activity_record_from_issue_node():
     ]
 
 
+def test_contributor_activity_warns_when_reviews_are_truncated(caplog):
+    """Contributor activity should warn when a PR has more than 100 reviews."""
+    node = {
+        "number": 42,
+        "createdAt": "2024-01-02T00:00:00Z",
+        "author": {"login": "dana"},
+        "reviews": {
+            "pageInfo": {"hasNextPage": True},
+            "nodes": [],
+        },
+    }
+    context = {
+        "owner": "org",
+        "repo": "repo",
+    }
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.data_sources.models"):
+        ContributorActivityRecord.from_github_node(node, context)
+
+    assert len(caplog.records) == 1
+    assert "org/repo#42" in caplog.records[0].message
+
+
+def test_contributor_activity_does_not_warn_when_reviews_are_not_truncated(caplog):
+    """Contributor activity should not warn when all reviews were fetched."""
+    node = {
+        "number": 42,
+        "createdAt": "2024-01-02T00:00:00Z",
+        "author": {"login": "dana"},
+        "reviews": {
+            "pageInfo": {"hasNextPage": False},
+            "nodes": [],
+        },
+    }
+    context = {
+        "owner": "org",
+        "repo": "repo",
+    }
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.data_sources.models"):
+        ContributorActivityRecord.from_github_node(node, context)
+
+    assert not caplog.records
+
+
 def test_issue_timeline_event_record_creation():
     """Issue timeline records should preserve normalized event metadata."""
     occurred = datetime(2024, 1, 1)
@@ -198,7 +244,9 @@ def test_issue_timeline_event_from_issue_node_expands_timeline_items():
         },
     }
 
-    records = IssueTimelineEventRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+    records = IssueTimelineEventRecord.from_github_node(
+        node, {"owner": "org", "repo": "repo"}
+    )
 
     assert [(r.event_type, r.label) for r in records] == [
         ("labeled", "beginner"),  # event type and label name lower-cased
@@ -214,7 +262,9 @@ def test_issue_timeline_event_from_github_node_handles_empty():
     """An issue with no label events yields no records."""
     node = {"number": 7, "timelineItems": {"nodes": []}}
 
-    records = IssueTimelineEventRecord.from_github_node(node, {"owner": "org", "repo": "repo"})
+    records = IssueTimelineEventRecord.from_github_node(
+        node, {"owner": "org", "repo": "repo"}
+    )
 
     assert records == []
 
@@ -223,7 +273,12 @@ def test_hydration_tolerates_null_connections():
     """GraphQL nulls a connection on partial errors, which must not raise."""
     context = {"owner": "org", "repo": "repo", "target_type": "pull_request"}
 
-    assert IssueTimelineEventRecord.from_github_node({"number": 7, "timelineItems": None}, context) == []
+    assert (
+        IssueTimelineEventRecord.from_github_node(
+            {"number": 7, "timelineItems": None}, context
+        )
+        == []
+    )
     node = {"number": 7, "createdAt": None, "author": None, "reviews": None}
     assert ContributorActivityRecord.from_github_node(node, context) == []
 
@@ -325,7 +380,9 @@ def test_extract_labels_degrades_on_missing_or_malformed():
     """Missing labels, non-mapping entries, and non-str names are skipped."""
     assert _extract_labels({}) == []
     assert _extract_labels(None) == []
-    assert _extract_labels({"labels": {"nodes": ["x", {"name": 5}, {"name": "ok"}]}}) == ["ok"]
+    assert _extract_labels(
+        {"labels": {"nodes": ["x", {"name": 5}, {"name": "ok"}]}}
+    ) == ["ok"]
 
 
 def test_extract_label_name_lowercases():
