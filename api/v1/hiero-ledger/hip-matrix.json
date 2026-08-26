@@ -695,7 +695,7 @@
     {
      "key": "hiero-ledger/hiero-mirror-node",
      "merged": 11,
-     "open": 1
+     "open": 2
     },
     {
      "key": "hiero-ledger/hiero-block-node",
@@ -704,8 +704,8 @@
     },
     {
      "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 0,
-     "open": 1
+     "merged": 1,
+     "open": 0
     },
     {
      "key": "hiero-ledger/hiero-sdk-go",
@@ -760,9 +760,8 @@
    ],
    "note": {
     "kind": "partial",
-    "text": "java \u00b7 go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
+    "text": "go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
     "items": [
-     "java",
      "go",
      "cpp",
      "rust",
@@ -2929,6 +2928,88 @@
    }
   },
   {
+   "key": 906,
+   "label": "HIP-906",
+   "sublabel": "Proxy Redirect Contract for Hbar Allowance and Approval",
+   "status": "Final",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 0
+    }
+   ],
+   "note": {
+    "kind": "none",
+    "text": "no SDK activity found"
+   }
+  },
+  {
    "key": 745,
    "label": "HIP-745",
    "sublabel": "Optionally send transaction data without required transactio",
@@ -3695,88 +3776,6 @@
     {
      "key": "hiero-ledger/hiero-mirror-node",
      "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-block-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-go",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-js",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-cpp",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-rust",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-swift",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-python",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-json-rpc-relay",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node-explorer",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/solo",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-local-node",
-     "merged": 0,
-     "open": 0
-    }
-   ],
-   "note": {
-    "kind": "none",
-    "text": "no SDK activity found"
-   }
-  },
-  {
-   "key": 906,
-   "label": "HIP-906",
-   "sublabel": "Proxy Redirect Contract for Hbar Allowance and Approval",
-   "status": "Final",
-   "cells": [
-    {
-     "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 1,
      "open": 0
     },
     {
@@ -13156,6 +13155,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-08-21T09:19:32.399013+00:00",
+ "generated_at": "2026-08-26T09:23:49.784372+00:00",
  "stale": false
 }

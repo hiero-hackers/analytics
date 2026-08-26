@@ -81,6 +81,13 @@
    "triage": 0
   },
   {
+   "repo": "solo-build-actions",
+   "maintainers": 4,
+   "active_maintainers": 0,
+   "committers": 5,
+   "triage": 3
+  },
+  {
    "repo": "hiero-did-sdk-python",
    "maintainers": 9,
    "active_maintainers": 0,
@@ -151,8 +158,8 @@
    "triage": 0
   }
  ],
- "row_count": 17,
- "generated_at": "2026-08-21T09:17:53.551443+00:00",
+ "row_count": 18,
+ "generated_at": "2026-08-26T09:22:24.599221+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -206,18 +213,18 @@
     "triage": 0
    },
    {
-    "repo": "hiero-improvement-proposals",
-    "maintainers": 4,
-    "active_maintainers": 0,
-    "committers": 77,
-    "triage": 0
-   },
-   {
     "repo": "hiero-local-node",
     "maintainers": 4,
     "active_maintainers": 0,
     "committers": 5,
     "triage": 0
+   },
+   {
+    "repo": "solo-build-actions",
+    "maintainers": 4,
+    "active_maintainers": 0,
+    "committers": 5,
+    "triage": 3
    },
    {
     "repo": "hiero-sdk-js",
@@ -227,18 +234,18 @@
     "triage": 12
    },
    {
+    "repo": "heka-identity-platform",
+    "maintainers": 4,
+    "active_maintainers": 0,
+    "committers": 3,
+    "triage": 0
+   },
+   {
     "repo": "hiero-sdk-rust",
     "maintainers": 4,
     "active_maintainers": 0,
     "committers": 2,
     "triage": 12
-   },
-   {
-    "repo": "hiero-gradle-conventions",
-    "maintainers": 4,
-    "active_maintainers": 0,
-    "committers": 1,
-    "triage": 0
    },
    {
     "repo": "homebrew-tools",
@@ -248,17 +255,17 @@
     "triage": 0
    },
    {
-    "repo": "hiero-consensus-specifications",
-    "maintainers": 5,
+    "repo": "hiero-cli",
+    "maintainers": 6,
     "active_maintainers": 0,
     "committers": 2,
     "triage": 0
    },
    {
-    "repo": "hiero-cli",
-    "maintainers": 6,
+    "repo": "awesome-contributions",
+    "maintainers": 7,
     "active_maintainers": 0,
-    "committers": 2,
+    "committers": 0,
     "triage": 0
    },
    {
@@ -290,13 +297,6 @@
     "triage": 2
    },
    {
-    "repo": ".github",
-    "maintainers": 16,
-    "active_maintainers": 0,
-    "committers": 0,
-    "triage": 0
-   },
-   {
     "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -311,6 +311,13 @@
     "triage": 0
    },
    {
+    "repo": "hiero-improvement-proposals",
+    "maintainers": 4,
+    "active_maintainers": 1,
+    "committers": 77,
+    "triage": 0
+   },
+   {
     "repo": "sdk-collaboration-hub",
     "maintainers": 4,
     "active_maintainers": 1,
@@ -318,10 +325,17 @@
     "triage": 6
    },
    {
-    "repo": "heka-identity-platform",
+    "repo": "hiero-gradle-conventions",
     "maintainers": 4,
     "active_maintainers": 1,
-    "committers": 3,
+    "committers": 1,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-consensus-specifications",
+    "maintainers": 5,
+    "active_maintainers": 1,
+    "committers": 2,
     "triage": 0
    },
    {
@@ -332,8 +346,8 @@
     "triage": 11
    },
    {
-    "repo": "awesome-contributions",
-    "maintainers": 7,
+    "repo": ".github",
+    "maintainers": 16,
     "active_maintainers": 1,
     "committers": 0,
     "triage": 0
@@ -397,18 +411,18 @@
     "triage": 0
    },
    {
+    "repo": "solo-build-actions",
+    "maintainers": 4,
+    "active_maintainers": 0,
+    "committers": 5,
+    "triage": 3
+   },
+   {
     "repo": "hiero-sdk-rust",
     "maintainers": 4,
     "active_maintainers": 0,
     "committers": 2,
     "triage": 12
-   },
-   {
-    "repo": "hiero-consensus-specifications",
-    "maintainers": 5,
-    "active_maintainers": 0,
-    "committers": 2,
-    "triage": 0
    },
    {
     "repo": "hiero-cli",
@@ -474,15 +488,22 @@
     "triage": 0
    },
    {
-    "repo": "awesome-contributions",
-    "maintainers": 7,
+    "repo": "hiero-consensus-specifications",
+    "maintainers": 5,
     "active_maintainers": 1,
-    "committers": 0,
+    "committers": 2,
     "triage": 0
    },
    {
-    "repo": ".github",
-    "maintainers": 16,
+    "repo": "hiero-sdk-go",
+    "maintainers": 5,
+    "active_maintainers": 1,
+    "committers": 1,
+    "triage": 11
+   },
+   {
+    "repo": "awesome-contributions",
+    "maintainers": 7,
     "active_maintainers": 1,
     "committers": 0,
     "triage": 0
@@ -495,6 +516,13 @@
     "active_maintainers": 0,
     "committers": 4,
     "triage": 0
+   },
+   {
+    "repo": "solo-build-actions",
+    "maintainers": 4,
+    "active_maintainers": 0,
+    "committers": 5,
+    "triage": 3
    },
    {
     "repo": "hiero-ethereum-execution-spec-tests",

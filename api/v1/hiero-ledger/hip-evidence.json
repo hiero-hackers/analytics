@@ -540,14 +540,28 @@
    "hip_title": "EOA Code Delegation",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 14119,
-   "pr_title": "HIP-1340 Pectra + hedera-app bump to 0.77.0-rc.7",
+   "pr_title": "HIP-1340 Pectra + hedera-app bump to 0.77.0-rc.9",
    "pr_state": "OPEN",
    "pr_merged_at": null,
    "match_sources": "title|branch|body",
    "qualifier": null,
    "counted": true,
-   "snippet": "HIP-1340 Pectra + hedera-app bump to 0.77.0-rc.7",
+   "snippet": "HIP-1340 Pectra + hedera-app bump to 0.77.0-rc.9",
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14119"
+  },
+  {
+   "hip": 1340,
+   "hip_title": "EOA Code Delegation",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14135,
+   "pr_title": "HIP-1340 Add acceptance tests",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "HIP-1340 Add acceptance tests",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14135"
   },
   {
    "hip": 1340,
@@ -569,8 +583,8 @@
    "repo": "hiero-ledger/hiero-sdk-java",
    "pr_number": 2569,
    "pr_title": "feat: HIP-1340",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-08-24 10:08:53+00:00",
    "match_sources": "title|branch|body",
    "qualifier": null,
    "counted": true,
@@ -7426,6 +7440,20 @@
   {
    "hip": 906,
    "hip_title": "Proxy Redirect Contract for Hbar Allowance and Approval",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 26944,
+   "pr_title": "feat: account staking configuration via the Hedera Account Service (HIP-1522)",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "an read that state from the EVM at all. HIP-906 closed the same gap for HBAR allowances",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26944"
+  },
+  {
+   "hip": 906,
+   "hip_title": "Proxy Redirect Contract for Hbar Allowance and Approval",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 11052,
    "pr_title": "Add web3 integration tests for hbar approve via system contract ",
@@ -11750,8 +11778,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 835,
- "generated_at": "2026-08-21T09:19:32.394188+00:00",
+ "row_count": 837,
+ "generated_at": "2026-08-26T09:23:49.781412+00:00",
  "stale": false,
  "macro": "HIPs"
 }

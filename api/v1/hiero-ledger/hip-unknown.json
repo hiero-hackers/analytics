@@ -28,6 +28,13 @@
  ],
  "rows": [
   {
+   "hip": 1522,
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 26944,
+   "pr_title": "feat: account staking configuration via the Hedera Account Service (HIP-1522)",
+   "snippet": "uration via the Hedera Account Service (HIP-1522)"
+  },
+  {
    "hip": 1485,
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 13654,
@@ -91,8 +98,8 @@
    "snippet": "`HIP-432`: Long Term Scheduled Transaction"
   }
  ],
- "row_count": 9,
- "generated_at": "2026-08-21T09:19:32.395782+00:00",
+ "row_count": 10,
+ "generated_at": "2026-08-26T09:23:49.782423+00:00",
  "stale": false,
  "macro": "HIPs"
 }

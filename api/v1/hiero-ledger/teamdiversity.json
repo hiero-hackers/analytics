@@ -780,6 +780,18 @@
    "organisations": "Hashgraph 2, LimeChain 1"
   },
   {
+   "team": "solo-build-actions-maintainers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 67,
+   "hhi": 5556,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 2, Independent 1"
+  },
+  {
    "team": "tsc-eligibility-check-committers",
    "members": 3,
    "resolved": 3,
@@ -960,6 +972,18 @@
    "organisations": "LimeChain 1, Hashgraph 1"
   },
   {
+   "team": "hiero-website-triage",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 50,
+   "hhi": 5000,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 1, Independent 1"
+  },
+  {
    "team": "hiero-consensus-node-execution-codeowners",
    "members": 18,
    "resolved": 17,
@@ -1116,6 +1140,18 @@
    "organisations": "Hashgraph 5, LimeChain 5, Independent 2"
   },
   {
+   "team": "solo-build-actions-committers",
+   "members": 8,
+   "resolved": 6,
+   "distinct_orgs": 3,
+   "top_org": "Hashgraph",
+   "top_org_pct": 50,
+   "hhi": 3333,
+   "unknown": 2,
+   "single_employer": false,
+   "organisations": "Hashgraph 3, LimeChain 1, DevLabs 1, Independent 1"
+  },
+  {
    "team": "hashgraph-online-standards-sdk-js-maintainers",
    "members": 3,
    "resolved": 3,
@@ -1138,18 +1174,6 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 1, OpenElements 1, Independent 1"
-  },
-  {
-   "team": "hiero-website-triage",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 33,
-   "hhi": 3333,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Hashgraph 1, Independent 2"
   },
   {
    "team": "identity-collaboration-hub-maintainers",
@@ -1320,8 +1344,8 @@
    "organisations": "LimeChain 1, Independent 7"
   }
  ],
- "row_count": 106,
- "generated_at": "2026-08-21T09:18:05.282955+00:00",
+ "row_count": 108,
+ "generated_at": "2026-08-26T09:22:32.913560+00:00",
  "stale": false,
  "macro": "Governance"
 }
