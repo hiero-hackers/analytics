@@ -7,8 +7,8 @@
  * reported by name, so the gap is visible rather than silent.
  */
 
-import { useEffect, useState } from "react";
-import { fetchSection, type SectionDoc, type SectionRef } from "./api";
+import { useEffect, useState } from 'react';
+import { fetchSection, type SectionDoc, type SectionRef } from './api';
 
 export interface LoadedSections {
   docs: SectionDoc[];
@@ -19,7 +19,11 @@ export interface LoadedSections {
 }
 
 export function useSectionDocs(refs: SectionRef[]): LoadedSections {
-  const [state, setState] = useState<LoadedSections>({ docs: [], failed: [], loading: refs.length > 0 });
+  const [state, setState] = useState<LoadedSections>({
+    docs: [],
+    failed: [],
+    loading: refs.length > 0,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -27,8 +31,10 @@ export function useSectionDocs(refs: SectionRef[]): LoadedSections {
     Promise.allSettled(refs.map((ref) => fetchSection(ref))).then((results) => {
       if (cancelled) return;
       setState({
-        docs: results.flatMap((result) => (result.status === "fulfilled" ? [result.value] : [])),
-        failed: refs.filter((_ref, index) => results[index].status === "rejected").map((ref) => ref.title),
+        docs: results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : [])),
+        failed: refs
+          .filter((_ref, index) => results[index].status === 'rejected')
+          .map((ref) => ref.title),
         loading: false,
       });
     });

@@ -6,11 +6,11 @@
  * methodology. The PNGs carry their provenance footer in the image itself.
  */
 
-import { useState } from "react";
-import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from "../api";
-import { downloadCsvText } from "../csv";
-import { ChartLightbox, type LightboxContent } from "./ChartLightbox";
-import { CopyLinkButton } from "./CopyLinkButton";
+import { useState } from 'react';
+import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
+import { downloadCsvText } from '../csv';
+import { ChartLightbox, type LightboxContent } from './ChartLightbox';
+import { CopyLinkButton } from './CopyLinkButton';
 
 function Figure({
   chart,
@@ -48,13 +48,13 @@ function Figure({
     />
   );
   return (
-    <figure className={slide ? "slide" : fullRow ? "chart wide" : "chart"}>
+    <figure className={slide ? 'slide' : fullRow ? 'chart wide' : 'chart'}>
       {chart.variants.length > 1 && (
         <div className="charttabs">
           {chart.variants.map((option, index) => (
             <button
               key={option.label}
-              className={index === variant ? "ctab active" : "ctab"}
+              className={index === variant ? 'ctab active' : 'ctab'}
               onClick={() => setVariant(index)}
             >
               {option.label}
@@ -73,7 +73,7 @@ export function ChartSectionCard({
   provenance,
 }: {
   section: ChartSection;
-  provenance: Manifest["provenance"];
+  provenance: Manifest['provenance'];
 }) {
   const [slide, setSlide] = useState(0);
   const [zoom, setZoom] = useState<LightboxContent | null>(null);
@@ -118,7 +118,13 @@ export function ChartSectionCard({
                   // The chart's companion table, stamped with the provenance
                   // preamble like every other browser download.
                   fetchApiText(download.path).then((text) =>
-                    downloadCsvText(download.name, section.title, text, provenance, download.generated_at),
+                    downloadCsvText(
+                      download.name,
+                      section.title,
+                      text,
+                      provenance,
+                      download.generated_at,
+                    ),
                   )
                 }
               >
@@ -141,7 +147,12 @@ export function ChartSectionCard({
               Next ›
             </button>
           </div>
-          <Figure key={section.charts[slide].title} chart={section.charts[slide]} onZoom={onZoom} slide />
+          <Figure
+            key={section.charts[slide].title}
+            chart={section.charts[slide]}
+            onZoom={onZoom}
+            slide
+          />
         </div>
       ) : (
         <div className="gallery">

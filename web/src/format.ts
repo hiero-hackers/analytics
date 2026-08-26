@@ -13,9 +13,9 @@ export function stamp(iso: string): string {
   const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(iso);
   const date = new Date(hasZone ? iso : `${iso}Z`);
   if (Number.isNaN(date.getTime())) {
-    return iso.slice(0, 16).replace("T", " "); // unparseable: show it raw
+    return iso.slice(0, 16).replace('T', ' '); // unparseable: show it raw
   }
-  return date.toISOString().slice(0, 16).replace("T", " ");
+  return date.toISOString().slice(0, 16).replace('T', ' ');
 }
 
 /**

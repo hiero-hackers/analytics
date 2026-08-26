@@ -8,7 +8,7 @@
 /** This page's URL with `widget` set to the named section. */
 export function shareUrl(sectionId: string): string {
   const params = new URLSearchParams(window.location.hash.slice(1));
-  params.set("widget", sectionId);
+  params.set('widget', sectionId);
   return `${window.location.origin}${window.location.pathname}#${params.toString()}`;
 }
 
@@ -21,8 +21,6 @@ export async function copyText(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch {
-
-  }
+  } catch {}
   return false;
 }

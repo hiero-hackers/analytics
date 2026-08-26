@@ -4,8 +4,8 @@
  * the panel exists so each cell's count is independently checkable.
  */
 
-import { useEffect } from "react";
-import { safeUrl } from "../safety";
+import { useEffect } from 'react';
+import { safeUrl } from '../safety';
 
 /** One evidence line, in the legacy panel's field order. */
 export interface EvidenceItem {
@@ -31,10 +31,10 @@ export function EvidencePanel({
 }) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
   return (
@@ -44,7 +44,7 @@ export function EvidencePanel({
           HIP-{hip} · {repo}
         </h3>
         <span className="n">
-          {items.length} referencing PR{items.length > 1 ? "s" : ""}
+          {items.length} referencing PR{items.length > 1 ? 's' : ''}
         </span>
         <button type="button" className="dl" onClick={onClose}>
           Close
@@ -64,8 +64,10 @@ export function EvidencePanel({
                   <span>#{item.n}</span>
                 )}
                 <span className="t">{item.t}</span>
-                <span className="meta">{item.st === "MERGED" ? `merged ${item.d}` : item.st.toLowerCase()}</span>
-                <span className="meta">matched in: {item.m.split("|").join(", ")}</span>
+                <span className="meta">
+                  {item.st === 'MERGED' ? `merged ${item.d}` : item.st.toLowerCase()}
+                </span>
+                <span className="meta">matched in: {item.m.split('|').join(', ')}</span>
                 {item.q && <span className="cue">not counted — “{item.q}”</span>}
               </div>
               {item.x && <div className="snip">{item.x}</div>}

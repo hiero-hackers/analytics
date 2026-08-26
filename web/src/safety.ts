@@ -10,7 +10,7 @@
  */
 
 /** URL schemes a data-driven link may use. */
-const SAFE_URL_SCHEMES = new Set(["http:", "https:", "mailto:"]);
+const SAFE_URL_SCHEMES = new Set(['http:', 'https:', 'mailto:']);
 
 /**
  * The URL if it is safe to link to, otherwise null.
@@ -36,7 +36,7 @@ export function safeUrl(value: string): string | null {
 // side neutralises for its spreadsheet copies (export/csv_safety.py). The
 // control characters count because a leading tab, CR or LF is stripped on
 // import, exposing whatever follows it to the formula parser.
-const FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r", "\n"];
+const FORMULA_PREFIXES = ['=', '+', '-', '@', '\t', '\r', '\n'];
 
 /**
  * A cell a spreadsheet will treat as text, never as a formula.
@@ -45,6 +45,6 @@ const FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r", "\n"];
  * alone: it is the dashboard's empty-cell placeholder, not a formula.
  */
 export function csvSafe(value: unknown): string {
-  const text = value === null || value === undefined ? "" : String(value);
-  return text && text !== "-" && FORMULA_PREFIXES.includes(text[0]) ? `'${text}` : text;
+  const text = value === null || value === undefined ? '' : String(value);
+  return text && text !== '-' && FORMULA_PREFIXES.includes(text[0]) ? `'${text}` : text;
 }

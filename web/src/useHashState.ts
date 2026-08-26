@@ -5,15 +5,15 @@
  * goes through this same hook.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export function useHashState(key: string, fallback: string): [string, (value: string) => void] {
   const read = () => new URLSearchParams(window.location.hash.slice(1)).get(key) ?? fallback;
   const [value, setValue] = useState(read);
   useEffect(() => {
     const onHash = () => setValue(read());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- read is stable per key/fallback
   }, [key, fallback]);
   const update = (next: string) => {

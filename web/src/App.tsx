@@ -4,23 +4,22 @@
  * groups, chart-section cards, then the table sections.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { fetchManifest, type ChartSection, type Manifest } from "./api";
-import { ChartSectionCard } from "./components/ChartSectionCard";
-import { Glossary } from "./components/Glossary";
-import { MetricTiles } from "./components/MetricTiles";
-import { ProvenanceFooter } from "./components/ProvenanceFooter";
-import { SectionGroups, type Group } from "./components/SectionGroups";
-import { SectionTable } from "./components/SectionTable";
-import { Skeleton } from "./components/Skeleton";
-import { TabBar } from "./components/TabBar";
-import { WipFooter } from "./components/WipFooter";
-import { stamp } from "./format";
-import { useHashState } from "./useHashState";
-import { useSectionDocs } from "./useSectionDocs";
-import { useViewDocs } from "./useViewDocs";
-import { ViewCards } from "./components/ViewCards";
-
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { fetchManifest, type ChartSection, type Manifest } from './api';
+import { ChartSectionCard } from './components/ChartSectionCard';
+import { Glossary } from './components/Glossary';
+import { MetricTiles } from './components/MetricTiles';
+import { ProvenanceFooter } from './components/ProvenanceFooter';
+import { SectionGroups, type Group } from './components/SectionGroups';
+import { SectionTable } from './components/SectionTable';
+import { Skeleton } from './components/Skeleton';
+import { TabBar } from './components/TabBar';
+import { WipFooter } from './components/WipFooter';
+import { stamp } from './format';
+import { useHashState } from './useHashState';
+import { useSectionDocs } from './useSectionDocs';
+import { useViewDocs } from './useViewDocs';
+import { ViewCards } from './components/ViewCards';
 
 const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
 
@@ -41,7 +40,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
   const chartSections = (entry.chart_sections ?? []).filter((section) => section.macro === macro);
   const provenance = manifest.provenance;
   // A shared section link names its target here; see the effect below.
-  const [widget] = useHashState("widget", "");
+  const [widget] = useHashState('widget', '');
 
   // The tab is a sequence of named sections: each group renders its views,
   // then its chart cards, then its tables, and the jump bar links each one —
@@ -60,7 +59,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     if (!names.includes(chartGroup(section))) names.push(chartGroup(section));
   }
   for (const doc of docs) {
-    if (!names.includes(doc.group || "")) names.push(doc.group || "");
+    if (!names.includes(doc.group || '')) names.push(doc.group || '');
   }
   const settled = !viewsLoading && !docsLoading;
   // A shared #widget=<section id> link: once the tab settles, scroll to and flash that section
@@ -69,20 +68,20 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     if (!settled || !widget) return;
     const jump = () => {
       const target = document.getElementById(widget);
-      target?.scrollIntoView({ block: "start", behavior: "smooth" });
-      target?.classList.add("flash");
+      target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      target?.classList.add('flash');
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
-      flashTimer.current = window.setTimeout(() => target?.classList.remove("flash"), FLASH_MS);
+      flashTimer.current = window.setTimeout(() => target?.classList.remove('flash'), FLASH_MS);
     };
-    const canRequestFrame = typeof window.requestAnimationFrame === "function";
+    const canRequestFrame = typeof window.requestAnimationFrame === 'function';
     const raf = canRequestFrame ? window.requestAnimationFrame(jump) : undefined;
     if (raf === undefined) jump();
     return () => {
-      if (typeof window.cancelAnimationFrame === "function" && raf !== undefined) {
+      if (typeof window.cancelAnimationFrame === 'function' && raf !== undefined) {
         window.cancelAnimationFrame(raf as number);
       }
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
-      document.getElementById(widget)?.classList.remove("flash");
+      document.getElementById(widget)?.classList.remove('flash');
     };
   }, [settled, widget]);
   const groups: Group[] = !settled
@@ -90,7 +89,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
     : names.flatMap((name): Group[] => {
         const groupViews = views.filter((view) => (view.group ?? names[0]) === name);
         const groupCharts = chartSections.filter((section) => chartGroup(section) === name);
-        const groupDocs = docs.filter((doc) => (doc.group || "") === name);
+        const groupDocs = docs.filter((doc) => (doc.group || '') === name);
         if (!groupViews.length && !groupCharts.length && !groupDocs.length) return [];
         return [
           [
@@ -103,7 +102,12 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
                 <ChartSectionCard key={section.id} section={section} provenance={provenance} />
               ))}
               {groupDocs.map((doc) => (
-                <SectionTable key={doc.id} doc={doc} provenance={provenance} periodLabels={manifest.period_labels} />
+                <SectionTable
+                  key={doc.id}
+                  doc={doc}
+                  provenance={provenance}
+                  periodLabels={manifest.period_labels}
+                />
               ))}
             </>,
           ],
@@ -117,8 +121,8 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
           the tab — the rest of the page is still worth reading. */}
       {unavailable.length > 0 && (
         <p className="error">
-          Could not load {unavailable.length === 1 ? "this section" : "these sections"}:{" "}
-          {unavailable.join(", ")}. Everything else on this tab is unaffected — reload to try again.
+          Could not load {unavailable.length === 1 ? 'this section' : 'these sections'}:{' '}
+          {unavailable.join(', ')}. Everything else on this tab is unaffected — reload to try again.
         </p>
       )}
       {settled ? <SectionGroups groups={groups} /> : <Skeleton label="Loading tab" rows={6} />}
@@ -197,7 +201,8 @@ function Dashboard({
   return (
     <>
       <p className="sub">
-        Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart to enlarge.
+        Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart
+        to enlarge.
       </p>
       {/* The org filter is the outermost scope — everything below it is "this
           org's view" — so it sits above the content tabs. */}
@@ -208,7 +213,9 @@ function Dashboard({
         onSelect={(name) => setMacro(macros.find((candidate) => topOf(candidate) === name) ?? name)}
         kind="macro"
       />
-      {subTabs.length > 0 && <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />}
+      {subTabs.length > 0 && (
+        <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />
+      )}
       {/* Every macro ships its own explainer, listing only what that tab
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}
@@ -234,8 +241,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   // Bumped by retry to re-run the fetch below without duplicating its body.
   const [reloadKey, setReloadKey] = useState(0);
-  const [macro, setMacro] = useHashState("tab", "");
-  const [org, setOrg] = useHashState("org", "");
+  const [macro, setMacro] = useHashState('tab', '');
+  const [org, setOrg] = useHashState('org', '');
 
   useEffect(() => {
     let cancelled = false;
@@ -270,7 +277,13 @@ export default function App() {
           <Skeleton label="Loading dashboard" rows={5} />
         </>
       ) : (
-        <Dashboard manifest={manifest} macro={macro} setMacro={setMacro} org={org} setOrg={setOrg} />
+        <Dashboard
+          manifest={manifest}
+          macro={macro}
+          setMacro={setMacro}
+          org={org}
+          setOrg={setOrg}
+        />
       )}
     </div>
   );

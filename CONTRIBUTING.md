@@ -125,6 +125,15 @@ Ruff's rules and line length live in [pyproject.toml](pyproject.toml) under
 `[tool.ruff]`; the same config backs the CLI, the pre-commit hook, and CI, so all
 three agree.
 
+The `web/` dashboard has its own lint/format gate, enforced by the same CI
+workflow's `web-lint` job:
+
+```bash
+npm --prefix web run lint            # oxlint (ESLint-compatible, TS/React rules)
+npm --prefix web run format:check    # Prettier
+npm --prefix web run format          # Prettier, autofix
+```
+
 ## Testing
 
 - Tests mirror the source layout: code in `src/hiero_analytics/<pkg>/<module>.py`

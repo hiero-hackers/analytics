@@ -5,8 +5,8 @@
  * rather than blanking the tab around it.
  */
 
-import { useEffect, useState } from "react";
-import { fetchView, type ViewDoc, type ViewRef } from "./api";
+import { useEffect, useState } from 'react';
+import { fetchView, type ViewDoc, type ViewRef } from './api';
 
 export interface LoadedViews {
   views: ViewDoc[];
@@ -25,7 +25,11 @@ export interface LoadedViews {
 }
 
 export function useViewDocs(refs: ViewRef[]): LoadedViews {
-  const [state, setState] = useState<LoadedViews>({ views: [], failed: [], loading: refs.length > 0 });
+  const [state, setState] = useState<LoadedViews>({
+    views: [],
+    failed: [],
+    loading: refs.length > 0,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -33,8 +37,10 @@ export function useViewDocs(refs: ViewRef[]): LoadedViews {
     Promise.allSettled(refs.map((ref) => fetchView(ref))).then((results) => {
       if (cancelled) return;
       setState({
-        views: results.flatMap((result) => (result.status === "fulfilled" ? [result.value] : [])),
-        failed: refs.filter((_ref, index) => results[index].status === "rejected").map((ref) => ref.title),
+        views: results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : [])),
+        failed: refs
+          .filter((_ref, index) => results[index].status === 'rejected')
+          .map((ref) => ref.title),
         loading: false,
       });
     });

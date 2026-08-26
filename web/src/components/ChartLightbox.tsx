@@ -5,8 +5,8 @@
  * step-by-step methodology on the dark background.
  */
 
-import { useEffect } from "react";
-import { ChartInfo, type ChartInfoProps } from "./ChartInfo";
+import { useEffect } from 'react';
+import { ChartInfo, type ChartInfoProps } from './ChartInfo';
 
 export interface LightboxContent extends ChartInfoProps {
   /** Absent for text-only content (a KPI tile's explanation). */
@@ -16,17 +16,29 @@ export interface LightboxContent extends ChartInfoProps {
   title?: string;
 }
 
-export function ChartLightbox({ content, onClose }: { content: LightboxContent; onClose: () => void }) {
+export function ChartLightbox({
+  content,
+  onClose,
+}: {
+  content: LightboxContent;
+  onClose: () => void;
+}) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
   return (
-    <div className="lightbox" style={{ display: "flex" }} onClick={onClose} role="dialog" aria-label={content.alt}>
+    <div
+      className="lightbox"
+      style={{ display: 'flex' }}
+      onClick={onClose}
+      role="dialog"
+      aria-label={content.alt}
+    >
       <span className="hint">click outside or press Esc to close</span>
       <button type="button" className="lbclose" aria-label="Close" onClick={onClose}>
         ✕

@@ -8,13 +8,13 @@
  * component happened to need it first.
  */
 
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type ReactNode } from 'react';
 
 export function emphasized(text: string): ReactNode[] {
   return text
     .split(/(\*[^*]+\*)/)
     .map((part, index) =>
-      part.startsWith("*") && part.endsWith("*") ? (
+      part.startsWith('*') && part.endsWith('*') ? (
         <em key={index}>{part.slice(1, -1)}</em>
       ) : (
         <Fragment key={index}>{part}</Fragment>

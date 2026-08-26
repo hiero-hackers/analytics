@@ -7,8 +7,8 @@
  * (or the "data as of" treatment) cannot apply to one and miss the other.
  */
 
-import type { ReactNode } from "react";
-import { stamp } from "../format";
+import type { ReactNode } from 'react';
+import { stamp } from '../format';
 
 export function SectionCard({
   id,
@@ -43,9 +43,9 @@ export function SectionCard({
           <div className="sactions">
             {actions && <div className="actionrow">{actions}</div>}
             {generatedAt && (
-              <span className={stale ? "asof stale" : "asof"}>
+              <span className={stale ? 'asof stale' : 'asof'}>
                 data as of {stamp(generatedAt)}
-                {stale ? " — older than the scheduled refresh" : ""}
+                {stale ? ' — older than the scheduled refresh' : ''}
               </span>
             )}
           </div>

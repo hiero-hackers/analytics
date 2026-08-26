@@ -13,10 +13,10 @@
  * purely about what reaches the DOM.
  */
 
-import { useRef } from "react";
-import { flexRender, type Table } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import type { Row } from "../api";
+import { useRef } from 'react';
+import { flexRender, type Table } from '@tanstack/react-table';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import type { Row } from '../api';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
 // real measurements as rows mount, so this only has to be close.
@@ -28,7 +28,7 @@ export const VIRTUALIZE_ABOVE = 100;
 export function DataTable({ table }: { table: Table<Row> }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
-  const globalFilter = (table.getState().globalFilter as string) ?? "";
+  const globalFilter = (table.getState().globalFilter as string) ?? '';
   const virtualized = rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
     count: virtualized ? rows.length : 0,
@@ -64,16 +64,24 @@ export function DataTable({ table }: { table: Table<Row> }) {
                   return (
                     <th
                       key={header.id}
-                      className={
-                        header.column.columnDef.meta?.numeric ? "num" : undefined
+                      className={header.column.columnDef.meta?.numeric ? 'num' : undefined}
+                      aria-sort={
+                        sorted === 'asc'
+                          ? 'ascending'
+                          : sorted === 'desc'
+                            ? 'descending'
+                            : undefined
                       }
-                      aria-sort={sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : undefined}
                     >
-                      <button type="button" className="thbtn" onClick={header.column.getToggleSortingHandler()}>
+                      <button
+                        type="button"
+                        className="thbtn"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {/* The mark's slot is always reserved so toggling sort never shifts the column. */}
                         <span className="sortmark" aria-hidden="true">
-                          {{ asc: "↑", desc: "↓" }[sorted] ?? ""}
+                          {{ asc: '↑', desc: '↓' }[sorted] ?? ''}
                         </span>
                       </button>
                     </th>
@@ -88,17 +96,21 @@ export function DataTable({ table }: { table: Table<Row> }) {
                 <td colSpan={columnCount} className="py-6 text-center text-[13px] text-muted">
                   {globalFilter ? (
                     <>
-                      No rows match —{" "}
-                      <button type="button" className="underline" onClick={() => table.setGlobalFilter("")}>
+                      No rows match —{' '}
+                      <button
+                        type="button"
+                        className="underline"
+                        onClick={() => table.setGlobalFilter('')}
+                      >
                         clear the filter?
                       </button>
                     </>
-                 ) : (
-                  "No rows to show."
-                   )}
-                 </td>
-               </tr>
-             )}
+                  ) : (
+                    'No rows to show.'
+                  )}
+                </td>
+              </tr>
+            )}
             {paddingTop > 0 && (
               <tr aria-hidden="true">
                 <td colSpan={columnCount} style={{ height: paddingTop, padding: 0, border: 0 }} />
@@ -113,7 +125,7 @@ export function DataTable({ table }: { table: Table<Row> }) {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className={cell.column.columnDef.meta?.numeric ? "num" : undefined}
+                    className={cell.column.columnDef.meta?.numeric ? 'num' : undefined}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -122,7 +134,10 @@ export function DataTable({ table }: { table: Table<Row> }) {
             ))}
             {paddingBottom > 0 && (
               <tr aria-hidden="true">
-                <td colSpan={columnCount} style={{ height: paddingBottom, padding: 0, border: 0 }} />
+                <td
+                  colSpan={columnCount}
+                  style={{ height: paddingBottom, padding: 0, border: 0 }}
+                />
               </tr>
             )}
           </tbody>
