@@ -19,6 +19,11 @@ LOAD_SHARE_MIN_ACTIONS = 20
 # Maintainer-coverage flag: surface repos with at most this many *active* maintainers.
 UNDERSTAFFED_MAX_ACTIVE_MAINTAINERS = 1
 
+# Affiliation curation floor: below this share of resolved affiliations a role's
+# diversity charts describe a minority of their own population, so the run warns
+# rather than letting curation decay pass as a quietly shrinking employer count.
+AFFILIATION_MIN_KNOWN_SHARE_PCT = env_int("AFFILIATION_MIN_KNOWN_SHARE_PCT", 60, minimum=0)
+
 # Role co-membership networks: min shared members for a repo-repo link, per
 # governance role (raise to thin a dense group into something readable).
 ROLE_NETWORK_MIN_SHARED = {

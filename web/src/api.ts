@@ -11,7 +11,8 @@
  * truth for the valid set. Keep the two lists in sync; a mismatch is a
  * compile-time error here and a test failure on the Python side.
  */
-export type ColumnFormat = "hip" | "date" | "link" | "evidence" | "status" | "flag" | "presence" | "number";
+export type ColumnFormat =
+  'hip' | 'date' | 'link' | 'evidence' | 'status' | 'flag' | 'presence' | 'number';
 
 export interface ColumnSpec {
   key: string;
@@ -93,7 +94,7 @@ export interface MatrixCell {
 
 /** The trailing parity note of a matrix row (e.g. which SDKs lack PRs). */
 export interface GapNote {
-  kind: "complete" | "none" | "partial";
+  kind: 'complete' | 'none' | 'partial';
   text: string;
   items?: string[];
 }
@@ -110,7 +111,7 @@ export interface MatrixRow {
 /** A generic entity x category matrix (today: HIP implementation coverage). */
 export interface MatrixView {
   id: string;
-  kind: "matrix";
+  kind: 'matrix';
   macro: string;
   /** The named section group this view renders under. */
   group?: string;
@@ -141,7 +142,7 @@ export interface BoardItem {
 /** Entities placed in lifecycle columns (today: the HIP governance board). */
 export interface BoardView {
   id: string;
-  kind: "board";
+  kind: 'board';
   macro: string;
   /** The named section group this view renders under. */
   group?: string;
@@ -263,12 +264,14 @@ async function getJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-export const fetchManifest = (): Promise<Manifest> => getJson<Manifest>(`${API_ROOT}/manifest.json`);
+export const fetchManifest = (): Promise<Manifest> =>
+  getJson<Manifest>(`${API_ROOT}/manifest.json`);
 
 export const fetchSection = (ref: SectionRef): Promise<SectionDoc> =>
   getJson<SectionDoc>(`${API_ROOT}/${ref.path}`);
 
-export const fetchView = (ref: ViewRef): Promise<ViewDoc> => getJson<ViewDoc>(`${API_ROOT}/${ref.path}`);
+export const fetchView = (ref: ViewRef): Promise<ViewDoc> =>
+  getJson<ViewDoc>(`${API_ROOT}/${ref.path}`);
 
 /** Raw text of a file shipped inside the API tree (e.g. a chart's CSV). */
 export const fetchApiText = (path: string): Promise<string> =>

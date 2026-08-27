@@ -102,12 +102,16 @@ CHART_MACRO = {
                 # tables together.
                 "group": "Organisation diversity",
                 "description": (
-                    "Where maintainer authority sits — org-wide, per team and per repo. The first chart is "
-                    "the ecosystem-wide split of maintainers by employer (solo contributors pooled as "
-                    "'Independent'); the next two count the governance teams and the repositories that a "
-                    "single employer solely controls (an organisational bus-factor); the last two break "
-                    "down each repository's and each team's maintainer mix. See the affiliations and "
-                    "repo-diversity tables below for the underlying detail."
+                    "Where write authority sits — org-wide, per team and per repo. The role tabs switch "
+                    "between maintainers (merge rights) and committers (write access, but no maintainer "
+                    "seat anywhere), so the two benches can be compared: a committer bench spread across "
+                    "more employers is the leading indicator that maintainer diversity will follow. The "
+                    "first chart is the ecosystem-wide split by employer (solo contributors pooled as "
+                    "'Independent', unmapped people shown as their own 'Unknown' band rather than dropped); "
+                    "the next two count the governance teams and the repositories that a single employer "
+                    "solely controls (an organisational bus-factor); the last two break down each "
+                    "repository's and each team's mix. The team charts are membership-based and so have no "
+                    "role tabs. See the affiliations and repo-diversity tables below for the underlying detail."
                 ),
                 # Deliberately not time-filterable (charts and tables alike):
                 # diversity is a property of the roster, and windowing it mostly
@@ -115,10 +119,28 @@ CHART_MACRO = {
                 # The compact charts share the top rows; the two wide
                 # composition charts then stack full-width, one row each.
                 "files": [
-                    ("Maintainers by organisation", "affiliation_donut.png"),
+                    (
+                        "Role-holders by organisation",
+                        [
+                            ("Maintainers", "affiliation_donut.png"),
+                            ("Committers", "affiliation_donut_committers.png"),
+                        ],
+                    ),
                     ("Single-employer teams by org", "single_employer_teams_by_org.png"),
-                    ("Single-employer repos by org", "single_employer_repos_by_org.png"),
-                    ("Organisation mix by repo", "repo_affiliation_composition.png"),
+                    (
+                        "Single-employer repos by org",
+                        [
+                            ("Maintainers", "single_employer_repos_by_org.png"),
+                            ("Committers", "single_employer_repos_by_org_committers.png"),
+                        ],
+                    ),
+                    (
+                        "Organisation mix by repo",
+                        [
+                            ("Maintainers", "repo_affiliation_composition.png"),
+                            ("Committers", "repo_affiliation_composition_committers.png"),
+                        ],
+                    ),
                     ("Organisation mix by team", "team_affiliation_composition.png"),
                 ],
             },
@@ -318,6 +340,27 @@ SECTION_SPECS = [
         ],
     },
     {
+        "id": "committeraffiliations",
+        "file": "committer_affiliations.csv",
+        "title": "Committer affiliations — reference",
+        "description": (
+            "The same reference as the maintainer table, for people whose highest role anywhere is "
+            "committer — write access, but no maintainer seat in any repository. The two populations are "
+            "disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, "
+            "so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. "
+            "To fix a mapping or resolve an unknown, edit its row in data/affiliations.yaml and append "
+            "'# manual: reason', or use 'Suggest a correction' to open an issue on the analytics repo."
+        ),
+        "action_url": AFFILIATION_ISSUE_URL,
+        "action_label": "Suggest a correction",
+        "columns": [
+            ("login", "committer"),
+            ("organisation", "organisation"),
+            ("status", "status"),
+            ("method", "method"),
+        ],
+    },
+    {
         "id": "repodiversity",
         "file": "repo_affiliation_diversity.csv",
         # Deliberately not time-filterable (like the diversity charts):
@@ -332,6 +375,29 @@ SECTION_SPECS = [
         "columns": [
             ("repo", "repo"),
             ("maintainers", "maintainers", "number"),
+            ("distinct_orgs", "distinct orgs", "number"),
+            ("top_org", "largest org"),
+            ("top_org_pct", "largest org %", "number"),
+            ("independent", "independent"),
+            ("unknown", "unknown"),
+            ("organisations", "organisations"),
+        ],
+    },
+    {
+        "id": "committerrepodiversity",
+        "file": "repo_affiliation_diversity_committers.csv",
+        # Deliberately not time-filterable — see repodiversity above.
+        "title": "Committer organisation diversity by repo",
+        "description": (
+            "The repo table above, over committers instead of maintainers: per repo, how many committers "
+            "it has, how many distinct employers they span, the largest employer and its share of resolved "
+            "committers, and the independent / unknown counts. Read it against the maintainer table — a "
+            "repo whose maintainers are single-employer but whose committers are not has a bench it could "
+            "promote from. The 'unknown' count is higher here, so weigh a single-employer reading against it."
+        ),
+        "columns": [
+            ("repo", "repo"),
+            ("committers", "committers", "number"),
             ("distinct_orgs", "distinct orgs", "number"),
             ("top_org", "largest org"),
             ("top_org_pct", "largest org %", "number"),
@@ -397,6 +463,8 @@ GLOSSARY = glossary_of(
         "period tabs",
         "organisation",
         "method",
+        "committer",
+        "role tabs",
         "resolved",
         "distinct orgs",
         "largest org / largest org %",
@@ -424,8 +492,12 @@ SECTION_GROUPS = [
     # The governance bodies: teams as groups, then the TSC members individually.
     ("Teams & TSC", ["teams", "teamrepo", "tscrepo"]),
     # Who is affiliated with which organisation, and how concentrated that is —
-    # the org-diversity chart card renders at the top of this group.
-    ("Organisation diversity", ["affiliations", "repodiversity", "teamdiversity"]),
+    # the org-diversity chart card renders at the top of this group. Each role's
+    # reference table sits beside its repo-diversity breakdown.
+    (
+        "Organisation diversity",
+        ["affiliations", "repodiversity", "committeraffiliations", "committerrepodiversity", "teamdiversity"],
+    ),
 ]
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
@@ -434,6 +506,7 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 # horizontally at a readable height instead of squashing them to the card width.
 WIDE_CHARTS = {
     "repo_affiliation_composition.png",
+    "repo_affiliation_composition_committers.png",
     "team_affiliation_composition.png",
 }
 
@@ -473,15 +546,27 @@ CHART_NOTES = {
     "triage_network.png": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos "
     "are linked when they share a triage holder (thicker line = more shared). Bubble colour is the "
     "repo's category.",
-    "affiliation_donut.png": "The share of maintainers held by the two largest employers, with everyone else (smaller orgs and "
-    "solo 'Independent' contributors) pooled into 'Other' — the concentration at a glance; the full "
-    "breakdown is in the affiliations table.",
+    "affiliation_donut.png": "The share of role-holders employed by the two largest organisations, with everyone else (smaller "
+    "orgs and solo 'Independent' contributors) pooled into 'Other' — the concentration at a glance. "
+    "People with no curated affiliation are shown as their own 'Unknown' slice rather than dropped, and "
+    "the title states what share of the population is known, so a small slice can be read against how "
+    "much of the roster is resolved. The role tabs switch between maintainers and committers; the full "
+    "breakdown is in the affiliations tables.",
+    "affiliation_donut_committers.png": "The committer view of the same chart: people whose highest role anywhere is committer (write "
+    "access, no maintainer seat), so this population never overlaps the maintainer tab. Curation is "
+    "thinner here, which is why the 'Unknown' slice is larger and the known share in the title matters "
+    "more — every percentage is a share of all committers, unknowns included, so weigh the employer "
+    "slices against how big the 'Unknown' one is.",
     "repo_affiliation_composition.png": "Each bar is a repository, normalised to 100% so the segments show each employer's share of that "
-    "repo's maintainers. The dashed line marks 50%: a segment reaching past it means one employer holds "
+    "repo's role-holders. The dashed line marks 50%: a segment reaching past it means one employer holds "
     "the majority (an organisational bus-factor). Largest employers get their own colour, smaller ones "
-    "pool into 'Other orgs', and solo or unmapped maintainers show as 'Independent' and 'Unknown'. Repos "
+    "pool into 'Other orgs', and solo or unmapped holders show as 'Independent' and 'Unknown'. Repos "
     "are ordered most-concentrated first — by the largest single employer's share — and repos with the "
-    "same concentration are grouped by their leading organisation (colour), so like sits next to like.",
+    "same concentration are grouped by their leading organisation (colour), so like sits next to like. "
+    "The role tabs switch between maintainers and committers; a repo counts only where it grants that role.",
+    "repo_affiliation_composition_committers.png": "The committer view of the same chart. Repos appear only where someone holds committer as their "
+    "highest role, so the set of bars differs from the maintainer tab — a repo whose committer bar is "
+    "multi-colour while its maintainer bar is single-colour has a cross-org bench it could promote from.",
     "team_affiliation_composition.png": "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the "
     "team's members. The dashed line marks 50%: a segment past it means one employer holds the majority "
     "(a capture / bus-factor risk). Largest employers get their own colour, smaller ones pool into "
@@ -492,10 +577,14 @@ CHART_NOTES = {
     "resolved member of that team shares this one employer. Taller bars mean more single-employer "
     "teams, a governance-capture / bus-factor risk. Teams are counted only where their members "
     "resolve to an employer, so teams dominated by unmapped members are not over-counted here.",
-    "single_employer_repos_by_org.png": "Each bar is an organisation; bar height is how many repositories it solely maintains — every "
-    "resolved maintainer of that repo shares this one employer (at least two of them, no independents). "
-    "Taller bars mean more single-employer repos, an organisational bus-factor. Repos dominated by "
-    "unmapped maintainers are not counted here.",
+    "single_employer_repos_by_org.png": "Each bar is an organisation; bar height is how many repositories it solely holds — every "
+    "resolved holder of that role in the repo shares this one employer (at least two of them, no "
+    "independents). Taller bars mean more single-employer repos, an organisational bus-factor. Repos "
+    "dominated by unmapped holders are not counted here. The role tabs switch between maintainers and "
+    "committers.",
+    "single_employer_repos_by_org_committers.png": "The committer view of the same chart: repositories where every resolved committer shares one "
+    "employer. Because committer curation is thinner, more repos fall below the 'enough of the roster "
+    "is known' bar and are left uncounted — treat this as a floor, not a total.",
 }
 
 # Step-by-step "how this was built" methodology, keyed by chart filename. Shown as
@@ -547,20 +636,37 @@ CHART_METHODOLOGY = {
         ("Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."),
     ],
     "affiliation_donut.png": [
-        "Collect every maintainer from the governance config — anyone holding the maintainer role in any repo.",
-        "Look up each maintainer's organisation in the curated affiliations file.",
+        (
+            "Resolve every person's role per repository from the governance config, then reduce each to the "
+            "most senior role they hold anywhere — so the maintainer and committer tabs are disjoint "
+            "populations and can be compared directly."
+        ),
+        "Look up each person's organisation in the curated affiliations file.",
         (
             "That file resolves each person from public signals in priority order: GPG-key email, profile email, "
             "the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then "
             "commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph."
         ),
         (
-            "Count distinct maintainers per organisation; people with an identity but no employer are pooled as "
-            "'Independent'; people with no public signal are excluded."
+            "Count distinct people per organisation; people with an identity but no employer are pooled as "
+            "'Independent', and people with no public signal form their own 'Unknown' slice — the chart's "
+            "total is the whole population, never a silently trimmed one."
         ),
         (
-            "Keep the two largest employers, fold everyone else (smaller orgs and independents) into 'Other', "
-            "and draw a filled pie of their shares."
+            "Keep the two largest slices, fold everyone else into 'Other', draw a filled pie of their shares, "
+            "and state the share of the population with a known affiliation in the title."
+        ),
+    ],
+    "affiliation_donut_committers.png": [
+        (
+            "Same construction as the maintainer tab, over the people whose highest role anywhere is "
+            "committer: write access in at least one repository and a maintainer seat in none."
+        ),
+        "Look up each committer's organisation in the same curated affiliations file, by the same priority order.",
+        (
+            "Count distinct committers per organisation, pooling employer-less people as 'Independent' and "
+            "unmapped people as 'Unknown'; the title states what share is known, which is materially lower "
+            "than for maintainers."
         ),
     ],
     "single_employer_teams_by_org.png": [
@@ -574,21 +680,25 @@ CHART_METHODOLOGY = {
         "Plot one bar per organisation — its height is how many teams it solely controls.",
     ],
     "single_employer_repos_by_org.png": [
-        "For each repository, take the maintainers holding the maintainer role there.",
+        "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
         (
-            "Flag a repo 'single-employer' when every resolved maintainer shares the same organisation "
-            "(at least two such maintainers, and no independents)."
+            "Flag a repo 'single-employer' when every resolved holder shares the same organisation "
+            "(at least two such holders, and no independents)."
         ),
-        "Group those single-employer repos by the organisation that maintains them.",
-        "Plot one bar per organisation — its height is how many repos it solely maintains.",
+        "Group those single-employer repos by the organisation that holds them.",
+        "Plot one bar per organisation — its height is how many repos it solely holds.",
+    ],
+    "single_employer_repos_by_org_committers.png": [
+        "Same construction over each repository's committers — people with write access there and no maintainer seat anywhere.",
+        "Repos where unmapped committers outnumber resolved ones are never flagged, so thin curation under-counts rather than over-claims.",
     ],
     "repo_affiliation_composition.png": [
-        "For each repository, take the maintainers holding the maintainer role there.",
+        "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file.",
         (
-            "Count maintainers per organisation within the repo; the largest employers across all repos get their "
-            "own colour, the rest pool into 'Other orgs', and solo/unmapped maintainers show as "
+            "Count holders per organisation within the repo; the largest employers across all repos get their "
+            "own colour, the rest pool into 'Other orgs', and solo/unmapped holders show as "
             "'Independent'/'Unknown'."
         ),
         (
@@ -598,6 +708,13 @@ CHART_METHODOLOGY = {
         (
             "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour "
             "bars are single-employer repos; multi-colour bars are cross-org."
+        ),
+    ],
+    "repo_affiliation_composition_committers.png": [
+        "Same construction over each repository's committers, so only repos that grant committer appear.",
+        (
+            "Compare a repo's two bars: a single-colour maintainer bar beside a multi-colour committer bar is "
+            "a concentrated top with a diverse bench underneath it."
         ),
     ],
     "team_affiliation_composition.png": [

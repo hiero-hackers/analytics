@@ -3,21 +3,21 @@
  * then copies it. Label flips to "Copied!" or "Couldn't copy" and reverts on its own,
  * so the click always shows feedback whether successful or not.
  */
-import { useEffect, useRef, useState } from "react";
-import { copyText, shareUrl } from "../share";
+import { useEffect, useRef, useState } from 'react';
+import { copyText, shareUrl } from '../share';
 
 const TRANSIENT_MS = 1600;
 
-type CopyStatus = "idle" | "copied" | "failed";
+type CopyStatus = 'idle' | 'copied' | 'failed';
 
 const LABELS: Record<CopyStatus, string> = {
-  idle: "Copy link",
-  copied: "Copied!",
+  idle: 'Copy link',
+  copied: 'Copied!',
   failed: "Couldn't copy",
 };
 
 export function CopyLinkButton({ sectionId }: { sectionId: string }) {
-  const [status, setStatus] = useState<CopyStatus>("idle");
+  const [status, setStatus] = useState<CopyStatus>('idle');
   const timer = useRef<number | undefined>(undefined);
   const clickId = useRef(0);
 
@@ -30,13 +30,19 @@ export function CopyLinkButton({ sectionId }: { sectionId: string }) {
     if (id !== clickId.current) return;
 
     window.clearTimeout(timer.current);
-    setStatus(ok ? "copied" : "failed");
-    timer.current = window.setTimeout(() => setStatus("idle"), TRANSIENT_MS);
+    setStatus(ok ? 'copied' : 'failed');
+    timer.current = window.setTimeout(() => setStatus('idle'), TRANSIENT_MS);
   };
 
   return (
     <button type="button" className="dl" onClick={onCopy}>
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <svg
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+      >
         <path
           d="M6.2 9.8 4.5 11.5a2.1 2.1 0 0 1-3-3L4.2 5.8a2.1 2.1 0 0 1 3 0"
           strokeLinecap="round"

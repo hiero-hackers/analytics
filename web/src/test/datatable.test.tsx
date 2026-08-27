@@ -9,30 +9,31 @@
  * something.
  */
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import type { Row } from "../api";
-import { DataTable, VIRTUALIZE_ABOVE } from "../components/DataTable";
-import { useDataTable } from "../useDataTable";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import type { Row } from '../api';
+import { DataTable, VIRTUALIZE_ABOVE } from '../components/DataTable';
+import { useDataTable } from '../useDataTable';
 
 function Harness({ rows }: { rows: Row[] }) {
-  const table = useDataTable([{ key: "n", label: "n" }], rows, "harness");
+  const table = useDataTable([{ key: 'n', label: 'n' }], rows, 'harness');
   return <DataTable table={table} />;
 }
 
-const makeRows = (count: number): Row[] => Array.from({ length: count }, (_, index) => ({ n: index }));
+const makeRows = (count: number): Row[] =>
+  Array.from({ length: count }, (_, index) => ({ n: index }));
 
-describe("DataTable", () => {
-  it("renders a table at the threshold whole", () => {
+describe('DataTable', () => {
+  it('renders a table at the threshold whole', () => {
     render(<Harness rows={makeRows(VIRTUALIZE_ABOVE)} />);
 
-    expect(screen.getAllByRole("row")).toHaveLength(VIRTUALIZE_ABOVE + 1); // + header
+    expect(screen.getAllByRole('row')).toHaveLength(VIRTUALIZE_ABOVE + 1); // + header
   });
 
-  it("renders every row of a small table, in order", () => {
+  it('renders every row of a small table, in order', () => {
     render(<Harness rows={makeRows(5)} />);
 
-    const cells = screen.getAllByRole("cell").map((cell) => cell.textContent);
-    expect(cells).toEqual(["0", "1", "2", "3", "4"]);
+    const cells = screen.getAllByRole('cell').map((cell) => cell.textContent);
+    expect(cells).toEqual(['0', '1', '2', '3', '4']);
   });
 });

@@ -3,14 +3,14 @@
  * With a single group, sections render bare — the header would be redundant.
  */
 
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 export type Group = [name: string, content: ReactNode];
 
 // Position-qualified so two groups can never collide on a key or an anchor —
 // distinct names can slug to the same string ("Roles & teams" / "Roles teams"),
 // and a name could in principle repeat.
-const anchorId = (name: string, index: number) => `grp-${index}-${name.replace(/\W+/g, "-")}`;
+const anchorId = (name: string, index: number) => `grp-${index}-${name.replace(/\W+/g, '-')}`;
 
 export function SectionGroups({ groups }: { groups: Group[] }) {
   const showHeaders = groups.length > 1;

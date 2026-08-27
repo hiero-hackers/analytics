@@ -198,7 +198,7 @@ def render_comembership_network(
             color=MUTED_TEXT_COLOR,
         )
         ax.axis("off")
-        fig.tight_layout()
+        # tight_layout conflicts with the externally positioned legend and footer.
 
         # Nodes, not edges: the node count is what a reader checks the stamp
         # against ("are all the teams here?"), and edges follow from it.

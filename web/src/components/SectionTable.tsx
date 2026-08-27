@@ -4,15 +4,15 @@
  * table core.
  */
 
-import { useState } from "react";
-import type { Manifest, SectionDoc } from "../api";
-import { safeUrl } from "../safety";
-import { useDataTable } from "../useDataTable";
-import { CopyLinkButton } from "./CopyLinkButton";
-import { CsvDownloadButton } from "./CsvDownloadButton";
-import { DataTable } from "./DataTable";
-import { PeriodTabs } from "./PeriodTabs";
-import { SectionCard } from "./SectionCard";
+import { useState } from 'react';
+import type { Manifest, SectionDoc } from '../api';
+import { safeUrl } from '../safety';
+import { useDataTable } from '../useDataTable';
+import { CopyLinkButton } from './CopyLinkButton';
+import { CsvDownloadButton } from './CsvDownloadButton';
+import { DataTable } from './DataTable';
+import { PeriodTabs } from './PeriodTabs';
+import { SectionCard } from './SectionCard';
 
 export function SectionTable({
   doc,
@@ -20,7 +20,7 @@ export function SectionTable({
   periodLabels,
 }: {
   doc: SectionDoc;
-  provenance: Manifest["provenance"];
+  provenance: Manifest['provenance'];
   periodLabels?: Record<string, string>;
 }) {
   const [period, setPeriod] = useState<string | null>(null);

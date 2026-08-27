@@ -5,9 +5,9 @@ A static Vite + React + TypeScript app that renders the versioned JSON data API
 sections, chart sections, bespoke views, and metrics the API lists, so adding
 analytics on the Python side rarely requires frontend changes.
 
-Three kinds of content arrive from the API. *Sections* are tables, rendered
-generically from their column specs. *Chart sections* are PNG galleries with
-their notes and step-by-step methodology. *Views* are the bespoke cases a table
+Three kinds of content arrive from the API. _Sections_ are tables, rendered
+generically from their column specs. _Chart sections_ are PNG galleries with
+their notes and step-by-step methodology. _Views_ are the bespoke cases a table
 cannot express — today the HIP coverage matrix and governance board — which the
 Python side ships as pure data (`export/hip_views.py`) so the component owns
 only the rendering.

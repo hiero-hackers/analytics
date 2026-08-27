@@ -13,10 +13,10 @@ export function TabBar({
   items: string[];
   active: string;
   onSelect: (item: string) => void;
-  kind: "macro" | "tab";
+  kind: 'macro' | 'tab';
 }) {
   return (
-    <nav className={kind === "macro" ? "macrobar" : "tabbar"}>
+    <nav className={kind === 'macro' ? 'macrobar' : 'tabbar'}>
       {items.map((name) => (
         <button
           key={name}

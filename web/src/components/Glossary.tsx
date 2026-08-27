@@ -4,12 +4,12 @@
  * only inline markup the glossary contract allows.
  */
 
-import { Fragment } from "react";
-import type { Glossary as GlossaryData } from "../api";
-import { emphasized } from "../markup";
+import { Fragment } from 'react';
+import type { Glossary as GlossaryData } from '../api';
+import { emphasized } from '../markup';
 
 export function Glossary({ glossary }: { glossary: GlossaryData }) {
-  if (glossary.layout === "notes") {
+  if (glossary.layout === 'notes') {
     // Interpretation notes (e.g. the HIPs tab's HIP-1 reading rules): bolded
     // lead-ins with prose, not the term/definition grid.
     return (

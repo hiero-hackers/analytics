@@ -1,8 +1,6 @@
-"""Tests for the maintainer organisation-diversity analysis."""
+"""Tests for the role-holder organisation-diversity analysis."""
 
 from __future__ import annotations
-
-from datetime import UTC, datetime
 
 import pandas as pd
 
@@ -18,8 +16,8 @@ from hiero_analytics.analysis.affiliation import (
     build_single_employer_team_counts,
     build_team_affiliation_diversity,
     build_team_org_composition,
-    classify_maintainers,
-    filter_active_logins,
+    classify_role_holders,
+    known_share_pct,
     load_affiliations,
     load_manual_logins,
     summarize_affiliation,
@@ -77,12 +75,12 @@ def test_load_manual_logins_detects_marked_rows(tmp_path):
     assert load_manual_logins(tmp_path / "nope.yaml") == set()
 
 
-def test_classify_maintainers_assigns_status():
-    """Each maintainer is labelled affiliated, independent, or unknown."""
+def test_classify_role_holders_assigns_status():
+    """Each role-holder is labelled affiliated, independent, or unknown."""
     maintainers = {"Alice", "carol", "dave", "zoe"}  # zoe absent -> unknown
     affiliations = {k: v for k, v in _affiliations().items() if v != "?"}
 
-    df = classify_maintainers(maintainers, affiliations)
+    df = classify_role_holders(maintainers, affiliations)
 
     by_login = df.set_index("login")
     assert by_login.loc["Alice", "status"] == "affiliated"
@@ -92,16 +90,16 @@ def test_classify_maintainers_assigns_status():
     assert pd.isna(by_login.loc["zoe", "organisation"])
 
 
-def test_classify_maintainers_matches_login_case_insensitively():
+def test_classify_role_holders_matches_login_case_insensitively():
     """Mixed-case logins still match a lowercased affiliations key."""
-    df = classify_maintainers({"ALICE"}, {"alice": "Hashgraph"})
+    df = classify_role_holders({"ALICE"}, {"alice": "Hashgraph"})
     assert df.iloc[0]["status"] == "affiliated"
     assert df.iloc[0]["organisation"] == "Hashgraph"
 
 
 def test_build_distribution_folds_independents_and_sorts():
     """The distribution pools independents and excludes unknowns, sorted by count."""
-    classified = classify_maintainers(
+    classified = classify_role_holders(
         {"alice", "bob", "carol", "dave", "erin", "zoe"},
         {k: v for k, v in _affiliations().items() if v != "?"},
     )
@@ -115,51 +113,98 @@ def test_build_distribution_folds_independents_and_sorts():
     assert "?" not in set(dist["organisation"])
 
 
+def test_build_distribution_names_the_value_column_for_the_role():
+    """A non-maintainer role gets its own value column, same shape and ordering."""
+    classified = classify_role_holders(
+        {"alice", "bob", "carol"}, {k: v for k, v in _affiliations().items() if v != "?"}
+    )
+
+    dist = build_affiliation_distribution(classified, value_col="committers")
+
+    assert list(dist.columns) == ["organisation", "committers"]
+    assert dist[dist["organisation"] == "Hashgraph"]["committers"].iloc[0] == 2
+
+
+def test_build_distribution_can_show_unknowns_as_their_own_band():
+    """With include_unknown the unmapped are a band, so the chart totals the real population."""
+    classified = classify_role_holders(
+        {"alice", "bob", "carol", "dave", "erin", "zoe"},
+        {k: v for k, v in _affiliations().items() if v != "?"},
+    )
+
+    dist = build_affiliation_distribution(classified, include_unknown=True)
+
+    assert UNKNOWN_LABEL in set(dist["organisation"])
+    assert dist[dist["organisation"] == UNKNOWN_LABEL]["maintainers"].iloc[0] == 1  # zoe
+    assert dist["maintainers"].sum() == 6  # nothing silently dropped
+
+
+def test_build_distribution_omits_the_unknown_band_when_there_are_none():
+    """A fully-curated population gets no Unknown row even when the band is requested."""
+    classified = classify_role_holders({"alice", "bob"}, {"alice": "Hashgraph", "bob": INDEPENDENT})
+
+    dist = build_affiliation_distribution(classified, include_unknown=True)
+
+    assert UNKNOWN_LABEL not in set(dist["organisation"])
+
+
+def test_known_share_pct_reports_curation_coverage():
+    """Known share counts affiliated + independent against the whole population."""
+    classified = classify_role_holders({"alice", "dave", "zoe", "yan"}, {"alice": "Hashgraph", "dave": INDEPENDENT})
+
+    assert known_share_pct(classified) == 50
+    assert known_share_pct(pd.DataFrame(columns=["login", "organisation", "status"])) == 0
+
+
 def test_build_distribution_empty_frame():
     """An empty classification yields an empty distribution."""
     empty = pd.DataFrame(columns=["login", "organisation", "status"])
     assert build_affiliation_distribution(empty).empty
+    assert list(build_affiliation_distribution(empty, value_col="committers").columns) == [
+        "organisation",
+        "committers",
+    ]
 
 
 def test_summarize_counts_and_concentration():
     """Coverage counts and top-org share are computed over the known set."""
-    classified = classify_maintainers(
+    classified = classify_role_holders(
         {"alice", "bob", "carol", "dave", "erin", "zoe"},
         {k: v for k, v in _affiliations().items() if v != "?"},
     )
 
     summary = summarize_affiliation(classified)
 
-    assert summary["maintainers"] == 6
-    assert summary["affiliated"] == 3  # alice, bob, carol
-    assert summary["independent"] == 2  # dave, erin
-    assert summary["unknown"] == 1  # zoe
-    assert summary["distinct_orgs"] == 2  # Hashgraph, LimeChain
-    assert summary["top_org"] == "Hashgraph"
-    assert summary["top_share_pct"] == 40  # 2 of 5 known
+    assert summary.total == 6
+    assert summary.affiliated == 3  # alice, bob, carol
+    assert summary.independent == 2  # dave, erin
+    assert summary.unknown == 1  # zoe
+    assert summary.distinct_orgs == 2  # Hashgraph, LimeChain
+    assert summary.top_org == "Hashgraph"
+    assert summary.top_share_pct == 40  # 2 of 5 known
 
 
 def test_summarize_independents_lower_hhi():
     """Each independent is its own entity, so the independent tail reduces the HHI."""
-    everyone_one_org = classify_maintainers(
+    everyone_one_org = classify_role_holders(
         {"a", "b", "c", "d"}, {"a": "Hashgraph", "b": "Hashgraph", "c": "Hashgraph", "d": "Hashgraph"}
     )
-    mixed = classify_maintainers(
+    mixed = classify_role_holders(
         {"a", "b", "c", "d"},
         {"a": "Hashgraph", "b": "Hashgraph", "c": INDEPENDENT, "d": INDEPENDENT},
     )
 
-    assert summarize_affiliation(everyone_one_org)["hhi"] == 10000  # monopoly
-    assert summarize_affiliation(mixed)["hhi"] < 10000
+    assert summarize_affiliation(everyone_one_org).hhi == 10000  # monopoly
+    assert summarize_affiliation(mixed).hhi < 10000
 
 
 def test_summarize_empty_is_zeroed():
     """Summarising an empty frame returns zeroed metrics, not an error."""
     empty = pd.DataFrame(columns=["login", "organisation", "status"])
     summary = summarize_affiliation(empty)
-    assert summary["maintainers"] == 0
-    assert summary["hhi"] == 0
-    assert summary["top_org"] is None
+    assert summary.total == 0
+    assert summary.hhi == 0
+    assert summary.top_org is None
 
 
 def test_repo_diversity_flags_single_vendor_and_excludes_roleless():
@@ -181,6 +226,35 @@ def test_repo_diversity_flags_single_vendor_and_excludes_roleless():
 def test_repo_diversity_empty_role_lookup():
     """No maintainers anywhere yields an empty, correctly-typed frame."""
     assert build_repo_affiliation_diversity({}, {}).empty
+
+
+def test_repo_diversity_for_a_non_maintainer_role():
+    """Asking for committers counts committer seats under a role-named column."""
+    df = build_repo_affiliation_diversity(_ROLE_LOOKUP, _REPO_AFFILIATIONS, role="committer")
+
+    assert list(df.columns) == [
+        "repo",
+        "committers",
+        "distinct_orgs",
+        "top_org",
+        "top_org_pct",
+        "independent",
+        "unknown",
+        "organisations",
+    ]
+    assert list(df["repo"]) == ["no-maint"]  # the only repo with a committer
+    assert df.iloc[0]["committers"] == 1
+
+
+def test_single_employer_repo_counts_follow_the_role_column():
+    """The capture count reads whichever population column the diversity frame carries."""
+    role_lookup = {"org/captured": {"alice": "committer", "bob": "committer"}}
+    diversity = build_repo_affiliation_diversity(role_lookup, _REPO_AFFILIATIONS, role="committer")
+
+    counts = build_single_employer_repo_counts(diversity, count_col="committers")
+
+    assert list(counts["organisation"]) == ["Hashgraph"]
+    assert counts.iloc[0]["repos"] == 1
 
 
 def test_repo_diversity_top_pct_uses_resolved_denominator():
@@ -449,19 +523,6 @@ def test_org_activity_heatmap_can_include_unknown():
     assert org_hm.iloc[0]["organisation"] == UNKNOWN_LABEL
 
 
-def test_filter_active_logins_keeps_recently_active():
-    """Only logins with activity at or after the cutoff are kept; case-insensitive."""
-    cutoff = datetime(2026, 1, 1, tzinfo=UTC)
-    last_active = {
-        "alice": (datetime(2026, 3, 1, tzinfo=UTC), "Alice"),  # after cutoff -> active
-        "bob": (datetime(2025, 6, 1, tzinfo=UTC), "Bob"),  # before cutoff -> quiet
-        "carol": (datetime(2026, 1, 1, tzinfo=UTC), "Carol"),  # exactly cutoff -> active
-    }
-    active = filter_active_logins({"Alice", "bob", "carol", "dave"}, last_active, cutoff)
-
-    assert active == {"Alice", "carol"}  # dave absent (no activity), bob too old
-
-
 def test_top_n_with_other_folds_the_tail():
     """Beyond top_n, the remaining rows collapse into a single 'Other (k)' row."""
     dist = pd.DataFrame({"organisation": ["A", "B", "C", "D", "E"], "maintainers": [10, 8, 6, 4, 2]})
@@ -476,6 +537,29 @@ def test_top_n_with_other_noop_when_small():
     folded = top_n_with_other(dist, "organisation", "maintainers", top_n=6)
     assert list(folded["organisation"]) == ["B", "A"]  # sorted desc, no Other row
     assert "Other" not in " ".join(folded["organisation"])
+
+
+def test_top_n_with_other_never_folds_a_pinned_band():
+    """A tiny Unknown band survives the fold: the donut promises to show it."""
+    dist = pd.DataFrame(
+        {"organisation": ["A", "B", "C", UNKNOWN_LABEL], "maintainers": [10, 8, 6, 1]},
+    )
+
+    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=2, always_keep=(UNKNOWN_LABEL,))
+
+    assert list(folded["organisation"]) == ["A", "B", UNKNOWN_LABEL, "Other (1)"]
+    # Pinning does not spend the top_n budget, so C alone is what folded away.
+    assert folded[folded["organisation"] == "Other (1)"]["maintainers"].iloc[0] == 6
+    assert folded["maintainers"].sum() == dist["maintainers"].sum()
+
+
+def test_top_n_with_other_pinning_is_a_noop_when_the_band_is_absent():
+    """Nothing to pin means the plain top-N fold, unchanged."""
+    dist = pd.DataFrame({"organisation": ["A", "B", "C"], "maintainers": [10, 8, 6]})
+
+    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=2, always_keep=(UNKNOWN_LABEL,))
+
+    assert list(folded["organisation"]) == ["A", "B", "Other (1)"]
 
 
 def test_load_affiliations_resolves_misiek_blocky_and_seanbohan(tmp_path):

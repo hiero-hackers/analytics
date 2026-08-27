@@ -398,7 +398,17 @@ class ContributorActivityRecord(BaseRecord):
                 )
             )
 
-        for review in (node.get("reviews") or {}).get("nodes") or []:
+        reviews = node.get("reviews") or {}
+        if (reviews.get("pageInfo") or {}).get("hasNextPage"):
+            # The reviews connection caps results at 100 and does not paginate
+            # the inner connection. Surface when a PR exceeds that limit.
+            logger.warning(
+                "PR %s#%s has >100 reviews; only the first 100 were fetched (review history truncated for this PR)",
+                repo_name,
+                pr_number,
+            )
+
+        for review in reviews.get("nodes") or []:
             review_author = _extract_login(review)
             reviewed_at = _parse_dt(review.get("submittedAt"))
             if reviewed_at and (cutoff is None or reviewed_at >= cutoff) and review_author:

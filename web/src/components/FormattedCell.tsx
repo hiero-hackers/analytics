@@ -5,33 +5,33 @@
  * switches.
  */
 
-import type { ColumnFormat } from "../api";
-import { dateStamp } from "../format";
-import { safeUrl } from "../safety";
+import type { ColumnFormat } from '../api';
+import { dateStamp } from '../format';
+import { safeUrl } from '../safety';
 
 // Fixed locale: the dashboard's prose is en, and a deterministic separator
 // keeps snapshots and tests stable across viewer locales.
-const NUMBER_FORMAT = new Intl.NumberFormat("en-US");
+const NUMBER_FORMAT = new Intl.NumberFormat('en-US');
 
 export function FormattedCell({ value, format }: { value: unknown; format?: ColumnFormat }) {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
   const text = String(value);
   switch (format) {
-    case "number": {
+    case 'number': {
       // Separators for legibility; a non-numeric value (older API, junk row)
       // degrades to plain text rather than NaN.
-      const numeric = typeof value === "number" ? value : Number(text);
+      const numeric = typeof value === 'number' ? value : Number(text);
       return <>{Number.isFinite(numeric) ? NUMBER_FORMAT.format(numeric) : text}</>;
     }
-    case "hip":
+    case 'hip':
       return <span className="cell-hip">HIP-{text}</span>;
-    case "date":
+    case 'date':
       // UTC-converted date, full raw timestamp on hover. Conversion, not
       // truncation: slicing an offset-bearing value can misreport the day.
       return <span title={text}>{dateStamp(text)}</span>;
-    case "link": {
+    case 'link': {
       // The href comes from generated data; an unsafe scheme renders as inert
       // text rather than a clickable link.
       const href = safeUrl(text);
@@ -43,20 +43,23 @@ export function FormattedCell({ value, format }: { value: unknown; format?: Colu
         <>{text}</>
       );
     }
-    case "evidence": {
-      const tone = text === "merged" ? "chip-merged" : text === "open_only" ? "chip-open" : "chip-none";
-      return <span className={`chip ${tone}`}>{text.replace("_", " ")}</span>;
+    case 'evidence': {
+      const tone =
+        text === 'merged' ? 'chip-merged' : text === 'open_only' ? 'chip-open' : 'chip-none';
+      return <span className={`chip ${tone}`}>{text.replace('_', ' ')}</span>;
     }
-    case "status":
+    case 'status':
       return <span className="chip chip-spec">{text}</span>;
-    case "flag":
-      return <>{text === "true" || text === "True" ? "✓" : "—"}</>;
-    case "presence": {
+    case 'flag':
+      return <>{text === 'true' || text === 'True' ? '✓' : '—'}</>;
+    case 'presence': {
       // A yes/no column: a labelled chip reads at a glance where a bare tick
       // leaves the reader decoding an empty-looking cell.
-      const present = text === "true" || text === "True";
+      const present = text === 'true' || text === 'True';
       return (
-        <span className={present ? "chip chip-merged" : "chip chip-none"}>{present ? "present" : "missing"}</span>
+        <span className={present ? 'chip chip-merged' : 'chip chip-none'}>
+          {present ? 'present' : 'missing'}
+        </span>
       );
     }
     default:

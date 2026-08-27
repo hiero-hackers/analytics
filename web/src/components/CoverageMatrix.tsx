@@ -9,10 +9,10 @@
  * sortable table.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { MatrixRow, MatrixView } from "../api";
-import type { EvidenceItem } from "./EvidencePanel";
-import { EvidencePanel } from "./EvidencePanel";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { MatrixRow, MatrixView } from '../api';
+import type { EvidenceItem } from './EvidencePanel';
+import { EvidencePanel } from './EvidencePanel';
 
 /** The board's "show in matrix" request; nonce re-triggers repeat jumps. */
 export interface JumpRequest {
@@ -27,13 +27,15 @@ function cellClass(merged: number, open: number, ceilings: number[]): string {
     const bucket = ceilings.findIndex((ceiling) => merged <= ceiling);
     return bucket === -1 ? `m${ceilings.length + 1}` : `m${bucket + 1}`;
   }
-  return open > 0 ? "mo" : "m0";
+  return open > 0 ? 'mo' : 'm0';
 }
 
 /** Everything the legacy row matched its text filter against. */
 function haystack(row: MatrixRow): string {
-  const cells = row.cells.map((cell) => (cell.merged > 0 ? String(cell.merged) : cell.open > 0 ? "○" : "—"));
-  return [row.label, row.sublabel, row.status, row.note.text, ...cells].join(" ").toLowerCase();
+  const cells = row.cells.map((cell) =>
+    cell.merged > 0 ? String(cell.merged) : cell.open > 0 ? '○' : '—',
+  );
+  return [row.label, row.sublabel, row.status, row.note.text, ...cells].join(' ').toLowerCase();
 }
 
 export function CoverageMatrix({
@@ -45,8 +47,8 @@ export function CoverageMatrix({
   evidence: Map<string, EvidenceItem[]>;
   jump: JumpRequest | null;
 }) {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("");
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('');
   const [selected, setSelected] = useState<{ hip: number; repo: string } | null>(null);
   const [flashHip, setFlashHip] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
@@ -55,12 +57,12 @@ export function CoverageMatrix({
   // scrolls to it and flashes it — exactly the legacy behaviour.
   useEffect(() => {
     if (!jump) return;
-    setQuery("");
-    setStatus("");
+    setQuery('');
+    setStatus('');
     setSelected(null);
     setFlashHip(jump.hip);
     const row = tableRef.current?.querySelector(`#hipmx-row-${jump.hip}`);
-    row?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+    row?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
     const timer = setTimeout(() => setFlashHip(null), FLASH_MS);
     return () => clearTimeout(timer);
   }, [jump]);
@@ -68,14 +70,18 @@ export function CoverageMatrix({
   const rows = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return view.rows.filter(
-      (row) => (status === "" || row.status === status) && (needle === "" || haystack(row).includes(needle)),
+      (row) =>
+        (status === '' || row.status === status) &&
+        (needle === '' || haystack(row).includes(needle)),
     );
   }, [view.rows, query, status]);
 
   const selectedItems = selected ? evidence.get(`${selected.hip}|${selected.repo}`) : undefined;
 
   const toggleCell = (hip: number, repo: string) => {
-    setSelected((current) => (current && current.hip === hip && current.repo === repo ? null : { hip, repo }));
+    setSelected((current) =>
+      current && current.hip === hip && current.repo === repo ? null : { hip, repo },
+    );
   };
 
   return (
@@ -93,8 +99,8 @@ export function CoverageMatrix({
             <button
               key={option}
               type="button"
-              className={option === status ? "hipmx-fbtn active" : "hipmx-fbtn"}
-              onClick={() => setStatus((current) => (current === option ? "" : option))}
+              className={option === status ? 'hipmx-fbtn active' : 'hipmx-fbtn'}
+              onClick={() => setStatus((current) => (current === option ? '' : option))}
             >
               {option}
             </button>
@@ -125,7 +131,11 @@ export function CoverageMatrix({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.key} id={`hipmx-row-${row.key}`} className={row.key === flashHip ? "flash" : undefined}>
+              <tr
+                key={row.key}
+                id={`hipmx-row-${row.key}`}
+                className={row.key === flashHip ? 'flash' : undefined}
+              >
                 <th>
                   {row.label}
                   <small>{row.sublabel}</small>
@@ -145,7 +155,7 @@ export function CoverageMatrix({
                   return (
                     <td
                       key={cell.key}
-                      className={`${heat} ck${isSelected ? " sel" : ""}`}
+                      className={`${heat} ck${isSelected ? ' sel' : ''}`}
                       title={
                         cell.merged > 0
                           ? `${cell.merged} merged PRs — click for the list`
@@ -154,23 +164,23 @@ export function CoverageMatrix({
                       {...(clickable && {
                         onClick: () => toggleCell(row.key, cell.key),
                         onKeyDown: (event: React.KeyboardEvent) => {
-                          if (event.key === "Enter" || event.key === " ") {
+                          if (event.key === 'Enter' || event.key === ' ') {
                             event.preventDefault();
                             toggleCell(row.key, cell.key);
                           }
                         },
                         tabIndex: 0,
-                        role: "button",
+                        role: 'button',
                       })}
                     >
-                      {cell.merged > 0 ? cell.merged : "○"}
+                      {cell.merged > 0 ? cell.merged : '○'}
                     </td>
                   );
                 })}
                 <td className="hipmx-gaps">
-                  {row.note.kind === "complete" ? (
+                  {row.note.kind === 'complete' ? (
                     <span className="ok">{row.note.text}</span>
-                  ) : row.note.kind === "none" ? (
+                  ) : row.note.kind === 'none' ? (
                     <span className="none">{row.note.text}</span>
                   ) : (
                     row.note.text
@@ -189,7 +199,8 @@ export function CoverageMatrix({
         {view.ramp.map((_shade, index) => (
           <i key={index} className={`m${index + 1}`} />
         ))}
-        more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no reference found
+        more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no
+        reference found
       </div>
       {selected && selectedItems && (
         <EvidencePanel

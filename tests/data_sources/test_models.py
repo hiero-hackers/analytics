@@ -1,5 +1,6 @@
 """Tests for normalized GitHub data record models."""
 
+import logging
 from dataclasses import FrozenInstanceError
 from datetime import datetime
 
@@ -157,6 +158,51 @@ def test_contributor_activity_record_from_issue_node():
             target_author="dana",
         )
     ]
+
+
+def test_contributor_activity_warns_when_reviews_are_truncated(caplog):
+    """Contributor activity should warn when a PR has more than 100 reviews."""
+    node = {
+        "number": 42,
+        "createdAt": "2024-01-02T00:00:00Z",
+        "author": {"login": "dana"},
+        "reviews": {
+            "pageInfo": {"hasNextPage": True},
+            "nodes": [],
+        },
+    }
+    context = {
+        "owner": "org",
+        "repo": "repo",
+    }
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.data_sources.models"):
+        ContributorActivityRecord.from_github_node(node, context)
+
+    assert len(caplog.records) == 1
+    assert "org/repo#42" in caplog.records[0].message
+
+
+def test_contributor_activity_does_not_warn_when_reviews_are_not_truncated(caplog):
+    """Contributor activity should not warn when all reviews were fetched."""
+    node = {
+        "number": 42,
+        "createdAt": "2024-01-02T00:00:00Z",
+        "author": {"login": "dana"},
+        "reviews": {
+            "pageInfo": {"hasNextPage": False},
+            "nodes": [],
+        },
+    }
+    context = {
+        "owner": "org",
+        "repo": "repo",
+    }
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.data_sources.models"):
+        ContributorActivityRecord.from_github_node(node, context)
+
+    assert not caplog.records
 
 
 def test_issue_timeline_event_record_creation():

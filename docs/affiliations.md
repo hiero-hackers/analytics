@@ -1,9 +1,9 @@
-# Maintainer affiliations
+# Role-holder affiliations
 
-How the analytics decides **which organisation each maintainer belongs to**, and how to
-correct it by hand. This powers the *Organisation diversity* charts and tables in the
-dashboard (who employs the maintainers, per-repo and per-team concentration, the activity
-heatmaps by organisation, and the affiliations reference table).
+How the analytics decides **which organisation each governance role-holder belongs to**, and
+how to correct it by hand. This powers the *Organisation diversity* charts and tables in the
+dashboard (who employs the maintainers and the committers, per-repo and per-team
+concentration, the activity heatmaps by organisation, and the affiliations reference tables).
 
 ## Source of truth
 
@@ -19,8 +19,15 @@ daniela-barbosa: "?"             # maintainer · Daniela Barbosa
 - **Value** — an organisation name, `"Independent"` (a solo contributor with no employer),
   or `"?"` (unknown — no public signal yet).
 - **Comment** — `governance-role · name`, for readability. The role tag (`maintainer` /
-  `committer` / `triage` / `team`) is informational; only the **104 maintainers** feed the
-  maintainer-org charts, the rest are here so the team-concentration view is fully covered.
+  `committer` / `triage` / `team`) is informational; the charts derive each person's role
+  from the live governance config, not from this comment.
+
+The *Organisation diversity* charts are split into **role tabs**. Each tab draws a disjoint
+population, keyed on the person's *highest* role anywhere in the org, so nobody is counted
+twice: the **104 maintainers** on the Maintainers tab, and the **133 people whose ceiling is
+write access** on the Committers tab. Curation coverage differs sharply between them —
+maintainers are **98%** resolved, committers **78%** — so each chart states its own known
+share and draws the unresolved as an explicit *Unknown* band rather than hiding them.
 
 The dashboard reads this file directly (offline) — no network needed at render time.
 
@@ -75,8 +82,10 @@ A manual row:
 
 The unknowns are the `"?"` rows (status `unknown`). To work through them:
 
-1. **Get the worklist** — filter the *Maintainer affiliations* table by `status = unknown`, or
-   `grep ': "?"' src/hiero_analytics/data/affiliations.yaml`. Each row's comment has the name.
+1. **Get the worklist** — filter the *Maintainer affiliations* or *Committer affiliations*
+   table by `status = unknown`, or `grep ': "?"' src/hiero_analytics/data/affiliations.yaml`.
+   Each row's comment has the name. The committer roster is where the bulk of the remaining
+   unknowns sit, and it is the one the *Unknown* band on the Committers tab is measuring.
 2. **Find their employer** — check the gitignored audit CSV
    (`outputs/data/org/<org>/maintainer_affiliation_audit.csv`); it lists each unknown's weak
    signals: an unmapped org membership, a **LinkedIn URL** pointer, redacted email domains.

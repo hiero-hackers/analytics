@@ -77,7 +77,9 @@ CLI_ONLY_CHARTS = {
 # artifact; the CSV is its exportable source) and non-dashboard reports.
 CHART_COMPANION_CSVS = {
     "affiliation_distribution.csv",
+    "affiliation_distribution_committers.csv",
     "repo_affiliation_composition.csv",
+    "repo_affiliation_composition_committers.csv",
     "team_affiliation_composition.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
     "contributor_activity_heatmap.csv",
@@ -209,8 +211,10 @@ GOVERNANCE = {
         # (which need >= 4 resolved members) render in both All and Active views.
         {"name": "core", "maintainers": [], "members": ["alice", "bob", "carol", "dave", "erin"]},
         # Write- and triage-permission teams so the committer and triage role
-        # networks (Governance tab) have holders to render.
-        {"name": "sdk-devs", "maintainers": [], "members": ["bob", "dave"]},
+        # networks (Governance tab) have holders to render. frank and grace hold
+        # write and nothing higher, so the committer role tab on the
+        # organisation-diversity card has a population of its own.
+        {"name": "sdk-devs", "maintainers": [], "members": ["bob", "dave", "frank", "grace"]},
         {"name": "triagers", "maintainers": [], "members": ["erin"]},
     ],
     "repositories": [
@@ -228,6 +232,8 @@ AFFILIATIONS = {
     "carol": "Independent",
     "dave": "Beta LLC",
     "erin": "Acme Corp",
+    "frank": "Acme Corp",
+    "grace": "Acme Corp",
 }
 
 ISSUES = [

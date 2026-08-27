@@ -6,7 +6,7 @@
  * the data API.
  */
 
-import { emphasized } from "../markup";
+import { emphasized } from '../markup';
 
 export interface ChartInfoProps {
   note?: string;

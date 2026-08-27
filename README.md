@@ -179,7 +179,7 @@ To avoid re-downloading all of GitHub history on every run, fetching is **increm
 ## Documentation
 
 - [**Architecture**](docs/architecture.md) — the layer map, the two extensibility registries, the fetch/persistence model, and where new features go. Start here to understand the codebase.
-- [**Maintainer affiliations**](docs/affiliations.md) — how each maintainer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
+- [**Role-holder affiliations**](docs/affiliations.md) — how each maintainer and committer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
 - [**Snapshot archive**](docs/snapshots.md) — every refresh's data API is archived to the `data/snapshots` branch, so the dashboard's history is queryable and diffable. How to read a past snapshot, and how to build on it.
 
 ---

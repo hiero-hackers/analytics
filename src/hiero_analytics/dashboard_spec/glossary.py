@@ -96,7 +96,22 @@ TERMS: dict[str, str] = {
     "independent": "people with no named employer: solo contributors, or personal-email-only signals.",
     "unknown": (
         "people no public signal could place. Not the same as independent — it means *we could not tell*, "
-        "so they are excluded from share calculations rather than counted as solo."
+        "so they are excluded from the share and concentration calculations rather than counted as solo. "
+        "The organisation-diversity charts still show them as their own band, and state what share of the "
+        "population is known, so nothing is silently dropped."
+    ),
+    "committer": (
+        "in the committer affiliations table, a person whose *highest* role anywhere is committer — write "
+        "access in at least one repository and a maintainer seat in none. Disjoint from the maintainer "
+        "table by construction, so the two role tabs never count the same person twice."
+    ),
+    "role tabs": (
+        "on the organisation-diversity charts, whether you are looking at maintainers or committers. The "
+        "two populations are disjoint (each person counts at their highest role), so the committer tab is "
+        "the bench beneath the maintainers — if it spans more employers than the maintainer tab, diversity "
+        "is more likely to improve as people are promoted. Curation is thinner for committers, so read its "
+        "unknown band and stated known-share before drawing conclusions. The team charts have no role tabs: "
+        "team membership is not a permission."
     ),
     "organisation mix": "the employers present in the group, largest first.",
 }

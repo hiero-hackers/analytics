@@ -4,7 +4,7 @@
  * wired in. Any view rendering API rows builds its table through this.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -12,14 +12,14 @@ import {
   getSortedRowModel,
   useReactTable,
   type Table,
-} from "@tanstack/react-table";
-import type { ColumnSpec, Row } from "./api";
-import { FormattedCell } from "./components/FormattedCell";
+} from '@tanstack/react-table';
+import type { ColumnSpec, Row } from './api';
+import { FormattedCell } from './components/FormattedCell';
 
 // Column meta this app attaches: whether the column holds numbers, which earns
 // it tabular figures so digits keep a constant width. Alignment itself is not
 // per-column — every cell centres (see the `th`/`td` rules).
-declare module "@tanstack/react-table" {
+declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interface merging requires the type params
   interface ColumnMeta<TData, TValue> {
     numeric?: boolean;
@@ -29,12 +29,12 @@ declare module "@tanstack/react-table" {
 /** Sortable value: raw for numbers, string otherwise (matches legacy sort). */
 function sortableValue(row: Row, key: string): number | string {
   const value = row[key];
-  if (typeof value === "number") return value;
-  return value === null || value === undefined ? "" : String(value);
+  if (typeof value === 'number') return value;
+  return value === null || value === undefined ? '' : String(value);
 }
 
 export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: string): Table<Row> {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState('');
   const helper = createColumnHelper<Row>();
   const tableColumns = useMemo(
     () =>
@@ -42,8 +42,10 @@ export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: str
         helper.accessor((row) => sortableValue(row, spec.key), {
           id: spec.key,
           header: spec.label,
-          cell: (context) => <FormattedCell value={context.row.original[spec.key]} format={spec.format} />,
-          meta: { numeric: spec.format === "number" },
+          cell: (context) => (
+            <FormattedCell value={context.row.original[spec.key]} format={spec.format} />
+          ),
+          meta: { numeric: spec.format === 'number' },
         }),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- columns derive from the key

@@ -1,7 +1,7 @@
 /** Rolling-period selector for tables and future charts. */
 
 const TAB =
-  "cursor-pointer whitespace-nowrap rounded-md border-0 px-3 py-1.5 text-[13px] [font:inherit]";
+  'cursor-pointer whitespace-nowrap rounded-md border-0 px-3 py-1.5 text-[13px] [font:inherit]';
 const IDLE = `${TAB} bg-transparent text-muted hover:bg-raise hover:text-ink`;
 const ACTIVE = `${TAB} bg-accent font-semibold text-on-accent shadow-sm`;
 

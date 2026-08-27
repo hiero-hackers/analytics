@@ -1,8 +1,12 @@
-"""Maintainer organisation-diversity analysis.
+"""Role-holder organisation-diversity analysis.
 
 Reads the curated ``data/affiliations.yaml`` mapping (login -> organisation) and,
-given the current maintainer set, classifies each maintainer and builds the
-distribution + concentration metrics for the organisation-diversity chart.
+given the current holders of a governance role, classifies each holder and builds
+the distribution + concentration metrics for the organisation-diversity charts.
+
+The builders are role-agnostic: pass the role (or the value-column name derived
+from it) and the same code serves maintainers, committers or triage. Maintainer
+remains the default so the existing output surface is unchanged.
 
 Independents (people with an identity but no corporate employer) count *toward*
 diversity: in the concentration measure each is its own singleton entity, so a
@@ -14,12 +18,13 @@ from __future__ import annotations
 import logging
 import re
 from collections import Counter
+from collections.abc import Collection
+from dataclasses import dataclass
 
 import pandas as pd
 import yaml
 
 from hiero_analytics.config.paths import SRC
-from hiero_analytics.domain.recency import is_active_since
 from hiero_analytics.domain.repos import bare_repo
 
 _HEATMAP_META = {"contributor name", "role", "activity score"}
@@ -32,18 +37,36 @@ UNKNOWN_LABEL = "Unknown"
 OTHER_LABEL = "Other orgs"
 _UNKNOWN_VALUES = {"", "?", "unknown", "none"}
 
-DISTRIBUTION_COLUMNS = ["organisation", "maintainers"]
+DEFAULT_ROLE = "maintainer"
+
+
+def role_column(role: str) -> str:
+    """Column/keyname for a role's population count, e.g. ``maintainer`` -> ``maintainers``."""
+    return f"{role}s"
+
+
+def distribution_columns(value_col: str = "maintainers") -> list[str]:
+    """Column order for an affiliation-distribution frame counting ``value_col``."""
+    return ["organisation", value_col]
+
+
+def repo_diversity_columns(count_col: str = "maintainers") -> list[str]:
+    """Column order for a per-repo diversity frame whose population column is ``count_col``."""
+    return [
+        "repo",
+        count_col,
+        "distinct_orgs",
+        "top_org",
+        "top_org_pct",
+        "independent",
+        "unknown",
+        "organisations",
+    ]
+
+
+DISTRIBUTION_COLUMNS = distribution_columns()
 CLASSIFIED_COLUMNS = ["login", "organisation", "status"]
-REPO_DIVERSITY_COLUMNS = [
-    "repo",
-    "maintainers",
-    "distinct_orgs",
-    "top_org",
-    "top_org_pct",
-    "independent",
-    "unknown",
-    "organisations",
-]
+REPO_DIVERSITY_COLUMNS = repo_diversity_columns()
 TEAM_DIVERSITY_COLUMNS = [
     "team",
     "members",
@@ -96,14 +119,15 @@ def load_manual_logins(path=AFFILIATIONS_PATH) -> set[str]:
     return manual
 
 
-def classify_maintainers(maintainers: set[str], affiliations: dict[str, str]) -> pd.DataFrame:
-    """One row per maintainer: login, organisation, status.
+def classify_role_holders(logins: set[str], affiliations: dict[str, str]) -> pd.DataFrame:
+    """One row per role-holder: login, organisation, status.
 
     status is ``affiliated`` (named employer), ``independent`` (solo / no
-    employer), or ``unknown`` (no entry in the affiliations map).
+    employer), or ``unknown`` (no entry in the affiliations map). The caller
+    decides which role the ``logins`` set represents.
     """
     rows: list[dict[str, object]] = []
-    for login in sorted(maintainers):
+    for login in sorted(logins):
         org = affiliations.get(login.lower())
         if not org:
             rows.append({"login": login, "organisation": None, "status": "unknown"})
@@ -114,36 +138,74 @@ def classify_maintainers(maintainers: set[str], affiliations: dict[str, str]) ->
     return pd.DataFrame(rows, columns=CLASSIFIED_COLUMNS)
 
 
-def build_affiliation_distribution(classified: pd.DataFrame) -> pd.DataFrame:
-    """Chart frame (organisation, maintainers) over the *known* set.
+def build_affiliation_distribution(
+    classified: pd.DataFrame,
+    *,
+    value_col: str = "maintainers",
+    include_unknown: bool = False,
+) -> pd.DataFrame:
+    """Chart frame (organisation, ``value_col``) over the role-holder population.
 
-    Named employers each get a row counting their maintainers; all independents
+    Named employers each get a row counting their role-holders; all independents
     fold into a single ``Independent`` row (the chart shows the size of the
-    diverse tail). Unknowns are excluded. Sorted by count, descending.
+    diverse tail). With ``include_unknown`` the unmapped holders form their own
+    ``Unknown`` band rather than vanishing, so the chart's total is the real
+    population — the composition charts already work this way. Sorted by count,
+    descending.
     """
+    columns = distribution_columns(value_col)
     if classified.empty:
-        return pd.DataFrame(columns=DISTRIBUTION_COLUMNS)
+        return pd.DataFrame(columns=columns)
 
-    known = classified[classified["status"] != "unknown"]
-    if known.empty:
-        return pd.DataFrame(columns=DISTRIBUTION_COLUMNS)
+    population = classified.copy()
+    if include_unknown:
+        population.loc[population["status"] == "unknown", "organisation"] = UNKNOWN_LABEL
+    else:
+        population = population[population["status"] != "unknown"]
+    if population.empty:
+        return pd.DataFrame(columns=columns)
 
     counts = (
-        known.groupby("organisation")["login"]
+        population.groupby("organisation")["login"]
         .nunique()
-        .reset_index(name="maintainers")
-        .sort_values("maintainers", ascending=False, kind="stable")
+        .reset_index(name=value_col)
+        .sort_values(value_col, ascending=False, kind="stable")
         .reset_index(drop=True)
     )
-    return counts[DISTRIBUTION_COLUMNS]
+    return counts[columns]
 
 
-def summarize_affiliation(classified: pd.DataFrame) -> dict[str, object]:
+def known_share_pct(classified: pd.DataFrame) -> int:
+    """Percentage of the population whose affiliation is curated (0 when empty).
+
+    Quoted alongside any chart that shows an ``Unknown`` band, so a reader can
+    weigh the shares against how much of the roster is actually resolved.
+    """
+    total = len(classified)
+    if not total:
+        return 0
+    return round(100 * int((classified["status"] != "unknown").sum()) / total)
+
+
+@dataclass(frozen=True)
+class AffiliationSummary:
+    """Coverage counts and concentration for one population of role-holders."""
+
+    total: int
+    affiliated: int
+    independent: int
+    unknown: int
+    distinct_orgs: int
+    hhi: int
+    top_org: str | None
+    top_share_pct: int
+
+
+def summarize_affiliation(classified: pd.DataFrame) -> AffiliationSummary:
     """Coverage counts plus concentration (HHI) over the known set.
 
     HHI treats each independent as its own singleton entity, so independents
-    push concentration down. Returns a dict of plain numbers for logging /
-    headline metrics.
+    push concentration down.
     """
     total = len(classified)
     by_status = classified["status"].value_counts().to_dict() if total else {}
@@ -162,36 +224,50 @@ def summarize_affiliation(classified: pd.DataFrame) -> dict[str, object]:
     employer_counts = known[known["status"] == "affiliated"]["organisation"].value_counts()
     entity_counts = Counter(entities)
     hhi = round(10000 * sum((n / known_total) ** 2 for n in entity_counts.values())) if known_total else 0
-    top_org = employer_counts.index[0] if not employer_counts.empty else None
+    top_org = str(employer_counts.index[0]) if not employer_counts.empty else None
     top_share = round(100 * int(employer_counts.iloc[0]) / known_total) if known_total and top_org else 0
 
-    return {
-        "maintainers": total,
-        "affiliated": affiliated,
-        "independent": independent,
-        "unknown": unknown,
-        "distinct_orgs": int(employer_counts.size),
-        "hhi": hhi,
-        "top_org": top_org,
-        "top_share_pct": top_share,
-    }
+    return AffiliationSummary(
+        total=total,
+        affiliated=affiliated,
+        independent=independent,
+        unknown=unknown,
+        distinct_orgs=int(employer_counts.size),
+        hhi=hhi,
+        top_org=top_org,
+        top_share_pct=top_share,
+    )
 
 
-def top_n_with_other(distribution: pd.DataFrame, label_col: str, value_col: str, *, top_n: int = 6) -> pd.DataFrame:
+def top_n_with_other(
+    distribution: pd.DataFrame,
+    label_col: str,
+    value_col: str,
+    *,
+    top_n: int = 6,
+    always_keep: Collection[str] = (),
+) -> pd.DataFrame:
     """Fold a distribution to its top-N rows plus a single ``Other (k)`` row.
 
     Keeps a donut readable: the largest ``top_n`` slices stay, the rest collapse
-    into one. Returns the frame unchanged when it already has ``top_n`` rows or fewer.
+    into one. Labels in ``always_keep`` survive the fold however small they are,
+    so a band the chart promises to show (``Unknown``) cannot silently disappear
+    into ``Other``; they do not consume the ``top_n`` budget. Returns the frame
+    unchanged when it already has ``top_n`` rows or fewer.
     """
     if distribution.empty:
         return distribution
     ordered = distribution.sort_values(value_col, ascending=False).reset_index(drop=True)
     if len(ordered) <= top_n:
         return ordered
-    head = ordered.head(top_n)
-    tail = ordered.iloc[top_n:]
+    pinned = ordered[label_col].isin(always_keep)
+    rest = ordered[~pinned]
+    kept = pd.concat([rest.head(top_n), ordered[pinned]]).sort_values(value_col, ascending=False)
+    tail = rest.iloc[top_n:]
+    if tail.empty:
+        return kept.reset_index(drop=True)
     other = pd.DataFrame([{label_col: f"Other ({len(tail)})", value_col: int(tail[value_col].sum())}])
-    return pd.concat([head, other], ignore_index=True)
+    return pd.concat([kept, other], ignore_index=True)
 
 
 def build_org_activity_heatmap(contributor_heatmap, affiliations, *, include_unknown=False):
@@ -226,23 +302,7 @@ def build_org_activity_heatmap(contributor_heatmap, affiliations, *, include_unk
     )
 
 
-def filter_active_logins(logins, last_active, cutoff):
-    """Subset of ``logins`` whose most recent activity is at or after ``cutoff``.
-
-    ``last_active`` is ``{login_lower: (datetime, display_login)}`` as produced by
-    ``latest_activity_by_account``. A login with no recorded activity is treated
-    as inactive. Used to measure diversity over the maintainers who actually hold
-    the keys day-to-day, not just the nominal roster.
-    """
-    active = set()
-    for login in logins:
-        entry = last_active.get(login.lower())
-        if entry and is_active_since(entry[0], cutoff):
-            active.add(login)
-    return active
-
-
-def _repo_maintainers(role_lookup: dict[str, dict[str, str]], role: str) -> dict[str, set[str]]:
+def _repo_role_holders(role_lookup: dict[str, dict[str, str]], role: str) -> dict[str, set[str]]:
     """Map bare repo name -> set of logins holding ``role`` there (non-empty repos only)."""
     repos: dict[str, set[str]] = {}
     for repo, holders in role_lookup.items():
@@ -256,7 +316,7 @@ def build_repo_affiliation_diversity(
     role_lookup: dict[str, dict[str, str]],
     affiliations: dict[str, str],
     *,
-    role: str = "maintainer",
+    role: str = DEFAULT_ROLE,
 ) -> pd.DataFrame:
     """Per-repo organisational diversity of a repo's ``role``-holders.
 
@@ -265,22 +325,24 @@ def build_repo_affiliation_diversity(
     counts. A repo where every holder shares one employer (``distinct_orgs`` 1)
     is an organisational bus-factor even when the org-wide picture looks diverse.
     Sorted single-employer-first (then most holders), so capture risk surfaces.
+    The population column is named for the role (``maintainers``, ``committers``).
     """
+    count_col = role_column(role)
     rows: list[dict[str, object]] = []
-    for repo, logins in _repo_maintainers(role_lookup, role).items():
-        classified = classify_maintainers(logins, affiliations)
+    for repo, logins in _repo_role_holders(role_lookup, role).items():
+        classified = classify_role_holders(logins, affiliations)
         employer_counts = classified[classified["status"] == "affiliated"]["organisation"].value_counts()
         independent = int((classified["status"] == "independent").sum())
         unknown = int((classified["status"] == "unknown").sum())
         top_org = employer_counts.index[0] if not employer_counts.empty else None
-        # Share of *resolved* maintainers (unknowns excluded) — the same statistic
+        # Share of *resolved* holders (unknowns excluded) — the same statistic
         # as the team table's "largest org %", so the two tables read alike.
         resolved = len(logins) - unknown
         top_pct = round(100 * int(employer_counts.iloc[0]) / resolved) if not employer_counts.empty and resolved else 0
         rows.append(
             {
                 "repo": repo,
-                "maintainers": len(logins),
+                count_col: len(logins),
                 "distinct_orgs": int(employer_counts.size),
                 "top_org": top_org,
                 "top_org_pct": top_pct,
@@ -290,10 +352,10 @@ def build_repo_affiliation_diversity(
             }
         )
 
-    df = pd.DataFrame(rows, columns=REPO_DIVERSITY_COLUMNS)
+    df = pd.DataFrame(rows, columns=repo_diversity_columns(count_col))
     if df.empty:
         return df
-    return df.sort_values(["distinct_orgs", "maintainers"], ascending=[True, False]).reset_index(drop=True)
+    return df.sort_values(["distinct_orgs", count_col], ascending=[True, False]).reset_index(drop=True)
 
 
 def _build_org_composition(
@@ -353,17 +415,17 @@ def build_repo_org_composition(
     role_lookup: dict[str, dict[str, str]],
     affiliations: dict[str, str],
     *,
-    role: str = "maintainer",
+    role: str = DEFAULT_ROLE,
     top_n: int = 6,
 ) -> tuple[pd.DataFrame, list[str]]:
-    """Per-repo maintainer counts split by employer, for a stacked composition chart.
+    """Per-repo role-holder counts split by employer, for a stacked composition chart.
 
     The ``top_n`` employers (by total seats across repos) get their own column;
     the rest pool into ``Other orgs``. Independents and unknowns get their own
-    columns so each bar's length is the repo's full maintainer count. Returns
+    columns so each bar's length is the repo's full holder count. Returns
     ``(frame, segment_columns)`` with segments ordered for stacking.
     """
-    groups = list(_repo_maintainers(role_lookup, role).items())
+    groups = list(_repo_role_holders(role_lookup, role).items())
     return _build_org_composition(groups, affiliations, label_col="repo", top_n=top_n)
 
 
@@ -413,32 +475,32 @@ def build_team_affiliation_diversity(
     for team, members in team_membership.items():
         if len(members) < min_members:
             continue
-        classified = classify_maintainers(set(members), affiliations)
+        classified = classify_role_holders(set(members), affiliations)
         summary = summarize_affiliation(classified)
-        resolved = int(summary["affiliated"]) + int(summary["independent"])
+        resolved = summary.affiliated + summary.independent
         # Full org breakdown, e.g. "Hashgraph 5, LimeChain 2, Independent 1".
         employer_counts = classified[classified["status"] == "affiliated"]["organisation"].value_counts()
         mix = [f"{org} {int(n)}" for org, n in employer_counts.items()]
-        if summary["independent"]:
-            mix.append(f"Independent {int(summary['independent'])}")
+        if summary.independent:
+            mix.append(f"Independent {summary.independent}")
         rows.append(
             {
                 "team": team,
-                "members": int(summary["maintainers"]),
+                "members": summary.total,
                 "resolved": resolved,
-                "distinct_orgs": int(summary["distinct_orgs"]),
-                "top_org": summary["top_org"],
-                "top_org_pct": int(summary["top_share_pct"]),
-                "hhi": int(summary["hhi"]),
-                "unknown": int(summary["unknown"]),
+                "distinct_orgs": summary.distinct_orgs,
+                "top_org": summary.top_org,
+                "top_org_pct": summary.top_share_pct,
+                "hhi": summary.hhi,
+                "unknown": summary.unknown,
                 # One employer holds every resolved seat (no independents) -> capture
                 # risk. Teams where unmapped members outnumber resolved ones are not
                 # flagged: too little of the team is known to call it captured.
                 "single_employer": (
-                    summary["distinct_orgs"] == 1
+                    summary.distinct_orgs == 1
                     and resolved >= 2
-                    and summary["independent"] == 0
-                    and resolved >= int(summary["unknown"])
+                    and summary.independent == 0
+                    and resolved >= summary.unknown
                 ),
                 "organisations": ", ".join(mix),
             }
@@ -467,18 +529,18 @@ def build_single_employer_team_counts(team_diversity: pd.DataFrame) -> pd.DataFr
     )
 
 
-def build_single_employer_repo_counts(repo_diversity: pd.DataFrame) -> pd.DataFrame:
+def build_single_employer_repo_counts(repo_diversity: pd.DataFrame, *, count_col: str = "maintainers") -> pd.DataFrame:
     """Count single-employer repositories by the org that holds them (chart frame).
 
-    A repo is single-employer when every *resolved* maintainer shares one employer
+    A repo is single-employer when every *resolved* holder shares one employer
     (no independents) and there are at least two of them — the repo-level analogue
-    of a captured team. Repos where unmapped maintainers outnumber resolved ones
+    of a captured team. Repos where unmapped holders outnumber resolved ones
     are not flagged: too little of the repo's roster is known to call it captured.
     """
     cols = ["organisation", "repos"]
     if repo_diversity.empty:
         return pd.DataFrame(columns=cols)
-    resolved = repo_diversity["maintainers"] - repo_diversity["unknown"]
+    resolved = repo_diversity[count_col] - repo_diversity["unknown"]
     single = (
         (repo_diversity["distinct_orgs"] == 1)
         & (repo_diversity["independent"] == 0)

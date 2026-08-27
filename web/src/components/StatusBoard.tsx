@@ -4,8 +4,8 @@
  * bar's button jumps to the entity's row in the target view (the matrix).
  */
 
-import { useState } from "react";
-import type { BoardItem, BoardView } from "../api";
+import { useState } from 'react';
+import type { BoardItem, BoardView } from '../api';
 
 export function StatusBoard({ view, onJump }: { view: BoardView; onJump: (hip: number) => void }) {
   const [picked, setPicked] = useState<BoardItem | null>(null);
@@ -24,7 +24,7 @@ export function StatusBoard({ view, onJump }: { view: BoardView; onJump: (hip: n
                 <button
                   key={item.key}
                   type="button"
-                  className={picked?.key === item.key ? "hipchip active" : "hipchip"}
+                  className={picked?.key === item.key ? 'hipchip active' : 'hipchip'}
                   title={`${item.title} · ${item.status}`}
                   onClick={() => setPicked((current) => (current?.key === item.key ? null : item))}
                 >
