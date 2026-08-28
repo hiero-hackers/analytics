@@ -79,3 +79,81 @@ jobs:
       # The build script runs `tsc -b` first, so this is the typecheck too.
       - name: Typecheck and build
         run: npm run build --prefix web
+
+  # Separate from `web` so the two run in parallel and a browser failure reads
+  # as a browser failure. This layer covers what jsdom structurally cannot: the
+  # built bundle booting, base-relative URLs resolving against real files, and
+  # the page's own Content-Security-Policy.
+  e2e:
+    name: Web dashboard (Playwright smoke)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # This job runs contributor-controlled npm scripts and a browser.
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Keyed on the Playwright version alone: an unrelated lockfile change
+      # should not evict a browser download that is still correct.
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # Restore on every run, but only `main` writes the cache. A pull request
+      # cannot then hand a later run a browser binary of its own choosing —
+      # the same reasoning as the dataset cache in dashboard-preview.yml.
+      - name: Restore the Playwright browser
+        id: browser-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # A restored cache carries the browser but not the system libraries it
+      # links against, which live outside the cached path.
+      - name: Install Chromium system dependencies
+        if: steps.browser-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Save the Playwright browser
+        if: github.event_name == 'push' && steps.browser-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # Builds the app and stages the fixture site itself, via the config's
+      # `webServer` command.
+      - name: Run the smoke suite
+        run: npm run test:e2e
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-traces
+          path: web/test-results
+          retention-days: 7

@@ -18,6 +18,10 @@ export default defineConfig({
     },
   },
   test: {
+    // Scoped to src/ so vitest never collects the Playwright specs: its default
+    // pattern is `**/*.{test,spec}.*`, which would otherwise pull `e2e/` into
+    // `npm test` and fail there for want of a browser.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
     css: false,
