@@ -21,3 +21,10 @@ def is_sha_pinned(reference: str) -> bool:
 def find_unpinned_actions(workflow_text: str) -> list[str]:
     """Return GitHub Actions references that are not pinned to a commit SHA."""
     return [reference for reference in extract_action_references(workflow_text) if not is_sha_pinned(reference)]
+
+
+def check_workflows(
+    workflows: list[dict[str, str]],
+) -> dict[str, list[str]]:
+    """Check workflow files for GitHub Actions that are not SHA pinned."""
+    return {workflow["name"]: find_unpinned_actions(workflow["text"]) for workflow in workflows}
