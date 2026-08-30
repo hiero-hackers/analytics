@@ -26,6 +26,34 @@ import { VariantTabs } from './VariantTabs';
  */
 const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant) => variant.label));
 
+const sharedAxesFor = (charts: ChartSpec[]) => {
+  const counts = new Map<string, number>();
+
+  for (const chart of charts) {
+    if (chart.variants.length > 1) {
+      const key = axisOf(chart);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  }
+
+  return charts
+    .filter((chart) => chart.variants.length > 1 && (counts.get(axisOf(chart)) ?? 0) > 1)
+    .map((chart) => ({
+      key: axisOf(chart),
+      labels: chart.variants.map((variant) => variant.label),
+    }))
+    .filter((axis, index, all) => all.findIndex((other) => other.key === axis.key) === index);
+};
+
+function activeVariant(chart: ChartSpec, variant: number) {
+  return chart.variants[Math.min(variant, chart.variants.length - 1)];
+}
+
+function chartAlt(chart: ChartSpec, variant: number) {
+  const active = activeVariant(chart, variant);
+  return chart.variants.length > 1 ? `${chart.title} — ${active.label}` : chart.title;
+}
+
 function Figure({
   chart,
   onZoom,
@@ -40,11 +68,12 @@ function Figure({
   stretch?: boolean;
   /** Set when the card owns this chart's axis: it renders one tab row for all
    *  the charts that share it, so this figure shows none of its own. */
-  axis?: { index: number; onSelect: (index: number) => void };
+  axis?: { index: number };
 }) {
   const [own, setOwn] = useState(0);
   const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
-  const active = chart.variants[variant];
+  const active = activeVariant(chart, variant);
+  const alt = chartAlt(chart, variant);
   // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
   // the `wide` scroll-box treatment would shrink it to the box height instead.
   // It gets the full row with natural page flow: the dimensions ship with the
@@ -56,7 +85,7 @@ function Figure({
   const img = (
     <img
       src={chartUrl(active.file)}
-      alt={chart.title}
+      alt={alt}
       loading="lazy"
       // Intrinsic size (when known) reserves the aspect-ratio box up front, so
       // a screen of lazy-loading charts doesn't shove content around as each
@@ -94,37 +123,27 @@ export function ChartSectionCard({
   // One selection per shared axis, keyed by its label set.
   const [shared, setShared] = useState<Record<string, number>>({});
 
-  const onZoom = (chart: ChartSpec, variant: number) =>
+  const onZoom = (chart: ChartSpec, variant: number) => {
+    const active = activeVariant(chart, variant);
+
     setZoom({
-      src: chartUrl(chart.variants[variant].file),
-      alt: chart.title,
+      src: chartUrl(active.file),
+      alt: chartAlt(chart, variant),
       // The tab's own text where it has one: on a role-tabbed chart the
       // chart-level note describes maintainers, and showing it on the
       // Committers tab misdescribes the population the reader is looking at.
       note: chart.variants[variant].note ?? chart.note,
-      methodology: chart.variants[variant].methodology ?? chart.methodology,
+      methodology: active.methodology ?? chart.methodology,
     });
+  };
   const count = section.charts.length;
 
   // An axis belongs to the card once two charts offer the same labels; a lone
   // multi-variant chart keeps its own tabs where they sit, under its caption.
-  const axisCounts = new Map<string, number>();
-  for (const chart of section.charts) {
-    if (chart.variants.length > 1) {
-      const axis = axisOf(chart);
-      axisCounts.set(axis, (axisCounts.get(axis) ?? 0) + 1);
-    }
-  }
-  const sharedAxes = section.charts
-    .filter((chart) => chart.variants.length > 1 && (axisCounts.get(axisOf(chart)) ?? 0) > 1)
-    .map((chart) => ({ key: axisOf(chart), labels: chart.variants.map((v) => v.label) }))
-    .filter((axis, index, all) => all.findIndex((other) => other.key === axis.key) === index);
+  const sharedAxes = sharedAxesFor(section.charts);
   const axisFor = (chart: ChartSpec) =>
     sharedAxes.some((axis) => axis.key === axisOf(chart))
-      ? {
-          index: shared[axisOf(chart)] ?? 0,
-          onSelect: (index: number) => setShared({ ...shared, [axisOf(chart)]: index }),
-        }
+      ? { index: shared[axisOf(chart)] ?? 0 }
       : undefined;
 
   // The gallery lays half-width charts out in pairs; full-row charts break the

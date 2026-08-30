@@ -166,7 +166,9 @@ describe('Charts', () => {
     expect(screen.getByRole('button', { name: 'By year' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'By month' })).toBeInTheDocument();
 
-    await userEvent.click(screen.getByAltText('Unique active contributors by role'));
+    expect(screen.getByAltText('Unique active contributors by role — By year')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByAltText('Unique active contributors by role — By year'));
     const lightbox = await screen.findByRole('dialog');
     expect(within(lightbox).getByText('How to read this chart.')).toBeInTheDocument();
     expect(within(lightbox).getByText('Step-by-step methodology')).toBeInTheDocument();
@@ -185,7 +187,13 @@ describe('Organisation diversity card (#435)', () => {
     return await screen.findByText('Organisation diversity');
   };
 
-  const chartSrc = (title: string) => screen.getByAltText(title).getAttribute('src');
+  const chartSrc = (title: string) => {
+    const image = screen
+      .getAllByRole('img')
+      .find((img) => img.getAttribute('alt')?.startsWith(title));
+    expect(image).toBeDefined();
+    return image!.getAttribute('src');
+  };
 
   it('gives the card one role axis, so every role-tabbed chart switches together', async () => {
     await openDiversity();
@@ -227,7 +235,7 @@ describe('Organisation diversity card (#435)', () => {
     const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
 
     await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
-    await userEvent.click(screen.getByAltText('Role-holders by organisation'));
+    await userEvent.click(screen.getByAltText('Role-holders by organisation — Committers'));
 
     // The committer tab must describe committers — it used to show the
     // maintainer note, which misdescribed its own population.
