@@ -2,6 +2,7 @@
 
 from hiero_analytics.analysis.workflow_security import (
     extract_action_references,
+    find_unpinned_actions,
     is_sha_pinned,
 )
 
@@ -27,3 +28,18 @@ def test_is_sha_pinned() -> None:
     assert is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef01234567")
     assert not is_sha_pinned("actions/checkout@v4")
     assert not is_sha_pinned("actions/checkout@main")
+
+
+def test_find_unpinned_actions() -> None:
+    """Test detection of Actions references that are not SHA pinned."""
+    workflow = """
+    jobs:
+      build:
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+    """
+
+    assert find_unpinned_actions(workflow) == [
+        "actions/checkout@v4",
+    ]
