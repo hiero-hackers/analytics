@@ -1,0 +1,26 @@
+query WORKFLOWS_QUERY(
+  $owner: String!
+  $repo: String!
+) {
+  repository(owner: $owner, name: $repo) {
+    object(expression: "HEAD:.github/workflows") {
+      ... on Tree {
+        entries {
+          name
+          object {
+            ... on Blob {
+              text
+            }
+          }
+        }
+      }
+    }
+  }
+
+  rateLimit {
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}
