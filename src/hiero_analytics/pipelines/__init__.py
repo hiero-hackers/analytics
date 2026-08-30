@@ -37,6 +37,12 @@ PIPELINES: tuple[Pipeline, ...] = (
     # why this isn't offline-capable like repo_growth). extra_orgs=True:
     # releases have no governance dependency.
     Pipeline("releases", "Fetch releases and publish cadence/staleness tables", args=("org",), extra_orgs=True),
+    Pipeline(
+        "ci_health",
+        "Audit CI/CD workflows and repository configuration for security, reliability, and compliance",
+        args=("org",),
+        extra_orgs=True,
+    ),
     Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays
