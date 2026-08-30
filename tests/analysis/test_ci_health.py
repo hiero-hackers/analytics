@@ -1,6 +1,6 @@
 """Tests for GitHub Actions workflow security checks."""
 
-from hiero_analytics.analysis.workflow_security import (
+from hiero_analytics.analysis.ci_health import (
     check_workflows,
     extract_action_references,
     find_unpinned_actions,
