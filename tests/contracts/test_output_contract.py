@@ -28,6 +28,7 @@ matplotlib.use("Agg")
 
 import hiero_analytics.config.paths as paths
 import hiero_analytics.pipelines.affiliation as affiliation_mod
+import hiero_analytics.pipelines.ci_health as ci_health_mod
 import hiero_analytics.pipelines.codeowner_and_runner as codeowner_mod
 import hiero_analytics.pipelines.contributor_activity as activity_mod
 import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
@@ -87,6 +88,7 @@ CHART_COMPANION_CSVS = {
     "repo_affiliation_composition_committers.csv",
     "team_affiliation_composition.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
+    "ci_health.csv",
     "contributor_activity_heatmap.csv",
     "org_activity_heatmap.csv",
     "team_activity_heatmap.csv",
@@ -353,6 +355,28 @@ def outputs_root(tmp_path_factory) -> Path:
             scorecard_mod,
             "fetch_repo_scorecard",
             lambda name: ScorecardRecord(repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "fetch_org_repos",
+            lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
+        )
+        mp.setattr(
+            ci_health_mod,
+            "fetch_repo_workflows_graphql",
+            lambda _c, _owner, _repo: [
+                {
+                    "name": "ci.yml",
+                    "text": "uses: actions/checkout@v4",
+                }
+            ],
+        )
+        mp.setattr(
+            ci_health_mod,
+            "check_workflows",
+            lambda _workflows: {
+                "ci.yml": ["actions/checkout@v4"],
+            },
         )
         mp.setattr(
             codeowner_mod,
