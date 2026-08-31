@@ -1,8 +1,7 @@
 {
  "id": "committeraffiliations",
  "title": "Committer affiliations \u2014 reference",
- "description": "The same reference as the maintainer table, for people whose highest role anywhere is committer \u2014 write access, but no maintainer seat in any repository. The two populations are disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. To fix a mapping or resolve an unknown, edit its row in data/affiliations.yaml and append '# manual: reason', or use 'Suggest a correction' to open an issue on the analytics repo.",
- "group": "Organisation diversity",
+ "description": "The same reference as the Maintainers tab, for people whose highest role anywhere is committer \u2014 write access, but no maintainer seat in any repository. The two populations are disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. To fix a mapping or resolve an unknown, edit its row in data/affiliations.yaml and append '# manual: reason', or use 'Suggest a correction' to open an issue on the analytics repo.",
  "source": "committer_affiliations.csv",
  "columns": [
   {
@@ -312,12 +311,6 @@
    "method": "automated"
   },
   {
-   "login": "filev94",
-   "organisation": "LimeChain",
-   "status": "affiliated",
-   "method": "automated"
-  },
-  {
    "login": "gerbert-vandenberghe",
    "organisation": "FundRequest",
    "status": "affiliated",
@@ -450,12 +443,6 @@
    "method": "automated"
   },
   {
-   "login": "kselveliev",
-   "organisation": "LimeChain",
-   "status": "affiliated",
-   "method": "automated"
-  },
-  {
    "login": "litt3",
    "organisation": null,
    "status": "unknown",
@@ -559,12 +546,6 @@
   },
   {
    "login": "naydenovn",
-   "organisation": "LimeChain",
-   "status": "affiliated",
-   "method": "automated"
-  },
-  {
-   "login": "nickeynikolovv",
    "organisation": "LimeChain",
    "status": "affiliated",
    "method": "automated"
@@ -822,12 +803,15 @@
    "method": "automated"
   }
  ],
- "row_count": 133,
+ "row_count": 130,
+ "label": "Committers",
  "action": {
   "url": "https://github.com/hiero-hackers/analytics/issues",
   "label": "Suggest a correction"
  },
- "generated_at": "2026-08-26T09:22:30.943115+00:00",
+ "generated_at": "2026-08-31T09:12:57.939506+00:00",
  "stale": false,
- "macro": "Governance"
+ "group": "Organisation diversity",
+ "macro": "Governance",
+ "absorbed_by": "affiliations"
 }

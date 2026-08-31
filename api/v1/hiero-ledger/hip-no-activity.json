@@ -2,7 +2,6 @@
  "id": "hip-no-activity",
  "title": "Approved, no implementation PRs found",
  "description": "Approved or accepted specs created in the Hiero era (since September 2024) with zero referencing PRs anywhere, newest first. Older approved specs are deliberately excluded: the sweep cannot see pre-era implementation history, so the claim would be unreliable \u2014 they remain visible in the governance board's Approved column.",
- "group": "What is left to do",
  "source": "hip_approved_no_activity.csv",
  "columns": [
   {
@@ -52,7 +51,8 @@
   }
  ],
  "row_count": 4,
- "generated_at": "2026-08-26T09:23:49.786615+00:00",
+ "generated_at": "2026-08-31T09:14:12.021210+00:00",
  "stale": false,
+ "group": "What is left to do",
  "macro": "HIPs"
 }

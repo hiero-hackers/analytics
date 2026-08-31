@@ -2,7 +2,6 @@
  "id": "hip-unknown",
  "title": "Unknown HIP numbers (review)",
  "description": "References to numbers absent from the spec inventory \u2014 typically HIP numbers assigned to in-flight proposals whose spec file has not merged yet, legacy pre-migration numbers, or the occasional false positive. Kept for review instead of being counted.",
- "group": "Evidence",
  "source": "hip_unknown_references.csv",
  "columns": [
   {
@@ -99,7 +98,8 @@
   }
  ],
  "row_count": 10,
- "generated_at": "2026-08-26T09:23:49.782423+00:00",
+ "generated_at": "2026-08-31T09:14:12.015158+00:00",
  "stale": false,
+ "group": "Evidence",
  "macro": "HIPs"
 }

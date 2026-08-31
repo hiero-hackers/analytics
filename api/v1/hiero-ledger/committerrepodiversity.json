@@ -1,8 +1,7 @@
 {
  "id": "committerrepodiversity",
  "title": "Committer organisation diversity by repo",
- "description": "The repo table above, over committers instead of maintainers: per repo, how many committers it has, how many distinct employers they span, the largest employer and its share of resolved committers, and the independent / unknown counts. Read it against the maintainer table \u2014 a repo whose maintainers are single-employer but whose committers are not has a bench it could promote from. The 'unknown' count is higher here, so weigh a single-employer reading against it.",
- "group": "Organisation diversity",
+ "description": "The Maintainers tab's table over committers instead of maintainers: per repo, how many committers it has, how many distinct employers they span, the largest employer and its share of resolved committers, and the independent / unknown counts. Read it against the Maintainers tab \u2014 a repo whose maintainers are single-employer but whose committers are not has a bench it could promote from. The 'unknown' count is higher here, so weigh a single-employer reading against it.",
  "source": "repo_affiliation_diversity_committers.csv",
  "columns": [
   {
@@ -243,16 +242,6 @@
    "organisations": "Hashgraph, LimeChain"
   },
   {
-   "repo": "hiero-mirror-node",
-   "committers": 10,
-   "distinct_orgs": 2,
-   "top_org": "LimeChain",
-   "top_org_pct": 50,
-   "independent": 2,
-   "unknown": 0,
-   "organisations": "LimeChain, Hashgraph"
-  },
-  {
    "repo": "hiero-block-node",
    "committers": 7,
    "distinct_orgs": 2,
@@ -260,6 +249,16 @@
    "top_org_pct": 50,
    "independent": 1,
    "unknown": 1,
+   "organisations": "Hashgraph, LimeChain"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "committers": 7,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 43,
+   "independent": 2,
+   "unknown": 0,
    "organisations": "Hashgraph, LimeChain"
   },
   {
@@ -344,7 +343,10 @@
   }
  ],
  "row_count": 30,
- "generated_at": "2026-08-26T09:22:31.490434+00:00",
+ "label": "Committers",
+ "generated_at": "2026-08-31T09:12:58.689536+00:00",
  "stale": false,
- "macro": "Governance"
+ "group": "Organisation diversity",
+ "macro": "Governance",
+ "absorbed_by": "repodiversity"
 }

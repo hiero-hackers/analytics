@@ -600,6 +600,95 @@
    }
   },
   {
+   "key": 1340,
+   "label": "HIP-1340",
+   "sublabel": "EOA Code Delegation",
+   "status": "Approved",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 6,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 11,
+     "open": 2
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 3,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 3,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 1,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 0
+    }
+   ],
+   "note": {
+    "kind": "partial",
+    "text": "go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
+    "items": [
+     "go",
+     "cpp",
+     "rust",
+     "swift",
+     "python"
+    ]
+   }
+  },
+  {
    "key": 1313,
    "label": "HIP-1313",
    "sublabel": "High-Volume Entity Creation",
@@ -679,95 +768,6 @@
    "note": {
     "kind": "complete",
     "text": "\u2713 all SDKs"
-   }
-  },
-  {
-   "key": 1340,
-   "label": "HIP-1340",
-   "sublabel": "EOA Code Delegation",
-   "status": "Approved",
-   "cells": [
-    {
-     "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 5,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 11,
-     "open": 2
-    },
-    {
-     "key": "hiero-ledger/hiero-block-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-go",
-     "merged": 0,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-js",
-     "merged": 3,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-cpp",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-rust",
-     "merged": 0,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-swift",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-python",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-json-rpc-relay",
-     "merged": 3,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node-explorer",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/solo",
-     "merged": 1,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-local-node",
-     "merged": 0,
-     "open": 0
-    }
-   ],
-   "note": {
-    "kind": "partial",
-    "text": "go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
-    "items": [
-     "go",
-     "cpp",
-     "rust",
-     "swift",
-     "python"
-    ]
    }
   },
   {
@@ -13155,6 +13155,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-08-26T09:23:49.784372+00:00",
+ "generated_at": "2026-08-31T09:14:12.017843+00:00",
  "stale": false
 }

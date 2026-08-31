@@ -2,7 +2,6 @@
  "id": "hip-evidence",
  "title": "Evidence (per PR)",
  "description": "The audit trail: every (HIP, PR) reference with where it matched and the matched text. Filter to a HIP and repository to independently verify a coverage cell. References whose only mention is a body phrase behind a distancing cue (\u201cwaiting on\u201d, \u201cprepares for\u201d, \u201cblocked by\u201d\u2026) are kept here but excluded from every count \u2014 the cue and the counted flag make each exclusion auditable.",
- "group": "Evidence",
  "source": "hip_pr_evidence.csv",
  "columns": [
   {
@@ -324,6 +323,20 @@
    "counted": true,
    "snippet": "Delegation](https://hips.hedera.com/hip/hip-1340#hip-1340) - [Ignore Trailing Calldata",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/25309"
+  },
+  {
+   "hip": 1340,
+   "hip_title": "EOA Code Delegation",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 26975,
+   "pr_title": "fix: ignore staking records in code delegation child count",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-08-26 17:55:14+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "edera.services.bdd.suites.contract.hips.hip1340.CodeDelegationType4TransactionTest\"` ->",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26975"
   },
   {
    "hip": 1340,
@@ -11778,8 +11791,9 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 837,
- "generated_at": "2026-08-26T09:23:49.781412+00:00",
+ "row_count": 838,
+ "generated_at": "2026-08-31T09:14:12.013992+00:00",
  "stale": false,
+ "group": "Evidence",
  "macro": "HIPs"
 }

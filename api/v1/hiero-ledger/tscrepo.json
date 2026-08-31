@@ -2,7 +2,6 @@
  "id": "tscrepo",
  "title": "TSC activity by repo",
  "description": "For TSC members with activity, which repos they work in and the role they hold there.",
- "group": "Teams & TSC",
  "source": "tsc_activity_by_repo.csv",
  "columns": [
   {
@@ -59,11 +58,11 @@
    "repo": "hiero-ledger/governance",
    "repo_role": "maintainer",
    "prs_opened": 3,
-   "reviews_given": 25,
+   "reviews_given": 26,
    "merges_done": 3,
    "issues_opened": 0,
    "labels_applied": 0,
-   "last_active": "2026-08-25 14:09:27+00:00"
+   "last_active": "2026-08-29 15:21:00+00:00"
   },
   {
    "account": "MilanWR",
@@ -289,12 +288,12 @@
    "account": "hendrikebbers",
    "repo": "hiero-ledger/governance",
    "repo_role": "maintainer",
-   "prs_opened": 91,
-   "reviews_given": 186,
-   "merges_done": 148,
+   "prs_opened": 92,
+   "reviews_given": 187,
+   "merges_done": 149,
    "issues_opened": 4,
    "labels_applied": 0,
-   "last_active": "2026-08-25 20:23:32+00:00"
+   "last_active": "2026-08-27 14:37:58+00:00"
   },
   {
    "account": "hendrikebbers",
@@ -356,11 +355,11 @@
    "repo": "hiero-ledger/hiero-enterprise-java",
    "repo_role": "maintainer",
    "prs_opened": 8,
-   "reviews_given": 26,
+   "reviews_given": 28,
    "merges_done": 16,
    "issues_opened": 5,
    "labels_applied": 0,
-   "last_active": "2026-08-21 14:36:35+00:00"
+   "last_active": "2026-08-31 07:58:39+00:00"
   },
   {
    "account": "hendrikebbers",
@@ -697,11 +696,11 @@
    "repo": "hiero-ledger/hiero-consensus-specifications",
    "repo_role": "maintainer",
    "prs_opened": 11,
-   "reviews_given": 53,
+   "reviews_given": 54,
    "merges_done": 18,
    "issues_opened": 0,
    "labels_applied": 0,
-   "last_active": "2026-08-21 17:41:56+00:00"
+   "last_active": "2026-08-27 14:57:35+00:00"
   },
   {
    "account": "kantorcodes",
@@ -928,11 +927,11 @@
    "repo": "hiero-ledger/hiero-improvement-proposals",
    "repo_role": "committer",
    "prs_opened": 9,
-   "reviews_given": 109,
+   "reviews_given": 110,
    "merges_done": 3,
    "issues_opened": 0,
    "labels_applied": 0,
-   "last_active": "2026-08-25 02:50:06+00:00"
+   "last_active": "2026-08-27 17:14:10+00:00"
   },
   {
    "account": "rbair23",
@@ -947,6 +946,17 @@
   },
   {
    "account": "rbair23",
+   "repo": "hiero-ledger/governance",
+   "repo_role": "maintainer",
+   "prs_opened": 4,
+   "reviews_given": 9,
+   "merges_done": 3,
+   "issues_opened": 1,
+   "labels_applied": 1,
+   "last_active": "2026-08-29 15:18:27+00:00"
+  },
+  {
+   "account": "rbair23",
    "repo": "hiero-ledger/tsc",
    "repo_role": "maintainer",
    "prs_opened": 1,
@@ -955,17 +965,6 @@
    "issues_opened": 0,
    "labels_applied": 0,
    "last_active": "2025-08-01 14:26:25+00:00"
-  },
-  {
-   "account": "rbair23",
-   "repo": "hiero-ledger/governance",
-   "repo_role": "maintainer",
-   "prs_opened": 3,
-   "reviews_given": 9,
-   "merges_done": 3,
-   "issues_opened": 1,
-   "labels_applied": 1,
-   "last_active": "2025-09-05 18:55:04+00:00"
   },
   {
    "account": "rbair23",
@@ -1178,6 +1177,17 @@
   },
   {
    "account": "stoqnkpL",
+   "repo": "hiero-ledger/governance",
+   "repo_role": "maintainer",
+   "prs_opened": 2,
+   "reviews_given": 3,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-08-27 14:43:26+00:00"
+  },
+  {
+   "account": "stoqnkpL",
    "repo": "hiero-ledger/hiero-local-node",
    "repo_role": "general",
    "prs_opened": 0,
@@ -1186,17 +1196,6 @@
    "issues_opened": 2,
    "labels_applied": 1,
    "last_active": "2023-10-16 09:33:52+00:00"
-  },
-  {
-   "account": "stoqnkpL",
-   "repo": "hiero-ledger/governance",
-   "repo_role": "maintainer",
-   "prs_opened": 1,
-   "reviews_given": 2,
-   "merges_done": 0,
-   "issues_opened": 0,
-   "labels_applied": 0,
-   "last_active": "2026-04-28 13:49:27+00:00"
   },
   {
    "account": "stoqnkpL",
@@ -1211,7 +1210,7 @@
   }
  ],
  "row_count": 106,
- "generated_at": "2026-08-26T09:22:30.019441+00:00",
+ "generated_at": "2026-08-31T09:12:56.630709+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -1220,55 +1219,33 @@
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 1,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 14:09:27+00:00"
+    "last_active": "2026-08-29 15:21:00+00:00"
    },
    {
     "account": "hendrikebbers",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
-    "prs_opened": 0,
-    "reviews_given": 5,
+    "prs_opened": 1,
+    "reviews_given": 3,
     "merges_done": 1,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 20:23:32+00:00"
+    "last_active": "2026-08-27 14:37:58+00:00"
    },
    {
     "account": "hendrikebbers",
     "repo": "hiero-ledger/hiero-enterprise-java",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-08-21 14:36:35+00:00"
-   },
-   {
-    "account": "hendrikebbers",
-    "repo": "hiero-ledger/hiero-sdk-java",
-    "repo_role": "triage",
-    "prs_opened": 0,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-08-21 14:33:36+00:00"
-   },
-   {
-    "account": "hendrikebbers",
-    "repo": "hiero-ledger/sdk-collaboration-hub",
-    "repo_role": "maintainer",
-    "prs_opened": 0,
     "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 11:16:48+00:00"
+    "last_active": "2026-08-31 07:58:39+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1282,6 +1259,17 @@
     "last_active": "2026-08-24 11:02:21+00:00"
    },
    {
+    "account": "hendrikebbers",
+    "repo": "hiero-ledger/sdk-collaboration-hub",
+    "repo_role": "maintainer",
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-25 11:16:48+00:00"
+   },
+   {
     "account": "kantorcodes",
     "repo": "hiero-ledger/hiero-consensus-specifications",
     "repo_role": "maintainer",
@@ -1290,7 +1278,7 @@
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-21 17:41:56+00:00"
+    "last_active": "2026-08-27 14:57:35+00:00"
    },
    {
     "account": "popowycz",
@@ -1307,12 +1295,34 @@
     "account": "rbair23",
     "repo": "hiero-ledger/hiero-improvement-proposals",
     "repo_role": "committer",
-    "prs_opened": 1,
-    "reviews_given": 5,
+    "prs_opened": 0,
+    "reviews_given": 6,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 02:50:06+00:00"
+    "last_active": "2026-08-27 17:14:10+00:00"
+   },
+   {
+    "account": "rbair23",
+    "repo": "hiero-ledger/governance",
+    "repo_role": "maintainer",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-29 15:18:27+00:00"
+   },
+   {
+    "account": "stoqnkpL",
+    "repo": "hiero-ledger/governance",
+    "repo_role": "maintainer",
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-27 14:43:26+00:00"
    },
    {
     "account": "stoqnkpL",
@@ -1332,22 +1342,22 @@
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 2,
+    "reviews_given": 3,
     "merges_done": 1,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 14:09:27+00:00"
+    "last_active": "2026-08-29 15:21:00+00:00"
    },
    {
     "account": "hendrikebbers",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
-    "prs_opened": 4,
-    "reviews_given": 6,
-    "merges_done": 3,
+    "prs_opened": 5,
+    "reviews_given": 7,
+    "merges_done": 4,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 20:23:32+00:00"
+    "last_active": "2026-08-27 14:37:58+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1376,11 +1386,11 @@
     "repo": "hiero-ledger/hiero-enterprise-java",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 3,
+    "reviews_given": 5,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-21 14:36:35+00:00"
+    "last_active": "2026-08-31 07:58:39+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1420,11 +1430,11 @@
     "repo": "hiero-ledger/hiero-consensus-specifications",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 1,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-21 17:41:56+00:00"
+    "last_active": "2026-08-27 14:57:35+00:00"
    },
    {
     "account": "popowycz",
@@ -1442,11 +1452,33 @@
     "repo": "hiero-ledger/hiero-improvement-proposals",
     "repo_role": "committer",
     "prs_opened": 1,
-    "reviews_given": 5,
+    "reviews_given": 6,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 02:50:06+00:00"
+    "last_active": "2026-08-27 17:14:10+00:00"
+   },
+   {
+    "account": "rbair23",
+    "repo": "hiero-ledger/governance",
+    "repo_role": "maintainer",
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-29 15:18:27+00:00"
+   },
+   {
+    "account": "stoqnkpL",
+    "repo": "hiero-ledger/governance",
+    "repo_role": "maintainer",
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-27 14:43:26+00:00"
    },
    {
     "account": "stoqnkpL",
@@ -1481,7 +1513,7 @@
     "merges_done": 3,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 14:09:27+00:00"
+    "last_active": "2026-08-29 15:21:00+00:00"
    },
    {
     "account": "MilanWR",
@@ -1532,7 +1564,7 @@
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 3,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
@@ -1543,7 +1575,7 @@
     "repo": "hiero-ledger/hiero-hederium",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 2,
+    "reviews_given": 1,
     "merges_done": 1,
     "issues_opened": 0,
     "labels_applied": 0,
@@ -1586,20 +1618,20 @@
     "account": "hendrikebbers",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
-    "prs_opened": 35,
-    "reviews_given": 55,
-    "merges_done": 27,
+    "prs_opened": 36,
+    "reviews_given": 56,
+    "merges_done": 28,
     "issues_opened": 3,
     "labels_applied": 0,
-    "last_active": "2026-08-25 20:23:32+00:00"
+    "last_active": "2026-08-27 14:37:58+00:00"
    },
    {
     "account": "hendrikebbers",
     "repo": "hiero-ledger/tsc",
     "repo_role": "maintainer",
-    "prs_opened": 23,
-    "reviews_given": 11,
-    "merges_done": 28,
+    "prs_opened": 22,
+    "reviews_given": 8,
+    "merges_done": 26,
     "issues_opened": 3,
     "labels_applied": 3,
     "last_active": "2026-07-06 11:34:15+00:00"
@@ -1609,11 +1641,11 @@
     "repo": "hiero-ledger/hiero-enterprise-java",
     "repo_role": "maintainer",
     "prs_opened": 8,
-    "reviews_given": 26,
+    "reviews_given": 28,
     "merges_done": 16,
     "issues_opened": 5,
     "labels_applied": 0,
-    "last_active": "2026-08-21 14:36:35+00:00"
+    "last_active": "2026-08-31 07:58:39+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1653,8 +1685,8 @@
     "repo": "hiero-ledger/hiero-solo-action",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 13,
-    "merges_done": 2,
+    "reviews_given": 12,
+    "merges_done": 1,
     "issues_opened": 0,
     "labels_applied": 2,
     "last_active": "2026-07-15 13:01:51+00:00"
@@ -1861,7 +1893,7 @@
     "account": "itsbrandondev",
     "repo": "hiero-ledger/tsc",
     "repo_role": "maintainer",
-    "prs_opened": 16,
+    "prs_opened": 15,
     "reviews_given": 2,
     "merges_done": 4,
     "issues_opened": 0,
@@ -1895,17 +1927,17 @@
     "repo": "hiero-ledger/hiero-consensus-specifications",
     "repo_role": "maintainer",
     "prs_opened": 11,
-    "reviews_given": 53,
+    "reviews_given": 54,
     "merges_done": 18,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-21 17:41:56+00:00"
+    "last_active": "2026-08-27 14:57:35+00:00"
    },
    {
     "account": "kantorcodes",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
-    "prs_opened": 3,
+    "prs_opened": 2,
     "reviews_given": 3,
     "merges_done": 3,
     "issues_opened": 0,
@@ -1925,17 +1957,6 @@
    },
    {
     "account": "kantorcodes",
-    "repo": "hiero-ledger/hiero-improvement-proposals",
-    "repo_role": "committer",
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-01-29 14:46:49+00:00"
-   },
-   {
-    "account": "kantorcodes",
     "repo": "hiero-ledger/tsc",
     "repo_role": "maintainer",
     "prs_opened": 0,
@@ -1944,6 +1965,17 @@
     "issues_opened": 1,
     "labels_applied": 1,
     "last_active": "2025-11-14 20:32:38+00:00"
+   },
+   {
+    "account": "kantorcodes",
+    "repo": "hiero-ledger/hiero-improvement-proposals",
+    "repo_role": "committer",
+    "prs_opened": 2,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-01-29 14:46:49+00:00"
    },
    {
     "account": "kantorcodes",
@@ -1983,11 +2015,11 @@
     "repo": "hiero-ledger/hiero-improvement-proposals",
     "repo_role": "committer",
     "prs_opened": 1,
-    "reviews_given": 8,
+    "reviews_given": 9,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-08-25 02:50:06+00:00"
+    "last_active": "2026-08-27 17:14:10+00:00"
    },
    {
     "account": "rbair23",
@@ -2004,12 +2036,12 @@
     "account": "rbair23",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
-    "prs_opened": 0,
+    "prs_opened": 1,
     "reviews_given": 1,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2025-09-05 18:55:04+00:00"
+    "last_active": "2026-08-29 15:18:27+00:00"
    },
    {
     "account": "rbair23",
@@ -2021,6 +2053,17 @@
     "issues_opened": 1,
     "labels_applied": 0,
     "last_active": "2026-04-15 14:10:01+00:00"
+   },
+   {
+    "account": "stoqnkpL",
+    "repo": "hiero-ledger/governance",
+    "repo_role": "maintainer",
+    "prs_opened": 2,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-08-27 14:43:26+00:00"
    },
    {
     "account": "stoqnkpL",
@@ -2046,17 +2089,6 @@
    },
    {
     "account": "stoqnkpL",
-    "repo": "hiero-ledger/governance",
-    "repo_role": "maintainer",
-    "prs_opened": 1,
-    "reviews_given": 1,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-04-28 13:49:27+00:00"
-   },
-   {
-    "account": "stoqnkpL",
     "repo": "hiero-ledger/tsc",
     "repo_role": "maintainer",
     "prs_opened": 0,
@@ -2068,5 +2100,6 @@
    }
   ]
  },
+ "group": "Teams & TSC",
  "macro": "Governance"
 }

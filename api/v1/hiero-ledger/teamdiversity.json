@@ -2,7 +2,6 @@
  "id": "teamdiversity",
  "title": "Team organisation concentration",
  "description": "Per governance team: how many members resolve to an employer, how many distinct employers they span, the largest employer and its share, and the concentration (HHI, 10000 = one employer). 'single employer' = one employer holds every resolved seat \u2014 a capture / bus-factor risk, most serious for admin, release, security, and maintainer teams; teams with more unmapped than resolved members are never flagged. 'unknown' is how many members aren't in the affiliations map (mostly non-maintainers), so read a flag on a mostly-unknown team with caution. Most concentrated first.",
- "group": "Organisation diversity",
  "source": "team_affiliation_diversity.csv",
  "columns": [
   {
@@ -1080,6 +1079,18 @@
    "organisations": "DSR Corporation 5, Hashgraph 2, The Hashgraph Association 1, Hedera 1"
   },
   {
+   "team": "hiero-mirror-node-committers",
+   "members": 9,
+   "resolved": 9,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 56,
+   "hhi": 3827,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 5, LimeChain 2, Independent 2"
+  },
+  {
    "team": "governance-write",
    "members": 68,
    "resolved": 68,
@@ -1126,18 +1137,6 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "DSR Corporation 2, The Hashgraph Association 1, Hashgraph 1"
-  },
-  {
-   "team": "hiero-mirror-node-committers",
-   "members": 12,
-   "resolved": 12,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 42,
-   "hhi": 3611,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Hashgraph 5, LimeChain 5, Independent 2"
   },
   {
    "team": "solo-build-actions-committers",
@@ -1345,7 +1344,8 @@
   }
  ],
  "row_count": 108,
- "generated_at": "2026-08-26T09:22:32.913560+00:00",
+ "generated_at": "2026-08-31T09:13:00.677139+00:00",
  "stale": false,
+ "group": "Organisation diversity",
  "macro": "Governance"
 }

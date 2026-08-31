@@ -2,7 +2,6 @@
  "id": "understaffed",
  "title": "Repos with one or fewer active maintainers",
  "description": "Repos where at most one maintainer has been active in the selected period. 'maintainers' is the total on paper; 'committers' and 'triage' show others with access to the repo. Fewest active maintainers first.",
- "group": "Coverage & risk",
  "source": "maintainer_coverage_risk.csv",
  "columns": [
   {
@@ -159,7 +158,7 @@
   }
  ],
  "row_count": 18,
- "generated_at": "2026-08-26T09:22:24.599221+00:00",
+ "generated_at": "2026-08-31T09:12:49.457930+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -204,6 +203,13 @@
     "active_maintainers": 0,
     "committers": 1,
     "triage": 15
+   },
+   {
+    "repo": "hiero-docs",
+    "maintainers": 3,
+    "active_maintainers": 0,
+    "committers": 0,
+    "triage": 0
    },
    {
     "repo": "tsc-eligibility-check",
@@ -297,6 +303,13 @@
     "triage": 2
    },
    {
+    "repo": ".github",
+    "maintainers": 16,
+    "active_maintainers": 0,
+    "committers": 0,
+    "triage": 0
+   },
+   {
     "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -344,13 +357,6 @@
     "active_maintainers": 1,
     "committers": 1,
     "triage": 11
-   },
-   {
-    "repo": ".github",
-    "maintainers": 16,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
    }
   ],
   "30d": [
@@ -547,5 +553,6 @@
    }
   ]
  },
+ "group": "Coverage & risk",
  "macro": "Governance"
 }

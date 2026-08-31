@@ -2,7 +2,6 @@
  "id": "codeowners",
  "title": "CODEOWNERS by repository",
  "description": "Whether each repository declares code owners, repositories without a file first \u2014 a yes/no per repository, which is why this is a table and not a chart. A missing file is a lead, not a defect: docs, archive, and meta repositories may have no meaningful owner to name, so relevance is a human call. Checked in the standard locations (root, .github/, docs/).",
- "group": "Ownership",
  "source": "repo_wise_codeowner_status.csv",
  "columns": [
   {
@@ -186,7 +185,8 @@
   }
  ],
  "row_count": 42,
- "generated_at": "2026-08-26T09:22:59.496270+00:00",
+ "generated_at": "2026-08-31T09:13:20.653446+00:00",
  "stale": false,
+ "group": "Ownership",
  "macro": "Security & scorecards"
 }
