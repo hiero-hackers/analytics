@@ -8,8 +8,8 @@ if (!Element.prototype.scrollIntoView) {
 }
 
 // Mock TanStack Table row model functions for testing
-vi.mock('@tanstack/react-table', async () => {
-  const actual = await vi.importActual<typeof import('@tanstack/react-table')>('@tanstack/react-table');
+vi.mock('@tanstack/react-table', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/react-table')>();
   return {
     ...actual,
     getCoreRowModel: () => actual.getCoreRowModel(),
@@ -17,7 +17,6 @@ vi.mock('@tanstack/react-table', async () => {
     getFilteredRowModel: () => actual.getFilteredRowModel(),
   };
 });
-
 afterEach(() => {
   cleanup();
   window.location.hash = '';
