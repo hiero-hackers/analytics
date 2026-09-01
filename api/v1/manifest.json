@@ -341,10 +341,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-08-31T09:15:14.861706+00:00",
+ "generated_at": "2026-09-01T09:12:54.264685+00:00",
  "provenance": {
-  "git_sha": "d84302f",
-  "data_as_of": "2026-08-31T09:06:12.482634+00:00"
+  "git_sha": "3c5293a",
+  "data_as_of": "2026-08-31T09:07:50.696333+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -353,7 +353,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1438,
+     "row_count": 1446,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -559,7 +559,7 @@
           "A contributor on several teams counts toward each, so team totals overlap \u2014 this measures each team's activity, not a partition.",
           "Rank teams by total, show the busiest 25, and colour each cell by its monthly score."
          ],
-         "width": 1779,
+         "width": 1825,
          "height": 1856
         }
        ],
@@ -585,7 +585,7 @@
           "Rank organisations by total and colour each cell by its monthly score."
          ],
          "width": 1643,
-         "height": 1080
+         "height": 1140
         }
        ],
        "note": "Rows are organisations, columns are the last six months; each cell is that org's people's weighted activity that month (issues \u00d72, reviews \u00d73, PRs opened \u00d73, merges \u00d72) \u2014 greener = more active. It shows which employers carry the work over time, the activity counterpart to the head-count chart. Bots and contributors not mapped to an organisation are excluded.",
@@ -768,13 +768,13 @@
         {
          "label": "1 month",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_30d.png",
-         "width": 2278,
+         "width": 2343,
          "height": 1051
         },
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2206,
+         "width": 2284,
          "height": 1051
         }
        ],
@@ -1093,7 +1093,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-08-31T09:14:12.022946+00:00"
+      "generated_at": "2026-09-01T09:11:52.566384+00:00"
      }
     },
     {
@@ -1167,7 +1167,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-08-31T09:14:12.018609+00:00"
+      "generated_at": "2026-09-01T09:11:52.562131+00:00"
      }
     },
     {
@@ -1320,7 +1320,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2092,
-         "height": 1405
+         "height": 1343
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1385,7 +1385,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1438,
+      "value": 1446,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1431,7 +1431,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "37%",
+      "value": "36%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -1502,7 +1502,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 98,
+      "value": 99,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1536,7 +1536,7 @@
      "id": "codeowners",
      "macro": "Security & scorecards",
      "title": "CODEOWNERS by repository",
-     "row_count": 27,
+     "row_count": 30,
      "path": "hiero-hackers/codeowners.json"
     }
    ],
@@ -1671,7 +1671,7 @@
           "Rank contributors by their six-month total and keep the top 25.",
           "Colour each cell by its monthly score (greener = more active)."
          ],
-         "width": 1630,
+         "width": 1631,
          "height": 1856
         }
        ],
@@ -1831,7 +1831,7 @@
          "label": "1 month",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_30d.png",
          "width": 2095,
-         "height": 904
+         "height": 901
         },
         {
          "label": "Week",
