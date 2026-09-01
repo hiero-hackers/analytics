@@ -13,6 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 from hiero_analytics.config.analysis import GONE_DARK_DAYS
+from hiero_analytics.dashboard_spec import table_variants
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.domain.roles import ROLE_PRIORITY
 
@@ -45,6 +46,15 @@ def _holders_by_highest_role(coverage: pd.DataFrame) -> dict[str, int]:
     highest = df.sort_values("_r").groupby("_u")["granted_role"].last()
     counts = highest.value_counts()
     return {role: int(counts.get(role, 0)) for role in _GRANTED_ROLES}
+
+
+def _known_affiliation_share(affiliations: pd.DataFrame) -> str | None:
+    """Known-affiliation share from a role's full reference table."""
+    if affiliations.empty or "status" not in affiliations:
+        return None
+    statuses = affiliations["status"].astype(str).str.lower()
+    known = int(statuses.isin({"affiliated", "independent"}).sum())
+    return _pct(known, len(statuses))
 
 
 def contributors_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> list:
@@ -86,6 +96,12 @@ def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> l
     for role, label in (("maintainer", "maintainers"), ("committer", "committers"), ("triage", "triage")):
         if role in role_counts:
             metrics.append((label, role_counts[role]))
+    for section_id, label in (
+        ("affiliations", "maintainer affiliations known"),
+        ("committeraffiliations", "committer affiliations known"),
+    ):
+        if share := _known_affiliation_share(loaded.get(section_id, pd.DataFrame())):
+            metrics.append((label, share))
     # The gonedark table follows the shared period tabs, but this tile keeps its
     # fixed 180-day access-hygiene threshold. Quiet-for-a-month is a superset of
     # quiet-for-180-days, so the 30d variant filters down to it exactly; a blank
@@ -109,9 +125,18 @@ METRICS_BY_MACRO = {"Contributors": contributors_metrics, "Governance": governan
 
 
 def macro_metrics(macro_name: str, family, org_data_dir: Path) -> list:
-    """The macro's tiles computed from its section tables, or [] when none apply."""
+    """The macro's tiles computed from its section tables, or [] when none apply.
+
+    Keyed by section id, and by variant id for a role-tabbed section — a
+    variant that a card now renders as a tab is still its own table, and a tile
+    reading it must not go blank because the card it lives under was merged.
+    """
     builder = METRICS_BY_MACRO.get(macro_name)
     if builder is None:
         return []
-    loaded = {spec["id"]: _load(org_data_dir / spec["file"]) for spec in family.SECTION_SPECS}
+    loaded = {
+        variant["id"]: _load(org_data_dir / variant["file"])
+        for spec in family.SECTION_SPECS
+        for variant in table_variants(spec)
+    }
     return builder(loaded, org_data_dir)

@@ -20,7 +20,7 @@ from hiero_analytics.dashboard_spec import (
     onboarding,
     security,
 )
-from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged
+from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged, table_variants
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order — the tab order the dashboard shows.
@@ -44,6 +44,7 @@ __all__ = [
     "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
     "WIDE_CHARTS",
+    "table_variants",
 ]
 
 AFFILIATION_ISSUE_URL = governance.AFFILIATION_ISSUE_URL

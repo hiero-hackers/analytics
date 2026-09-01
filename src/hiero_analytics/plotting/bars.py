@@ -8,6 +8,7 @@ from typing import cast
 import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch, Patch, Rectangle
+from matplotlib.ticker import MaxNLocator
 
 from hiero_analytics.config.charts import (
     ANNOTATION_FONT_SIZE,
@@ -65,12 +66,13 @@ def _should_use_horizontal(df: pd.DataFrame, x_col: str, rotate_x: int | None) -
 
 
 def _compute_annotation_padding(max_value: float) -> float:
-    """Return label padding with a small fixed floor for low-count charts."""
-    return max(max_value * ANNOTATION_PADDING_RATIO, ANNOTATION_MIN_PADDING)
+    """Return label padding, scaling down the floor for very small counts."""
+    scaled_floor = min(ANNOTATION_MIN_PADDING, max_value * 0.1)
+    return max(max_value * ANNOTATION_PADDING_RATIO, scaled_floor)
 
 
-def _compute_horizontal_axis_limit(max_value: float, annotation_padding: float) -> float:
-    """Leave enough room for labels while keeping the horizontal axis compact."""
+def _compute_value_axis_limit(max_value: float, annotation_padding: float) -> float:
+    """Leave enough room for labels while keeping either value axis compact."""
     if max_value <= 0:
         return 1.0
 
@@ -83,18 +85,22 @@ def _compute_horizontal_axis_limit(max_value: float, annotation_padding: float) 
 def _apply_bar_axis_layout(ax: Axes, values: pd.Series, *, horizontal: bool) -> None:
     """Shared axis treatment for bar charts: orientation, margins, value-axis limits.
 
-    Horizontal charts read top-down (inverted y) and reserve room on the right
-    for the end-of-bar total labels; vertical charts pin the value axis to zero.
+    Horizontal charts read top-down (inverted y); both orientations reserve room
+    after the largest value for the end-of-bar total labels.
     """
+    max_value = float(values.max()) if not values.empty else 0.0
+    padding = _compute_annotation_padding(max_value)
     if horizontal:
         ax.invert_yaxis()
-        max_value = float(values.max()) if not values.empty else 0.0
-        padding = _compute_annotation_padding(max_value)
         ax.margins(y=HORIZONTAL_Y_MARGIN, x=HORIZONTAL_X_MARGIN)
-        ax.set_xlim(0, _compute_horizontal_axis_limit(max_value, padding))
+        ax.set_xlim(0, _compute_value_axis_limit(max_value, padding))
     else:
         ax.margins(x=VERTICAL_X_MARGIN, y=VERTICAL_Y_MARGIN)
-        ax.set_ylim(bottom=0)
+        ax.set_ylim(0, _compute_value_axis_limit(max_value, padding))
+
+    if not values.empty and all(float(value).is_integer() for value in values):
+        value_axis = ax.xaxis if horizontal else ax.yaxis
+        value_axis.set_major_locator(MaxNLocator(integer=True))
 
 
 def _stacked_bar_figsize(row_count: int, *, horizontal: bool, auto_height_for_horizontal: bool) -> tuple[float, float]:
@@ -212,6 +218,7 @@ def plot_bar(
     output_path: Path,
     rotate_x: int | None = None,
     colors: dict[str, str] | None = None,
+    horizontal: bool | None = None,
 ) -> None:
     """Plot a standard bar chart."""
     df = prepare_dataframe(df, x_col, y_col).copy()
@@ -221,7 +228,7 @@ def plot_bar(
         df = (
             df.sort_values(x_col) if is_numeric_or_datetime(df[x_col]) else df.sort_values(y_col, ascending=False)
         )  # Auto-switch to a more report-like horizontal layout for crowded categories.
-    horizontal = _should_use_horizontal(df, x_col, rotate_x)
+    use_horizontal = _should_use_horizontal(df, x_col, rotate_x) if horizontal is None else horizontal
 
     with figure_context() as (fig, ax):
         bar_colors = (
@@ -237,7 +244,7 @@ def plot_bar(
                 linewidth=0,
                 zorder=BAR_ZORDER,
             )
-            if horizontal
+            if use_horizontal
             else ax.bar(
                 df[x_col],
                 df[y_col],
@@ -249,19 +256,19 @@ def plot_bar(
         )
         patches = cast(list[Rectangle], list(bars.patches))
         _round_bar_patches(ax, patches)
-        _annotate_bar_totals(ax, patches, df[y_col], horizontal=horizontal)
+        _annotate_bar_totals(ax, patches, df[y_col], horizontal=use_horizontal)
 
-        _apply_bar_axis_layout(ax, df[y_col], horizontal=horizontal)
+        _apply_bar_axis_layout(ax, df[y_col], horizontal=use_horizontal)
 
         finalize_chart(
             fig=fig,
             ax=ax,
             title=title,
-            xlabel=y_col if horizontal else x_col,
-            ylabel="" if horizontal else y_col,
+            xlabel=y_col if use_horizontal else x_col,
+            ylabel="" if use_horizontal else y_col,
             output_path=output_path,
-            rotate_x=None if horizontal else rotate_x,
-            grid_axis="x" if horizontal else "y",
+            rotate_x=None if use_horizontal else rotate_x,
+            grid_axis="x" if use_horizontal else "y",
             record_count=len(df),
         )
 

@@ -574,3 +574,28 @@ def test_load_affiliations_resolves_misiek_blocky_and_seanbohan(tmp_path):
 
     assert mapping == {"misiek-blocky": "BlockyDevs", "seanbohan": "Linux Foundation"}
     assert load_manual_logins(path) == {"misiek-blocky", "seanbohan"}
+
+
+def test_top_n_with_other_always_pools_named_labels():
+    """A pooled label folds into 'Other' however large, freeing the slot for an employer."""
+    distribution = pd.DataFrame(
+        {
+            "organisation": ["Hashgraph", "Independent", "LimeChain", "BlockyDevs"],
+            "maintainers": [34, 25, 20, 2],
+        }
+    )
+
+    folded = top_n_with_other(distribution, "organisation", "maintainers", top_n=2, always_pool=("Independent",))
+
+    assert folded["organisation"].tolist() == ["Hashgraph", "LimeChain", "Other (2)"]
+    # Independent is inside 'Other', not dropped: the total is still the population.
+    assert int(folded["maintainers"].sum()) == 81
+
+
+def test_top_n_with_other_keeps_frame_when_everything_is_pooled():
+    """Pooling every row would leave a single meaningless slice, so nothing folds."""
+    distribution = pd.DataFrame({"organisation": ["Independent"], "maintainers": [12]})
+
+    folded = top_n_with_other(distribution, "organisation", "maintainers", top_n=2, always_pool=("Independent",))
+
+    assert folded["organisation"].tolist() == ["Independent"]

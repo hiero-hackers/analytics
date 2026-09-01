@@ -4,6 +4,13 @@
  * Active…), optional slideshow navigation, horizontal scroll for wide charts,
  * and a lightbox that reveals the "how to read this" note and step-by-step
  * methodology. The PNGs carry their provenance footer in the image itself.
+ *
+ * Charts that offer the *same* set of variant labels share one axis, owned by
+ * the card: the Organisation-diversity card has three Maintainers/Committers
+ * charts, and per-figure tabs let a reader end up comparing a maintainer donut
+ * with a committer repo mix while the description promised the tabs switch the
+ * view. Charts with any other label set (the period-tabbed cards elsewhere)
+ * keep their own tabs, so nothing else changes.
  */
 
 import { useState } from 'react';
@@ -11,6 +18,13 @@ import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifes
 import { downloadCsvText } from '../csv';
 import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 import { CopyLinkButton } from './CopyLinkButton';
+import { VariantTabs } from './VariantTabs';
+
+/**
+ * A chart's variant axis, identified by its ordered label set. Serialised
+ * rather than joined so no separator can be confused with a label.
+ */
+const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant) => variant.label));
 
 function Figure({
   chart,
@@ -18,6 +32,7 @@ function Figure({
   slide = false,
   stretch = false,
   liveView,
+  axis,
 }: {
   chart: ChartSpec;
   onZoom: (chart: ChartSpec, variant: number) => void;
@@ -28,9 +43,13 @@ function Figure({
    *  that loaded successfully. Falls back to the PNG variants below when
    *  absent — still loading, failed to fetch, or not produced for this org. */
   liveView?: HeatmapView;
+  /** Set when the card owns this chart's axis: it renders one tab row for all
+   *  the charts that share it, so this figure shows none of its own. */
+  axis?: { index: number; onSelect: (index: number) => void };
 }) {
-  const [variant, setVariant] = useState(0);
-  const active = chart.variants[Math.min(variant, chart.variants.length - 1)];
+  const [own, setOwn] = useState(0);
+  const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
+  const active = chart.variants[variant];
   // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
   // the `wide` scroll-box treatment would shrink it to the box height instead.
   // It gets the full row with natural page flow: the dimensions ship with the
@@ -74,18 +93,13 @@ function Figure({
   );
   return (
     <figure className={slide ? 'slide' : fullRow ? 'chart wide' : 'chart'}>
-      {chart.variants.length > 1 && (
-        <div className="charttabs">
-          {chart.variants.map((option, index) => (
-            <button
-              key={option.label}
-              className={index === variant ? 'ctab active' : 'ctab'}
-              onClick={() => setVariant(index)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+      {!axis && (
+        <VariantTabs
+          labels={chart.variants.map((option) => option.label)}
+          active={variant}
+          onSelect={setOwn}
+          ariaLabel={`${chart.title} view`}
+        />
       )}
       {chart.wide ? <div className="chartscroll">{img}</div> : img}
       <figcaption>{chart.title}</figcaption>
@@ -112,15 +126,41 @@ export function ChartSectionCard({
     const view = viewById.get(chart.live_view_id);
     return view?.kind === "heatmap" ? view : undefined;
   };
+  // One selection per shared axis, keyed by its label set.
+  const [shared, setShared] = useState<Record<string, number>>({});
 
   const onZoom = (chart: ChartSpec, variant: number) =>
     setZoom({
       src: chartUrl(chart.variants[variant].file),
       alt: chart.title,
-      note: chart.note,
-      methodology: chart.methodology,
+      // The tab's own text where it has one: on a role-tabbed chart the
+      // chart-level note describes maintainers, and showing it on the
+      // Committers tab misdescribes the population the reader is looking at.
+      note: chart.variants[variant].note ?? chart.note,
+      methodology: chart.variants[variant].methodology ?? chart.methodology,
     });
   const count = section.charts.length;
+
+  // An axis belongs to the card once two charts offer the same labels; a lone
+  // multi-variant chart keeps its own tabs where they sit, under its caption.
+  const axisCounts = new Map<string, number>();
+  for (const chart of section.charts) {
+    if (chart.variants.length > 1) {
+      const axis = axisOf(chart);
+      axisCounts.set(axis, (axisCounts.get(axis) ?? 0) + 1);
+    }
+  }
+  const sharedAxes = section.charts
+    .filter((chart) => chart.variants.length > 1 && (axisCounts.get(axisOf(chart)) ?? 0) > 1)
+    .map((chart) => ({ key: axisOf(chart), labels: chart.variants.map((v) => v.label) }))
+    .filter((axis, index, all) => all.findIndex((other) => other.key === axis.key) === index);
+  const axisFor = (chart: ChartSpec) =>
+    sharedAxes.some((axis) => axis.key === axisOf(chart))
+      ? {
+          index: shared[axisOf(chart)] ?? 0,
+          onSelect: (index: number) => setShared({ ...shared, [axisOf(chart)]: index }),
+        }
+      : undefined;
 
   // The gallery lays half-width charts out in pairs; full-row charts break the
   // pairing. A half-width chart stretches to the full row only when it is the
@@ -137,7 +177,17 @@ export function ChartSectionCard({
   const halfCount = section.charts.filter((chart) => !isFullRow(chart)).length;
   const stretched = section.charts.map((chart) => isFullRow(chart) || halfCount === 1);
 
-  const download = section.download;
+  // A card whose tabs show different populations declares a companion CSV per
+  // tab; offering one for the whole card would hand a reader on the Committers
+  // tab the maintainer table. No entry for the active tab means no button.
+  const activeLabel = sharedAxes.length
+    ? sharedAxes[0].labels[shared[sharedAxes[0].key] ?? 0]
+    : undefined;
+  const download = section.downloads
+    ? activeLabel
+      ? section.downloads[activeLabel]
+      : undefined
+    : section.download;
   return (
     <section className="card" id={section.id}>
       <h2>{section.title}</h2>
@@ -169,6 +219,17 @@ export function ChartSectionCard({
           </div>
         </div>
       </div>
+      {/* One row per shared axis, above the gallery: the card's charts switch
+          together, so the control belongs to the card and not to each figure. */}
+      {sharedAxes.map((axis) => (
+        <VariantTabs
+          key={axis.key}
+          labels={axis.labels}
+          active={shared[axis.key] ?? 0}
+          onSelect={(index) => setShared({ ...shared, [axis.key]: index })}
+          ariaLabel={`${section.title} view`}
+        />
+      ))}
       {section.slideshow && count > 1 ? (
         <div className="slideshow">
           <div className="slidenav">
@@ -187,6 +248,7 @@ export function ChartSectionCard({
             chart={section.charts[slide]}
             onZoom={onZoom}
             slide
+            axis={axisFor(section.charts[slide])}
           />
         </div>
       ) : (
@@ -198,6 +260,7 @@ export function ChartSectionCard({
               onZoom={onZoom}
               stretch={stretched[index]}
               liveView={liveViewFor(chart)}
+              axis={axisFor(chart)}
             />
           ))}
         </div>

@@ -8,12 +8,15 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import matplotlib
+import pandas as pd
 import pytest
+from PIL import Image
 
 matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.affiliation as runner
 from hiero_analytics.data_sources.models import ContributorActivityRecord
+from hiero_analytics.export.data_api import _WIDE_ASPECT_ABOVE
 
 TEST_ORG = "test-org"
 
@@ -144,6 +147,132 @@ def test_main_creates_output_files(
     assert "Independent" in distribution
 
 
+def test_distribution_chart_excludes_unknown_and_keeps_coverage_out_of_title(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """The downloadable distribution and pie both describe resolved holders only."""
+    data_dir, charts_dir = tmp_path / "data", tmp_path / "charts"
+    data_dir.mkdir()
+    charts_dir.mkdir()
+    classified = pd.DataFrame(
+        [
+            {"login": "alice", "organisation": "Acme Corp", "status": "affiliated"},
+            {"login": "bob", "organisation": None, "status": "unknown"},
+        ]
+    )
+    captured: dict = {}
+
+    def _capture_pie(_distribution, **kwargs):
+        captured.update(kwargs)
+
+    monkeypatch.setattr(runner, "plot_pie", _capture_pie)
+
+    runner._distribution_chart(
+        classified,
+        data_dir,
+        charts_dir,
+        suffix="",
+        title="test-org — maintainer organisation diversity",
+        value_col="maintainers",
+    )
+
+    distribution = pd.read_csv(data_dir / "affiliation_distribution.csv")
+    assert "Unknown" not in distribution["organisation"].tolist()
+    assert "%" not in captured["title"]
+
+
+def test_distribution_chart_stays_below_dashboard_wide_aspect_threshold(tmp_path: Path):
+    """The standard donut title must keep the chart in its half-width gallery cell."""
+    data_dir, charts_dir = tmp_path / "data", tmp_path / "charts"
+    data_dir.mkdir()
+    charts_dir.mkdir()
+    classified = pd.DataFrame(
+        [
+            {"login": "alice", "organisation": "Hashgraph", "status": "affiliated"},
+            {"login": "bob", "organisation": "Hashgraph", "status": "affiliated"},
+            {"login": "carol", "organisation": "LimeChain", "status": "affiliated"},
+            {"login": "dave", "organisation": None, "status": "unknown"},
+        ]
+    )
+
+    runner._distribution_chart(
+        classified,
+        data_dir,
+        charts_dir,
+        suffix="",
+        title="hiero-ledger — maintainer organisation diversity (distinct maintainers by employer)",
+        value_col="maintainers",
+    )
+
+    with Image.open(charts_dir / "affiliation_donut.png") as image:
+        assert image.width / image.height < _WIDE_ASPECT_ABOVE
+
+
+def test_organisation_colors_are_stable_across_role_populations():
+    """Role-specific order and generated neutral bands must not alter organisation colours."""
+    shared = runner._composition_colors(
+        ["LimeChain", "Hashgraph", "BlockyDevs", "Independent", "Other orgs", "Unknown"]
+    )
+    maintainers = runner._chart_colors(["LimeChain", "Hashgraph", "Independent"], shared)
+    committers = runner._chart_colors(["Other (18)", "BlockyDevs", "Hashgraph", "Other orgs"], shared)
+
+    assert maintainers["Hashgraph"] == committers["Hashgraph"]
+    assert maintainers["Independent"] == runner._SEGMENT_FIXED["Independent"]
+    assert committers["Other orgs"] == runner._SEGMENT_FIXED["Other orgs"]
+    assert committers["Other (18)"] == runner._SEGMENT_FIXED["Other orgs"]
+
+
+def test_prominent_organisation_colors_are_distinct_and_stable():
+    """The chart-visible employer head must not collide or churn for a rare new org."""
+    employers = [employer for rank in range(10, 0, -1) for employer in [f"Employer {11 - rank:02d}"] * rank]
+
+    colors = runner._composition_colors(employers)
+    with_unrelated = runner._composition_colors([*employers, "Unrelated newcomer"])
+    top_ten = [f"Employer {index:02d}" for index in range(1, 11)]
+
+    assert len({colors[employer] for employer in top_ten}) == 10
+    assert with_unrelated["Employer 01"] == colors["Employer 01"]
+
+
+def test_repo_diversity_role_variants_are_wired_horizontal(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Both role variants must pass the same explicit orientation to their chart."""
+    calls: list[dict] = []
+
+    def _capture_bar(_df, **kwargs):
+        calls.append(kwargs)
+
+    monkeypatch.setattr(runner, "plot_bar", _capture_bar)
+    role_lookup = {
+        "test-org/core": {"alice": "maintainer", "amy": "maintainer"},
+        "test-org/tools": {"bob": "committer", "ben": "committer"},
+    }
+    affiliations = {
+        "alice": "Hashgraph",
+        "amy": "Hashgraph",
+        "bob": "BlockyDevs",
+        "ben": "BlockyDevs",
+    }
+
+    for role, suffix in runner.ROLE_VARIANTS:
+        runner._repo_diversity_views(
+            role_lookup,
+            affiliations,
+            tmp_path / "data",
+            tmp_path / "charts",
+            role=role,
+            suffix=suffix,
+            title=f"{role} diversity",
+            organisation_colors=runner._composition_colors(list(affiliations.values())),
+        )
+
+    assert [call["output_path"].name for call in calls] == [
+        "single_employer_repos_by_org.png",
+        "single_employer_repos_by_org_committers.png",
+    ]
+    assert all(call["horizontal"] is True for call in calls)
+
+
 def test_main_handles_empty_inputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -258,3 +387,44 @@ def test_main_stays_quiet_when_curation_is_healthy(
         runner.main(TEST_ORG)
 
     assert not [record for record in caplog.records if "decayed" in record.getMessage()]
+
+
+def test_distribution_chart_pools_independents_into_other(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Only employers are ranked, but the companion CSV keeps Independent's own row."""
+    data_dir, charts_dir = tmp_path / "data", tmp_path / "charts"
+    data_dir.mkdir()
+    charts_dir.mkdir()
+    classified = pd.DataFrame(
+        [
+            {"login": "alice", "organisation": "Hashgraph", "status": "affiliated"},
+            {"login": "bob", "organisation": "Hashgraph", "status": "affiliated"},
+            {"login": "carol", "organisation": "Independent", "status": "independent"},
+            {"login": "dave", "organisation": "Independent", "status": "independent"},
+            {"login": "erin", "organisation": "LimeChain", "status": "affiliated"},
+            {"login": "frank", "organisation": "LimeChain", "status": "affiliated"},
+            {"login": "grace", "organisation": "BlockyDevs", "status": "affiliated"},
+        ]
+    )
+    captured: dict = {}
+
+    def _capture_frame(distribution, **_kwargs):
+        captured["frame"] = distribution
+
+    monkeypatch.setattr(runner, "plot_pie", _capture_frame)
+
+    runner._distribution_chart(
+        classified,
+        data_dir,
+        charts_dir,
+        suffix="",
+        title="test-org — maintainer organisation diversity",
+        value_col="maintainers",
+    )
+
+    slices = captured["frame"]["organisation"].tolist()
+    assert slices == ["Hashgraph", "LimeChain", "Other (2)"]
+    distribution = pd.read_csv(data_dir / "affiliation_distribution.csv")
+    assert "Independent" in distribution["organisation"].tolist()

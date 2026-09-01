@@ -246,24 +246,35 @@ def top_n_with_other(
     *,
     top_n: int = 6,
     always_keep: Collection[str] = (),
+    always_pool: Collection[str] = (),
 ) -> pd.DataFrame:
     """Fold a distribution to its top-N rows plus a single ``Other (k)`` row.
 
     Keeps a donut readable: the largest ``top_n`` slices stay, the rest collapse
     into one. Labels in ``always_keep`` survive the fold however small they are,
-    so a band the chart promises to show (``Unknown``) cannot silently disappear
-    into ``Other``; they do not consume the ``top_n`` budget. Returns the frame
-    unchanged when it already has ``top_n`` rows or fewer.
+    so a band the chart promises to show cannot silently disappear into
+    ``Other``; they do not consume the ``top_n`` budget. Labels in
+    ``always_pool`` are the mirror image: they always land in ``Other``, however
+    large, and never compete for a slot — which is how a non-employer band like
+    ``Independent`` is kept from displacing a real employer from the ranking.
+    Returns the frame unchanged when it already has ``top_n`` rows or fewer, and
+    when pooling would leave nothing ranked at all.
     """
     if distribution.empty:
         return distribution
     ordered = distribution.sort_values(value_col, ascending=False).reset_index(drop=True)
-    if len(ordered) <= top_n:
+    pooled = ordered[ordered[label_col].isin(always_pool)]
+    rankable = ordered[~ordered[label_col].isin(always_pool)]
+    # Pooling every row would leave a pie whose only slice is 'Other' — no
+    # information at all, so show the distribution as it stands instead.
+    if rankable.empty:
         return ordered
-    pinned = ordered[label_col].isin(always_keep)
-    rest = ordered[~pinned]
-    kept = pd.concat([rest.head(top_n), ordered[pinned]]).sort_values(value_col, ascending=False)
-    tail = rest.iloc[top_n:]
+    if pooled.empty and len(ordered) <= top_n:
+        return ordered
+    pinned = rankable[label_col].isin(always_keep)
+    rest = rankable[~pinned]
+    kept = pd.concat([rest.head(top_n), rankable[pinned]]).sort_values(value_col, ascending=False)
+    tail = pd.concat([rest.iloc[top_n:], pooled])
     if tail.empty:
         return kept.reset_index(drop=True)
     other = pd.DataFrame([{label_col: f"Other ({len(tail)})", value_col: int(tail[value_col].sum())}])

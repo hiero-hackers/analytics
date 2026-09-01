@@ -42,7 +42,7 @@ import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
-from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES
+from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -57,8 +57,13 @@ from hiero_analytics.data_sources.models import (
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 
-# Every table section across the table-bearing macros (Contributors, Governance).
-ALL_SECTION_SPECS = [spec for family in TABLE_FAMILIES.values() for spec in family.SECTION_SPECS]
+# Every table section across the table-bearing macros (Contributors, Governance),
+# flattened through its role variants: a variant the dashboard renders as a tab
+# is still its own produced CSV with its own id, columns and API document, so it
+# has to face the same production/coverage/orphan checks a top-level section does.
+ALL_SECTION_SPECS = [
+    variant for family in TABLE_FAMILIES.values() for spec in family.SECTION_SPECS for variant in table_variants(spec)
+]
 
 PRIMARY = "hiero-ledger"
 HACKERS = "hiero-hackers"

@@ -26,8 +26,10 @@ The *Organisation diversity* charts are split into **role tabs**. Each tab draws
 population, keyed on the person's *highest* role anywhere in the org, so nobody is counted
 twice: the **104 maintainers** on the Maintainers tab, and the **133 people whose ceiling is
 write access** on the Committers tab. Curation coverage differs sharply between them —
-maintainers are **98%** resolved, committers **78%** — so each chart states its own known
-share and draws the unresolved as an explicit *Unknown* band rather than hiding them.
+maintainers are **98%** resolved, committers **78%**. The employer pie shows only resolved
+holders, so its percentages use the same resolved-population denominator as the concentration
+metrics. Unresolved holders remain visible in the affiliations and diversity tables, and each
+pipeline run logs the known share and warns if it falls below the configured floor.
 
 The dashboard reads this file directly (offline) — no network needed at render time.
 
@@ -85,7 +87,7 @@ The unknowns are the `"?"` rows (status `unknown`). To work through them:
 1. **Get the worklist** — filter the *Maintainer affiliations* or *Committer affiliations*
    table by `status = unknown`, or `grep ': "?"' src/hiero_analytics/data/affiliations.yaml`.
    Each row's comment has the name. The committer roster is where the bulk of the remaining
-   unknowns sit, and it is the one the *Unknown* band on the Committers tab is measuring.
+   unknowns sit, so check its known share before interpreting the Committers pie.
 2. **Find their employer** — check the gitignored audit CSV
    (`outputs/data/org/<org>/maintainer_affiliation_audit.csv`); it lists each unknown's weak
    signals: an unmapped org membership, a **LinkedIn URL** pointer, redacted email domains.

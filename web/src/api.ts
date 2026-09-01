@@ -32,6 +32,13 @@ export interface SectionRef {
   title: string;
   row_count: number;
   path: string;
+  /**
+   * Set when this section is a role variant another card now renders as a tab.
+   * Its document still exists and still resolves — `v1` is additive-only, so a
+   * merged card may not withdraw an id — but the dashboard reads its rows from
+   * the absorbing section's `variants` rather than fetching it twice.
+   */
+  absorbed_by?: string;
 }
 
 export interface ChartVariant {
@@ -41,6 +48,14 @@ export interface ChartVariant {
    *  reserve the image's box so loading charts don't shift the page. */
   width?: number;
   height?: number;
+  /**
+   * This tab's own "how to read this" and derivation steps. A chart's tabs show
+   * different populations (maintainers / committers) or different spans, so the
+   * text has to follow the tab; the chart-level fields below remain the
+   * fallback for a tab with no entry of its own.
+   */
+  note?: string;
+  methodology?: string[];
 }
 
 export interface ChartSpec {
@@ -75,6 +90,13 @@ export interface ChartSection {
   charts: ChartSpec[];
   /** A companion CSV copied into the API tree, offered as a download. */
   download?: ChartDownload;
+  /**
+   * Companion CSVs per chart-variant label, for a card whose tabs show
+   * different populations. The card offers the one matching its shared variant
+   * axis and hides the button where that tab has none — a single download here
+   * would hand a reader on the Committers tab the maintainer table.
+   */
+  downloads?: Record<string, ChartDownload>;
 }
 
 /** A bespoke view the manifest lists by reference, like sections. */
@@ -235,6 +257,26 @@ export interface Manifest {
 
 export type Row = Record<string, unknown>;
 
+/**
+ * One role variant of a tabbed table section. Carries a full table of its own:
+ * the count column is named for the role it counts, so the variants differ in
+ * shape and not only in labels.
+ */
+export interface SectionVariant {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+  source: string;
+  columns: ColumnSpec[];
+  rows: Row[];
+  row_count: number;
+  action?: { url: string; label: string };
+  generated_at?: string;
+  stale?: boolean;
+  periods?: Record<string, Row[]>;
+}
+
 export interface SectionDoc {
   id: string;
   title: string;
@@ -249,6 +291,12 @@ export interface SectionDoc {
   generated_at?: string;
   stale?: boolean;
   periods?: Record<string, Row[]>;
+  /**
+   * Role tabs. The first variant is also hoisted to the fields above, so a
+   * consumer that predates this field reads the same table it always did.
+   * Present only when more than one variant was produced.
+   */
+  variants?: SectionVariant[];
 }
 
 /** Deploy-relative roots: the app, the API, and the chart PNGs ship together. */

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from hiero_analytics.export.macro_metrics import contributors_metrics
+from hiero_analytics.export.macro_metrics import contributors_metrics, governance_metrics
 
 
 def test_contributor_metrics_tiles(tmp_path):
@@ -30,3 +30,23 @@ def test_contributor_metrics_tiles(tmp_path):
     assert metrics["open PRs %"] == "50%"
     assert metrics["give reviews %"] == "25%"
     assert metrics["completed a GFI %"] == "50%"
+
+
+def test_governance_metrics_include_live_affiliation_coverage(tmp_path):
+    """Known-share tiles use each role's full affiliations reference table."""
+    loaded = {
+        "repo": pd.DataFrame(
+            {
+                "user": ["alice", "bob"],
+                "granted_role": ["maintainer", "committer"],
+            }
+        ),
+        "teams": pd.DataFrame(),
+        "affiliations": pd.DataFrame({"status": ["affiliated", "independent", "unknown"]}),
+        "committeraffiliations": pd.DataFrame({"status": ["affiliated", "unknown", "unknown", "unknown"]}),
+    }
+
+    metrics = dict(governance_metrics(loaded, tmp_path))
+
+    assert metrics["maintainer affiliations known"] == "67%"
+    assert metrics["committer affiliations known"] == "25%"

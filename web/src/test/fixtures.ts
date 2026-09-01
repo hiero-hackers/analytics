@@ -49,6 +49,66 @@ export const HACKERS_DOC: SectionDoc = {
   row_count: 1,
 };
 
+/**
+ * A role-tabbed table: the two tabs are disjoint populations with genuinely
+ * different shapes (the first column is labelled for the role it names), which
+ * is what the Organisation-diversity tables look like once merged.
+ */
+export const AFFILIATIONS_DOC: SectionDoc = {
+  id: 'affiliations',
+  title: 'Organisation affiliations — reference',
+  description: 'Each maintainer and the organisation they were mapped to.',
+  group: 'Organisation diversity',
+  macro: 'Diversity',
+  source: 'maintainer_affiliations.csv',
+  columns: [
+    { key: 'login', label: 'maintainer' },
+    { key: 'organisation', label: 'organisation' },
+  ],
+  rows: [
+    { login: 'alice', organisation: 'Hashgraph' },
+    { login: 'bob', organisation: 'LimeChain' },
+  ],
+  row_count: 2,
+  action: { url: 'https://example.test/affiliation', label: 'Suggest an affiliation fix' },
+  generated_at: '2026-07-25T10:00:00+00:00',
+  variants: [
+    {
+      id: 'affiliations',
+      label: 'Maintainers',
+      title: 'Maintainer affiliations — reference',
+      description: 'Each maintainer and the organisation they were mapped to.',
+      source: 'maintainer_affiliations.csv',
+      columns: [
+        { key: 'login', label: 'maintainer' },
+        { key: 'organisation', label: 'organisation' },
+      ],
+      rows: [
+        { login: 'alice', organisation: 'Hashgraph' },
+        { login: 'bob', organisation: 'LimeChain' },
+      ],
+      row_count: 2,
+      action: { url: 'https://example.test/affiliation', label: 'Suggest an affiliation fix' },
+      generated_at: '2026-07-25T10:00:00+00:00',
+    },
+    {
+      id: 'committeraffiliations',
+      label: 'Committers',
+      title: 'Committer affiliations — reference',
+      description: 'Each committer, whose highest role anywhere is committer.',
+      source: 'committer_affiliations.csv',
+      columns: [
+        { key: 'login', label: 'committer' },
+        { key: 'organisation', label: 'organisation' },
+      ],
+      rows: [{ login: 'dave', organisation: 'BlockyDevs' }],
+      row_count: 1,
+      action: { url: 'https://example.test/affiliation', label: 'Suggest an affiliation fix' },
+      generated_at: '2026-07-26T10:00:00+00:00',
+    },
+  ],
+};
+
 export const HIP_EVIDENCE_DOC: SectionDoc = {
   id: 'hip-evidence',
   title: 'Evidence (per PR)',
@@ -301,6 +361,23 @@ export const MANIFEST: Manifest = {
           row_count: 2,
           path: 'hiero-ledger/profiles.json',
         },
+        {
+          id: 'affiliations',
+          macro: 'Diversity',
+          title: 'Organisation affiliations — reference',
+          row_count: 2,
+          path: 'hiero-ledger/affiliations.json',
+        },
+        // Absorbed: still listed and still fetchable (v1 may not withdraw an
+        // id), but its rows travel inside the card above as a role tab.
+        {
+          id: 'committeraffiliations',
+          macro: 'Diversity',
+          title: 'Committer affiliations — reference',
+          row_count: 1,
+          path: 'hiero-ledger/committeraffiliations.json',
+          absorbed_by: 'affiliations',
+        },
       ],
       chart_sections: [
         {
@@ -337,6 +414,69 @@ export const MANIFEST: Manifest = {
             {
               title: "By team",
               variants: [{ label: "By team", file: "charts/org/hiero-ledger/team_activity_heatmap.png" }],
+            },
+          ],
+        },
+        // Three charts on one card: two share a Maintainers/Committers axis
+        // (so the card owns it), the third has none of its own.
+        {
+          id: 'org-diversity',
+          macro: 'Diversity',
+          title: 'Organisation diversity',
+          group: 'Organisation diversity',
+          description: 'Where write authority sits.',
+          downloads: {
+            Maintainers: {
+              name: 'maintainer_affiliations.csv',
+              path: 'hiero-ledger/maintainer_affiliations.csv',
+            },
+            Committers: {
+              name: 'committer_affiliations.csv',
+              path: 'hiero-ledger/committer_affiliations.csv',
+            },
+          },
+          charts: [
+            {
+              title: 'Role-holders by organisation',
+              variants: [
+                {
+                  label: 'Maintainers',
+                  file: 'charts/org/hiero-ledger/affiliation_donut.png',
+                  note: 'The maintainer bench by employer.',
+                  methodology: ['Count maintainers.'],
+                },
+                {
+                  label: 'Committers',
+                  file: 'charts/org/hiero-ledger/affiliation_donut_committers.png',
+                  note: 'The committer bench by employer.',
+                  methodology: ['Count committers.'],
+                },
+              ],
+              note: 'The maintainer bench by employer.',
+              methodology: ['Count maintainers.'],
+            },
+            {
+              title: 'Single-employer repos by org',
+              variants: [
+                {
+                  label: 'Maintainers',
+                  file: 'charts/org/hiero-ledger/single_employer_repos_by_org.png',
+                },
+                {
+                  label: 'Committers',
+                  file: 'charts/org/hiero-ledger/single_employer_repos_by_org_committers.png',
+                },
+              ],
+            },
+            {
+              title: 'Single-employer teams by org',
+              variants: [
+                {
+                  label: 'Single-employer teams by org',
+                  file: 'charts/org/hiero-ledger/single_employer_teams_by_org.png',
+                },
+              ],
+              note: 'Teams are membership-based, so they have no role tabs.',
             },
           ],
         },
@@ -380,7 +520,12 @@ const ROUTES: Record<string, unknown> = {
   'hiero-ledger/hip-board.json': BOARD_DOC,
   'hiero-ledger/hip-matrix.json': MATRIX_DOC,
   'hiero-ledger/profiles.json': CONTRIB_DOC,
+  'hiero-ledger/affiliations.json': AFFILIATIONS_DOC,
+  'hiero-ledger/committeraffiliations.json': AFFILIATIONS_DOC.variants?.[1],
   'hiero-hackers/profiles.json': HACKERS_DOC,
+  // Chart companion CSVs travel inside the API tree as raw text.
+  'hiero-ledger/maintainer_affiliations.csv': 'login,organisation\nalice,Hashgraph\n',
+  'hiero-ledger/committer_affiliations.csv': 'login,organisation\ndave,BlockyDevs\n',
 };
 
 /**
@@ -401,7 +546,9 @@ export function stubApi(overrides: Record<string, () => Response | Promise<Respo
       if (!match) {
         return new Response('not found', { status: 404 });
       }
-      return new Response(JSON.stringify(match[1]), { status: 200 });
+      // CSV companions are served verbatim; everything else is a JSON document.
+      const body = typeof match[1] === 'string' ? match[1] : JSON.stringify(match[1]);
+      return new Response(body, { status: 200 });
     }),
   );
 }

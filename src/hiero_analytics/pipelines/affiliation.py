@@ -18,6 +18,7 @@ fetch, so this stays cheap and deterministic.
 from __future__ import annotations
 
 import logging
+from collections import Counter
 
 from hiero_analytics.analysis.affiliation import (
     AFFILIATIONS_PATH,
@@ -67,22 +68,64 @@ logger = logging.getLogger(__name__)
 # tab never renames an existing artifact.
 ROLE_VARIANTS = [("maintainer", ""), ("committer", "_committers")]
 
-# Neutral greys for the non-employer segments of the per-repo composition; named
-# employers cycle through the categorical palette.
+# Neutral greys for non-employer segments; named employers use the categorical
+# palette shared by every organisation-keyed chart in this pipeline.
 _SEGMENT_FIXED = {INDEPENDENT: "#94A3B8", OTHER_LABEL: "#CBD5E1", UNKNOWN_LABEL: "#E5E7EB"}
-_SEGMENT_PALETTE = ["#F97316", "#0EA5E9", "#14B8A6", "#8B5CF6", "#EF4444", "#F59E0B", "#EC4899"]
+# Twenty qualitative swatches derived from matplotlib's tab20 palette. The
+# neutral greys were replaced, and the darker hues come first so adjacent,
+# prominent employers stay easy to distinguish in dense stacked bars.
+_SEGMENT_PALETTE = [
+    "#1F77B4",
+    "#FF7F0E",
+    "#2CA02C",
+    "#D62728",
+    "#9467BD",
+    "#8C564B",
+    "#E377C2",
+    "#BCBD22",
+    "#17BECF",
+    "#393B79",
+    "#AEC7E8",
+    "#FFBB78",
+    "#98DF8A",
+    "#FF9896",
+    "#C5B0D5",
+    "#C49C94",
+    "#F7B6D2",
+    "#DBDB8D",
+    "#9EDAE5",
+    "#8C6D31",
+]
+
+
+def _fixed_segment_color(segment: str) -> str | None:
+    """The fixed grey for a non-employer segment, including folded Other labels."""
+    if segment in _SEGMENT_FIXED:
+        return _SEGMENT_FIXED[segment]
+    if segment.startswith("Other (") and segment.endswith(")") and segment[7:-1].isdigit():
+        return _SEGMENT_FIXED[OTHER_LABEL]
+    return None
 
 
 def _composition_colors(segments: list[str]) -> dict[str, str]:
-    """Fixed greys for non-employer segments; palette colours for the employers."""
-    colors: dict[str, str] = {}
-    cycle = 0
-    for segment in segments:
-        if segment in _SEGMENT_FIXED:
-            colors[segment] = _SEGMENT_FIXED[segment]
-        else:
-            colors[segment] = _SEGMENT_PALETTE[cycle % len(_SEGMENT_PALETTE)]
-            cycle += 1
+    """Return prominence-ranked employer colours plus fixed non-employer greys."""
+    seat_counts = Counter(segments)
+    employers = sorted(
+        (segment for segment in seat_counts if _fixed_segment_color(segment) is None),
+        key=lambda segment: (-seat_counts[segment], segment.casefold(), segment),
+    )
+    # The full affiliation map is ranked once for the pipeline. Modulo remains
+    # an overflow fallback: collisions are possible beyond 20 employers, but
+    # the chart-visible employer head fits; dense compositions pool the tail.
+    colors = {employer: _SEGMENT_PALETTE[index % len(_SEGMENT_PALETTE)] for index, employer in enumerate(employers)}
+    colors.update({segment: color for segment in seat_counts if (color := _fixed_segment_color(segment)) is not None})
+    return colors
+
+
+def _chart_colors(segments: list[str], organisation_colors: dict[str, str] | None) -> dict[str, str]:
+    """Select shared colours for a chart, adding only generated neutral labels."""
+    colors = dict(organisation_colors or {})
+    colors.update({segment: color for segment in segments if (color := _fixed_segment_color(segment)) is not None})
     return colors
 
 
@@ -117,10 +160,23 @@ def _plot_grouped_heatmap(df, label_col, ylabel, filename, title, data_dir, char
 
 
 def _pie_chart(
-    distribution, label_col, value_col, center_label, title, output_path, *, top_n=6, donut=True, always_keep=()
+    distribution,
+    label_col,
+    value_col,
+    center_label,
+    title,
+    output_path,
+    *,
+    colors=None,
+    top_n=6,
+    donut=True,
+    always_keep=(),
+    always_pool=(),
 ):
     """Render a distribution as a pie/donut (top-N slices + 'Other'); skips empty frames."""
-    folded = top_n_with_other(distribution, label_col, value_col, top_n=top_n, always_keep=always_keep)
+    folded = top_n_with_other(
+        distribution, label_col, value_col, top_n=top_n, always_keep=always_keep, always_pool=always_pool
+    )
     if folded.empty:
         return
     plot_pie(
@@ -129,32 +185,38 @@ def _pie_chart(
         value_col=value_col,
         title=title,
         output_path=output_path,
+        colors=_chart_colors(folded[label_col].astype(str).tolist(), colors),
         center_label=center_label if donut else None,
         donut=donut,
     )
 
 
-def _distribution_chart(classified, data_dir, charts_dir, *, suffix, title, value_col):
-    """Role-holders-by-organisation pie, including the unmapped as their own band."""
-    distribution = build_affiliation_distribution(classified, value_col=value_col, include_unknown=True)
+def _distribution_chart(classified, data_dir, charts_dir, *, suffix, title, value_col, colors=None):
+    """Role-holders-by-organisation pie over people with resolved affiliations."""
+    distribution = build_affiliation_distribution(classified, value_col=value_col, include_unknown=False)
     save_dataframe(distribution, data_dir / f"affiliation_distribution{suffix}.csv")
     # A filled pie of the two largest employers + 'Other' — the concentration at a glance.
-    # Unknown is pinned: it is usually too small to survive the fold, and the chart's
-    # whole claim is that the unmapped are visible rather than quietly dropped.
+    # 'Independent' is pooled rather than ranked: it is the absence of an employer,
+    # so letting it take a slot would push a real employer out of the ranking (on the
+    # committer tab it outranks LimeChain). The full breakdown, Independent included,
+    # stays in the companion CSV and the affiliations table.
     _pie_chart(
         distribution,
         "organisation",
         value_col,
         value_col,
-        f"{title} — {known_share_pct(classified)}% have a known affiliation",
+        title,
         charts_dir / f"affiliation_donut{suffix}.png",
+        colors=colors,
         top_n=2,
         donut=False,
-        always_keep=(UNKNOWN_LABEL,),
+        always_pool=(INDEPENDENT,),
     )
 
 
-def _repo_composition_chart(role_lookup, affiliations, data_dir, charts_dir, *, role, suffix, title):
+def _repo_composition_chart(
+    role_lookup, affiliations, data_dir, charts_dir, *, role, suffix, title, organisation_colors
+):
     """Per-repo organisation-mix stacked bar for one role's holders."""
     composition, segments = build_repo_org_composition(role_lookup, affiliations, role=role)
     if segments:
@@ -166,7 +228,7 @@ def _repo_composition_chart(role_lookup, affiliations, data_dir, charts_dir, *, 
             x_col="repo",
             stack_cols=segments,
             labels=segments,
-            colors=_composition_colors(segments),
+            colors=_chart_colors(segments, organisation_colors),
             title=title,
             force_horizontal=False,
             rotate_x=90,
@@ -178,7 +240,7 @@ def _repo_composition_chart(role_lookup, affiliations, data_dir, charts_dir, *, 
         )
 
 
-def _team_composition_chart(team_membership, affiliations, data_dir, charts_dir, *, suffix, title):
+def _team_composition_chart(team_membership, affiliations, data_dir, charts_dir, *, suffix, title, organisation_colors):
     """Per-team organisation-mix stacked bar for a (possibly active-filtered) membership."""
     composition, segments = build_team_org_composition(team_membership, affiliations)
     if segments:
@@ -190,7 +252,7 @@ def _team_composition_chart(team_membership, affiliations, data_dir, charts_dir,
             x_col="team",
             stack_cols=segments,
             labels=segments,
-            colors=_composition_colors(segments),
+            colors=_chart_colors(segments, organisation_colors),
             title=title,
             force_horizontal=False,
             rotate_x=90,
@@ -202,7 +264,7 @@ def _team_composition_chart(team_membership, affiliations, data_dir, charts_dir,
         )
 
 
-def _single_employer_chart(team_membership, affiliations, charts_dir, *, suffix, title):
+def _single_employer_chart(team_membership, affiliations, charts_dir, *, suffix, title, organisation_colors):
     """Single-employer teams by controlling org, as a bar (possibly active-filtered)."""
     diversity = build_team_affiliation_diversity(team_membership, affiliations)
     plot_and_save(
@@ -212,10 +274,11 @@ def _single_employer_chart(team_membership, affiliations, charts_dir, *, suffix,
         x_col="organisation",
         y_col="teams",
         title=title,
+        colors=organisation_colors,
     )
 
 
-def _repo_diversity_views(role_lookup, affiliations, data_dir, charts_dir, *, role, suffix, title):
+def _repo_diversity_views(role_lookup, affiliations, data_dir, charts_dir, *, role, suffix, title, organisation_colors):
     """Per-repo diversity table plus its single-employer-repos-by-org companion chart."""
     diversity = build_repo_affiliation_diversity(role_lookup, affiliations, role=role)
     save_dataframe(diversity, data_dir / f"repo_affiliation_diversity{suffix}.csv")
@@ -226,6 +289,8 @@ def _repo_diversity_views(role_lookup, affiliations, data_dir, charts_dir, *, ro
         x_col="organisation",
         y_col="repos",
         title=title,
+        colors=organisation_colors,
+        horizontal=True,
     )
     if not diversity.empty:
         logger.info(
@@ -298,7 +363,18 @@ def _write_activity_views(
     _write_activity_heatmaps(records, role_lookup, team_membership, affiliations, org_data_dir, org_charts_dir, org=org)
 
 
-def _write_role_views(role, suffix, role_lookup, affiliations, manual_logins, data_dir, charts_dir, *, org):
+def _write_role_views(
+    role,
+    suffix,
+    role_lookup,
+    affiliations,
+    manual_logins,
+    data_dir,
+    charts_dir,
+    *,
+    org,
+    organisation_colors,
+):
     """Every org-scoped view for one governance role: reference table, donut, mixes."""
     holders = highest_role_holders(role_lookup, role)
     plural = role_column(role)
@@ -352,6 +428,7 @@ def _write_role_views(role, suffix, role_lookup, affiliations, manual_logins, da
         suffix=suffix,
         title=f"{org} — {role} organisation diversity (distinct {plural} by employer)",
         value_col=plural,
+        colors=organisation_colors,
     )
     _repo_composition_chart(
         role_repos,
@@ -361,6 +438,7 @@ def _write_role_views(role, suffix, role_lookup, affiliations, manual_logins, da
         role=role,
         suffix=suffix,
         title=f"{org} — {role} organisation mix by repository",
+        organisation_colors=organisation_colors,
     )
     _repo_diversity_views(
         role_repos,
@@ -370,6 +448,7 @@ def _write_role_views(role, suffix, role_lookup, affiliations, manual_logins, da
         role=role,
         suffix=suffix,
         title=f"{org} — repositories with a single {role} employer, by controlling organisation",
+        organisation_colors=organisation_colors,
     )
 
 
@@ -382,6 +461,7 @@ def main(org: str = ORG) -> None:
     team_membership = build_team_membership(config)
     affiliations = load_affiliations()
     manual_logins = load_manual_logins()
+    organisation_colors = _composition_colors(list(affiliations.values()))
 
     # One set of org-scoped views per role tab. Roles are resolved at each
     # person's *highest* role anywhere, so the populations are disjoint and agree
@@ -397,6 +477,7 @@ def main(org: str = ORG) -> None:
             org_data_dir,
             org_charts_dir,
             org=org,
+            organisation_colors=organisation_colors,
         )
 
     # Team views are role-agnostic (membership, not permissions), so they stay single-variant.
@@ -406,6 +487,7 @@ def main(org: str = ORG) -> None:
         org_charts_dir,
         suffix="",
         title=f"{org} — single-employer governance teams, by controlling organisation",
+        organisation_colors=organisation_colors,
     )
     _team_composition_chart(
         team_membership,
@@ -414,6 +496,7 @@ def main(org: str = ORG) -> None:
         org_charts_dir,
         suffix="",
         title=f"{org} — organisation mix by governance team (teams with 4+ resolved members)",
+        organisation_colors=organisation_colors,
     )
     team_diversity = build_team_affiliation_diversity(team_membership, affiliations)
     save_dataframe(team_diversity, org_data_dir / "team_affiliation_diversity.csv")

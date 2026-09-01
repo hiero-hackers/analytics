@@ -280,11 +280,221 @@ def test_chart_sections_carry_presentation_structure(api_env: Path, tmp_path: Pa
     (section,) = manifest["orgs"][ORG]["chart_sections"]
     assert section["title"] == "Widget charts" and section["slideshow"] is True
     (chart,) = section["charts"]
-    # Only the produced variant is listed; note, methodology and wide survive.
-    assert chart["variants"] == [{"label": "All", "file": f"charts/org/{ORG}/widgets.png"}]
+    # Only the produced variant is listed. Its own note and methodology travel
+    # with it — the tab a reader is looking at has to explain that tab — and the
+    # chart-level copies stay as the fallback for a variant with no entry.
+    assert chart["variants"] == [
+        {
+            "label": "All",
+            "file": f"charts/org/{ORG}/widgets.png",
+            "note": "How to read widgets.",
+            "methodology": ["Step one."],
+        }
+    ]
     assert chart["note"] == "How to read widgets."
     assert chart["methodology"] == ["Step one."]
     assert chart["wide"] is True
+
+
+ROLE_TABBED_SECTION = {
+    "id": "widgets",
+    "file": "widgets.csv",
+    "title": "Widgets",
+    "description": "All widgets.",
+    "columns": [("name", "widget"), ("count", "count"), ("last_seen", "last seen", "date")],
+    "variants": [
+        {"id": "widgets", "label": "Maintainers"},
+        {
+            "id": "committerwidgets",
+            "label": "Committers",
+            "file": "committer_widgets.csv",
+            "description": "The committer view.",
+            # A genuinely different shape, not just a relabel: the count column
+            # is named for the role it counts in each produced CSV.
+            "columns": [("name", "widget"), ("committers", "committers"), ("last_seen", "last seen", "date")],
+        },
+    ],
+}
+
+
+def _write_committer_widgets(org_data: Path, frame: pd.DataFrame) -> None:
+    frame.to_csv(org_data / "committer_widgets.csv", index=False)
+
+
+def test_role_variants_publish_one_tabbed_document(api_env: Path, monkeypatch: pytest.MonkeyPatch):
+    """A role-tabbed section ships every variant, hoisting the first to the top.
+
+    Hoisting is what keeps ``v1`` additive: a consumer that predates variants
+    reads the same ``columns``/``rows`` it always did, while the dashboard
+    renders one card with a tab per role instead of two stacked cards.
+    """
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(ROLE_TABBED_SECTION)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+    _write_committer_widgets(api_env, pd.DataFrame({"name": ["b"], "committers": [2], "last_seen": ["2026-07-02"]}))
+
+    api_dir = emit_data_api().parent
+    document = json.loads((api_dir / ORG / "widgets.json").read_text())
+
+    assert document["rows"] == [{"name": "a", "count": 1, "last_seen": "2026-07-01"}]
+    assert [variant["label"] for variant in document["variants"]] == ["Maintainers", "Committers"]
+    committer = document["variants"][1]
+    assert committer["id"] == "committerwidgets"
+    assert committer["description"] == "The committer view."
+    assert committer["rows"] == [{"name": "b", "committers": 2, "last_seen": "2026-07-02"}]
+    assert [column["key"] for column in committer["columns"]] == ["name", "committers", "last_seen"]
+
+
+def test_absorbed_variants_keep_their_own_id_and_document(api_env: Path, monkeypatch: pytest.MonkeyPatch):
+    """Merging two cards into one must not withdraw ids consumers already resolve.
+
+    ``v1`` is additive-only and shared ``#widget=`` links name section ids, so
+    an absorbed variant keeps its own document and manifest entry, tagged with
+    the card that now renders it.
+    """
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(ROLE_TABBED_SECTION)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+    _write_committer_widgets(api_env, pd.DataFrame({"name": ["b"], "committers": [2], "last_seen": ["2026-07-02"]}))
+
+    manifest_path = emit_data_api()
+    manifest = json.loads(manifest_path.read_text())
+
+    entries = {section["id"]: section for section in manifest["orgs"][ORG]["sections"]}
+    assert set(entries) == {"widgets", "committerwidgets"}
+    assert "absorbed_by" not in entries["widgets"]
+    assert entries["committerwidgets"]["absorbed_by"] == "widgets"
+    assert entries["committerwidgets"]["row_count"] == 1
+    absorbed = json.loads((manifest_path.parent / ORG / "committerwidgets.json").read_text())
+    assert absorbed["rows"] == [{"name": "b", "committers": 2, "last_seen": "2026-07-02"}]
+    assert absorbed["group"] == "A group"
+
+
+def test_a_role_variant_without_its_table_is_simply_absent(api_env: Path, monkeypatch: pytest.MonkeyPatch):
+    """One surviving variant is an ordinary single-table section, tab row and all."""
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(ROLE_TABBED_SECTION)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+
+    manifest_path = emit_data_api()
+
+    document = json.loads((manifest_path.parent / ORG / "widgets.json").read_text())
+    assert "variants" not in document
+    assert [section["id"] for section in json.loads(manifest_path.read_text())["orgs"][ORG]["sections"]] == ["widgets"]
+
+
+def test_a_role_variant_faces_the_column_contract(api_env: Path, monkeypatch: pytest.MonkeyPatch):
+    """A renamed column in a variant's CSV fails the emit like the base table's."""
+    monkeypatch.setattr(data_api, "TABLE_FAMILIES", {"Testing": _family(ROLE_TABBED_SECTION)})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+    _write_committer_widgets(api_env, pd.DataFrame({"name": ["b"], "commiters": [2], "last_seen": ["2026-07-02"]}))
+
+    with pytest.raises(DataApiContractError, match="committer_widgets.csv"):
+        emit_data_api()
+
+
+def test_chart_variants_carry_their_own_note_and_methodology(
+    api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Each tab explains the population it shows, not the first tab's.
+
+    A role-tabbed card's committer note used to be unreachable: the emitter
+    picked one entry per chart, so the reader on the Committers tab was told
+    they were looking at maintainers.
+    """
+    monkeypatch.setattr(
+        data_api,
+        "CHART_MACROS",
+        [
+            {
+                "name": "Testing",
+                "charts": {
+                    ORG: [
+                        {
+                            "id": "w-chart",
+                            "title": "Widget charts",
+                            "description": "All widget charts.",
+                            "files": [
+                                ("Widgets", [("All", "widgets.png"), ("Active", "widgets_active.png")]),
+                            ],
+                        }
+                    ]
+                },
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        data_api,
+        "CHART_NOTES",
+        {"widgets.png": "Every widget.", "widgets_active.png": "Only the active ones."},
+    )
+    monkeypatch.setattr(
+        data_api,
+        "CHART_METHODOLOGY",
+        {"widgets.png": ["Count them all."], "widgets_active.png": ["Filter, then count."]},
+    )
+    chart_dir = tmp_path / "charts" / "org" / ORG
+    chart_dir.mkdir(parents=True)
+    for name in ("widgets.png", "widgets_active.png"):
+        (chart_dir / name).write_bytes(b"\x89PNG")
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+
+    manifest = json.loads(emit_data_api().read_text())
+
+    ((chart,),) = [section["charts"] for section in manifest["orgs"][ORG]["chart_sections"]]
+    assert [(variant["label"], variant["note"]) for variant in chart["variants"]] == [
+        ("All", "Every widget."),
+        ("Active", "Only the active ones."),
+    ]
+    assert chart["variants"][1]["methodology"] == ["Filter, then count."]
+
+
+def test_chart_downloads_can_be_declared_per_variant(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """A role-tabbed card offers the active tab's companion CSV, not one for all.
+
+    Only the tabs with a declared companion appear, so the frontend can hide
+    the button where the active tab has none rather than handing the reader
+    another tab's table.
+    """
+    monkeypatch.setattr(
+        data_api,
+        "CHART_MACROS",
+        [
+            {
+                "name": "Testing",
+                "charts": {
+                    ORG: [
+                        {
+                            "id": "w-chart",
+                            "title": "Widget charts",
+                            "description": "All widget charts.",
+                            # "Active" declares a companion that no pipeline
+                            # produced, so it must not be offered at all.
+                            "csv": {"All": "widgets.csv", "Active": "widgets_active.csv"},
+                            "files": [
+                                ("Widgets", [("All", "widgets.png"), ("Active", "widgets_active.png")]),
+                            ],
+                        }
+                    ]
+                },
+            }
+        ],
+    )
+    chart_dir = tmp_path / "charts" / "org" / ORG
+    chart_dir.mkdir(parents=True)
+    for name in ("widgets.png", "widgets_active.png"):
+        (chart_dir / name).write_bytes(b"\x89PNG")
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+
+    manifest = json.loads(emit_data_api().read_text())
+
+    (section,) = manifest["orgs"][ORG]["chart_sections"]
+    assert "download" not in section
+    assert section["downloads"] == {
+        "All": {
+            "name": "widgets.csv",
+            "path": f"{ORG}/widgets.csv",
+            "generated_at": "2026-07-25T10:00:00+00:00",
+        }
+    }
+    assert (tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.csv").exists()
 
 
 def test_manifest_ships_only_per_macro_glossaries(api_env: Path, monkeypatch: pytest.MonkeyPatch):

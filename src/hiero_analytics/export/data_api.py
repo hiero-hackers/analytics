@@ -21,6 +21,13 @@ The published rows carry *exactly* the declared columns: an extra column a
 pipeline writes stays in the CSV rather than becoming an undeclared part of
 the API's shape.
 
+Role variants: a section whose spec declares ``variants`` publishes each one
+under ``variants`` and hoists the first to the top level, so the dashboard can
+render them as one tabbed card while a consumer that predates the field still
+reads the same ``columns``/``rows``. Each absorbed variant keeps its own
+document and its own manifest entry, tagged ``absorbed_by`` — merging two cards
+into one must not withdraw ids that consumers and shared links already resolve.
+
 Versioning: breaking shape changes (renamed keys, removed sections) bump the
 version directory so consumers migrate deliberately; additive changes land in
 place. ``v1`` is additive-only from here.
@@ -54,6 +61,7 @@ from hiero_analytics.dashboard_spec import (
     PROJECT_ISSUES_URL,
     TABLE_FAMILIES,
     WIDE_CHARTS,
+    table_variants,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.csv_safety import sanitize_csv_text
@@ -164,45 +172,97 @@ def _period_variants(section: dict, org: str, org_data_dir: Path) -> dict[str, l
     return variants
 
 
-def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Path) -> dict | None:
-    """Build one section's API document, or None when its table wasn't produced."""
-    csv_path = org_data_dir / section["file"]
+def _variant_document(variant: dict, org: str, org_data_dir: Path) -> dict | None:
+    """One variant's payload, or None when its table wasn't produced."""
+    csv_path = org_data_dir / variant["file"]
     if not csv_path.exists():
         return None
-    frame = _contract_frame(section, pd.read_csv(csv_path), f"{org}/{section['file']}")
+    frame = _contract_frame(variant, pd.read_csv(csv_path), f"{org}/{variant['file']}")
     document = {
-        "id": section["id"],
-        "title": section["title"],
-        "description": section["description"],
-        "group": group_of.get(section["id"], ""),
-        "source": section["file"],
+        "id": variant["id"],
+        "title": variant["title"],
+        "description": variant["description"],
+        "source": variant["file"],
         # Column entries mirror the spec: (key, label) plus an optional display
         # format — serialized as objects so consumers need no tuple knowledge.
         "columns": [
             {"key": column[0], "label": column[1], **({"format": column[2]} if len(column) > 2 else {})}
-            for column in section["columns"]
+            for column in variant["columns"]
         ],
         "rows": _rows(frame),
         "row_count": len(frame),
     }
+    if label := variant.get("label"):
+        document["label"] = label
     # A section's call to action (e.g. the affiliations table's "Suggest a
     # correction" issue link) travels with the document.
-    if action_url := section.get("action_url"):
-        document["action"] = {"url": action_url, "label": section.get("action_label", "Suggest a correction")}
+    if action_url := variant.get("action_url"):
+        document["action"] = {"url": action_url, "label": variant.get("action_label", "Suggest a correction")}
     _stamp_freshness(document, csv_path)
-    if periods := _period_variants(section, org, org_data_dir):
+    if periods := _period_variants(variant, org, org_data_dir):
         document["periods"] = periods
     return document
 
 
+def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Path) -> dict | None:
+    """Build one section's API document, or None when its table wasn't produced.
+
+    A role-tabbed section publishes each variant under ``variants`` *and*
+    hoists the first one to the top level, so a v1 consumer that knows nothing
+    about variants still reads the same ``columns``/``rows`` it always did.
+    """
+    documents = [
+        document
+        for variant in table_variants(section)
+        if (document := _variant_document(variant, org, org_data_dir)) is not None
+    ]
+    if not documents:
+        return None
+    # The card's heading is the section's own, role-neutral title; each variant
+    # keeps the role-specific one for its standalone document and CSV export.
+    document = {
+        **documents[0],
+        "id": section["id"],
+        "title": section["title"],
+        "group": group_of.get(section["id"], ""),
+    }
+    # One surviving variant is an ordinary single-table section: no tab row to
+    # render, so no reason to ship the wrapper.
+    if len(documents) > 1:
+        document["variants"] = documents
+    return document
+
+
+def variant_annotations(filename: str) -> dict:
+    """The note and methodology declared for one chart file, keyed by filename.
+
+    The lookup is per *file*, not per chart: a chart's tabs show different
+    populations (maintainers / committers) or different spans, and each has its
+    own entry in the spec. Selecting one entry per chart — as the emitter used
+    to — made every entry belonging to a non-first tab unreachable.
+    """
+    annotations = {}
+    if note := CHART_NOTES.get(filename):
+        annotations["note"] = note
+    if methodology := CHART_METHODOLOGY.get(filename):
+        annotations["methodology"] = methodology
+    return annotations
+
+
 def _chart_variant(org: str, chart_dir: Path, label: str, filename: str) -> dict:
-    """One chart variant, carrying its pixel size when it can be read.
+    """One chart variant, carrying its own explanation and pixel size.
 
     The dimensions let the browser reserve the image's box before the PNG
     arrives, so a page of charts doesn't shift under the reader as they load.
     An unreadable PNG simply ships without them rather than failing the emit.
+
+    Note and methodology are keyed by *filename*, so each tab carries the text
+    describing the population it actually shows. The chart-level fields below
+    remain as the fallback for a variant with no entry of its own (the period
+    tabs that share one explanation), which is also what a v1 consumer written
+    before these fields existed keeps reading.
     """
-    variant = {"label": label, "file": f"charts/org/{org}/{filename}"}
+    variant = {"label": label, "file": f"charts/org/{org}/{filename}", **variant_annotations(filename)}
     try:
         with Image.open(chart_dir / filename) as image:
             variant["width"], variant["height"] = image.width, image.height
@@ -297,19 +357,11 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
     return sections
 
 
-def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, org_dir: Path) -> None:
-    """Copy a chart's declared companion CSV into the API tree and reference it.
-
-    The Pages deploy publishes only the API tree and the chart PNGs, so a CSV
-    the dashboard offers for download has to travel inside the API. The copy
-    keeps the raw ``outputs/data`` artifact untouched.
-    """
-    csv_name = spec.get("csv")
-    if not csv_name:
-        return
+def _copy_download(csv_name: str, org: str, org_data_dir: Path, org_dir: Path) -> dict | None:
+    """Copy one companion CSV into the API tree and describe it, or None."""
     csv_path = org_data_dir / csv_name
     if not csv_path.exists():
-        return
+        return None
     # This copy exists to be downloaded and opened in a spreadsheet, so it is
     # neutralised against formula injection; the artifact under outputs/data
     # stays verbatim for pandas consumers.
@@ -317,7 +369,51 @@ def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, or
     download = {"name": csv_name, "path": f"{org}/{csv_name}"}
     if generated_at := _read_meta(csv_path).get("generated_at"):
         download["generated_at"] = generated_at
-    section["download"] = download
+    return download
+
+
+def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, org_dir: Path) -> None:
+    """Copy a chart card's declared companion CSV(s) into the API and reference them.
+
+    The Pages deploy publishes only the API tree and the chart PNGs, so a CSV
+    the dashboard offers for download has to travel inside the API. The copy
+    keeps the raw ``outputs/data`` artifact untouched.
+
+    ``csv`` is one filename for a card whose tabs all read the same table, or a
+    ``{variant label: filename}`` map for a card whose tabs show different
+    populations — a single download on a role-tabbed card would hand the reader
+    the maintainer table while they are looking at committers. The frontend
+    offers the active tab's entry and hides the button where a tab has none.
+    """
+    declared = spec.get("csv")
+    if not declared:
+        return
+    if isinstance(declared, str):
+        if download := _copy_download(declared, org, org_data_dir, org_dir):
+            section["download"] = download
+        return
+    downloads = {
+        label: download
+        for label, csv_name in declared.items()
+        if (download := _copy_download(csv_name, org, org_data_dir, org_dir))
+    }
+    if downloads:
+        section["downloads"] = downloads
+
+
+def _write_section(document: dict, org: str, org_dir: Path) -> dict:
+    """Write one section document and return the manifest entry pointing at it."""
+    (org_dir / f"{document['id']}.json").write_text(json.dumps(document, indent=1), encoding="utf-8")
+    entry = {
+        "id": document["id"],
+        "macro": document["macro"],
+        "title": document["title"],
+        "row_count": document["row_count"],
+        "path": f"{org}/{document['id']}.json",
+    }
+    if absorbed_by := document.get("absorbed_by"):
+        entry["absorbed_by"] = absorbed_by
+    return entry
 
 
 def _org_views(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
@@ -429,17 +525,22 @@ def emit_data_api() -> Path:
                 if document is None:
                     continue
                 document["macro"] = family.CHART_MACRO["name"]
-                path = org_dir / f"{document['id']}.json"
-                path.write_text(json.dumps(document, indent=1), encoding="utf-8")
-                sections.append(
-                    {
-                        "id": document["id"],
+                sections.append(_write_section(document, org, org_dir))
+                # A role-tabbed card absorbs what used to be sibling sections.
+                # Each absorbed variant keeps its own document *and* its own
+                # manifest entry, tagged with the card that now renders it:
+                # v1 is additive-only, so merging two cards into one must not
+                # withdraw ids that consumers — and shared `#widget=` links —
+                # already resolve. The dashboard skips these and reads the
+                # rows from the merged card's `variants` instead.
+                for variant in document.get("variants", [])[1:]:
+                    absorbed = {
+                        **variant,
+                        "group": document["group"],
                         "macro": document["macro"],
-                        "title": document["title"],
-                        "row_count": document["row_count"],
-                        "path": f"{org}/{document['id']}.json",
+                        "absorbed_by": document["id"],
                     }
-                )
+                    sections.append(_write_section(absorbed, org, org_dir))
         chart_sections = _org_chart_sections(org, org_data_dir, org_dir)
         views = _org_views(org, org_data_dir, org_dir)
         if sections or chart_sections or views:

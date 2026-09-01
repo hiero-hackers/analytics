@@ -111,6 +111,28 @@ METRIC_ANNOTATIONS: dict[str, dict] = {
             "Count the people whose highest role is triage.",
         ],
     },
+    "maintainer affiliations known": {
+        "note": (
+            "The share of maintainers whose affiliation is resolved to a named employer or Independent. "
+            "The organisation-diversity pie uses this resolved population as its denominator."
+        ),
+        "methodology": [
+            "Take every row in the maintainer affiliations reference table.",
+            "Count rows whose status is affiliated or independent.",
+            "Divide by all maintainer rows, including unknowns, and round to a whole percent.",
+        ],
+    },
+    "committer affiliations known": {
+        "note": (
+            "The share of highest-role committers whose affiliation is resolved to a named employer or "
+            "Independent. Read the committer organisation-diversity pie against this coverage."
+        ),
+        "methodology": [
+            "Take every row in the committer affiliations reference table.",
+            "Count rows whose status is affiliated or independent.",
+            "Divide by all committer rows, including unknowns, and round to a whole percent.",
+        ],
+    },
     "quiet permission-holders (180d+)": {
         "note": (
             "People holding a granted role who have had no tracked activity for 180 days or more — an "

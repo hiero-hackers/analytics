@@ -13,7 +13,9 @@ from hiero_analytics.dashboard_spec import (
     MACRO_GLOSSARIES,
     TABLE_FAMILIES,
     WIDE_CHARTS,
+    table_variants,
 )
+from hiero_analytics.export.data_api import variant_annotations
 
 
 def _referenced_files() -> set[str]:
@@ -38,6 +40,32 @@ def test_chart_annotations_reference_existing_charts():
     assert set(CHART_NOTES) <= referenced, sorted(set(CHART_NOTES) - referenced)
     assert set(CHART_METHODOLOGY) <= referenced, sorted(set(CHART_METHODOLOGY) - referenced)
     assert referenced >= WIDE_CHARTS, sorted(WIDE_CHARTS - referenced)
+
+
+def test_every_chart_annotation_reaches_a_variant():
+    """Every note and methodology entry must reach the tab it was written for.
+
+    The emitter used to pick one entry per chart (the first listed filename
+    that happened to be keyed), so an entry belonging to any later tab was
+    dead text: the committer tabs rendered the maintainer note, and the period
+    tabs the all-time one. This walks the real spec through the emitter's own
+    per-variant lookup, so reverting to per-chart selection fails here rather
+    than shipping unreachable copy.
+    """
+    reached_notes, reached_methods = set(), set()
+    for macro in CHART_MACROS:
+        for specs in macro["charts"].values():
+            for spec in specs:
+                for _caption, variants in spec["files"]:
+                    for _label, filename in variants:
+                        annotations = variant_annotations(filename)
+                        if "note" in annotations:
+                            reached_notes.add(filename)
+                        if "methodology" in annotations:
+                            reached_methods.add(filename)
+
+    assert set(CHART_NOTES) == reached_notes, sorted(set(CHART_NOTES) ^ reached_notes)
+    assert set(CHART_METHODOLOGY) == reached_methods, sorted(set(CHART_METHODOLOGY) ^ reached_methods)
 
 
 def test_section_groups_match_section_specs():
@@ -154,7 +182,14 @@ def test_column_glossaries_cover_the_columns_their_tables_show():
             continue
         # Each glossary key may name several labels ("a / b / c").
         defined = {part.strip() for entry in glossary["terms"] for part in entry["term"].split("/")}
-        shown = {column[1] for spec in family.SECTION_SPECS for column in spec["columns"]}
+        # Through the role variants: a label that only appears on a tab is
+        # still a label the tab shows, and must still be explained.
+        shown = {
+            column[1]
+            for spec in family.SECTION_SPECS
+            for variant in table_variants(spec)
+            for column in variant["columns"]
+        }
         unexplained = shown - defined - SELF_EVIDENT
         assert not unexplained, f"{macro_name}: columns shown but not explained: {sorted(unexplained)}"
 

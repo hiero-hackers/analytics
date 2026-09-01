@@ -25,9 +25,24 @@ const FLASH_MS = 1800; // shared link jump: flash the target for this long, then
 
 function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; macro: string }) {
   const entry = manifest.orgs[org];
+  // An absorbed section is a role variant another card renders as a tab. Its
+  // document still exists (v1 may not withdraw an id), but its rows travel
+  // inside the absorbing card, so fetching it would only duplicate the card.
   const refs = useMemo(
-    () => (entry.sections ?? []).filter((section) => section.macro === macro),
+    () =>
+      (entry.sections ?? []).filter((section) => section.macro === macro && !section.absorbed_by),
     [entry, macro],
+  );
+  // …and a link to one still has to land: `#widget=committeraffiliations`
+  // resolves to the card that absorbed it, which then activates that tab.
+  const absorbedInto = useMemo(
+    () =>
+      Object.fromEntries(
+        (entry.sections ?? [])
+          .filter((section) => section.absorbed_by)
+          .map((section) => [section.id, section.absorbed_by as string]),
+      ),
+    [entry],
   );
   const viewRefs = useMemo(
     () => (entry.views ?? []).filter((view) => view.macro === macro),
@@ -67,7 +82,7 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
   useEffect(() => {
     if (!settled || !widget) return;
     const jump = () => {
-      const target = document.getElementById(widget);
+      const target = document.getElementById(absorbedInto[widget] ?? widget);
       target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
       target?.classList.add('flash');
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
@@ -81,9 +96,9 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
         window.cancelAnimationFrame(raf as number);
       }
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
-      document.getElementById(widget)?.classList.remove('flash');
+      document.getElementById(absorbedInto[widget] ?? widget)?.classList.remove('flash');
     };
-  }, [settled, widget]);
+  }, [settled, widget, absorbedInto]);
   const groups: Group[] = !settled
     ? []
     : names.flatMap((name): Group[] => {

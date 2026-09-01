@@ -177,6 +177,181 @@ describe('Charts', () => {
   });
 });
 
+describe('Organisation diversity card (#435)', () => {
+  const openDiversity = async () => {
+    render(<App />);
+    await screen.findByRole('button', { name: 'Diversity' });
+    await userEvent.click(screen.getByRole('button', { name: 'Diversity' }));
+    return await screen.findByText('Organisation diversity');
+  };
+
+  const chartSrc = (title: string) => screen.getByAltText(title).getAttribute('src');
+
+  it('gives the card one role axis, so every role-tabbed chart switches together', async () => {
+    await openDiversity();
+
+    // One tab row for the card, not one per chart: three charts, two of which
+    // share the axis, must not be able to disagree about the active role.
+    const axes = screen.getAllByRole('group', { name: 'Organisation diversity view' });
+    expect(axes).toHaveLength(1);
+    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut.png');
+    expect(chartSrc('Single-employer repos by org')).toContain('single_employer_repos_by_org.png');
+
+    await userEvent.click(within(axes[0]).getByRole('button', { name: 'Committers' }));
+
+    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut_committers.png');
+    expect(chartSrc('Single-employer repos by org')).toContain(
+      'single_employer_repos_by_org_committers.png',
+    );
+    // The chart with no role axis is untouched by the card's tabs.
+    expect(chartSrc('Single-employer teams by org')).toContain('single_employer_teams_by_org.png');
+  });
+
+  it('leaves a chart with its own variant set on its own tabs', async () => {
+    // The period-tabbed pipeline card shares no axis with anything, so its
+    // tabs stay under the figure and keep their own state.
+    await openGovernance();
+
+    expect(
+      screen.queryByRole('group', { name: 'Maintainer pipeline view' }),
+    ).not.toBeInTheDocument();
+    const own = screen.getByRole('group', { name: 'Unique active contributors by role view' });
+    expect(within(own).getByRole('button', { name: 'By year' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('shows the active tab’s note and methodology in the lightbox', async () => {
+    await openDiversity();
+    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
+
+    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(screen.getByAltText('Role-holders by organisation'));
+
+    // The committer tab must describe committers — it used to show the
+    // maintainer note, which misdescribed its own population.
+    const lightbox = await screen.findByRole('dialog');
+    expect(within(lightbox).getByText('The committer bench by employer.')).toBeInTheDocument();
+    expect(within(lightbox).getByText('Count committers.')).toBeInTheDocument();
+    expect(
+      within(lightbox).queryByText('The maintainer bench by employer.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('downloads the active tab’s companion CSV', async () => {
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    vi.stubGlobal(
+      'URL',
+      Object.assign(Object.create(URL), {
+        createObjectURL: () => 'blob:test',
+        revokeObjectURL: () => {},
+      }),
+    );
+    await openDiversity();
+    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
+    const card = screen.getByText('Organisation diversity').closest('section') as HTMLElement;
+
+    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(card).getByRole('button', { name: 'Download CSV' }));
+
+    await vi.waitFor(() =>
+      expect(
+        vi
+          .mocked(fetch)
+          .mock.calls.some(([url]) => String(url).endsWith('committer_affiliations.csv')),
+      ).toBe(true),
+    );
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(([url]) => String(url).endsWith('maintainer_affiliations.csv')),
+    ).toBe(false);
+  });
+});
+
+describe('Role-tabbed tables (#435)', () => {
+  const openDiversity = async () => {
+    render(<App />);
+    await screen.findByRole('button', { name: 'Diversity' });
+    await userEvent.click(screen.getByRole('button', { name: 'Diversity' }));
+    return await screen.findByText('Organisation affiliations — reference');
+  };
+
+  it('renders one tabbed card instead of two stacked ones', async () => {
+    await openDiversity();
+
+    // The absorbed section is not a card of its own any more…
+    expect(screen.queryByText('Committer affiliations — reference')).not.toBeInTheDocument();
+    // …and its document is never fetched: its rows travel inside this card.
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(([url]) => String(url).endsWith('committeraffiliations.json')),
+    ).toBe(false);
+
+    const roles = screen.getByRole('group', { name: 'Role' });
+    expect(within(roles).getByRole('button', { name: 'Maintainers' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByText('alice')).toBeInTheDocument();
+    expect(screen.queryByText('dave')).not.toBeInTheDocument();
+  });
+
+  it('swaps rows, columns and the freshness stamp with the tab', async () => {
+    await openDiversity();
+    const roles = screen.getByRole('group', { name: 'Role' });
+    const table = screen.getByRole('table');
+
+    expect(within(table).getByText('maintainer')).toBeInTheDocument();
+
+    await userEvent.click(within(roles).getByRole('button', { name: 'Committers' }));
+
+    // The count column is named for the role it counts, so the tabs differ in
+    // shape and not only in their rows.
+    expect(within(screen.getByRole('table')).getByText('committer')).toBeInTheDocument();
+    expect(within(screen.getByRole('table')).queryByText('maintainer')).not.toBeInTheDocument();
+    expect(screen.getByText('dave')).toBeInTheDocument();
+    expect(screen.queryByText('alice')).not.toBeInTheDocument();
+    expect(screen.getByText(/data as of 2026-07-26 10:00/)).toBeInTheDocument();
+    expect(screen.getByText(/whose highest role anywhere is committer/)).toBeInTheDocument();
+  });
+
+  it('keeps period tabs and role tabs distinguishable', async () => {
+    // Role tabs are not PeriodTabs: they carry no "All time" null state, and
+    // the two axes have to stay tellable apart on a table that has both.
+    await openDiversity();
+
+    expect(within(screen.getByRole('group', { name: 'Role' })).getAllByRole('button')).toHaveLength(
+      2,
+    );
+    expect(screen.queryByRole('group', { name: 'Time range' })).not.toBeInTheDocument();
+  });
+
+  it('resolves a deep link to an absorbed section, with its tab active', async () => {
+    // `#widget=committeraffiliations` predates the merge and must still land:
+    // on the card that absorbed it, scrolled to and with that tab active.
+    const scrolled: Element[] = [];
+    vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (this: Element) {
+      scrolled.push(this);
+    });
+    window.location.hash = 'tab=Diversity&widget=committeraffiliations';
+    render(<App />);
+
+    const card = await screen.findByText('Organisation affiliations — reference');
+    expect(card).toBeInTheDocument();
+    await screen.findByText('dave');
+    await vi.waitFor(() => expect(scrolled.map((el) => el.id)).toContain('affiliations'));
+    expect(
+      within(screen.getByRole('group', { name: 'Role' })).getByRole('button', {
+        name: 'Committers',
+      }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByText('alice')).not.toBeInTheDocument();
+  });
+});
+
 describe('Per-tab explainers', () => {
   it("each tab shows its own explainer and no other tab's", async () => {
     render(<App />);

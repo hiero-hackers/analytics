@@ -43,3 +43,20 @@ def merged(families: Sequence[ModuleType], attribute: str) -> dict:
             raise ValueError(f"{attribute} defined by multiple families: {sorted(overlap)}")
         result.update(entries)
     return result
+
+
+def table_variants(section: dict) -> list[dict]:
+    """A section's role variants as fully-resolved section dicts.
+
+    A section without ``variants`` is its own single variant, so every consumer
+    (the emitter, the metric loader, the output contract tests) can iterate one
+    shape. Each declared variant inherits the section's ``file``, ``title``,
+    ``description``, ``columns`` and ``periods`` and overrides what differs —
+    so the variant that matches the section restates nothing, and the one that
+    deviates (a differently-named count column, a differently-labelled first
+    column) declares only its own difference.
+    """
+    declared = section.get("variants")
+    if not declared:
+        return [section]
+    return [{**{key: value for key, value in section.items() if key != "variants"}, **variant} for variant in declared]
