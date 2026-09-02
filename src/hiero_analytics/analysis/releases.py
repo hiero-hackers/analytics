@@ -83,6 +83,15 @@ def build_release_staleness(
     a standalone artifact because release staleness is neither governance-
     dependent nor period-scoped.
 
+    Prereleases are excluded from every staleness computation here
+    (``latest_release``, ``median_gap_days``, ``staleness_ratio``) — a repo
+    cutting frequent release-candidate tags without shipping a real release
+    would otherwise read as "on pace" off cadence noise, not actual shipping
+    health. A repo with only prereleases and no full release ever correctly
+    shows as never_released. Prereleases still appear in the timeline chart
+    (build_release_timeline, diamond markers) — that chart's job is showing
+    release rhythm, where RC activity is part of the picture.
+
     ``now`` is injectable for deterministic tests; production callers should
     leave it unset.
     """
@@ -92,8 +101,10 @@ def build_release_staleness(
     if repo_universe.empty:
         return pd.DataFrame(columns=_STALENESS_COLUMNS)
 
+    # Prereleases don't count toward shipping cadence -- see the docstring above.
+    non_prerelease_records = [r for r in records if not r.is_prerelease]
     releases = records_to_dataframe(
-        records,
+        non_prerelease_records,
         lambda r: {"repo": r.repo, "published_at": r.published_at},
         ["repo", "published_at"],
     )
@@ -123,7 +134,7 @@ def build_release_staleness(
     # A zero-day median gap (e.g. two releases tagged the same day) makes the
     # ratio undefined, not infinite — treated the same as "no cadence yet".
     safe_gap = staleness["median_gap_days"].where(staleness["median_gap_days"] > 0)
-    ratio = (staleness["days_since_last_release"] / safe_gap).astype("Float64")
+    ratio = (staleness["days_since_last_release"] / safe_gap).round(1).astype("Float64")
     staleness["staleness_ratio"] = ratio.mask(never_released, math.inf)
     staleness["staleness_bucket"] = _staleness_bucket(staleness["latest_release"], staleness["staleness_ratio"])
 
