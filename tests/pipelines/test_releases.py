@@ -51,7 +51,9 @@ def test_main_publishes_timeline_and_staleness_tables(
     _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
-    monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: synthetic_releases)
+    monkeypatch.setattr(
+        releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org, **_kwargs: synthetic_releases
+    )
 
     releases_pipeline.main(org="org")
 
@@ -99,7 +101,7 @@ def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
-    monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org: [])
+    monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org, **_kwargs: [])
 
     releases_pipeline.main(org="org")
 
@@ -145,7 +147,7 @@ def test_period_tabs_only_render_when_something_falls_in_that_window(stub_pipeli
     monkeypatch.setattr(
         releases_pipeline,
         "fetch_org_releases_graphql",
-        lambda _client, _org: records,
+        lambda _client, _org, **_kwargs: records,
     )
 
     releases_pipeline.main(org="org")

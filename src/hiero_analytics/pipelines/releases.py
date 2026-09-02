@@ -36,7 +36,9 @@ def main(org: str = ORG):
         logger.warning("No repositories found for org: %s", org)
         return
 
-    records = fetch_org_releases_graphql(client, org)
+    # Reuse the repo list already fetched above -- fetch_org_releases_graphql
+    # would otherwise call fetch_org_repos_graphql a second time on its own.
+    records = fetch_org_releases_graphql(client, org, repos=[r.name for r in all_repos])
 
     timeline = build_release_timeline(records)
     save_dataframe(timeline, org_data_dir / "release_timeline.csv")
@@ -52,11 +54,12 @@ def main(org: str = ORG):
         int(staleness["latest_release"].isna().sum()) if not staleness.empty else len(all_repos),
     )
 
-    # Last 18 months" is intentionally capped at 548 days.
-    # dashboard uses (ACTIVITY_PERIODS) — a reader shouldn't have to learn a
-    # different set of windows for this one tab. "All time" caps at
-    # ALL_TIME_WINDOW_DAYS rather than truly all history, both for legibility
-    # and because build_release_timeline's CSV already has the full record.
+    # Period-tabbed spans matching the same vocabulary used across the
+    # dashboard (ACTIVITY_PERIODS) — a reader shouldn't have to learn a
+    # different set of windows for this one tab. "Last 18 months" is
+    # intentionally capped at ALL_TIME_WINDOW_DAYS rather than truly all
+    # history, both for legibility and because build_release_timeline's CSV
+    # already has the full record.
     now = datetime.now(UTC)
     spans = [("Last 18 months", ALL_TIME_WINDOW_DAYS, "")] + [
         (period.label, period.days, f"_{period.key}") for period in reversed(ACTIVITY_PERIODS)

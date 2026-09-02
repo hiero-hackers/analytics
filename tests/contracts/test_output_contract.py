@@ -419,7 +419,7 @@ def outputs_root(tmp_path_factory) -> Path:
             "fetch_org_repos_graphql",
             lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
         )
-        mp.setattr(releases_mod, "fetch_org_releases_graphql", lambda _c, _org: RELEASES)
+        mp.setattr(releases_mod, "fetch_org_releases_graphql", lambda _c, _org, **_kwargs: RELEASES)
         mp.setattr(hackers_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
         mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)
         mp.setattr(hip_mod, "fetch_org_pr_hip_refs_graphql", lambda _c, _org, **_k: HIP_REFS)
