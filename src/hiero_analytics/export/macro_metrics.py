@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from hiero_analytics.config.analysis import GONE_DARK_DAYS
+from hiero_analytics.config.analysis import GONE_DARK_DAYS, STALENESS_OVERDUE_RATIO
 from hiero_analytics.dashboard_spec import table_variants
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.domain.roles import ROLE_PRIORITY
@@ -147,8 +147,8 @@ def releases_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> lis
     metrics.append(("released last 90d %", _pct(recent, total_releasing)))
 
     ratio = pd.to_numeric(releasing["staleness_ratio"], errors="coerce")
-    overdue = int((ratio > 3).sum())
-    metrics.append((">3x their own typical gap", overdue))
+    overdue = int((ratio > STALENESS_OVERDUE_RATIO).sum())
+    metrics.append((f">{STALENESS_OVERDUE_RATIO:g}x their own typical gap", overdue))
 
     return metrics
 
