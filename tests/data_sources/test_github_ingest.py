@@ -592,29 +592,82 @@ def test_fetch_repo_releases_graphql_excludes_drafts(mock_client, bypass_paginat
     assert prerelease.is_prerelease is True
 
 
-def test_fetch_org_releases_graphql_parallel(monkeypatch, mock_client):
-    """An org release fetch combines per-repo results (no incremental store involved)."""
+def _release(owner: str, repo: str, tag: str = "v1.0.0") -> ReleaseRecord:
+    """Build a minimal ReleaseRecord for the batched-fetch tests below."""
+    return ReleaseRecord(
+        repo=f"{owner}/{repo}",
+        tag_name=tag,
+        name=tag,
+        published_at=datetime(2026, 1, 1, tzinfo=UTC),
+        is_prerelease=False,
+    )
+
+
+def test_fetch_org_releases_graphql_batches_stale_repos(monkeypatch, mock_client):
+    """Repos with no fresh cache entry are batch-fetched together, then cached individually."""
     repos = [
         RepositoryRecord("org/repo1", "repo1", "org"),
         RepositoryRecord("org/repo2", "repo2", "org"),
     ]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: None)  # both cache misses
 
-    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda _client, _org: repos)
+    saved = []
+    monkeypatch.setattr(ingest.releases, "save_records_cache", lambda *a, **_kw: saved.append((a[1], list(a[4]))))
 
-    def fetch_repo_releases(_client, owner, repo, **_kwargs):
-        return [
-            ReleaseRecord(
-                repo=f"{owner}/{repo}",
-                tag_name="v1.0.0",
-                name="v1.0.0",
-                published_at=datetime(2026, 1, 1, tzinfo=UTC),
-                is_prerelease=False,
-            )
-        ]
+    def fake_batched(_client, stale_repos, **_kwargs):
+        assert {r.full_name for r in stale_repos} == {"org/repo1", "org/repo2"}
+        return [_release("org", "repo1"), _release("org", "repo2")], []
 
-    monkeypatch.setattr(ingest.releases, "fetch_repo_releases_graphql", fetch_repo_releases)
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fake_batched)
 
     records = ingest.fetch_org_releases_graphql(mock_client, "org", max_workers=2)
+
+    assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
+    assert len(records) == 2
+    # Each repo's slice was cached individually, not one combined org-wide entry.
+    assert {scope for scope, _ in saved} == {"org_repo1", "org_repo2"}
+
+
+def test_fetch_org_releases_graphql_skips_network_for_fresh_cache(monkeypatch, mock_client):
+    """A repo with a fresh cache entry never reaches the batch fetch at all."""
+    repos = [RepositoryRecord("org/repo1", "repo1", "org")]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: [_release("org", "repo1")])
+
+    def fail_if_called(*_a, **_kw):
+        raise AssertionError("fetch_repos_batched must not be called when every repo's cache is fresh")
+
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fail_if_called)
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org")
+
+    assert {r.repo for r in records} == {"org/repo1"}
+
+
+def test_fetch_org_releases_graphql_falls_back_for_repos_the_batch_could_not_return(monkeypatch, mock_client):
+    """A repo the batch marks as failed still gets its data via the single-repo fallback."""
+    repos = [
+        RepositoryRecord("org/repo1", "repo1", "org"),
+        RepositoryRecord("org/repo2", "repo2", "org"),
+    ]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: None)
+    monkeypatch.setattr(ingest.releases, "save_records_cache", lambda *_a, **_kw: None)
+
+    def fake_batched(_client, stale_repos, **_kwargs):
+        # repo2's alias came back missing from the batched response -- the
+        # real fetch_repos_batched reports this via failed_repos rather than
+        # raising, so repo1 succeeding shouldn't block repo2's fallback.
+        repo2 = next(r for r in stale_repos if r.name == "repo2")
+        return [_release("org", "repo1")], [repo2]
+
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fake_batched)
+    monkeypatch.setattr(
+        ingest.releases, "fetch_repo_releases_graphql", lambda _client, owner, repo, **_kw: [_release(owner, repo)]
+    )
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org")
 
     assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
     assert len(records) == 2
