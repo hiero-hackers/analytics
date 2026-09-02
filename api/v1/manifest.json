@@ -341,7 +341,7 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-09-01T09:12:54.264685+00:00",
+ "generated_at": "2026-09-02T13:29:06.897809+00:00",
  "provenance": {
   "git_sha": "3c5293a",
   "data_as_of": "2026-08-31T09:07:50.696333+00:00"
@@ -460,7 +460,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 838,
+     "row_count": 839,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1093,7 +1093,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-09-01T09:11:52.566384+00:00"
+      "generated_at": "2026-09-02T13:27:51.044508+00:00"
      }
     },
     {
@@ -1167,7 +1167,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-09-01T09:11:52.562131+00:00"
+      "generated_at": "2026-09-02T13:27:51.041153+00:00"
      }
     },
     {
@@ -1320,7 +1320,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2092,
-         "height": 1343
+         "height": 1280
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1898,7 +1898,7 @@
      },
      {
       "label": "active last month %",
-      "value": "52%",
+      "value": "50%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

@@ -554,8 +554,8 @@
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 14119,
    "pr_title": "HIP-1340 Pectra + hedera-app bump to 0.77.0-rc.11",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-01 17:36:16+00:00",
    "match_sources": "title|branch|body",
    "qualifier": null,
    "counted": true,
@@ -568,8 +568,8 @@
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 14135,
    "pr_title": "HIP-1340 Add acceptance tests",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-01 19:55:03+00:00",
    "match_sources": "title",
    "qualifier": null,
    "counted": true,
@@ -10729,6 +10729,20 @@
   {
    "hip": 551,
    "hip_title": "Batch transactions",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27035,
+   "pr_title": "fix: attribute synthetic batch records to the inner transaction that caused them",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "inner transaction\u2019s, breaking the field HIP-551 designates for correlating records with",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27035"
+  },
+  {
+   "hip": 551,
+   "hip_title": "Batch transactions",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 10481,
    "pr_title": "HIP-551: Add batch transaction design",
@@ -11791,8 +11805,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 838,
- "generated_at": "2026-09-01T09:11:52.557433+00:00",
+ "row_count": 839,
+ "generated_at": "2026-09-02T13:27:51.037310+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
