@@ -26,9 +26,24 @@ declare module '@tanstack/react-table' {
   }
 }
 
-/** Sortable value: raw for numbers, string otherwise (matches legacy sort). */
-function sortableValue(row: Row, key: string): number | string {
+// Severity rank for the "staleness" column format (analysis/releases.py's
+// staleness_bucket values) -- plain alphabetical sort put "never_released"
+// and "overdue" nowhere near each other, which is why the pace column
+// wasn't landing at either end when sorted.
+const STALENESS_RANK: Record<string, number> = {
+  insufficient_history: 0,
+  on_pace: 1,
+  watch: 2,
+  overdue: 3,
+  never_released: 4,
+};
+
+/** Sortable value: raw for numbers, ranked for staleness, string otherwise (matches legacy sort). */
+function sortableValue(row: Row, key: string, format?: ColumnSpec['format']): number | string {
   const value = row[key];
+  if (format === 'staleness' && typeof value === 'string') {
+    return STALENESS_RANK[value] ?? -1;
+  }
   if (typeof value === 'number') return value;
   return value === null || value === undefined ? '' : String(value);
 }
@@ -39,7 +54,7 @@ export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: str
   const tableColumns = useMemo(
     () =>
       columns.map((spec: ColumnSpec) =>
-        helper.accessor((row) => sortableValue(row, spec.key), {
+        helper.accessor((row) => sortableValue(row, spec.key, spec.format), {
           id: spec.key,
           header: spec.label,
           cell: (context) => (

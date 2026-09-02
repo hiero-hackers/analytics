@@ -838,8 +838,7 @@
     --dot: var(--edge-strong);
     color: var(--soft);
   }
-  .chip-overdue,
-  .chip-never {
+  .chip-overdue {
     --dot: var(--neg);
     color: var(--neg);
   }
