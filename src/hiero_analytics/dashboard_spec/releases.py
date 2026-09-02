@@ -27,10 +27,8 @@ CHART_MACRO = {
                 "title": "Release timeline",
                 "description": (
                     "Every release per repo, windowed by the tabs below (Week / 1 month / "
-                    "1 year / Last 18 months). "
-                    "Y-axis sorted by release count in the selected window (busiest at top); "
-                    "the number beside each row is that count, so a high-cadence repo's row "
-                    "stays readable instead of turning into a solid smear of overlapping dots."
+                    "1 year / Last 18 months) — busiest repos at top. Click the chart for the "
+                    "full methodology."
                 ),
                 "files": [
                     (
@@ -73,10 +71,8 @@ SECTION_SPECS = [
         "title": "Release staleness by repo",
         "description": (
             "Every repo in the org, whether or not it has ever released — a repo with no "
-            "releases still gets a row rather than being silently absent, and its 'pace' "
-            "column ranks it as maximally stale. 'staleness_ratio' is blank for the narrower "
-            "case of a repo with only one release ever, or a same-day repeat release — it has "
-            "shipped, there just isn't enough history yet to say what's normal for it."
+            "releases still gets a row, ranked maximally stale, rather than being silently "
+            "absent. See the glossary below for what 'staleness_ratio' and 'pace' mean."
         ),
         "columns": [
             ("repo", "repo"),
@@ -115,6 +111,17 @@ GLOSSARY = {
                 "release on every merge racks up hundreds; one that ships quarterly won't), not "
                 "how healthy its release cadence is — so it's shown as context, not as the "
                 "headline signal."
+            ),
+        },
+        {
+            "term": "Prereleases.",
+            "definition": (
+                "Shown in the timeline chart (diamond markers) — that's about release rhythm, "
+                "and a release candidate is part of that rhythm. Excluded from 'latest release', "
+                "'typical gap', and 'pace' in the table below: a repo cutting frequent RC tags "
+                "without shipping a real release would otherwise read as on pace off that noise, "
+                "not actual shipping health. A repo with only prereleases and no full release "
+                "ever shows as never released."
             ),
         },
         {

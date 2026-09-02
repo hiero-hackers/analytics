@@ -155,6 +155,64 @@ class TestBuildReleaseStaleness:
         assert pd.isna(result.iloc[0]["days_since_last_release"])
 
 
+class TestPrereleasesExcludedFromStaleness:
+    """Prereleases feed the timeline chart but not the staleness calc -- see the module docstring."""
+
+    def test_repo_with_only_prereleases_is_never_released(self) -> None:
+        """An RC-only repo doesn't read as 'on pace' off cadence noise -- it never actually shipped."""
+        repos = [_repo("rc-only")]
+        records = [
+            _release("org/rc-only", "v1.0.0-rc1", datetime(2026, 1, 1, tzinfo=UTC), is_prerelease=True),
+            _release("org/rc-only", "v1.0.0-rc2", datetime(2026, 1, 8, tzinfo=UTC), is_prerelease=True),
+            _release("org/rc-only", "v1.0.0-rc3", datetime(2026, 1, 15, tzinfo=UTC), is_prerelease=True),
+        ]
+
+        result = build_release_staleness(records, repos).set_index("repo")
+
+        assert pd.isna(result.loc["org/rc-only", "latest_release"])
+        assert result.loc["org/rc-only", "staleness_bucket"] == "never_released"
+        assert math.isinf(result.loc["org/rc-only", "staleness_ratio"])
+
+    def test_prerelease_does_not_distort_an_established_cadence(self) -> None:
+        """A prerelease sitting on top of a real cadence doesn't change latest_release or the gap.
+
+        Three real releases every 10 days establish a clean cadence; a
+        prerelease dropped in between them must be invisible to the
+        calculation -- same latest_release, same median_gap_days as if it
+        had never existed.
+        """
+        repos = [_repo("steady")]
+        without_rc = [
+            _release("org/steady", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/steady", "v2", datetime(2026, 1, 11, tzinfo=UTC)),
+            _release("org/steady", "v3", datetime(2026, 1, 21, tzinfo=UTC)),
+        ]
+        with_rc = [
+            *without_rc,
+            _release("org/steady", "v2.1.0-rc1", datetime(2026, 1, 15, tzinfo=UTC), is_prerelease=True),
+        ]
+        now = datetime(2026, 2, 1, tzinfo=UTC)
+
+        baseline = build_release_staleness(without_rc, repos, now=now).set_index("repo")
+        with_prerelease = build_release_staleness(with_rc, repos, now=now).set_index("repo")
+
+        assert with_prerelease.loc["org/steady", "latest_release"] == baseline.loc["org/steady", "latest_release"]
+        assert with_prerelease.loc["org/steady", "median_gap_days"] == baseline.loc["org/steady", "median_gap_days"]
+        assert with_prerelease.loc["org/steady", "staleness_ratio"] == baseline.loc["org/steady", "staleness_ratio"]
+
+    def test_prerelease_still_appears_in_the_timeline(self) -> None:
+        """The exclusion is staleness-only -- build_release_timeline keeps every release."""
+        records = [
+            _release("org/a", "v1", datetime(2026, 1, 1, tzinfo=UTC)),
+            _release("org/a", "v2-rc1", datetime(2026, 1, 5, tzinfo=UTC), is_prerelease=True),
+        ]
+
+        timeline = build_release_timeline(records)
+
+        assert len(timeline) == 2
+        assert timeline["is_prerelease"].tolist() == [False, True]
+
+
 class TestStalenessRatio:
     """The cadence-relative signal — validated against real hiero-ledger data on #331."""
 
@@ -178,7 +236,7 @@ class TestStalenessRatio:
 
         assert result.iloc[0]["median_gap_days"] == 3.0
         assert result.iloc[0]["days_since_last_release"] == 38
-        assert round(float(result.iloc[0]["staleness_ratio"]), 2) == round(38 / 3, 2)
+        assert result.iloc[0]["staleness_ratio"] == round(38 / 3, 1)  # source data rounds to 1 decimal
 
     def test_ratio_is_null_with_fewer_than_two_releases(self) -> None:
         """No established cadence to compare against — null, not zero or a raw-days fallback."""
