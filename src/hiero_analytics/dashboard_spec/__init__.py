@@ -18,13 +18,14 @@ from hiero_analytics.dashboard_spec import (
     governance,
     hips,
     onboarding,
+    releases,
     security,
 )
 from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged, table_variants
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order — the tab order the dashboard shows.
-_FAMILIES = (contributors, governance, hips, security, onboarding, community)
+_FAMILIES = (contributors, governance, hips, security, onboarding, community, releases)
 
 # The assembled spec surface — everything a consumer (the data API emitter,
 # the contract tests) reads off this package.
@@ -53,7 +54,7 @@ PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
 # The frontend implements exactly these (web/src/components/FormattedCell.tsx);
 # an unlisted value would fall through to plain text, so a typo is caught by
 # tests/dashboard_spec instead of shipping as a silently unformatted column.
-COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence", "number"})
+COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence", "number", "staleness"})
 
 # The families that carry table sections, keyed by their macro name — the
 # dashboard pipeline reads SECTION_SPECS / SECTION_ORDER / SECTION_GROUP_OF

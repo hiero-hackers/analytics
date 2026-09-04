@@ -149,6 +149,7 @@ Available pipelines:
 | `affiliation` | Contributor affiliation mapping |
 | `scorecard` | OpenSSF Scorecard results |
 | `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
+| `releases` | GitHub Releases cadence and per-repo staleness (`latest_release`, `days_since_last_release`) |
 | `hiero_hackers` | Hiero Hackers org composition and activity |
 | `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
 | `repo_growth` | Generate repository-growth timeline charts |

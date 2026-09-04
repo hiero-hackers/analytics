@@ -838,6 +838,14 @@
     --dot: var(--edge-strong);
     color: var(--soft);
   }
+  .chip-overdue {
+    --dot: var(--neg);
+    color: var(--neg);
+  }
+  .chip-watch {
+    --dot: var(--warn);
+    color: var(--warn-ink);
+  }
   .chip-spec {
     --dot: var(--link);
     color: var(--link-ink);

@@ -9,7 +9,55 @@ import pytest
 
 matplotlib.use("Agg")
 
-from hiero_analytics.plotting.scatter import plot_scatter_with_regression
+from hiero_analytics.plotting.scatter import plot_release_timeline, plot_scatter_with_regression
+
+
+def test_plot_release_timeline_writes_chart_file(tmp_path):
+    """A normal set of releases across a few repos produces a non-empty chart file."""
+    df = pd.DataFrame(
+        {
+            "repo": ["org/a", "org/a", "org/b", "org/c"],
+            "published_at": pd.to_datetime(["2026-01-01", "2026-03-01", "2026-02-01", "2026-01-15"], utc=True),
+            "is_prerelease": [False, True, False, False],
+        }
+    )
+    output = tmp_path / "release_timeline.png"
+
+    plot_release_timeline(df, title="Release Timeline", output_path=output)
+
+    assert output.exists() and output.stat().st_size > 0
+
+
+def test_plot_release_timeline_raises_on_empty_dataframe(tmp_path):
+    """An empty DataFrame should raise immediately, matching the other chart helpers."""
+    empty_df = pd.DataFrame({"repo": pd.Series(dtype=str), "published_at": pd.Series(dtype="datetime64[ns, UTC]")})
+
+    with pytest.raises(ValueError, match="DataFrame is empty"):
+        plot_release_timeline(empty_df, title="Empty", output_path=tmp_path / "should_not_exist.png")
+
+
+def test_plot_release_timeline_raises_on_missing_column(tmp_path):
+    """A missing required column is reported clearly, not as a raw pandas error."""
+    df = pd.DataFrame({"repo": ["org/a"]})  # no "published_at" column
+
+    with pytest.raises(KeyError, match="Missing columns"):
+        plot_release_timeline(df, title="Missing", output_path=tmp_path / "should_not_exist.png")
+
+
+def test_plot_release_timeline_handles_a_single_repo_with_many_releases(tmp_path):
+    """A high-cadence single repo (the overplotting stress case from #331) still renders."""
+    df = pd.DataFrame(
+        {
+            "repo": ["org/busy"] * 50,
+            "published_at": pd.date_range("2025-02-01", periods=50, freq="11D", tz="UTC"),
+            "is_prerelease": [i % 5 == 0 for i in range(50)],
+        }
+    )
+    output = tmp_path / "release_timeline_busy.png"
+
+    plot_release_timeline(df, title="Busy repo", output_path=output)
+
+    assert output.exists() and output.stat().st_size > 0
 
 
 def test_plot_scatter_with_regression_writes_chart_file(tmp_path):

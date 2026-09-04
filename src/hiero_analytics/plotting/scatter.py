@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from matplotlib import dates as mdates
 
 from hiero_analytics.config.charts import (
     ANNOTATION_FONT_SIZE,
@@ -19,6 +20,93 @@ from hiero_analytics.plotting.base import (
     prepare_dataframe,
 )
 from hiero_analytics.plotting.primitives import styled_text_badge
+
+
+def plot_release_timeline(
+    df: pd.DataFrame,
+    *,
+    title: str,
+    output_path: Path,
+) -> None:
+    """Per-repo release timeline, sorted by release count.
+
+    Expects ``repo``, ``published_at``, and ``is_prerelease`` columns. Callers
+    apply date-window filtering before plotting.
+
+     Release counts are shown as labels to keep high-cadence repos readable;
+     markers convey cadence and release patterns. Repos with no releases are
+     omitted from the chart; the full repository denominator is preserved in the
+     staleness table.
+    """
+    df = prepare_dataframe(df, "repo", "published_at")
+
+    order = df.groupby("repo").size().sort_values(ascending=True).index.tolist()
+    y_pos = {repo: i for i, repo in enumerate(order)}
+
+    with figure_context(figsize=(12, max(4, 0.42 * len(order) + 1.5))) as (fig, ax):
+        stable = df[~df["is_prerelease"]]
+        pre = df[df["is_prerelease"]]
+
+        ax.scatter(
+            stable["published_at"],
+            stable["repo"].map(y_pos),
+            color=PRIMARY_PALETTE[2],
+            alpha=0.45,
+            s=42,
+            edgecolors="none",
+            zorder=3,
+            label="Release",
+        )
+        ax.scatter(
+            pre["published_at"],
+            pre["repo"].map(y_pos),
+            color=PRIMARY_PALETTE[0],
+            alpha=0.6,
+            s=42,
+            marker="D",
+            edgecolors="none",
+            zorder=4,
+            label="Prerelease",
+        )
+
+        ax.set_yticks(list(y_pos.values()))
+        ax.set_yticklabels(list(y_pos.keys()))
+        ax.margins(x=0.02, y=0.03)
+
+        # "Nov" with "2025" beneath, not "2025-11" — matplotlib's own
+        # concise-date machinery, not a hand-rolled formatter, so it degrades
+        # sensibly if the plotted span shrinks to under a month (period tabs).
+        locator = mdates.AutoDateLocator()
+        formatter = mdates.ConciseDateFormatter(locator)
+        ax.xaxis.set_major_locator(locator)
+        ax.xaxis.set_major_formatter(formatter)
+
+        counts = df.groupby("repo").size()
+        for repo, y in y_pos.items():
+            ax.text(
+                1.005,
+                y,
+                str(int(counts.get(repo, 0))),
+                transform=ax.get_yaxis_transform(),
+                va="center",
+                ha="left",
+                fontsize=ANNOTATION_FONT_SIZE,
+                color=MUTED_TEXT_COLOR,
+            )
+
+        finalize_chart(
+            fig=fig,
+            ax=ax,
+            title=title,
+            xlabel="Release date",
+            ylabel="",
+            output_path=output_path,
+            legend=True,
+            legend_loc="upper left",
+            legend_bbox_to_anchor=(1.06, 1.0),
+            grid_axis="x",
+            record_count=len(df),
+        )
 
 
 def plot_scatter_with_regression(
