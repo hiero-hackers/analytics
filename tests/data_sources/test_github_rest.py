@@ -173,7 +173,7 @@ def test_parse_purl_returns_none_for_malformed_input(malformed):
     assert _parse_purl(malformed) is None
 
 
-# -- fetch_repo_sbom: the 404/403-vs-error contract, and SBOM parsing ---------
+# -- fetch_repo_sbom: the 404-vs-error contract, and SBOM parsing ------------
 
 
 def test_fetch_repo_sbom_parses_packages_and_excludes_the_described_root():
@@ -216,11 +216,10 @@ def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl():
     assert coverage.package_count == 0
 
 
-@pytest.mark.parametrize("status_code", [403, 404])
-def test_fetch_repo_sbom_treats_403_and_404_as_disabled(status_code):
-    """Both 403 and 404 mean 'dependency graph off for this repo', not an error."""
+def test_fetch_repo_sbom_treats_404_as_disabled():
+    """404 is the only unambiguous 'dependency graph off for this repo' signal."""
     client = Mock()
-    client.get.side_effect = _http_error(status_code)
+    client.get.side_effect = _http_error(404)
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
@@ -228,14 +227,39 @@ def test_fetch_repo_sbom_treats_403_and_404_as_disabled(status_code):
     assert records == []
 
 
-def test_fetch_repo_sbom_reports_other_errors_as_error_status_not_disabled():
-    """A genuine failure (5xx, auth, etc.) is status='error', distinguishable from 'disabled'."""
+@pytest.mark.parametrize("status_code", [403, 500])
+def test_fetch_repo_sbom_reports_403_and_other_errors_as_error_status_not_disabled(status_code):
+    """403 is ambiguous (rate limit, scope, private repo) -- must be retryable 'error', not 'disabled'."""
     client = Mock()
-    client.get.side_effect = _http_error(500)
+    client.get.side_effect = _http_error(status_code)
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
     assert coverage.status == "error"
+    assert records == []
+
+
+@pytest.mark.parametrize("malformed_sbom", [{"sbom": "not-an-object"}, {"sbom": None}, "not-an-object", None])
+def test_fetch_repo_sbom_reports_error_when_sbom_is_not_an_object(malformed_sbom):
+    """A malformed payload/sbom must not be reported as an available SBOM with zero packages."""
+    client = Mock()
+    client.get.return_value = malformed_sbom
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
+    assert records == []
+
+
+@pytest.mark.parametrize("malformed_packages", [{"not": "a list"}, "not-a-list", 5])
+def test_fetch_repo_sbom_reports_error_when_packages_is_not_a_list(malformed_packages):
+    """'packages' present but the wrong type must not silently resolve to an empty manifest."""
+    client = Mock()
+    client.get.return_value = {"sbom": {"documentDescribes": [], "packages": malformed_packages}}
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
     assert records == []
 
 

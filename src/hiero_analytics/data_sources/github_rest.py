@@ -93,25 +93,32 @@ def fetch_repo_sbom(
 ) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
     """Fetch and parse one repository's dependency-graph SBOM.
 
-    Treat 403/404 as ``"disabled"`` (dependency graph off for this repo) and
-    any other HTTP failure as ``"error"``, so missing data is never confused
-    with an empty dependency set. Non-HTTP request failures (timeouts,
-    connection errors) still propagate so the org-wide fan-out in
-    ``fetch_org_sbom_data`` can retry them.
+    Only a 404 counts as ``"disabled"`` (dependency graph off for this repo) —
+    the same 404-vs-error contract ``has_codeowners_file``/``fetch_repo_workflows``
+    use. A 403 is ambiguous (rate limiting, an insufficiently-scoped token, a
+    private repo) rather than an unambiguous disabled-state signal, so it is
+    reported as ``"error"`` like any other HTTP failure, so the org-wide
+    fan-out in ``fetch_org_sbom_data`` can retry it instead of a transient or
+    permission failure being silently misclassified as "no dependency graph".
+    Non-HTTP request failures (timeouts, connection errors) still propagate
+    so ``fetch_org_sbom_data`` can retry them too.
     """
     url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
     try:
         payload = client.get(url)
     except requests.HTTPError as exc:
         status_code = exc.response.status_code if exc.response is not None else None
-        status = "disabled" if status_code in (403, 404) else "error"
+        status = "disabled" if status_code == 404 else "error"
         return SbomCoverageRecord(repo=repo, status=status, package_count=0), []
 
-    sbom = (payload or {}).get("sbom") or {}
-    packages = sbom.get("packages") or []
-    # The document's own "described" package(s) represent the repo itself,
-    # not a dependency -- exclude by SPDXID via the SPDX-standard
-    # documentDescribes list rather than guessing from the name.
+    sbom = payload.get("sbom") if isinstance(payload, dict) else None
+    if not isinstance(sbom, dict):
+        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+
+    raw_packages = sbom.get("packages")
+    if raw_packages is not None and not isinstance(raw_packages, list):
+        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+    packages = raw_packages or []
     described_ids = set(sbom.get("documentDescribes") or [])
 
     records: list[DependencyManifestRecord] = []
@@ -261,10 +268,11 @@ def fetch_org_sbom_data(
     a repo that is still failing after retries gets an ``"error"`` coverage
     row from the fan-out itself instead of being silently dropped.
     """
+
     def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
         coverage, packages = fetch_repo_sbom(client, org, repo)
         return [coverage, *packages]
-    
+
     try:
         combined = fetch_all_with_retry(
             repo_names,
@@ -272,13 +280,10 @@ def fetch_org_sbom_data(
             per_repo,
             task_desc="SBOM data",
             describe=str,
-            )
+        )
     except PartialOrgFetchError as exc:
         combined = list(exc.records)
-        combined.extend(
-            SbomCoverageRecord(repo=repo, status="error", package_count=0)
-            for repo in exc.failed_repos
-        )
+        combined.extend(SbomCoverageRecord(repo=repo, status="error", package_count=0) for repo in exc.failed_repos)
     coverage = [r for r in combined if isinstance(r, SbomCoverageRecord)]
     packages = [r for r in combined if isinstance(r, DependencyManifestRecord)]
     return coverage, packages
