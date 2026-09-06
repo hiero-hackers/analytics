@@ -341,10 +341,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-09-02T13:29:06.897809+00:00",
+ "generated_at": "2026-09-06T09:12:21.895210+00:00",
  "provenance": {
-  "git_sha": "3c5293a",
-  "data_as_of": "2026-08-31T09:07:50.696333+00:00"
+  "git_sha": "f6b31d6",
+  "data_as_of": "2026-09-06T09:04:03.254842+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -353,7 +353,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1446,
+     "row_count": 1458,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -388,7 +388,7 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 765,
+     "row_count": 760,
      "path": "hiero-ledger/repo.json"
     },
     {
@@ -423,7 +423,7 @@
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 130,
+     "row_count": 129,
      "path": "hiero-ledger/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -438,7 +438,7 @@
      "id": "committerrepodiversity",
      "macro": "Governance",
      "title": "Committer organisation diversity by repo",
-     "row_count": 30,
+     "row_count": 29,
      "path": "hiero-ledger/committerrepodiversity.json",
      "absorbed_by": "repodiversity"
     },
@@ -460,7 +460,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 839,
+     "row_count": 842,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -559,7 +559,7 @@
           "A contributor on several teams counts toward each, so team totals overlap \u2014 this measures each team's activity, not a partition.",
           "Rank teams by total, show the busiest 25, and colour each cell by its monthly score."
          ],
-         "width": 1825,
+         "width": 1779,
          "height": 1856
         }
        ],
@@ -774,7 +774,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2284,
+         "width": 2219,
          "height": 1051
         }
        ],
@@ -1009,7 +1009,7 @@
           "Same construction over each repository's committers, so only repos that grant committer appear.",
           "Compare a repo's two bars: a single-colour maintainer bar beside a multi-colour committer bar is a concentrated top with a diverse bench underneath it."
          ],
-         "width": 1976,
+         "width": 1925,
          "height": 1274
         }
        ],
@@ -1093,7 +1093,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-09-02T13:27:51.044508+00:00"
+      "generated_at": "2026-09-06T09:11:30.254617+00:00"
      }
     },
     {
@@ -1167,7 +1167,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-09-02T13:27:51.041153+00:00"
+      "generated_at": "2026-09-06T09:11:30.250241+00:00"
      }
     },
     {
@@ -1385,7 +1385,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1446,
+      "value": 1458,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1395,7 +1395,7 @@
      },
      {
       "label": "active last month %",
-      "value": "10%",
+      "value": "11%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1404,7 +1404,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "33%",
+      "value": "32%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1462,7 +1462,7 @@
      },
      {
       "label": "committers",
-      "value": 130,
+      "value": 129,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -1502,7 +1502,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 99,
+      "value": 96,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1529,7 +1529,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 46,
+     "row_count": 47,
      "path": "hiero-hackers/profiles.json"
     },
     {
@@ -1636,7 +1636,7 @@
           "Link two repositories when they share contributors; the link's thickness is how many they share. Links use all contributors, active or not, so latent structure shows even in a quiet period.",
           "Thin the links with a minimum-shared threshold that scales with the number of repositories, so a dense organisation stays readable rather than becoming a hairball."
          ],
-         "width": 2180,
+         "width": 2209,
          "height": 1666
         }
        ],
@@ -1888,7 +1888,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 46,
+      "value": 47,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1898,7 +1898,7 @@
      },
      {
       "label": "active last month %",
-      "value": "50%",
+      "value": "45%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1907,7 +1907,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "33%",
+      "value": "34%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1916,7 +1916,7 @@
      },
      {
       "label": "file issues %",
-      "value": "48%",
+      "value": "47%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1925,7 +1925,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "78%",
+      "value": "81%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -1934,7 +1934,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "50%",
+      "value": "51%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",

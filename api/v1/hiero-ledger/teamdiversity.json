@@ -323,6 +323,18 @@
    "organisations": "Hashgraph 3"
   },
   {
+   "team": "hiero-gradle-conventions-committers",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Hashgraph 2"
+  },
+  {
    "team": "hiero-hederium-maintainers",
    "members": 2,
    "resolved": 2,
@@ -527,6 +539,30 @@
    "organisations": "Hashgraph 22, lmnt 1, DevLabs 1, LimeChain 1, Independent 1"
   },
   {
+   "team": "hiero-block-node-committers",
+   "members": 12,
+   "resolved": 11,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 82,
+   "hhi": 6860,
+   "unknown": 1,
+   "single_employer": false,
+   "organisations": "Hashgraph 9, LimeChain 1, Independent 1"
+  },
+  {
+   "team": "hiero-consensus-node-ci-codeowners",
+   "members": 5,
+   "resolved": 5,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 80,
+   "hhi": 6800,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 4, Independent 1"
+  },
+  {
    "team": "hiero-sdk-go-maintainers",
    "members": 5,
    "resolved": 5,
@@ -585,18 +621,6 @@
    "unknown": 1,
    "single_employer": false,
    "organisations": "LimeChain 3, Hashgraph 1"
-  },
-  {
-   "team": "hiero-consensus-node-ci-codeowners",
-   "members": 4,
-   "resolved": 4,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 75,
-   "hhi": 6250,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Hashgraph 3, Independent 1"
   },
   {
    "team": "hiero-gradle-conventions-maintainers",
@@ -719,18 +743,6 @@
    "organisations": "DSR Corporation 2, Hashgraph 1"
   },
   {
-   "team": "hiero-gradle-conventions-committers",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 67,
-   "hhi": 5556,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Hashgraph 2, LimeChain 1"
-  },
-  {
    "team": "hiero-sdk-cpp-committers",
    "members": 3,
    "resolved": 3,
@@ -825,18 +837,6 @@
    "unknown": 2,
    "single_employer": false,
    "organisations": "Hashgraph 8, LimeChain 1, DevLabs 1, Independent 1"
-  },
-  {
-   "team": "hiero-block-node-committers",
-   "members": 16,
-   "resolved": 15,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 67,
-   "hhi": 5200,
-   "unknown": 1,
-   "single_employer": false,
-   "organisations": "Hashgraph 10, LimeChain 4, Independent 1"
   },
   {
    "team": "solo-internal-contributors",
@@ -1344,7 +1344,7 @@
   }
  ],
  "row_count": 108,
- "generated_at": "2026-09-02T13:26:32.084884+00:00",
+ "generated_at": "2026-09-06T09:10:26.835407+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

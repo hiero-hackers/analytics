@@ -103,7 +103,7 @@
    "cells": [
     {
      "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 46,
+     "merged": 48,
      "open": 1
     },
     {
@@ -195,8 +195,8 @@
     },
     {
      "key": "hiero-ledger/hiero-block-node",
-     "merged": 1,
-     "open": 1
+     "merged": 2,
+     "open": 0
     },
     {
      "key": "hiero-ledger/hiero-sdk-java",
@@ -357,8 +357,8 @@
     },
     {
      "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 16,
-     "open": 1
+     "merged": 17,
+     "open": 0
     },
     {
      "key": "hiero-ledger/hiero-block-node",
@@ -1628,8 +1628,8 @@
     },
     {
      "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 6,
-     "open": 1
+     "merged": 7,
+     "open": 0
     },
     {
      "key": "hiero-ledger/hiero-block-node",
@@ -3940,6 +3940,88 @@
     {
      "key": "hiero-ledger/hiero-mirror-node",
      "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 0
+    }
+   ],
+   "note": {
+    "kind": "none",
+    "text": "no SDK activity found"
+   }
+  },
+  {
+   "key": 406,
+   "label": "HIP-406",
+   "sublabel": "Staking",
+   "status": "Final",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 0,
      "open": 0
     },
     {
@@ -9273,88 +9355,6 @@
    }
   },
   {
-   "key": 406,
-   "label": "HIP-406",
-   "sublabel": "Staking",
-   "status": "Final",
-   "cells": [
-    {
-     "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-block-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-go",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-js",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-cpp",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-rust",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-swift",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-python",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-json-rpc-relay",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node-explorer",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/solo",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-local-node",
-     "merged": 0,
-     "open": 0
-    }
-   ],
-   "note": {
-    "kind": "none",
-    "text": "no activity found"
-   }
-  },
-  {
    "key": 405,
    "label": "HIP-405",
    "sublabel": "Fungible Token Metadata JSON Schema",
@@ -13155,6 +13155,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-09-02T13:27:51.040566+00:00",
+ "generated_at": "2026-09-06T09:11:30.249444+00:00",
  "stale": false
 }
