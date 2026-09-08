@@ -8,7 +8,7 @@ from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.pipelines import ci_health
 
 
-def test_main_collects_unpinned_actions_and_saves_results(
+def test_main_collects_unpinned_actions_and_missing_permissions_and_saves_results(
     monkeypatch,
     tmp_path,
 ) -> None:
@@ -60,6 +60,17 @@ jobs:
             location=".github/workflows/build.yml:6",
         ),
     )
+    monkeypatch.setattr(
+        ci_health,
+        "check_explicit_permissions",
+        lambda _: CheckResult(
+            check="explicit_permissions",
+            band="permissions",
+            status="fail",
+            evidence=("Found 1 workflow(s) without an explicit permissions declaration: build.yml"),
+            location=".github/workflows/build.yml",
+        ),
+    )
 
     save_dataframe = Mock()
     monkeypatch.setattr(ci_health, "save_dataframe", save_dataframe)
@@ -81,18 +92,26 @@ jobs:
                     "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
                 ),
                 "location": ".github/workflows/build.yml:6",
-            }
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "explicit_permissions",
+                "band": "permissions",
+                "status": "fail",
+                "evidence": ("Found 1 workflow(s) without an explicit permissions declaration: build.yml"),
+                "location": ".github/workflows/build.yml",
+            },
         ]
     )
 
     pd.testing.assert_frame_equal(saved_df, expected)
 
 
-def test_main_saves_passing_result_when_all_actions_are_pinned(
+def test_main_saves_passing_results_when_all_checks_pass(
     monkeypatch,
     tmp_path,
 ) -> None:
-    """Test that a passing check still produces a result row."""
+    """Test that passing checks still produce result rows."""
     client = Mock()
     data_dir = tmp_path
 
@@ -117,7 +136,16 @@ def test_main_saves_passing_result_when_all_actions_are_pinned(
         lambda _, __, ___: [
             {
                 "name": "build.yml",
-                "text": ("uses: actions/checkout@0123456789abcdef0123456789abcdef01234567"),
+                "text": """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+""",
             }
         ],
     )
@@ -130,6 +158,17 @@ def test_main_saves_passing_result_when_all_actions_are_pinned(
             status="pass",
             evidence="All GitHub Actions are pinned to full commit SHAs.",
             location="",
+        ),
+    )
+    monkeypatch.setattr(
+        ci_health,
+        "check_explicit_permissions",
+        lambda _: CheckResult(
+            check="explicit_permissions",
+            band="permissions",
+            status="pass",
+            evidence=("All 1 workflow(s) explicitly declare GitHub Actions permissions."),
+            location=".github/workflows/build.yml:3",
         ),
     )
 
@@ -151,7 +190,15 @@ def test_main_saves_passing_result_when_all_actions_are_pinned(
                 "status": "pass",
                 "evidence": "All GitHub Actions are pinned to full commit SHAs.",
                 "location": "",
-            }
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "explicit_permissions",
+                "band": "permissions",
+                "status": "pass",
+                "evidence": ("All 1 workflow(s) explicitly declare GitHub Actions permissions."),
+                "location": ".github/workflows/build.yml:3",
+            },
         ]
     )
 
