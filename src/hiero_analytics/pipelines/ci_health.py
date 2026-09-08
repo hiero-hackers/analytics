@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from hiero_analytics.analysis.ci_health import check_workflows
+from hiero_analytics.analysis.ci_health import check_actions_sha_pinned
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest.workflows import (
     fetch_repo_workflows_graphql,
@@ -15,7 +15,7 @@ from hiero_analytics.pipelines.scorecard import fetch_org_repos
 
 
 def main(org: str = ORG) -> None:
-    """Check organization repositories for unpinned GitHub Actions."""
+    """Check organization repositories for CI health issues."""
     client, org_data_dir, _ = org_context(org)
 
     repos = fetch_org_repos(client, org)
@@ -29,22 +29,32 @@ def main(org: str = ORG) -> None:
             repo.name,
         )
 
-        for workflow_name, unpinned_actions in check_workflows(workflows).items():
-            findings.extend(
-                {
-                    "repo": repo.full_name,
-                    "workflow": workflow_name,
-                    "action": action,
-                }
-                for action in unpinned_actions
-            )
+        result = check_actions_sha_pinned(workflows)
+
+        findings.append(
+            {
+                "repo": repo.full_name,
+                "check": result.check,
+                "band": result.band,
+                "status": result.status,
+                "evidence": result.evidence,
+                "location": result.location,
+            }
+        )
 
     df = pd.DataFrame(
         findings,
-        columns=["repo", "workflow", "action"],
+        columns=[
+            "repo",
+            "check",
+            "band",
+            "status",
+            "evidence",
+            "location",
+        ],
     )
 
     save_dataframe(
         df=df,
-        path=org_data_dir / "ci_health.csv",
+        path=org_data_dir / "ci_health_checks.csv",
     )

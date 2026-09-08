@@ -1,7 +1,7 @@
 """Tests for GitHub Actions workflow security checks."""
 
 from hiero_analytics.analysis.ci_health import (
-    check_workflows,
+    check_actions_sha_pinned,
     extract_action_references,
     find_unpinned_actions,
     is_sha_pinned,
@@ -57,8 +57,8 @@ def test_find_unpinned_actions() -> None:
     ]
 
 
-def test_check_workflows() -> None:
-    """Test security checks across multiple workflow files."""
+def test_check_actions_sha_pinned_fails_for_unpinned_actions() -> None:
+    """Test that unpinned Actions produce a failing check result."""
     workflows = [
         {
             "name": "build.yml",
@@ -81,7 +81,43 @@ def test_check_workflows() -> None:
         },
     ]
 
-    assert check_workflows(workflows) == {
-        "build.yml": ["actions/checkout@v4"],
-        "release.yml": [],
-    }
+    result = check_actions_sha_pinned(workflows)
+
+    assert result.check == "actions_sha_pinned"
+    assert result.band == "actions"
+    assert result.status == "fail"
+    assert "actions/checkout@v4" in result.evidence
+    assert result.location == ".github/workflows/build.yml"
+
+
+def test_check_actions_sha_pinned_passes_when_all_actions_are_pinned() -> None:
+    """Test that fully pinned workflows produce a passing check result."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """
+            jobs:
+              build:
+                steps:
+                  - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+                  - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+            """,
+        },
+        {
+            "name": "release.yml",
+            "text": """
+            jobs:
+              release:
+                steps:
+                  - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+            """,
+        },
+    ]
+
+    result = check_actions_sha_pinned(workflows)
+
+    assert result.check == "actions_sha_pinned"
+    assert result.band == "actions"
+    assert result.status == "pass"
+    assert result.evidence == "All GitHub Actions are pinned to full commit SHAs."
+    assert result.location == ""

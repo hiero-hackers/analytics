@@ -43,6 +43,7 @@ import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
+from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
@@ -88,7 +89,7 @@ CHART_COMPANION_CSVS = {
     "repo_affiliation_composition_committers.csv",
     "team_affiliation_composition.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
-    "ci_health.csv",
+    "ci_health_checks.csv",
     "contributor_activity_heatmap.csv",
     "org_activity_heatmap.csv",
     "team_activity_heatmap.csv",
@@ -373,10 +374,16 @@ def outputs_root(tmp_path_factory) -> Path:
         )
         mp.setattr(
             ci_health_mod,
-            "check_workflows",
-            lambda _workflows: {
-                "ci.yml": ["actions/checkout@v4"],
-            },
+            "check_actions_sha_pinned",
+            lambda _workflows: CheckResult(
+                check="actions_sha_pinned",
+                band="actions",
+                status="fail",
+                evidence=(
+                    "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
+                ),
+                location=".github/workflows/ci.yml",
+            ),
         )
         mp.setattr(
             codeowner_mod,
