@@ -4,10 +4,14 @@ from unittest.mock import Mock
 
 import pandas as pd
 
+from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.pipelines import ci_health
 
 
-def test_main_collects_unpinned_actions_and_saves_results(monkeypatch, tmp_path) -> None:
+def test_main_collects_unpinned_actions_and_saves_results(
+    monkeypatch,
+    tmp_path,
+) -> None:
     """Test that workflow security findings are collected and saved."""
     client = Mock()
     data_dir = tmp_path
@@ -39,10 +43,16 @@ def test_main_collects_unpinned_actions_and_saves_results(monkeypatch, tmp_path)
     )
     monkeypatch.setattr(
         ci_health,
-        "check_workflows",
-        lambda _: {
-            "build.yml": ["actions/checkout@v4"],
-        },
+        "check_actions_sha_pinned",
+        lambda _: CheckResult(
+            check="actions_sha_pinned",
+            band="actions",
+            status="fail",
+            evidence=(
+                "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
+            ),
+            location=".github/workflows/build.yml",
+        ),
     )
 
     save_dataframe = Mock()
@@ -58,8 +68,13 @@ def test_main_collects_unpinned_actions_and_saves_results(monkeypatch, tmp_path)
         [
             {
                 "repo": "hiero-ledger/hiero-sdk-java",
-                "workflow": "build.yml",
-                "action": "actions/checkout@v4",
+                "check": "actions_sha_pinned",
+                "band": "actions",
+                "status": "fail",
+                "evidence": (
+                    "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
+                ),
+                "location": ".github/workflows/build.yml",
             }
         ]
     )
@@ -67,8 +82,11 @@ def test_main_collects_unpinned_actions_and_saves_results(monkeypatch, tmp_path)
     pd.testing.assert_frame_equal(saved_df, expected)
 
 
-def test_main_saves_empty_results_when_all_actions_are_pinned(monkeypatch, tmp_path) -> None:
-    """Test that no findings produce an empty security report."""
+def test_main_saves_passing_result_when_all_actions_are_pinned(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    """Test that a passing check still produces a result row."""
     client = Mock()
     data_dir = tmp_path
 
@@ -93,14 +111,20 @@ def test_main_saves_empty_results_when_all_actions_are_pinned(monkeypatch, tmp_p
         lambda _, __, ___: [
             {
                 "name": "build.yml",
-                "text": "uses: actions/checkout@0123456789abcdef0123456789abcdef01234567",
+                "text": ("uses: actions/checkout@0123456789abcdef0123456789abcdef01234567"),
             }
         ],
     )
     monkeypatch.setattr(
         ci_health,
-        "check_workflows",
-        lambda _: {"build.yml": []},
+        "check_actions_sha_pinned",
+        lambda _: CheckResult(
+            check="actions_sha_pinned",
+            band="actions",
+            status="pass",
+            evidence="All GitHub Actions are pinned to full commit SHAs.",
+            location="",
+        ),
     )
 
     save_dataframe = Mock()
@@ -112,5 +136,17 @@ def test_main_saves_empty_results_when_all_actions_are_pinned(monkeypatch, tmp_p
 
     saved_df = save_dataframe.call_args.kwargs["df"]
 
-    assert saved_df.empty
-    assert list(saved_df.columns) == ["repo", "workflow", "action"]
+    expected = pd.DataFrame(
+        [
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "actions_sha_pinned",
+                "band": "actions",
+                "status": "pass",
+                "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+                "location": "",
+            }
+        ]
+    )
+
+    pd.testing.assert_frame_equal(saved_df, expected)
