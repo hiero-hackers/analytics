@@ -4,6 +4,7 @@ from hiero_analytics.analysis.ci_health import (
     check_actions_sha_pinned,
     extract_action_references,
     find_unpinned_actions,
+    find_unpinned_actions_with_lines,
     is_sha_pinned,
 )
 
@@ -57,27 +58,43 @@ def test_find_unpinned_actions() -> None:
     ]
 
 
+def test_find_unpinned_actions_with_lines() -> None:
+    """Test detection of unpinned Actions references with line numbers."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+      - uses: actions/setup-node@main
+"""
+
+    assert find_unpinned_actions_with_lines(workflow) == [
+        ("actions/checkout@v4", 6),
+        ("actions/setup-node@main", 8),
+    ]
+
+
 def test_check_actions_sha_pinned_fails_for_unpinned_actions() -> None:
     """Test that unpinned Actions produce a failing check result."""
     workflows = [
         {
             "name": "build.yml",
-            "text": """
-            jobs:
-              build:
-                steps:
-                  - uses: actions/checkout@v4
-                  - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
-            """,
+            "text": """jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+""",
         },
         {
             "name": "release.yml",
-            "text": """
-            jobs:
-              release:
-                steps:
-                  - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
-            """,
+            "text": """jobs:
+  release:
+    steps:
+      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+""",
         },
     ]
 
@@ -87,7 +104,7 @@ def test_check_actions_sha_pinned_fails_for_unpinned_actions() -> None:
     assert result.band == "actions"
     assert result.status == "fail"
     assert "actions/checkout@v4" in result.evidence
-    assert result.location == ".github/workflows/build.yml"
+    assert result.location == ".github/workflows/build.yml:4"
 
 
 def test_check_actions_sha_pinned_passes_when_all_actions_are_pinned() -> None:

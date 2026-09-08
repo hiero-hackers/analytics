@@ -37,7 +37,13 @@ def test_main_collects_unpinned_actions_and_saves_results(
         lambda _, __, ___: [
             {
                 "name": "build.yml",
-                "text": "uses: actions/checkout@v4",
+                "text": """name: CI
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+""",
             }
         ],
     )
@@ -51,7 +57,7 @@ def test_main_collects_unpinned_actions_and_saves_results(
             evidence=(
                 "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
             ),
-            location=".github/workflows/build.yml",
+            location=".github/workflows/build.yml:6",
         ),
     )
 
@@ -74,7 +80,7 @@ def test_main_collects_unpinned_actions_and_saves_results(
                 "evidence": (
                     "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
                 ),
-                "location": ".github/workflows/build.yml",
+                "location": ".github/workflows/build.yml:6",
             }
         ]
     )

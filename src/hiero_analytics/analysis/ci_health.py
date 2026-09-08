@@ -25,6 +25,20 @@ def find_unpinned_actions(workflow_text: str) -> list[str]:
     return [reference for reference in extract_action_references(workflow_text) if not is_sha_pinned(reference)]
 
 
+def find_unpinned_actions_with_lines(workflow_text: str) -> list[tuple[str, int]]:
+    """Return unpinned GitHub Actions references with their line numbers."""
+    findings: list[tuple[str, int]] = []
+
+    for line_number, line in enumerate(workflow_text.splitlines(), start=1):
+        match = USES_PATTERN.match(line)
+        if match:
+            reference = match.group(1)
+            if not is_sha_pinned(reference):
+                findings.append((reference, line_number))
+
+    return findings
+
+
 def check_actions_sha_pinned(
     workflows: list[dict[str, str]],
 ) -> CheckResult:
@@ -33,12 +47,11 @@ def check_actions_sha_pinned(
     locations: list[str] = []
 
     for workflow in workflows:
-        actions = find_unpinned_actions(workflow["text"])
+        findings = find_unpinned_actions_with_lines(workflow["text"])
 
-        unpinned_actions.extend(actions)
-
-        if actions:
-            locations.append(f".github/workflows/{workflow['name']}")
+        for reference, line_number in findings:
+            unpinned_actions.append(reference)
+            locations.append(f".github/workflows/{workflow['name']}:{line_number}")
 
     if not unpinned_actions:
         return CheckResult(
