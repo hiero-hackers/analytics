@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import pandas as pd
 
-from hiero_analytics.analysis.ci_health import check_actions_sha_pinned
+from hiero_analytics.analysis.ci_health import (
+    check_actions_sha_pinned,
+    check_explicit_permissions,
+)
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest.workflows import (
     fetch_repo_workflows_graphql,
@@ -29,9 +32,12 @@ def main(org: str = ORG) -> None:
             repo.name,
         )
 
-        result = check_actions_sha_pinned(workflows)
+        results = [
+            check_actions_sha_pinned(workflows),
+            check_explicit_permissions(workflows),
+        ]
 
-        findings.append(
+        findings.extend(
             {
                 "repo": repo.full_name,
                 "check": result.check,
@@ -40,6 +46,7 @@ def main(org: str = ORG) -> None:
                 "evidence": result.evidence,
                 "location": result.location,
             }
+            for result in results
         )
 
     df = pd.DataFrame(
