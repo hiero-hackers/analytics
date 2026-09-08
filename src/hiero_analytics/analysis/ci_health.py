@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+from hiero_analytics.analysis.ci_health_types import CheckResult
+
 USES_PATTERN = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)", re.MULTILINE)
 
 
@@ -23,8 +25,37 @@ def find_unpinned_actions(workflow_text: str) -> list[str]:
     return [reference for reference in extract_action_references(workflow_text) if not is_sha_pinned(reference)]
 
 
-def check_workflows(
+def check_actions_sha_pinned(
     workflows: list[dict[str, str]],
-) -> dict[str, list[str]]:
-    """Check workflow files for GitHub Actions that are not SHA pinned."""
-    return {workflow["name"]: find_unpinned_actions(workflow["text"]) for workflow in workflows}
+) -> CheckResult:
+    """Check whether GitHub Actions references are pinned to commit SHAs."""
+    unpinned_actions: list[str] = []
+    locations: list[str] = []
+
+    for workflow in workflows:
+        actions = find_unpinned_actions(workflow["text"])
+
+        unpinned_actions.extend(actions)
+
+        if actions:
+            locations.append(f".github/workflows/{workflow['name']}")
+
+    if not unpinned_actions:
+        return CheckResult(
+            check="actions_sha_pinned",
+            band="actions",
+            status="pass",
+            evidence="All GitHub Actions are pinned to full commit SHAs.",
+            location="",
+        )
+
+    return CheckResult(
+        check="actions_sha_pinned",
+        band="actions",
+        status="fail",
+        evidence=(
+            f"Found {len(unpinned_actions)} GitHub Actions reference(s) "
+            "that are not pinned to a full commit SHA: " + ", ".join(unpinned_actions)
+        ),
+        location="; ".join(locations),
+    )
