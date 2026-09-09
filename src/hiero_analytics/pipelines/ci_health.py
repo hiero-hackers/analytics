@@ -9,8 +9,8 @@ from hiero_analytics.analysis.ci_health import (
     check_explicit_permissions,
 )
 from hiero_analytics.config.paths import ORG
-from hiero_analytics.data_sources.github_ingest.workflows import (
-    fetch_repo_workflows_graphql,
+from hiero_analytics.data_sources.github_ingest.ci_health import (
+    fetch_repo_ci_health_graphql,
 )
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
@@ -26,15 +26,18 @@ def main(org: str = ORG) -> None:
     findings: list[dict[str, str]] = []
 
     for repo in repos:
-        workflows = fetch_repo_workflows_graphql(
+        record = fetch_repo_ci_health_graphql(
             client,
             repo.owner,
             repo.name,
         )
 
+        if record is None:
+            continue
+
         results = [
-            check_actions_sha_pinned(workflows),
-            check_explicit_permissions(workflows),
+            check_actions_sha_pinned(record.workflows),
+            check_explicit_permissions(record.workflows),
         ]
 
         findings.extend(
