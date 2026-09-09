@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import pandas as pd
 
 from hiero_analytics.analysis.ci_health_types import CheckResult
+from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.pipelines import ci_health
 
 
@@ -21,6 +22,28 @@ def test_main_collects_unpinned_actions_and_missing_permissions_and_saves_result
     repo.name = "hiero-sdk-java"
     repo.full_name = "hiero-ledger/hiero-sdk-java"
 
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+""",
+        }
+    ]
+
+    record = CIHealthRecord(
+        workflows=workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=False,
+    )
+
     monkeypatch.setattr(
         ci_health,
         "org_context",
@@ -33,19 +56,8 @@ def test_main_collects_unpinned_actions_and_missing_permissions_and_saves_result
     )
     monkeypatch.setattr(
         ci_health,
-        "fetch_repo_workflows_graphql",
-        lambda _, __, ___: [
-            {
-                "name": "build.yml",
-                "text": """name: CI
-
-jobs:
-  build:
-    steps:
-      - uses: actions/checkout@v4
-""",
-            }
-        ],
+        "fetch_repo_ci_health_graphql",
+        lambda _, __, ___: record,
     )
     monkeypatch.setattr(
         ci_health,
@@ -120,6 +132,31 @@ def test_main_saves_passing_results_when_all_checks_pass(
     repo.name = "hiero-sdk-java"
     repo.full_name = "hiero-ledger/hiero-sdk-java"
 
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+""",
+        }
+    ]
+
+    record = CIHealthRecord(
+        workflows=workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
     monkeypatch.setattr(
         ci_health,
         "org_context",
@@ -132,22 +169,8 @@ def test_main_saves_passing_results_when_all_checks_pass(
     )
     monkeypatch.setattr(
         ci_health,
-        "fetch_repo_workflows_graphql",
-        lambda _, __, ___: [
-            {
-                "name": "build.yml",
-                "text": """name: CI
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    steps:
-      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
-""",
-            }
-        ],
+        "fetch_repo_ci_health_graphql",
+        lambda _, __, ___: record,
     )
     monkeypatch.setattr(
         ci_health,
