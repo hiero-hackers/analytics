@@ -31,7 +31,7 @@ from ..cache import load_records_cache, save_records_cache
 from ..github_client import GitHubClient
 from ..models import ReleaseRecord, RepositoryRecord
 from ..pagination import extract_graphql_cursor_page
-from ._common import _cache_kwargs, fetch_org_repos_graphql
+from ._common import _cache_kwargs, fetch_all_with_retry, fetch_org_repos_graphql
 from .batched import fetch_repos_batched
 
 RELEASES_RESOURCE = "repo_releases"
@@ -157,7 +157,6 @@ def fetch_org_releases_graphql(
         model_class=ReleaseRecord,
         nodes_path=["releases"],
         context_builder=lambda repo: {"owner": repo.owner, "repo": repo.name},
-        max_workers=max_workers,
     )
 
     # Save each repo's slice back to its own cache entry individually --
@@ -180,13 +179,21 @@ def fetch_org_releases_graphql(
     # A batch that fails to return a repo cleanly (missing alias, repeating
     # cursor) falls back to the single-repo path, which keeps its own
     # explicit MAX_RELEASE_PAGES guard -- see _fetch_repo_releases_uncached.
-    for repo in failed_repos:
-        records = fetch_repo_releases_graphql(
-            client,
-            repo.owner,
-            repo.name,
-            **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
-        )
-        fresh_records.extend(records)
+    if failed_repos:
+        def fetch_one(repo: RepositoryRecord) -> list[ReleaseRecord]:
+            return fetch_repo_releases_graphql(
+                client,
+                repo.owner,
+                repo.name,
+                **_cache_kwargs(use_cache, cache_ttl_seconds, refresh),
+            )
 
+        fresh_records.extend(
+            fetch_all_with_retry(
+                failed_repos,
+                max_workers,
+                fetch_one,
+                "releases",
+            )
+        )
     return fresh_records
