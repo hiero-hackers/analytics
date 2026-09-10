@@ -61,20 +61,31 @@ def test_fetch_repo_ci_health_graphql_cache_miss(monkeypatch):
                 "object": {
                     "entries": [
                         {
-                            "name": "ci.yml",
-                            "object": {"text": ("name: CI\nuses: actions/checkout@v4\n")},
+                            "name": "workflows",
+                            "object": {
+                                "entries": [
+                                    {
+                                        "name": "ci.yml",
+                                        "object": {"text": ("name: CI\nuses: actions/checkout@v4\n")},
+                                    },
+                                    {
+                                        "name": "release.yaml",
+                                        "object": {"text": "name: Release\n"},
+                                    },
+                                    {
+                                        "name": "broken.yml",
+                                        "object": {},
+                                    },
+                                ]
+                            },
                         },
                         {
-                            "name": "release.yaml",
-                            "object": {"text": "name: Release\n"},
+                            "name": "dependabot.yml",
+                            "object": {"text": "version: 2\n"},
                         },
                         {
                             "name": "README.md",
                             "object": {"text": "# CI documentation"},
-                        },
-                        {
-                            "name": "broken.yml",
-                            "object": {},
                         },
                     ]
                 },

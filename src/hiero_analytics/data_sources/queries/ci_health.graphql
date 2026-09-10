@@ -6,13 +6,23 @@ query CI_HEALTH_QUERY($owner: String!, $repo: String!) {
     hasProjectsEnabled
     webCommitSignoffRequired
 
-    object(expression: "HEAD:.github/workflows") {
+    object(expression: "HEAD:.github") {
       ... on Tree {
         entries {
           name
           object {
             ... on Blob {
               text
+            }
+            ... on Tree {
+              entries {
+                name
+                object {
+                  ... on Blob {
+                    text
+                  }
+                }
+              }
             }
           }
         }
