@@ -142,3 +142,96 @@ def check_explicit_permissions(
         ),
         location="; ".join(locations),
     )
+
+
+DCO_PATTERNS = (
+    "dco",
+    "developer certificate of origin",
+    "developercertificateoforigin",
+)
+
+CODEQL_PATTERNS = (
+    "codeql",
+    "github/codeql-action",
+)
+
+
+def find_workflow_names_containing(
+    workflows: list[dict[str, str]],
+    patterns: tuple[str, ...],
+) -> list[str]:
+    """Return workflow names whose names or contents match known patterns."""
+    matches: list[str] = []
+
+    for workflow in workflows:
+        name = workflow["name"]
+        text = workflow["text"].lower()
+
+        if any(pattern in name.lower() or pattern in text for pattern in patterns):
+            matches.append(name)
+
+    return matches
+
+
+def check_repository_security_configuration(
+    workflows: list[dict[str, str]],
+    *,
+    has_wiki_enabled: bool,
+    has_issues_enabled: bool,
+    has_discussions_enabled: bool,
+    has_projects_enabled: bool,
+    web_commit_signoff_required: bool,
+) -> CheckResult:
+    """Check repository security-related settings and workflow controls."""
+    dco_workflows = find_workflow_names_containing(
+        workflows,
+        DCO_PATTERNS,
+    )
+    codeql_workflows = find_workflow_names_containing(
+        workflows,
+        CODEQL_PATTERNS,
+    )
+
+    settings = (
+        f"wiki={has_wiki_enabled}, "
+        f"issues={has_issues_enabled}, "
+        f"discussions={has_discussions_enabled}, "
+        f"projects={has_projects_enabled}, "
+        f"web_commit_signoff_required={web_commit_signoff_required}"
+    )
+
+    controls: list[str] = []
+    locations: list[str] = []
+
+    if web_commit_signoff_required:
+        controls.append("web commit sign-off enabled")
+    else:
+        controls.append("web commit sign-off disabled")
+        locations.append("repository settings")
+
+    if dco_workflows:
+        controls.append("DCO workflow detected: " + ", ".join(dco_workflows))
+        locations.extend(f".github/workflows/{name}" for name in dco_workflows)
+    else:
+        controls.append("DCO workflow not detected")
+
+    if codeql_workflows:
+        controls.append("CodeQL workflow detected: " + ", ".join(codeql_workflows))
+        locations.extend(f".github/workflows/{name}" for name in codeql_workflows)
+    else:
+        controls.append("CodeQL workflow not detected")
+
+    if not web_commit_signoff_required:
+        status = "fail"
+    elif not dco_workflows or not codeql_workflows:
+        status = "review"
+    else:
+        status = "pass"
+
+    return CheckResult(
+        check="repository_security_configuration",
+        band="repository",
+        status=status,
+        evidence=(settings + ". " + "; ".join(controls) + "."),
+        location="; ".join(locations),
+    )
