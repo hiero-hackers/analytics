@@ -3,6 +3,7 @@
 from hiero_analytics.analysis.ci_health import (
     check_actions_sha_pinned,
     check_explicit_permissions,
+    check_repository_security_configuration,
     extract_action_references,
     find_permissions_with_lines,
     find_unpinned_actions,
@@ -307,3 +308,100 @@ def test_check_explicit_permissions_returns_na_without_workflows() -> None:
     assert result.status == "na"
     assert result.evidence == "Repository has no GitHub Actions workflows."
     assert result.location == ""
+
+
+def test_repository_security_configuration_pass():
+    """Pass when sign-off, DCO, and CodeQL controls are detected."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+        {
+            "name": "codeql.yml",
+            "text": "uses: github/codeql-action/upload-sarif@v3\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "pass"
+    assert "DCO workflow detected" in result.evidence
+    assert "CodeQL workflow detected" in result.evidence
+
+
+def test_repository_security_configuration_fail_without_signoff():
+    """Fail when web commit sign-off is disabled."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+        {
+            "name": "codeql.yml",
+            "text": "uses: github/codeql-action/upload-sarif@v3\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=True,
+        has_issues_enabled=True,
+        has_discussions_enabled=True,
+        has_projects_enabled=True,
+        web_commit_signoff_required=False,
+    )
+
+    assert result.status == "fail"
+    assert "web commit sign-off disabled" in result.evidence
+
+
+def test_repository_security_configuration_review_without_codeql():
+    """Request review when CodeQL is not detected."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "review"
+    assert "CodeQL workflow not detected" in result.evidence
+
+
+def test_repository_security_configuration_detects_codeql_by_content():
+    """Detect CodeQL even when the workflow filename is generic."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": ("name: Security\nuses: github/codeql-action/init@v3\n"),
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "review"
+    assert "CodeQL workflow detected" in result.evidence

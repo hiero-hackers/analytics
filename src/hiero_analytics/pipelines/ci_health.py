@@ -7,6 +7,7 @@ import pandas as pd
 from hiero_analytics.analysis.ci_health import (
     check_actions_sha_pinned,
     check_explicit_permissions,
+    check_repository_security_configuration,
 )
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest.ci_health import (
@@ -38,6 +39,14 @@ def main(org: str = ORG) -> None:
         results = [
             check_actions_sha_pinned(record.workflows),
             check_explicit_permissions(record.workflows),
+            check_repository_security_configuration(
+                record.workflows,
+                has_wiki_enabled=record.has_wiki_enabled,
+                has_issues_enabled=record.has_issues_enabled,
+                has_discussions_enabled=record.has_discussions_enabled,
+                has_projects_enabled=record.has_projects_enabled,
+                web_commit_signoff_required=record.web_commit_signoff_required,
+            ),
         ]
 
         findings.extend(
