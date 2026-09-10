@@ -68,6 +68,28 @@ def fetch_repo_ci_health_graphql(
     workflows: list[dict[str, str]] = []
 
     for entry in tree.get("entries") or []:
+        if entry.get("name") != "workflows":
+            continue
+
+        workflows_tree = entry.get("object") or {}
+
+        for workflow_entry in workflows_tree.get("entries") or []:
+            name = workflow_entry.get("name", "")
+            obj = workflow_entry.get("object") or {}
+
+            if not name.endswith((".yml", ".yaml")):
+                continue
+
+            text = obj.get("text")
+            if text is None:
+                continue
+
+            workflows.append(
+                {
+                    "name": name,
+                    "text": text,
+                }
+            )
         name = entry.get("name", "")
         obj = entry.get("object") or {}
 
