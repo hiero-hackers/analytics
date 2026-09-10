@@ -83,6 +83,22 @@ jobs:
             location=".github/workflows/build.yml",
         ),
     )
+    monkeypatch.setattr(
+        ci_health,
+        "check_repository_security_configuration",
+        lambda _, **__: CheckResult(
+            check="repository_security_configuration",
+            band="repository",
+            status="fail",
+            evidence=(
+                "web_commit_signoff_required=False. "
+                "web commit sign-off disabled; "
+                "DCO workflow not detected; "
+                "CodeQL workflow not detected."
+            ),
+            location="repository settings",
+        ),
+    )
 
     save_dataframe = Mock()
     monkeypatch.setattr(ci_health, "save_dataframe", save_dataframe)
@@ -112,6 +128,19 @@ jobs:
                 "status": "fail",
                 "evidence": ("Found 1 workflow(s) without an explicit permissions declaration: build.yml"),
                 "location": ".github/workflows/build.yml",
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "repository_security_configuration",
+                "band": "repository",
+                "status": "fail",
+                "evidence": (
+                    "web_commit_signoff_required=False. "
+                    "web commit sign-off disabled; "
+                    "DCO workflow not detected; "
+                    "CodeQL workflow not detected."
+                ),
+                "location": "repository settings",
             },
         ]
     )
@@ -194,6 +223,22 @@ jobs:
             location=".github/workflows/build.yml:3",
         ),
     )
+    monkeypatch.setattr(
+        ci_health,
+        "check_repository_security_configuration",
+        lambda _, **__: CheckResult(
+            check="repository_security_configuration",
+            band="repository",
+            status="pass",
+            evidence=(
+                "web_commit_signoff_required=True. "
+                "web commit sign-off enabled; "
+                "DCO workflow detected: dco.yml; "
+                "CodeQL workflow detected: codeql.yml."
+            ),
+            location=(".github/workflows/dco.yml; .github/workflows/codeql.yml"),
+        ),
+    )
 
     save_dataframe = Mock()
     monkeypatch.setattr(ci_health, "save_dataframe", save_dataframe)
@@ -221,6 +266,19 @@ jobs:
                 "status": "pass",
                 "evidence": ("All 1 workflow(s) explicitly declare GitHub Actions permissions."),
                 "location": ".github/workflows/build.yml:3",
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "repository_security_configuration",
+                "band": "repository",
+                "status": "pass",
+                "evidence": (
+                    "web_commit_signoff_required=True. "
+                    "web commit sign-off enabled; "
+                    "DCO workflow detected: dco.yml; "
+                    "CodeQL workflow detected: codeql.yml."
+                ),
+                "location": (".github/workflows/dco.yml; .github/workflows/codeql.yml"),
             },
         ]
     )
