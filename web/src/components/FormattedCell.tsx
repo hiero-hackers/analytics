@@ -53,7 +53,7 @@ export function FormattedCell({ value, format }: { value: unknown; format?: Colu
     case 'staleness': {
       // Matches analysis/releases.py's staleness_bucket values exactly.
       const tone: Record<string, string> = {
-        never_released: 'chip-never',
+        never_released: 'chip-none',
         overdue: 'chip-overdue',
         watch: 'chip-watch',
         on_pace: 'chip-merged',
