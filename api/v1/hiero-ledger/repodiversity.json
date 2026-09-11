@@ -464,7 +464,7 @@
  ],
  "row_count": 42,
  "label": "Maintainers",
- "generated_at": "2026-09-06T09:10:23.923718+00:00",
+ "generated_at": "2026-09-11T09:11:53.507442+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -934,7 +934,7 @@
    ],
    "row_count": 42,
    "label": "Maintainers",
-   "generated_at": "2026-09-06T09:10:23.923718+00:00",
+   "generated_at": "2026-09-11T09:11:53.507442+00:00",
    "stale": false
   },
   {
@@ -1162,11 +1162,11 @@
     },
     {
      "repo": "hiero-consensus-node",
-     "committers": 45,
+     "committers": 43,
      "distinct_orgs": 2,
      "top_org": "Hashgraph",
-     "top_org_pct": 66,
-     "independent": 5,
+     "top_org_pct": 67,
+     "independent": 4,
      "unknown": 4,
      "organisations": "Hashgraph, LimeChain"
     },
@@ -1232,32 +1232,32 @@
     },
     {
      "repo": "hiero-contracts",
-     "committers": 22,
+     "committers": 24,
      "distinct_orgs": 3,
      "top_org": "LimeChain",
      "top_org_pct": 35,
      "independent": 5,
-     "unknown": 2,
+     "unknown": 4,
      "organisations": "LimeChain, Hashgraph, BlockyDevs"
     },
     {
      "repo": "hiero-ethereum-execution-spec-tests",
-     "committers": 8,
+     "committers": 10,
      "distinct_orgs": 3,
      "top_org": "BlockyDevs",
      "top_org_pct": 14,
      "independent": 4,
-     "unknown": 1,
+     "unknown": 3,
      "organisations": "BlockyDevs, Hashgraph, LimeChain"
     },
     {
      "repo": "hiero-json-rpc-relay",
-     "committers": 8,
+     "committers": 10,
      "distinct_orgs": 3,
      "top_org": "BlockyDevs",
      "top_org_pct": 14,
      "independent": 4,
-     "unknown": 1,
+     "unknown": 3,
      "organisations": "BlockyDevs, Hashgraph, LimeChain"
     },
     {
@@ -1273,7 +1273,7 @@
    ],
    "row_count": 29,
    "label": "Committers",
-   "generated_at": "2026-09-06T09:10:24.902930+00:00",
+   "generated_at": "2026-09-11T09:11:54.536343+00:00",
    "stale": false
   }
  ],

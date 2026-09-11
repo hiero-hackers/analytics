@@ -4247,6 +4247,20 @@
   {
    "hip": 1137,
    "hip_title": "Block Node discoverabilty via on chain registry",
+   "repo": "hiero-ledger/hiero-sdk-rust",
+   "pr_number": 1327,
+   "pr_title": "chore: Release v0.46.0",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-09 13:53:11+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "### What ships since v0.45.0 - feat: HIP-1137 registered node transactions (#1295) -",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-rust/pull/1327"
+  },
+  {
+   "hip": 1137,
+   "hip_title": "Block Node discoverabilty via on chain registry",
    "repo": "hiero-ledger/hiero-sdk-swift",
    "pr_number": 590,
    "pr_title": "feat: implement HIP-1137 block node discoverability via on-chain registry",
@@ -8727,6 +8741,20 @@
   {
    "hip": 869,
    "hip_title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27023,
+   "pr_title": "feat: implement TLS support for BN communication",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "HA-384 matches `grpc_certificate_hash` (HIP-869); note that hash is over PEM text while",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27023"
+  },
+  {
+   "hip": 869,
+   "hip_title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
    "repo": "hiero-ledger/hiero-json-rpc-relay",
    "pr_number": 3069,
    "pr_title": "build(deps): [Snyk] Upgrade @hashgraph/sdk from 2.50.0 to 2.51.0",
@@ -11847,8 +11875,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 842,
- "generated_at": "2026-09-06T09:11:30.245447+00:00",
+ "row_count": 844,
+ "generated_at": "2026-09-11T09:13:26.606131+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

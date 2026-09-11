@@ -341,10 +341,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-09-06T09:12:21.895210+00:00",
+ "generated_at": "2026-09-11T09:14:40.609055+00:00",
  "provenance": {
-  "git_sha": "f6b31d6",
-  "data_as_of": "2026-09-06T09:04:03.254842+00:00"
+  "git_sha": "8fd9548",
+  "data_as_of": "2026-09-11T09:04:42.216133+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -353,7 +353,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1458,
+     "row_count": 1461,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -367,7 +367,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 18,
+     "row_count": 17,
      "path": "hiero-ledger/understaffed.json"
     },
     {
@@ -388,7 +388,7 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 760,
+     "row_count": 758,
      "path": "hiero-ledger/repo.json"
     },
     {
@@ -402,14 +402,14 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2615,
+     "row_count": 2649,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
      "id": "tscrepo",
      "macro": "Governance",
      "title": "TSC activity by repo",
-     "row_count": 106,
+     "row_count": 107,
      "path": "hiero-ledger/tscrepo.json"
     },
     {
@@ -423,7 +423,7 @@
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 129,
+     "row_count": 131,
      "path": "hiero-ledger/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -446,7 +446,7 @@
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
-     "row_count": 108,
+     "row_count": 107,
      "path": "hiero-ledger/teamdiversity.json"
     },
     {
@@ -460,14 +460,14 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 842,
+     "row_count": 844,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
      "id": "hip-unknown",
      "macro": "HIPs",
      "title": "Unknown HIP numbers (review)",
-     "row_count": 10,
+     "row_count": 11,
      "path": "hiero-ledger/hip-unknown.json"
     },
     {
@@ -774,7 +774,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2219,
+         "width": 2206,
          "height": 1051
         }
        ],
@@ -1093,7 +1093,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-09-06T09:11:30.254617+00:00"
+      "generated_at": "2026-09-11T09:13:26.615472+00:00"
      }
     },
     {
@@ -1167,7 +1167,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-09-06T09:11:30.250241+00:00"
+      "generated_at": "2026-09-11T09:13:26.611091+00:00"
      }
     },
     {
@@ -1314,13 +1314,13 @@
          "label": "1 month",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_30d.png",
          "width": 2091,
-         "height": 1844
+         "height": 1969
         },
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
-         "width": 2092,
-         "height": 1280
+         "width": 2093,
+         "height": 1468
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -1385,7 +1385,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1458,
+      "value": 1461,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1404,7 +1404,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "32%",
+      "value": "33%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1413,7 +1413,7 @@
      },
      {
       "label": "file issues %",
-      "value": "53%",
+      "value": "52%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1462,7 +1462,7 @@
      },
      {
       "label": "committers",
-      "value": 129,
+      "value": 131,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -1472,7 +1472,7 @@
      },
      {
       "label": "triage",
-      "value": 9,
+      "value": 7,
       "note": "People whose highest role anywhere is triage (label and issue management, no merge rights).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -1492,7 +1492,7 @@
      },
      {
       "label": "committer affiliations known",
-      "value": "78%",
+      "value": "76%",
       "note": "The share of highest-role committers whose affiliation is resolved to a named employer or Independent. Read the committer organisation-diversity pie against this coverage.",
       "methodology": [
        "Take every row in the committer affiliations reference table.",
@@ -1536,7 +1536,7 @@
      "id": "codeowners",
      "macro": "Security & scorecards",
      "title": "CODEOWNERS by repository",
-     "row_count": 30,
+     "row_count": 31,
      "path": "hiero-hackers/codeowners.json"
     }
    ],
@@ -1836,7 +1836,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_7d.png",
-         "width": 2095,
+         "width": 2096,
          "height": 901
         }
        ],
@@ -1907,7 +1907,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "34%",
+      "value": "36%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1916,7 +1916,7 @@
      },
      {
       "label": "file issues %",
-      "value": "47%",
+      "value": "49%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1934,7 +1934,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "51%",
+      "value": "53%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
