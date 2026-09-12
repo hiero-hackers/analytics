@@ -77,3 +77,7 @@ def main(org: str = ORG) -> None:
         df=df,
         path=org_data_dir / "ci_health_checks.csv",
     )
+
+
+if __name__ == "__main__":
+    main()
