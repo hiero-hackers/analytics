@@ -1,0 +1,39 @@
+query CI_HEALTH_QUERY($owner: String!, $repo: String!) {
+  repository(owner: $owner, name: $repo) {
+    hasWikiEnabled
+    hasIssuesEnabled
+    hasDiscussionsEnabled
+    hasProjectsEnabled
+    webCommitSignoffRequired
+
+    object(expression: "HEAD:.github") {
+      ... on Tree {
+        entries {
+          name
+          object {
+            ... on Blob {
+              text
+            }
+            ... on Tree {
+              entries {
+                name
+                object {
+                  ... on Blob {
+                    text
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  rateLimit {
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

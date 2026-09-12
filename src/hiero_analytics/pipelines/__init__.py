@@ -32,6 +32,12 @@ PIPELINES: tuple[Pipeline, ...] = (
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
     Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
     Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",), extra_orgs=True),
+    Pipeline(
+        "ci_health",
+        "Audit CI/CD workflows and repository configuration for security, reliability, and compliance",
+        args=("org",),
+        extra_orgs=True,
+    ),
     Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays
