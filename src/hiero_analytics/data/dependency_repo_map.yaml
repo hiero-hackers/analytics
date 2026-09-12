@@ -1,0 +1,28 @@
+# Package -> org-repo overrides for the dependency network chart (#338).
+#
+# Different in kind from affiliations.yaml, despite the shared '# manual'
+# convention: affiliations.yaml is a comprehensively regenerated mapping of
+# every known login. This file is corrections-only. The normalization
+# heuristics in analysis/dependency_network.py resolve the overwhelming
+# majority of packages on their own; nothing needs an entry here unless the
+# heuristic gets it wrong.
+#
+# Two kinds of entry:
+#   package: "repo-name"   -- the heuristic missed a real intra-org dependency
+#                              (e.g. a published package name that doesn't
+#                              resemble its source repo's name at all).
+#   package: null           -- a false-positive suppression: a package whose
+#                              name coincidentally resembles an org repo but
+#                              is NOT actually published by this org (a public
+#                              npm/PyPI/crates.io package with a similar name).
+#                              Without this, the resolver would wrongly draw
+#                              an intra-org edge.
+#
+# Key format: "ecosystem:package_name" (as parsed from the purl -- see
+# DependencyManifestRecord), lowercased. Append '# manual' to any entry you
+# hand-correct, same as affiliations.yaml, so it's visible and won't be
+# silently overwritten if this file ever grows a regeneration step.
+#
+# Empty by design at PR-1 time -- no real hiero-ledger SBOM data has been
+# resolved against yet. Populate once the coverage/resolution numbers from
+# the initial run show which packages the heuristic actually misses.
