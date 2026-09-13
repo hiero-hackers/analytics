@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import matplotlib
+import pandas as pd
 import pytest
 
 matplotlib.use("Agg")
@@ -145,6 +146,7 @@ def test_main_creates_output_files(
         "contributor_activity_profiles_30d.csv",
         "contributor_activity_profiles_7d.csv",
         "contributor_activity_profiles_365d.csv",
+        "bot_suspects.csv",
     ]
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file
@@ -188,6 +190,29 @@ def test_main_skips_gfi_completers_when_offline_dataset_missing(
     assert (data_dir / "contributor_activity_profiles.csv").exists()
 
 
+def test_main_writes_bot_suspects_csv(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_label_events,
+):
+    """Contributors with a weak automation signal are flagged; clean logins are not."""
+    activity = [
+        _test_activity(f"{ORG}/repo-a", "alice", "authored_pull_request"),
+        _test_activity(f"{ORG}/repo-a", "hiero-automation", "authored_pull_request"),
+        _test_activity(f"{ORG}/repo-b", "sdk-release-ci", "authored_pull_request"),
+    ]
+    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, activity, synthetic_label_events)
+
+    runner.main(ORG)
+
+    csv_path = tmp_path / "data" / "bot_suspects.csv"
+    assert csv_path.exists()
+    suspects = pd.read_csv(csv_path)
+    assert set(suspects["login"]) == {"hiero-automation", "sdk-release-ci"}
+    assert "alice" not in set(suspects["login"])
+
+
 def test_main_handles_empty_inputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -200,3 +225,4 @@ def test_main_handles_empty_inputs(
 
     # The org-wide profile table is still written (headers only).
     assert (tmp_path / "data" / "contributor_activity_profiles.csv").exists()
+    assert (tmp_path / "data" / "bot_suspects.csv").exists()

@@ -1,0 +1,364 @@
+diff --git a/src/hiero_analytics/analysis/bot_suspects.py b/src/hiero_analytics/analysis/bot_suspects.py
+new file mode 100644
+index 0000000..0f1b7d7
+--- /dev/null
++++ b/src/hiero_analytics/analysis/bot_suspects.py
+@@ -0,0 +1,40 @@
++"""Build the bot-suspects review table.
++
++``is_bot_login`` excludes named/suffixed automation accounts from people
++metrics, but a login like ``hiero-automation`` or ``sdk-release-ci`` slips
++through it and counts as a person in contributor tables, heatmaps, and
++diversity metrics until someone happens to notice and adds it to
++``BOT_LOGINS``. This sweeps every contributor login that showed up in
++activity, flags the ones matching a weaker bot-ish signal, and writes them
++out for a maintainer to confirm — mirroring how
++``hip_implementation``'s ``hip_unknown_references.csv`` keeps unmatched HIP
++numbers for review instead of silently dropping or counting them.
++
++Suspects stay in the people metrics; nothing here removes or discounts them.
++False positives in the output are acceptable (a real name can trip a
++substring signal); the point is to surface candidates for ``BOT_LOGINS``, not
++to make the exclusion call automatically.
++"""
++
++from __future__ import annotations
++
++import pandas as pd
++
++from hiero_analytics.data_sources.models import ContributorActivityRecord
++from hiero_analytics.domain.bots import bot_suspect_signal
++
++_SUSPECT_COLUMNS = ["login", "signal"]
++
++
++def build_bot_suspects(records: list[ContributorActivityRecord]) -> pd.DataFrame:
++    """Distinct contributor logins that trip a weak bot signal, for review.
++
++    One row per distinct login (case-insensitive), sorted alphabetically.
++    Logins ``is_bot_login`` already excludes never appear here — they're
++    automation accounts by the canonical policy already, not suspects.
++    """
++    logins = {record.actor.strip().lower() for record in records if record.actor}
++    rows = [{"login": login, "signal": signal} for login in logins if (signal := bot_suspect_signal(login)) is not None]
++    if not rows:
++        return pd.DataFrame(columns=_SUSPECT_COLUMNS)
++    return pd.DataFrame(rows, columns=_SUSPECT_COLUMNS).sort_values("login").reset_index(drop=True)
+diff --git a/src/hiero_analytics/dashboard_spec/contributors.py b/src/hiero_analytics/dashboard_spec/contributors.py
+index 1c1c61f..4fcc906 100644
+--- a/src/hiero_analytics/dashboard_spec/contributors.py
++++ b/src/hiero_analytics/dashboard_spec/contributors.py
+@@ -134,6 +134,22 @@ SECTION_SPECS = [
+             ("last_active", "last active", "date"),
+         ],
+     },
++    {
++        "id": "bot-suspects",
++        "file": "bot_suspects.csv",
++        "title": "Bot suspects (review)",
++        "description": (
++            "Contributor logins is_bot_login() does not exclude, but that trip a weaker automation "
++            "signal — a substring like 'automation', 'actions', 'service', 'auto', 'svc', 'ci', or "
++            "'bot' outside the recognised '-bot'/'[bot]' suffix. These stay counted as people "
++            "everywhere else on this dashboard; a maintainer confirming one is automation adds it "
++            "to BOT_LOGINS. False positives (real names tripping a substring) are expected here."
++        ),
++        "columns": [
++            ("login", "login"),
++            ("signal", "signal matched"),
++        ],
++    },
+ ]
+ 
+ # This tab's "how to read this": only the columns the contributor tables show.
+@@ -149,6 +165,8 @@ GLOSSARY = glossary_of(
+         "repos",
+         "last active",
+         "period tabs",
++        "login",
++        "signal matched",
+     ),
+     note=(
+         "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked "
+@@ -164,6 +182,7 @@ SECTION_GROUPS = [
+     ("Activity & networks", []),
+     # The full per-person list.
+     ("All contributors", ["profiles"]),
++    ("Bot suspects (review)", ["bot-suspects"]),
+ ]
+ SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
+ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
+diff --git a/src/hiero_analytics/dashboard_spec/glossary.py b/src/hiero_analytics/dashboard_spec/glossary.py
+index 88be616..a496dfe 100644
+--- a/src/hiero_analytics/dashboard_spec/glossary.py
++++ b/src/hiero_analytics/dashboard_spec/glossary.py
+@@ -99,6 +99,13 @@ TERMS: dict[str, str] = {
+         "so they are excluded from share calculations rather than counted as solo."
+     ),
+     "organisation mix": "the employers present in the group, largest first.",
++    # --- Bot-suspects review columns --------------------------------------
++    "login": "the GitHub login flagged for review.",
++    "signal matched": (
++        "the weak automation signal that fired (a substring like *automation*, *ci*, *svc*, "
++        "*service*, *auto*, or *bot* outside the recognised suffix) — the reason it's here, not "
++        "proof it's a bot. Confirmed bots move to BOT_LOGINS by hand."
++    ),
+ }
+ 
+ GLOSSARY_NOTE = (
+diff --git a/src/hiero_analytics/domain/bots.py b/src/hiero_analytics/domain/bots.py
+index d0dfe05..ffeaa78 100644
+--- a/src/hiero_analytics/domain/bots.py
++++ b/src/hiero_analytics/domain/bots.py
+@@ -28,3 +28,30 @@ def is_bot_login(login: str) -> bool:
+     """True when a login is an automation account rather than a person."""
+     name = login.strip().lower()
+     return name.endswith("[bot]") or name.endswith("-bot") or name in BOT_LOGINS
++
++
++# Weaker automation signals than is_bot_login's suffix/name-list checks — plain
++# substrings, so they will false-positive on real names (e.g. "marcia" contains
++# "ci"). That's fine here: these are for a human-reviewed suspects list, not for
++# exclusion, so a false positive costs a reviewer a glance rather than silently
++# mislabeling a person. Ordered longest/most-specific first so a login matching
++# several (e.g. "hiero-automation" also contains "auto") reports the most
++# descriptive one rather than a generic substring of it.
++SUSPECT_SIGNALS = ("automation", "actions", "service", "auto", "bot", "svc", "ci")
++
++
++def bot_suspect_signal(login: str) -> str | None:
++    """The weak automation signal a login trips, or ``None`` if it trips none.
++
++    Only meaningful for logins ``is_bot_login`` does *not* already exclude —
++    those are automation accounts by the canonical policy already, not
++    suspects. Intended for a review CSV: a hit here doesn't mean "bot", it
++    means "a maintainer should take a look".
++    """
++    name = login.strip().lower()
++    if is_bot_login(name):
++        return None
++    for signal in SUSPECT_SIGNALS:
++        if signal in name:
++            return signal
++    return None
+diff --git a/src/hiero_analytics/pipelines/contributor_activity.py b/src/hiero_analytics/pipelines/contributor_activity.py
+index fa2ab6f..c8d8bb0 100644
+--- a/src/hiero_analytics/pipelines/contributor_activity.py
++++ b/src/hiero_analytics/pipelines/contributor_activity.py
+@@ -8,6 +8,11 @@ ranking. Rows are ordered by ``last_active`` (recency).
+ 
+ This complements ``run_maintainer_pipeline_org`` (which maps activity onto named
+ governance roles); here we never name or rank roles.
++
++Also writes ``bot_suspects.csv`` — contributor logins that ``is_bot_login()``
++does not exclude but that match a weaker automation signal (see
++``analysis.bot_suspects``), kept for maintainer review rather than acted on
++automatically.
+ """
+ 
+ from __future__ import annotations
+@@ -17,6 +22,7 @@ from datetime import UTC, datetime, timedelta
+ 
+ import pandas as pd
+ 
++from hiero_analytics.analysis.bot_suspects import build_bot_suspects
+ from hiero_analytics.analysis.comembership import build_comembership_network
+ from hiero_analytics.analysis.contributor_activity_profile import (
+     build_active_membership,
+@@ -98,6 +104,14 @@ def main(org: str = ORG) -> None:
+     label_events = load_issue_label_events(client, org)
+     logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
+ 
++    # Hooked here rather than in a per-org fetch/ingest step: this is the first
++    # point in run_all with every org-wide contributor login already assembled
++    # in one list, so the sweep needs no extra fetch and stays a pure function
++    # of data this pipeline was loading anyway.
++    bot_suspects = build_bot_suspects(records)
++    save_dataframe(bot_suspects, org_data_dir / "bot_suspects.csv")
++    logger.info("Bot suspects: %d logins flagged for review", len(bot_suspects))
++
+     _write_gfi_completers(client, org, org_data_dir)
+ 
+     # Org-wide: the all-time base table, plus one variant per shared activity
+diff --git a/tests/analysis/test_bot_suspects.py b/tests/analysis/test_bot_suspects.py
+new file mode 100644
+index 0000000..8828709
+--- /dev/null
++++ b/tests/analysis/test_bot_suspects.py
+@@ -0,0 +1,75 @@
++"""Tests for the bot-suspects review-table transform."""
++
++from __future__ import annotations
++
++from datetime import UTC, datetime
++
++from hiero_analytics.analysis.bot_suspects import build_bot_suspects
++from hiero_analytics.data_sources.models import ContributorActivityRecord
++
++REPO = "hiero-hackers/analytics"
++
++
++def _activity(actor: str) -> ContributorActivityRecord:
++    return ContributorActivityRecord(
++        repo=REPO,
++        activity_type="authored_pull_request",
++        actor=actor,
++        occurred_at=datetime(2026, 1, 1, tzinfo=UTC),
++        target_type="pull_request",
++        target_number=1,
++        target_author=actor,
++    )
++
++
++def test_flags_logins_with_a_weak_signal():
++    """A contributor login matching a weak signal is flagged with which one fired."""
++    suspects = build_bot_suspects([_activity("hiero-automation"), _activity("sdk-release-ci")])
++
++    assert list(suspects["login"]) == ["hiero-automation", "sdk-release-ci"]
++    assert list(suspects["signal"]) == ["automation", "ci"]
++
++
++def test_excludes_clean_human_logins():
++    """A login tripping no weak signal never appears in the suspects table."""
++    suspects = build_bot_suspects([_activity("alice"), _activity("bob")])
++
++    assert suspects.empty
++    assert list(suspects.columns) == ["login", "signal"]
++
++
++def test_excludes_logins_is_bot_login_already_catches():
++    """Named/suffixed automation accounts are resolved already, not suspects."""
++    suspects = build_bot_suspects([_activity("dependabot[bot]"), _activity("renovate")])
++
++    assert suspects.empty
++
++
++def test_dedupes_case_insensitively():
++    """The same contributor showing up with different casing is one row."""
++    suspects = build_bot_suspects([_activity("Hiero-Automation"), _activity("hiero-automation")])
++
++    assert len(suspects) == 1
++    assert suspects.iloc[0]["login"] == "hiero-automation"
++
++
++def test_ignores_records_with_no_actor():
++    """A record with a falsy actor doesn't blow up the sweep."""
++    suspects = build_bot_suspects([_activity("")])
++
++    assert suspects.empty
++
++
++def test_empty_input_returns_empty_frame_with_schema():
++    """No records still produces a stable-schema empty frame, not a crash."""
++    suspects = build_bot_suspects([])
++
++    assert suspects.empty
++    assert list(suspects.columns) == ["login", "signal"]
++
++
++def test_sorted_alphabetically_by_login():
++    """Rows come out sorted so the CSV is stable and easy to scan."""
++    suspects = build_bot_suspects([_activity("sdk-release-ci"), _activity("hiero-automation")])
++
++    assert list(suspects["login"]) == ["hiero-automation", "sdk-release-ci"]
+diff --git a/tests/domain/test_bots.py b/tests/domain/test_bots.py
+index b059f16..5b2314d 100644
+--- a/tests/domain/test_bots.py
++++ b/tests/domain/test_bots.py
+@@ -2,7 +2,7 @@
+ 
+ from __future__ import annotations
+ 
+-from hiero_analytics.domain.bots import is_bot_login
++from hiero_analytics.domain.bots import bot_suspect_signal, is_bot_login
+ 
+ 
+ def test_suffixed_bot_logins_are_detected():
+@@ -23,3 +23,32 @@ def test_people_logins_are_not_bots():
+     """An ordinary human login is not flagged."""
+     assert is_bot_login("alice") is False
+     assert is_bot_login("robert-downey") is False  # '-bot' must be a suffix, not a substring
++
++
++def test_suspect_signal_catches_unsuffixed_automation_logins():
++    """Logins is_bot_login misses because they carry no suffix still trip a suspect signal."""
++    assert bot_suspect_signal("hiero-automation") == "automation"
++    assert bot_suspect_signal("sdk-release-ci") == "ci"
++
++
++def test_suspect_signal_catches_bot_as_a_non_suffix_substring():
++    """'bot' appearing mid-login (not as the '-bot'/'[bot]' suffix) still fires."""
++    assert bot_suspect_signal("botrunner") == "bot"
++    assert bot_suspect_signal("sdk-bot-helper") == "bot"
++
++
++def test_suspect_signal_prefers_the_more_specific_match():
++    """A login matching both 'automation' and its substring 'auto' reports the more specific one."""
++    assert bot_suspect_signal("hiero-automation") == "automation"
++
++
++def test_suspect_signal_is_none_for_already_excluded_bot_logins():
++    """A login is_bot_login already excludes is not also a suspect — it's resolved, not pending review."""
++    assert bot_suspect_signal("dependabot[bot]") is None
++    assert bot_suspect_signal("renovate") is None
++
++
++def test_suspect_signal_is_none_for_clean_human_logins():
++    """A login with none of the weak signals is left alone."""
++    assert bot_suspect_signal("alice") is None
++    assert bot_suspect_signal("robert-downey") is None
+diff --git a/tests/pipelines/test_contributor_activity.py b/tests/pipelines/test_contributor_activity.py
+index 8f0f04c..60cf4a1 100644
+--- a/tests/pipelines/test_contributor_activity.py
++++ b/tests/pipelines/test_contributor_activity.py
+@@ -8,6 +8,7 @@ from pathlib import Path
+ from unittest.mock import MagicMock
+ 
+ import matplotlib
++import pandas as pd
+ import pytest
+ 
+ matplotlib.use("Agg")
+@@ -145,6 +146,7 @@ def test_main_creates_output_files(
+         "contributor_activity_profiles_30d.csv",
+         "contributor_activity_profiles_7d.csv",
+         "contributor_activity_profiles_365d.csv",
++        "bot_suspects.csv",
+     ]
+     for csv_file in expected_csvs:
+         csv_path = data_dir / csv_file
+@@ -188,6 +190,29 @@ def test_main_skips_gfi_completers_when_offline_dataset_missing(
+     assert (data_dir / "contributor_activity_profiles.csv").exists()
+ 
+ 
++def test_main_writes_bot_suspects_csv(
++    tmp_path: Path,
++    monkeypatch: pytest.MonkeyPatch,
++    mock_github_client,
++    synthetic_label_events,
++):
++    """Contributors with a weak automation signal are flagged; clean logins are not."""
++    activity = [
++        _test_activity(f"{ORG}/repo-a", "alice", "authored_pull_request"),
++        _test_activity(f"{ORG}/repo-a", "hiero-automation", "authored_pull_request"),
++        _test_activity(f"{ORG}/repo-b", "sdk-release-ci", "authored_pull_request"),
++    ]
++    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, activity, synthetic_label_events)
++
++    runner.main(ORG)
++
++    csv_path = tmp_path / "data" / "bot_suspects.csv"
++    assert csv_path.exists()
++    suspects = pd.read_csv(csv_path)
++    assert set(suspects["login"]) == {"hiero-automation", "sdk-release-ci"}
++    assert "alice" not in set(suspects["login"])
++
++
+ def test_main_handles_empty_inputs(
+     tmp_path: Path,
+     monkeypatch: pytest.MonkeyPatch,
+@@ -200,3 +225,4 @@ def test_main_handles_empty_inputs(
+ 
+     # The org-wide profile table is still written (headers only).
+     assert (tmp_path / "data" / "contributor_activity_profiles.csv").exists()
++    assert (tmp_path / "data" / "bot_suspects.csv").exists()
