@@ -10,6 +10,7 @@ from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
 from hiero_analytics.data_sources.models import (
     IssueRecord,
     PullRequestDifficultyRecord,
+    ReleaseRecord,
     RepositoryRecord,
 )
 
@@ -532,3 +533,164 @@ def test_merged_pr_since_stops_paginating_past_the_watermark(mock_client):
 
     assert {r.pr_number for r in records} == {1, 2}  # boundary record still returned
     assert mock_client.graphql.call_count == 2  # did NOT request a third page
+
+
+# ---------------------------------------------------------
+# releases
+# ---------------------------------------------------------
+
+
+def test_fetch_repo_releases_graphql_excludes_drafts(mock_client, bypass_pagination):
+    """Draft releases are filtered client-side; published and prerelease are kept."""
+    _ = bypass_pagination
+
+    mock_client.graphql.return_value = {
+        "data": {
+            "repository": {
+                "releases": {
+                    "nodes": [
+                        {
+                            "tagName": "v0.5.0",
+                            "name": "v0.5.0",
+                            "isPrerelease": False,
+                            "isDraft": False,
+                            "publishedAt": "2026-06-01T10:00:00Z",
+                            "createdAt": "2026-06-01T09:00:00Z",
+                        },
+                        {
+                            "tagName": "v0.6.0-rc1",
+                            "name": "v0.6.0-rc1",
+                            "isPrerelease": True,
+                            "isDraft": False,
+                            "publishedAt": "2026-07-01T10:00:00Z",
+                            "createdAt": "2026-07-01T09:00:00Z",
+                        },
+                        {
+                            "tagName": "v0.7.0-draft",
+                            "name": None,
+                            "isPrerelease": False,
+                            "isDraft": True,
+                            "publishedAt": None,
+                            "createdAt": "2026-08-01T09:00:00Z",
+                        },
+                    ],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+    }
+
+    records = ingest.fetch_repo_releases_graphql(mock_client, "org", "repo")
+
+    assert len(records) == 2  # the draft is excluded
+    assert all(isinstance(r, ReleaseRecord) for r in records)
+    assert {r.tag_name for r in records} == {"v0.5.0", "v0.6.0-rc1"}
+    stable = next(r for r in records if r.tag_name == "v0.5.0")
+    assert stable.repo == "org/repo"
+    assert stable.is_prerelease is False
+    prerelease = next(r for r in records if r.tag_name == "v0.6.0-rc1")
+    assert prerelease.is_prerelease is True
+
+
+def _release(owner: str, repo: str, tag: str = "v1.0.0") -> ReleaseRecord:
+    """Build a minimal ReleaseRecord for the batched-fetch tests below."""
+    return ReleaseRecord(
+        repo=f"{owner}/{repo}",
+        tag_name=tag,
+        name=tag,
+        published_at=datetime(2026, 1, 1, tzinfo=UTC),
+        is_prerelease=False,
+    )
+
+
+def test_fetch_org_releases_graphql_batches_stale_repos(monkeypatch, mock_client):
+    """Repos with no fresh cache entry are batch-fetched together, then cached individually."""
+    repos = [
+        RepositoryRecord("org/repo1", "repo1", "org"),
+        RepositoryRecord("org/repo2", "repo2", "org"),
+    ]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: None)  # both cache misses
+
+    saved = []
+    monkeypatch.setattr(ingest.releases, "save_records_cache", lambda *a, **_kw: saved.append((a[1], list(a[4]))))
+
+    def fake_batched(_client, stale_repos, **_kwargs):
+        assert {r.full_name for r in stale_repos} == {"org/repo1", "org/repo2"}
+        return [_release("org", "repo1"), _release("org", "repo2")], []
+
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fake_batched)
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org", max_workers=2)
+
+    assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
+    assert len(records) == 2
+    # Each repo's slice was cached individually, not one combined org-wide entry.
+    assert {scope for scope, _ in saved} == {"org_repo1", "org_repo2"}
+
+
+def test_fetch_org_releases_graphql_skips_network_for_fresh_cache(monkeypatch, mock_client):
+    """A repo with a fresh cache entry never reaches the batch fetch at all."""
+    repos = [RepositoryRecord("org/repo1", "repo1", "org")]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: [_release("org", "repo1")])
+
+    def fail_if_called(*_a, **_kw):
+        raise AssertionError("fetch_repos_batched must not be called when every repo's cache is fresh")
+
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fail_if_called)
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org")
+
+    assert {r.repo for r in records} == {"org/repo1"}
+
+
+def test_fetch_org_releases_graphql_falls_back_for_repos_the_batch_could_not_return(monkeypatch, mock_client):
+    """A repo the batch marks as failed still gets its data via the single-repo fallback."""
+    repos = [
+        RepositoryRecord("org/repo1", "repo1", "org"),
+        RepositoryRecord("org/repo2", "repo2", "org"),
+    ]
+    monkeypatch.setattr(ingest.releases, "fetch_org_repos_graphql", lambda _client, _org, **_kw: repos)
+    monkeypatch.setattr(ingest.releases, "load_records_cache", lambda *_a, **_kw: None)
+    monkeypatch.setattr(ingest.releases, "save_records_cache", lambda *_a, **_kw: None)
+
+    def fake_batched(_client, stale_repos, **_kwargs):
+        # repo2's alias came back missing from the batched response -- the
+        # real fetch_repos_batched reports this via failed_repos rather than
+        # raising, so repo1 succeeding shouldn't block repo2's fallback.
+        repo2 = next(r for r in stale_repos if r.name == "repo2")
+        return [_release("org", "repo1")], [repo2]
+
+    monkeypatch.setattr(ingest.releases, "fetch_repos_batched", fake_batched)
+    monkeypatch.setattr(
+        ingest.releases, "fetch_repo_releases_graphql", lambda _client, owner, repo, **_kw: [_release(owner, repo)]
+    )
+
+    records = ingest.fetch_org_releases_graphql(mock_client, "org")
+
+    assert {r.repo for r in records} == {"org/repo1", "org/repo2"}
+    assert len(records) == 2
+
+
+def test_fetch_repo_releases_graphql_rejects_excessive_pagination(mock_client, monkeypatch):
+    """Release ingestion must not silently return partial data."""
+    monkeypatch.setattr(ingest.releases, "MAX_RELEASE_PAGES", 2)
+
+    page = {
+        "data": {
+            "repository": {
+                "releases": {
+                    "nodes": [],
+                    "pageInfo": {
+                        "hasNextPage": True,
+                        "endCursor": "cursor",
+                    },
+                }
+            }
+        }
+    }
+    mock_client.graphql.return_value = page
+
+    with pytest.raises(RuntimeError, match="refusing to emit partial data"):
+        ingest.fetch_repo_releases_graphql(mock_client, "org", "repo")

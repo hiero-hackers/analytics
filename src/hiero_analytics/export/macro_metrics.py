@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from hiero_analytics.config.analysis import GONE_DARK_DAYS
+from hiero_analytics.config.analysis import GONE_DARK_DAYS, STALENESS_OVERDUE_RATIO
 from hiero_analytics.dashboard_spec import table_variants
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.domain.roles import ROLE_PRIORITY
@@ -121,7 +121,43 @@ def governance_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> l
     return metrics
 
 
-METRICS_BY_MACRO = {"Contributors": contributors_metrics, "Governance": governance_metrics}
+def releases_metrics(loaded: dict[str, pd.DataFrame], org_data_dir: Path) -> list:
+    """Headline tiles for the Releases macro.
+
+    Every percentage is scoped to repos that have ever released (not the full
+    repo universe) — most zero-release repos are structurally non-shipping
+    (docs/governance/meta), so folding them into a "released recently %"
+    tile would mostly measure "what fraction of this org is docs," not
+    health. "repos with releases" is reported as its own factual count
+    instead, so the scoping is visible rather than silently assumed.
+    """
+    _ = org_data_dir
+    summary = loaded["release-staleness"]
+    if summary.empty:
+        return []
+
+    releasing = summary[summary["latest_release"].notna()]
+    total_releasing = len(releasing)
+    if total_releasing == 0:
+        return [("repos with releases", f"0 of {len(summary)}")]
+
+    metrics: list = [("repos with releases", f"{total_releasing} of {len(summary)}")]
+
+    recent = int((pd.to_numeric(releasing["days_since_last_release"], errors="coerce") <= 90).sum())
+    metrics.append(("released last 90d %", _pct(recent, total_releasing)))
+
+    ratio = pd.to_numeric(releasing["staleness_ratio"], errors="coerce")
+    overdue = int((ratio > STALENESS_OVERDUE_RATIO).sum())
+    metrics.append((f">{STALENESS_OVERDUE_RATIO:g}x their own typical gap", overdue))
+
+    return metrics
+
+
+METRICS_BY_MACRO = {
+    "Contributors": contributors_metrics,
+    "Governance": governance_metrics,
+    "Releases": releases_metrics,
+}
 
 
 def macro_metrics(macro_name: str, family, org_data_dir: Path) -> list:

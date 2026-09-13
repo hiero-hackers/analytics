@@ -34,5 +34,32 @@ describe('FormattedCell', () => {
     expect(within(row).getByText('✓')).toBeInTheDocument();
     expect(within(row).getByText('present')).toBeInTheDocument();
     expect(within(row).getByText('2,490')).toBeInTheDocument();
+    expect(within(row).getByText('overdue')).toBeInTheDocument();
+  });
+
+  it('renders every staleness bucket with a distinct label', () => {
+    const buckets: [string, string][] = [
+      ['never_released', 'never released'],
+      ['overdue', 'overdue'],
+      ['watch', 'watch'],
+      ['on_pace', 'on pace'],
+      ['insufficient_history', 'not enough history'],
+    ];
+
+    for (const [value, label] of buckets) {
+      const doc = {
+        ...ALL_FORMATS_DOC,
+        rows: [{ ...ALL_FORMATS_DOC.rows[0], staleness: value }],
+      };
+
+      function OneRow() {
+        const table = useDataTable(doc.columns, doc.rows, 'one-row');
+        return <DataTable table={table} />;
+      }
+
+      const { unmount } = render(<OneRow />);
+      expect(screen.getByText(label)).toBeInTheDocument();
+      unmount();
+    }
   });
 });

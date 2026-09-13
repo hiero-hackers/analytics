@@ -1,23 +1,17 @@
-"""GitHub data ingestion utilities using the GraphQL API.
+"""GitHub GraphQL ingestion utilities.
 
-This package provides functions for retrieving repositories, issues, and merged
-pull request metadata from GitHub. Data is fetched using cursor-based pagination
-and can be aggregated across an organization with parallel requests.
+Resource-specific implementations live in separate modules:
 
-The implementation is split by resource for readability:
+- `_common` — shared pagination, parallel fetching, and repo listing
+- `batched` — batched multi-repo GraphQL fetching
+- `issues` — issue and label-event ingestion
+- `pull_requests` — merged-PR difficulty ingestion
+- `contributors` — contributor activity ingestion
+- `hip_references` — HIP mention and spec inventory ingestion
+- `releases` — GitHub Releases ingestion
 
-- ``_common``       — generic paginated/parallel fetch engine + repo listing
-- ``batched``       — aliased multi-repo batched fetch engine (GraphQL)
-- ``issues``        — issue and issue-label-event ingestion (GraphQL)
-- ``pull_requests`` — merged-PR difficulty ingestion (GraphQL)
-- ``contributors``  — contributor activity ingestion (GraphQL)
-- ``hip_references`` — PR HIP-mention ingestion + HIP spec inventory (GraphQL)
-
-This module is a thin facade that re-exports the public API, so existing
-``from ...github_ingest import X`` imports keep working unchanged. Tests that
-monkeypatch an internal helper must patch it on the *owning submodule*
-(``github_ingest.issues``, ``.contributors``, ``._common``, ``.batched``),
-because that is where the call site resolves the name.
+This module re-exports the public API for backwards-compatible imports.
+Internal helpers should be monkeypatched on their owning submodule.
 """
 
 from __future__ import annotations
@@ -62,6 +56,11 @@ from .pull_requests import (
     fetch_org_merged_pr_difficulty_graphql,
     fetch_repo_merged_pr_difficulty_graphql,
 )
+from .releases import (
+    RELEASES_RESOURCE,
+    fetch_org_releases_graphql,
+    fetch_repo_releases_graphql,
+)
 
 # Every org-wide incrementally fetched resource, by dataset name — the
 # declarative registry the individual fetchers are built from.
@@ -85,6 +84,7 @@ __all__ = [
     "MERGED_PR_RESOURCE",
     "CONTRIBUTOR_ACTIVITY_RESOURCE",
     "PR_HIP_REFS_RESOURCE",
+    "RELEASES_RESOURCE",
     # generic engine + repos
     "fetch_github_resource",
     "fetch_org_resource_parallel",
@@ -105,4 +105,7 @@ __all__ = [
     # HIP references + inventory
     "fetch_org_pr_hip_refs_graphql",
     "fetch_hip_inventory",
+    # releases
+    "fetch_repo_releases_graphql",
+    "fetch_org_releases_graphql",
 ]

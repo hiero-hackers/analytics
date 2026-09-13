@@ -1,0 +1,24 @@
+query RELEASES_QUERY($owner:String!,$repo:String!,$cursor:String){
+  repository(owner:$owner, name:$repo){
+    releases(first:100, after:$cursor, orderBy:{field:CREATED_AT, direction:DESC}){
+      pageInfo{
+        hasNextPage
+        endCursor
+      }
+      nodes{
+        tagName
+        name
+        isPrerelease
+        isDraft
+        publishedAt
+        createdAt
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}
