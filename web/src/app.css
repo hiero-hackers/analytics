@@ -224,6 +224,41 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* ---- Responsive layout ---------------------------------------------------
+     Breakpoint convention (the first in this file — set here as the precedent
+     future contributors follow):
+
+       tablet        max-width: 767px   tablets in portrait
+       phone         max-width: 599px   phones in portrait
+       narrow-phone  max-width: 479px   component-level re-flow only (shead
+                                        stacking, jump bar, glossary, card
+                                        padding — see @layer components below)
+
+     Plain `@media` queries throughout — consistent with `prefers-color-scheme`
+     and `prefers-reduced-motion` above.  No CSS custom-media (needs PostCSS)
+     and no Tailwind `sm:`/`md:` variants here; those belong to TSX components
+     that already use the Tailwind vocabulary (MetricTiles, PeriodTabs, …).
+     Component-class overrides live in the matching block at the end of
+     `@layer components` below. */
+
+  /* Tablet: recover breathing room without disturbing desktop layout. */
+  @media (max-width: 767px) {
+    body {
+      padding: 16px;
+    }
+  }
+
+  /* Phone: tighten further and scale the hero heading down so it leaves more
+     room for the subtitle and tab bar beneath it. */
+  @media (max-width: 599px) {
+    body {
+      padding: 12px;
+    }
+    h1 {
+      font-size: 22px;
+    }
+  }
 }
 
 /* ---- Component vocabulary ------------------------------------------------ */
@@ -450,9 +485,18 @@
     background: var(--surface);
     color: var(--ink);
   }
+  /* Three-level cascade keeps the scroll box viewport-relative across the
+     browser matrix: 520 px for browsers without `min()` support, then
+     `min(520px, 60vh)` for those with `min()` but without `dvh`, and finally
+     `min(520px, 60dvh)` for full support. `dvh` (dynamic viewport height)
+     accounts for collapsible browser chrome; `60dvh` leaves at least 40 % of
+     the screen for content above and below the table so the page-scroll
+     gesture cannot be trapped. */
   .tablewrap {
     overflow: auto;
-    max-height: 520px;
+    max-height: 520px; /* no min() support: fixed cap */
+    max-height: min(520px, 60vh); /* min() + vh, no dvh: viewport-relative */
+    max-height: min(520px, 60dvh); /* full support: dvh accounts for browser chrome */
     border: 1px solid var(--edge-faint);
     border-radius: var(--r-frame);
   }
@@ -899,9 +943,12 @@
      on a dark page. The heat buckets read from --heat-*, which inverts for
      dark mode (see the palette); the matrix legend renders the same classes,
      so cells and legend cannot drift. */
+  /* Same three-level cascade as .tablewrap above (560 px / 60vh / 60dvh). */
   .hipmx-wrap {
     overflow: auto;
-    max-height: 560px;
+    max-height: 560px; /* no min() support: fixed cap */
+    max-height: min(560px, 60vh); /* min() + vh, no dvh: viewport-relative */
+    max-height: min(560px, 60dvh); /* full support: dvh accounts for browser chrome */
     border: 1px solid var(--edge-faint);
     border-radius: var(--r-frame);
     padding: 0 6px 6px 0;
@@ -1274,5 +1321,58 @@
   }
   .hipboard-info button {
     margin-left: auto;
+  }
+
+  /* ---- Responsive layout (component layer) ---------------------------------
+     Builds on the tablet/phone breakpoints from @layer base above, plus the
+     narrow-phone breakpoint (≤479 px) introduced here for component-level
+     re-flow.  All three are documented in the convention table in @layer base. */
+
+  /* ---- Narrow-phone breakpoint (≤479 px) -----------------------------------
+     Finer-grained adjustments that the 599 px phone breakpoint alone cannot
+     provide: the section header, jump bar label, glossary column, and card
+     padding all need more room than padding alone gives them at this width. */
+
+  /* Below 480 px the description + action-button row becomes too cramped.
+     Stack them: description first, then the action group below it.
+     .sactions originally has `align-items: flex-end` (right-aligns its
+     children within the column); override to left-align when stacked. */
+  @media (max-width: 479px) {
+    .shead {
+      flex-direction: column;
+    }
+    .sactions {
+      align-items: flex-start; /* left-align when stacked, not right */
+    }
+
+    /* The jump bar scrolls horizontally (flex-wrap: nowrap; overflow-x: auto).
+       The label is visually hidden (not display:none) so it stays in the
+       accessibility tree: screen readers still read "Jump to" before the
+       button list, giving group context without consuming horizontal space.
+       `position: absolute` removes it from the flex layout entirely. */
+    .jlabel {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Glossary: the fixed 150 px definition column consumes more than half a
+       ~280 px card body at this width.  minmax(0, 120px) caps it at 120 px
+       and lets it shrink as needed to share space fairly with the value
+       column (the 0 is the floor — it can compress all the way if forced). */
+    .glossary dl {
+      grid-template-columns: minmax(0, 120px) 1fr;
+    }
+
+    /* Cards: recover 8 px on each side so the content columns have more room. */
+    .card {
+      padding: 12px 14px;
+    }
   }
 }
