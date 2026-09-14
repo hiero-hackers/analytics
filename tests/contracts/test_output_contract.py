@@ -28,6 +28,7 @@ matplotlib.use("Agg")
 
 import hiero_analytics.config.paths as paths
 import hiero_analytics.pipelines.affiliation as affiliation_mod
+import hiero_analytics.pipelines.ci_health as ci_health_mod
 import hiero_analytics.pipelines.codeowner_and_runner as codeowner_mod
 import hiero_analytics.pipelines.contributor_activity as activity_mod
 import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
@@ -42,7 +43,9 @@ import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
+from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
+from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -87,6 +90,7 @@ CHART_COMPANION_CSVS = {
     "repo_affiliation_composition_committers.csv",
     "team_affiliation_composition.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
+    "ci_health_checks.csv",
     "contributor_activity_heatmap.csv",
     "org_activity_heatmap.csv",
     "team_activity_heatmap.csv",
@@ -353,6 +357,52 @@ def outputs_root(tmp_path_factory) -> Path:
             scorecard_mod,
             "fetch_repo_scorecard",
             lambda name: ScorecardRecord(repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "fetch_org_repos",
+            lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
+        )
+        mp.setattr(
+            ci_health_mod,
+            "fetch_repo_ci_health_graphql",
+            lambda _c, _owner, _repo: CIHealthRecord(
+                workflows=[
+                    {
+                        "name": "ci.yml",
+                        "text": "uses: actions/checkout@v4",
+                    }
+                ],
+                has_wiki_enabled=False,
+                has_issues_enabled=True,
+                has_discussions_enabled=False,
+                has_projects_enabled=False,
+                web_commit_signoff_required=True,
+            ),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "check_actions_sha_pinned",
+            lambda _workflows: CheckResult(
+                check="actions_sha_pinned",
+                band="actions",
+                status="fail",
+                evidence=(
+                    "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
+                ),
+                location=".github/workflows/ci.yml",
+            ),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "check_explicit_permissions",
+            lambda _workflows: CheckResult(
+                check="explicit_permissions",
+                band="permissions",
+                status="fail",
+                evidence=("Found 1 workflow(s) without an explicit permissions declaration: ci.yml"),
+                location=".github/workflows/ci.yml",
+            ),
         )
         mp.setattr(
             codeowner_mod,
