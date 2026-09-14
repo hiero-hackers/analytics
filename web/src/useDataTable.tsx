@@ -6,22 +6,60 @@
 
 import { useMemo, useState } from 'react';
 import {
+  columnFilteringFeature,
+  columnVisibilityFeature,
   createColumnHelper,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type Table,
+  createFilteredRowModel,
+  createSortedRowModel,
+  filterFn_includesString,
+  globalFilteringFeature,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_basic,
+  sortFn_text,
+  tableFeatures,
+  useTable,
+  type ReactTable,
 } from '@tanstack/react-table';
 import type { ColumnSpec, Row } from './api';
 import { FormattedCell } from './components/FormattedCell';
+
+/**
+ * v9 bundles nothing by default: every feature, row model, and sort/filter
+ * function this app touches is registered here, and nothing else ships.
+ * Only the global filter box is used, but `globalFilteringFeature` and the
+ * filtered row model both declare `columnFilteringFeature` a prerequisite, so
+ * it comes along; `includesString` is what global filtering defaults to. The
+ * sort functions are the three `getAutoSortFn` can pick for the
+ * `number | string` values `sortableValue` produces — dates never occur, so
+ * `datetime` is left out.
+ */
+const features = tableFeatures({
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  globalFilteringFeature,
+  rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  filterFns: { includesString: filterFn_includesString },
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    basic: sortFn_basic,
+    text: sortFn_text,
+  },
+});
+
+export type DataTableFeatures = typeof features;
+
+/** The table instance `useDataTable` hands back — what every table view renders from. */
+export type DataTableInstance = ReactTable<DataTableFeatures, Row>;
 
 // Column meta this app attaches: whether the column holds numbers, which earns
 // it tabular figures so digits keep a constant width. Alignment itself is not
 // per-column — every cell centres (see the `th`/`td` rules).
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interface merging requires the type params
-  interface ColumnMeta<TData, TValue> {
+  interface ColumnMeta<TFeatures, TData, TValue> {
     numeric?: boolean;
   }
 }
@@ -33,13 +71,17 @@ function sortableValue(row: Row, key: string): number | string {
   return value === null || value === undefined ? '' : String(value);
 }
 
-export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: string): Table<Row> {
+export function useDataTable(
+  columns: ColumnSpec[],
+  rows: Row[],
+  columnsKey: string,
+): DataTableInstance {
   const [filter, setFilter] = useState('');
-  const helper = createColumnHelper<Row>();
+  const helper = createColumnHelper<DataTableFeatures, Row>();
   const tableColumns = useMemo(
     () =>
       columns.map((spec: ColumnSpec) =>
-        helper.accessor((row) => sortableValue(row, spec.key), {
+        helper.accessor((row): unknown => sortableValue(row, spec.key), {
           id: spec.key,
           header: spec.label,
           cell: (context) => (
@@ -51,13 +93,11 @@ export function useDataTable(columns: ColumnSpec[], rows: Row[], columnsKey: str
     // eslint-disable-next-line react-hooks/exhaustive-deps -- columns derive from the key
     [columnsKey],
   );
-  return useReactTable({
+  return useTable({
+    features,
     data: rows,
     columns: tableColumns,
     state: { globalFilter: filter },
     onGlobalFilterChange: setFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 }

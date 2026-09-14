@@ -14,9 +14,9 @@
  */
 
 import { useRef } from 'react';
-import { flexRender, type Table } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import type { Row } from '../api';
+import type { DataTableInstance } from '../useDataTable';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
 // real measurements as rows mount, so this only has to be close.
@@ -25,10 +25,10 @@ const OVERSCAN = 12;
 /** Below this, a table renders whole — the DOM cost is already negligible. */
 export const VIRTUALIZE_ABOVE = 100;
 
-export function DataTable({ table }: { table: Table<Row> }) {
+export function DataTable({ table }: { table: DataTableInstance }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
-  const globalFilter = (table.getState().globalFilter as string) ?? '';
+  const globalFilter = (table.state.globalFilter as string) ?? '';
   const virtualized = rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
     count: virtualized ? rows.length : 0,
