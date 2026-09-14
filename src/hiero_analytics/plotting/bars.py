@@ -302,7 +302,8 @@ def plot_stacked_bar(
         Labels corresponding to each stacked column.
 
     title : str
-        Chart title.
+        Chart title. Embedded as PNG metadata, not drawn on the figure — the
+        dashboard captions each chart from the spec.
 
     output_path : Path
         Destination path for the saved chart.

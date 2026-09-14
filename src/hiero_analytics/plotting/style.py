@@ -7,15 +7,18 @@ by the analytics system. Style configuration values are sourced from
 
 It also owns the provenance footer every figure carries, so the stamp is styled
 in the same place as the rest of the chart furniture rather than at each of the
-dozen call sites that render one.
+dozen call sites that render one, and the registration of the vendored Inter
+faces the web dashboard shares.
 """
 
 from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
+from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from matplotlib.figure import Figure
 
 from hiero_analytics.config.charts import (
@@ -23,6 +26,7 @@ from hiero_analytics.config.charts import (
     DEFAULT_FIGSIZE,
     DEFAULT_STYLE,
     FIGURE_BACKGROUND_COLOR,
+    FONT_FALLBACKS,
     FONT_FAMILY,
     FOOTER_ALPHA,
     FOOTER_FONT_SIZE,
@@ -41,8 +45,6 @@ from hiero_analytics.config.charts import (
     PLOT_BACKGROUND_COLOR,
     TEXT_COLOR,
     TICK_FONT_SIZE,
-    TITLE_COLOR,
-    TITLE_FONT_SIZE,
 )
 from hiero_analytics.provenance import resolve_provenance
 
@@ -50,6 +52,29 @@ logger = logging.getLogger(__name__)
 
 # Prevent applying style multiple times
 _STYLE_APPLIED = False
+
+# The Inter faces vendored beside this module (see `config.charts.FONT_FAMILY`).
+_FONT_DIR = Path(__file__).parent / "fonts"
+
+
+def _register_bundled_fonts() -> None:
+    """Make the vendored Inter faces resolvable by ``FONT_FAMILY``.
+
+    matplotlib only draws with fonts its font manager knows about, and it looks
+    at system directories, not at ours — so the shipped TTFs have to be handed
+    to it explicitly. Each face registers under family ``Inter`` with its own
+    weight, which is what lets ``fontweight="semibold"`` pick SemiBold while
+    body text stays Regular.
+
+    Never raises. A chart set in the fallback typeface is a cosmetic
+    regression; a pipeline that dies because a font file is missing from an
+    install is not, so any failure degrades to ``FONT_FALLBACKS``.
+    """
+    try:
+        for path in sorted(_FONT_DIR.glob("*.ttf")):
+            font_manager.fontManager.addfont(str(path))
+    except Exception:  # noqa: BLE001 - typography must never fail a render
+        logger.debug("Could not register bundled fonts from %s", _FONT_DIR, exc_info=True)
 
 
 def apply_style() -> None:
@@ -70,6 +95,10 @@ def apply_style() -> None:
     # styling on top so every chart export looks consistent.
     plt.style.use(DEFAULT_STYLE)
 
+    # Must precede the rcParams update: the font stack below names Inter, which
+    # only resolves once the bundled faces are registered.
+    _register_bundled_fonts()
+
     plt.rcParams.update(
         {
             "figure.figsize": DEFAULT_FIGSIZE,
@@ -77,10 +106,9 @@ def apply_style() -> None:
             "savefig.facecolor": FIGURE_BACKGROUND_COLOR,
             "savefig.transparent": False,
             "axes.facecolor": PLOT_BACKGROUND_COLOR,
-            "axes.titlesize": TITLE_FONT_SIZE,
-            "axes.titleweight": "semibold",
-            "axes.titlecolor": TITLE_COLOR,
-            "axes.titlepad": 18,
+            # No axes-title params: charts are rendered untitled on purpose. The
+            # dashboard captions every figure from the spec, so a baked-in title
+            # printed the same string twice; see `base.finalize_chart`.
             "axes.labelsize": LABEL_FONT_SIZE,
             "axes.labelcolor": MUTED_TEXT_COLOR,
             "axes.edgecolor": AXIS_LINE_COLOR,
@@ -93,7 +121,8 @@ def apply_style() -> None:
             "xtick.major.size": 0,
             "ytick.major.size": 0,
             "text.color": TEXT_COLOR,
-            "font.family": FONT_FAMILY,
+            "font.family": "sans-serif",
+            "font.sans-serif": [FONT_FAMILY, *FONT_FALLBACKS],
             "legend.fontsize": LEGEND_FONT_SIZE,
             "legend.facecolor": LEGEND_BACKGROUND_COLOR,
             "legend.edgecolor": LEGEND_EDGE_COLOR,

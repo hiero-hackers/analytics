@@ -16,9 +16,34 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/* ---- Typography ---------------------------------------------------------- */
+
+/*
+ * Inter, self-hosted rather than pulled from a font CDN: the page ships under
+ * `font-src 'self'` (see index.html's CSP) and deploys to GitHub Pages, so an
+ * outside origin would simply be blocked. Vite fingerprints and rewrites this
+ * relative URL at build time, which keeps it correct under the `base: "./"`
+ * deploy path.
+ *
+ * One variable file covers the whole 100-900 range. The chart PNGs are set in
+ * the same typeface from the static faces vendored at
+ * src/hiero_analytics/plotting/fonts — keep the two in step.
+ */
+@font-face {
+  font-family: "InterVariable";
+  src: url("./assets/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---- Semantic palette ---------------------------------------------------- */
 
 :root {
+  /* The system stack stays behind Inter so text renders immediately, and still
+     reads correctly if the font file ever fails to load. */
+  --font-stack: "InterVariable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
   --page: #fafafa; /* page background */
   --ink: #1b1b1b; /* primary text */
   --muted: #666; /* secondary text */
@@ -53,6 +78,7 @@
 }
 
 @theme inline {
+  --font-sans: var(--font-stack);
   --color-page: var(--page);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
@@ -72,7 +98,7 @@
 
 @layer base {
   body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-stack);
     max-width: 1100px;
     margin: 0 auto;
     padding: 24px;

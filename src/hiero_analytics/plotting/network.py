@@ -186,7 +186,8 @@ def render_comembership_network(
         style_legend(legend)
         legend.get_frame().set_alpha(0.9)
 
-        ax.set_title(title)
+        # Untitled on purpose; the title travels as PNG metadata. See
+        # `base.save_and_close`.
         ax.text(
             0.5,
             -0.02,
@@ -202,7 +203,7 @@ def render_comembership_network(
 
         # Nodes, not edges: the node count is what a reader checks the stamp
         # against ("are all the teams here?"), and edges follow from it.
-        save_and_close(fig, output_path, dpi=_NETWORK_DPI, record_count=graph.number_of_nodes())
+        save_and_close(fig, output_path, dpi=_NETWORK_DPI, record_count=graph.number_of_nodes(), title=title)
         return True
     finally:
         plt.close(fig)

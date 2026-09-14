@@ -7,10 +7,13 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+from PIL import Image
 
 from hiero_analytics.plotting.base import (
     adaptive_legend_placement,
     create_figure,
+    finalize_chart,
+    save_and_close,
     style_axes,
 )
 
@@ -54,3 +57,41 @@ def test_style_axes_uses_single_axis_grid():
     assert not ax.spines["right"].get_visible()
 
     plt.close(fig)
+
+
+def test_finalize_chart_does_not_draw_the_title(tmp_path):
+    """The dashboard captions each figure, so the chart itself stays untitled.
+
+    Rendering the title here printed the same string twice on screen — once in
+    the PNG, once in the figcaption beneath it — and spent the top of every plot
+    doing it.
+    """
+    fig, ax = create_figure()
+    ax.plot([2023, 2024], [3, 5])
+
+    finalize_chart(fig, ax, "Single-employer teams by org", "", "", tmp_path / "chart.png")
+
+    assert ax.get_title() == ""
+
+
+def test_finalize_chart_embeds_the_title_as_png_metadata(tmp_path):
+    """The untitled PNG still names itself, for readers who meet it outside the dashboard."""
+    fig, ax = create_figure()
+    ax.plot([2023, 2024], [3, 5])
+    output = tmp_path / "chart.png"
+
+    finalize_chart(fig, ax, "Single-employer teams by org", "", "", output)
+
+    with Image.open(output) as image:
+        assert image.text["Title"] == "Single-employer teams by org"
+
+
+def test_save_and_close_omits_metadata_without_a_title(tmp_path):
+    """A titleless save writes no empty Title chunk."""
+    fig, _ = create_figure()
+    output = tmp_path / "chart.png"
+
+    save_and_close(fig, output)
+
+    with Image.open(output) as image:
+        assert "Title" not in image.text

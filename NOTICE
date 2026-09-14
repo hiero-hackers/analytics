@@ -10,3 +10,18 @@ You may obtain a copy of the License in the LICENSE file, or at:
 This product is maintained by the Hiero Hackers community
 (https://github.com/hiero-hackers) and is not an official Linux Foundation
 Decentralized Trust project.
+
+-------------------------------------------------------------------------------
+Third-party assets bundled with this product
+-------------------------------------------------------------------------------
+
+Inter (https://github.com/rsms/inter), version 4.1
+Copyright (c) 2016 The Inter Project Authors
+Licensed under the SIL Open Font License, Version 1.1.
+
+Redistributed as font files, not as source code:
+
+  - src/hiero_analytics/plotting/fonts/  (static TTFs; the chart PNGs)
+  - web/src/assets/fonts/                (variable WOFF2; the web dashboard)
+
+The full license text accompanies each, as OFL.txt.

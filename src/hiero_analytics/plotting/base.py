@@ -133,6 +133,7 @@ def save_and_close(
     *,
     dpi: int = DEFAULT_DPI,
     record_count: int | Mapping[str, int] | None = None,
+    title: str | None = None,
 ) -> None:
     """Write ``fig`` to ``output_path`` and always close it, even when saving fails.
 
@@ -142,22 +143,35 @@ def save_and_close(
     ``{label: count}`` mapping for a figure plotting more than one series); pass
     it whenever the frame is in hand, since a stamp showing the data and code but
     not the row count cannot distinguish a real decline from a truncated fetch.
+
+    ``title`` is written into the PNG's ``Title`` text chunk rather than drawn on
+    the figure. Charts are captioned by the dashboard spec, so drawing it would
+    print the same string twice on screen — but a PNG also travels on its own
+    into issues and slide decks, and the embedded tag keeps it self-describing
+    there without spending vertical space in the plot.
     """
     try:
         draw_provenance_footer(fig, record_count=record_count)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
+        fig.savefig(
+            output_path,
+            dpi=dpi,
+            bbox_inches="tight",
+            metadata={"Title": title} if title else None,
+        )
     finally:
         plt.close(fig)
 
 
 def style_axes(ax: Axes, *, grid_axis: str | None = "y") -> None:
     """Apply a clean card-like axis treatment inspired by shadcn charts."""
-    # Treat the plotting region like a chart card inside the figure canvas.
+    # The plotting region shares the figure ground, which in turn matches the
+    # `.chart img` background the dashboard paints behind the PNG — so the image
+    # blends into its card. Drawing a plate edge here would add a second frame
+    # inside the card's own border, so the grid alone carries the structure.
     ax.set_facecolor(PLOT_BACKGROUND_COLOR)
     ax.set_axisbelow(True)
-    ax.patch.set_edgecolor(CARD_BORDER_COLOR)
-    ax.patch.set_linewidth(1.0)
+    ax.patch.set_linewidth(0.0)
 
     if grid_axis is None:
         # Non-cartesian charts such as donuts should read as clean summaries
@@ -186,7 +200,6 @@ def style_axes(ax: Axes, *, grid_axis: str | None = "y") -> None:
     ax.tick_params(axis="y", colors=MUTED_TEXT_COLOR, pad=8)
     ax.xaxis.label.set_color(MUTED_TEXT_COLOR)
     ax.yaxis.label.set_color(MUTED_TEXT_COLOR)
-    ax.title.set_color(TITLE_COLOR)
 
 
 def style_legend(legend: Legend | None) -> None:
@@ -236,11 +249,11 @@ def finalize_chart(
 ) -> None:
     """Finalize and save a chart.
 
-    ``record_count`` is forwarded to the provenance footer; see
-    :func:`save_and_close`.
+    ``title`` is not drawn on the figure: the dashboard captions every chart from
+    the spec, so a baked-in title rendered the same string twice and spent the
+    top of the plot doing it. It is embedded as PNG metadata instead — see
+    :func:`save_and_close`, which also documents ``record_count``.
     """
-    # Titles are left-aligned to feel more like dashboard/report headings.
-    ax.set_title(title, loc="left")
     style_axes(ax, grid_axis=grid_axis)
 
     if xlabel:
@@ -273,4 +286,4 @@ def finalize_chart(
     # Reserve optional outer space for legends or header elements before export.
     fig.tight_layout(rect=layout_rect)
 
-    save_and_close(fig, output_path, record_count=record_count)
+    save_and_close(fig, output_path, record_count=record_count, title=title)

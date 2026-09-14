@@ -51,7 +51,8 @@ def plot_pie(
     value_col : str
         Column containing numeric values for each slice.
     title : str
-        Chart title.
+        Chart title. Embedded as PNG metadata, not drawn on the figure — the
+        dashboard captions each chart from the spec.
     output_path : Path
         File path where the chart image will be saved.
     colors : dict[str, str], optional

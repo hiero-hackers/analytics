@@ -10,6 +10,7 @@ from matplotlib.colors import Normalize
 
 from hiero_analytics.config.charts import ACTIVITY_HEATMAP_CMAP, ACTIVITY_HEATMAP_PALETTE, FONT_WEIGHT_SEMIBOLD
 from hiero_analytics.plotting.base import save_and_close
+from hiero_analytics.plotting.style import apply_style
 
 _CELL_VALUE_FONT_SIZE = 9
 
@@ -34,6 +35,12 @@ def plot_heatmap(
     normalized 0..max and coloured with ``cmap``. With ``annotate`` each cell shows
     its integer value. No-ops on an empty matrix.
     """
+    # This renderer builds its own figure rather than going through
+    # `base.create_figure`, so it has to ask for the shared style itself — a
+    # heatmap that happens to be the first chart of a run would otherwise be
+    # drawn in matplotlib's defaults, in the wrong typeface.
+    apply_style()
+
     palette = palette or ACTIVITY_HEATMAP_PALETTE
     matrix = np.asarray(values, dtype=float)
     if matrix.size == 0:
@@ -72,7 +79,8 @@ def plot_heatmap(
                         color=text_color,
                     )
 
-        ax.set_title(title, loc="left", color=palette["text_dark"])
+        # Untitled on purpose; the title travels as PNG metadata. See
+        # `base.save_and_close`.
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         for spine in ax.spines.values():
@@ -84,6 +92,6 @@ def plot_heatmap(
 
         fig.tight_layout()
         # Matrix rows are the records (one per entity); columns are time buckets.
-        save_and_close(fig, output_path, record_count=matrix.shape[0])
+        save_and_close(fig, output_path, record_count=matrix.shape[0], title=title)
     finally:
         plt.close(fig)

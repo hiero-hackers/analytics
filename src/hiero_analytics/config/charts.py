@@ -12,8 +12,21 @@ DEFAULT_FIGSIZE: tuple[int, int] = (12, 7)
 # Base style
 # --------------------------------------------------
 DEFAULT_STYLE: str = "default"
-FONT_FAMILY: str = "DejaVu Sans"
-TITLE_FONT_SIZE: int = 16
+
+# Inter, vendored as static TTFs in `plotting/fonts` and registered by
+# `plotting.style.apply_style`. The web dashboard loads the same typeface (see
+# the `--font-stack` token in web/src/app.css), so a chart PNG embedded in a
+# card is set in the type around it rather than in matplotlib's DejaVu Sans.
+# Only Regular (400) and SemiBold (600) are shipped — the two weights the
+# charts actually ask for — so requesting any other weight falls through the
+# stack below.
+FONT_FAMILY: str = "Inter"
+
+# Resolved in order when a glyph or weight is missing from Inter. DejaVu Sans
+# ships with matplotlib, so the last entry always resolves and a font that
+# failed to register degrades to the old typeface instead of a broken render.
+FONT_FALLBACKS: tuple[str, ...] = ("DejaVu Sans",)
+
 LABEL_FONT_SIZE: int = 11
 TICK_FONT_SIZE: int = 10
 LEGEND_FONT_SIZE: int = 10
@@ -24,13 +37,21 @@ FONT_WEIGHT_SEMIBOLD: str = "semibold"
 # --------------------------------------------------
 # Surface + typography colors
 # --------------------------------------------------
-FIGURE_BACKGROUND_COLOR = "#F6F8FB"
-PLOT_BACKGROUND_COLOR = "#FFFFFF"
-TITLE_COLOR = "#0F172A"
-TEXT_COLOR = "#334155"
-MUTED_TEXT_COLOR = "#64748B"
-AXIS_LINE_COLOR = "#D7E0EA"
-CARD_BORDER_COLOR = "#DCE5EF"
+# These mirror the semantic tokens in web/src/app.css, so a chart reads as part
+# of the card it sits in rather than as a pasted-in image. Keep them in step
+# with that stylesheet's `:root` block.
+#
+# The figure ground is `--surface`, the same white as `.chart img`'s background,
+# which is what lets the PNG blend into its card with no visible plate edge.
+FIGURE_BACKGROUND_COLOR = "#FFFFFF"  # --surface
+PLOT_BACKGROUND_COLOR = "#FFFFFF"  # --surface
+TITLE_COLOR = "#1B1B1B"  # --ink
+# A notch lighter than --ink: in-plot labels sit directly on the data, where the
+# full-strength ink of a heading reads as heavy.
+TEXT_COLOR = "#333333"
+MUTED_TEXT_COLOR = "#666666"  # --muted
+AXIS_LINE_COLOR = "#E6E6E6"  # --edge
+CARD_BORDER_COLOR = "#E6E6E6"  # --edge
 
 # --------------------------------------------------
 # Grid styling
@@ -38,14 +59,14 @@ CARD_BORDER_COLOR = "#DCE5EF"
 GRID_ENABLED: bool = True
 GRID_ALPHA: float = 1.0
 GRID_STYLE: str = "-"
-GRID_COLOR: str = "#E8EEF5"
+GRID_COLOR: str = "#EEEEEE"  # --edge-faint
 GRID_LINE_WIDTH: float = 0.8
 
 # --------------------------------------------------
 # Legend styling
 # --------------------------------------------------
-LEGEND_BACKGROUND_COLOR = "#FFFFFF"
-LEGEND_EDGE_COLOR = "#E2E8F0"
+LEGEND_BACKGROUND_COLOR = "#FFFFFF"  # --surface
+LEGEND_EDGE_COLOR = "#E6E6E6"  # --edge
 LEGEND_BOX_STYLE = "round,pad=0.35,rounding_size=1.4"
 
 # --------------------------------------------------
@@ -63,7 +84,7 @@ LINE_FILL_ALPHA: float = 0.08
 
 # Muted neutral used to background "earlier" / context series so the
 # accent color carries the eye to the recent / live portion of a chart.
-MUTED_HISTORICAL_COLOR = "#CBD5E1"
+MUTED_HISTORICAL_COLOR = "#CCCCCC"  # --edge-strong
 
 # Dashed threshold/reference lines (e.g. a 50% majority marker) and their labels.
 REFERENCE_LINE_COLOR = "#444444"
@@ -178,11 +199,11 @@ SCORECARD_CHECK_COLORS = {
 # chrome colours (figure/axes background, cell text, ticks).
 ACTIVITY_HEATMAP_CMAP = "RdYlGn"
 ACTIVITY_HEATMAP_PALETTE = {
-    "figure_bg": "#F6F8FB",
-    "axes_bg": "#FFFFFF",
-    "text_dark": "#0F172A",
+    "figure_bg": FIGURE_BACKGROUND_COLOR,
+    "axes_bg": PLOT_BACKGROUND_COLOR,
+    "text_dark": TITLE_COLOR,
     "text_light": "#FFFFFF",
-    "tick": "#64748B",
+    "tick": MUTED_TEXT_COLOR,
 }
 
 # Compliance / Codeowners status colors.
