@@ -8,6 +8,11 @@ ranking. Rows are ordered by ``last_active`` (recency).
 
 This complements ``run_maintainer_pipeline_org`` (which maps activity onto named
 governance roles); here we never name or rank roles.
+
+Also writes ``bot_suspects.csv`` — contributor logins that ``is_bot_login()``
+does not exclude but that match a weaker automation signal (see
+``analysis.bot_suspects``), kept for maintainer review rather than acted on
+automatically.
 """
 
 from __future__ import annotations
@@ -17,6 +22,7 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
+from hiero_analytics.analysis.bot_suspects import build_bot_suspects
 from hiero_analytics.analysis.comembership import build_comembership_network
 from hiero_analytics.analysis.contributor_activity_profile import (
     build_active_membership,
@@ -97,6 +103,14 @@ def main(org: str = ORG) -> None:
     records = load_contributor_activity(client, org)
     label_events = load_issue_label_events(client, org)
     logger.info("Using %d activity records and %d label events (all-time)", len(records), len(label_events))
+
+    # Hooked here rather than in a per-org fetch/ingest step: this is the first
+    # point in run_all with every org-wide contributor login already assembled
+    # in one list, so the sweep needs no extra fetch and stays a pure function
+    # of data this pipeline was loading anyway.
+    bot_suspects = build_bot_suspects(records)
+    save_dataframe(bot_suspects, org_data_dir / "bot_suspects.csv")
+    logger.info("Bot suspects: %d logins flagged for review", len(bot_suspects))
 
     _write_gfi_completers(client, org, org_data_dir)
 

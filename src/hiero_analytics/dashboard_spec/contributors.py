@@ -134,6 +134,22 @@ SECTION_SPECS = [
             ("last_active", "last active", "date"),
         ],
     },
+    {
+        "id": "bot-suspects",
+        "file": "bot_suspects.csv",
+        "title": "Bot suspects (review)",
+        "description": (
+            "Contributor logins is_bot_login() does not exclude, but that trip a weaker automation "
+            "signal — a substring like 'automation', 'actions', 'service', 'auto', 'svc', 'ci', or "
+            "'bot' outside the recognised '-bot'/'[bot]' suffix. These stay counted as people "
+            "everywhere else on this dashboard; a maintainer confirming one is automation adds it "
+            "to BOT_LOGINS. False positives (real names tripping a substring) are expected here."
+        ),
+        "columns": [
+            ("login", "login"),
+            ("signal", "signal matched"),
+        ],
+    },
 ]
 
 # This tab's "how to read this": only the columns the contributor tables show.
@@ -149,6 +165,8 @@ GLOSSARY = glossary_of(
         "repos",
         "last active",
         "period tabs",
+        "login",
+        "signal matched",
     ),
     note=(
         "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked "
@@ -164,6 +182,7 @@ SECTION_GROUPS = [
     ("Activity & networks", []),
     # The full per-person list.
     ("All contributors", ["profiles"]),
+    ("Bot suspects (review)", ["bot-suspects"]),
 ]
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}

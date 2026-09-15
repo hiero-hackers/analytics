@@ -1,0 +1,331 @@
+diff --git a/src/hiero_analytics/analysis/bot_suspects.py b/src/hiero_analytics/analysis/bot_suspects.py
+index 0f1b7d7..53af398 100644
+--- a/src/hiero_analytics/analysis/bot_suspects.py
++++ b/src/hiero_analytics/analysis/bot_suspects.py
+@@ -12,29 +12,68 @@ numbers for review instead of silently dropping or counting them.
+ 
+ Suspects stay in the people metrics; nothing here removes or discounts them.
+ False positives in the output are acceptable (a real name can trip a
+-substring signal); the point is to surface candidates for ``BOT_LOGINS``, not
+-to make the exclusion call automatically.
++signal); the point is to surface candidates for ``BOT_LOGINS``, not to make
++the exclusion call automatically. A login a maintainer confirms is a real
++person, not a bot, goes in ``data/bot_suspect_dismissals.yaml`` (mirroring
++``affiliations.yaml``'s hand-maintained-file pattern) so it stops reappearing
++every run — see ``load_dismissed_suspects``.
+ """
+ 
+ from __future__ import annotations
+ 
++import logging
++
+ import pandas as pd
+ 
++from hiero_analytics.config.paths import SRC
+ from hiero_analytics.data_sources.models import ContributorActivityRecord
+ from hiero_analytics.domain.bots import bot_suspect_signal
+ 
++logger = logging.getLogger(__name__)
++
+ _SUSPECT_COLUMNS = ["login", "signal"]
+ 
++DISMISSALS_PATH = SRC / "data" / "bot_suspect_dismissals.yaml"
++
++
++def load_dismissed_suspects(path=DISMISSALS_PATH) -> set[str]:
++    """Lowercased logins a maintainer has confirmed are real people, not bots.
++
++    One bare login per line (comments and blank lines ignored) — see the file
++    itself for the format. Missing file just means nothing's been dismissed yet.
++    """
++    if not path.exists():
++        logger.warning("Bot-suspect dismissals file not found: %s", path)
++        return set()
++
++    dismissed: set[str] = set()
++    for raw in path.read_text(encoding="utf-8").splitlines():
++        body = raw.split("#", 1)[0].strip().lower()
++        if body:
++            dismissed.add(body)
++    return dismissed
++
+ 
+-def build_bot_suspects(records: list[ContributorActivityRecord]) -> pd.DataFrame:
++def build_bot_suspects(
++    records: list[ContributorActivityRecord],
++    dismissed: set[str] | None = None,
++) -> pd.DataFrame:
+     """Distinct contributor logins that trip a weak bot signal, for review.
+ 
+     One row per distinct login (case-insensitive), sorted alphabetically.
+     Logins ``is_bot_login`` already excludes never appear here — they're
+-    automation accounts by the canonical policy already, not suspects.
++    automation accounts by the canonical policy already, not suspects. Logins
++    in ``dismissed`` (default: ``load_dismissed_suspects()``) are skipped too —
++    a maintainer already looked and confirmed they're people.
+     """
++    if dismissed is None:
++        dismissed = load_dismissed_suspects()
+     logins = {record.actor.strip().lower() for record in records if record.actor}
+-    rows = [{"login": login, "signal": signal} for login in logins if (signal := bot_suspect_signal(login)) is not None]
++    rows = [
++        {"login": login, "signal": signal}
++        for login in logins
++        if login not in dismissed and (signal := bot_suspect_signal(login)) is not None
++    ]
+     if not rows:
+         return pd.DataFrame(columns=_SUSPECT_COLUMNS)
+     return pd.DataFrame(rows, columns=_SUSPECT_COLUMNS).sort_values("login").reset_index(drop=True)
+diff --git a/src/hiero_analytics/data/bot_suspect_dismissals.yaml b/src/hiero_analytics/data/bot_suspect_dismissals.yaml
+new file mode 100644
+index 0000000..bb7f8a0
+--- /dev/null
++++ b/src/hiero_analytics/data/bot_suspect_dismissals.yaml
+@@ -0,0 +1,13 @@
++# Logins a maintainer has manually reviewed and confirmed are real people, not
++# bots — they trip a weak signal in bot_suspect_signal() (e.g. their login
++# happens to start or end with "ci") but aren't automation accounts. Once a
++# login is here, build_bot_suspects() stops listing it, so a re-run of the
++# pipeline doesn't re-flag the same confirmed-human login every time.
++#
++# Confirmed bots go the other direction: add the login to BOT_LOGINS in
++# domain/bots.py instead, so it's excluded from people metrics entirely rather
++# than just dropped from this review list.
++#
++# One login per line, lowercase, with a comment saying who reviewed it and why.
++# Example (illustrative — nobody has actually reviewed these two yet):
++# cijujohn  # reviewed by <you> on <date> - human login, "ci" is a coincidence
+diff --git a/src/hiero_analytics/domain/bots.py b/src/hiero_analytics/domain/bots.py
+index ffeaa78..dcabc5a 100644
+--- a/src/hiero_analytics/domain/bots.py
++++ b/src/hiero_analytics/domain/bots.py
+@@ -7,6 +7,8 @@ suffix checks. Matching is case-insensitive.
+ 
+ from __future__ import annotations
+ 
++import re
++
+ # Named automation accounts whose login carries no ``[bot]``/``-bot`` suffix; the
+ # suffixed ones (``*-bot``, ``*[bot]``) are caught by is_bot_login regardless.
+ BOT_LOGINS = frozenset(
+@@ -30,15 +32,19 @@ def is_bot_login(login: str) -> bool:
+     return name.endswith("[bot]") or name.endswith("-bot") or name in BOT_LOGINS
+ 
+ 
+-# Weaker automation signals than is_bot_login's suffix/name-list checks — plain
+-# substrings, so they will false-positive on real names (e.g. "marcia" contains
+-# "ci"). That's fine here: these are for a human-reviewed suspects list, not for
+-# exclusion, so a false positive costs a reviewer a glance rather than silently
+-# mislabeling a person. Ordered longest/most-specific first so a login matching
+-# several (e.g. "hiero-automation" also contains "auto") reports the most
+-# descriptive one rather than a generic substring of it.
++# Weaker automation signals than is_bot_login's suffix/name-list checks. Ordered
++# longest/most-specific first so a login matching several (e.g.
++# "hiero-automation" also matches "auto") reports the most descriptive one
++# rather than a generic prefix/suffix of it.
+ SUSPECT_SIGNALS = ("automation", "actions", "service", "auto", "bot", "svc", "ci")
+ 
++_TOKEN_SPLIT = re.compile(r"[^a-z0-9]+")
++
++
++def _tokens(name: str) -> list[str]:
++    """Split a login on non-alphanumeric separators (-, _, .) into word-ish chunks."""
++    return [t for t in _TOKEN_SPLIT.split(name) if t]
++
+ 
+ def bot_suspect_signal(login: str) -> str | None:
+     """The weak automation signal a login trips, or ``None`` if it trips none.
+@@ -47,11 +53,24 @@ def bot_suspect_signal(login: str) -> str | None:
+     those are automation accounts by the canonical policy already, not
+     suspects. Intended for a review CSV: a hit here doesn't mean "bot", it
+     means "a maintainer should take a look".
++
++    A signal only counts as the prefix or suffix of a token (a login split on
++    -, _, .), never a mid-word substring — plain substring matching flagged
++    real names purely because a signal's letters happened to sit somewhere in
++    the middle (e.g. "viniciusjssouza" contains "ci"). Anchoring to token edges
++    cuts that out while still catching the motivating cases: "hiero-automation"
++    (suffix of a token), "sdk-release-ci" (suffix), "botrunner" (prefix, single
++    token), "sdk-bot-helper" (a whole token, which is trivially both). It won't
++    catch everything — a short signal like "ci" can still be a real prefix or
++    suffix of an unrelated name — but that's an explicit tradeoff per review:
++    false positives from a genuine edge match are acceptable, false positives
++    from a signal merely appearing somewhere inside a word are not.
+     """
+     name = login.strip().lower()
+     if is_bot_login(name):
+         return None
++    tokens = _tokens(name)
+     for signal in SUSPECT_SIGNALS:
+-        if signal in name:
++        if any(token.startswith(signal) or token.endswith(signal) for token in tokens):
+             return signal
+     return None
+diff --git a/tests/analysis/test_bot_suspects.py b/tests/analysis/test_bot_suspects.py
+index 8828709..df0282d 100644
+--- a/tests/analysis/test_bot_suspects.py
++++ b/tests/analysis/test_bot_suspects.py
+@@ -3,9 +3,14 @@
+ from __future__ import annotations
+ 
+ from datetime import UTC, datetime
++from pathlib import Path
+ 
+-from hiero_analytics.analysis.bot_suspects import build_bot_suspects
++import yaml
++
++from hiero_analytics.analysis.affiliation import AFFILIATIONS_PATH
++from hiero_analytics.analysis.bot_suspects import build_bot_suspects, load_dismissed_suspects
+ from hiero_analytics.data_sources.models import ContributorActivityRecord
++from hiero_analytics.domain.bots import bot_suspect_signal
+ 
+ REPO = "hiero-hackers/analytics"
+ 
+@@ -24,7 +29,7 @@ def _activity(actor: str) -> ContributorActivityRecord:
+ 
+ def test_flags_logins_with_a_weak_signal():
+     """A contributor login matching a weak signal is flagged with which one fired."""
+-    suspects = build_bot_suspects([_activity("hiero-automation"), _activity("sdk-release-ci")])
++    suspects = build_bot_suspects([_activity("hiero-automation"), _activity("sdk-release-ci")], dismissed=set())
+ 
+     assert list(suspects["login"]) == ["hiero-automation", "sdk-release-ci"]
+     assert list(suspects["signal"]) == ["automation", "ci"]
+@@ -32,7 +37,7 @@ def test_flags_logins_with_a_weak_signal():
+ 
+ def test_excludes_clean_human_logins():
+     """A login tripping no weak signal never appears in the suspects table."""
+-    suspects = build_bot_suspects([_activity("alice"), _activity("bob")])
++    suspects = build_bot_suspects([_activity("alice"), _activity("bob")], dismissed=set())
+ 
+     assert suspects.empty
+     assert list(suspects.columns) == ["login", "signal"]
+@@ -40,14 +45,14 @@ def test_excludes_clean_human_logins():
+ 
+ def test_excludes_logins_is_bot_login_already_catches():
+     """Named/suffixed automation accounts are resolved already, not suspects."""
+-    suspects = build_bot_suspects([_activity("dependabot[bot]"), _activity("renovate")])
++    suspects = build_bot_suspects([_activity("dependabot[bot]"), _activity("renovate")], dismissed=set())
+ 
+     assert suspects.empty
+ 
+ 
+ def test_dedupes_case_insensitively():
+     """The same contributor showing up with different casing is one row."""
+-    suspects = build_bot_suspects([_activity("Hiero-Automation"), _activity("hiero-automation")])
++    suspects = build_bot_suspects([_activity("Hiero-Automation"), _activity("hiero-automation")], dismissed=set())
+ 
+     assert len(suspects) == 1
+     assert suspects.iloc[0]["login"] == "hiero-automation"
+@@ -55,14 +60,14 @@ def test_dedupes_case_insensitively():
+ 
+ def test_ignores_records_with_no_actor():
+     """A record with a falsy actor doesn't blow up the sweep."""
+-    suspects = build_bot_suspects([_activity("")])
++    suspects = build_bot_suspects([_activity("")], dismissed=set())
+ 
+     assert suspects.empty
+ 
+ 
+ def test_empty_input_returns_empty_frame_with_schema():
+     """No records still produces a stable-schema empty frame, not a crash."""
+-    suspects = build_bot_suspects([])
++    suspects = build_bot_suspects([], dismissed=set())
+ 
+     assert suspects.empty
+     assert list(suspects.columns) == ["login", "signal"]
+@@ -70,6 +75,57 @@ def test_empty_input_returns_empty_frame_with_schema():
+ 
+ def test_sorted_alphabetically_by_login():
+     """Rows come out sorted so the CSV is stable and easy to scan."""
+-    suspects = build_bot_suspects([_activity("sdk-release-ci"), _activity("hiero-automation")])
++    suspects = build_bot_suspects([_activity("sdk-release-ci"), _activity("hiero-automation")], dismissed=set())
+ 
+     assert list(suspects["login"]) == ["hiero-automation", "sdk-release-ci"]
++
++
++def test_dismissed_logins_are_skipped():
++    """A login a maintainer already confirmed is a real person doesn't reappear."""
++    suspects = build_bot_suspects(
++        [_activity("hiero-automation"), _activity("cijujohn")],
++        dismissed={"cijujohn"},
++    )
++
++    assert list(suspects["login"]) == ["hiero-automation"]
++
++
++def test_dismissed_lookup_is_case_insensitive():
++    """Dismissals match regardless of the casing GitHub returns for the actor."""
++    suspects = build_bot_suspects([_activity("CijuJohn")], dismissed={"cijujohn"})
++
++    assert suspects.empty
++
++
++def test_load_dismissed_suspects_parses_bare_logins(tmp_path: Path):
++    """One lowercase login per line; comments and blank lines are ignored."""
++    dismissals = tmp_path / "bot_suspect_dismissals.yaml"
++    dismissals.write_text(
++        "# header comment\n\ncijujohn  # reviewed by someone, human login\nJoshMarinacci # trailing comment\n",
++        encoding="utf-8",
++    )
++
++    assert load_dismissed_suspects(dismissals) == {"cijujohn", "joshmarinacci"}
++
++
++def test_load_dismissed_suspects_missing_file_returns_empty_set(tmp_path: Path):
++    """A missing dismissals file just means nothing's been dismissed yet, not a crash."""
++    assert load_dismissed_suspects(tmp_path / "does_not_exist.yaml") == set()
++
++
++def test_signal_false_positive_rate_against_real_contributor_logins():
++    """Regression guard: the heuristic should stay rare against real logins.
++
++    affiliations.yaml is the project's actual curated contributor list, so it
++    doubles as a sanity check for the suspect signal per review feedback on
++    #328 — this fails loudly if a future change to SUSPECT_SIGNALS makes the
++    heuristic noisy again, rather than that only being caught by a maintainer
++    skimming a much longer bot_suspects.csv by hand.
++    """
++    real_logins = list(yaml.safe_load(AFFILIATIONS_PATH.read_text(encoding="utf-8")).keys())
++    assert len(real_logins) > 100  # sanity: this really is the full curated list
++
++    flagged = [login for login in real_logins if bot_suspect_signal(login)]
++    # Not zero — "ci" as a real prefix/suffix is an accepted tradeoff (see
++    # bot_suspect_signal's docstring) — but should stay a handful, not a flood.
++    assert len(flagged) <= 5, f"suspect signal is flagging real logins broadly: {flagged}"
+diff --git a/tests/domain/test_bots.py b/tests/domain/test_bots.py
+index 5b2314d..bf39a0d 100644
+--- a/tests/domain/test_bots.py
++++ b/tests/domain/test_bots.py
+@@ -32,9 +32,29 @@ def test_suspect_signal_catches_unsuffixed_automation_logins():
+ 
+ 
+ def test_suspect_signal_catches_bot_as_a_non_suffix_substring():
+-    """'bot' appearing mid-login (not as the '-bot'/'[bot]' suffix) still fires."""
+-    assert bot_suspect_signal("botrunner") == "bot"
+-    assert bot_suspect_signal("sdk-bot-helper") == "bot"
++    """'bot' as a token prefix (not the '-bot'/'[bot]' suffix) still fires."""
++    assert bot_suspect_signal("botrunner") == "bot"  # prefix of the whole (single-token) login
++    assert bot_suspect_signal("sdk-bot-helper") == "bot"  # a whole token on its own
++
++
++def test_suspect_signal_ignores_a_signal_buried_mid_word():
++    """A signal sitting in the middle of a token, touching neither edge, doesn't fire.
++
++    Plain substring matching flagged real people for this (e.g. "viniciusjssouza"
++    contains "ci" mid-word); anchoring to token prefix/suffix rules that out.
++    """
++    assert bot_suspect_signal("viniciusjssouza") is None
++    assert bot_suspect_signal("marcia") is None
++
++
++def test_suspect_signal_still_allows_a_genuine_prefix_or_suffix_match():
++    """A short signal like 'ci' can still be a real prefix/suffix of an unrelated name.
++
++    That's an accepted tradeoff, not a bug — token-boundary matching removes
++    mid-word false positives, not every false positive.
++    """
++    assert bot_suspect_signal("cijujohn") == "ci"
++    assert bot_suspect_signal("joshmarinacci") == "ci"
+ 
+ 
+ def test_suspect_signal_prefers_the_more_specific_match():
