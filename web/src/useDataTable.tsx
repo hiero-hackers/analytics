@@ -96,7 +96,7 @@ export function useDataTable(
   const tableColumns = useMemo(
     () =>
       columns.map((spec: ColumnSpec) =>
-        helper.accessor((row) => sortableValue(row, spec.key, spec.format), {
+        helper.accessor((row): unknown => sortableValue(row, spec.key, spec.format), {
           id: spec.key,
           header: spec.label,
           cell: (context) => (

@@ -180,6 +180,7 @@ def fetch_org_releases_graphql(
     # cursor) falls back to the single-repo path, which keeps its own
     # explicit MAX_RELEASE_PAGES guard -- see _fetch_repo_releases_uncached.
     if failed_repos:
+
         def fetch_one(repo: RepositoryRecord) -> list[ReleaseRecord]:
             return fetch_repo_releases_graphql(
                 client,
