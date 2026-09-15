@@ -1,0 +1,380 @@
+{
+ "id": "release-staleness",
+ "title": "Release staleness by repo",
+ "description": "Every repo in the org, whether or not it has ever released \u2014 a repo with no releases still gets a row, ranked maximally stale, rather than being silently absent. See the glossary below for what 'staleness_ratio' and 'pace' mean.",
+ "source": "release_repo_summary.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "latest_release",
+   "label": "latest release",
+   "format": "date"
+  },
+  {
+   "key": "days_since_last_release",
+   "label": "days since",
+   "format": "number"
+  },
+  {
+   "key": "median_gap_days",
+   "label": "typical gap (days)",
+   "format": "number"
+  },
+  {
+   "key": "staleness_ratio",
+   "label": "\u00d7 overdue vs. own pace",
+   "format": "number"
+  },
+  {
+   "key": "staleness_bucket",
+   "label": "pace",
+   "format": "staleness"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "hiero-ledger/hiero-sdk-java",
+   "latest_release": "2026-08-20 05:44:31+00:00",
+   "days_since_last_release": 26.0,
+   "median_gap_days": 14.0,
+   "staleness_ratio": 1.9,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-improvement-proposals",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "latest_release": "2026-09-10 18:16:31+00:00",
+   "days_since_last_release": 4.0,
+   "median_gap_days": 7.0,
+   "staleness_ratio": 0.6,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "latest_release": "2026-09-09 10:37:24+00:00",
+   "days_since_last_release": 6.0,
+   "median_gap_days": 10.0,
+   "staleness_ratio": 0.6,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-cli",
+   "latest_release": "2026-06-24 08:30:41+00:00",
+   "days_since_last_release": 83.0,
+   "median_gap_days": 11.0,
+   "staleness_ratio": 7.5,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "latest_release": "2026-08-20 21:14:36+00:00",
+   "days_since_last_release": 25.0,
+   "median_gap_days": 13.0,
+   "staleness_ratio": 1.9,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-swift",
+   "latest_release": "2026-09-10 08:13:27+00:00",
+   "days_since_last_release": 5.0,
+   "median_gap_days": 28.0,
+   "staleness_ratio": 0.2,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "latest_release": "2026-09-11 14:58:59+00:00",
+   "days_since_last_release": 3.0,
+   "median_gap_days": 5.0,
+   "staleness_ratio": 0.6,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-docs",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-local-node",
+   "latest_release": "2026-05-12 08:15:58+00:00",
+   "days_since_last_release": 126.0,
+   "median_gap_days": 12.0,
+   "staleness_ratio": 10.5,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-rust",
+   "latest_release": "2026-04-30 11:55:23+00:00",
+   "days_since_last_release": 138.0,
+   "median_gap_days": 25.5,
+   "staleness_ratio": 5.4,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "latest_release": "2026-09-02 11:50:57+00:00",
+   "days_since_last_release": 13.0,
+   "median_gap_days": 8.5,
+   "staleness_ratio": 1.5,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-mirror-node-explorer",
+   "latest_release": "2026-07-27 17:03:50+00:00",
+   "days_since_last_release": 49.0,
+   "median_gap_days": 44.0,
+   "staleness_ratio": 1.1,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-tck",
+   "latest_release": "2026-08-13 08:23:42+00:00",
+   "days_since_last_release": 33.0,
+   "median_gap_days": 15.0,
+   "staleness_ratio": 2.2,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-cpp",
+   "latest_release": "2026-09-10 11:48:29+00:00",
+   "days_since_last_release": 5.0,
+   "median_gap_days": 21.0,
+   "staleness_ratio": 0.2,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-cryptography",
+   "latest_release": "2026-08-25 21:34:07+00:00",
+   "days_since_last_release": 20.0,
+   "median_gap_days": 4.0,
+   "staleness_ratio": 5.0,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/solo",
+   "latest_release": "2026-09-09 11:46:10+00:00",
+   "days_since_last_release": 6.0,
+   "median_gap_days": 6.0,
+   "staleness_ratio": 1.0,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-block-node",
+   "latest_release": "2026-08-25 23:14:25+00:00",
+   "days_since_last_release": 20.0,
+   "median_gap_days": 8.0,
+   "staleness_ratio": 2.5,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-ledger/hiero-solo-action",
+   "latest_release": "2026-09-02 10:04:16+00:00",
+   "days_since_last_release": 13.0,
+   "median_gap_days": 25.0,
+   "staleness_ratio": 0.5,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/governance",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-website",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/tsc",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/awesome-contributions",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/.github",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-sdk-python",
+   "latest_release": "2026-07-30 21:52:12+00:00",
+   "days_since_last_release": 46.0,
+   "median_gap_days": 14.0,
+   "staleness_ratio": 3.3,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/hiero-gradle-conventions",
+   "latest_release": "2026-07-02 15:22:46+00:00",
+   "days_since_last_release": 74.0,
+   "median_gap_days": 6.5,
+   "staleness_ratio": 11.4,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/hiero-hederium",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-did-sdk-python",
+   "latest_release": "2026-03-24 20:59:49+00:00",
+   "days_since_last_release": 174.0,
+   "median_gap_days": 23.0,
+   "staleness_ratio": 7.6,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/sdk-collaboration-hub",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/tsc-eligibility-check",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-did-sdk-js",
+   "latest_release": "2026-06-04 16:25:31+00:00",
+   "days_since_last_release": 102.0,
+   "median_gap_days": 21.0,
+   "staleness_ratio": 4.9,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-ledger/homebrew-tools",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-identity-standards",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-enterprise-java",
+   "latest_release": "2026-06-17 17:37:23+00:00",
+   "days_since_last_release": 89.0,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-ledger/identity-collaboration-hub",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-contracts",
+   "latest_release": "2026-09-03 10:56:27+00:00",
+   "days_since_last_release": 12.0,
+   "median_gap_days": 62.5,
+   "staleness_ratio": 0.2,
+   "staleness_bucket": "on_pace"
+  },
+  {
+   "repo": "hiero-ledger/hiero-consensus-specifications",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/hiero-ethereum-execution-spec-tests",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/heka-identity-platform",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-ledger/solo-docs",
+   "latest_release": "2026-04-02 13:15:48+00:00",
+   "days_since_last_release": 165.0,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-ledger/solo-build-actions",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  }
+ ],
+ "row_count": 42,
+ "generated_at": "2026-09-15T12:33:02.226155+00:00",
+ "stale": false,
+ "group": "Release cadence & staleness",
+ "macro": "Releases"
+}

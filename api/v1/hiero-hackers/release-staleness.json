@@ -1,0 +1,268 @@
+{
+ "id": "release-staleness",
+ "title": "Release staleness by repo",
+ "description": "Every repo in the org, whether or not it has ever released \u2014 a repo with no releases still gets a row, ranked maximally stale, rather than being silently absent. See the glossary below for what 'staleness_ratio' and 'pace' mean.",
+ "source": "release_repo_summary.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "latest_release",
+   "label": "latest release",
+   "format": "date"
+  },
+  {
+   "key": "days_since_last_release",
+   "label": "days since",
+   "format": "number"
+  },
+  {
+   "key": "median_gap_days",
+   "label": "typical gap (days)",
+   "format": "number"
+  },
+  {
+   "key": "staleness_ratio",
+   "label": "\u00d7 overdue vs. own pace",
+   "format": "number"
+  },
+  {
+   "key": "staleness_bucket",
+   "label": "pace",
+   "format": "staleness"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "hiero-hackers/noobisoft",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-enterprise-js",
+   "latest_release": "2026-08-15 12:22:00+00:00",
+   "days_since_last_release": 31.0,
+   "median_gap_days": 3.0,
+   "staleness_ratio": 10.3,
+   "staleness_bucket": "overdue"
+  },
+  {
+   "repo": "hiero-hackers/analytics",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/.github",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/governance",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/rs-hiero-mirror-node",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/sdk-automations",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-maintainer-automation-prototype",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-workflow-orchestrator",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-hybrid-workflow-app",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-enterprise-proxy",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-sdk-csharp",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-did-sdk-rs",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/vscode-hedera-transaction-viewer",
+   "latest_release": "2026-08-12 23:07:14+00:00",
+   "days_since_last_release": 33.0,
+   "median_gap_days": 21.0,
+   "staleness_ratio": 1.6,
+   "staleness_bucket": "watch"
+  },
+  {
+   "repo": "hiero-hackers/hiero-sdk-v3-prototyping",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-sdk-dart",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-block-verifier-js",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/agentic-support-hiero",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-verify-fn",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-streams-rs",
+   "latest_release": "2026-08-02 07:52:31+00:00",
+   "days_since_last_release": 44.0,
+   "median_gap_days": 0.0,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-hackers/hiero-differential-fuzz",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-journal-rs",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-notifications",
+   "latest_release": "2026-07-18 22:52:04+00:00",
+   "days_since_last_release": 58.0,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-hackers/hiero-receipts",
+   "latest_release": "2026-07-21 15:54:45+00:00",
+   "days_since_last_release": 55.0,
+   "median_gap_days": 0.0,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-hackers/hiero-checkout",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "hiero-hackers/hiero-payment-requests",
+   "latest_release": "2026-07-21 13:07:07+00:00",
+   "days_since_last_release": 55.0,
+   "median_gap_days": 0.0,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-hackers/hiero-x402",
+   "latest_release": "2026-07-31 15:02:38+00:00",
+   "days_since_last_release": 45.0,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "insufficient_history"
+  },
+  {
+   "repo": "hiero-hackers/hiero-tck-action",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  }
+ ],
+ "row_count": 28,
+ "generated_at": "2026-09-15T12:34:44.423507+00:00",
+ "stale": false,
+ "group": "Release cadence & staleness",
+ "macro": "Releases"
+}
