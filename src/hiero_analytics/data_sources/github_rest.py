@@ -1,7 +1,8 @@
-"""GitHub REST helpers for CODEOWNERS presence and Actions-runner classification.
+"""GitHub REST helpers for CODEOWNERS presence, Actions-runner classification, and dependency-graph SBOM fetching.
 
-CODEOWNERS existence checks and workflow-YAML runner scanning via the REST API
-(the GraphQL ingestion lives in ``github_ingest``).
+CODEOWNERS existence checks, workflow-YAML runner scanning, and per-repo SBOM
+package lists, all via the REST API (the GraphQL ingestion lives in
+``github_ingest``).
 """
 
 from __future__ import annotations
@@ -9,13 +10,15 @@ from __future__ import annotations
 import base64
 import logging
 import re
+from urllib.parse import unquote
 
 import requests
 import yaml
 
+from .dataset_store import PartialOrgFetchError
 from .github_client import GitHubClient
 from .github_ingest._common import fetch_all_with_retry
-from .models import RunnerRecord
+from .models import DependencyManifestRecord, RunnerRecord, SbomCoverageRecord
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,84 @@ def has_codeowners_file(client: GitHubClient, org: str, repo: str) -> bool:
             return True
 
     return False
+
+
+def _parse_purl(purl: str) -> tuple[str, str, str | None] | None:
+    """Parse a package URL (purl) into (ecosystem, name, version).
+
+    Format: ``pkg:type/namespace/name@version`` or ``pkg:type/name@version``
+    (namespace optional; npm scopes and Maven groupIds arrive as the
+    namespace segment, percent-encoded per the purl spec — e.g. an npm scope
+    is ``%40scope``, not ``@scope``). Qualifiers (``?...``) and subpath
+    (``#...``) are dropped — irrelevant for repo resolution. Returns
+    ``None`` for anything that doesn't parse as ``pkg:...`` rather than
+    raising, since a single malformed purl shouldn't fail the whole repo's
+    SBOM.
+    """
+    if not purl.startswith("pkg:"):
+        return None
+    body = purl[len("pkg:") :].split("?", 1)[0].split("#", 1)[0]
+    if "/" not in body:
+        return None
+    ecosystem, rest = body.split("/", 1)
+    name_and_version, _, version = rest.rpartition("@")
+    if not name_and_version:
+        # No '@version' segment at all -- treat the whole remainder as the name.
+        name_and_version, version = rest, None
+    return ecosystem.lower(), unquote(name_and_version), unquote(version) if version else None
+
+
+def fetch_repo_sbom(
+    client: GitHubClient, org: str, repo: str
+) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+    """Fetch and parse one repository's dependency-graph SBOM.
+
+    Only a 404 counts as ``"disabled"`` (dependency graph off for this repo) —
+    the same 404-vs-error contract ``has_codeowners_file``/``fetch_repo_workflows``
+    use. A 403 is ambiguous (rate limiting, an insufficiently-scoped token, a
+    private repo) rather than an unambiguous disabled-state signal, so it is
+    reported as ``"error"`` like any other HTTP failure, so the org-wide
+    fan-out in ``fetch_org_sbom_data`` can retry it instead of a transient or
+    permission failure being silently misclassified as "no dependency graph".
+    Non-HTTP request failures (timeouts, connection errors) still propagate
+    so ``fetch_org_sbom_data`` can retry them too.
+    """
+    url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
+    try:
+        payload = client.get(url)
+    except requests.HTTPError as exc:
+        status_code = exc.response.status_code if exc.response is not None else None
+        status = "disabled" if status_code == 404 else "error"
+        return SbomCoverageRecord(repo=repo, status=status, package_count=0), []
+
+    sbom = payload.get("sbom") if isinstance(payload, dict) else None
+    if not isinstance(sbom, dict):
+        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+
+    raw_packages = sbom.get("packages")
+    if raw_packages is not None and not isinstance(raw_packages, list):
+        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+    packages = raw_packages or []
+    described_ids = set(sbom.get("documentDescribes") or [])
+
+    records: list[DependencyManifestRecord] = []
+    for pkg in packages:
+        if not isinstance(pkg, dict) or pkg.get("SPDXID") in described_ids:
+            continue
+        purls = [
+            ref.get("referenceLocator", "")
+            for ref in (pkg.get("externalRefs") or [])
+            if isinstance(ref, dict) and ref.get("referenceType") == "purl"
+        ]
+        parsed = next((p for purl in purls if (p := _parse_purl(purl)) is not None), None)
+        if parsed is None:
+            continue
+        ecosystem, package_name, version = parsed
+        records.append(
+            DependencyManifestRecord(repo=repo, package_name=package_name, ecosystem=ecosystem, version=version)
+        )
+
+    return SbomCoverageRecord(repo=repo, status="ok", package_count=len(records)), records
 
 
 def _is_self_hosted(label: str) -> bool | None:
@@ -166,3 +247,43 @@ def fetch_repo_workflows(client: GitHubClient, org: str, repo: str) -> list[Runn
         task_desc=f"workflow files ({repo})",
         describe=lambda wf: str(wf.get("name", "?")),
     )
+
+
+# Concurrency for the org-wide SBOM fan-out (one call per repo).
+_SBOM_FETCH_WORKERS = 8
+
+
+def fetch_org_sbom_data(
+    client: GitHubClient,
+    org: str,
+    repo_names: list[str],
+    max_workers: int = _SBOM_FETCH_WORKERS,
+) -> tuple[list[SbomCoverageRecord], list[DependencyManifestRecord]]:
+    """Fetch and parse dependency-graph SBOMs for every repo in ``repo_names``.
+
+    Fans ``fetch_repo_sbom`` out across the org with retry. ``fetch_repo_sbom``
+    already turns 403/404 into ``"disabled"`` and any other HTTP failure into
+    ``"error"`` for that repo, so those never raise here. Non-HTTP failures
+    (timeouts, connection errors) do propagate, and this layer retries them;
+    a repo that is still failing after retries gets an ``"error"`` coverage
+    row from the fan-out itself instead of being silently dropped.
+    """
+
+    def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
+        coverage, packages = fetch_repo_sbom(client, org, repo)
+        return [coverage, *packages]
+
+    try:
+        combined = fetch_all_with_retry(
+            repo_names,
+            max_workers,
+            per_repo,
+            task_desc="SBOM data",
+            describe=str,
+        )
+    except PartialOrgFetchError as exc:
+        combined = list(exc.records)
+        combined.extend(SbomCoverageRecord(repo=repo, status="error", package_count=0) for repo in exc.failed_repos)
+    coverage = [r for r in combined if isinstance(r, SbomCoverageRecord)]
+    packages = [r for r in combined if isinstance(r, DependencyManifestRecord)]
+    return coverage, packages
