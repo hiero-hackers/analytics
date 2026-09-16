@@ -372,10 +372,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-09-15T12:34:45.405326+00:00",
+ "generated_at": "2026-09-16T09:14:50.293134+00:00",
  "provenance": {
-  "git_sha": "75b16ca",
-  "data_as_of": "2026-09-11T09:06:49.592078+00:00"
+  "git_sha": "420dac3",
+  "data_as_of": "2026-09-16T09:05:05.376027+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -384,7 +384,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1461,
+     "row_count": 1463,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -812,7 +812,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2206,
+         "width": 2219,
          "height": 1051
         }
        ],
@@ -1131,7 +1131,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-09-15T12:33:33.870180+00:00"
+      "generated_at": "2026-09-16T09:13:41.398404+00:00"
      }
     },
     {
@@ -1205,7 +1205,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-09-15T12:33:33.865778+00:00"
+      "generated_at": "2026-09-16T09:13:41.393922+00:00"
      }
     },
     {
@@ -1476,7 +1476,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1461,
+      "value": 1463,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1495,7 +1495,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "33%",
+      "value": "32%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -1915,7 +1915,7 @@
           "Count jobs, not repositories, and stack them per repository \u2014 so a repository with many jobs contributes proportionally more."
          ],
          "width": 2093,
-         "height": 1656
+         "height": 1718
         }
        ],
        "note": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard (GitHub-hosted), or indeterminate (could not be classified).",
@@ -2062,7 +2062,7 @@
      },
      {
       "label": "active last month %",
-      "value": "40%",
+      "value": "38%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

@@ -151,7 +151,7 @@
   }
  ],
  "row_count": 17,
- "generated_at": "2026-09-15T12:31:43.730576+00:00",
+ "generated_at": "2026-09-16T09:11:48.587938+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -191,17 +191,17 @@
     "triage": 15
    },
    {
-    "repo": "tsc-eligibility-check",
+    "repo": "hiero-docs",
     "maintainers": 3,
     "active_maintainers": 0,
     "committers": 0,
     "triage": 0
    },
    {
-    "repo": "hiero-improvement-proposals",
-    "maintainers": 4,
+    "repo": "tsc-eligibility-check",
+    "maintainers": 3,
     "active_maintainers": 0,
-    "committers": 77,
+    "committers": 0,
     "triage": 0
    },
    {
@@ -240,24 +240,10 @@
     "triage": 0
    },
    {
-    "repo": "hiero-sdk-java",
-    "maintainers": 5,
-    "active_maintainers": 0,
-    "committers": 5,
-    "triage": 12
-   },
-   {
     "repo": "homebrew-tools",
     "maintainers": 5,
     "active_maintainers": 0,
     "committers": 3,
-    "triage": 0
-   },
-   {
-    "repo": "hiero-consensus-specifications",
-    "maintainers": 5,
-    "active_maintainers": 0,
-    "committers": 2,
     "triage": 0
    },
    {
@@ -317,25 +303,11 @@
     "triage": 15
    },
    {
-    "repo": "hiero-docs",
-    "maintainers": 3,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
-   },
-   {
-    "repo": "hiero-mirror-node-explorer",
-    "maintainers": 3,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
-   },
-   {
-    "repo": "solo",
+    "repo": "hiero-improvement-proposals",
     "maintainers": 4,
     "active_maintainers": 1,
-    "committers": 9,
-    "triage": 1
+    "committers": 77,
+    "triage": 0
    },
    {
     "repo": "heka-identity-platform",
@@ -345,18 +317,18 @@
     "triage": 0
    },
    {
+    "repo": "hiero-consensus-specifications",
+    "maintainers": 5,
+    "active_maintainers": 1,
+    "committers": 2,
+    "triage": 0
+   },
+   {
     "repo": "hiero-sdk-go",
     "maintainers": 5,
     "active_maintainers": 1,
     "committers": 1,
     "triage": 11
-   },
-   {
-    "repo": "solo-docs",
-    "maintainers": 10,
-    "active_maintainers": 1,
-    "committers": 3,
-    "triage": 0
    },
    {
     "repo": "hiero-contracts",
@@ -499,13 +471,6 @@
     "active_maintainers": 1,
     "committers": 2,
     "triage": 15
-   },
-   {
-    "repo": "hiero-improvement-proposals",
-    "maintainers": 4,
-    "active_maintainers": 1,
-    "committers": 77,
-    "triage": 0
    },
    {
     "repo": "heka-identity-platform",
