@@ -17,6 +17,7 @@ import { useRef } from 'react';
 import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { DataTableInstance } from '../useDataTable';
+import { PRINT_ROW_LIMIT, usePrintMode } from '../printContext';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
 // real measurements as rows mount, so this only has to be close.
@@ -26,10 +27,11 @@ const OVERSCAN = 12;
 export const VIRTUALIZE_ABOVE = 100;
 
 export function DataTable({ table }: { table: DataTableInstance }) {
+  const printing = usePrintMode();
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
   const globalFilter = (table.state.globalFilter as string) ?? '';
-  const virtualized = rows.length > VIRTUALIZE_ABOVE;
+  const virtualized = !printing && rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
     count: virtualized ? rows.length : 0,
     getScrollElement: () => scrollRef.current,
@@ -42,12 +44,30 @@ export function DataTable({ table }: { table: DataTableInstance }) {
     virtualized && virtualRows.length
       ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
       : 0;
-  const visibleRows = virtualized ? virtualRows.map((item) => rows[item.index]) : rows;
+  const visibleRows = printing
+    ? rows.slice(0, PRINT_ROW_LIMIT)
+    : virtualized
+      ? virtualRows.map((item) => rows[item.index])
+      : rows;
   const columnCount = table.getVisibleFlatColumns().length;
 
   return (
     <>
+      {printing && globalFilter && (
+        <p className="print-selection">
+          Filter: “{globalFilter}”. {rows.length} of {table.options.data.length} rows match; rows
+          outside this filter are not printed.
+        </p>
+      )}
+      {printing && rows.length > PRINT_ROW_LIMIT && (
+        <p className="print-selection" data-print-truncated>
+          Showing {PRINT_ROW_LIMIT} of {rows.length} rows in the current order.{' '}
+          {rows.length - PRINT_ROW_LIMIT} rows are not printed. Download CSV from this table on the
+          dashboard for the complete selection.
+        </p>
+      )}
       <input
+        data-print-hide
         className="search"
         placeholder="Filter…"
         aria-label="Filter rows"
@@ -73,9 +93,12 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                             : undefined
                       }
                     >
+                      {printing && flexRender(header.column.columnDef.header, header.getContext())}
                       <button
                         type="button"
                         className="thbtn"
+                        hidden={printing}
+                        data-print-hide
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -94,7 +117,7 @@ export function DataTable({ table }: { table: DataTableInstance }) {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={columnCount} className="py-6 text-center text-[13px] text-muted">
-                  {globalFilter ? (
+                  {globalFilter && !printing ? (
                     <>
                       No rows match —{' '}
                       <button
@@ -105,6 +128,8 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                         clear the filter?
                       </button>
                     </>
+                  ) : globalFilter ? (
+                    'No rows match this filter.'
                   ) : (
                     'No rows to show.'
                   )}
@@ -125,7 +150,12 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className={cell.column.columnDef.meta?.numeric ? 'num' : undefined}
+                    className={
+                      cell.column.columnDef.meta?.numeric ||
+                      (printing && typeof row.original[cell.column.id] === 'number')
+                        ? 'num'
+                        : undefined
+                    }
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

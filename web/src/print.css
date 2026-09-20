@@ -1,0 +1,400 @@
+/* The normal dashboard remains the screen view. This file defines paper. */
+[data-print-only],
+[data-print-layout] > tfoot {
+  display: none;
+}
+
+/* A persistent presentation wrapper preserves React state in browsers that
+   need a repeating table footer instead of @page margin boxes. */
+[data-print-layout],
+[data-print-layout] > tbody,
+[data-print-layout] > tbody > tr,
+[data-print-layout] > tbody > tr > td {
+  display: contents;
+  font: inherit;
+  text-align: inherit;
+  white-space: normal;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm 17mm;
+  @bottom-left {
+    content: var(--print-provenance, 'Data provenance unavailable');
+    font:
+      8pt system-ui,
+      sans-serif;
+    color: #333;
+  }
+  @bottom-right {
+    content: 'Page ' counter(page) ' of ' counter(pages);
+    font:
+      8pt system-ui,
+      sans-serif;
+    color: #333;
+  }
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+    --page: #fff;
+    --surface: #fff;
+    --ink: #1b1b1b;
+    --muted: #444;
+    --soft: #555;
+    --row-line: #ccc;
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  html,
+  body,
+  #root,
+  .wrap {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    background: #fff;
+    color: var(--ink);
+  }
+  body {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+  [data-print-only] {
+    display: block;
+  }
+  [data-print-hide],
+  .macrobar,
+  .tabbar,
+  .jump,
+  .search,
+  .actionrow,
+  .slidenav,
+  .lightbox,
+  .hipev,
+  .sub,
+  .provenance,
+  .sbadge,
+  .sortmark,
+  button,
+  input,
+  select {
+    display: none !important;
+  }
+  h1 {
+    font-size: 21pt;
+  }
+  h2,
+  .card h2,
+  .tsum h2 {
+    font-size: 13pt;
+  }
+  h3,
+  .grouphdr {
+    font-size: 11pt;
+  }
+  h1,
+  h2,
+  h3,
+  summary,
+  .print-title,
+  .print-selection,
+  .shead {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .print-title {
+    font-size: 15pt;
+    font-weight: 600;
+    margin: 4mm 0;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  .card,
+  details,
+  .sbody,
+  .shead,
+  .sactions,
+  .group,
+  .footrow {
+    display: block;
+    position: static;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 5mm;
+    background: transparent;
+  }
+  details::details-content {
+    content-visibility: visible;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::marker,
+  summary::-webkit-details-marker {
+    content: '';
+    display: none;
+  }
+  .tsum::before,
+  .grouphdr::before {
+    display: none;
+  }
+  .grouphdr {
+    border-bottom: 1px solid var(--edge-strong);
+    padding: 2mm 0;
+    margin: 5mm 0 3mm;
+  }
+  .desc,
+  .asof,
+  .count,
+  .print-selection,
+  .print-chart-status {
+    font-size: 9pt;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    margin: 2mm 0;
+  }
+  [data-print-truncated],
+  [data-print-incomplete],
+  .print-chart-status {
+    border-left: 2pt solid var(--warn-ink);
+    padding-left: 3mm;
+  }
+  .tablewrap,
+  .hipmx-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+  }
+  table {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 8.5pt;
+    border-collapse: collapse;
+  }
+  /* Give repository names and long employer lists space without squeezing
+     short values into vertical strings. The bespoke matrix keeps its fixed
+     four-column layout below. */
+  .tablewrap table {
+    table-layout: auto;
+  }
+  .tablewrap th,
+  .tablewrap td {
+    min-width: 8mm;
+    max-width: 40mm;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tbody {
+    display: table-row-group;
+  }
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  th,
+  td,
+  .hipmx th,
+  .hipmx td {
+    position: static;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    text-overflow: clip;
+    overflow: visible;
+    font-size: inherit;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: left;
+    vertical-align: top;
+    padding: 1.5mm 1mm;
+    border-bottom: 0.25mm solid var(--row-line);
+  }
+  th {
+    color: var(--ink);
+    background: var(--raise);
+  }
+  td.num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  td > *,
+  th > *,
+  .chip {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+  }
+  .chip {
+    border: 1px solid var(--edge-strong);
+    background: transparent;
+    color: var(--ink);
+  }
+  a {
+    color: var(--link-ink);
+    text-decoration: underline;
+  }
+  .cell-link {
+    max-width: none;
+  }
+  .gallery,
+  .slideshow {
+    display: block;
+    width: 100%;
+    padding: 0;
+  }
+  .chart,
+  .chart.wide,
+  .slide {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 4mm 0;
+    padding: 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .chartscroll {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .chart img,
+  .slide img,
+  .chartscroll img {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 220mm;
+    object-fit: contain;
+    filter: none !important;
+    border: 0;
+  }
+  figcaption {
+    font-size: 9pt;
+    text-align: left;
+    break-before: avoid;
+  }
+  .metric-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3mm;
+  }
+  .metric-tile {
+    break-inside: avoid;
+    padding: 3mm;
+  }
+  .metric-tile > div:first-child {
+    font-size: 8pt;
+  }
+  .metric-tile > div:last-child {
+    font-size: 18pt;
+  }
+  .glossary dl {
+    grid-template-columns: minmax(0, 30%) minmax(0, 70%);
+    font-size: 9pt;
+  }
+  .glossary dd,
+  .glossary dt {
+    overflow-wrap: anywhere;
+  }
+  [data-print-board] {
+    display: block;
+  }
+  .print-board-list {
+    padding-left: 5mm;
+  }
+  .print-board-list li {
+    break-inside: avoid;
+    margin: 1mm 0;
+  }
+  [data-print-matrix] th:first-child {
+    width: 20%;
+  }
+  [data-print-matrix] th:nth-child(2) {
+    width: 12%;
+  }
+  [data-print-matrix] th:nth-child(3) {
+    width: 48%;
+  }
+  [data-print-matrix] th:nth-child(4) {
+    width: 20%;
+  }
+  [data-print-matrix] tbody th {
+    font-weight: 400;
+    background: transparent;
+  }
+  [data-print-matrix] small {
+    display: block;
+    font-size: inherit;
+  }
+  .print-matrix-band {
+    margin-bottom: 2mm;
+  }
+  .footrow {
+    break-inside: avoid;
+  }
+  /* Native repeating tfoot fallback: reserve footer space, never overlay data. */
+  [data-print-layout] {
+    display: table;
+    table-layout: auto;
+  }
+  [data-print-layout] > tbody {
+    display: table-row-group;
+  }
+  [data-print-layout] > tbody > tr {
+    display: table-row;
+    break-inside: auto;
+  }
+  [data-print-layout] > tbody > tr > td {
+    display: table-cell;
+    padding: 0;
+    border: 0;
+  }
+  [data-print-layout] > tfoot {
+    display: table-footer-group;
+  }
+  [data-print-layout] > tfoot > tr > td {
+    font-size: 8pt;
+    padding: 3mm 0 0;
+    border: 0;
+  }
+}

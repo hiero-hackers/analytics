@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright staging and local verification artifacts
+.e2e/
+playwright-report/
+test-results/

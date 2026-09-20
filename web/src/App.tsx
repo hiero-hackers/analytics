@@ -20,6 +20,9 @@ import { useHashState } from './useHashState';
 import { useSectionDocs } from './useSectionDocs';
 import { useViewDocs } from './useViewDocs';
 import { ViewCards } from './components/ViewCards';
+import { PrintControls, PrintProvider } from './printing';
+import { PrintLayout } from './components/PrintFooter';
+import './print.css';
 
 const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
 
@@ -131,11 +134,18 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
 
   return (
     <>
+      <PrintControls key={`${org}/${macro}`} ready={settled} />
+      {!settled && (
+        <p data-print-only>
+          Incomplete document: this tab is still loading. Close print preview and use Print tab when
+          loading finishes.
+        </p>
+      )}
       <MetricTiles tiles={entry.metrics?.[macro] ?? []} />
       {/* A section that could not load leaves a named gap rather than blanking
           the tab — the rest of the page is still worth reading. */}
       {unavailable.length > 0 && (
-        <p className="error">
+        <p className="error" data-print-incomplete>
           Could not load {unavailable.length === 1 ? 'this section' : 'these sections'}:{' '}
           {unavailable.join(', ')}. Everything else on this tab is unaffected — reload to try again.
         </p>
@@ -214,7 +224,14 @@ function Dashboard({
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
 
   return (
-    <>
+    <PrintLayout provenance={manifest.provenance}>
+      <p data-print-only className="print-title">
+        {activeMacro} · {shownOrg}
+      </p>
+      <p data-print-only>
+        Generated {stamp(manifest.generated_at)} UTC. Periods and filters are stated beside each
+        table or chart.
+      </p>
       <p className="sub">
         Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart
         to enlarge.
@@ -238,16 +255,20 @@ function Dashboard({
       {orgHasMacro ? (
         <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
       ) : (
-        <p className="empty">
-          {manifest.macro_absent_notes?.[activeMacro] ?? `No ${activeMacro} data for ${shownOrg}.`}
-        </p>
+        <>
+          <PrintControls />
+          <p className="empty">
+            {manifest.macro_absent_notes?.[activeMacro] ??
+              `No ${activeMacro} data for ${shownOrg}.`}
+          </p>
+        </>
       )}
       {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
       <div className="footrow">
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
-    </>
+    </PrintLayout>
   );
 }
 
@@ -280,26 +301,32 @@ export default function App() {
   };
 
   return (
-    <div className="wrap">
-      <h1>Hiero — analytics dashboard</h1>
-      {/* The header renders in every state below; only the content beneath it
+    <PrintProvider>
+      <div className="wrap">
+        <h1>Hiero — analytics dashboard</h1>
+        {/* The header renders in every state below; only the content beneath it
           changes shape — chrome never pops in after the fact. */}
-      {error ? (
-        <FatalError message={error} onRetry={retry} />
-      ) : !manifest ? (
-        <>
-          <p className="sub">Loading…</p>
-          <Skeleton label="Loading dashboard" rows={5} />
-        </>
-      ) : (
-        <Dashboard
-          manifest={manifest}
-          macro={macro}
-          setMacro={setMacro}
-          org={org}
-          setOrg={setOrg}
-        />
-      )}
-    </div>
+        {error ? (
+          <FatalError message={error} onRetry={retry} />
+        ) : !manifest ? (
+          <>
+            <p className="sub">Loading…</p>
+            <p data-print-only>
+              Incomplete document: dashboard data is still loading. Close print preview and wait for
+              the dashboard to finish loading.
+            </p>
+            <Skeleton label="Loading dashboard" rows={5} />
+          </>
+        ) : (
+          <Dashboard
+            manifest={manifest}
+            macro={macro}
+            setMacro={setMacro}
+            org={org}
+            setOrg={setOrg}
+          />
+        )}
+      </div>
+    </PrintProvider>
   );
 }

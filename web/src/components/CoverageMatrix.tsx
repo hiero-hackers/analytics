@@ -11,6 +11,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MatrixRow, MatrixView } from '../api';
+import { PRINT_ROW_LIMIT, usePrintMode } from '../printContext';
 import type { EvidenceItem } from './EvidencePanel';
 import { EvidencePanel } from './EvidencePanel';
 
@@ -47,6 +48,7 @@ export function CoverageMatrix({
   evidence: Map<string, EvidenceItem[]>;
   jump: JumpRequest | null;
 }) {
+  const printing = usePrintMode();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [selected, setSelected] = useState<{ hip: number; repo: string } | null>(null);
@@ -77,6 +79,7 @@ export function CoverageMatrix({
   }, [view.rows, query, status]);
 
   const selectedItems = selected ? evidence.get(`${selected.hip}|${selected.repo}`) : undefined;
+  const printRows = rows.slice(0, PRINT_ROW_LIMIT);
 
   const toggleCell = (hip: number, repo: string) => {
     setSelected((current) =>
@@ -86,7 +89,20 @@ export function CoverageMatrix({
 
   return (
     <>
-      <div className="hipmx-filters">
+      {printing && (
+        <p className="print-selection">
+          Showing {printRows.length} of {view.rows.length} rows. Governance: {status || 'All'}.
+          Filter: {query.trim() ? `“${query.trim()}”` : 'None'}.
+        </p>
+      )}
+      {printing && rows.length > PRINT_ROW_LIMIT && (
+        <p className="print-selection" data-print-truncated>
+          Showing {PRINT_ROW_LIMIT} of {rows.length} matching rows in the current order.{' '}
+          {rows.length - PRINT_ROW_LIMIT} matching rows are not printed. Download CSV from this
+          matrix on the dashboard for the complete data.
+        </p>
+      )}
+      <div className="hipmx-filters" hidden={printing}>
         <input
           className="search"
           placeholder="Filter by HIP number or title…"
@@ -107,7 +123,47 @@ export function CoverageMatrix({
           ))}
         </div>
       </div>
-      <div className="hipmx-wrap">
+      {printing && (
+        <table className="print-matrix" data-print-matrix>
+          <caption>Component PR counts are merged/open; 0/0 means no reference found.</caption>
+          <thead>
+            <tr>
+              <th scope="col">HIP</th>
+              <th scope="col">{view.row_header}</th>
+              <th scope="col">Component PRs (merged/open)</th>
+              <th scope="col">{view.note_header}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {printRows.map((row) => (
+              <tr key={row.key}>
+                <th scope="row">
+                  {row.label}
+                  <br />
+                  {row.sublabel}
+                </th>
+                <td>{row.status}</td>
+                <td>
+                  {view.bands.map((band) => (
+                    <div className="print-matrix-band" key={band.label}>
+                      <strong>{band.label}: </strong>
+                      {view.columns
+                        .filter((column) => column.band === band.label)
+                        .map((column) => {
+                          const cell = row.cells.find((cell) => cell.key === column.key);
+                          return `${column.label} ${cell ? `${cell.merged}/${cell.open}` : 'unavailable'}`;
+                        })
+                        .join(' · ')}
+                    </div>
+                  ))}
+                </td>
+                <td>{row.note.text}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <div className="hipmx-wrap" hidden={printing} data-print-hide>
         <table className="hipmx" ref={tableRef}>
           <thead>
             <tr className="hipmx-grp">
@@ -191,7 +247,7 @@ export function CoverageMatrix({
           </tbody>
         </table>
       </div>
-      <div className="hipmx-legend">
+      <div className="hipmx-legend" hidden={printing}>
         fewer
         {/* Keyed off the ramp's *length*, not its colours: the swatches wear the
             same m1–m5 classes as the cells, so both follow the theme together.
@@ -202,7 +258,7 @@ export function CoverageMatrix({
         more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no
         reference found
       </div>
-      {selected && selectedItems && (
+      {!printing && selected && selectedItems && (
         <EvidencePanel
           hip={selected.hip}
           repo={selected.repo}
@@ -210,7 +266,7 @@ export function CoverageMatrix({
           onClose={() => setSelected(null)}
         />
       )}
-      <p className="count">{rows.length} rows</p>
+      {!printing && <p className="count">{rows.length} rows</p>}
     </>
   );
 }
