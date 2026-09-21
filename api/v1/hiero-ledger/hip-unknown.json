@@ -37,8 +37,8 @@
    "hip": 1485,
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 13654,
-   "pr_title": "Add new endpoint for debug_traceCall in web3",
-   "snippet": "coverage. The PR will be blocked until [HIP-1485](https://hips.hedera.com/#hip-1485) is"
+   "pr_title": "Add callTracer support for debug methods in web3",
+   "snippet": "s for reviewer**: This PR should await HIP-1485 initial confirmation. **Checklist**"
   },
   {
    "hip": 1485,
@@ -105,7 +105,7 @@
   }
  ],
  "row_count": 11,
- "generated_at": "2026-09-16T09:13:41.390444+00:00",
+ "generated_at": "2026-09-21T09:14:40.056794+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

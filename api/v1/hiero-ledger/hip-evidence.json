@@ -2175,6 +2175,20 @@
   {
    "hip": 1261,
    "hip_title": "Simple Fees",
+   "repo": "hiero-ledger/sdk-collaboration-hub",
+   "pr_number": 286,
+   "pr_title": "docs: add proposal for a shared HTTP transport layer",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "URL rewriting, mirror lag sleeps), the HIP-1261 aggregation formula, and the per-langua",
+   "url": "https://github.com/hiero-ledger/sdk-collaboration-hub/pull/286"
+  },
+  {
+   "hip": 1261,
+   "hip_title": "Simple Fees",
    "repo": "hiero-ledger/solo",
    "pr_number": 4187,
    "pr_title": "chore(deps): bump the npm-deps group across 1 directory with 5 updates",
@@ -11875,8 +11889,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 844,
- "generated_at": "2026-09-16T09:13:41.389090+00:00",
+ "row_count": 845,
+ "generated_at": "2026-09-21T09:14:40.055509+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

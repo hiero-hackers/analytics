@@ -11,12 +11,6 @@
    "title": "In review",
    "items": [
     {
-     "key": 1342,
-     "label": "HIP-1342",
-     "title": "Ignore Trailing Calldata for System Contract",
-     "status": "Last Call"
-    },
-    {
      "key": 1331,
      "label": "HIP-1331",
      "title": "An `ExtendedAssetChanges` extra for large atomic swaps",
@@ -43,6 +37,12 @@
      "key": 1427,
      "label": "HIP-1427",
      "title": "Historical Record File Wrapping for Block Stream Cutover",
+     "status": "Approved"
+    },
+    {
+     "key": 1342,
+     "label": "HIP-1342",
+     "title": "Ignore Trailing Calldata for System Contract",
      "status": "Approved"
     },
     {
@@ -983,6 +983,6 @@
  ],
  "target_view": "hip-matrix",
  "macro": "HIPs",
- "generated_at": "2026-09-16T09:13:41.395759+00:00",
+ "generated_at": "2026-09-21T09:14:40.062731+00:00",
  "stale": false
 }
