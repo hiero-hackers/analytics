@@ -19,7 +19,7 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
   return (
     <>
       {showHeaders && (
-        <div className="jump">
+        <div className="jump" data-scroll-restore>
           <span className="jlabel">Jump to</span>
           {groups.map(([name], index) => (
             // Deliberately NOT an <a href="#…">: the URL hash is the app's

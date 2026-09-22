@@ -163,7 +163,7 @@ export function CoverageMatrix({
           </tbody>
         </table>
       )}
-      <div className="hipmx-wrap" hidden={printing} data-print-hide>
+      <div className="hipmx-wrap" hidden={printing} data-print-hide data-scroll-restore>
         <table className="hipmx" ref={tableRef}>
           <thead>
             <tr className="hipmx-grp">
@@ -258,7 +258,7 @@ export function CoverageMatrix({
         more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no
         reference found
       </div>
-      {!printing && selected && selectedItems && (
+      {selected && selectedItems && (
         <EvidencePanel
           hip={selected.hip}
           repo={selected.repo}

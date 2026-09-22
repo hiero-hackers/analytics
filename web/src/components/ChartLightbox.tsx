@@ -6,6 +6,7 @@
  */
 
 import { useEffect } from 'react';
+import { usePrintMode } from '../printContext';
 import { ChartInfo, type ChartInfoProps } from './ChartInfo';
 
 export interface LightboxContent extends ChartInfoProps {
@@ -23,18 +24,23 @@ export function ChartLightbox({
   content: LightboxContent;
   onClose: () => void;
 }) {
+  const printing = usePrintMode();
   useEffect(() => {
+    if (printing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, printing]);
 
   return (
     <div
       className="lightbox"
-      style={{ display: 'flex' }}
+      style={{ display: printing ? 'none' : 'flex' }}
+      hidden={printing}
+      data-print-hide
+      data-scroll-restore
       onClick={onClose}
       role="dialog"
       aria-label={content.alt}
@@ -51,7 +57,7 @@ export function ChartLightbox({
         </h3>
       )}
       {(content.note || content.methodology) && (
-        <div className="lbcap" onClick={(event) => event.stopPropagation()}>
+        <div className="lbcap" data-scroll-restore onClick={(event) => event.stopPropagation()}>
           <ChartInfo note={content.note} methodology={content.methodology} />
         </div>
       )}

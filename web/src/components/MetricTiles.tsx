@@ -65,9 +65,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
           );
         })}
       </div>
-      {!printing && explained && (
-        <ChartLightbox content={explained} onClose={() => setExplained(null)} />
-      )}
+      {explained && <ChartLightbox content={explained} onClose={() => setExplained(null)} />}
     </>
   );
 }

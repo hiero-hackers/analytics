@@ -34,6 +34,7 @@ export function PeriodTabs({
         aria-label="Time range"
         hidden={printing}
         data-print-hide
+        data-scroll-restore
       >
         {periods.map((key) => (
           <button

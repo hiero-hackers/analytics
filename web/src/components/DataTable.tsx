@@ -33,8 +33,9 @@ export function DataTable({ table }: { table: DataTableInstance }) {
   const globalFilter = (table.state.globalFilter as string) ?? '';
   const virtualized = !printing && rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
-    count: virtualized ? rows.length : 0,
-    getScrollElement: () => scrollRef.current,
+    // Pause observation during printing, retaining the measured screen rows and offset.
+    count: rows.length > VIRTUALIZE_ABOVE ? rows.length : 0,
+    getScrollElement: () => (printing ? null : scrollRef.current),
     estimateSize: () => ROW_HEIGHT,
     overscan: OVERSCAN,
   });
@@ -44,8 +45,14 @@ export function DataTable({ table }: { table: DataTableInstance }) {
     virtualized && virtualRows.length
       ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
       : 0;
-  const visibleRows = printing
-    ? rows.slice(0, PRINT_ROW_LIMIT)
+  const renderedRows = printing
+    ? [
+        ...rows.slice(0, PRINT_ROW_LIMIT),
+        // Retain the screen viewport beyond the cap so its focused links survive printing.
+        ...virtualRows
+          .filter((item) => item.index >= PRINT_ROW_LIMIT)
+          .map((item) => rows[item.index]),
+      ]
     : virtualized
       ? virtualRows.map((item) => rows[item.index])
       : rows;
@@ -74,7 +81,7 @@ export function DataTable({ table }: { table: DataTableInstance }) {
         value={globalFilter}
         onChange={(event) => table.setGlobalFilter(event.target.value)}
       />
-      <div className="tablewrap" ref={scrollRef}>
+      <div className="tablewrap" ref={scrollRef} data-scroll-restore>
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -117,19 +124,18 @@ export function DataTable({ table }: { table: DataTableInstance }) {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={columnCount} className="py-6 text-center text-[13px] text-muted">
-                  {globalFilter && !printing ? (
+                  {globalFilter ? (
                     <>
-                      No rows match —{' '}
+                      {printing ? 'No rows match this filter.' : 'No rows match —'}{' '}
                       <button
                         type="button"
+                        hidden={printing}
                         className="underline"
                         onClick={() => table.setGlobalFilter('')}
                       >
                         clear the filter?
                       </button>
                     </>
-                  ) : globalFilter ? (
-                    'No rows match this filter.'
                   ) : (
                     'No rows to show.'
                   )}
@@ -141,9 +147,10 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                 <td colSpan={columnCount} style={{ height: paddingTop, padding: 0, border: 0 }} />
               </tr>
             )}
-            {visibleRows.map((row, index) => (
+            {renderedRows.map((row, index) => (
               <tr
                 key={row.id}
+                hidden={printing && index >= PRINT_ROW_LIMIT}
                 data-index={virtualized ? virtualRows[index].index : index}
                 ref={virtualized ? virtualizer.measureElement : undefined}
               >

@@ -1,6 +1,6 @@
-import type { Page } from '@playwright/test';
-import { PRINT_CONTRIB_DOC, PRINT_GOV_DOC } from './fixtures';
-import { MATRIX_DOC } from '../src/test/fixtures';
+import type { Locator, Page } from '@playwright/test';
+import { PRINT_CONTRIB_DOC, PRINT_GOV_DOC, PRINT_MANIFEST } from './fixtures';
+import { BOARD_DOC, HIP_EVIDENCE_DOC, MATRIX_DOC } from '../src/test/fixtures';
 import { test, expect } from './browser';
 
 async function enterNativePrint(page: Page) {
@@ -19,6 +19,22 @@ async function openGovernance(page: Page) {
   await page.goto('./#tab=Governance');
   await expect(page.locator('#roles')).toBeVisible();
 }
+
+async function setScrollOffset(scroller: Locator, top: number, left: number) {
+  await scroller.evaluate(
+    (element, offset) => {
+      element.scrollTop = offset.top;
+      element.scrollLeft = offset.left;
+    },
+    { top, left },
+  );
+}
+
+const scrollOffset = (scroller: Locator) =>
+  scroller.evaluate((element) => ({
+    top: Math.round(element.scrollTop),
+    left: Math.round(element.scrollLeft),
+  }));
 
 async function decodedCharts(page: Page) {
   await expect
@@ -140,13 +156,51 @@ test('large tables print a deliberate row cap and an explicit omission notice', 
   await page.goto('./#tab=Contributors');
   await expect(page.locator('#profiles')).toBeVisible();
   await enterNativePrint(page);
-  const printed = await page.locator('#profiles tbody tr').count();
+  const printed = await page.locator('#profiles tbody tr:not([hidden])').count();
   expect(printed).toBe(500);
   expect(printed).toBeLessThan(PRINT_CONTRIB_DOC.row_count);
   await expect(page.locator('#profiles')).toContainText(/500.*620/);
   await expect(page.locator('#profiles')).toContainText(/omitted|truncated|remaining|not printed/i);
   await expect(page.getByRole('cell', { name: 'contributor-0500', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'contributor-0501', exact: true })).toHaveCount(0);
+});
+
+test('printing a capped table preserves scrolling and focus beyond the printed rows', async ({
+  page,
+}) => {
+  await page.route('**/profiles.json', (route) =>
+    route.fulfill({
+      json: {
+        ...PRINT_CONTRIB_DOC,
+        columns: [...PRINT_CONTRIB_DOC.columns, { key: 'url', label: 'Profile', format: 'link' }],
+        rows: PRINT_CONTRIB_DOC.rows.map((row, index) => ({
+          ...row,
+          url: `https://example.test/profile/${index}`,
+        })),
+      },
+    }),
+  );
+  await page.goto('./#tab=Contributors');
+  const scroller = page.locator('#profiles .tablewrap');
+  await setScrollOffset(scroller, 100000, 0);
+  const link = scroller.locator('a[href="https://example.test/profile/619"]');
+  await link.focus();
+  await expect(link).toBeFocused();
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  const offset = await scrollOffset(scroller);
+  expect(offset.top).toBeGreaterThan(14000);
+  await enterNativePrint(page);
+  await expect(page.locator('#profiles tbody tr:not([hidden])')).toHaveCount(500);
+  await expect(link).toBeHidden();
+  await expect(page.getByRole('cell', { name: 'contributor-0620', exact: true })).toHaveCount(0);
+  await leavePrint(page);
+  await expect.poll(() => scrollOffset(scroller)).toEqual(offset);
+  await expect(link).toBeFocused();
 });
 
 test('print-media emulation alone switches off virtualisation', async ({ page }) => {
@@ -235,6 +289,17 @@ test('printing preserves filtered and sorted rows and makes the filter explicit'
   await expect(section).toContainText(/filter.*member-12/i);
   await leavePrint(page);
   await expect(section.getByRole('textbox', { name: 'Filter rows' })).toHaveValue('member-12');
+
+  await section.getByRole('textbox', { name: 'Filter rows' }).fill('no matching contributor');
+  const clear = section.getByRole('button', { name: 'clear the filter?' });
+  await clear.focus();
+  await enterNativePrint(page);
+  await expect(section).toContainText('No rows match this filter.');
+  await expect(clear).toBeHidden();
+  await leavePrint(page);
+  await expect(clear).toBeFocused();
+  await clear.click();
+  await expect(section.getByRole('textbox', { name: 'Filter rows' })).toHaveValue('');
 });
 
 test('the selected role variant remains selected in the printed table', async ({ page }) => {
@@ -360,7 +425,69 @@ test('native print restores keyboard focus to period, sort, KPI and role control
   await expect(role).toBeFocused();
 });
 
-test('native print preserves horizontal and vertical matrix scrolling', async ({ page }) => {
+test('native print preserves table, wide-chart and period-tab scrolling', async ({ page }) => {
+  const org = PRINT_MANIFEST.orgs['hiero-ledger'];
+  const periods = { '30d': '1 month', '90d': '3 months', '180d': '6 months', '365d': '1 year' };
+  await page.route('**/manifest.json', (route) =>
+    route.fulfill({
+      json: {
+        ...PRINT_MANIFEST,
+        period_labels: periods,
+        orgs: {
+          ...PRINT_MANIFEST.orgs,
+          'hiero-ledger': {
+            ...org,
+            // A gallery's wide chart scrolls; the slideshow scales its images to fit.
+            chart_sections: org.chart_sections.map((section) =>
+              section.id === 'pipeline' ? { ...section, slideshow: false } : section,
+            ),
+          },
+        },
+      },
+    }),
+  );
+  await page.route('**/hiero-ledger/roles.json', (route) =>
+    route.fulfill({
+      json: {
+        ...PRINT_GOV_DOC,
+        periods: Object.fromEntries(Object.keys(periods).map((key) => [key, PRINT_GOV_DOC.rows])),
+      },
+    }),
+  );
+  // The shared one-pixel image cannot exercise a genuinely wide chart layout.
+  await page.route('**/pipeline_monthly.png', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400"><rect width="1600" height="400" fill="white"/></svg>',
+    }),
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openGovernance(page);
+  await decodedCharts(page);
+  const table = page.locator('#roles .tablewrap');
+  const chart = page.locator('#pipeline .chartscroll');
+  const periodTabs = page.locator('#roles').getByRole('group', { name: 'Time range' });
+  await table.scrollIntoViewIfNeeded();
+  await setScrollOffset(table, 700, 200);
+  await setScrollOffset(chart, 0, 200);
+  await setScrollOffset(periodTabs, 0, 40);
+  const offsets = () => Promise.all([table, chart, periodTabs].map(scrollOffset));
+  const expected = [
+    { top: 700, left: 200 },
+    { top: 0, left: 200 },
+    { top: 0, left: 40 },
+  ];
+  await expect.poll(offsets).toEqual(expected);
+
+  await enterNativePrint(page);
+  await expect(page.locator('#roles tbody tr')).toHaveCount(PRINT_GOV_DOC.row_count);
+  await expect(chart).toHaveCSS('overflow-x', 'visible');
+  await expect(periodTabs).toBeHidden();
+  await leavePrint(page);
+  await expect.poll(offsets).toEqual(expected);
+});
+
+test('native print preserves matrix and nested board scrolling', async ({ page }) => {
   const columns = Array.from({ length: 14 }, (_, index) => ({
     key: `repo-${index}`,
     label: `component-${index}`,
@@ -378,19 +505,139 @@ test('native print preserves horizontal and vertical matrix scrolling', async ({
     })),
   };
   await page.route('**/hip-matrix.json', (route) => route.fulfill({ json: matrix }));
+  await page.route('**/hip-board.json', (route) =>
+    route.fulfill({
+      json: {
+        ...BOARD_DOC,
+        columns: BOARD_DOC.columns.map((column, index) =>
+          index === 0
+            ? {
+                ...column,
+                items: Array.from({ length: 40 }, (_, item) => ({
+                  ...column.items[0],
+                  key: 1200 + item,
+                  label: `HIP-${1200 + item}`,
+                })),
+              }
+            : column,
+        ),
+      },
+    }),
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./#tab=HIPs');
-  const scroller = page.locator('.hipmx-wrap');
-  await scroller.scrollIntoViewIfNeeded();
-  await scroller.evaluate((element) => {
-    element.scrollTop = 700;
-    element.scrollLeft = 200;
-  });
-  const offset = () =>
-    scroller.evaluate((element) => ({ top: element.scrollTop, left: element.scrollLeft }));
-  await expect.poll(offset).toEqual({ top: 700, left: 200 });
+  const matrixScroller = page.locator('.hipmx-wrap');
+  const board = page.locator('#hip-board .hipboard');
+  const chips = page.locator('#hip-board .hipboard-chips').first();
+  await matrixScroller.scrollIntoViewIfNeeded();
+  await setScrollOffset(matrixScroller, 700, 200);
+  await setScrollOffset(board, 0, 200);
+  await setScrollOffset(chips, 100, 0);
+  const offsets = () => Promise.all([matrixScroller, board, chips].map(scrollOffset));
+  const expected = [
+    { top: 700, left: 200 },
+    { top: 0, left: 200 },
+    { top: 100, left: 0 },
+  ];
+  await expect.poll(offsets).toEqual(expected);
   await enterNativePrint(page);
   await expect(page.locator('[data-print-matrix] tbody tr')).toHaveCount(100);
+  await expect(page.locator('#hip-board [data-print-board]').first().locator('li')).toHaveCount(40);
   await leavePrint(page);
-  await expect.poll(offset).toEqual({ top: 700, left: 200 });
+  await expect.poll(offsets).toEqual(expected);
+});
+
+test('native print preserves open chart and metric explanations', async ({ page }) => {
+  const org = PRINT_MANIFEST.orgs['hiero-ledger'];
+  const methodology = Array.from(
+    { length: 20 },
+    (_, index) => `Step ${index + 1}: count the matching contributors.`,
+  );
+  await page.route('**/manifest.json', (route) =>
+    route.fulfill({
+      json: {
+        ...PRINT_MANIFEST,
+        orgs: {
+          ...PRINT_MANIFEST.orgs,
+          'hiero-ledger': {
+            ...org,
+            chart_sections: org.chart_sections.map((section) => ({
+              ...section,
+              charts: section.charts.map((chart) => ({ ...chart, methodology })),
+            })),
+            metrics: {
+              ...org.metrics,
+              Governance: org.metrics!.Governance.map((tile) => ({ ...tile, methodology })),
+            },
+          },
+        },
+      },
+    }),
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openGovernance(page);
+  for (const opener of [
+    page.locator('#pipeline figure img').first(),
+    page.getByRole('button', { name: /maintainers 103/i }),
+  ]) {
+    await opener.click();
+    const dialog = page.getByRole('dialog');
+    const details = dialog.locator('details');
+    const summary = details.locator('summary');
+    await summary.focus();
+    await summary.press('Enter');
+    await expect(details).toHaveAttribute('open', '');
+    const caption = dialog.locator('.lbcap');
+    await setScrollOffset(caption, 100, 0);
+    await expect.poll(() => scrollOffset(caption)).toEqual({ top: 100, left: 0 });
+    const close = dialog.getByRole('button', { name: 'Close', exact: true });
+    await close.focus();
+
+    await enterNativePrint(page);
+    await expect(page.locator('.lightbox')).toBeHidden();
+    await page.keyboard.press('Escape');
+    await leavePrint(page);
+    await expect(dialog).toBeVisible();
+    await expect(details).toHaveAttribute('open', '');
+    await expect(close).toBeFocused();
+    await expect.poll(() => scrollOffset(caption)).toEqual({ top: 100, left: 0 });
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+  }
+});
+
+test('native print restores an open evidence panel and keeps raw numbers unbroken', async ({
+  page,
+}) => {
+  const rows = Array.from({ length: 40 }, (_, index) => ({
+    ...HIP_EVIDENCE_DOC.rows[0],
+    pr_number: 1000 + index,
+  }));
+  await page.route('**/hip-evidence.json', (route) =>
+    route.fulfill({
+      json: { ...HIP_EVIDENCE_DOC, rows, row_count: rows.length },
+    }),
+  );
+  await page.goto('./#tab=HIPs');
+  await page.locator('#hip-matrix').getByRole('button', { name: '3', exact: true }).click();
+  const panel = page.locator('.hipev');
+  const list = panel.locator('ol');
+  await setScrollOffset(list, 200, 0);
+  await expect.poll(() => scrollOffset(list)).toEqual({ top: 200, left: 0 });
+  const close = panel.getByRole('button', { name: 'Close', exact: true });
+  await close.focus();
+  const number = page.locator('#hip-evidence').getByRole('cell', { name: '1000', exact: true });
+  await expect(number).toHaveCSS('text-align', 'center');
+
+  await enterNativePrint(page);
+  await expect(panel).toBeHidden();
+  await expect(number).toHaveCSS('text-align', 'right');
+  await expect(number).toHaveCSS('white-space', 'nowrap');
+  await page.keyboard.press('Escape');
+  await leavePrint(page);
+  await expect(panel).toBeVisible();
+  await expect(close).toBeFocused();
+  await expect.poll(() => scrollOffset(list)).toEqual({ top: 200, left: 0 });
+  await page.keyboard.press('Escape');
+  await expect(panel).toHaveCount(0);
 });

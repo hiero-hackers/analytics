@@ -27,11 +27,10 @@ export function PrintProvider({ children }: { children: ReactNode }) {
     restorePending.current = false;
     if (focusFrame.current !== undefined) cancelAnimationFrame(focusFrame.current);
     focus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    scroll.current = [
-      ...document.querySelectorAll<HTMLElement>(
-        '.wrap .tablewrap, .wrap .hipmx-wrap, .wrap .hipboard, .wrap .hipboard-chips',
-      ),
-    ].map((element) => ({ element, top: element.scrollTop, left: element.scrollLeft }));
+    // Persistent scroll containers opt in at their component with data-scroll-restore.
+    scroll.current = [...document.querySelectorAll<HTMLElement>('.wrap [data-scroll-restore]')].map(
+      (element) => ({ element, top: element.scrollTop, left: element.scrollLeft }),
+    );
     closed.current = [
       ...document.querySelectorAll<HTMLDetailsElement>('.wrap details:not([open])'),
     ];

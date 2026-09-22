@@ -107,7 +107,13 @@ function Figure({
           ariaLabel={`${chart.title} view`}
         />
       )}
-      {chart.wide ? <div className="chartscroll">{img}</div> : img}
+      {chart.wide ? (
+        <div className="chartscroll" data-scroll-restore>
+          {img}
+        </div>
+      ) : (
+        img
+      )}
       {imageStatus === 'error' && (
         <p className="print-chart-status" role="alert">
           Could not load chart: {chart.title} ({active.label}).
@@ -281,7 +287,7 @@ export function ChartSectionCard({
           ))}
         </div>
       )}
-      {!printing && zoom && <ChartLightbox content={zoom} onClose={() => setZoom(null)} />}
+      {zoom && <ChartLightbox content={zoom} onClose={() => setZoom(null)} />}
     </section>
   );
 }

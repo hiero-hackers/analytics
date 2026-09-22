@@ -5,6 +5,7 @@
  */
 
 import { useEffect } from 'react';
+import { usePrintMode } from '../printContext';
 import { safeUrl } from '../safety';
 
 /** One evidence line, in the legacy panel's field order. */
@@ -29,16 +30,18 @@ export function EvidencePanel({
   items: EvidenceItem[];
   onClose: () => void;
 }) {
+  const printing = usePrintMode();
   useEffect(() => {
+    if (printing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, printing]);
 
   return (
-    <div className="hipev">
+    <div className="hipev" hidden={printing} data-print-hide>
       <div className="hipev-head">
         <h3>
           HIP-{hip} · {repo}
@@ -50,7 +53,7 @@ export function EvidencePanel({
           Close
         </button>
       </div>
-      <ol>
+      <ol data-scroll-restore>
         {items.map((item) => {
           const href = safeUrl(`https://github.com/${repo}/pull/${item.n}`);
           return (

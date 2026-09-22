@@ -14,13 +14,13 @@ export function StatusBoard({ view, onJump }: { view: BoardView; onJump: (hip: n
 
   return (
     <>
-      <div className="hipboard" hidden={printing} data-print-hide>
+      <div className="hipboard" hidden={printing} data-print-hide data-scroll-restore>
         {view.columns.map((column) => (
           <div key={column.title} className="hipboard-col">
             <h3>
               {column.title} <span className="n">{column.items.length}</span>
             </h3>
-            <div className="hipboard-chips">
+            <div className="hipboard-chips" data-scroll-restore>
               {column.items.length === 0 && <span className="none">none</span>}
               {column.items.map((item) => (
                 <button

@@ -112,3 +112,40 @@ Governance: 10 images totalling 2.23 MiB. The 500-row cap bounds the additional 
 work, and asset preparation has a 15-second timeout, including the final render
 frame. The fallback presentation wrapper and print listeners are removed/cleaned
 up with their owning components.
+
+## State-restoration follow-up (21 September 2026)
+
+Persistent scroll containers opt in with `data-scroll-restore` in their component.
+The print controller queries that attribute, so adding a scrolling component does
+not require adding its CSS class to a central list. Coverage includes tables,
+matrices, boards, charts, period tabs, the jump bar and open explanation/evidence
+panels. Open panels stay mounted while hidden; their Escape handlers pause during
+printing. Methodology expansion, focus and scroll positions therefore survive
+print/cancel.
+
+Virtual tables detach their scroll observer during printing while retaining their
+screen measurements and offset. This avoids restoring against the shorter printed
+table when the reader was scrolled beyond row 500. The previous viewport's rows
+beyond that cap stay mounted but hidden, preserving focused links without printing
+extra rows or rendering a second table. The empty-filter clear button also stays
+mounted while hidden.
+
+Regression checks now cover those cases, including an actual Firefox period-tab
+reset reproduced with the old selector. The suite passes 78 unit/component tests
+and 20 Playwright tests in each of Chromium and Firefox. The browser suite uses
+print-media emulation and dispatched lifecycle events; the button tests observe
+`window.print` rather than automate the operating system's print dialog. Chromium
+also generates a PDF. Native Firefox PDF evidence is recorded separately above.
+
+Local Chromium timing checks used the real Governance data and ten chart images.
+Preparation took 0.26 seconds with charts already loaded. With a fresh browser
+context, 6x CPU slowdown, 150 ms network latency and approximately 1.6 Mbps download
+throughput, it took 11.45 seconds. At 750 Kbps the 15-second timeout fired, restored
+the screen and did not invoke printing. Once the remaining images loaded, a retry
+succeeded in 0.57 seconds. These are simulated conditions on this machine, not
+measurements from separate slow hardware. Timing starts at the Print tab click,
+after the tab's data has loaded; it excludes the initial dashboard load.
+
+The timeout is a bounded wait with an explicit retry path, not a guarantee that
+every device or connection finishes within 15 seconds. Safari native printing
+remains unverified, and Firefox page numbering still needs its native print setting.
