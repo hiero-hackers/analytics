@@ -92,6 +92,12 @@ def load_channels_df() -> pd.DataFrame:
             f"Channels CSV not found at {path}. Place the snapshot there or set HIERO_DISCORD_CHANNELS_CSV."
         )
     df = pd.read_csv(path)
+    for row in df.itertuples():
+        if not (row.d30 <= row.d90 <= row.d365 <= row.total):
+            raise ValueError(
+                f"Channel {row.channel!r} violates d30<=d90<=d365<=total: "
+                f"d30={row.d30}, d90={row.d90}, d365={row.d365}, total={row.total}"
+            )
     df["channel_label"] = "#" + df["channel"]
     df["category"] = df["channel"].apply(_categorize_channel)
     return df
