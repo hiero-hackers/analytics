@@ -1,12 +1,15 @@
 /**
  * A miniature but structurally complete data API: two orgs, one macro with
  * charts + tables + metrics (only for the primary org) and one macro both
- * orgs share, so org-tab behaviour is exercised. `stubApi` serves it through
- * a fetch stub keyed by URL suffix — the same contract the real API honours.
+ * orgs share, so org-tab behaviour is exercised.
+ *
+ * Both suites read this one tree: the unit tests serve it from memory through
+ * `stubApi` (see `stubApi.ts`), and the e2e setup writes `ROUTES` to disk as
+ * the static API the built app fetches. That is why nothing here imports
+ * vitest — the e2e side loads this module outside the test runner.
  */
 
-import { vi } from 'vitest';
-import type { BoardView, Manifest, MatrixView, SectionDoc } from '../api';
+import type { BoardView, Manifest, MatrixView, SectionDoc, SectionVariant, ViewDoc } from '../api';
 
 export const GOV_DOC: SectionDoc = {
   id: 'roles',
@@ -477,7 +480,17 @@ export const MANIFEST: Manifest = {
   },
 };
 
-const ROUTES: Record<string, unknown> = {
+/**
+ * The fixture API tree: path beneath `data/api/v1` -> what is served there,
+ * mirroring what `export/data_api.py` writes. A JSON document is typed against
+ * the `api.ts` interfaces, so a fixture that drifts from the shapes the app
+ * parses fails `tsc` instead of failing a browser at runtime. A string is a raw
+ * file (a chart's companion CSV) and is served verbatim.
+ */
+export const ROUTES: Record<
+  string,
+  Manifest | SectionDoc | SectionVariant | ViewDoc | string | undefined
+> = {
   'manifest.json': MANIFEST,
   'hiero-ledger/roles.json': GOV_DOC,
   'hiero-ledger/hip-evidence.json': HIP_EVIDENCE_DOC,
@@ -491,28 +504,3 @@ const ROUTES: Record<string, unknown> = {
   'hiero-ledger/maintainer_affiliations.csv': 'login,organisation\nalice,Hashgraph\n',
   'hiero-ledger/committer_affiliations.csv': 'login,organisation\ndave,BlockyDevs\n',
 };
-
-/**
- * Stub global fetch to serve the fixture API; returns the spy for assertions.
- * `overrides` lets a test intercept specific routes (e.g. to delay or fail a
- * request) while every other route still serves its normal fixture — so a
- * test controlling one request doesn't have to also know every other request
- * the page happens to make.
- */
-export function stubApi(overrides: Record<string, () => Response | Promise<Response>> = {}) {
-  return vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      const key = String(url);
-      const override = Object.entries(overrides).find(([suffix]) => key.endsWith(suffix));
-      if (override) return override[1]();
-      const match = Object.entries(ROUTES).find(([suffix]) => key.endsWith(suffix));
-      if (!match) {
-        return new Response('not found', { status: 404 });
-      }
-      // CSV companions are served verbatim; everything else is a JSON document.
-      const body = typeof match[1] === 'string' ? match[1] : JSON.stringify(match[1]);
-      return new Response(body, { status: 200 });
-    }),
-  );
-}

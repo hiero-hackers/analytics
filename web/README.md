@@ -58,3 +58,26 @@ documentation of the manifest contract), `app.test.tsx` covers the app shell
 and table/chart behavior, `csv.test.ts` covers the provenance-stamped export.
 Query by role and text, not by class name — styling refactors shouldn't break
 tests.
+
+### Browser smoke suite
+
+`e2e/` holds a Playwright suite for what jsdom cannot see: the built bundle
+booting, base-relative URLs resolving against real files, and the page's
+Content-Security-Policy. `npm run test:e2e` builds the app, writes the same
+`fixtures.ts` tree to `.e2e-site/` as real files, serves it on localhost, and
+drives Chromium through it. Nothing leaves the machine, and any request that
+tries to leave the local server fails the run.
+
+```bash
+npx playwright install chromium   # once, to fetch the browser
+npm run test:e2e
+```
+
+The staging scripts are TypeScript that Node runs directly, so it needs Node
+22.18 or newer (CI uses 24). It runs in its own CI job, next to the Vitest one.
+
+The fixture manifest decides what gets served. If you add a section or view, add
+the matching API document to `ROUTES` in `fixtures.ts`; chart images are created
+as placeholders from the manifest, and staging names anything it cannot write.
+The companion CSVs a card offers for download are placeholders too, unless
+`ROUTES` lists a real one.
