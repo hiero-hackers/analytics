@@ -228,15 +228,13 @@ def test_fetch_repo_sbom_treats_404_as_disabled():
 
 
 @pytest.mark.parametrize("status_code", [403, 500])
-def test_fetch_repo_sbom_reports_403_and_other_errors_as_error_status_not_disabled(status_code):
-    """403 is ambiguous (rate limit, scope, private repo) -- must be retryable 'error', not 'disabled'."""
+def test_fetch_repo_sbom_propagates_http_errors(status_code):
+    """HTTP failures must propagate so the org-level retry can handle them."""
     client = Mock()
     client.get.side_effect = _http_error(status_code)
 
-    coverage, records = fetch_repo_sbom(client, "org", "repo")
-
-    assert coverage.status == "error"
-    assert records == []
+    with pytest.raises(requests.HTTPError):
+        fetch_repo_sbom(client, "org", "repo")
 
 
 @pytest.mark.parametrize("malformed_sbom", [{"sbom": "not-an-object"}, {"sbom": None}, "not-an-object", None])
@@ -292,3 +290,51 @@ def test_fetch_org_sbom_data_returns_one_coverage_row_per_repo():
     assert {c.repo for c in coverage} == {"repo-a", "repo-b"}
     assert {c.repo: c.status for c in coverage} == {"repo-a": "ok", "repo-b": "disabled"}
     assert [p.repo for p in packages] == ["repo-a"]
+
+
+def test_fetch_org_sbom_data_retries_http_failures():
+    """HTTP failures from a repo fetch reach the org-level retry mechanism."""
+    calls = {"repo-a": 0}
+
+    def fake_get(url):
+        if "repo-a" in url:
+            calls["repo-a"] += 1
+
+            if calls["repo-a"] == 1:
+                raise _http_error(500)
+
+            return {
+                "sbom": {
+                    "documentDescribes": [],
+                    "packages": [
+                        {
+                            "SPDXID": "x",
+                            "externalRefs": [
+                                {
+                                    "referenceType": "purl",
+                                    "referenceLocator": "pkg:npm/left-pad@1.0.0",
+                                }
+                            ],
+                        }
+                    ],
+                }
+            }
+
+        raise _http_error(404)
+
+    client = Mock()
+    client.get.side_effect = fake_get
+
+    coverage, packages = fetch_org_sbom_data(
+        client,
+        "org",
+        ["repo-a", "repo-b"],
+        max_workers=1,
+    )
+
+    assert calls["repo-a"] == 2
+    assert {c.repo: c.status for c in coverage} == {
+        "repo-a": "ok",
+        "repo-b": "disabled",
+    }
+    assert len(packages) == 1

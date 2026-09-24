@@ -465,8 +465,8 @@ class SbomCoverageRecord:
 
     ``status`` is one of ``"ok"`` (SBOM available, packages parsed —
     ``package_count`` may still be 0 for a repo with a genuinely empty
-    manifest), ``"disabled"`` (dependency graph off for this repo, or the
-    endpoint 404/403'd), or ``"error"`` (fetch failed for a reason other
+    manifest), ``"disabled"`` (dependency graph unavilable for this repo, or the
+    endpoint 404 response), or ``"error"`` (fetch failed for a reason other
     than disablement; surfaced rather than silently dropped). This is what
     makes "no edges" distinguishable from "no data" downstream.
     """

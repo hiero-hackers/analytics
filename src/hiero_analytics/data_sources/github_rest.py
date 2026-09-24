@@ -104,20 +104,50 @@ def fetch_repo_sbom(
     so ``fetch_org_sbom_data`` can retry them too.
     """
     url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
+    logger.info("Fetching SBOM for %s/%s", org, repo)
+
     try:
         payload = client.get(url)
     except requests.HTTPError as exc:
         status_code = exc.response.status_code if exc.response is not None else None
-        status = "disabled" if status_code == 404 else "error"
-        return SbomCoverageRecord(repo=repo, status=status, package_count=0), []
+
+        if status_code == 404:
+            logger.info(
+                "SBOM unavailable for %s/%s (404)",
+                org,
+                repo,
+            )
+            return SbomCoverageRecord(
+                repo=repo,
+                status="disabled",
+                package_count=0,
+            ), []
+
+        logger.warning(
+            "SBOM request failed for %s/%s with HTTP %s; propagating for retry",
+            org,
+            repo,
+            status_code,
+        )
+        raise
 
     sbom = payload.get("sbom") if isinstance(payload, dict) else None
     if not isinstance(sbom, dict):
-        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+        logger.error("Malformed SBOM response for %s/%s", org, repo)
+        return SbomCoverageRecord(
+            repo=repo,
+            status="error",
+            package_count=0,
+        ), []
 
     raw_packages = sbom.get("packages")
     if raw_packages is not None and not isinstance(raw_packages, list):
-        return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
+        logger.error("Malformed SBOM package list for %s/%s", org, repo)
+        return SbomCoverageRecord(
+            repo=repo,
+            status="error",
+            package_count=0,
+        ), []
     packages = raw_packages or []
     described_ids = set(sbom.get("documentDescribes") or [])
 
@@ -138,8 +168,17 @@ def fetch_repo_sbom(
             DependencyManifestRecord(repo=repo, package_name=package_name, ecosystem=ecosystem, version=version)
         )
 
-    return SbomCoverageRecord(repo=repo, status="ok", package_count=len(records)), records
-
+    logger.info(
+        "SBOM fetched for %s/%s: %d dependency packages",
+        org,
+        repo,
+        len(records),
+    )
+    return SbomCoverageRecord(
+        repo=repo,
+        status="ok",
+        package_count=len(records),
+    ), records
 
 def _is_self_hosted(label: str) -> bool | None:
     """
@@ -261,12 +300,11 @@ def fetch_org_sbom_data(
 ) -> tuple[list[SbomCoverageRecord], list[DependencyManifestRecord]]:
     """Fetch and parse dependency-graph SBOMs for every repo in ``repo_names``.
 
-    Fans ``fetch_repo_sbom`` out across the org with retry. ``fetch_repo_sbom``
-    already turns 403/404 into ``"disabled"`` and any other HTTP failure into
-    ``"error"`` for that repo, so those never raise here. Non-HTTP failures
-    (timeouts, connection errors) do propagate, and this layer retries them;
-    a repo that is still failing after retries gets an ``"error"`` coverage
-    row from the fan-out itself instead of being silently dropped.
+    Fans ``fetch_repo_sbom`` out across the organization with retry handling.
+    A 404 is treated as an unavailable dependency graph. Other HTTP and
+    network failures propagate through the fan-out so transient failures can
+    be retried. Repositories that still fail after the retry are represented
+    as ``"error"`` coverage rows rather than being silently dropped.
     """
 
     def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
