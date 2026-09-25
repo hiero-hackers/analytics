@@ -534,24 +534,39 @@ def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
                     assert set(period_rows[0]) == declared
 
 
-def test_data_api_emits_the_hip_views(outputs_root: Path):
-    """The HIP board and coverage matrix ship as view documents for the org.
+def test_data_api_emits_the_bespoke_views(outputs_root: Path):
+    """The bespoke dashboard views ship as view documents for the org.
 
-    These are the bespoke views the frontend renders as components; if the
-    pipeline produced HIP data but the API listed no views, the HIPs tab would
-    silently lose its centrepieces.
+    These are the views the frontend renders as custom components; if a
+    pipeline produced the underlying data but the API listed no view, the
+    corresponding dashboard component would silently disappear.
     """
     api_dir = outputs_root / "data" / "api" / "v1"
     manifest = json.loads((api_dir / "manifest.json").read_text())
 
     views = manifest["orgs"][PRIMARY]["views"]
-    assert [(view["id"], view["kind"]) for view in views] == [("hip-board", "board"), ("hip-matrix", "matrix")]
+    view_pairs = {(view["id"], view["kind"]) for view in views}
+
+    assert ("hip-board", "board") in view_pairs
+    assert ("hip-matrix", "matrix") in view_pairs
+    assert ("ci-health-matrix", "ci_health_matrix") in view_pairs
+
     for view in views:
         document = json.loads((api_dir / view["path"]).read_text())
-        assert document["macro"] == "HIPs"
+
+        if view["id"] in {"hip-board", "hip-matrix"}:
+            assert document["macro"] == "HIPs"
+
+        if view["id"] == "ci-health-matrix":
+            assert document["macro"] == "Security & scorecards"
+
     matrix = json.loads((api_dir / PRIMARY / "hip-matrix.json").read_text())
     assert matrix["rows"], "matrix emitted with no rows"
     assert matrix["bands"], "matrix emitted with no header bands"
+
+    ci_health_matrix = json.loads((api_dir / PRIMARY / "ci-health-matrix.json").read_text())
+    assert ci_health_matrix["rows"], "CI health matrix emitted with no rows"
+    assert ci_health_matrix["columns"], "CI health matrix emitted with no columns"
 
 
 def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):

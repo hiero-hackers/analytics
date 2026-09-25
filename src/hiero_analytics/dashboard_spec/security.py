@@ -11,6 +11,8 @@ ABSENT_NOTE = (
     "pipelines are org-independent, so this fills in on the next full run."
 )
 
+CUSTOM_VIEWS_MODULE = "hiero_analytics.export.ci_health_views"
+
 CHART_MACRO = {
     "name": "Security & scorecards",
     "charts": {
@@ -69,6 +71,7 @@ SECTION_GROUPS = [
     # Scorecards is chart-only; the ownership card renders above its table.
     ("Scorecards", []),
     ("Ownership", ["codeowners"]),
+    ("CI health", []),
 ]
 
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
