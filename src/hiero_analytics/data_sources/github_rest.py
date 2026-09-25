@@ -180,6 +180,7 @@ def fetch_repo_sbom(
         package_count=len(records),
     ), records
 
+
 def _is_self_hosted(label: str) -> bool | None:
     """
     Determines if a runner is self-hosted.
