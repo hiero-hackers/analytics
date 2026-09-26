@@ -21,6 +21,7 @@ export function TabBar({
         <button
           key={name}
           className={name === active ? `${kind} active` : kind}
+          aria-pressed={name === active}
           onClick={() => onSelect(name)}
         >
           {name}
