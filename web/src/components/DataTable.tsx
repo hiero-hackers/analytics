@@ -93,7 +93,10 @@ export function DataTable({ table }: { table: DataTableInstance }) {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={columnCount} className="py-6 text-center text-[13px] text-muted">
+                <td
+                  colSpan={columnCount}
+                  className="py-6 text-center text-[13px] text-muted-foreground"
+                >
                   {globalFilter ? (
                     <>
                       No rows match —{' '}

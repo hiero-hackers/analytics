@@ -1,21 +1,26 @@
 /**
- * The analytics dashboard, driven entirely by the data-API manifest: metric
- * tiles, the "how to read this" glossary, a jump bar over collapsible section
- * groups, chart-section cards, then the table sections.
+ * The analytics dashboard, driven entirely by the data-API manifest. The shell
+ * is a sticky header (wordmark, org switcher, freshness, theme), a sidebar of
+ * tabs with the active tab's table of contents, and the tab itself: metric
+ * tiles, the "how to read this" glossary, then collapsible section groups of
+ * views, chart-section cards and tables.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { fetchManifest, type ChartSection, type Manifest } from './api';
+import { AppHeader, Freshness } from './components/AppHeader';
+import { AppSidebar } from './components/AppSidebar';
 import { ChartSectionCard } from './components/ChartSectionCard';
 import { Glossary } from './components/Glossary';
 import { MetricTiles } from './components/MetricTiles';
 import { ProvenanceFooter } from './components/ProvenanceFooter';
-import { SectionGroups, type Group } from './components/SectionGroups';
+import { SectionGroups } from './components/SectionGroups';
 import { SectionTable } from './components/SectionTable';
 import { Skeleton } from './components/Skeleton';
-import { TabBar } from './components/TabBar';
 import { WipFooter } from './components/WipFooter';
-import { stamp } from './format';
+import { navModel, type NavModel } from './nav';
+import { tocEntries, type Group, type TocEntry } from './toc';
 import { useHashState } from './useHashState';
 import { useSectionDocs } from './useSectionDocs';
 import { useViewDocs } from './useViewDocs';
@@ -23,7 +28,18 @@ import { ViewCards } from './components/ViewCards';
 
 const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
 
-function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; macro: string }) {
+function OrgPanel({
+  org,
+  manifest,
+  macro,
+  onToc,
+}: {
+  org: string;
+  manifest: Manifest;
+  macro: string;
+  /** Reports this tab's table of contents to the sidebar (empty while loading). */
+  onToc: (entries: TocEntry[]) => void;
+}) {
   const entry = manifest.orgs[org];
   // An absorbed section is a role variant another card renders as a tab. Its
   // document still exists (v1 may not withdraw an id), but its rows travel
@@ -129,6 +145,16 @@ function OrgPanel({ org, manifest, macro }: { org: string; manifest: Manifest; m
         ];
       });
 
+  // The sidebar's "On this page" lists these groups; keyed by content so a
+  // re-render with the same groups doesn't re-report them.
+  const toc = tocEntries(groups);
+  const tocKey = JSON.stringify(toc);
+  useEffect(() => {
+    onToc(toc);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- tocKey is toc's identity
+  }, [tocKey, onToc]);
+  useEffect(() => () => onToc([]), [onToc]);
+
   return (
     <>
       <MetricTiles tiles={entry.metrics?.[macro] ?? []} />
@@ -155,7 +181,7 @@ function FatalError({ message, onRetry }: { message: string; onRetry: () => void
       <button type="button" className="dl mt-2" onClick={onRetry}>
         Retry
       </button>
-      <details className="mt-3 text-[13px] text-muted">
+      <details className="mt-3 text-[13px] text-muted-foreground">
         <summary className="cursor-pointer">Error details</summary>
         <pre className="mt-2 whitespace-pre-wrap break-all">{message}</pre>
       </details>
@@ -163,80 +189,38 @@ function FatalError({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-/** Everything that depends on a loaded manifest — tabs, org filter, panels, footer. */
+/** The active tab, for the org selected in the header. */
 function Dashboard({
   manifest,
-  macro,
-  setMacro,
-  org,
-  setOrg,
+  nav,
+  onToc,
 }: {
   manifest: Manifest;
-  macro: string;
-  setMacro: (value: string) => void;
-  org: string;
-  setOrg: (value: string) => void;
+  nav: NavModel;
+  onToc: (entries: TocEntry[]) => void;
 }) {
-  const orgs = Object.keys(manifest.orgs);
-  const derived = [
-    ...new Set(
-      Object.values(manifest.orgs).flatMap((entry) => [
-        ...(entry.sections ?? []).map((section) => section.macro),
-        ...(entry.chart_sections ?? []).map((section) => section.macro),
-        ...(entry.views ?? []).map((view) => view.macro),
-      ]),
-    ),
-  ];
-  // The manifest's family order wins where it knows the macro; anything it
-  // doesn't list (older manifest, ad-hoc macro) keeps its derived position.
-  const declared = (manifest.macro_order ?? []).filter((name) => derived.includes(name));
-  const macros = [...declared, ...derived.filter((name) => !declared.includes(name))];
-  const activeMacro = macros.includes(macro) ? macro : macros[0];
-  // Umbrella tabs: a macro with a parent renders as a sub-tab of that parent.
-  // The top bar shows one entry per umbrella (in content order); a second tab
-  // row appears for the active umbrella's members. The hash keeps storing the
-  // actual macro, so old links keep working.
-  const parents = manifest.macro_parents ?? {};
-  const topOf = (name: string) => parents[name] ?? name;
-  const topTabs = [...new Set(macros.map(topOf))];
-  const activeTop = topOf(activeMacro);
-  const subTabs = macros.filter((name) => parents[name] === activeTop);
-  // The org filter is global: it lists every org and the selection sticks as
-  // tabs change. A tab the selected org has no content for renders a short
-  // explanation (from the manifest) instead of a blank page, so absence reads
-  // as a property of the data rather than a bug.
-  const shownOrg = orgs.includes(org) ? org : orgs[0];
-  const shownEntry = manifest.orgs[shownOrg];
-  const orgHasMacro =
-    (shownEntry.sections ?? []).some((section) => section.macro === activeMacro) ||
-    (shownEntry.chart_sections ?? []).some((section) => section.macro === activeMacro) ||
-    (shownEntry.views ?? []).some((view) => view.macro === activeMacro);
+  const { isMobile } = useSidebar();
+  const { activeMacro, shownOrg, orgHasMacro } = nav;
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
+  const dataAsOf = manifest.provenance.data_as_of;
 
   return (
     <>
-      <p className="sub">
-        Generated {stamp(manifest.generated_at)} UTC · every table filters and sorts · click a chart
-        to enlarge.
-      </p>
-      {/* The org filter is the outermost scope — everything below it is "this
-          org's view" — so it sits above the content tabs. */}
-      {orgs.length > 1 && <TabBar items={orgs} active={shownOrg} onSelect={setOrg} kind="tab" />}
-      <TabBar
-        items={topTabs}
-        active={activeTop}
-        onSelect={(name) => setMacro(macros.find((candidate) => topOf(candidate) === name) ?? name)}
-        kind="macro"
-      />
-      {subTabs.length > 0 && (
-        <TabBar items={subTabs} active={activeMacro} onSelect={setMacro} kind="tab" />
-      )}
+      {/* Styled text, not a heading: card titles are the page's h2s, and the
+          sidebar already marks the tab as the current page. */}
+      <div className="mb-4">
+        <p className="text-[21px] font-semibold tracking-tight">{activeMacro}</p>
+        {/* The header shows freshness on wide screens; phones get it here. */}
+        {isMobile && dataAsOf && (
+          <Freshness dataAsOf={dataAsOf} className="mt-0.5 text-xs text-muted-foreground" />
+        )}
+      </div>
       {/* Every macro ships its own explainer, listing only what that tab
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}
       {glossary && <Glossary glossary={glossary} />}
       {orgHasMacro ? (
-        <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} />
+        <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
       ) : (
         <p className="empty">
           {manifest.macro_absent_notes?.[activeMacro] ?? `No ${activeMacro} data for ${shownOrg}.`}
@@ -279,27 +263,31 @@ export default function App() {
     setReloadKey((key) => key + 1);
   };
 
+  const nav = manifest ? navModel(manifest, macro, org) : null;
+  const [toc, setToc] = useState<TocEntry[]>([]);
+
   return (
-    <div className="wrap">
-      <h1>Hiero — analytics dashboard</h1>
-      {/* The header renders in every state below; only the content beneath it
-          changes shape — chrome never pops in after the fact. */}
-      {error ? (
-        <FatalError message={error} onRetry={retry} />
-      ) : !manifest ? (
-        <>
-          <p className="sub">Loading…</p>
-          <Skeleton label="Loading dashboard" rows={5} />
-        </>
-      ) : (
-        <Dashboard
-          manifest={manifest}
-          macro={macro}
-          setMacro={setMacro}
-          org={org}
-          setOrg={setOrg}
-        />
-      )}
-    </div>
+    // The header renders in every state below; only the content beneath it
+    // changes shape — chrome never pops in after the fact.
+    <SidebarProvider className="flex-col">
+      <AppHeader nav={nav} onOrg={setOrg} dataAsOf={manifest?.provenance.data_as_of} />
+      <div className="flex flex-1">
+        <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
+        {/* min-w-0: a flex item defaults to min-width:auto and would widen to
+            its longest unbreakable line (a nowrap stamp, a wide table) instead
+            of shrinking to the viewport — the page would scroll sideways. */}
+        <SidebarInset className="min-w-0">
+          <div className="mx-auto w-full max-w-[1148px] p-3 min-[600px]:p-4 md:p-6">
+            {error ? (
+              <FatalError message={error} onRetry={retry} />
+            ) : !manifest || !nav ? (
+              <Skeleton label="Loading dashboard" rows={5} />
+            ) : (
+              <Dashboard manifest={manifest} nav={nav} onToc={setToc} />
+            )}
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }

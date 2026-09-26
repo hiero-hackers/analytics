@@ -9,7 +9,7 @@ export function WipFooter({ issuesUrl }: { issuesUrl?: string }) {
   // something that isn't on their tab; this footer is the general route.
   const href = issuesUrl ? safeUrl(issuesUrl) : null;
   return (
-    <footer className="mb-2 max-w-[62ch] text-[13px] leading-normal text-muted">
+    <footer className="mb-2 max-w-[62ch] text-[13px] leading-normal text-muted-foreground">
       <span className="mr-1.5 inline-block rounded bg-warn/20 px-2 py-[2px] text-[11px] font-semibold tracking-[0.04em] uppercase text-warn-ink">
         Work in progress
       </span>{' '}

@@ -4,6 +4,7 @@
  * (sorting, filtering, period tabs, the action link).
  */
 
+import type { ReactNode } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,6 +15,10 @@ beforeEach(() => {
   vi.unstubAllGlobals();
   stubApi();
 });
+
+/** Pick an org in the header's switcher (a native select since the shell redesign). */
+const chooseOrg = (org: string) =>
+  userEvent.selectOptions(screen.getByRole('combobox', { name: 'Organisation' }), org);
 
 const openGovernance = async () => {
   render(<App />);
@@ -39,18 +44,19 @@ describe('App shell', () => {
 
     // The org filter is present on every tab.
     await userEvent.click(await screen.findByRole('button', { name: 'Contributors' }));
-    expect(await screen.findByRole('button', { name: 'hiero-hackers' })).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'hiero-hackers' })).toBeInTheDocument();
 
     // Select hiero-hackers, then open Governance: the selection sticks, and
     // the tab explains why this org has no governance content.
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-hackers' }));
+    await chooseOrg('hiero-hackers');
     await screen.findByText('erin');
     await userEvent.click(screen.getByRole('button', { name: 'Governance' }));
     expect(await screen.findByText(/need a published governance config/)).toBeInTheDocument();
     expect(screen.queryByText('Role holders')).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Organisation' })).toHaveValue('hiero-hackers');
 
     // Switching back to hiero-ledger restores the tab's content.
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-ledger' }));
+    await chooseOrg('hiero-ledger');
     expect(await screen.findByText('Role holders')).toBeInTheDocument();
   });
 
@@ -59,7 +65,7 @@ describe('App shell', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Contributors' }));
     expect(await screen.findByText('alice')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-hackers' }));
+    await chooseOrg('hiero-hackers');
     expect(await screen.findByText('erin')).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
   });
@@ -70,9 +76,9 @@ describe('App shell', () => {
     expect(screen.getByText('maintainers')).toBeInTheDocument();
     expect(screen.getByText('103')).toBeInTheDocument();
     expect(screen.getByText('How to read this — what each column means')).toBeInTheDocument();
-    // Each group appears twice: once in the jump bar (a button — deliberately
-    // not a fragment link, which would clobber the tab/org hash state), once
-    // as its header. The chart card renders under its own named group — there
+    // Each group appears twice: once in the sidebar's "On this page" (a
+    // button — deliberately not a fragment link, which would clobber the
+    // tab/org hash state), once as its header. The chart card renders under its own named group — there
     // is no generic "Charts" section any more.
     expect(screen.getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
     expect(screen.getAllByText('Pipeline charts')).toHaveLength(2);
@@ -86,7 +92,11 @@ describe('App shell', () => {
       'href',
       'https://example.test/issues',
     );
-    expect(screen.getByText(/data 2026-07-25 21:00 UTC · code abc1234/)).toBeInTheDocument();
+    // Provenance: the data watermark sits in the header, the code revision in the footer.
+    expect(screen.getByText('2026-07-25 21:00 UTC').closest('p')).toHaveTextContent(
+      'Data as of 2026-07-25 21:00 UTC',
+    );
+    expect(screen.getByText('Code abc1234')).toBeInTheDocument();
   });
 });
 
@@ -438,29 +448,31 @@ describe('Resilience', () => {
 
 describe('Section groups', () => {
   it('gives colliding group names distinct keys and anchors', async () => {
-    const { SectionGroups } = await import('../components/SectionGroups');
+    const { SectionGroups, GroupStrip } = await import('../components/SectionGroups');
+    const { tocEntries } = await import('../toc');
     // Distinct names that slug identically, plus an outright repeat.
-    const { container } = render(
-      <SectionGroups
-        groups={[
-          ['Roles & teams', <p key="a">a</p>],
-          ['Roles  teams', <p key="b">b</p>],
-          ['Roles & teams', <p key="c">c</p>],
-        ]}
-      />,
-    );
+    const groups: [string, ReactNode][] = [
+      ['Roles & teams', <p key="a">a</p>],
+      ['Roles  teams', <p key="b">b</p>],
+      ['Roles & teams', <p key="c">c</p>],
+    ];
+    const { container } = render(<SectionGroups groups={groups} />);
 
     const ids = [...container.querySelectorAll('details.group')].map((el) => el.id);
     expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
+    expect(tocEntries(groups).map((entry) => entry.id)).toEqual(ids);
 
-    // Every jump button scrolls its own group, even under name collisions.
+    // Every table-of-contents entry scrolls its own group, even under name
+    // collisions. (The phone strip and the sidebar list share these entries.)
+    render(<GroupStrip entries={tocEntries(groups)} />);
     const scrolled: Element[] = [];
     const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (
       this: Element,
     ) {
       scrolled.push(this);
     });
-    for (const button of container.querySelectorAll('button.jbtn')) {
+    const strip = screen.getByRole('navigation', { name: 'Jump to' });
+    for (const button of within(strip).getAllByRole('button')) {
       await userEvent.click(button);
     }
     spy.mockRestore();
@@ -493,9 +505,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Hiero — analytics dashboard' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Hiero analytics' })).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Loading dashboard' })).toBeInTheDocument();
 
     resolveManifest(new Response(JSON.stringify(MANIFEST)));
@@ -551,9 +561,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Hiero — analytics dashboard' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Hiero analytics' })).toBeInTheDocument();
     expect(await screen.findByText(/Failed to load the dashboard data/)).toBeInTheDocument();
     expect(screen.getByText('Error details')).toBeInTheDocument();
 

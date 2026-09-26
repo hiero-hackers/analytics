@@ -1,26 +1,53 @@
 /*
- * The dashboard stylesheet: Tailwind v4 utilities on top of the design the
- * generated dashboard established.
+ * The dashboard stylesheet: Tailwind v4 (preflight included) plus shadcn/ui,
+ * on top of the design the generated dashboard established.
  *
- * - Tailwind's preflight reset is deliberately NOT imported: the layout was
- *   built against browser defaults, and the reset would subtly change it.
  * - The semantic palette below is the single source of colors. Dark mode is
- *   one token flip, not per-rule overrides. New components: compose Tailwind
- *   utilities from these tokens (bg-surface, text-muted, border-edge, …) and
- *   never introduce raw hex values.
- * - The component classes further down are the pre-Tailwind vocabulary,
- *   kept verbatim (values unchanged) and migrated to utilities opportunistically.
+ *   one token flip, not per-rule overrides. shadcn's semantic names (primary,
+ *   muted-foreground, border, …) are mapped onto it in `@theme inline` — never
+ *   paste shadcn's default palette, because two names collide in meaning (see
+ *   the mapping). Components never introduce raw hex values.
+ * - Theme: the OS preference by default; `data-theme="light"|"dark"` on <html>
+ *   forces one (set before first paint by public/theme-init.js, persisted by
+ *   src/theme.ts). The `dark` variant below matches exactly those two cases, so
+ *   `dark:` utilities inside shadcn components agree with the tokens.
+ * - The component classes further down are the pre-Tailwind vocabulary, being
+ *   migrated to shadcn components; don't add new ones.
  */
 
-@layer theme, base, components, utilities;
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'tailwindcss';
+/* Animation utilities (animate-in/out, fade, zoom) shadcn's overlays use. */
+@import 'tw-animate-css';
+/* shadcn's state variants (data-open:, data-checked:, …) its components use. */
+@import 'shadcn/tailwind.css';
+
+/* Dark = the OS prefers dark and no explicit light choice, or an explicit dark
+   choice. `:root` is listed alongside its descendants so the variant also
+   works on `:root` itself — the palette's dark values below use it. */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+}
 
 /* ---- Semantic palette ---------------------------------------------------- */
 
 :root {
   color-scheme: light dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
 
+:root {
   --page: #fafafa; /* page background */
   --ink: #1b1b1b; /* primary text */
   --muted: #666; /* secondary text */
@@ -49,8 +76,12 @@
   --r-control: 6px;
   --r-frame: 8px; /* inputs, scroll boxes, and framed chart media */
   --r-pill: 999px;
+  --radius: 0.5rem; /* shadcn components: lg = 8px, md ≈ 6px, sm ≈ 5px */
   --dur: 120ms;
-  --jump-h: 58px; /* sticky jump bar height + small scroll buffer */
+  /* Scroll offset for jump targets (groups, shared-link cards): the sticky
+     header (52px) plus a small buffer — and on phones the sticky group strip
+     under it too (see the media rule after this block). */
+  --jump-h: 60px;
 
   /* Deliberately outside the light/dark flip below.
      --chart-ground: chart PNGs carry a baked-in light background, so their
@@ -81,9 +112,17 @@
   --heat-open-edge: #9ec5f4;
   --flash: #fff3d6; /* row highlight when the board jumps to a HIP */
 }
-
-@media (prefers-color-scheme: dark) {
+@media (max-width: 767px) {
   :root {
+    --jump-h: 104px;
+  }
+}
+
+/* The dark flip, written once: the `dark` variant emits it both under
+   `@media (prefers-color-scheme: dark)` for `:root:not([data-theme='light'])`
+   and for `:root[data-theme='dark']`, so the two cases cannot drift apart. */
+:root {
+  @variant dark {
     --page: #0f0f0f;
     --ink: #e6e6e6;
     --muted: #999;
@@ -123,10 +162,55 @@
   }
 }
 
+/* Utilities over the palette. The shadcn block maps its semantic names onto
+   our tokens by *meaning*, which is not always by name:
+     shadcn `muted` is a background        → our --raise (our --muted is text)
+     shadcn `muted-foreground` is 2nd text → our --muted
+     shadcn `accent` is a hover background → our --raise (our --accent is the
+                                             near-black active fill → primary)
+   So in markup: text-muted-foreground (not text-muted), bg-primary (not
+   bg-accent), text-primary-foreground (not text-on-accent). */
 @theme inline {
+  /* shadcn semantic tokens */
+  --color-background: var(--page);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary: var(--raise);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--raise);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--raise);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--neg);
+  --color-border: var(--edge);
+  --color-input: var(--edge-input);
+  --color-ring: var(--link);
+  --color-sidebar: var(--page);
+  --color-sidebar-foreground: var(--ink);
+  --color-sidebar-primary: var(--accent);
+  --color-sidebar-primary-foreground: var(--on-accent);
+  --color-sidebar-accent: var(--raise);
+  --color-sidebar-accent-foreground: var(--ink);
+  --color-sidebar-border: var(--edge);
+  --color-sidebar-ring: var(--link);
+
+  /* shadcn's radius scale, derived from one --radius like its generated CSS. */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Our own tokens with no shadcn counterpart. */
   --color-page: var(--page);
   --color-ink: var(--ink);
-  --color-muted: var(--muted);
   --color-soft: var(--soft);
   --color-surface: var(--surface);
   --color-raise: var(--raise);
@@ -135,8 +219,6 @@
   --color-edge-strong: var(--edge-strong);
   --color-edge-faint: var(--edge-faint);
   --color-row-line: var(--row-line);
-  --color-accent: var(--accent);
-  --color-on-accent: var(--on-accent);
   --color-link: var(--link);
   --color-link-ink: var(--link-ink);
   --color-ok: var(--ok);
@@ -149,6 +231,29 @@
 /* ---- Page & element defaults --------------------------------------------- */
 
 @layer base {
+  /* shadcn's base rule: preflight zeroes border widths with `border: 0 solid`
+     but leaves the colour at currentColor, so every `border` utility would
+     draw black. Components expect the theme's border colour by default. */
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+  /* Preflight resets buttons to cursor: default; the dashboard's controls
+     have always shown a pointer (shadcn init --pointer writes the same). */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  /* Legacy compat, temporary: preflight sets line-height 1.5, but every
+     legacy rule below was tuned against the browser default (`normal`, about
+     1.2) — under 1.5 each pill, tile, row and header grows 5–9% taller. shadcn
+     components set their own line-height through text-* utilities, so this
+     only holds the legacy layout still. Remove once the legacy classes are
+     gone (Phase 3). */
+  html {
+    line-height: normal;
+  }
   body {
     font-family:
       system-ui,
@@ -156,17 +261,8 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px;
     color: var(--ink);
     background: var(--page);
-  }
-  h1 {
-    font-size: 26px;
-    font-weight: 650;
-    letter-spacing: -0.01em;
-    margin: 0 0 4px;
   }
   h3 {
     font-size: 14px;
@@ -225,49 +321,16 @@
     }
   }
 
-  /* ---- Responsive layout ---------------------------------------------------
-     Breakpoint convention (the first in this file — set here as the precedent
-     future contributors follow):
-
-       tablet        max-width: 767px   tablets in portrait
-       phone         max-width: 599px   phones in portrait
-       narrow-phone  max-width: 479px   component-level re-flow only (shead
-                                        stacking, jump bar, glossary, card
-                                        padding — see @layer components below)
-
-     Plain `@media` queries throughout — consistent with `prefers-color-scheme`
-     and `prefers-reduced-motion` above.  No CSS custom-media (needs PostCSS)
-     and no Tailwind `sm:`/`md:` variants here; those belong to TSX components
-     that already use the Tailwind vocabulary (MetricTiles, PeriodTabs, …).
-     Component-class overrides live in the matching block at the end of
-     `@layer components` below. */
-
-  /* Tablet: recover breathing room without disturbing desktop layout. */
-  @media (max-width: 767px) {
-    body {
-      padding: 16px;
-    }
-  }
-
-  /* Phone: tighten further and scale the hero heading down so it leaves more
-     room for the subtitle and tab bar beneath it. */
-  @media (max-width: 599px) {
-    body {
-      padding: 12px;
-    }
-    h1 {
-      font-size: 22px;
-    }
-  }
+  /* Breakpoints: tablet ≤767px (shadcn's `md` boundary, where the sidebar
+     becomes a Sheet), phone ≤599px, narrow phone ≤479px (component re-flow,
+     see the end of @layer components). The page gutters that used to live on
+     <body> are now utilities on the app shell's content column (App.tsx). */
 }
 
 /* ---- Component vocabulary ------------------------------------------------ */
 
 @layer components {
   /* Shared control behaviour: one timing, one focus ring, everywhere. */
-  .macro,
-  .tab,
-  .jbtn,
   .dl,
   .snav,
   .ctab,
@@ -284,8 +347,7 @@
      custom properties, not by restating the whole treatment. */
   .dl,
   .snav,
-  .ctab,
-  .jbtn {
+  .ctab {
     font: inherit;
     font-size: var(--btn-size, 13px);
     padding: var(--btn-pad, 5px 12px);
@@ -298,19 +360,12 @@
   }
   .dl:hover,
   .snav:hover,
-  .ctab:hover:not(.active),
-  .jbtn:hover {
+  .ctab:hover:not(.active) {
     background: var(--raise);
   }
-  :is(.macro, .tab, .jbtn, .dl, .snav, .ctab, .thbtn, .search, .lbclose):focus-visible {
+  :is(.dl, .snav, .ctab, .thbtn, .search, .lbclose):focus-visible {
     outline: 2px solid var(--link);
     outline-offset: 2px;
-  }
-
-  .sub {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0 0 20px;
   }
 
   /* A tab the selected org has no content for: the "why" note in place of
@@ -322,62 +377,6 @@
     margin: 48px auto;
     text-align: center;
     line-height: 1.6;
-  }
-
-  /* Macro (top-level) tabs */
-  .macrobar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .macro {
-    padding: 9px 18px;
-    border: 1px solid var(--edge-input);
-    background: var(--surface);
-    border-radius: var(--r-pill);
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    text-decoration: none;
-    display: inline-block;
-  }
-  .macro.active {
-    background: var(--accent);
-    color: var(--on-accent);
-    border-color: var(--accent);
-  }
-  .macro:hover:not(.active) {
-    border-color: var(--soft);
-    background: var(--raise);
-  }
-
-  /* Org tabs */
-  .tabbar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 18px;
-    border-bottom: 1px solid var(--edge);
-    flex-wrap: wrap;
-  }
-  .tab {
-    padding: 8px 16px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--muted);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-  }
-  .tab.active {
-    color: var(--ink);
-    border-bottom-color: var(--ink);
-    font-weight: 600;
-  }
-  .tab:hover {
-    color: var(--ink);
   }
 
   /* Cards & section chrome */
@@ -757,6 +756,7 @@
   .lbmethod ol {
     margin: 10px auto 0;
     padding-left: 20px;
+    list-style: decimal; /* preflight strips list markers; the steps are a sequence */
     color: var(--lb-text);
     font-size: 13px;
     max-width: 680px;
@@ -765,38 +765,10 @@
     margin: 5px 0;
   }
 
-  /* Jump bar & groups */
-  .jump {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    display: flex;
-    gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    align-items: center;
-    background: var(--page);
-    padding: 10px 0;
-    margin: 0 0 6px;
-    border-bottom: 1px solid var(--edge);
-  }
+  /* Section groups (the jump bar became the sidebar's "On this page" and the
+     phone strip in SectionGroups) */
   .group {
     scroll-margin-top: var(--jump-h);
-  }
-  .jlabel {
-    font-size: 12px;
-    color: var(--soft);
-    font-weight: 600;
-    margin-right: 2px;
-  }
-  /* The pill variant: same button, rounded and with a lighter resting edge. */
-  .jbtn {
-    border-radius: var(--r-pill);
-    border-color: var(--edge-input);
-  }
-  .jbtn:hover {
-    border-color: var(--soft);
   }
   .grouphdr {
     font-size: 12px;
@@ -833,6 +805,7 @@
   .error {
     color: var(--neg);
     font-size: 14px;
+    margin: 1em 0; /* the paragraph margin preflight removes */
   }
   .footrow {
     display: flex;
@@ -937,10 +910,10 @@
      series hues recognisable while the ground goes dark — the pragmatic fix
      for the PNG era; client-rendered charts will retire it. The lightbox is
      exempt: it is always dark, and readers zoom in for a faithful look. */
-  @media (prefers-color-scheme: dark) {
-    .chart img,
-    .chartscroll img,
-    .slide img {
+  .chart img,
+  .chartscroll img,
+  .slide img {
+    @variant dark {
       filter: invert(0.9) hue-rotate(180deg);
     }
   }
@@ -1238,6 +1211,7 @@
   .hipabout {
     margin: 0;
     padding-left: 18px;
+    list-style: disc; /* preflight strips list markers */
     font-size: 13px;
     color: var(--muted);
     display: flex;
@@ -1260,7 +1234,7 @@
     padding-bottom: 4px;
   }
   .hipboard-col {
-    flex: 0 0 172px;
+    flex: 0 0 194px; /* border-box since preflight: 172px content + padding + border */
     background: var(--raise);
     border: 1px solid var(--edge);
     border-radius: var(--r-frame);
@@ -1351,23 +1325,6 @@
     }
     .sactions {
       align-items: flex-start; /* left-align when stacked, not right */
-    }
-
-    /* The jump bar scrolls horizontally (flex-wrap: nowrap; overflow-x: auto).
-       The label is visually hidden (not display:none) so it stays in the
-       accessibility tree: screen readers still read "Jump to" before the
-       button list, giving group context without consuming horizontal space.
-       `position: absolute` removes it from the flex layout entirely. */
-    .jlabel {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
     }
 
     /* Glossary: the fixed 150 px definition column consumes more than half a
