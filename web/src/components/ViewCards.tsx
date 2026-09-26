@@ -6,7 +6,7 @@
  */
 
 import { useMemo, useRef, useState } from 'react';
-import type { BoardView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from '../api';
+import type { BoardView, CIHealthMatrixView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from '../api';
 import { CoverageMatrix, type JumpRequest } from './CoverageMatrix';
 import { type CsvExportSource } from '../csv';
 import { CopyLinkButton } from './CopyLinkButton';
@@ -14,6 +14,7 @@ import { CsvDownloadButton } from './CsvDownloadButton';
 import type { EvidenceItem } from './EvidencePanel';
 import { SectionCard } from './SectionCard';
 import { StatusBoard } from './StatusBoard';
+import { CIHealthMatrix } from './CIHealthMatrix';
 
 /** Per-cell evidence keyed "<entity>|<repo>", newest merged first. */
 function evidenceByCell(rows: Row[]): Map<string, EvidenceItem[]> {
@@ -72,6 +73,31 @@ function matrixExport(view: MatrixView): CsvExportSource {
   };
 }
 
+function ciHealthMatrixExport(view: CIHealthMatrixView): CsvExportSource {
+  return {
+    name: 'ci_health_matrix',
+    title: view.title,
+    columns: [
+      { key: 'repo', label: 'repository' },
+      ...view.columns.map((column) => ({
+        key: column.key,
+        label: column.label,
+      })),
+    ],
+    rows: view.rows.map((row) => {
+      const record: Row = {
+        repo: row.label,
+      };
+
+      for (const cell of row.cells) {
+        record[cell.key] = cell.status;
+      }
+
+      return record;
+    }),
+  };
+}
+
 function boardExport(view: BoardView): CsvExportSource {
   return {
     name: 'hip_governance_board',
@@ -114,7 +140,7 @@ export function ViewCards({
   return (
     <>
       {views.map((view) => {
-        const exportSource = view.kind === 'board' ? boardExport(view) : matrixExport(view);
+        const exportSource = view.kind === 'board' ? boardExport(view) : view.kind === 'matrix' ? matrixExport(view) : ciHealthMatrixExport(view);
         return (
           <SectionCard
             key={view.id}
@@ -147,8 +173,10 @@ export function ViewCards({
                   view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
                 }
               />
-            ) : (
+            ) : view.kind === 'matrix' ? (
               <CoverageMatrix view={view} evidence={evidence} jump={jump} />
+            ) : (
+              <CIHealthMatrix view={view} />
             )}
           </SectionCard>
         );
