@@ -27,6 +27,8 @@ import { WipFooter } from './components/WipFooter';
 import { navModel, type NavModel } from './nav';
 import { tocEntries, type Group, type TocEntry } from './toc';
 import { useHashState } from './useHashState';
+import { writeParams } from './urlState';
+import { FocusBar } from './components/FocusBar';
 import { useSectionDocs } from './useSectionDocs';
 import { useViewDocs } from './useViewDocs';
 import { ViewCards } from './components/ViewCards';
@@ -261,6 +263,7 @@ function Dashboard({
           shows. It may be absent when a cached bundle meets an older manifest
           — degrade to no glossary, never a crash. */}
       {glossary && <Glossary glossary={glossary} />}
+      <FocusBar />
       {orgHasMacro ? (
         <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
       ) : (
@@ -321,7 +324,15 @@ export default function App() {
     // The header renders in every state below; only the content beneath it
     // changes shape — chrome never pops in after the fact.
     <SidebarProvider className="flex-col">
-      <AppHeader nav={nav} onOrg={setOrg} dataAsOf={manifest?.provenance.data_as_of} />
+      <AppHeader
+        nav={nav}
+        // A focused repository or person belongs to one organisation.
+        onOrg={(next) => {
+          writeParams({ focus: null });
+          setOrg(next);
+        }}
+        dataAsOf={manifest?.provenance.data_as_of}
+      />
       <div className="flex flex-1">
         <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
         {/* min-w-0: a flex item defaults to min-width:auto and would widen to

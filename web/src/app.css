@@ -92,6 +92,17 @@
      print rather than a hole. It stops being a constant when the charts
      themselves become theme-aware (see the chart legibility issue). */
   --chart-ground: #fff;
+  --chart-general: #64748b;
+  --chart-triage: #b77913;
+  --chart-committer: #168575;
+  --chart-maintainer: #3975dc;
+  /* Neutral series colours for interactive charts with no domain palette
+     (export/chart_data.py FALLBACK_COLORS). Distinct from the role hues above. */
+  --chart-1: #c2570c;
+  --chart-2: #0f7f86;
+  --chart-3: #6d4fc2;
+  --chart-4: #9a6a00;
+  --chart-5: #b3334d;
 
   /* HIP coverage-matrix heat ramp: more merged PRs = more ink. Mirrors
      HIP_EVIDENCE_RAMP (config/charts.py), which the same values reach the
@@ -119,6 +130,15 @@
    and for `:root[data-theme='dark']`, so the two cases cannot drift apart. */
 :root {
   @variant dark {
+    --chart-general: #94a3b8;
+    --chart-triage: #e9b44c;
+    --chart-committer: #3dc5ad;
+    --chart-maintainer: #79a8fa;
+    --chart-1: #f5945a;
+    --chart-2: #4cc4cc;
+    --chart-3: #a891f2;
+    --chart-4: #e0b54a;
+    --chart-5: #f07a92;
     --page: #0d0f12;
     --surface: #15181c;
     --ink: #e3e6ea;

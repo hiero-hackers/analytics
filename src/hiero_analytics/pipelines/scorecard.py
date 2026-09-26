@@ -17,7 +17,7 @@ from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_org_repos_graphql
 from hiero_analytics.data_sources.models import ScorecardRecord
 from hiero_analytics.data_sources.scorecard import fetch_repo_scorecard
-from hiero_analytics.export.save import plot_and_save
+from hiero_analytics.export.save import plot_and_save, save_dataframe
 from hiero_analytics.pipelines._shared import org_context
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 
@@ -53,7 +53,7 @@ def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
 
 def main(org: str = ORG):
     """Fetch scorecards for all organisation repos and generate bar charts."""
-    client, _, org_charts_dir = org_context(org)
+    client, org_data_dir, org_charts_dir = org_context(org)
 
     repos = fetch_org_repos(client, org)
 
@@ -68,6 +68,8 @@ def main(org: str = ORG):
         return
 
     df = scorecard_to_dataframe(scorecards)
+    # The interactive scorecard chart reads this; the PNG never needed a CSV.
+    save_dataframe(df, org_data_dir / "org_scorecard.csv")
     plot_and_save(
         df,
         plot_bar,
@@ -78,6 +80,9 @@ def main(org: str = ORG):
     )
 
     df_stacked = scorecard_stacked_dataframe(scorecards)
+    # Per-check scores for the interactive checks matrix: -1 (inconclusive) is
+    # kept as-is and unreported checks stay blank, never a zero score.
+    save_dataframe(scorecard_stacked_dataframe(scorecards, missing=None), org_data_dir / "org_scorecard_checks.csv")
     plot_and_save(
         df_stacked,
         plot_stacked_bar,

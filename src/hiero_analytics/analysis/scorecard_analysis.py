@@ -34,11 +34,12 @@ def scorecard_to_dataframe(scorecards: list[ScorecardRecord]) -> pd.DataFrame:
     )
 
 
-def scorecard_stacked_dataframe(scorecards: list[ScorecardRecord]) -> pd.DataFrame:
+def scorecard_stacked_dataframe(scorecards: list[ScorecardRecord], missing: float | None = 0.0) -> pd.DataFrame:
     """
     Convert ScorecardRecord list into a dataframe with checks as columns.
 
-    Missing checks are filled with 0.
+    Checks a scorecard does not report are filled with ``missing``: 0 for the
+    stacked chart, None where "not reported" must stay distinct from a zero.
     """
     if not scorecards:
         return pd.DataFrame(columns=["repo", "score", "date", *CHECK_COLUMNS])
@@ -52,7 +53,7 @@ def scorecard_stacked_dataframe(scorecards: list[ScorecardRecord]) -> pd.DataFra
                 "repo": s.repo,
                 "score": s.score,
                 "date": s.date,
-                **{check: checks.get(check, 0.0) for check in CHECK_COLUMNS},
+                **{check: checks.get(check, missing) for check in CHECK_COLUMNS},
             }
         )
 

@@ -5,6 +5,12 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import (
+    DIFFICULTY_OVER_TIME_SERIES,
+    DIFFICULTY_SERIES,
+    SPAN_WINDOWS,
+)
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "Nothing generated for this org yet: the issue-difficulty and onboarding "
@@ -19,6 +25,52 @@ CHART_MACRO = {
         "*": [
             {
                 "id": "issue-difficulty",
+                "interactive_sources": {
+                    **{
+                        f"difficulty_by_repo{suffix}.png": {
+                            "kind": "categories",
+                            "file": f"difficulty_by_repo{suffix}.csv",
+                            "category": "repo",
+                            "category_label": "Repository",
+                            "series": DIFFICULTY_SERIES,
+                            "stacked": True,
+                            "orientation": "horizontal",
+                            "rank": True,
+                            "top_n": 12,
+                            "window": window,
+                            "metric": "open_issues_by_difficulty",
+                            "unit": "Open issues",
+                            "population": (
+                                "Open issues in each repository, by difficulty label. 'Unknown' is an "
+                                "open issue with no difficulty label yet. Each issue is counted once."
+                            ),
+                        }
+                        for suffix, window in SPAN_WINDOWS
+                    },
+                    **{
+                        f"{stem}.png": {
+                            "kind": "timeseries",
+                            "file": f"{stem}.csv",
+                            "category": "date",
+                            "category_label": "Date (UTC)",
+                            "frequency": "snapshot",
+                            "series": series,
+                            "mark": "area",
+                            "stacked": True,
+                            "metric": "open_issues_by_difficulty",
+                            "unit": "Open issues",
+                            "population": (
+                                "Open issues on each date, by the difficulty label they carried then, "
+                                "reconstructed from label events. Each point is a count at that moment, "
+                                "not activity during the week."
+                            ),
+                        }
+                        for stem, series in [
+                            ("difficulty_over_time_all_event_based_weekly", DIFFICULTY_OVER_TIME_SERIES),
+                            ("difficulty_over_time_event_based_weekly", DIFFICULTY_OVER_TIME_SERIES[1:]),
+                        ]
+                    },
+                },
                 "group": "Issue difficulty",
                 "title": "Issue difficulty",
                 "description": (

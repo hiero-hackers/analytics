@@ -62,7 +62,7 @@ from hiero_analytics.domain.periods import ACTIVITY_PERIODS, Period
 from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
-from hiero_analytics.plotting.network import render_comembership_network
+from hiero_analytics.plotting.network import network_tables, render_comembership_network
 
 logger = logging.getLogger(__name__)
 # Thresholds live in config.analysis (ROLE_ACTIVE_DAYS, the network link
@@ -162,7 +162,7 @@ def _write_repo_summaries(combined, org_data_dir, period: Period | None = None):
     logger.info("Review load share: %d repos (>=%d review+merge in window)", len(load_share), LOAD_SHARE_MIN_ACTIONS)
 
 
-def _write_role_networks(combined, org_charts_dir, org: str = ORG):
+def _write_role_networks(combined, org_data_dir, org_charts_dir, org: str = ORG):
     """Co-membership networks per governance role (maintainer, committer, triage).
 
     The Governance tab shows how each permission tier connects the repos; the
@@ -177,6 +177,12 @@ def _write_role_networks(combined, org_charts_dir, org: str = ORG):
     ]
     for key, label, membership, min_shared in groups:
         nodes, edges = build_comembership_network(membership, min_shared=min_shared)
+        if nodes.empty:
+            continue
+        # The interactive network reads these: same nodes, edges and layout as the PNG.
+        node_table, edge_table = network_tables(nodes, edges)
+        save_dataframe(node_table, org_data_dir / f"{key}_network_nodes.csv")
+        save_dataframe(edge_table, org_data_dir / f"{key}_network_edges.csv")
         if render_comembership_network(
             nodes,
             edges,
@@ -260,7 +266,7 @@ def main(org: str = ORG) -> None:
     if not combined.empty:
         save_dataframe(combined, org_data_dir / "role_coverage_all.csv")
         _write_repo_summaries(combined, org_data_dir)
-        _write_role_networks(combined, org_charts_dir, org)
+        _write_role_networks(combined, org_data_dir, org_charts_dir, org)
 
     for period in ACTIVITY_PERIODS:
         # Every ACTIVITY_PERIODS entry is a bounded window (all-time is the

@@ -31,12 +31,12 @@ from hiero_analytics.data_sources.github_ingest import fetch_org_merged_pr_diffi
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
-from hiero_analytics.plotting.network import render_comembership_network
+from hiero_analytics.plotting.network import network_tables, render_comembership_network
 
 logger = logging.getLogger(__name__)
 
 
-def _build_contributor_network(records, label_events, by_repo, org_charts_dir, org: str) -> None:
+def _build_contributor_network(records, label_events, by_repo, org_data_dir, org_charts_dir, org: str) -> None:
     """Render the all-contributors co-membership network for the org.
 
     Governance-independent (no roles needed), so it runs for every org. Repos are
@@ -52,6 +52,12 @@ def _build_contributor_network(records, label_events, by_repo, org_charts_dir, o
     membership = build_active_membership(by_repo, recent_by_repo)
     min_shared = max(1, round(len(by_repo) / CONTRIBUTOR_NETWORK_REPOS_PER_LINK))
     nodes, edges = build_comembership_network(membership, min_shared=min_shared)
+    if nodes.empty:
+        return
+    # The interactive network reads these: same nodes, edges and layout as the PNG.
+    node_table, edge_table = network_tables(nodes, edges)
+    save_dataframe(node_table, org_data_dir / "all_network_nodes.csv")
+    save_dataframe(edge_table, org_data_dir / "all_network_edges.csv")
     if render_comembership_network(
         nodes,
         edges,
@@ -123,6 +129,6 @@ def main(org: str = ORG) -> None:
     logger.info("Wrote per-repo profiles for %d repositories", len(by_repo))
 
     # All-contributors network (no governance needed, so every org gets it).
-    _build_contributor_network(records, label_events, by_repo, org_charts_dir, org)
+    _build_contributor_network(records, label_events, by_repo, org_data_dir, org_charts_dir, org)
 
     logger.info("Contributor activity tables complete")

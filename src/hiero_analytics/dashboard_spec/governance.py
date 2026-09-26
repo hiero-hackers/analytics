@@ -11,6 +11,14 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.constants import PROJECT_ISSUES_URL
 from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
+from hiero_analytics.dashboard_spec.interactive import (
+    ROLE_ACTIVITY,
+    ROLE_BY_REPO,
+    SPAN_WINDOWS,
+    affiliation_share,
+    composition,
+    role_network,
+)
 
 # "Suggest a correction" target for the affiliations reference table. That table
 # earns a contextual link because its data is hand-curated: a correction is either
@@ -34,6 +42,22 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "maintainer-pipeline",
+                # Same windows as the PNGs: all years, 12 months, 5 ISO weeks, 7 days.
+                "interactive_sources": {
+                    f"maintainer_pipeline_{name}.png": {
+                        **ROLE_ACTIVITY,
+                        "file": f"maintainer_pipeline_{name}.csv",
+                        "category": frequency,
+                        "frequency": frequency,
+                        **({"buckets": buckets} if buckets else {}),
+                    }
+                    for name, frequency, buckets in [
+                        ("yearly", "year", None),
+                        ("monthly", "month", 12),
+                        ("weekly", "week", 5),
+                        ("daily", "day", 7),
+                    ]
+                },
                 "title": "Maintainer pipeline over time",
                 "group": "Maintainer pipeline",
                 "description": (
@@ -56,6 +80,14 @@ CHART_MACRO = {
             },
             {
                 "id": "maintainer-pipeline-by-repo",
+                "interactive_sources": {
+                    f"maintainer_pipeline_by_repo{suffix}.png": {
+                        **ROLE_BY_REPO,
+                        "file": f"maintainer_pipeline_by_repo{suffix}.csv",
+                        "window": window,
+                    }
+                    for suffix, window in SPAN_WINDOWS
+                },
                 "title": "Maintainer pipeline by repository",
                 "group": "Maintainer pipeline",
                 "description": (
@@ -93,6 +125,14 @@ CHART_MACRO = {
                     ("Committers", "committer_network.png"),
                     ("Triage", "triage_network.png"),
                 ],
+                "interactive_sources": {
+                    f"{key}_network.png": role_network(key, label)
+                    for key, label in [
+                        ("maintainer", "maintainers"),
+                        ("committer", "committers"),
+                        ("triage", "triage holders"),
+                    ]
+                },
             },
             {
                 "id": "org-diversity",
@@ -114,6 +154,32 @@ CHART_MACRO = {
                     "repository's and each team's mix. The team charts are membership-based and so have no "
                     "role tabs. See the affiliations and repo-diversity tables below for the underlying detail."
                 ),
+                "interactive_sources": {
+                    "affiliation_donut.png": affiliation_share("maintainer", "maintainers", ""),
+                    "affiliation_donut_committers.png": affiliation_share("committer", "committers", "_committers"),
+                    **{
+                        f"repo_affiliation_composition{suffix}.png": composition(
+                            "repo",
+                            "Repository",
+                            f"repo_affiliation_composition{suffix}.csv",
+                            f"{plural.capitalize()} (share of repository)",
+                            f"People holding the {role} role in each repository, by curated employer; "
+                            "a person is counted in every repository where they hold it.",
+                        )
+                        for suffix, role, plural in [
+                            ("", "maintainer", "maintainers"),
+                            ("_committers", "committer", "committers"),
+                        ]
+                    },
+                    "team_affiliation_composition.png": composition(
+                        "team",
+                        "Team",
+                        "team_affiliation_composition.csv",
+                        "Members (share of team)",
+                        "Members of each governance team with at least four resolved members, by curated "
+                        "employer; a person is counted in every team they belong to.",
+                    ),
+                },
                 # Deliberately not time-filterable (charts and tables alike):
                 # diversity is a property of the roster, and windowing it mostly
                 # re-measures activity, which the activity views already show.

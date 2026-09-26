@@ -129,6 +129,12 @@ def _chart_colors(segments: list[str], organisation_colors: dict[str, str] | Non
     return colors
 
 
+def segment_colors(segments: list[str]) -> dict[str, str]:
+    """The colours the composition PNGs give ``segments``, for the interactive charts."""
+    colors = _chart_colors(segments, _composition_colors(list(load_affiliations().values())))
+    return {segment: colors[segment] for segment in segments if segment in colors}
+
+
 def _percent_rows(df, value_cols):
     """Copy of ``df`` with each row's ``value_cols`` rescaled to sum to 100 (percent)."""
     out = df.copy()

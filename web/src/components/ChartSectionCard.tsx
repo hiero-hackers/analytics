@@ -13,7 +13,8 @@
  * keep their own tabs, so nothing else changes.
  */
 
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import { useUrlIndex, useUrlList } from '../urlState';
 import { ChevronLeftIcon, ChevronRightIcon, Maximize2Icon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,8 @@ import { VariantTabs } from './VariantTabs';
 
 /** The light mat every chart PNG sits on: its baked-in white ground, framed,
  *  so in dark mode it reads as a mounted print rather than a hole in the page. */
+const InteractiveChart = lazy(() => import('./InteractiveChart'));
+
 const MAT = 'rounded-lg border border-edge-faint bg-chart-ground';
 
 /**
@@ -37,12 +40,17 @@ const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant)
 
 function Figure({
   chart,
+  stateKey,
   onZoom,
   slide = false,
   stretch = false,
   axis,
+  provenance,
 }: {
   chart: ChartSpec;
+  /** URL key for this figure's own tab, so a shared link opens the same variant. */
+  stateKey: string;
+  provenance: Manifest['provenance'];
   onZoom: (chart: ChartSpec, variant: number) => void;
   slide?: boolean;
   /** Span the full row even though the chart itself is half-width shaped. */
@@ -51,7 +59,7 @@ function Figure({
    *  the charts that share it, so this figure shows none of its own. */
   axis?: { index: number; onSelect: (index: number) => void };
 }) {
-  const [own, setOwn] = useState(0);
+  const [own, setOwn] = useUrlIndex(stateKey);
   const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
   const active = chart.variants[variant];
   // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
@@ -61,7 +69,10 @@ function Figure({
   const tall = Boolean(active.width && active.height && active.width / active.height <= 1.05);
   // Full row without the scroll box: wide-aspect charts with few bars scale to
   // fit; only hand-flagged `wide` charts (many bars) get horizontal scrolling.
-  const fullRow = chart.wide || chart.full_row || tall || stretch;
+  // Heatmaps, networks and timelines need the width whether or not a PNG
+  // (and so its dimensions) exists.
+  const wideKind = ['matrix', 'network', 'events'].includes(active.interactive?.kind ?? '');
+  const fullRow = chart.wide || chart.full_row || tall || stretch || wideKind;
   const img = (
     <img
       src={chartUrl(active.file)}
@@ -92,21 +103,39 @@ function Figure({
       )}
       {/* A real button, so the enlarged view and its notes are reachable from
           the keyboard; the image inside keeps the chart's alt text. */}
-      <button
-        type="button"
-        aria-label={`Enlarge chart: ${chart.title}`}
-        onClick={() => onZoom(chart, variant)}
-        className={cn(
-          MAT,
-          'group/chart relative block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
-          chart.wide && 'overflow-x-auto overflow-y-hidden',
-        )}
-      >
-        <span className="mb-2 ml-auto w-fit flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm opacity-80 transition-opacity group-hover/chart:opacity-100">
-          <Maximize2Icon className="size-3" /> Explore
-        </span>
-        {img}
-      </button>
+      {active.interactive ? (
+        <Suspense
+          fallback={
+            <p role="status" className="p-10 text-center text-muted-foreground">
+              Loading chart…
+            </p>
+          }
+        >
+          <InteractiveChart
+            key={active.interactive.path}
+            variant={active}
+            title={chart.title}
+            provenance={provenance}
+            fallback={active.image_available !== false ? img : undefined}
+          />
+        </Suspense>
+      ) : (
+        <button
+          type="button"
+          aria-label={`Enlarge chart: ${chart.title}`}
+          onClick={() => onZoom(chart, variant)}
+          className={cn(
+            MAT,
+            'group/chart relative block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
+            chart.wide && 'overflow-x-auto overflow-y-hidden',
+          )}
+        >
+          <span className="mb-2 ml-auto w-fit flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm opacity-80 transition-opacity group-hover/chart:opacity-100">
+            <Maximize2Icon className="size-3" /> Explore
+          </span>
+          {img}
+        </button>
+      )}
       <figcaption
         className={cn(
           'mt-3 text-left text-xs font-medium text-foreground',
@@ -126,10 +155,12 @@ export function ChartSectionCard({
   section: ChartSection;
   provenance: Manifest['provenance'];
 }) {
-  const [slide, setSlide] = useState(0);
+  // Slide and shared tabs live in the URL: "Copy link" reproduces the view.
+  const [rawSlide, setSlide] = useUrlIndex(`${section.id}.slide`);
   const [zoom, setZoom] = useState<LightboxContent | null>(null);
-  // One selection per shared axis, keyed by its label set.
-  const [shared, setShared] = useState<Record<string, number>>({});
+  // One selection per shared axis, keyed by its label set; the URL holds them
+  // as `<section>.tab=<i>,<j>` in axis order.
+  const [rawShared, setRawShared] = useUrlList(`${section.id}.tab`);
 
   const onZoom = (chart: ChartSpec, variant: number) =>
     setZoom({
@@ -142,6 +173,7 @@ export function ChartSectionCard({
       methodology: chart.variants[variant].methodology ?? chart.methodology,
     });
   const count = section.charts.length;
+  const slide = Math.min(rawSlide, count - 1);
 
   // An axis belongs to the card once two charts offer the same labels; a lone
   // multi-variant chart keeps its own tabs where they sit, under its caption.
@@ -156,6 +188,18 @@ export function ChartSectionCard({
     .filter((chart) => chart.variants.length > 1 && (axisCounts.get(axisOf(chart)) ?? 0) > 1)
     .map((chart) => ({ key: axisOf(chart), labels: chart.variants.map((v) => v.label) }))
     .filter((axis, index, all) => all.findIndex((other) => other.key === axis.key) === index);
+  const shared: Record<string, number> = Object.fromEntries(
+    sharedAxes.map((axis, i) => [
+      axis.key,
+      Math.min(Number.parseInt(rawShared[i] ?? '0', 10) || 0, axis.labels.length - 1),
+    ]),
+  );
+  const setShared = (next: Record<string, number>) =>
+    setRawShared(
+      sharedAxes.every((axis) => !next[axis.key])
+        ? []
+        : sharedAxes.map((axis) => String(next[axis.key] ?? 0)),
+    );
   const axisFor = (chart: ChartSpec) =>
     sharedAxes.some((axis) => axis.key === axisOf(chart))
       ? {
@@ -251,6 +295,8 @@ export function ChartSectionCard({
           <Figure
             key={section.charts[slide].title}
             chart={section.charts[slide]}
+            stateKey={`${section.id}.${slide}.tab`}
+            provenance={provenance}
             onZoom={onZoom}
             slide
             axis={axisFor(section.charts[slide])}
@@ -262,6 +308,8 @@ export function ChartSectionCard({
             <Figure
               key={chart.title}
               chart={chart}
+              stateKey={`${section.id}.${index}.tab`}
+              provenance={provenance}
               onZoom={onZoom}
               stretch={stretched[index]}
               axis={axisFor(chart)}

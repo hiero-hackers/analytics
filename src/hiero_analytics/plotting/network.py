@@ -71,6 +71,67 @@ def _packed_layout(graph: nx.Graph, seed: int) -> tuple[dict, list]:
     return pos, isolated
 
 
+def _graph(nodes: pd.DataFrame, edges: pd.DataFrame) -> nx.Graph:
+    """Repositories as nodes (with active members), shared members as weighted edges."""
+    graph = nx.Graph()
+    for row in nodes.itertuples():
+        graph.add_node(row.repo, active=int(row.active_members))
+    for row in edges.itertuples():
+        if row.repo_a in graph and row.repo_b in graph:
+            graph.add_edge(row.repo_a, row.repo_b, weight=int(row.shared))
+    return graph
+
+
+# Isolated bubbles sit in rows of up to eight, at a fixed spacing, under the clusters.
+_ISOLATE_GAP = 0.9
+_ISOLATE_COLS = 8
+
+
+def network_layout(graph: nx.Graph, seed: int = 42) -> tuple[dict, list, tuple[float, float] | None]:
+    """Positions for every node, plus where the "not linked" caption goes.
+
+    The single layout both the PNG and the interactive network use, so the two
+    draw the same picture. Returns ``(pos, isolated, caption)``; ``caption`` is
+    None when every node is linked.
+    """
+    pos, isolated = _packed_layout(graph, seed)
+    if not isolated:
+        return pos, isolated, None
+    if pos:
+        xs = [p[0] for p in pos.values()]
+        ys = [p[1] for p in pos.values()]
+        x_min, x_max, y_min = min(xs), max(xs), min(ys)
+    else:
+        x_min, x_max, y_min = -1.0, 1.0, -1.0
+    # Fixed bubble spacing (not span-based) so a single isolate doesn't get
+    # flung far below; centre the row under the clusters, just beneath them.
+    cols = min(len(isolated), _ISOLATE_COLS)
+    row_width = (cols - 1) * _ISOLATE_GAP
+    x_centre = (x_min + x_max) / 2
+    top = y_min - _ISOLATE_GAP * 1.8
+    for i, node in enumerate(isolated):
+        row, col = divmod(i, cols)
+        pos[node] = (x_centre - row_width / 2 + col * _ISOLATE_GAP, top - row * _ISOLATE_GAP)
+    return pos, isolated, (x_centre, top + _ISOLATE_GAP * 0.8)
+
+
+def network_tables(nodes: pd.DataFrame, edges: pd.DataFrame, seed: int = 42) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """The drawn network as node and edge tables, positions included.
+
+    Nodes gain ``category`` (repository type) and the ``x``/``y`` the PNG uses;
+    edges keep only pairs whose repositories are nodes. The interactive chart
+    reads these, so it shows exactly the graph the PNG shows.
+    """
+    graph = _graph(nodes, edges)
+    pos, _isolated, _caption = network_layout(graph, seed)
+    node_table = nodes[["repo", "active_members", "total_members"]].copy()
+    node_table["category"] = node_table["repo"].map(categorize_repo)
+    node_table["x"] = node_table["repo"].map(lambda repo: round(pos[repo][0], 4))
+    node_table["y"] = node_table["repo"].map(lambda repo: round(pos[repo][1], 4))
+    edge_table = edges[edges["repo_a"].isin(graph) & edges["repo_b"].isin(graph)][["repo_a", "repo_b", "shared"]]
+    return node_table.reset_index(drop=True), edge_table.reset_index(drop=True)
+
+
 def render_comembership_network(
     nodes: pd.DataFrame,
     edges: pd.DataFrame,
@@ -92,12 +153,7 @@ def render_comembership_network(
         return False
 
     apply_style()
-    graph = nx.Graph()
-    for row in nodes.itertuples():
-        graph.add_node(row.repo, active=int(row.active_members))
-    for row in edges.itertuples():
-        if row.repo_a in graph and row.repo_b in graph:
-            graph.add_edge(row.repo_a, row.repo_b, weight=int(row.shared))
+    graph = _graph(nodes, edges)
 
     categories = {node: categorize_repo(node) for node in graph.nodes()}
     node_colors = [REPO_CATEGORY_COLORS.get(categories[node], _OTHER_COLOR) for node in graph.nodes()]
@@ -106,27 +162,10 @@ def render_comembership_network(
     # clusters sit side by side, not flung apart); isolated bubbles tuck below.
     fig, ax = plt.subplots(figsize=(16, 12))
     try:
-        pos, isolated = _packed_layout(graph, seed)
-        if isolated:
-            if pos:
-                xs = [p[0] for p in pos.values()]
-                ys = [p[1] for p in pos.values()]
-                x_min, x_max, y_min = min(xs), max(xs), min(ys)
-            else:
-                x_min, x_max, y_min = -1.0, 1.0, -1.0
-            # Fixed bubble spacing (not span-based) so a single isolate doesn't get
-            # flung far below; centre the row under the clusters, just beneath them.
-            gap = 0.9
-            cols = min(len(isolated), 8)
-            row_width = (cols - 1) * gap
-            x_centre = (x_min + x_max) / 2
-            top = y_min - gap * 1.8
-            for i, node in enumerate(isolated):
-                row, col = divmod(i, cols)
-                pos[node] = (x_centre - row_width / 2 + col * gap, top - row * gap)
+        pos, _isolated, caption = network_layout(graph, seed)
+        if caption:
             ax.text(
-                x_centre,
-                top + gap * 0.8,
+                *caption,
                 f"not linked — no shared {member_label}",
                 ha="center",
                 va="bottom",

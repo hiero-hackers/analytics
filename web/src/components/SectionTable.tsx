@@ -10,9 +10,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import { ExternalLinkIcon } from 'lucide-react';
+import { CrosshairIcon, ExternalLinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Manifest, SectionDoc, SectionVariant } from '../api';
+import { DIMENSION_LABELS, dimensionOf, matches, useFocus } from '../focus';
 import { safeUrl } from '../safety';
 import { useDataTable } from '../useDataTable';
 import { useHashState } from '../useHashState';
@@ -57,7 +58,16 @@ export function SectionTable({
   // The tabs carry independent row sets, so a period the previous tab offered
   // may not exist on this one; fall back to its all-time rows rather than
   // rendering an undefined table.
-  const rows = (period && active.periods?.[period]) || active.rows;
+  const periodRows = (period && active.periods?.[period]) || active.rows;
+  // The dashboard focus narrows this table only when it has that column (a
+  // repository focus leaves a per-person table alone, and says nothing).
+  const [focus, setFocus] = useFocus();
+  const focusColumn = focus
+    ? active.columns.find((column) => dimensionOf(column.key) === focus.dimension)
+    : undefined;
+  const rows = focusColumn
+    ? periodRows.filter((row) => matches(focus, focus!.dimension, row[focusColumn.key]))
+    : periodRows;
   const table = useDataTable(active.columns, rows, active.id);
   const shown = table.getRowModel().rows.length;
   const action = active.action ? safeUrl(active.action.url) : null;
@@ -66,7 +76,11 @@ export function SectionTable({
     <SectionCard
       id={doc.id}
       title={doc.title}
-      badge={shown === rows.length ? `${rows.length} rows` : `${shown} of ${rows.length}`}
+      badge={
+        shown === periodRows.length
+          ? `${periodRows.length} rows`
+          : `${shown} of ${periodRows.length}`
+      }
       description={active.description}
       generatedAt={active.generated_at}
       stale={active.stale}
@@ -90,7 +104,8 @@ export function SectionTable({
               title: active.title,
               columns: active.columns,
               rows: table.getRowModel().rows.map((row) => row.original),
-              total: rows.length,
+              // "N of M" in the preamble: the focus and the search both narrow the export.
+              total: periodRows.length,
               dataAsOf: active.generated_at,
             })}
           />
@@ -109,6 +124,27 @@ export function SectionTable({
         onChange={setPeriod}
         labels={periodLabels}
       />
+      {focus && focusColumn && (
+        <p
+          role="status"
+          className="mb-3 flex flex-wrap items-center gap-2 rounded-md border border-link/40 bg-link/5 px-3 py-2 text-xs"
+        >
+          <CrosshairIcon className="size-3.5 text-link" aria-hidden="true" />
+          {/* One text run: the flex gap would otherwise split "name: n of m". */}
+          <span>
+            Filtered to {DIMENSION_LABELS[focus.dimension]} <strong>{focus.value}</strong>:{' '}
+            {rows.length} of {periodRows.length} rows.
+          </span>
+          <Button
+            variant="link"
+            size="sm"
+            className="h-auto p-0 text-xs"
+            onClick={() => setFocus(null)}
+          >
+            Clear focus
+          </Button>
+        </p>
+      )}
       <DataTable table={table} />
     </SectionCard>
   );

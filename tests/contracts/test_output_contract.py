@@ -526,6 +526,44 @@ def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
     assert any("download" in section for section in hip_charts)
 
 
+def test_data_api_ships_every_interactive_chart(outputs_root: Path):
+    """Each interactive reference resolves to a document inside the API tree.
+
+    Every source whose CSV the pipelines produced must publish: a declared
+    source that silently falls back to its PNG is a migration that never shipped.
+    """
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    published, missing = set(), []
+    for entry in manifest["orgs"].values():
+        for section in entry["chart_sections"]:
+            for chart in section["charts"]:
+                for variant in chart["variants"]:
+                    if reference := variant.get("interactive"):
+                        path = api_dir / reference["path"]
+                        if not path.exists():
+                            missing.append(reference["path"])
+                            continue
+                        document = json.loads(path.read_text())
+                        assert document["kind"] == reference["kind"]
+                        # Each kind carries its own drawable content under its own key.
+                        content = {"network": "nodes"}.get(document["kind"], "rows")
+                        assert document["population"] and content in document
+                        published.add(Path(reference["path"]).name)
+    assert not missing, f"interactive charts referenced but not written: {missing}"
+
+    org_data = outputs_root / "data" / "org" / PRIMARY
+    expected = {
+        f"{Path(filename).stem}.json"
+        for macro in CHART_MACROS
+        for spec in macro["charts"].get(PRIMARY) or macro["charts"].get("*", [])
+        for filename, source in spec.get("interactive_sources", {}).items()
+        if (org_data / source["file"]).exists()
+    }
+    assert expected <= published, f"sources with data but no interactive chart: {sorted(expected - published)}"
+
+
 def test_every_spec_table_csv_is_produced(outputs_root: Path):
     """Each section's CSV (and every derived period variant) exists for the primary org."""
     org_data = outputs_root / "data" / "org" / PRIMARY
@@ -559,6 +597,16 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
         if spec.get("periods"):
             stem = Path(spec["file"]).stem
             spec_csvs.update(period.filename(stem) for period in ACTIVITY_PERIODS)
+    # CSVs an interactive chart reads are spec-listed through its source.
+    spec_csvs.update(
+        name
+        for macro in CHART_MACROS
+        for specs in macro["charts"].values()
+        for spec in specs
+        for source in spec.get("interactive_sources", {}).values()
+        for name in (source["file"], source.get("edges_file"))
+        if name
+    )
     period_suffixes = tuple(f"_{period.key}.csv" for period in ACTIVITY_PERIODS)
 
     orphans = []
