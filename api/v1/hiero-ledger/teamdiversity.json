@@ -363,12 +363,12 @@
    "members": 2,
    "resolved": 1,
    "distinct_orgs": 1,
-   "top_org": "Launchbadge",
+   "top_org": "Hashgraph",
    "top_org_pct": 100,
    "hhi": 10000,
    "unknown": 1,
    "single_employer": false,
-   "organisations": "Launchbadge 1"
+   "organisations": "Hashgraph 1"
   },
   {
    "team": "hiero-sdk-tck-maintainers",
@@ -623,16 +623,16 @@
    "organisations": "Hashgraph 3, Onepiece Software 1"
   },
   {
-   "team": "hiero-sdk-java-committers",
+   "team": "hiero-sdk-java-maintainers",
    "members": 4,
    "resolved": 4,
-   "distinct_orgs": 1,
+   "distinct_orgs": 2,
    "top_org": "LimeChain",
    "top_org_pct": 75,
    "hhi": 6250,
    "unknown": 0,
    "single_employer": false,
-   "organisations": "LimeChain 3, Independent 1"
+   "organisations": "LimeChain 3, Hashgraph 1"
   },
   {
    "team": "hiero-sdk-js-maintainers",
@@ -731,18 +731,6 @@
    "organisations": "DSR Corporation 2, Hashgraph 1"
   },
   {
-   "team": "hiero-sdk-cpp-committers",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 2,
-   "top_org": "LimeChain",
-   "top_org_pct": 67,
-   "hhi": 5556,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "LimeChain 2, Hashgraph 1"
-  },
-  {
    "team": "hiero-sdk-cpp-maintainers",
    "members": 3,
    "resolved": 3,
@@ -753,6 +741,18 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 2, LimeChain 1"
+  },
+  {
+   "team": "hiero-sdk-java-committers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 67,
+   "hhi": 5556,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "LimeChain 2, Hashgraph 1"
   },
   {
    "team": "hiero-sdk-rust-committers",
@@ -935,6 +935,18 @@
    "organisations": "OpenElements 1, Independent 1"
   },
   {
+   "team": "hiero-sdk-cpp-committers",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 50,
+   "hhi": 5000,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "LimeChain 1, Hashgraph 1"
+  },
+  {
    "team": "hiero-solo-action-committers",
    "members": 2,
    "resolved": 2,
@@ -995,16 +1007,28 @@
    "organisations": "Hashgraph 26, LimeChain 13, Independent 4"
   },
   {
-   "team": "hiero-sdk-java-maintainers",
+   "team": "solo-charts-maintainers",
    "members": 5,
    "resolved": 5,
    "distinct_orgs": 2,
-   "top_org": "LimeChain",
+   "top_org": "Hashgraph",
    "top_org_pct": 60,
    "hhi": 4400,
    "unknown": 0,
    "single_employer": false,
-   "organisations": "LimeChain 3, Hashgraph 1, Independent 1"
+   "organisations": "Hashgraph 3, DevLabs 1, Independent 1"
+  },
+  {
+   "team": "solo-containers-maintainers",
+   "members": 5,
+   "resolved": 5,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 60,
+   "hhi": 4400,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 3, DevLabs 1, Independent 1"
   },
   {
    "team": "sdk-collaboration-hub-committers",
@@ -1089,6 +1113,30 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 39, LimeChain 14, DSR Corporation 2, The Hashgraph Association 2, Linux Foundation 2, Launchbadge 2, Hedera 1, Jitty Labs 1, Hgraph 1, Onepiece Software 1, Hashgraph Online 1, 8bees 1, Independent 1"
+  },
+  {
+   "team": "solo-charts-committers",
+   "members": 6,
+   "resolved": 4,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 50,
+   "hhi": 3750,
+   "unknown": 2,
+   "single_employer": false,
+   "organisations": "Hashgraph 2, LimeChain 1, Independent 1"
+  },
+  {
+   "team": "solo-containers-committers",
+   "members": 6,
+   "resolved": 4,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 50,
+   "hhi": 3750,
+   "unknown": 2,
+   "single_employer": false,
+   "organisations": "Hashgraph 2, LimeChain 1, Independent 1"
   },
   {
    "team": "hiero-local-node-maintainers",
@@ -1331,8 +1379,8 @@
    "organisations": "LimeChain 1, Independent 7"
   }
  ],
- "row_count": 107,
- "generated_at": "2026-09-21T09:13:15.728753+00:00",
+ "row_count": 111,
+ "generated_at": "2026-09-26T09:11:12.521699+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

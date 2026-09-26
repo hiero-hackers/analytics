@@ -262,14 +262,24 @@
    "organisations": "LimeChain, Hashgraph"
   },
   {
-   "repo": "hiero-sdk-java",
+   "repo": "solo-charts",
    "maintainers": 5,
    "distinct_orgs": 2,
-   "top_org": "LimeChain",
+   "top_org": "Hashgraph",
    "top_org_pct": 60,
    "independent": 1,
    "unknown": 0,
-   "organisations": "LimeChain, Hashgraph"
+   "organisations": "Hashgraph, DevLabs"
+  },
+  {
+   "repo": "solo-containers",
+   "maintainers": 5,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 60,
+   "independent": 1,
+   "unknown": 0,
+   "organisations": "Hashgraph, DevLabs"
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -280,6 +290,16 @@
    "independent": 0,
    "unknown": 0,
    "organisations": "Hashgraph, Onepiece Software"
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "maintainers": 4,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 75,
+   "independent": 0,
+   "unknown": 0,
+   "organisations": "LimeChain, Hashgraph"
   },
   {
    "repo": "hiero-sdk-js",
@@ -462,9 +482,9 @@
    "organisations": "Hashgraph, Linux Foundation, LimeChain, Hgraph, Hashgraph Online, 8bees, Hedera"
   }
  ],
- "row_count": 42,
+ "row_count": 44,
  "label": "Maintainers",
- "generated_at": "2026-09-21T09:13:12.467675+00:00",
+ "generated_at": "2026-09-26T09:11:10.848806+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -732,14 +752,24 @@
      "organisations": "LimeChain, Hashgraph"
     },
     {
-     "repo": "hiero-sdk-java",
+     "repo": "solo-charts",
      "maintainers": 5,
      "distinct_orgs": 2,
-     "top_org": "LimeChain",
+     "top_org": "Hashgraph",
      "top_org_pct": 60,
      "independent": 1,
      "unknown": 0,
-     "organisations": "LimeChain, Hashgraph"
+     "organisations": "Hashgraph, DevLabs"
+    },
+    {
+     "repo": "solo-containers",
+     "maintainers": 5,
+     "distinct_orgs": 2,
+     "top_org": "Hashgraph",
+     "top_org_pct": 60,
+     "independent": 1,
+     "unknown": 0,
+     "organisations": "Hashgraph, DevLabs"
     },
     {
      "repo": "hiero-gradle-conventions",
@@ -750,6 +780,16 @@
      "independent": 0,
      "unknown": 0,
      "organisations": "Hashgraph, Onepiece Software"
+    },
+    {
+     "repo": "hiero-sdk-java",
+     "maintainers": 4,
+     "distinct_orgs": 2,
+     "top_org": "LimeChain",
+     "top_org_pct": 75,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "LimeChain, Hashgraph"
     },
     {
      "repo": "hiero-sdk-js",
@@ -932,9 +972,9 @@
      "organisations": "Hashgraph, Linux Foundation, LimeChain, Hgraph, Hashgraph Online, 8bees, Hedera"
     }
    ],
-   "row_count": 42,
+   "row_count": 44,
    "label": "Maintainers",
-   "generated_at": "2026-09-21T09:13:12.467675+00:00",
+   "generated_at": "2026-09-26T09:11:10.848806+00:00",
    "stale": false
   },
   {
@@ -992,6 +1032,26 @@
     },
     {
      "repo": "solo-build-actions",
+     "committers": 2,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 2,
+     "organisations": null
+    },
+    {
+     "repo": "solo-charts",
+     "committers": 2,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 2,
+     "organisations": null
+    },
+    {
+     "repo": "solo-containers",
      "committers": 2,
      "distinct_orgs": 0,
      "top_org": null,
@@ -1131,16 +1191,6 @@
      "organisations": "Hashgraph"
     },
     {
-     "repo": "hiero-sdk-java",
-     "committers": 1,
-     "distinct_orgs": 1,
-     "top_org": "LimeChain",
-     "top_org_pct": 100,
-     "independent": 0,
-     "unknown": 0,
-     "organisations": "LimeChain"
-    },
-    {
      "repo": "hiero-website",
      "committers": 1,
      "distinct_orgs": 1,
@@ -1271,9 +1321,9 @@
      "organisations": "Hashgraph, Launchbadge, Hedera, BugBytes, Inc., Envision Blockchain, FundRequest, VSP, dovuofficial, suku.world, LimeChain, contributor, RECDeFi, luthersystems, ScalemaiL, Robinhood"
     }
    ],
-   "row_count": 29,
+   "row_count": 30,
    "label": "Committers",
-   "generated_at": "2026-09-21T09:13:13.485393+00:00",
+   "generated_at": "2026-09-26T09:11:11.356048+00:00",
    "stale": false
   }
  ],

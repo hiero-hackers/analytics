@@ -2178,8 +2178,8 @@
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 286,
    "pr_title": "docs: add proposal for a shared HTTP transport layer",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-25 15:20:36+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -2269,6 +2269,20 @@
    "counted": true,
    "snippet": "in `integration/hip1195`, `integration/hip1259`, `issues/IssueRegressionTests`). Th",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26012"
+  },
+  {
+   "hip": 1259,
+   "hip_title": "Fee Collection Account",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27330,
+   "pr_title": "fix: wait for node balance in hip1259 reward validator",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-24 14:56:33+00:00",
+   "match_sources": "title|branch",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "fix: wait for node balance in hip1259 reward validator",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27330"
   },
   {
    "hip": 1259,
@@ -11889,8 +11903,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 845,
- "generated_at": "2026-09-21T09:14:40.055509+00:00",
+ "row_count": 846,
+ "generated_at": "2026-09-26T09:12:52.589356+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
