@@ -6,7 +6,15 @@
  */
 
 import { useMemo, useRef, useState } from 'react';
-import type { BoardView, CIHealthMatrixView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from '../api';
+import type {
+  BoardView,
+  CIHealthMatrixView,
+  Manifest,
+  MatrixView,
+  Row,
+  SectionDoc,
+  ViewDoc,
+} from '../api';
 import { CoverageMatrix, type JumpRequest } from './CoverageMatrix';
 import { type CsvExportSource } from '../csv';
 import { CopyLinkButton } from './CopyLinkButton';
@@ -140,7 +148,12 @@ export function ViewCards({
   return (
     <>
       {views.map((view) => {
-        const exportSource = view.kind === 'board' ? boardExport(view) : view.kind === 'matrix' ? matrixExport(view) : ciHealthMatrixExport(view);
+        const exportSource =
+          view.kind === 'board'
+            ? boardExport(view)
+            : view.kind === 'matrix'
+              ? matrixExport(view)
+              : ciHealthMatrixExport(view);
         return (
           <SectionCard
             key={view.id}
