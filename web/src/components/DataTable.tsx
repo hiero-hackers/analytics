@@ -16,7 +16,7 @@
 import { useRef } from 'react';
 import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, SearchIcon, XIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,7 @@ import type { DataTableInstance } from '../useDataTable';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
 // real measurements as rows mount, so this only has to be close.
-const ROW_HEIGHT = 33;
+const ROW_HEIGHT = 49;
 
 /** Text reads left, numbers right in tabular figures so their digits line up. */
 const align = (numeric?: boolean) => (numeric ? 'text-right tabular-nums' : undefined);
@@ -65,13 +65,35 @@ export function DataTable({ table }: { table: DataTableInstance }) {
 
   return (
     <>
-      <Input
-        placeholder="Filter…"
-        aria-label="Filter rows"
-        value={globalFilter}
-        onChange={(event) => table.setGlobalFilter(event.target.value)}
-        className="mb-3"
-      />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="relative w-full sm:max-w-xs">
+          <SearchIcon
+            aria-hidden="true"
+            className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground"
+          />
+          <Input
+            placeholder="Search this table…"
+            aria-label="Filter rows"
+            value={globalFilter}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            className="h-9 bg-background pl-9 pr-9"
+          />
+          {globalFilter && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Clear filter"
+              className="absolute top-0.5 right-0.5"
+              onClick={() => table.setGlobalFilter('')}
+            >
+              <XIcon />
+            </Button>
+          )}
+        </div>
+        <span role="status" className="text-xs text-muted-foreground tabular-nums">
+          {rows.length.toLocaleString('en-US')} {globalFilter ? 'matching' : 'total'} rows
+        </span>
+      </div>
       <Table
         containerRef={scrollRef}
         // The scroll box: capped at 520px or 60% of the dynamic viewport,
@@ -97,7 +119,11 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                     aria-sort={
                       sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined
                     }
-                    className={cn('bg-muted', align(numeric), index === 0 && STICKY_FIRST)}
+                    className={cn(
+                      'bg-muted px-4 py-2 text-xs',
+                      align(numeric),
+                      index === 0 && STICKY_FIRST,
+                    )}
                   >
                     <Button
                       type="button"
@@ -151,6 +177,7 @@ export function DataTable({ table }: { table: DataTableInstance }) {
           {visibleRows.map((row, index) => (
             <TableRow
               key={row.id}
+              className="even:bg-muted/25 hover:bg-link/5"
               data-index={virtualized ? virtualRows[index].index : index}
               ref={virtualized ? virtualizer.measureElement : undefined}
             >
@@ -161,6 +188,7 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                     key={cell.id}
                     data-numeric={numeric || undefined}
                     className={cn(
+                      'px-4 py-2.5',
                       align(numeric),
                       cellIndex === 0 && ['font-medium max-md:bg-card', STICKY_FIRST],
                     )}

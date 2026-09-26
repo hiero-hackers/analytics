@@ -22,6 +22,7 @@ import {
   type ReactTable,
 } from '@tanstack/react-table';
 import type { ColumnSpec, Row } from './api';
+import { ContributorCell } from './components/ContributorCell';
 import { FormattedCell } from './components/FormattedCell';
 
 /**
@@ -99,9 +100,15 @@ export function useDataTable(
         helper.accessor((row): unknown => sortableValue(row, spec.key, spec.format), {
           id: spec.key,
           header: spec.label,
-          cell: (context) => (
-            <FormattedCell value={context.row.original[spec.key]} format={spec.format} />
-          ),
+          cell: (context) => {
+            const value = context.row.original[spec.key];
+            return ['login', 'user', 'contributor'].includes(spec.key) &&
+              typeof value === 'string' ? (
+              <ContributorCell key={value} login={value} />
+            ) : (
+              <FormattedCell value={value} format={spec.format} />
+            );
+          },
           meta: { numeric: spec.format === 'number' },
         }),
       ),

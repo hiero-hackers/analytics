@@ -31,15 +31,21 @@ export function AppHeader({
 }) {
   const { isMobile } = useSidebar();
   return (
-    <header className="sticky top-0 z-20 flex h-13 shrink-0 items-center gap-2 border-b bg-background px-3 md:px-4">
+    <header className="sticky top-0 z-20 flex h-13 shrink-0 items-center gap-2 border-b bg-card px-3 md:px-4">
       <SidebarTrigger className="md:hidden" aria-label="Open sections" />
       {/* On wide screens the wordmark column is the sidebar's width, so the org
           switcher starts exactly where the content column does (16px header
           padding + sidebar + 8px gap = sidebar + the content's 24px padding). */}
       <div className="md:w-(--sidebar-width)">
-        <h1 className="text-[15px] font-semibold tracking-tight whitespace-nowrap">
+        <div className="flex items-center gap-2 text-[15px] font-semibold tracking-tight whitespace-nowrap">
+          <span
+            aria-hidden="true"
+            className="flex size-7 items-center justify-center rounded-lg bg-link text-sm font-bold text-white"
+          >
+            H
+          </span>
           Hiero analytics
-        </h1>
+        </div>
       </div>
       {nav && nav.orgs.length > 1 && (
         // The org is the outermost scope — everything below is "this org's

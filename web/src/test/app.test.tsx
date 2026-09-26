@@ -111,21 +111,25 @@ describe('Section tables', () => {
     let users = within(table)
       .getAllByRole('row')
       .slice(1)
-      .map((row) => within(row).getAllByRole('cell')[0].textContent);
-    expect(users).toEqual(['alice', 'bob', 'carol']);
+      .map((row) => within(row).getByRole('link'));
+    ['alice', 'bob', 'carol'].forEach((name, index) =>
+      expect(users[index]).toHaveAccessibleName(name),
+    );
 
     await userEvent.click(within(table).getByText(/count/));
     users = within(table)
       .getAllByRole('row')
       .slice(1)
-      .map((row) => within(row).getAllByRole('cell')[0].textContent);
-    expect(users).toEqual(['carol', 'bob', 'alice']);
+      .map((row) => within(row).getByRole('link'));
+    ['carol', 'bob', 'alice'].forEach((name, index) =>
+      expect(users[index]).toHaveAccessibleName(name),
+    );
   });
 
   it('filters rows and shows the shown-of-total badge', async () => {
     await openGovernance();
 
-    await userEvent.type(screen.getByPlaceholderText('Filter…'), 'ali');
+    await userEvent.type(screen.getByRole('textbox', { name: 'Filter rows' }), 'ali');
     expect(screen.getByText('1 of 3')).toBeInTheDocument();
     expect(screen.queryByText('bob')).not.toBeInTheDocument();
   });
@@ -510,7 +514,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: 'Hiero analytics' })).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Loading dashboard' })).toBeInTheDocument();
 
     resolveManifest(new Response(JSON.stringify(MANIFEST)));
@@ -541,7 +545,10 @@ describe('Loading, empty-filter, and error states (#343)', () => {
   it('shows a no-matches message when a filter excludes every row, and clears it', async () => {
     await openGovernance();
 
-    await userEvent.type(screen.getByPlaceholderText('Filter…'), 'nobody-has-this-name');
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Filter rows' }),
+      'nobody-has-this-name',
+    );
     expect(await screen.findByText(/No rows match/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'clear the filter?' })).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
@@ -566,7 +573,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: 'Hiero analytics' })).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
     expect(await screen.findByText(/Failed to load the dashboard data/)).toBeInTheDocument();
     expect(screen.getByText('Error details')).toBeInTheDocument();
 

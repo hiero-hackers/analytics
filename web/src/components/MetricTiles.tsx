@@ -1,6 +1,5 @@
 /**
- * The tab's headline figures, set as one ruled strip — the dashboard's single
- * bold element: large light numerals on a Signal-blue rule, no card grid.
+ * The tab's headline figures in responsive cards with aligned numerals.
  *
  * A figure is a single number with no axis and no rows behind it, so it is the
  * easiest thing here to misread. Each one with an explanation is therefore a
@@ -20,9 +19,11 @@ import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 // flex-col-reverse shows the number above its (DOM-first) label; justify-end
 // packs from the top in a reversed column, so every number sits on one line
 // even when a neighbour's label wraps to two.
-const FIGURE = 'flex min-w-0 flex-col-reverse justify-end gap-1 py-3 text-left';
-const VALUE = 'text-[2.5rem] leading-none font-light tracking-tight text-foreground tabular-nums';
-const LABEL = 'text-xs leading-snug text-muted-foreground';
+const FIGURE =
+  'flex min-w-0 flex-col-reverse justify-end gap-3 rounded-xl border bg-card p-5 text-left shadow-xs transition-colors hover:border-link/40';
+const VALUE =
+  'text-[2.5rem] leading-none font-semibold tracking-tight text-foreground tabular-nums';
+const LABEL = 'text-xs font-medium leading-snug text-muted-foreground';
 
 export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
   const [explained, setExplained] = useState<LightboxContent | null>(null);
@@ -31,8 +32,8 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
     return null;
   }
   return (
-    <section aria-label="Headline figures" className="mb-8 border-t-2 border-b border-t-link">
-      <div className="grid grid-cols-2 gap-x-6 min-[600px]:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(8.5rem,1fr))]">
+    <section aria-label="Headline figures" className="mb-8">
+      <div className="grid grid-cols-2 gap-3 min-[600px]:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(8.5rem,1fr))]">
         {tiles.map((tile) => {
           const explainable = Boolean(tile.note || tile.methodology?.length);
           return explainable ? (
@@ -40,7 +41,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
               key={tile.label}
               type="button"
               title="How is this measured?"
-              className={`${FIGURE} group/figure cursor-pointer rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+              className={`${FIGURE} group/figure cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring`}
               onClick={() =>
                 setExplained({
                   alt: tile.label,

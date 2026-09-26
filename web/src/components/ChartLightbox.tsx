@@ -9,7 +9,7 @@
  * the dialog to see how the number was made.
  */
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ZoomInIcon, ZoomOutIcon, ExternalLinkIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { emphasized } from '../markup';
 
 export interface LightboxContent {
@@ -36,6 +38,7 @@ export function ChartLightbox({
   content: LightboxContent;
   onClose: () => void;
 }) {
+  const [zoom, setZoom] = useState(1);
   const steps = content.methodology ?? [];
   // Radix returns focus to a DialogTrigger on close; this dialog is opened
   // from state (a chart or figure click), so it has none and focus would fall
@@ -67,13 +70,57 @@ export function ChartLightbox({
           </DialogTitle>
         </DialogHeader>
         {content.src && (
-          // The PNG keeps its baked-in light ground; the mat frames it in
-          // either theme instead of letting it float on the dialog surface.
-          <img
-            src={content.src}
-            alt={content.alt}
-            className="h-auto w-full rounded-lg border border-edge-faint bg-chart-ground p-2"
-          />
+          <div className="min-w-0">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2" aria-label="Chart zoom">
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Zoom out"
+                  disabled={zoom <= 1}
+                  onClick={() => setZoom(Math.max(1, zoom - 0.5))}
+                >
+                  <ZoomOutIcon />
+                </Button>
+                <span className="w-12 text-center text-xs tabular-nums" aria-live="polite">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Zoom in"
+                  disabled={zoom >= 3}
+                  onClick={() => setZoom(Math.min(3, zoom + 0.5))}
+                >
+                  <ZoomInIcon />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setZoom(1)}>
+                  Fit chart
+                </Button>
+              </div>
+              <a
+                href={content.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-link underline-offset-4 hover:underline"
+              >
+                Open original <ExternalLinkIcon className="size-3" />
+              </a>
+            </div>
+            <div
+              className="max-h-[65dvh] overflow-auto rounded-lg border bg-chart-ground"
+              tabIndex={0}
+              role="region"
+              aria-label="Chart preview"
+            >
+              <img
+                src={content.src}
+                alt={content.alt}
+                style={{ width: `${zoom * 100}%`, maxWidth: 'none' }}
+                className="h-auto p-2"
+              />
+            </div>
+          </div>
         )}
         {content.note && (
           <DialogDescription className="max-w-[80ch] text-sm/relaxed text-foreground">

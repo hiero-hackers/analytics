@@ -33,3 +33,5 @@ afterEach(() => {
   window.location.hash = '';
   window.innerWidth = DEFAULT_WIDTH;
 });
+
+Object.defineProperty(window, 'scrollTo', { value: () => {}, writable: true });

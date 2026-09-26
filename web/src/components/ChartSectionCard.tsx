@@ -14,7 +14,7 @@
  */
 
 import { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, Maximize2Icon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
 import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
@@ -76,7 +76,12 @@ function Figure({
     />
   );
   return (
-    <figure className={cn('m-0 min-w-0', (slide || fullRow) && 'col-span-full')}>
+    <figure
+      className={cn(
+        'm-0 min-w-0 rounded-xl border bg-background/40 p-3',
+        (slide || fullRow) && 'col-span-full',
+      )}
+    >
       {!axis && (
         <VariantTabs
           labels={chart.variants.map((option) => option.label)}
@@ -93,15 +98,18 @@ function Figure({
         onClick={() => onZoom(chart, variant)}
         className={cn(
           MAT,
-          'block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
+          'group/chart relative block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
           chart.wide && 'overflow-x-auto overflow-y-hidden',
         )}
       >
+        <span className="mb-2 ml-auto w-fit flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm opacity-80 transition-opacity group-hover/chart:opacity-100">
+          <Maximize2Icon className="size-3" /> Explore
+        </span>
         {img}
       </button>
       <figcaption
         className={cn(
-          'mt-1.5 text-center text-xs text-muted-foreground',
+          'mt-3 text-left text-xs font-medium text-foreground',
           slide && 'text-sm font-semibold',
         )}
       >

@@ -226,10 +226,32 @@ function Dashboard({
 
   return (
     <>
-      {/* Styled text, not a heading: card titles are the page's h2s, and the
-          sidebar already marks the tab as the current page. */}
-      <div className="mb-4">
-        <p className="text-[21px] font-semibold tracking-tight">{activeMacro}</p>
+      {/* The active page owns the h1; content cards use h2 headings. */}
+      <div className="mb-6 border-b pb-6">
+        <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
+          {shownOrg}{' '}
+          <span aria-hidden="true" className="px-2">
+            /
+          </span>{' '}
+          Analytics
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">{activeMacro}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {(
+            {
+              Contributors:
+                'Explore the people behind Hiero. Follow contribution activity, collaboration, and community growth.',
+              Governance:
+                'Understand project stewardship, role coverage, and the people guiding the ecosystem.',
+              HIPs: 'Follow improvement proposals from discussion to implementation.',
+              'Security & scorecards':
+                'Explore repository health, security practices, and scorecard results.',
+              'Issues & onboarding': 'Track the path from first issue to meaningful contribution.',
+              Community: 'Discover how the Hiero community connects and grows.',
+              Releases: 'Follow release activity and delivery across the ecosystem.',
+            } as Record<string, string>
+          )[activeMacro] ?? 'Explore activity and insights across the Hiero ecosystem.'}
+        </p>
         {/* The header shows freshness on wide screens; phones get it here. */}
         {isMobile && dataAsOf && (
           <Freshness dataAsOf={dataAsOf} className="mt-0.5 text-xs text-muted-foreground" />
@@ -308,7 +330,7 @@ export default function App() {
         <SidebarInset className="min-w-0">
           {/* Left-aligned next to the sidebar (not centred), so the content
               edge lines up with the header's org switcher at every width. */}
-          <div className="w-full max-w-[1148px] p-3 min-[600px]:p-4 md:p-6">
+          <div className="mx-auto w-full max-w-[1440px] p-4 min-[600px]:p-6 lg:p-8">
             {error ? (
               <FatalError message={error} onRetry={retry} />
             ) : !manifest || !nav ? (

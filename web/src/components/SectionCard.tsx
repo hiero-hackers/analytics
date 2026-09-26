@@ -56,7 +56,7 @@ export function SectionCard({
         aria-labelledby={titleId}
         // scroll-mt: land below the sticky header. [&.flash]: the shared-link
         // highlight, toggled as a class by App's jump effect.
-        className="mb-5 scroll-mt-(--jump-h) transition-colors duration-500 [&.flash]:bg-(--flash)"
+        className="mb-6 rounded-xl shadow-xs [--card-spacing:--spacing(5)] scroll-mt-(--jump-h) transition-colors duration-500 [&.flash]:bg-(--flash)"
       >
         <CardHeader>
           <CardTitle>

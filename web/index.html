@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <!--
       The dashboard is self-contained: its bundle, JSON, and chart PNGs are all
-      same-origin, so nothing legitimate needs an outside origin. 'unsafe-inline'
+      same-origin, except contributor photos from GitHub’s avatar host. 'unsafe-inline'
       is granted to styles only (React writes inline style attributes); scripts
       get no such exemption. Note frame-ancestors cannot be set from a meta tag —
       clickjacking protection would need a response header, which GitHub Pages
@@ -12,7 +12,7 @@
     -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Applies a stored light/dark choice before first paint (see the file).

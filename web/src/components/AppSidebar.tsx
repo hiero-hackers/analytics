@@ -1,3 +1,13 @@
+import {
+  UsersIcon,
+  ShieldCheckIcon,
+  GitPullRequestIcon,
+  LandmarkIcon,
+  CircleHelpIcon,
+  MessagesSquareIcon,
+  PackageIcon,
+  LayoutDashboardIcon,
+} from 'lucide-react';
 /**
  * Section navigation. "Sections" lists the manifest's tabs (an umbrella tab's
  * members nest under it); "On this page" is the active tab's table of
@@ -30,26 +40,44 @@ import { useActiveSection } from '../useActiveSection';
 import { scrollToGroup, type TocEntry } from '../toc';
 import { ThemeToggle } from './ThemeToggle';
 
+const navigationIcons: Record<string, typeof UsersIcon> = {
+  Contributors: UsersIcon,
+  Governance: LandmarkIcon,
+  HIPs: GitPullRequestIcon,
+  'Security & scorecards': ShieldCheckIcon,
+  'Issues & onboarding': CircleHelpIcon,
+  Community: MessagesSquareIcon,
+  Releases: PackageIcon,
+};
+
+function NavigationIcon({ name }: { name: string }) {
+  const Icon = navigationIcons[name] ?? LayoutDashboardIcon;
+  return <Icon aria-hidden="true" className="size-4 shrink-0" />;
+}
+
 function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string) => void }) {
   const { isMobile, setOpenMobile } = useSidebar();
   const select = (macro: string) => {
     onTab(macro);
+    window.scrollTo({ top: 0, behavior: 'instant' });
     if (isMobile) setOpenMobile(false);
   };
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Sections</SidebarGroupLabel>
+      <SidebarGroupLabel>Workspace</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {nav
             ? nav.topTabs.map((tab) => (
                 <SidebarMenuItem key={tab}>
                   <SidebarMenuButton
+                    className="h-10 gap-3 rounded-lg px-3 text-[13px] data-[active=true]:bg-link/10 data-[active=true]:text-link data-[active=true]:font-semibold"
                     isActive={tab === nav.activeTop}
                     aria-current={tab === nav.activeTop ? 'page' : undefined}
                     // An umbrella opens on its first member.
                     onClick={() => select(nav.macros.find((m) => nav.topOf(m) === tab) ?? tab)}
                   >
+                    <NavigationIcon name={tab} />
                     <span>{tab}</span>
                   </SidebarMenuButton>
                   {tab === nav.activeTop && nav.subTabs.length > 0 && (
