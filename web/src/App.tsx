@@ -7,6 +7,11 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { CircleAlertIcon, RotateCwIcon } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { fetchManifest, type ChartSection, type Manifest } from './api';
 import { AppHeader, Freshness } from './components/AppHeader';
@@ -161,10 +166,16 @@ function OrgPanel({
       {/* A section that could not load leaves a named gap rather than blanking
           the tab — the rest of the page is still worth reading. */}
       {unavailable.length > 0 && (
-        <p className="error">
-          Could not load {unavailable.length === 1 ? 'this section' : 'these sections'}:{' '}
-          {unavailable.join(', ')}. Everything else on this tab is unaffected — reload to try again.
-        </p>
+        <Alert variant="destructive" className="mb-6">
+          <CircleAlertIcon />
+          <AlertTitle>
+            Could not load {unavailable.length === 1 ? 'this section' : 'these sections'}:{' '}
+            {unavailable.join(', ')}.
+          </AlertTitle>
+          <AlertDescription>
+            Everything else on this tab is unaffected — reload to try again.
+          </AlertDescription>
+        </Alert>
       )}
       {settled ? <SectionGroups groups={groups} /> : <Skeleton label="Loading tab" rows={6} />}
     </>
@@ -174,18 +185,27 @@ function OrgPanel({
 /** Human-readable fatal error: retry button up front, raw cause tucked away. */
 function FatalError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="my-6">
-      <p className="error">
-        Failed to load the dashboard data. This is usually temporary — try again in a moment.
-      </p>
-      <button type="button" className="dl mt-2" onClick={onRetry}>
-        Retry
-      </button>
-      <details className="mt-3 text-[13px] text-muted-foreground">
-        <summary className="cursor-pointer">Error details</summary>
-        <pre className="mt-2 whitespace-pre-wrap break-all">{message}</pre>
-      </details>
-    </div>
+    <Alert variant="destructive" className="my-6">
+      <CircleAlertIcon />
+      <AlertTitle>Failed to load the dashboard data.</AlertTitle>
+      <AlertDescription className="flex flex-col items-start gap-3">
+        <p>This is usually temporary — try again in a moment.</p>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          <RotateCwIcon data-icon="inline-start" />
+          Retry
+        </Button>
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="link" size="sm" className="px-0">
+              Error details
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <pre className="mt-1 font-mono break-all whitespace-pre-wrap">{message}</pre>
+          </CollapsibleContent>
+        </Collapsible>
+      </AlertDescription>
+    </Alert>
   );
 }
 
@@ -222,12 +242,21 @@ function Dashboard({
       {orgHasMacro ? (
         <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
       ) : (
-        <p className="empty">
-          {manifest.macro_absent_notes?.[activeMacro] ?? `No ${activeMacro} data for ${shownOrg}.`}
-        </p>
+        // A tab the selected org has no content for: the manifest's "why",
+        // sized to read as information rather than an error.
+        <Empty className="my-12">
+          <EmptyHeader>
+            <EmptyTitle>
+              No {activeMacro} data for {shownOrg}
+            </EmptyTitle>
+            {manifest.macro_absent_notes?.[activeMacro] && (
+              <EmptyDescription>{manifest.macro_absent_notes[activeMacro]}</EmptyDescription>
+            )}
+          </EmptyHeader>
+        </Empty>
       )}
       {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
-      <div className="footrow">
+      <div className="mt-10 flex flex-wrap items-baseline justify-between gap-4 border-t pt-4">
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
@@ -277,7 +306,9 @@ export default function App() {
             its longest unbreakable line (a nowrap stamp, a wide table) instead
             of shrinking to the viewport — the page would scroll sideways. */}
         <SidebarInset className="min-w-0">
-          <div className="mx-auto w-full max-w-[1148px] p-3 min-[600px]:p-4 md:p-6">
+          {/* Left-aligned next to the sidebar (not centred), so the content
+              edge lines up with the header's org switcher at every width. */}
+          <div className="w-full max-w-[1148px] p-3 min-[600px]:p-4 md:p-6">
             {error ? (
               <FatalError message={error} onRetry={retry} />
             ) : !manifest || !nav ? (

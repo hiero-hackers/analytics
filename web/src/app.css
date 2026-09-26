@@ -20,6 +20,9 @@
 @import 'tw-animate-css';
 /* shadcn's state variants (data-open:, data-checked:, …) its components use. */
 @import 'shadcn/tailwind.css';
+/* The one typeface, self-hosted: the CSP allows fonts from 'self' only, so it
+   ships as woff2 in the bundle (browsers fetch only the Latin subset they need). */
+@import '@fontsource-variable/public-sans';
 
 /* Dark = the OS prefers dark and no explicit light choice, or an explicit dark
    choice. `:root` is listed alongside its descendants so the variant also
@@ -48,54 +51,47 @@
 }
 
 :root {
-  --page: #fafafa; /* page background */
-  --ink: #1b1b1b; /* primary text */
-  --muted: #666; /* secondary text */
-  --soft: #888; /* tertiary text (badges, counts, labels) */
-  --surface: #fff; /* cards, buttons, inputs */
-  --raise: #f3f3f3; /* hovered surface */
-  --edge: #e6e6e6; /* card & divider borders */
-  --edge-input: #ddd; /* input & pill borders */
-  --edge-strong: #ccc; /* small-button borders */
-  --edge-faint: #eee; /* table wrap & image borders */
-  --row-line: #f0f0f0; /* table row separators */
-  --accent: #1b1b1b; /* active pill background */
-  --on-accent: #fff; /* text on the active pill */
+  /* The six named colours of the design (Paper, Sheet, Ink, Graphite, Rule,
+     Signal): cool-tinted neutrals so they sit with the blue heat ramp and
+     Signal. Every text role is ≥ 4.5:1 (WCAG AA) on Paper and Sheet in both
+     themes. */
+  --page: #f6f7f9; /* Paper: page ground */
+  --surface: #fff; /* Sheet: cards, inputs, popovers */
+  --ink: #15181c; /* Ink: primary text; also the active fill (--accent) */
+  --muted: #59616c; /* Graphite: secondary text (5.9:1 on Paper) */
+  --edge: #e2e5e9; /* Rule: card & divider borders */
+  --link: #1d64c2; /* Signal: links, focus ring, the figure strip's rule (5.4:1) */
+
+  --soft: #69717c; /* tertiary text: counts, captions (4.6:1 on Paper, 4.9:1 on Sheet) */
+  --raise: #eef0f3; /* hovered / secondary surface */
+  --edge-input: #d5d9df; /* input & control borders */
+  --edge-strong: #c3c8cf; /* emphasised borders (dashed empty cells) */
+  --edge-faint: #e8ebee; /* scroll-box & chart-mat borders */
+  --row-line: #eef0f3; /* table row separators */
+  --accent: #15181c; /* active fill (shadcn: primary) */
+  --on-accent: #fff; /* text on the active fill */
 
   /* Semantic colors: one slot per meaning, dark values in the flip below. */
-  --link: #2a78d6; /* links and link-styled cells */
-  --link-ink: #255e9e; /* link-colored text that must read as text */
+  --link-ink: #1b58a8; /* link-colored text that must read as text */
   --ok: #0ca30c; /* positive dot/marker */
   --ok-ink: #0a6b0a; /* positive text */
   --warn: #fab219; /* warning dot/marker */
   --warn-ink: #8a6200; /* warning text */
   --neg: #b3261e; /* error text */
 
-  /* Shape & motion: shared control geometry, one hover timing everywhere. */
-  --r-card: 12px;
-  --r-control: 6px;
-  --r-frame: 8px; /* inputs, scroll boxes, and framed chart media */
-  --r-pill: 999px;
-  --radius: 0.5rem; /* shadcn components: lg = 8px, md ≈ 6px, sm ≈ 5px */
-  --dur: 120ms;
+  /* Shape: one radius, from which shadcn derives its scale (lg = 8px). */
+  --radius: 0.5rem;
   /* Scroll offset for jump targets (groups, shared-link cards): the sticky
      header (52px) plus a small buffer — and on phones the sticky group strip
      under it too (see the media rule after this block). */
   --jump-h: 60px;
 
-  /* Deliberately outside the light/dark flip below.
-     --chart-ground: chart PNGs carry a baked-in light background, so their
-     container must match it in either scheme or the image floats on a slab of
-     the wrong colour. It stops being a constant when the charts themselves
-     become theme-aware (see the chart legibility issue).
-     --lb-*: the lightbox is always dark on purpose, so its greys are scoped to
-     it rather than themed — three roles instead of the six one-off values
-     these replaced. */
+  /* Deliberately outside the light/dark flip below: chart PNGs carry a
+     baked-in white ground, so the mat they sit on (bg-chart-ground) must match
+     it in either scheme — in dark mode that reads as a light frame, a mounted
+     print rather than a hole. It stops being a constant when the charts
+     themselves become theme-aware (see the chart legibility issue). */
   --chart-ground: #fff;
-  --lb-title: #fff;
-  --lb-text: #e2e2e2;
-  --lb-dim: #bbb;
-  --lb-bright: #eee;
 
   /* HIP coverage-matrix heat ramp: more merged PRs = more ink. Mirrors
      HIP_EVIDENCE_RAMP (config/charts.py), which the same values reach the
@@ -123,21 +119,22 @@
    and for `:root[data-theme='dark']`, so the two cases cannot drift apart. */
 :root {
   @variant dark {
-    --page: #0f0f0f;
-    --ink: #e6e6e6;
-    --muted: #999;
-    --soft: #888;
-    --surface: #1a1a1a;
-    --raise: #262626;
-    --edge: #2a2a2a;
-    --edge-input: #333;
-    --edge-strong: #333;
-    --edge-faint: #333;
-    --row-line: #222;
-    --accent: #e6e6e6;
-    --on-accent: #0f0f0f;
+    --page: #0d0f12;
+    --surface: #15181c;
+    --ink: #e3e6ea;
+    --muted: #9ba4af; /* 7.6:1 on Paper */
+    --edge: #262a31;
+    --link: #72a8ea; /* 7.8:1 on Paper */
 
-    --link: #6ba3e8;
+    --soft: #858e99; /* 5.4:1 on Sheet */
+    --raise: #1e2228;
+    --edge-input: #313640;
+    --edge-strong: #3a404a;
+    --edge-faint: #2a2f36;
+    --row-line: #1c2026;
+    --accent: #e3e6ea;
+    --on-accent: #0d0f12;
+
     --link-ink: #8ab4e8;
     --ok: #34b334;
     --ok-ink: #7fd08a;
@@ -199,6 +196,10 @@
   --color-sidebar-border: var(--edge);
   --color-sidebar-ring: var(--link);
 
+  /* Type: one family (Public Sans, self-hosted above). Preflight gives <html>
+     the sans stack, so this reaches everything — Dialog and Sheet portals too. */
+  --font-sans: 'Public Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
   /* shadcn's radius scale, derived from one --radius like its generated CSS. */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -220,6 +221,7 @@
   --color-edge-faint: var(--edge-faint);
   --color-row-line: var(--row-line);
   --color-link: var(--link);
+  --color-chart-ground: var(--chart-ground);
   --color-link-ink: var(--link-ink);
   --color-ok: var(--ok);
   --color-ok-ink: var(--ok-ink);
@@ -228,7 +230,7 @@
   --color-neg: var(--neg);
 }
 
-/* ---- Page & element defaults --------------------------------------------- */
+/* ---- Base ---------------------------------------------------------------- */
 
 @layer base {
   /* shadcn's base rule: preflight zeroes border widths with `border: 0 solid`
@@ -240,77 +242,17 @@
     border-color: var(--color-border);
   }
   /* Preflight resets buttons to cursor: default; the dashboard's controls
-     have always shown a pointer (shadcn init --pointer writes the same). */
+     show a pointer (shadcn init --pointer writes the same rule). */
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
-  /* Legacy compat, temporary: preflight sets line-height 1.5, but every
-     legacy rule below was tuned against the browser default (`normal`, about
-     1.2) — under 1.5 each pill, tile, row and header grows 5–9% taller. shadcn
-     components set their own line-height through text-* utilities, so this
-     only holds the legacy layout still. Remove once the legacy classes are
-     gone (Phase 3). */
-  html {
-    line-height: normal;
-  }
   body {
-    font-family:
-      system-ui,
-      -apple-system,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
     color: var(--ink);
     background: var(--page);
   }
-  h3 {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 13px;
-  }
-  th {
-    position: sticky;
-    top: 0;
-    background: var(--raise);
-    text-align: center;
-    padding: 8px 10px;
-    cursor: pointer;
-    white-space: nowrap;
-    border-bottom: 1px solid var(--edge);
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-    transition: color var(--dur);
-  }
-  th:hover {
-    color: var(--ink);
-  }
-  td {
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--row-line);
-    white-space: nowrap;
-    text-align: center;
-  }
-  td:first-child {
-    font-weight: 500;
-  }
-  /* Cells centre by default (see `th`/`td`). Numeric columns additionally use
-     tabular figures so digits keep a constant width and columns of numbers
-     still line up under a centred heading. */
-  td.num {
-    font-variant-numeric: tabular-nums;
-  }
-  tr:hover td {
-    background: var(--raise);
-  }
+  /* Motion is decoration here, never information: honour the OS setting by
+     flattening every transition and animation (Dialog/Sheet fades included). */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -320,618 +262,32 @@
       scroll-behavior: auto !important;
     }
   }
-
-  /* Breakpoints: tablet ≤767px (shadcn's `md` boundary, where the sidebar
-     becomes a Sheet), phone ≤599px, narrow phone ≤479px (component re-flow,
-     see the end of @layer components). The page gutters that used to live on
-     <body> are now utilities on the app shell's content column (App.tsx). */
 }
 
-/* ---- Component vocabulary ------------------------------------------------ */
+/* ---- Bespoke views -----------------------------------------------------------
+   Everything else is shadcn components and utilities. What remains here is the
+   information design of the two bespoke HIP views, which no component
+   expresses — kept as CSS, expressed through the semantic tokens so both
+   follow the light/dark flip.
+
+   Coverage matrix (.hipmx*): a heat map, not a data table — separate-bordered
+   cells, banded two-row sticky header, heat buckets m1–m5 plus "open only"
+   (mo) and "none" (m0) states, keyboard-focusable evidence cells (ck/sel) and
+   the board-jump row flash. The legend swatches wear the same m1–m5 classes as
+   the cells, so the two cannot drift apart; the buckets read --heat-*, which
+   mirrors HIP_EVIDENCE_RAMP (config/charts.py) and inverts for dark mode.
+
+   Governance board (.hipboard*): lifecycle lanes of fixed width that scroll
+   sideways as a row, each with its own capped, scrolling chip list. */
 
 @layer components {
-  /* Shared control behaviour: one timing, one focus ring, everywhere. */
-  .dl,
-  .snav,
-  .ctab,
-  .chip {
-    transition:
-      background var(--dur),
-      border-color var(--dur),
-      color var(--dur);
-  }
-
-  /* One bordered-surface button. The variants below differ only in size and
-     shape — before this they were four near-identical rule blocks that drifted
-     apart on hover behaviour and colour. Add a variant by setting the two
-     custom properties, not by restating the whole treatment. */
-  .dl,
-  .snav,
-  .ctab {
-    font: inherit;
-    font-size: var(--btn-size, 13px);
-    padding: var(--btn-pad, 5px 12px);
-    border: 1px solid var(--edge-strong);
-    border-radius: var(--r-control);
-    background: var(--surface);
-    color: var(--ink);
-    cursor: pointer;
-    text-decoration: none;
-  }
-  .dl:hover,
-  .snav:hover,
-  .ctab:hover:not(.active) {
-    background: var(--raise);
-  }
-  :is(.dl, .snav, .ctab, .thbtn, .search, .lbclose):focus-visible {
-    outline: 2px solid var(--link);
-    outline-offset: 2px;
-  }
-
-  /* A tab the selected org has no content for: the "why" note in place of
-     the panel, sized to read as information rather than an error. */
-  .empty {
-    color: var(--muted);
-    font-size: 15px;
-    max-width: 640px;
-    margin: 48px auto;
-    text-align: center;
-    line-height: 1.6;
-  }
-
-  /* Cards & section chrome */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--edge);
-    border-radius: var(--r-card);
-    padding: 16px 18px;
-    margin-bottom: 20px;
-    scroll-margin-top: var(--jump-h);
-  }
-  .card.flash {
-    background: var(--flash);
-  }
-  .card h2 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 2px;
-  }
-  .shead {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px 16px;
-  }
-  .sactions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    flex: none;
-  }
-  .sactions .actionrow {
-    display: flex;
-    gap: 6px;
-  }
-  .dl {
-    --btn-size: 12px;
-    --btn-pad: 5px 11px;
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .dl svg {
-    width: 13px;
-    height: 13px;
-    flex: none;
-  }
-  .desc {
-    color: var(--muted);
-    font-size: 13px;
-    margin: 0 0 12px;
-  }
-  .count {
-    color: var(--soft);
-    font-size: 12px;
-    margin: 8px 0 0;
-  }
-
-  /* Glossary (arrives as pre-built HTML from the data API) */
-  .glossary {
-    margin: 0 0 18px;
-    border: 1px solid var(--edge);
-    border-radius: var(--r-card);
-    background: var(--surface);
-    padding: 0 14px;
-  }
-  .glossary summary {
-    cursor: pointer;
-    padding: 12px 0;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  .glossary dl {
-    margin: 0 0 10px;
-    font-size: 13px;
-    display: grid;
-    grid-template-columns: 150px 1fr;
-    gap: 5px 14px;
-  }
-  .glossary dt {
-    font-weight: 600;
-    color: var(--ink);
-  }
-  .glossary dd {
-    margin: 0;
-    color: var(--muted);
-  }
-  .gnote {
-    font-size: 12px;
-    color: var(--soft);
-    margin: 6px 0 12px;
-  }
-
-  /* Table sections */
-  .search {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px 10px;
-    border: 1px solid var(--edge-input);
-    border-radius: var(--r-frame);
-    font-size: 14px;
-    margin-bottom: 12px;
-    background: var(--surface);
-    color: var(--ink);
-  }
-  /* Three-level cascade keeps the scroll box viewport-relative across the
-     browser matrix: 520 px for browsers without `min()` support, then
-     `min(520px, 60vh)` for those with `min()` but without `dvh`, and finally
-     `min(520px, 60dvh)` for full support. `dvh` (dynamic viewport height)
-     accounts for collapsible browser chrome; `60dvh` leaves at least 40 % of
-     the screen for content above and below the table so the page-scroll
-     gesture cannot be trapped. */
-  .tablewrap {
-    overflow: auto;
-    max-height: 520px; /* no min() support: fixed cap */
-    max-height: min(520px, 60vh); /* min() + vh, no dvh: viewport-relative */
-    max-height: min(520px, 60dvh); /* full support: dvh accounts for browser chrome */
-    border: 1px solid var(--edge-faint);
-    border-radius: var(--r-frame);
-  }
-  details.tsec {
-    padding-top: 14px;
-    padding-bottom: 14px;
-  }
-  .tsum {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    list-style: none;
-    cursor: pointer;
-  }
-  .tsum::-webkit-details-marker {
-    display: none;
-  }
-  .tsum::before {
-    content: '\25B8';
-    color: var(--soft);
-    font-size: 13px;
-    transition: transform 0.15s ease;
-  }
-  details[open] .tsum::before {
-    transform: rotate(90deg);
-  }
-  .tsum h2 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    flex: 1;
-  }
-  .sbadge {
-    font-size: 12px;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-    color: var(--soft);
-    background: var(--raise);
-    border-radius: var(--r-pill);
-    padding: 2px 10px;
-    white-space: nowrap;
-  }
-  .sbody {
-    margin-top: 14px;
-  }
-  .sbody > .dl {
-    float: right;
-    margin-bottom: 8px;
-  }
-  .sbody > .search {
-    clear: both;
-  }
-
-  /* Freshness stamps: "data as of" (stale = older than the scheduled refresh). */
-  .asof {
-    display: inline-block;
-    font-size: 0.78rem;
-    color: var(--soft);
-    margin: 0;
-    white-space: nowrap;
-  }
-  .asof.stale {
-    color: var(--warn-ink);
-    font-weight: 600;
-  }
-
-  /* Charts */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 16px;
-  }
-  .chart {
-    margin: 0;
-  }
-  /* Framed chart media: the same border/radius/ground wherever a chart PNG
-     is shown, so a change lands once instead of in three places. */
-  .chart img,
-  .chartscroll,
-  .slide img {
-    border: 1px solid var(--edge-faint);
-    border-radius: var(--r-frame);
-    background: var(--chart-ground);
-  }
-  .chart img {
-    width: 100%;
-    height: auto;
-    cursor: zoom-in;
-  }
-  .chart img:hover {
-    border-color: var(--edge-strong);
-  }
-  .chart figcaption {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-    text-align: center;
-  }
-  .chart.wide {
-    grid-column: 1 / -1;
-  }
-  .chartscroll {
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-  .chartscroll img {
-    width: auto;
-    max-width: none;
-    height: 460px;
-    border: 0;
-    border-radius: 0;
-    display: block;
-    cursor: zoom-in;
-  }
-  .chartnote {
-    margin: 6px 0 0;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.45;
-    text-align: left;
-  }
-  .charttabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  .ctab {
-    --btn-size: 12px;
-    --btn-pad: 3px 11px;
-    color: var(--muted);
-  }
-  .ctab.active {
-    background: var(--accent);
-    color: var(--on-accent);
-    border-color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* Slideshow */
-  .slidenav {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 10px;
-  }
-  .snav {
-    --btn-pad: 6px 14px;
-  }
-  .scount {
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .slide img {
-    width: 100%;
-    height: auto;
-    cursor: zoom-in;
-  }
-  .slide figcaption {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 8px;
-    text-align: center;
-    font-weight: 600;
-  }
-
-  /* Lightbox — always dark, on purpose; no tokens */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(4px);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    /* Not centered via justify-content: the auto margins below centre content
-       that fits and top-align content that overflows, so a tall heatmap
-       scrolls at readable size instead of shrinking to fit. */
-    overflow-y: auto;
-    gap: 14px;
-    z-index: 1000;
-    cursor: zoom-out;
-    padding: 24px;
-    box-sizing: border-box;
-  }
-  .lightbox img {
-    margin-top: auto;
-    max-width: 96vw;
-    border-radius: var(--r-frame);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    background: var(--chart-ground);
-  }
-  .lightbox .hint {
-    position: fixed;
-    top: 20px;
-    right: 64px;
-    color: var(--lb-dim);
-    font-size: 13px;
-    line-height: 28px;
-  }
-  .lbclose {
-    position: fixed;
-    top: 16px;
-    right: 20px;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--r-pill);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--lb-bright);
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    transition: background var(--dur);
-  }
-  .lbclose:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-  .lbtitle {
-    color: var(--lb-title);
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-    text-align: center;
-  }
-  .lbcap {
-    max-width: 760px;
-    margin: 0 0 auto;
-    color: var(--lb-text);
-    font-size: 14px;
-    line-height: 1.5;
-    text-align: center;
-    padding: 0 16px;
-    max-height: 26vh;
-    overflow-y: auto;
-  }
-  .lbcap:empty {
-    display: none;
-  }
-  .lbcap .chartnote {
-    color: var(--lb-text);
-    margin: 0;
-    text-align: center;
-  }
-  .lbmethod {
-    margin-top: 10px;
-    text-align: left;
-  }
-  .lbmethod summary {
-    cursor: pointer;
-    color: var(--lb-dim);
-    font-size: 13px;
-    text-align: center;
-    list-style-position: inside;
-  }
-  .lbmethod summary:hover {
-    color: var(--lb-text);
-  }
-  .lbmethod ol {
-    margin: 10px auto 0;
-    padding-left: 20px;
-    list-style: decimal; /* preflight strips list markers; the steps are a sequence */
-    color: var(--lb-text);
-    font-size: 13px;
-    max-width: 680px;
-  }
-  .lbmethod li {
-    margin: 5px 0;
-  }
-
-  /* Section groups (the jump bar became the sidebar's "On this page" and the
-     phone strip in SectionGroups) */
-  .group {
-    scroll-margin-top: var(--jump-h);
-  }
-  .grouphdr {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--soft);
-    margin: 24px 0 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--edge);
-  }
-  summary.grouphdr {
-    cursor: pointer;
-    list-style: none;
-  }
-  summary.grouphdr::-webkit-details-marker {
-    display: none;
-  }
-  summary.grouphdr::before {
-    content: '\25be';
-    display: inline-block;
-    width: 1.1em;
-    color: var(--soft);
-    transition: transform 0.15s;
-  }
-  .group:not([open]) > summary.grouphdr::before {
-    transform: rotate(-90deg);
-  }
-  .group:not([open]) > summary.grouphdr {
-    color: var(--edge-strong);
-  }
-
-  /* App extras (no legacy counterpart) */
-  .error {
-    color: var(--neg);
-    font-size: 14px;
-    margin: 1em 0; /* the paragraph margin preflight removes */
-  }
-  .footrow {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 36px;
-    padding-top: 14px;
-    border-top: 1px solid var(--edge);
-  }
-  .provenance {
-    color: var(--soft);
-    font-size: 12px;
-    text-align: right;
-    margin: 0 0 0 auto;
-  }
-
-  /* Formatted table cells (chips, HIP badges, links). */
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11.5px;
-    font-weight: 600;
-    border-radius: var(--r-pill);
-    padding: 1px 9px;
-    border: 1px solid var(--edge);
-    background: var(--surface);
-  }
-  .chip::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--dot, var(--soft));
-  }
-  .chip-merged {
-    --dot: var(--ok);
-    color: var(--ok-ink);
-  }
-  .chip-open {
-    --dot: var(--warn);
-    color: var(--warn-ink);
-  }
-  .chip-none {
-    --dot: var(--edge-strong);
-    color: var(--soft);
-  }
-  .chip-overdue {
-    --dot: var(--neg);
-    color: var(--neg);
-  }
-  .chip-watch {
-    --dot: var(--warn);
-    color: var(--warn-ink);
-  }
-  .chip-spec {
-    --dot: var(--link);
-    color: var(--link-ink);
-  }
-  .cell-hip {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  /* Sortable column headers: a real button, with the sort mark's slot
-     reserved so toggling never shifts the column. */
-  .thbtn {
-    all: unset;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    font: inherit;
-    color: inherit;
-    text-transform: inherit;
-    letter-spacing: inherit;
-  }
-  .sortmark {
-    display: inline-block;
-    width: 1em;
-    color: var(--soft);
-    text-transform: none;
-  }
-  .cell-link {
-    font-size: 12px;
-    color: var(--link);
-    text-decoration: none;
-  }
-  .cell-link:hover {
-    text-decoration: underline;
-  }
-
-  /* (The former dark-mode leftovers block is gone: every rule it patched now
-     reads from the semantic tokens, whose dark values live in the single
-     token flip at the top of this file.) */
-
-  /* Chart PNGs bake a light ground (config/charts.py), so in dark mode the
-     gallery was a wall of white slabs. Inverting with a hue rotation keeps the
-     series hues recognisable while the ground goes dark — the pragmatic fix
-     for the PNG era; client-rendered charts will retire it. The lightbox is
-     exempt: it is always dark, and readers zoom in for a faithful look. */
-  .chart img,
-  .chartscroll img,
-  .slide img {
-    @variant dark {
-      filter: invert(0.9) hue-rotate(180deg);
-    }
-  }
-
-  /* ---- HIP views (coverage matrix, governance board, evidence panel) ----
-     Expressed through the semantic tokens like the rest of the stylesheet, so
-     the HIPs tab follows the light/dark flip instead of staying light-styled
-     on a dark page. The heat buckets read from --heat-*, which inverts for
-     dark mode (see the palette); the matrix legend renders the same classes,
-     so cells and legend cannot drift. */
-  /* Same three-level cascade as .tablewrap above (560 px / 60vh / 60dvh). */
   .hipmx-wrap {
     overflow: auto;
     max-height: 560px; /* no min() support: fixed cap */
     max-height: min(560px, 60vh); /* min() + vh, no dvh: viewport-relative */
     max-height: min(560px, 60dvh); /* full support: dvh accounts for browser chrome */
     border: 1px solid var(--edge-faint);
-    border-radius: var(--r-frame);
+    border-radius: var(--radius);
     padding: 0 6px 6px 0;
   }
   .hipmx {
@@ -949,6 +305,7 @@
     font-size: 11px;
   }
   .hipmx th {
+    white-space: nowrap;
     border-bottom: none;
     cursor: default;
     padding: 3px 8px;
@@ -960,9 +317,7 @@
   }
   .hipmx thead .hipmx-grp th {
     border-bottom: 1px solid var(--edge-strong);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 11px;
     color: var(--soft);
   }
   .hipmx tbody th {
@@ -1098,134 +453,6 @@
   .hipmx tr.flash td.hipmx-gaps {
     background: var(--flash) !important;
   }
-  .hipmx-filters {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .hipmx-filters .search {
-    margin-bottom: 0;
-  }
-  .hipmx-fbar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    font-size: 12px;
-    color: var(--soft);
-  }
-  .hipmx-fbtn {
-    padding: 3px 11px;
-    border: 1px solid var(--edge-input);
-    background: var(--surface);
-    border-radius: var(--r-pill);
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--ink);
-  }
-  .hipmx-fbtn:hover {
-    border-color: var(--soft);
-  }
-  .hipmx-fbtn.active {
-    background: var(--accent);
-    color: var(--on-accent);
-    border-color: var(--accent);
-  }
-  .hipev {
-    margin-top: 12px;
-    border: 1px solid var(--edge);
-    border-radius: var(--r-frame);
-    padding: 12px 14px;
-  }
-  .hipev-head {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-  .hipev-head h3 {
-    font-size: 13.5px;
-    margin: 0;
-    font-weight: 600;
-  }
-  .hipev-head .n {
-    color: var(--soft);
-    font-size: 12px;
-  }
-  .hipev-head button {
-    margin-left: auto;
-  }
-  .hipev ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  .hipev li {
-    padding: 6px 0;
-    border-bottom: 1px solid var(--row-line);
-    font-size: 12.5px;
-  }
-  .hipev li:last-child {
-    border-bottom: 0;
-  }
-  .hipev .l1 {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
-    flex-wrap: wrap;
-  }
-  .hipev .l1 a {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: var(--link);
-    text-decoration: none;
-  }
-  .hipev .l1 a:hover {
-    text-decoration: underline;
-  }
-  .hipev .t {
-    color: var(--muted);
-  }
-  .hipev .meta {
-    color: var(--soft);
-    font-size: 11.5px;
-    white-space: nowrap;
-  }
-  .hipev .cue {
-    color: var(--warn-ink);
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-  .hipev .snip {
-    color: var(--soft);
-    font-size: 11px;
-    margin-top: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-  .hipabout {
-    margin: 0;
-    padding-left: 18px;
-    list-style: disc; /* preflight strips list markers */
-    font-size: 13px;
-    color: var(--muted);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-width: 85ch;
-  }
-  .hipabout strong {
-    color: var(--ink);
-  }
-  .glossary .hipabout {
-    margin: 0 0 12px;
-    padding-left: 16px;
-  }
   .hipboard {
     display: flex;
     gap: 10px;
@@ -1237,7 +464,7 @@
     flex: 0 0 194px; /* border-box since preflight: 172px content + padding + border */
     background: var(--raise);
     border: 1px solid var(--edge);
-    border-radius: var(--r-frame);
+    border-radius: var(--radius);
     padding: 10px 10px 12px;
   }
   .hipboard-col h3 {
@@ -1264,80 +491,5 @@
   .hipboard-chips .none {
     color: var(--soft);
     font-size: 12px;
-  }
-  .hipchip {
-    padding: 2px 8px;
-    border: 1px solid var(--edge-input);
-    background: var(--surface);
-    border-radius: var(--r-control);
-    cursor: pointer;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--link-ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .hipchip:hover {
-    border-color: var(--link);
-  }
-  .hipchip.active {
-    border-color: var(--ink);
-    color: var(--ink);
-    background: var(--raise);
-  }
-  .hipboard-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    padding: 9px 12px;
-    border: 1px solid var(--edge);
-    border-radius: var(--r-frame);
-    font-size: 13px;
-  }
-  .hipboard-info strong {
-    font-variant-numeric: tabular-nums;
-  }
-  .hipboard-info .t {
-    color: var(--muted);
-  }
-  .hipboard-info button {
-    margin-left: auto;
-  }
-
-  /* ---- Responsive layout (component layer) ---------------------------------
-     Builds on the tablet/phone breakpoints from @layer base above, plus the
-     narrow-phone breakpoint (≤479 px) introduced here for component-level
-     re-flow.  All three are documented in the convention table in @layer base. */
-
-  /* ---- Narrow-phone breakpoint (≤479 px) -----------------------------------
-     Finer-grained adjustments that the 599 px phone breakpoint alone cannot
-     provide: the section header, jump bar label, glossary column, and card
-     padding all need more room than padding alone gives them at this width. */
-
-  /* Below 480 px the description + action-button row becomes too cramped.
-     Stack them: description first, then the action group below it.
-     .sactions originally has `align-items: flex-end` (right-aligns its
-     children within the column); override to left-align when stacked. */
-  @media (max-width: 479px) {
-    .shead {
-      flex-direction: column;
-    }
-    .sactions {
-      align-items: flex-start; /* left-align when stacked, not right */
-    }
-
-    /* Glossary: the fixed 150 px definition column consumes more than half a
-       ~280 px card body at this width.  minmax(0, 120px) caps it at 120 px
-       and lets it shrink as needed to share space fairly with the value
-       column (the 0 is the floor — it can compress all the way if forced). */
-    .glossary dl {
-      grid-template-columns: minmax(0, 120px) 1fr;
-    }
-
-    /* Cards: recover 8 px on each side so the content columns have more room. */
-    .card {
-      padding: 12px 14px;
-    }
   }
 }

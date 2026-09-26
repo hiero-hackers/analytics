@@ -23,10 +23,8 @@ const openHips = async () => {
   return await screen.findByText('Implementation coverage matrix');
 };
 
-const matrixCard = () =>
-  screen.getByText('Implementation coverage matrix').closest('.tsec') as HTMLElement;
-const boardCard = () =>
-  screen.getByText('Where specs sit in governance').closest('.tsec') as HTMLElement;
+const matrixCard = () => screen.getByRole('region', { name: 'Implementation coverage matrix' });
+const boardCard = () => screen.getByRole('region', { name: 'Where specs sit in governance' });
 
 describe('HIPs tab', () => {
   it('renders the board and matrix as cards, board first, with badges', async () => {
@@ -79,11 +77,11 @@ describe('HIPs tab', () => {
     expect(within(matrix).getByText('1 rows')).toBeInTheDocument();
     await userEvent.clear(within(matrix).getByPlaceholderText('Filter by HIP number or title…'));
 
-    await userEvent.click(within(matrix).getByRole('button', { name: 'Deferred' }));
+    await userEvent.click(within(matrix).getByRole('radio', { name: 'Deferred' }));
     expect(within(matrix).getByText('1 rows')).toBeInTheDocument();
     expect(within(matrix).queryByText('HIP-1200')).not.toBeInTheDocument();
 
-    await userEvent.click(within(matrix).getByRole('button', { name: 'Deferred' }));
+    await userEvent.click(within(matrix).getByRole('radio', { name: 'Deferred' }));
     expect(within(matrix).getByText('3 rows')).toBeInTheDocument();
   });
 
@@ -120,12 +118,12 @@ describe('HIPs tab', () => {
     const matrix = matrixCard();
 
     // Filter the target row out first, so the jump has to restore it.
-    await userEvent.click(within(matrix).getByRole('button', { name: 'Deferred' }));
+    await userEvent.click(within(matrix).getByRole('radio', { name: 'Deferred' }));
     expect(within(matrix).queryByText('HIP-1200')).not.toBeInTheDocument();
 
     await userEvent.click(within(board).getByRole('button', { name: 'HIP-1200' }));
     expect(within(board).getByText('Throughput')).toBeInTheDocument();
-    await userEvent.click(within(board).getByRole('button', { name: 'Show in coverage matrix ↓' }));
+    await userEvent.click(within(board).getByRole('button', { name: 'Show in coverage matrix' }));
 
     expect(within(matrix).getByText('3 rows')).toBeInTheDocument(); // filters cleared
     const row = matrix.querySelector('#hipmx-row-1200');
@@ -135,7 +133,7 @@ describe('HIPs tab', () => {
   it('the evidence table itself still renders as a section with hip formatting', async () => {
     await openHips();
 
-    const evidenceCard = screen.getByText('Evidence (per PR)').closest('.tsec') as HTMLElement;
+    const evidenceCard = screen.getByRole('region', { name: 'Evidence (per PR)' });
     expect(within(evidenceCard).getAllByText('HIP-1200').length).toBeGreaterThan(0);
   });
 });

@@ -5,6 +5,10 @@
  */
 
 import { useState } from 'react';
+import { ArrowDownIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
 import type { BoardItem, BoardView } from '../api';
 
 export function StatusBoard({ view, onJump }: { view: BoardView; onJump: (hip: number) => void }) {
@@ -21,28 +25,37 @@ export function StatusBoard({ view, onJump }: { view: BoardView; onJump: (hip: n
             <div className="hipboard-chips">
               {column.items.length === 0 && <span className="none">none</span>}
               {column.items.map((item) => (
-                <button
+                <Toggle
                   key={item.key}
-                  type="button"
-                  className={picked?.key === item.key ? 'hipchip active' : 'hipchip'}
-                  title={`${item.title} · ${item.status}`}
-                  onClick={() => setPicked((current) => (current?.key === item.key ? null : item))}
+                  variant="outline"
+                  size="sm"
+                  className="bg-card font-semibold text-link-ink tabular-nums"
+                  title={`${item.title} (${item.status})`}
+                  pressed={picked?.key === item.key}
+                  onPressedChange={(pressed) => setPicked(pressed ? item : null)}
                 >
                   {item.label}
-                </button>
+                </Toggle>
               ))}
             </div>
           </div>
         ))}
       </div>
       {picked && (
-        <div className="hipboard-info">
-          <strong>{picked.label}</strong>
-          <span className="t">{picked.title}</span>
-          <span className="chip chip-spec">{picked.status}</span>
-          <button type="button" className="dl" onClick={() => onJump(picked.key)}>
-            Show in coverage matrix ↓
-          </button>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2.5 rounded-lg border px-3 py-2 text-xs">
+          <strong className="font-semibold tabular-nums">{picked.label}</strong>
+          <span className="text-muted-foreground">{picked.title}</span>
+          <Badge variant="info">{picked.status}</Badge>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={() => onJump(picked.key)}
+          >
+            Show in coverage matrix
+            <ArrowDownIcon data-icon="inline-end" />
+          </Button>
         </div>
       )}
     </>

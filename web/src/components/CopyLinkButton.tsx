@@ -4,6 +4,8 @@
  * so the click always shows feedback whether successful or not.
  */
 import { useEffect, useRef, useState } from 'react';
+import { CheckIcon, LinkIcon, XIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { copyText, shareUrl } from '../share';
 
 const TRANSIENT_MS = 1600;
@@ -15,6 +17,8 @@ const LABELS: Record<CopyStatus, string> = {
   copied: 'Copied!',
   failed: "Couldn't copy",
 };
+
+const ICONS = { idle: LinkIcon, copied: CheckIcon, failed: XIcon } as const;
 
 export function CopyLinkButton({ sectionId }: { sectionId: string }) {
   const [status, setStatus] = useState<CopyStatus>('idle');
@@ -34,27 +38,12 @@ export function CopyLinkButton({ sectionId }: { sectionId: string }) {
     timer.current = window.setTimeout(() => setStatus('idle'), TRANSIENT_MS);
   };
 
+  const Icon = ICONS[status];
   return (
-    <button type="button" className="dl" onClick={onCopy}>
-      <svg
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden="true"
-      >
-        <path
-          d="M6.2 9.8 4.5 11.5a2.1 2.1 0 0 1-3-3L4.2 5.8a2.1 2.1 0 0 1 3 0"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9.8 6.2 11.5 4.5a2.1 2.1 0 0 1 3 3L11.8 10.2a2.1 2.1 0 0 1-3 0"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      {LABELS[status]}
-    </button>
+    <Button type="button" variant="outline" size="sm" onClick={onCopy}>
+      <Icon data-icon="inline-start" />
+      {/* Announced when it flips, so the result isn't visual-only. */}
+      <span aria-live="polite">{LABELS[status]}</span>
+    </Button>
   );
 }

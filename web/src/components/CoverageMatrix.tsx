@@ -10,6 +10,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { MatrixRow, MatrixView } from '../api';
 import type { EvidenceItem } from './EvidencePanel';
 import { EvidencePanel } from './EvidencePanel';
@@ -86,25 +88,31 @@ export function CoverageMatrix({
 
   return (
     <>
-      <div className="hipmx-filters">
-        <input
-          className="search"
+      <div className="mb-3 flex flex-col gap-2">
+        <Input
           placeholder="Filter by HIP number or title…"
+          aria-label="Filter HIPs"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <div className="hipmx-fbar">
-          <span>Governance:</span>
-          {view.filters.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={option === status ? 'hipmx-fbtn active' : 'hipmx-fbtn'}
-              onClick={() => setStatus((current) => (current === option ? '' : option))}
-            >
-              {option}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span id="hipmx-status-label">Governance:</span>
+          {/* Single choice that can be cleared: clicking the active status
+              again reports "" — no status filter, every row. */}
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            aria-labelledby="hipmx-status-label"
+            value={status}
+            onValueChange={setStatus}
+            className="flex-wrap"
+          >
+            {view.filters.map((option) => (
+              <ToggleGroupItem key={option} value={option}>
+                {option}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       </div>
       <div className="hipmx-wrap">
@@ -191,16 +199,20 @@ export function CoverageMatrix({
           </tbody>
         </table>
       </div>
-      <div className="hipmx-legend">
-        fewer
-        {/* Keyed off the ramp's *length*, not its colours: the swatches wear the
-            same m1–m5 classes as the cells, so both follow the theme together.
-            Painting the shipped hex here left the legend light in dark mode. */}
-        {view.ramp.map((_shade, index) => (
-          <i key={index} className={`m${index + 1}`} />
-        ))}
-        more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no
-        reference found
+      <div className="hipmx-legend gap-x-5">
+        <span className="inline-flex items-center gap-1.5">
+          fewer
+          {/* Keyed off the ramp's *length*, not its colours: the swatches wear
+              the same m1–m5 classes as the cells, so both follow the theme
+              together. Painting the shipped hex here left the legend light in
+              dark mode. */}
+          {view.ramp.map((_shade, index) => (
+            <i key={index} className={`m${index + 1}`} />
+          ))}
+          more merged PRs
+        </span>
+        <span>○ open PRs only</span>
+        <span>— no reference found</span>
       </div>
       {selected && selectedItems && (
         <EvidencePanel
@@ -210,7 +222,7 @@ export function CoverageMatrix({
           onClose={() => setSelected(null)}
         />
       )}
-      <p className="count">{rows.length} rows</p>
+      <p className="mt-2 text-xs text-soft tabular-nums">{rows.length} rows</p>
     </>
   );
 }

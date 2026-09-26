@@ -80,7 +80,8 @@ describe('App shell', () => {
     // button — deliberately not a fragment link, which would clobber the
     // tab/org hash state), once as its header. The chart card renders under its own named group — there
     // is no generic "Charts" section any more.
-    expect(screen.getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
+    const toc = screen.getByRole('navigation', { name: 'Dashboard' });
+    expect(within(toc).getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
     expect(screen.getAllByText('Pipeline charts')).toHaveLength(2);
     expect(screen.queryByText('Charts')).not.toBeInTheDocument();
     expect(screen.getAllByText('Roles & teams')).toHaveLength(2);
@@ -133,11 +134,11 @@ describe('Section tables', () => {
     await openGovernance();
     expect(screen.getByText('bob')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: '1 month' }));
+    await userEvent.click(screen.getByRole('radio', { name: '1 month' }));
     expect(screen.queryByText('bob')).not.toBeInTheDocument();
     expect(screen.getByText('alice')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'All time' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'All time' }));
     expect(screen.getByText('bob')).toBeInTheDocument();
   });
 
@@ -145,16 +146,18 @@ describe('Section tables', () => {
     await openGovernance();
 
     const cell = screen.getByText('2,490'); // 2490 renders with a separator
-    // Cells centre by default; `num` is what earns a column tabular digits.
-    expect(cell.closest('td')).toHaveClass('num');
+    // `data-numeric` is what earns a column right alignment and tabular digits.
+    expect(cell.closest('td')).toHaveAttribute('data-numeric');
     const table = screen.getByRole('table');
-    expect(within(table).getByText('count').closest('th')).toHaveClass('num');
+    expect(within(table).getByText('count').closest('th')).toHaveAttribute('data-numeric');
   });
 
   it('offers the period windows shortest-first, with all time last', async () => {
     await openGovernance();
 
-    const tabs = within(screen.getByRole('group', { name: 'Time range' })).getAllByRole('button');
+    const tabs = within(screen.getByRole('radiogroup', { name: 'Time range' })).getAllByRole(
+      'radio',
+    );
 
     expect(tabs.map((tab) => tab.textContent)).toEqual(['1 month', 'All time']);
   });
@@ -173,8 +176,8 @@ describe('Charts', () => {
   it('renders variant tabs and opens the lightbox with note and methodology', async () => {
     await openGovernance();
 
-    expect(screen.getByRole('button', { name: 'By year' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'By month' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'By year' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'By month' })).toBeInTheDocument();
 
     await userEvent.click(screen.getByAltText('Unique active contributors by role'));
     const lightbox = await screen.findByRole('dialog');
@@ -184,6 +187,10 @@ describe('Charts', () => {
 
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Focus goes back to the chart that opened it, not to <body>.
+    expect(
+      screen.getByRole('button', { name: 'Enlarge chart: Unique active contributors by role' }),
+    ).toHaveFocus();
   });
 });
 
@@ -202,12 +209,12 @@ describe('Organisation diversity card (#435)', () => {
 
     // One tab row for the card, not one per chart: three charts, two of which
     // share the axis, must not be able to disagree about the active role.
-    const axes = screen.getAllByRole('group', { name: 'Organisation diversity view' });
+    const axes = screen.getAllByRole('radiogroup', { name: 'Organisation diversity view' });
     expect(axes).toHaveLength(1);
     expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut.png');
     expect(chartSrc('Single-employer repos by org')).toContain('single_employer_repos_by_org.png');
 
-    await userEvent.click(within(axes[0]).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(axes[0]).getByRole('radio', { name: 'Committers' }));
 
     expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut_committers.png');
     expect(chartSrc('Single-employer repos by org')).toContain(
@@ -223,20 +230,19 @@ describe('Organisation diversity card (#435)', () => {
     await openGovernance();
 
     expect(
-      screen.queryByRole('group', { name: 'Maintainer pipeline view' }),
+      screen.queryByRole('radiogroup', { name: 'Maintainer pipeline view' }),
     ).not.toBeInTheDocument();
-    const own = screen.getByRole('group', { name: 'Unique active contributors by role view' });
-    expect(within(own).getByRole('button', { name: 'By year' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const own = screen.getByRole('radiogroup', {
+      name: 'Unique active contributors by role view',
+    });
+    expect(within(own).getByRole('radio', { name: 'By year' })).toBeChecked();
   });
 
   it('shows the active tab’s note and methodology in the lightbox', async () => {
     await openDiversity();
-    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
 
-    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
     await userEvent.click(screen.getByAltText('Role-holders by organisation'));
 
     // The committer tab must describe committers — it used to show the
@@ -259,10 +265,10 @@ describe('Organisation diversity card (#435)', () => {
       }),
     );
     await openDiversity();
-    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
-    const card = screen.getByText('Organisation diversity').closest('section') as HTMLElement;
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
+    const card = screen.getByRole('region', { name: 'Organisation diversity' });
 
-    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
     await userEvent.click(within(card).getByRole('button', { name: 'Download CSV' }));
 
     await vi.waitFor(() =>
@@ -300,23 +306,20 @@ describe('Role-tabbed tables (#435)', () => {
         .mock.calls.some(([url]) => String(url).endsWith('committeraffiliations.json')),
     ).toBe(false);
 
-    const roles = screen.getByRole('group', { name: 'Role' });
-    expect(within(roles).getByRole('button', { name: 'Maintainers' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const roles = screen.getByRole('radiogroup', { name: 'Role' });
+    expect(within(roles).getByRole('radio', { name: 'Maintainers' })).toBeChecked();
     expect(screen.getByText('alice')).toBeInTheDocument();
     expect(screen.queryByText('dave')).not.toBeInTheDocument();
   });
 
   it('swaps rows, columns and the freshness stamp with the tab', async () => {
     await openDiversity();
-    const roles = screen.getByRole('group', { name: 'Role' });
+    const roles = screen.getByRole('radiogroup', { name: 'Role' });
     const table = screen.getByRole('table');
 
     expect(within(table).getByText('maintainer')).toBeInTheDocument();
 
-    await userEvent.click(within(roles).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(roles).getByRole('radio', { name: 'Committers' }));
 
     // The count column is named for the role it counts, so the tabs differ in
     // shape and not only in their rows.
@@ -333,10 +336,10 @@ describe('Role-tabbed tables (#435)', () => {
     // the two axes have to stay tellable apart on a table that has both.
     await openDiversity();
 
-    expect(within(screen.getByRole('group', { name: 'Role' })).getAllByRole('button')).toHaveLength(
-      2,
-    );
-    expect(screen.queryByRole('group', { name: 'Time range' })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('radiogroup', { name: 'Role' })).getAllByRole('radio'),
+    ).toHaveLength(2);
+    expect(screen.queryByRole('radiogroup', { name: 'Time range' })).not.toBeInTheDocument();
   });
 
   it('resolves a deep link to an absorbed section, with its tab active', async () => {
@@ -354,10 +357,10 @@ describe('Role-tabbed tables (#435)', () => {
     await screen.findByText('dave');
     await vi.waitFor(() => expect(scrolled.map((el) => el.id)).toContain('affiliations'));
     expect(
-      within(screen.getByRole('group', { name: 'Role' })).getByRole('button', {
+      within(screen.getByRole('radiogroup', { name: 'Role' })).getByRole('radio', {
         name: 'Committers',
       }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    ).toBeChecked();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
   });
 });
@@ -392,8 +395,9 @@ describe('Cell formats', () => {
     );
 
     expect(container.textContent).toBe('presentmissing');
-    expect(container.querySelector('.chip-merged')).toBeInTheDocument();
-    expect(container.querySelector('.chip-none')).toBeInTheDocument();
+    // The tone (not only the word) distinguishes the two states.
+    expect(container.querySelector('[data-variant="ok"]')).toHaveTextContent('present');
+    expect(container.querySelector('[data-variant="neutral"]')).toHaveTextContent('missing');
   });
 });
 
@@ -458,7 +462,7 @@ describe('Section groups', () => {
     ];
     const { container } = render(<SectionGroups groups={groups} />);
 
-    const ids = [...container.querySelectorAll('details.group')].map((el) => el.id);
+    const ids = [...container.querySelectorAll('[id^="grp-"]')].map((el) => el.id);
     expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
     expect(tocEntries(groups).map((entry) => entry.id)).toEqual(ids);
 
@@ -483,7 +487,8 @@ describe('Section groups', () => {
     await openGovernance();
     expect(window.location.hash).toContain('tab=Governance');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Roles & teams' }));
+    const toc = screen.getByRole('navigation', { name: 'Dashboard' });
+    await userEvent.click(within(toc).getByRole('button', { name: 'Roles & teams' }));
 
     // The jump must not clobber the hash the app stores its state in: the
     // Governance content is still on screen and the hash still names the tab.

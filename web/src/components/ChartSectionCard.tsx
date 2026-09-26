@@ -14,11 +14,20 @@
  */
 
 import { useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { cn } from 'cn';
+import { Button } from '@/components/ui/button';
 import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
 import { downloadCsvText } from '../csv';
 import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 import { CopyLinkButton } from './CopyLinkButton';
+import { DownloadButton } from './CsvDownloadButton';
+import { SectionCard } from './SectionCard';
 import { VariantTabs } from './VariantTabs';
+
+/** The light mat every chart PNG sits on: its baked-in white ground, framed,
+ *  so in dark mode it reads as a mounted print rather than a hole in the page. */
+const MAT = 'rounded-lg border border-edge-faint bg-chart-ground';
 
 /**
  * A chart's variant axis, identified by its ordered label set. Serialised
@@ -63,11 +72,11 @@ function Figure({
       // one arrives. CSS still controls the displayed width.
       width={active.width}
       height={active.height}
-      onClick={() => onZoom(chart, variant)}
+      className={chart.wide ? 'block h-[460px] w-auto max-w-none' : 'h-auto w-full'}
     />
   );
   return (
-    <figure className={slide ? 'slide' : fullRow ? 'chart wide' : 'chart'}>
+    <figure className={cn('m-0 min-w-0', (slide || fullRow) && 'col-span-full')}>
       {!axis && (
         <VariantTabs
           labels={chart.variants.map((option) => option.label)}
@@ -76,8 +85,28 @@ function Figure({
           ariaLabel={`${chart.title} view`}
         />
       )}
-      {chart.wide ? <div className="chartscroll">{img}</div> : img}
-      <figcaption>{chart.title}</figcaption>
+      {/* A real button, so the enlarged view and its notes are reachable from
+          the keyboard; the image inside keeps the chart's alt text. */}
+      <button
+        type="button"
+        aria-label={`Enlarge chart: ${chart.title}`}
+        onClick={() => onZoom(chart, variant)}
+        className={cn(
+          MAT,
+          'block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
+          chart.wide && 'overflow-x-auto overflow-y-hidden',
+        )}
+      >
+        {img}
+      </button>
+      <figcaption
+        className={cn(
+          'mt-1.5 text-center text-xs text-muted-foreground',
+          slide && 'text-sm font-semibold',
+        )}
+      >
+        {chart.title}
+      </figcaption>
     </figure>
   );
 }
@@ -154,36 +183,33 @@ export function ChartSectionCard({
       : undefined
     : section.download;
   return (
-    <section className="card" id={section.id}>
-      <h2>{section.title}</h2>
-      <div className="shead">
-        <p className="desc">{section.description}</p>
-        <div className="sactions">
-          <div className="actionrow">
-            <CopyLinkButton sectionId={section.id} />
-            {download && (
-              <button
-                className="dl"
-                onClick={() =>
-                  // The chart's companion table, stamped with the provenance
-                  // preamble like every other browser download.
-                  fetchApiText(download.path).then((text) =>
-                    downloadCsvText(
-                      download.name,
-                      section.title,
-                      text,
-                      provenance,
-                      download.generated_at,
-                    ),
-                  )
-                }
-              >
-                Download CSV
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+    <SectionCard
+      id={section.id}
+      title={section.title}
+      description={section.description}
+      actions={
+        <>
+          <CopyLinkButton sectionId={section.id} />
+          {download && (
+            <DownloadButton
+              onClick={() =>
+                // The chart's companion table, stamped with the provenance
+                // preamble like every other browser download.
+                fetchApiText(download.path).then((text) =>
+                  downloadCsvText(
+                    download.name,
+                    section.title,
+                    text,
+                    provenance,
+                    download.generated_at,
+                  ),
+                )
+              }
+            />
+          )}
+        </>
+      }
+    >
       {/* One row per shared axis, above the gallery: the card's charts switch
           together, so the control belongs to the card and not to each figure. */}
       {sharedAxes.map((axis) => (
@@ -196,17 +222,23 @@ export function ChartSectionCard({
         />
       ))}
       {section.slideshow && count > 1 ? (
-        <div className="slideshow">
-          <div className="slidenav">
-            <button className="snav" onClick={() => setSlide((slide - 1 + count) % count)}>
-              ‹ Prev
-            </button>
-            <span className="scount">
+        <div>
+          <div className="mb-2.5 flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSlide((slide - 1 + count) % count)}
+            >
+              <ChevronLeftIcon data-icon="inline-start" />
+              Prev
+            </Button>
+            <span className="text-xs text-muted-foreground tabular-nums">
               {slide + 1} / {count}
             </span>
-            <button className="snav" onClick={() => setSlide((slide + 1) % count)}>
-              Next ›
-            </button>
+            <Button variant="outline" size="sm" onClick={() => setSlide((slide + 1) % count)}>
+              Next
+              <ChevronRightIcon data-icon="inline-end" />
+            </Button>
           </div>
           <Figure
             key={section.charts[slide].title}
@@ -217,7 +249,7 @@ export function ChartSectionCard({
           />
         </div>
       ) : (
-        <div className="gallery">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-4">
           {section.charts.map((chart, index) => (
             <Figure
               key={chart.title}
@@ -230,6 +262,6 @@ export function ChartSectionCard({
         </div>
       )}
       {zoom && <ChartLightbox content={zoom} onClose={() => setZoom(null)} />}
-    </section>
+    </SectionCard>
   );
 }

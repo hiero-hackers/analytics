@@ -1,9 +1,13 @@
-/** Rolling-period selector for tables and future charts. */
+/**
+ * Rolling-period selector for tables: a segmented bar of windows, shortest
+ * first, with "All time" (the null period) at the end of the scale. A
+ * single-select ToggleGroup, so it reads as one choice among options.
+ */
 
-const TAB =
-  'cursor-pointer whitespace-nowrap rounded-md border-0 px-3 py-1.5 text-[13px] [font:inherit]';
-const IDLE = `${TAB} bg-transparent text-muted-foreground hover:bg-raise hover:text-ink`;
-const ACTIVE = `${TAB} bg-primary font-semibold text-primary-foreground shadow-sm`;
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
+/** The value standing for "no window" — every row, not a rolling period. */
+const ALL_TIME = '__all__';
 
 export function PeriodTabs({
   periods,
@@ -21,33 +25,25 @@ export function PeriodTabs({
     return null;
   }
   return (
-    <div
-      className="mb-3 flex w-fit max-w-full gap-1 overflow-x-auto rounded-lg border border-solid border-edge bg-page p-1"
-      role="group"
+    <ToggleGroup
+      type="single"
+      spacing={0}
       aria-label="Time range"
+      value={active ?? ALL_TIME}
+      // "" means the active option was clicked again: keep the window.
+      onValueChange={(value) => value && onChange(value === ALL_TIME ? null : value)}
+      // One bordered bar: the segmented look that sets it apart from role tabs.
+      className="mb-3 max-w-full overflow-x-auto rounded-lg border bg-card p-0.5"
     >
       {periods.map((key) => (
-        <button
-          key={key}
-          type="button"
-          className={active === key ? ACTIVE : IDLE}
-          aria-pressed={active === key}
-          onClick={() => onChange(key)}
-        >
+        <ToggleGroupItem key={key} value={key}>
           {labels?.[key] ?? key}
-        </button>
+        </ToggleGroupItem>
       ))}
       {/* Last, not first: the windows read shortest to longest (30 days →
           1 year), and all-time is the end of that scale rather than a
           separate mode sitting before it. */}
-      <button
-        type="button"
-        className={active === null ? ACTIVE : IDLE}
-        aria-pressed={active === null}
-        onClick={() => onChange(null)}
-      >
-        All time
-      </button>
-    </div>
+      <ToggleGroupItem value={ALL_TIME}>All time</ToggleGroupItem>
+    </ToggleGroup>
   );
 }

@@ -6,7 +6,9 @@
  * a header and a contents list would both be redundant.
  */
 
+import { ChevronDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { anchorId, scrollToGroup, tocEntries, type Group, type TocEntry } from '../toc';
 import { useActiveSection } from '../useActiveSection';
@@ -43,10 +45,23 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
       {isMobile && entries.length > 0 && <GroupStrip entries={entries} />}
       {groups.map(([name, content], index) =>
         entries.length > 0 ? (
-          <details className="group" id={entries[index].id} open key={entries[index].id}>
-            <summary className="grouphdr">{name}</summary>
-            {content}
-          </details>
+          <Collapsible
+            defaultOpen
+            key={entries[index].id}
+            id={entries[index].id}
+            className="group/section-group mt-6 scroll-mt-(--jump-h) first:mt-0"
+          >
+            {/* The Radix trigger styled directly: a quiet ruled heading row, not
+                a button look (shadcn's Button paints its expanded state). */}
+            <CollapsibleTrigger className="mb-3 flex w-full items-center gap-2 border-b py-2 text-left text-sm font-semibold outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring">
+              <ChevronDownIcon
+                aria-hidden="true"
+                className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=closed]/section-group:-rotate-90"
+              />
+              {name}
+            </CollapsibleTrigger>
+            <CollapsibleContent>{content}</CollapsibleContent>
+          </Collapsible>
         ) : (
           <div key={anchorId(name, index)}>{content}</div>
         ),

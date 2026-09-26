@@ -10,6 +10,8 @@
  */
 
 import { useEffect, useState } from 'react';
+import { ExternalLinkIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { Manifest, SectionDoc, SectionVariant } from '../api';
 import { safeUrl } from '../safety';
 import { useDataTable } from '../useDataTable';
@@ -74,9 +76,12 @@ export function SectionTable({
               they are looking at. */}
           <CopyLinkButton sectionId={active.id} />
           {action && (
-            <a className="dl" href={action} target="_blank" rel="noopener noreferrer">
-              {active.action?.label}
-            </a>
+            <Button asChild variant="outline" size="sm">
+              <a href={action} target="_blank" rel="noopener noreferrer">
+                <ExternalLinkIcon data-icon="inline-start" />
+                {active.action?.label}
+              </a>
+            </Button>
           )}
           <CsvDownloadButton
             provenance={provenance}

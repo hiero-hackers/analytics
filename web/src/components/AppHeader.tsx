@@ -33,9 +33,10 @@ export function AppHeader({
   return (
     <header className="sticky top-0 z-20 flex h-13 shrink-0 items-center gap-2 border-b bg-background px-3 md:px-4">
       <SidebarTrigger className="md:hidden" aria-label="Open sections" />
-      {/* On wide screens the wordmark column matches the sidebar below it, so
-          the org switcher lines up with the content column. */}
-      <div className="md:w-[calc(var(--sidebar-width)-1rem)]">
+      {/* On wide screens the wordmark column is the sidebar's width, so the org
+          switcher starts exactly where the content column does (16px header
+          padding + sidebar + 8px gap = sidebar + the content's 24px padding). */}
+      <div className="md:w-(--sidebar-width)">
         <h1 className="text-[15px] font-semibold tracking-tight whitespace-nowrap">
           Hiero analytics
         </h1>

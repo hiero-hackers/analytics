@@ -25,19 +25,41 @@ npm run dev                            # the app, on http://localhost:5173
 
 ## Styling conventions
 
-- **Tailwind v4 utilities, composed from the semantic tokens** declared in
-  `src/app.css` (`bg-surface`, `text-muted`, `border-edge`, `text-ink`,
-  `bg-page`, `bg-raise`, `text-soft`, `bg-accent`, …). The tokens flip for
-  dark mode automatically — never write per-component dark colors when a
-  token exists.
-- **No raw hex values in components.** If a design genuinely needs a new
-  color, add a token to the palette in `src/app.css` and use it by name.
-- **Border utilities need `border-solid`** — Tailwind's preflight reset is
-  deliberately not imported (the layout predates it), so border-width
-  utilities alone won't render.
-- The `@layer components` classes in `src/app.css` are the pre-Tailwind
-  vocabulary (`.card`, `.tsec`, `.lightbox`, …). They are being migrated to
-  utilities opportunistically; don't add new ones.
+- **UI is built from [shadcn/ui](https://ui.shadcn.com) components** (Radix
+  base, Mira style) in `src/components/ui/`, added with
+  `npx shadcn@latest add <name>`. Reach for a component before writing
+  markup: `Card` for any content card, `Button`, `Badge`, `ToggleGroup` for a
+  2–7 option switch, `Collapsible`, `Dialog`, `Table`, `Alert`, `Empty`,
+  `Skeleton`. Compose them fully (`CardHeader`/`CardTitle`/…), and use
+  `className` for layout, not to restyle a component.
+- **The components are our source now.** Edits to generated files are allowed
+  but deliberate and marked `Local change` with the reason (e.g. `table.tsx`
+  lets its container be the scroll box; `badge.tsx` has the status tones
+  `ok`/`warn`/`neg`/`info`/`neutral`). Preview upstream changes with
+  `npx shadcn@latest add <name> --diff` before overwriting one.
+- **All colour comes from semantic tokens** in `src/app.css`. Components use
+  shadcn's names — `bg-background`, `bg-card`, `text-foreground`,
+  `text-muted-foreground`, `border-border`, `bg-primary`, `ring-ring` — plus
+  our own where shadcn has no slot (`text-soft`, `text-link`, `text-ok-ink`,
+  `bg-chart-ground`, …). Two names mean something different from what the
+  old palette used them for: shadcn `muted` and `accent` are _backgrounds_
+  (secondary text is `text-muted-foreground`, the active fill is
+  `bg-primary`). No raw hex values in components; a genuinely new colour gets
+  a token in `src/app.css`, with its dark value, and is used by name.
+- **Dark mode is one token flip.** The OS preference is the default;
+  `data-theme="light"|"dark"` on `<html>` forces one (the header's theme
+  switch, persisted by `src/theme.ts`, applied before first paint by
+  `public/theme-init.js`). The `dark:` variant matches exactly those cases,
+  but a component should rarely need it — tokens already flip.
+- **Tailwind's preflight is on**, so `border` utilities render without
+  `border-solid` and every box is `border-box`.
+- **Custom CSS is the exception**, allowed only for information design no
+  component expresses — today the HIP coverage matrix (`.hipmx*`) and the
+  governance board lanes (`.hipboard*`) in `src/app.css`, each commented with
+  why it remains. Everything else is utilities on components.
+- **Type:** one self-hosted family, Public Sans (the CSP allows fonts from
+  `'self'` only, so it ships in the bundle via `@fontsource-variable`). Numbers
+  that line up in columns use `tabular-nums`.
 
 ## Adding to the dashboard
 
@@ -54,7 +76,9 @@ npm run dev                            # the app, on http://localhost:5173
 
 `src/test/` holds the Vitest suite: `fixtures.ts` is a miniature but
 structurally complete data API served through a fetch stub (it doubles as
-documentation of the manifest contract), `app.test.tsx` covers the app shell
-and table/chart behavior, `csv.test.ts` covers the provenance-stamped export.
-Query by role and text, not by class name — styling refactors shouldn't break
-tests.
+documentation of the manifest contract), `app.test.tsx` covers tabs, tables
+and charts, `shell.test.tsx` the header, sidebar, theme switch and phone
+layout, `theme.test.ts` the theme plumbing, `csv.test.ts` the
+provenance-stamped export. Query by role and text, not by class name —
+styling refactors shouldn't break tests. (Radix gives a single-select
+`ToggleGroup` `radiogroup`/`radio` roles, and cards are labelled `region`s.)

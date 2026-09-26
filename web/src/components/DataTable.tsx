@@ -16,11 +16,29 @@
 import { useRef } from 'react';
 import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-react';
+import { cn } from 'cn';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import type { DataTableInstance } from '../useDataTable';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
 // real measurements as rows mount, so this only has to be close.
-const ROW_HEIGHT = 27;
+const ROW_HEIGHT = 33;
+
+/** Text reads left, numbers right in tabular figures so their digits line up. */
+const align = (numeric?: boolean) => (numeric ? 'text-right tabular-nums' : undefined);
+/** On narrow screens the first column (who/what the row is) stays in view while
+ *  the rest scrolls sideways; it needs an opaque ground to scroll under. */
+const STICKY_FIRST = 'max-md:sticky max-md:left-0 max-md:z-10';
 const OVERSCAN = 12;
 /** Below this, a table renders whole — the DOM cost is already negligible. */
 export const VIRTUALIZE_ABOVE = 100;
@@ -47,105 +65,119 @@ export function DataTable({ table }: { table: DataTableInstance }) {
 
   return (
     <>
-      <input
-        className="search"
+      <Input
         placeholder="Filter…"
         aria-label="Filter rows"
         value={globalFilter}
         onChange={(event) => table.setGlobalFilter(event.target.value)}
+        className="mb-3"
       />
-      <div className="tablewrap" ref={scrollRef}>
-        <table>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const sorted = header.column.getIsSorted() as string;
-                  return (
-                    <th
-                      key={header.id}
-                      className={header.column.columnDef.meta?.numeric ? 'num' : undefined}
-                      aria-sort={
-                        sorted === 'asc'
-                          ? 'ascending'
-                          : sorted === 'desc'
-                            ? 'descending'
-                            : undefined
-                      }
+      <Table
+        containerRef={scrollRef}
+        // The scroll box: capped at 520px or 60% of the dynamic viewport,
+        // whichever is less, so a long table never traps the page scroll.
+        containerClassName="max-h-[min(520px,60dvh)] overflow-auto rounded-lg border"
+      >
+        <TableHeader className="sticky top-0 z-20">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              {headerGroup.headers.map((header, index) => {
+                const sorted = header.column.getIsSorted() as string;
+                const numeric = header.column.columnDef.meta?.numeric;
+                const SortIcon =
+                  sorted === 'asc'
+                    ? ArrowUpIcon
+                    : sorted === 'desc'
+                      ? ArrowDownIcon
+                      : ArrowUpDownIcon;
+                return (
+                  <TableHead
+                    key={header.id}
+                    data-numeric={numeric || undefined}
+                    aria-sort={
+                      sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined
+                    }
+                    className={cn('bg-muted', align(numeric), index === 0 && STICKY_FIRST)}
+                  >
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn('-mx-2', numeric && 'flex-row-reverse')}
+                      onClick={header.column.getToggleSortingHandler()}
                     >
-                      <button
-                        type="button"
-                        className="thbtn"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {/* The mark's slot is always reserved so toggling sort never shifts the column. */}
-                        <span className="sortmark" aria-hidden="true">
-                          {{ asc: '↑', desc: '↓' }[sorted] ?? ''}
-                        </span>
-                      </button>
-                    </th>
-                  );
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={columnCount}
-                  className="py-6 text-center text-[13px] text-muted-foreground"
-                >
-                  {globalFilter ? (
-                    <>
-                      No rows match —{' '}
-                      <button
-                        type="button"
-                        className="underline"
-                        onClick={() => table.setGlobalFilter('')}
-                      >
-                        clear the filter?
-                      </button>
-                    </>
-                  ) : (
-                    'No rows to show.'
-                  )}
-                </td>
-              </tr>
-            )}
-            {paddingTop > 0 && (
-              <tr aria-hidden="true">
-                <td colSpan={columnCount} style={{ height: paddingTop, padding: 0, border: 0 }} />
-              </tr>
-            )}
-            {visibleRows.map((row, index) => (
-              <tr
-                key={row.id}
-                data-index={virtualized ? virtualRows[index].index : index}
-                ref={virtualized ? virtualizer.measureElement : undefined}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {/* Always an icon, so sorting never shifts the column. */}
+                      <SortIcon
+                        data-icon={numeric ? 'inline-start' : 'inline-end'}
+                        aria-hidden="true"
+                        className={sorted ? undefined : 'opacity-40'}
+                      />
+                    </Button>
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {rows.length === 0 && (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={columnCount} className="py-6 text-center text-muted-foreground">
+                {globalFilter ? (
+                  <>
+                    No rows match —{' '}
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="px-0"
+                      onClick={() => table.setGlobalFilter('')}
+                    >
+                      clear the filter?
+                    </Button>
+                  </>
+                ) : (
+                  'No rows to show.'
+                )}
+              </TableCell>
+            </TableRow>
+          )}
+          {paddingTop > 0 && (
+            <tr aria-hidden="true">
+              <td colSpan={columnCount} style={{ height: paddingTop, padding: 0, border: 0 }} />
+            </tr>
+          )}
+          {visibleRows.map((row, index) => (
+            <TableRow
+              key={row.id}
+              data-index={virtualized ? virtualRows[index].index : index}
+              ref={virtualized ? virtualizer.measureElement : undefined}
+            >
+              {row.getVisibleCells().map((cell, cellIndex) => {
+                const numeric = cell.column.columnDef.meta?.numeric;
+                return (
+                  <TableCell
                     key={cell.id}
-                    className={cell.column.columnDef.meta?.numeric ? 'num' : undefined}
+                    data-numeric={numeric || undefined}
+                    className={cn(
+                      align(numeric),
+                      cellIndex === 0 && ['font-medium max-md:bg-card', STICKY_FIRST],
+                    )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-            {paddingBottom > 0 && (
-              <tr aria-hidden="true">
-                <td
-                  colSpan={columnCount}
-                  style={{ height: paddingBottom, padding: 0, border: 0 }}
-                />
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          ))}
+          {paddingBottom > 0 && (
+            <tr aria-hidden="true">
+              <td colSpan={columnCount} style={{ height: paddingBottom, padding: 0, border: 0 }} />
+            </tr>
+          )}
+        </TableBody>
+      </Table>
     </>
   );
 }

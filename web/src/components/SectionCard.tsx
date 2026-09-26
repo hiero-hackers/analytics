@@ -1,13 +1,28 @@
 /**
- * The chrome every content card shares: a collapsible header with a row/size
- * badge, then a body carrying the description, the freshness stamp, whatever
- * actions belong to the card, and the content itself.
+ * The chrome every content card shares — tables, bespoke views and chart
+ * galleries all render through this, so a change to the header, the actions
+ * or the "data as of" treatment cannot apply to one kind and miss the others.
  *
- * Tables and bespoke views both render through this, so a change to the header
- * (or the "data as of" treatment) cannot apply to one and miss the other.
+ * A shadcn Card, collapsible as a whole: the header (title, description, size
+ * badge, collapse toggle) stays visible, the actions, content and freshness
+ * footer fold away. The card is a labelled region and keeps its `id`, which
+ * shared `#widget=` links scroll to and briefly flash (App adds `flash`).
  */
 
-import type { ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
+import { ChevronDownIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { stamp } from '../format';
 
 export function SectionCard({
@@ -22,36 +37,70 @@ export function SectionCard({
 }: {
   id?: string;
   title: string;
-  badge: ReactNode;
+  /** Size of what the card holds ("3 rows", "158 HIPs"); omitted for chart galleries. */
+  badge?: ReactNode;
   description: string;
   generatedAt?: string;
   stale?: boolean;
   actions?: ReactNode;
   children: ReactNode;
 }) {
+  const titleId = useId();
+  const [open, setOpen] = useState(true);
+
   return (
-    <details className="card tsec" open id={id}>
-      <summary className="tsum">
-        <h2>{title}</h2>
-        <span className="sbadge">{badge}</span>
-      </summary>
-      <div className="sbody">
-        <div className="shead">
-          <p className="desc">{description}</p>
-          {/* Right column: actions on top, freshness beneath — one place to
-              look instead of three items jostling on a single line. */}
-          <div className="sactions">
-            {actions && <div className="actionrow">{actions}</div>}
-            {generatedAt && (
-              <span className={stale ? 'asof stale' : 'asof'}>
+    <Collapsible asChild open={open} onOpenChange={setOpen}>
+      <Card
+        id={id}
+        role="region"
+        aria-labelledby={titleId}
+        // scroll-mt: land below the sticky header. [&.flash]: the shared-link
+        // highlight, toggled as a class by App's jump effect.
+        className="mb-5 scroll-mt-(--jump-h) transition-colors duration-500 [&.flash]:bg-(--flash)"
+      >
+        <CardHeader>
+          <CardTitle>
+            <h2 id={titleId} className="text-base font-semibold tracking-tight">
+              {title}
+            </h2>
+          </CardTitle>
+          <CardDescription className="max-w-[80ch] group-data-[state=closed]/card:hidden">
+            {description}
+          </CardDescription>
+          <CardAction className="flex items-center gap-1.5">
+            {badge !== undefined && (
+              <Badge variant="secondary" className="tabular-nums">
+                {badge}
+              </Badge>
+            )}
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={open ? `Collapse ${title}` : `Expand ${title}`}
+              >
+                <ChevronDownIcon className="transition-transform group-data-[state=closed]/card:-rotate-90" />
+              </Button>
+            </CollapsibleTrigger>
+          </CardAction>
+        </CardHeader>
+        <CollapsibleContent className="flex flex-col gap-(--card-spacing)">
+          {/* Actions wrap onto as many rows as they need — on a phone three
+              buttons no longer push the page sideways. */}
+          {actions && (
+            <CardContent className="flex flex-wrap items-center gap-2">{actions}</CardContent>
+          )}
+          <CardContent>{children}</CardContent>
+          {generatedAt && (
+            <CardFooter className="border-t text-muted-foreground">
+              <p className={stale ? 'font-medium text-warn-ink' : undefined}>
                 data as of {stamp(generatedAt)}
                 {stale ? ' — older than the scheduled refresh' : ''}
-              </span>
-            )}
-          </div>
-        </div>
-        {children}
-      </div>
-    </details>
+              </p>
+            </CardFooter>
+          )}
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 }

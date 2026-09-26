@@ -1,5 +1,6 @@
 /** The work-in-progress disclaimer footer, and the page's report-a-problem link. */
 
+import { Badge } from '@/components/ui/badge';
 import { safeUrl } from '../safety';
 
 export function WipFooter({ issuesUrl }: { issuesUrl?: string }) {
@@ -9,16 +10,21 @@ export function WipFooter({ issuesUrl }: { issuesUrl?: string }) {
   // something that isn't on their tab; this footer is the general route.
   const href = issuesUrl ? safeUrl(issuesUrl) : null;
   return (
-    <footer className="mb-2 max-w-[62ch] text-[13px] leading-normal text-muted-foreground">
-      <span className="mr-1.5 inline-block rounded bg-warn/20 px-2 py-[2px] text-[11px] font-semibold tracking-[0.04em] uppercase text-warn-ink">
+    <footer className="max-w-[62ch] text-xs/relaxed text-muted-foreground">
+      <Badge variant="warn" className="mr-1.5 align-middle">
         Work in progress
-      </span>{' '}
+      </Badge>
       This dashboard is under active development. Organisation affiliations are curated and still
       being verified — figures are directional and may change.{' '}
       {href ? (
         <>
           Spotted something wrong?{' '}
-          <a href={href} target="_blank" rel="noopener noreferrer" className="cell-link">
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-link underline-offset-4 hover:underline"
+          >
             Open an issue
           </a>
           . Affiliations can also be corrected from that table&rsquo;s own &ldquo;Suggest a

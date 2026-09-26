@@ -123,7 +123,7 @@ describe('On this page', () => {
 
     // The Roles group's top has scrolled up past the header; later ones haven't.
     const top = (name: string) =>
-      screen.getAllByText(name).find((el) => el.tagName === 'SUMMARY')!.parentElement!;
+      document.querySelector<HTMLElement>(`[id^="grp-"][id$="${name.replace(/\W+/g, '-')}"]`)!;
     for (const [name, y] of [
       ['Pipeline charts', -800],
       ['Roles & teams', 120],
