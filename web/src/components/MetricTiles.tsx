@@ -7,11 +7,13 @@
  * the steps that produced it.
  */
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { MetricTile } from '../api';
+import { usePrintMode } from '../printContext';
 import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 
 export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
+  const printing = usePrintMode();
   const [explained, setExplained] = useState<LightboxContent | null>(null);
 
   if (tiles.length === 0) {
@@ -19,7 +21,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
   }
   return (
     <>
-      <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
+      <div className="metric-tiles mb-6 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
         {tiles.map((tile) => {
           const explainable = Boolean(tile.note || tile.methodology?.length);
           const body = (
@@ -33,25 +35,29 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
             </>
           );
           const shell =
-            'rounded-[10px] border border-solid border-edge bg-surface px-4 py-3.5 text-left ' +
+            'metric-tile rounded-[10px] border border-solid border-edge bg-surface px-4 py-3.5 text-left ' +
             'transition-[border-color,transform,box-shadow] duration-[120ms] motion-reduce:transition-none';
           return explainable ? (
-            <button
-              key={tile.label}
-              type="button"
-              className={`${shell} cursor-pointer hover:border-soft hover:-translate-y-px hover:shadow-sm motion-reduce:hover:translate-y-0`}
-              title="How is this measured?"
-              onClick={() =>
-                setExplained({
-                  alt: tile.label,
-                  title: tile.label,
-                  note: tile.note,
-                  methodology: tile.methodology,
-                })
-              }
-            >
-              {body}
-            </button>
+            <Fragment key={tile.label}>
+              <button
+                type="button"
+                className={`${shell} cursor-pointer hover:border-soft hover:-translate-y-px hover:shadow-sm motion-reduce:hover:translate-y-0`}
+                title="How is this measured?"
+                hidden={printing}
+                data-print-hide
+                onClick={() =>
+                  setExplained({
+                    alt: tile.label,
+                    title: tile.label,
+                    note: tile.note,
+                    methodology: tile.methodology,
+                  })
+                }
+              >
+                {body}
+              </button>
+              {printing && <div className={shell}>{body}</div>}
+            </Fragment>
           ) : (
             <div className={shell} key={tile.label}>
               {body}

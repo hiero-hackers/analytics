@@ -4,6 +4,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { usePrintMode } from '../printContext';
 
 export type Group = [name: string, content: ReactNode];
 
@@ -13,11 +14,12 @@ export type Group = [name: string, content: ReactNode];
 const anchorId = (name: string, index: number) => `grp-${index}-${name.replace(/\W+/g, '-')}`;
 
 export function SectionGroups({ groups }: { groups: Group[] }) {
+  const printing = usePrintMode();
   const showHeaders = groups.length > 1;
   return (
     <>
       {showHeaders && (
-        <div className="jump">
+        <div className="jump" data-scroll-restore>
           <span className="jlabel">Jump to</span>
           {groups.map(([name], index) => (
             // Deliberately NOT an <a href="#…">: the URL hash is the app's
@@ -35,16 +37,19 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
           ))}
         </div>
       )}
-      {groups.map(([name, content], index) =>
-        showHeaders ? (
-          <details className="group" id={anchorId(name, index)} open key={anchorId(name, index)}>
-            <summary className="grouphdr">{name}</summary>
-            {content}
-          </details>
-        ) : (
-          <div key={anchorId(name, index)}>{content}</div>
-        ),
-      )}
+      {groups.map(([name, content], index) => (
+        <details
+          className={showHeaders ? 'group' : undefined}
+          id={anchorId(name, index)}
+          open
+          key={anchorId(name, index)}
+        >
+          <summary className="grouphdr" hidden={!showHeaders && !printing}>
+            {showHeaders || printing ? name : null}
+          </summary>
+          {content}
+        </details>
+      ))}
     </>
   );
 }

@@ -10,6 +10,8 @@
  * table that has both.
  */
 
+import { usePrintMode } from '../printContext';
+
 export function VariantTabs({
   labels,
   active,
@@ -21,22 +23,36 @@ export function VariantTabs({
   onSelect: (index: number) => void;
   ariaLabel: string;
 }) {
+  const printing = usePrintMode();
   if (labels.length < 2) {
     return null;
   }
   return (
-    <div className="charttabs" role="group" aria-label={ariaLabel}>
-      {labels.map((label, index) => (
-        <button
-          key={label}
-          type="button"
-          className={index === active ? 'ctab active' : 'ctab'}
-          aria-pressed={index === active}
-          onClick={() => onSelect(index)}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
+    <>
+      {printing && (
+        <p className="print-selection">
+          {ariaLabel}: {labels[active] ?? labels[0]}
+        </p>
+      )}
+      <div
+        className="charttabs"
+        role="group"
+        aria-label={ariaLabel}
+        hidden={printing}
+        data-print-hide
+      >
+        {labels.map((label, index) => (
+          <button
+            key={label}
+            type="button"
+            className={index === active ? 'ctab active' : 'ctab'}
+            aria-pressed={index === active}
+            onClick={() => onSelect(index)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </>
   );
 }

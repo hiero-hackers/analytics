@@ -13,9 +13,10 @@
  * keep their own tabs, so nothing else changes.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
 import { downloadCsvText } from '../csv';
+import { usePrintMode } from '../printContext';
 import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 import { CopyLinkButton } from './CopyLinkButton';
 import { VariantTabs } from './VariantTabs';
@@ -32,6 +33,7 @@ function Figure({
   slide = false,
   stretch = false,
   axis,
+  hidden = false,
 }: {
   chart: ChartSpec;
   onZoom: (chart: ChartSpec, variant: number) => void;
@@ -41,10 +43,26 @@ function Figure({
   /** Set when the card owns this chart's axis: it renders one tab row for all
    *  the charts that share it, so this figure shows none of its own. */
   axis?: { index: number; onSelect: (index: number) => void };
+  hidden?: boolean;
 }) {
+  const printing = usePrintMode();
   const [own, setOwn] = useState(0);
   const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
   const active = chart.variants[variant];
+  const src = chartUrl(active.file);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [imageState, setImageState] = useState<{
+    src: string;
+    status: 'ready' | 'error';
+  } | null>(null);
+  // Readiness belongs to the selected source: switching variants must never
+  // reuse the success or failure of the previous image.
+  const imageStatus = imageState?.src === src ? imageState.status : 'loading';
+  useEffect(() => {
+    if (imageRef.current?.complete && imageRef.current.naturalWidth > 0) {
+      setImageState({ src, status: 'ready' });
+    }
+  }, [src]);
   // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
   // the `wide` scroll-box treatment would shrink it to the box height instead.
   // It gets the full row with natural page flow: the dimensions ship with the
@@ -55,19 +73,32 @@ function Figure({
   const fullRow = chart.wide || chart.full_row || tall || stretch;
   const img = (
     <img
-      src={chartUrl(active.file)}
+      ref={imageRef}
+      key={src}
+      src={src}
       alt={chart.title}
-      loading="lazy"
+      loading="eager"
+      data-print-chart
+      data-print-chart-state={imageStatus}
+      hidden={imageStatus === 'error'}
+      className={imageStatus === 'error' ? 'hidden' : undefined}
       // Intrinsic size (when known) reserves the aspect-ratio box up front, so
-      // a screen of lazy-loading charts doesn't shove content around as each
+      // a screen of loading charts doesn't shove content around as each
       // one arrives. CSS still controls the displayed width.
       width={active.width}
       height={active.height}
+      onLoad={() => setImageState({ src, status: 'ready' })}
+      onError={() => setImageState({ src, status: 'error' })}
       onClick={() => onZoom(chart, variant)}
     />
   );
   return (
-    <figure className={slide ? 'slide' : fullRow ? 'chart wide' : 'chart'}>
+    <figure
+      className={slide ? 'slide' : fullRow ? 'chart wide' : 'chart'}
+      hidden={hidden}
+      data-print-error={imageStatus === 'error' ? '' : undefined}
+      data-print-pending={imageStatus === 'loading' ? '' : undefined}
+    >
       {!axis && (
         <VariantTabs
           labels={chart.variants.map((option) => option.label)}
@@ -76,8 +107,28 @@ function Figure({
           ariaLabel={`${chart.title} view`}
         />
       )}
-      {chart.wide ? <div className="chartscroll">{img}</div> : img}
-      <figcaption>{chart.title}</figcaption>
+      {chart.wide ? (
+        <div className="chartscroll" data-scroll-restore>
+          {img}
+        </div>
+      ) : (
+        img
+      )}
+      {imageStatus === 'error' && (
+        <p className="print-chart-status" role="alert">
+          Could not load chart: {chart.title} ({active.label}).
+        </p>
+      )}
+      {printing && imageStatus === 'loading' && (
+        <p className="print-chart-status">
+          Chart still loading: {chart.title} ({active.label}). Wait for it to load, then print
+          again.
+        </p>
+      )}
+      <figcaption>
+        {chart.title}
+        {printing && ` — ${active.label}`}
+      </figcaption>
     </figure>
   );
 }
@@ -89,6 +140,7 @@ export function ChartSectionCard({
   section: ChartSection;
   provenance: Manifest['provenance'];
 }) {
+  const printing = usePrintMode();
   const [slide, setSlide] = useState(0);
   const [zoom, setZoom] = useState<LightboxContent | null>(null);
   // One selection per shared axis, keyed by its label set.
@@ -208,13 +260,19 @@ export function ChartSectionCard({
               Next ›
             </button>
           </div>
-          <Figure
-            key={section.charts[slide].title}
-            chart={section.charts[slide]}
-            onZoom={onZoom}
-            slide
-            axis={axisFor(section.charts[slide])}
-          />
+          {/* Keep figures mounted so their chosen variants survive changing
+              slides and entering/leaving print mode. All selected chart
+              sources load eagerly, including the currently hidden slides. */}
+          {section.charts.map((chart, index) => (
+            <Figure
+              key={chart.title}
+              chart={chart}
+              onZoom={onZoom}
+              slide
+              axis={axisFor(chart)}
+              hidden={!printing && slide !== index}
+            />
+          ))}
         </div>
       ) : (
         <div className="gallery">

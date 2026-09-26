@@ -82,7 +82,7 @@
   --flash: #fff3d6; /* row highlight when the board jumps to a HIP */
 }
 
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --page: #0f0f0f;
     --ink: #e6e6e6;

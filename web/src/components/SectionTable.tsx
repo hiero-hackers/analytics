@@ -55,7 +55,8 @@ export function SectionTable({
   // The tabs carry independent row sets, so a period the previous tab offered
   // may not exist on this one; fall back to its all-time rows rather than
   // rendering an undefined table.
-  const rows = (period && active.periods?.[period]) || active.rows;
+  const effectivePeriod = period && active.periods?.[period] ? period : null;
+  const rows = (effectivePeriod && active.periods?.[effectivePeriod]) || active.rows;
   const table = useDataTable(active.columns, rows, active.id);
   const shown = table.getRowModel().rows.length;
   const action = active.action ? safeUrl(active.action.url) : null;
@@ -100,7 +101,7 @@ export function SectionTable({
       />
       <PeriodTabs
         periods={Object.keys(active.periods ?? {})}
-        active={period}
+        active={effectivePeriod}
         onChange={setPeriod}
         labels={periodLabels}
       />
