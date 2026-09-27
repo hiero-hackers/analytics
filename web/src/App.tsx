@@ -18,6 +18,7 @@ import { PAGE_TITLE_ID } from './hooks/use-header-scroll';
 import { NARROW_HEADER, useMediaQuery } from './hooks/use-media-query';
 import { AppSidebar } from './components/AppSidebar';
 import { ChartSectionCard } from './components/ChartSectionCard';
+import { SectionBoundary } from './components/ErrorBoundary';
 import { Glossary } from './components/Glossary';
 import { MetricTiles } from './components/MetricTiles';
 import { ProvenanceFooter } from './components/ProvenanceFooter';
@@ -138,15 +139,18 @@ function OrgPanel({
                 <ViewCards views={groupViews} sectionDocs={docs} provenance={provenance} />
               )}
               {groupCharts.map((section) => (
-                <ChartSectionCard key={section.id} section={section} provenance={provenance} />
+                <SectionBoundary key={section.id} id={section.id} title={section.title}>
+                  <ChartSectionCard section={section} provenance={provenance} />
+                </SectionBoundary>
               ))}
               {groupDocs.map((doc) => (
-                <SectionTable
-                  key={doc.id}
-                  doc={doc}
-                  provenance={provenance}
-                  periodLabels={manifest.period_labels}
-                />
+                <SectionBoundary key={doc.id} id={doc.id} title={doc.title}>
+                  <SectionTable
+                    doc={doc}
+                    provenance={provenance}
+                    periodLabels={manifest.period_labels}
+                  />
+                </SectionBoundary>
               ))}
             </>,
           ],
@@ -243,20 +247,8 @@ function Dashboard({
           {activeMacro}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          {(
-            {
-              Contributors:
-                'Explore the people behind Hiero. Follow contribution activity, collaboration, and community growth.',
-              Governance:
-                'Understand project stewardship, role coverage, and the people guiding the ecosystem.',
-              HIPs: 'Follow improvement proposals from discussion to implementation.',
-              'Security & scorecards':
-                'Explore repository health, security practices, and scorecard results.',
-              'Issues & onboarding': 'Track the path from first issue to meaningful contribution.',
-              Community: 'Discover how the Hiero community connects and grows.',
-              Releases: 'Follow release activity and delivery across the ecosystem.',
-            } as Record<string, string>
-          )[activeMacro] ?? 'Explore activity and insights across the Hiero ecosystem.'}
+          {manifest.macro_summaries?.[activeMacro] ??
+            'Explore activity and insights across the Hiero ecosystem.'}
         </p>
         {narrowHeader && dataAsOf && (
           <div className="mt-3">

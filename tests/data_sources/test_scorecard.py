@@ -7,7 +7,7 @@ import pytest
 import requests
 
 from hiero_analytics.data_sources.models import ScorecardRecord
-from hiero_analytics.data_sources.scorecard import fetch_repo_scorecard
+from hiero_analytics.data_sources.scorecard import fetch_repo_scorecard, scorecard_url
 
 MOCK_RESPONSE = {
     "score": 7.5,
@@ -87,3 +87,15 @@ def test_scorecard_uses_requested_organisation(mock_get):
     mock_get.return_value.json.return_value = MOCK_RESPONSE
     fetch_repo_scorecard("analytics", org="hiero-hackers")
     assert mock_get.call_args.args[0] == "https://api.scorecard.dev/projects/github.com/hiero-hackers/analytics"
+
+
+def test_scorecard_url_substitutes_the_org():
+    """Each org queries its own repos, through the default or an override."""
+    assert scorecard_url("sdk", "hiero-hackers") == "https://api.scorecard.dev/projects/github.com/hiero-hackers/sdk"
+    assert scorecard_url("sdk", "o", "https://mirror.test/{org}") == "https://mirror.test/o/sdk"
+
+
+def test_scorecard_url_rejects_an_org_less_override():
+    """An old-style override would silently query one org for all; fail loudly instead."""
+    with pytest.raises(ValueError, match=r"\{org\} placeholder"):
+        scorecard_url("sdk", "hiero-hackers", "https://mirror.test/projects/github.com/hiero-ledger")

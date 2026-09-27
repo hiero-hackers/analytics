@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense } from 'react';
-import { useUrlIndex, useUrlList } from '../urlState';
+import { parseIndex, useUrlIndex, useUrlList } from '../urlState';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
@@ -166,7 +166,7 @@ export function ChartSectionCard({
   const shared: Record<string, number> = Object.fromEntries(
     sharedAxes.map((axis, i) => [
       axis.key,
-      Math.min(Number.parseInt(rawShared[i] ?? '0', 10) || 0, axis.labels.length - 1),
+      Math.min(parseIndex(rawShared[i]), axis.labels.length - 1),
     ]),
   );
   const setShared = (next: Record<string, number>) =>

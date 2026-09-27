@@ -109,9 +109,11 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
         config={config}
         className="aspect-auto w-full"
         style={{ height: Math.max(order.length, 3) * ROW_HEIGHT + AXIS_HEIGHT }}
-        aria-label={`${title}: ${integer.format(rows.length)} releases across ${order.length} ${nouns}. Choose Data for the full list.`}
       >
-        <ScatterChart margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+        <ScatterChart
+          aria-label={`${title}: ${integer.format(rows.length)} releases across ${order.length} ${nouns}. Choose Data for the full list.`}
+          margin={{ top: 8, right: 16, left: 0, bottom: 4 }}
+        >
           <CartesianGrid horizontal={false} strokeDasharray="3 3" />
           <XAxis
             type="number"

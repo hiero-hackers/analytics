@@ -6,8 +6,9 @@ sections, chart sections, bespoke views, and metrics the API lists, so adding
 analytics on the Python side rarely requires frontend changes.
 
 Three kinds of content arrive from the API. _Sections_ are tables, rendered
-generically from their column specs. _Chart sections_ are PNG galleries with
-their notes and step-by-step methodology. _Views_ are the bespoke cases a table
+generically from their column specs. _Chart sections_ are galleries of
+interactive charts, drawn from each variant's JSON dataset, with their notes
+and step-by-step methodology. _Views_ are the bespoke cases a table
 cannot express — today the HIP coverage matrix and governance board — which the
 Python side ships as pure data (`export/hip_views.py`) so the component owns
 only the rendering.
@@ -54,6 +55,23 @@ npm run dev                            # the app, on http://localhost:5173
 - **Type:** one self-hosted family, Public Sans (the CSP allows fonts from
   `'self'` only, so it ships in the bundle via `@fontsource-variable`). Numbers
   that line up in columns use `tabular-nums`.
+
+## Third-party requests
+
+The CSP in `index.html` keeps everything on `'self'` except images from
+`https://avatars.githubusercontent.com` (contributor avatars, `ContributorCell`)
+and `https://github.com` (org avatars, `OrgSwitcher`, which redirect to the
+avatar host). This is a deliberate trade-off: the pictures make long contributor
+tables scannable, but GitHub sees the reader's IP address and which avatars,
+and therefore which contributor lists, they load. To keep that exposure small, the
+images load lazily (only rows scrolled into view) with
+`referrerPolicy="no-referrer"`, so GitHub is not told which page asked. A
+failed or blocked image falls back to initials, so a browser or extension that
+blocks third-party images loses nothing but the pictures.
+
+If that exposure is no longer acceptable, download the avatars in the pipeline,
+serve them from `'self'`, and drop both origins from `img-src`. Don't add any
+other origin without the same written reasoning here.
 
 ## Adding to the dashboard
 

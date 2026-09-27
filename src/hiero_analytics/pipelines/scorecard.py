@@ -64,7 +64,8 @@ def main(org: str = ORG):
     scorecards = fetch_all_scorecards(repos, org=org)
 
     if not scorecards:
-        logger.warning("No scorecards published; exporting empty datasets")
+        logger.warning("No scorecards fetched")
+        return
 
     df = scorecard_to_dataframe(scorecards)
     save_dataframe(df, org_data_dir / "org_scorecard.csv")

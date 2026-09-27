@@ -208,13 +208,15 @@ def main(org: str = ORG) -> None:
         "hip_repo_activity.csv": build_repo_activity(evidence),
         "hip_repo_engagement.csv": engagement,
         "hip_summary.csv": summary,
-        "hip_activity_by_status.csv": activity_by_status(summary),
         "hip_approved_no_activity.csv": _approved_no_activity(summary),
         "hip_process_checks.csv": build_process_checks(summary),
         "hip_adoption_funnel.csv": build_adoption_funnel(summary),
     }
     for filename, frame in tables.items():
         save_dataframe(frame, org_data_dir / filename)
+    # Chart data only, unlike the tables above: no rows means no chart, so no file.
+    if not (activity := activity_by_status(summary)).empty:
+        save_dataframe(activity, org_data_dir / "hip_activity_by_status.csv")
 
     _plot_engagement(engagement, org, org_charts_dir)
     _plot_adoption_funnel(tables["hip_adoption_funnel.csv"], org, org_charts_dir)

@@ -4,7 +4,7 @@
  * Wheel zoom needs Ctrl/⌘ so a plain wheel still scrolls the page.
  */
 
-import { useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import { useCallback, useMemo, useRef, useState, type PointerEvent } from 'react';
 import { MinusIcon, PlusIcon, RotateCcwIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,12 @@ const PAD = 48;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
 
+type Viewport = { zoom: number; x: number; y: number };
+const zoomed = (view: Viewport, factor: number): Viewport => ({
+  ...view,
+  zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.zoom * factor)),
+});
+
 /** plotting/network.py's marker area (140 + 260·√active pt²) as a radius, enlarged for card width. */
 const radius = (active: number) => 1.6 * Math.sqrt((140 + 260 * Math.sqrt(active)) / Math.PI);
 /** Room a node claims: its bubble with the label below it, or the label's half-width if wider. */
@@ -54,7 +60,7 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
   // A stale link (a threshold this document no longer offers) shows every link.
   const minShared = steps.includes(Number(linkedMin)) ? Number(linkedMin) : (steps[0] ?? 0);
   const edges = data.edges.filter((edge) => edge.shared >= minShared);
-  const [view, setView] = useState({ zoom: 1, x: 0, y: 0 });
+  const [view, setView] = useState<Viewport>({ zoom: 1, x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const member = data.member_label;
@@ -139,11 +145,22 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
   const lit = shown ? new Set([shown, ...(neighbours.get(shown) ?? []).map((n) => n.id)]) : null;
   const dimmed = (id: string) => (lit ? !lit.has(id) : needle ? !matches.has(id) : false);
 
-  const zoomBy = (factor: number) =>
-    setView((current) => ({
-      ...current,
-      zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, current.zoom * factor)),
-    }));
+  const zoomBy = (factor: number) => setView((current) => zoomed(current, factor));
+  // React registers `onWheel` as a passive listener, where preventDefault is a
+  // no-op and Ctrl+wheel (and trackpad pinch) would zoom the page too, so the
+  // wheel listener is attached natively. The graph renders inline and in the
+  // lightbox; each copy's ref wires its own listener and removes it on unmount.
+  const attachSvg = useCallback((svg: SVGSVGElement | null) => {
+    svgRef.current = svg;
+    if (!svg) return;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      setView((current) => zoomed(current, event.deltaY < 0 ? 1.15 : 1 / 1.15));
+    };
+    svg.addEventListener('wheel', onWheel, { passive: false });
+    return () => svg.removeEventListener('wheel', onWheel);
+  }, []);
   const toSvg = (dx: number) => {
     const width = svgRef.current?.getBoundingClientRect().width || bounds.width;
     return (dx * bounds.width) / width;
@@ -161,11 +178,6 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
       x: start.ox + toSvg(event.clientX - start.x) / current.zoom,
       y: start.oy + toSvg(event.clientY - start.y) / current.zoom,
     }));
-  };
-  const onWheel = (event: WheelEvent<SVGSVGElement>) => {
-    if (!event.ctrlKey && !event.metaKey) return;
-    event.preventDefault();
-    zoomBy(event.deltaY < 0 ? 1.15 : 1 / 1.15);
   };
 
   const scope = focus ? new Set([focus, ...(neighbours.get(focus) ?? []).map((n) => n.id)]) : null;
@@ -283,7 +295,7 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
               </Button>
             </div>
             <svg
-              ref={svgRef}
+              ref={attachSvg}
               role="group"
               aria-label={`${title}: ${data.nodes.length} repositories, ${edges.length} links. Tab to a repository and press Enter to show its links.`}
               viewBox={`0 0 ${bounds.width} ${bounds.height}`}
@@ -292,7 +304,6 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
               onPointerMove={onPointerMove}
               onPointerUp={() => (drag.current = null)}
               onPointerLeave={() => (drag.current = null)}
-              onWheel={onWheel}
               onKeyDown={(event) => event.key === 'Escape' && setSelected(null)}
             >
               <g

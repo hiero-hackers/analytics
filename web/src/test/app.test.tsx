@@ -27,6 +27,16 @@ const openGovernance = async () => {
 };
 
 describe('App shell', () => {
+  it('heads each tab with its manifest summary, or a generic line when it has none', async () => {
+    await openGovernance();
+    expect(screen.getByText('Who holds which role, and where.')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Contributors' }));
+    expect(
+      await screen.findByText('Explore activity and insights across the Hiero ecosystem.'),
+    ).toBeInTheDocument();
+  });
+
   it('renders a macro tab per manifest macro and switches between them', async () => {
     render(<App />);
 
@@ -215,6 +225,21 @@ describe('Organisation diversity card (#435)', () => {
     expect(chartVariant('Single-employer repos by org')).toContain('Committers');
     // The chart with no role axis is untouched by the card's tabs.
     expect(chartVariant('Single-employer teams by org')).toContain('Single-employer teams by org');
+  });
+
+  // Out-of-range tabs clamp to the last one; anything else falls back to the first.
+  it.each([
+    ['-1', 'Maintainers'],
+    ['x', 'Maintainers'],
+    ['99', 'Committers'],
+    ['1,-4', 'Committers'],
+  ])('opens a hand-edited link with card tab %s on %s', async (tab, expected) => {
+    window.location.hash = `org-diversity.tab=${tab}`;
+    await openDiversity();
+
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
+    expect(within(axis).getByRole('radio', { name: expected })).toBeChecked();
+    expect(chartVariant('Role-holders by organisation')).toContain(expected);
   });
 
   it('leads an odd run of half-width charts with a two-row chart', async () => {

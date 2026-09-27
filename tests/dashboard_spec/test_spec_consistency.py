@@ -11,6 +11,7 @@ from hiero_analytics.dashboard_spec import (
     COLUMN_FORMATS,
     CUSTOM_VIEW_MODULES,
     MACRO_GLOSSARIES,
+    MACRO_SUMMARIES,
     TABLE_FAMILIES,
     WIDE_CHARTS,
     table_variants,
@@ -117,6 +118,15 @@ def test_macro_glossaries_belong_to_real_macros():
         assert glossary["terms"], f"{macro_name}: glossary needs terms"
         # Data, not markup — the frontend owns the rendering.
         assert "<" not in str(glossary), f"{macro_name}: glossary must not carry HTML"
+
+
+def test_every_macro_has_a_plain_one_line_summary():
+    """Each tab states its purpose under its title: one line of text, no markup."""
+    assert set(MACRO_SUMMARIES) == _macro_names()
+    for macro_name, summary in MACRO_SUMMARIES.items():
+        assert summary.strip(), f"{macro_name}: summary is empty"
+        assert "\n" not in summary, f"{macro_name}: summary must be one line"
+        assert "<" not in summary, f"{macro_name}: summary must not carry HTML"
 
 
 def test_activity_specs_use_the_shared_period_set():

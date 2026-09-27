@@ -1,8 +1,11 @@
 """Validated numeric datasets for interactive charts.
 
 Reads the CSV a dashboard spec's ``interactive_sources`` entry names, checks it,
-and emits the JSON document the web app renders. It never aggregates, so the
-numbers are the analysis's. Kinds: timeseries, categories, matrix, network, events.
+and emits the JSON document the web app renders. The analysis's values pass
+through unchanged, never re-aggregated; the only statistic derived here is an
+optional median reference line (``reference: {"stat": "median"}``). Calendar
+gaps are filled with zero rows and categories are ordered for display. Kinds:
+timeseries, categories, matrix, network, events.
 """
 
 from __future__ import annotations
@@ -138,8 +141,13 @@ def _calendar(frame: pd.DataFrame, source: dict, series: list[dict], generated_a
             filled[entry["key"]] = filled[entry["key"]].ffill().fillna(start)
         else:
             filled[entry["key"]] = filled[entry["key"]].fillna(0)
-        filled[entry["key"]] = filled[entry["key"]].astype(frame[entry["key"]].dtype)
-    return filled.reset_index(names=category).fillna(0)
+    filled = filled.reset_index(names=category).fillna(0)
+    # Reindexing turns integer columns float (NaN in the new rows), so restore
+    # every one — series and detail alike — or a count serialises as 12.0.
+    for column in frame.columns:
+        if pd.api.types.is_integer_dtype(frame[column]):
+            filled[column] = filled[column].astype(frame[column].dtype)
+    return filled
 
 
 def _bucket_labels(first: datetime, last: datetime, frequency: str) -> list[str]:
@@ -263,7 +271,8 @@ def _matrix(source: dict, csv_path: Path, org: str, generated_at: str | None) ->
         # A blank cell is "not reported"; the sentinel is the source's own "could not score".
         absent = cells.isna() | (cells == sentinel if sentinel is not None else False)
         checked = _numbers(frame[~absent], column["key"], values, csv_path.name)
-        frame[column["key"]] = checked.reindex(frame.index).astype(object).where(~absent, None)
+        # Object before reindexing: an int64 column reindexed with gaps turns float first.
+        frame[column["key"]] = checked.astype(object).reindex(frame.index).where(~absent, None)
     if total := source.get("total"):
         frame[total["key"]] = _integral(_numbers(frame, total["key"], "number", csv_path.name))
     if sublabel := source.get("sublabel"):

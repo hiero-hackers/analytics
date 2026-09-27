@@ -7,6 +7,9 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.interactive import OWNERSHIP_SOURCES, SCORECARD_CHECKS
 
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Explore repository health, security practices, and scorecard results."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "Nothing generated for this org yet: the scorecard and repo-compliance "

@@ -46,6 +46,26 @@ def test_monthly_window_fills_gaps_and_preserves_counts(tmp_path):
     assert data["dimensions"] == ["period", "series"]
 
 
+def test_gap_filling_keeps_integer_details_integral(tmp_path):
+    """A gap-filled bucket must not turn integer detail counts into 12.0 in the JSON."""
+    path = tmp_path / "ts.csv"
+    path.write_text("month,prs,reviewers\n2026-01,5,12\n2026-03,7,3\n")
+    source = {
+        "kind": "timeseries",
+        "file": "ts.csv",
+        "category": "month",
+        "frequency": "month",
+        "series": [{"key": "prs", "label": "PRs"}],
+        "details": [{"key": "reviewers", "label": "Reviewers"}],
+        "metric": "m",
+        "unit": "u",
+        "population": "p",
+    }
+    data = chart_document(source, path, "org", "2026-03-15T00:00:00+00:00")
+    assert [row["reviewers"] for row in data["rows"]] == [12, 0, 3]
+    assert '"reviewers": 12,' in json.dumps(data["rows"][0])
+
+
 @pytest.mark.parametrize(
     ("frequency", "buckets", "expected"),
     [
@@ -140,15 +160,43 @@ def test_chart_note_does_not_replace_counting_rule(tmp_path, monkeypatch):
     monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
     monkeypatch.setattr(data_api, "CHART_NOTES", {"roles.png": "Read the bars left to right."})
     monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "images")
+    (tmp_path / "images" / "org").mkdir(parents=True)
+    (tmp_path / "images" / "org" / "roles.png").write_bytes(b"\x89PNG")
     output = tmp_path / "api" / "org"
     result = data_api._org_chart_sections("org", source, output)
     variant = result[0]["charts"][0]["variants"][0]
-    assert variant["image_available"] is False
+    assert variant["file"] == "charts/org/org/roles.png"
     assert variant["interactive"] == {"kind": "timeseries", "path": "org/charts/roles.json"}
     document = json.loads((output / "charts/roles.json").read_text())
     assert document["rows"][0]["general_user"] == 9
     assert document["note"] == "Read the bars left to right."
     assert "Bots are excluded" in document["population"]
+
+
+def test_a_dataset_without_its_png_lists_no_variant(tmp_path, monkeypatch):
+    """v1 is additive-only: every listed ``file`` is a PNG that exists, dataset or not."""
+    source = tmp_path / "source"
+    source.mkdir()
+    write_counts(source, "year", ["2026"], [9])
+    spec = {
+        "name": "Governance",
+        "charts": {
+            "org": [
+                {
+                    "id": "maintainer-pipeline",
+                    "title": "Pipeline",
+                    "description": "Roles",
+                    "files": [("Role counts", [("All time", "roles.png")])],
+                    "interactive_sources": {"roles.png": {**roles("year"), "file": "counts.csv"}},
+                }
+            ]
+        },
+    }
+    monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
+    monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "images")
+    output = tmp_path / "api" / "org"
+    assert data_api._org_chart_sections("org", source, output) == []
+    assert not (output / "charts").exists()
 
 
 def test_ranked_categories_keep_every_row(tmp_path):
@@ -253,6 +301,27 @@ def test_matrix_takes_month_columns_in_order_and_nulls_inconclusive(tmp_path):
     assert row["repo"] == "a"
     assert row["Fuzzing"] is None and row["Maintained"] == 5
     assert (data["scale"]["max"], data["missing"], data["value_format"]) == (10, "Not scored", "decimal")
+
+
+def test_count_matrix_with_a_blank_cell_keeps_integer_counts(tmp_path):
+    """One unreported cell must not turn the rest of its column into floats."""
+    path = tmp_path / "mx.csv"
+    path.write_text("repo,2026-01,2026-02\na,12,\nb,3,4\n")
+    source = {
+        "kind": "matrix",
+        "file": "mx.csv",
+        "row": "repo",
+        "row_label": "Repo",
+        "columns": "months",
+        "value_label": "v",
+        "metric": "m",
+        "unit": "u",
+        "population": "p",
+    }
+    data = chart_document(source, path, "org")
+    assert json.dumps(data["rows"]) == json.dumps(
+        [{"repo": "a", "2026-01": 12, "2026-02": None}, {"repo": "b", "2026-01": 3, "2026-02": 4}]
+    )
 
 
 def test_network_tables_carry_the_png_layout(tmp_path):

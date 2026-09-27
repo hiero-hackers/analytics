@@ -7,6 +7,9 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.interactive import DISCORD_SOURCES
 
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Discover how the Hiero community connects and grows."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "Discord serves the whole Hiero ecosystem, so community activity is published "

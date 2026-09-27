@@ -191,10 +191,9 @@ export type ChartDocument = SeriesDocument | MatrixDocument | NetworkDocument | 
 
 export interface ChartVariant {
   interactive?: { kind: ChartDocument['kind']; path: string };
-  /** Whether a PNG exists for external reports; the dashboard never shows it. */
-  image_available?: boolean;
   label: string;
-  /** The PNG name the variant is keyed by: a stable ID, not something to fetch. */
+  /** The variant's PNG, which always exists (v1 lists no variant without one). The
+   *  dashboard keys the variant by it and draws from `interactive` instead. */
   file: string;
   /**
    * This tab's own "how to read this" and derivation steps. A chart's tabs show
@@ -358,6 +357,8 @@ export interface Manifest {
   macro_order?: string[];
   /** Why a tab may be empty for an org — shown in place of a blank tab. */
   macro_absent_notes?: Record<string, string>;
+  /** Each tab's one-line purpose, shown under its title. */
+  macro_summaries?: Record<string, string>;
   /** Macro name -> ordered section-group names; each tab renders as this sequence. */
   group_order?: Record<string, string[]>;
   /** Display labels for rolling periods ("30d" -> "30 days"). */

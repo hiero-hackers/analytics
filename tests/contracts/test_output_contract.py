@@ -659,12 +659,17 @@ def test_every_chart_variant_has_a_data_source():
 
 
 def test_every_produced_chart_has_interactive_data(outputs_root: Path):
-    """Every published chart variant has an interactive document on disk."""
+    """Every published chart variant has its PNG and an interactive document on disk.
+
+    The PNG half is the v1 additive-only guarantee: ``file`` has always named an
+    image that exists, so a consumer built before interactive charts still works.
+    """
     manifest = json.loads((outputs_root / "data/api/v1/manifest.json").read_text())
     for org in manifest["orgs"].values():
         for section in org["chart_sections"]:
             for chart in section["charts"]:
                 for variant in chart["variants"]:
+                    assert (outputs_root / variant["file"]).is_file(), variant["file"]
                     assert variant.get("interactive"), variant["file"]
                     target = outputs_root / "data/api/v1" / variant["interactive"]["path"]
                     assert target.exists()

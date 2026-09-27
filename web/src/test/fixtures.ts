@@ -301,6 +301,7 @@ export const MANIFEST: Manifest = {
   },
   period_labels: { '30d': '1 month' },
   issues_url: 'https://example.test/issues',
+  macro_summaries: { Governance: 'Who holds which role, and where.' },
   macro_absent_notes: {
     Governance:
       "Governance analytics need a published governance config; this org doesn't have one.",

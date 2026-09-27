@@ -94,7 +94,6 @@ const provenance = { git_sha: 'abc', data_as_of: null };
 const variant = (path: string, kind: ChartDocument['kind'] = 'timeseries'): ChartVariant => ({
   label: '1 year',
   file: 'legacy.png',
-  image_available: false,
   interactive: { kind, path },
 });
 const serve = (document: unknown) =>
@@ -192,6 +191,39 @@ describe('Interactive charts', () => {
     // Bars and areas stack natively, so the choice only appears for lines.
     await userEvent.click(screen.getByRole('radio', { name: 'Area' }));
     expect(screen.queryByRole('radio', { name: 'Cumulative' })).not.toBeInTheDocument();
+  });
+
+  it('names the focusable chart surface, not its wrapper', async () => {
+    // The shared stub never reports a size, so Recharts would draw nothing.
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        report: ResizeObserverCallback;
+        constructor(report: ResizeObserverCallback) {
+          this.report = report;
+        }
+        observe(target: Element) {
+          const entry = { target, contentRect: { width: 640, height: 340 } };
+          this.report([entry as unknown as ResizeObserverEntry], this as never);
+        }
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+    serve({ ...data, id: 'named' });
+    const { container } = render(
+      <InteractiveChart
+        variant={variant('test/named.json')}
+        title="Role activity"
+        provenance={provenance}
+      />,
+    );
+    const surface = await screen.findByRole('application', {
+      name: /^Role activity\. Use the arrow keys on the chart/,
+    });
+    expect(surface.tagName.toLowerCase()).toBe('svg');
+    expect(surface).toHaveAttribute('tabindex', '0');
+    expect(container.querySelector('[data-slot="chart"][aria-label]')).toBeNull();
   });
 
   it('uses the selected series for the table and downloaded CSV', async () => {

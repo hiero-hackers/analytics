@@ -17,6 +17,9 @@ from hiero_analytics.dashboard_spec.interactive import (
     REPO_GROWTH_SOURCES,
 )
 
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Explore the people behind Hiero. Follow contribution activity, collaboration, and community growth."
+
 CHART_MACRO = {
     "name": "Contributors",
     "charts": {
@@ -205,8 +208,9 @@ CHART_NOTES = {
     "that month (issues ×2, reviews ×3, PRs opened ×3, merges ×2) — darker blue = more active. Aggregated "
     "straight from the events, so each counts once. The 25 busiest repositories are shown; bots are "
     "excluded.",
-    "contributor_counts.png": "The 20 repositories with the most distinct contributors over the last six months; bar height is "
-    "the number of unique contributors.",
+    "contributor_counts.png": "Repositories ranked by distinct contributors over the last six months; bar height is the "
+    "number of unique contributors. The static image shows the top 20; the interactive view and CSV hold every "
+    "repository.",
     "language_distribution.png": "How many repositories use each primary language (current snapshot). Repositories with no "
     "detected language are grouped as 'Unknown'.",
     "push_activity.png": "The share of repositories that received a push in the last 30 days (active) versus those that "
@@ -241,7 +245,7 @@ CHART_METHODOLOGY = {
     "contributor_counts.png": [
         "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
         "Count the distinct contributors active in each repository.",
-        "Keep the top 20 repositories by that count.",
+        "Rank the repositories by that count; the static image keeps the top 20, the CSV keeps them all.",
     ],
     "language_distribution.png": [
         "List the organisation's repositories and read GitHub's primary-language field for each.",

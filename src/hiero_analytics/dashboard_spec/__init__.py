@@ -40,6 +40,7 @@ __all__ = [
     "MACRO_GLOSSARIES",
     "MACRO_GROUP_ORDER",
     "MACRO_PARENTS",
+    "MACRO_SUMMARIES",
     "METRIC_ANNOTATIONS",
     "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
@@ -89,6 +90,11 @@ MACRO_PARENTS = {
 MACRO_ABSENT_NOTES = {
     family.CHART_MACRO["name"]: family.ABSENT_NOTE for family in _FAMILIES if hasattr(family, "ABSENT_NOTE")
 }
+
+
+# The one-line purpose shown under each tab's title. Every family declares one,
+# so a new tab cannot ship with the frontend's generic fallback by accident.
+MACRO_SUMMARIES = {family.CHART_MACRO["name"]: family.SUMMARY for family in _FAMILIES}
 
 
 def _group_order(family) -> list[str]:

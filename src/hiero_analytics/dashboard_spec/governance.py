@@ -28,6 +28,9 @@ from hiero_analytics.dashboard_spec.interactive import (
 # "this looks wrong" everywhere else.
 AFFILIATION_ISSUE_URL = PROJECT_ISSUES_URL
 
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Understand project stewardship, role coverage, and the people guiding the ecosystem."
+
 # Shown when the selected org has no content for this tab (see the manifest's
 # macro_absent_notes): say *why*, so absence reads as a property of the data,
 # not a bug.

@@ -11,6 +11,7 @@ import { CoverageMatrix, type JumpRequest } from './CoverageMatrix';
 import { type CsvExportSource } from '../csv';
 import { CopyLinkButton } from './CopyLinkButton';
 import { CsvDownloadButton } from './CsvDownloadButton';
+import { SectionBoundary } from './ErrorBoundary';
 import type { EvidenceItem } from './EvidencePanel';
 import { SectionCard } from './SectionCard';
 import { StatusBoard } from './StatusBoard';
@@ -116,41 +117,43 @@ export function ViewCards({
       {views.map((view) => {
         const exportSource = view.kind === 'board' ? boardExport(view) : matrixExport(view);
         return (
-          <SectionCard
-            key={view.id}
-            id={view.id}
-            title={view.title}
-            badge={view.badge}
-            description={view.description}
-            generatedAt={view.generated_at}
-            stale={view.stale}
-            actions={
-              <>
-                <CopyLinkButton sectionId={view.id} />
-                <CsvDownloadButton
-                  provenance={provenance}
-                  payload={() => ({
-                    ...exportSource,
-                    total: exportSource.rows.length,
-                    dataAsOf: view.generated_at,
-                  })}
+          <SectionBoundary key={view.id} id={view.id} title={view.title}>
+            <SectionCard
+              id={view.id}
+              title={view.title}
+              badge={view.badge}
+              description={view.description}
+              generatedAt={view.generated_at}
+              stale={view.stale}
+              actions={
+                <>
+                  <CopyLinkButton sectionId={view.id} />
+                  <CsvDownloadButton
+                    provenance={provenance}
+                    payload={() => ({
+                      ...exportSource,
+                      total: exportSource.rows.length,
+                      dataAsOf: view.generated_at,
+                    })}
+                  />
+                </>
+              }
+            >
+              {view.kind === 'board' ? (
+                // The board names the view its chips jump to, so a future board
+                // could target something other than the coverage matrix.
+                <StatusBoard
+                  view={view}
+                  onJump={(hip) =>
+                    view.target_view === matrix?.id &&
+                    setJump({ hip, nonce: ++jumpCounter.current })
+                  }
                 />
-              </>
-            }
-          >
-            {view.kind === 'board' ? (
-              // The board names the view its chips jump to, so a future board
-              // could target something other than the coverage matrix.
-              <StatusBoard
-                view={view}
-                onJump={(hip) =>
-                  view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
-                }
-              />
-            ) : (
-              <CoverageMatrix view={view} evidence={evidence} jump={jump} />
-            )}
-          </SectionCard>
+              ) : (
+                <CoverageMatrix view={view} evidence={evidence} jump={jump} />
+              )}
+            </SectionCard>
+          </SectionBoundary>
         );
       })}
     </>

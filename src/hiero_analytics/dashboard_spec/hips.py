@@ -12,6 +12,9 @@ from __future__ import annotations
 
 from hiero_analytics.dashboard_spec.interactive import HIP_STATUS_SOURCE
 
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Follow improvement proposals from discussion to implementation."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "The HIP process — specs in the hiero-ledger governance repo and the PRs that "

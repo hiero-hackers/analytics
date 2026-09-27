@@ -127,7 +127,6 @@ const provenance = { git_sha: 'abc', data_as_of: null };
 const variant = (document: ChartDocument, label = 'View'): ChartVariant => ({
   label,
   file: 'legacy.png',
-  image_available: false,
   interactive: { kind: document.kind, path: `test/${document.id}.json` },
 });
 function show(document: ChartDocument, title = 'Chart') {
@@ -289,6 +288,31 @@ describe('Network', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Download CSV' }));
     const rows = vi.mocked(downloadCsv).mock.calls[0][0].rows;
     expect(rows.find((row) => row.repo === 'hiero-sdk-go')?.linked).toBe('hiero-sdk-js (2)');
+  });
+
+  it('zooms on Ctrl+wheel without zooming the page, and leaves a plain wheel to scroll', async () => {
+    show({ ...network, id: 'net-wheel' }, 'Network');
+    const svg = await screen.findByRole('group', { name: /^Network: 4 repositories/ });
+    const scale = () =>
+      svg
+        .querySelector('g')!
+        .getAttribute('transform')!
+        .match(/scale\(([^)]+)\)/)![1];
+
+    const plain = new WheelEvent('wheel', { deltaY: -100, bubbles: true, cancelable: true });
+    act(() => void svg.dispatchEvent(plain));
+    expect(plain.defaultPrevented).toBe(false);
+    expect(scale()).toBe('1');
+
+    const pinch = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    act(() => void svg.dispatchEvent(pinch));
+    expect(pinch.defaultPrevented).toBe(true);
+    expect(scale()).toBe('1.15');
   });
 
   it('shows every pair in the matrix view and selects a repository from its name', async () => {

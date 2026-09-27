@@ -27,10 +27,11 @@ import {
 } from '@/components/ui/table';
 import type { ChartDetail, ColumnSpec, Row, SeriesDocument, TimeseriesDocument } from '../../api';
 import { dimensionOf, matches, toggle, useFocus } from '../../focus';
-import { useUrlFlag, useUrlList, useUrlParam } from '../../urlState';
+import { useBufferedUrlParam, useUrlFlag, useUrlList, useUrlParam } from '../../urlState';
 import { VariantTabs } from '../VariantTabs';
 import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
 import { Funnel, Meter } from './Composition';
+import { cumulative, overviewTotals, share, viewRows, type ViewRow } from './seriesRows';
 import {
   decimal,
   formatBucket,
@@ -58,13 +59,6 @@ const labelWidth = (labels: string[]) =>
     184,
     Math.max(64, Math.ceil(Math.max(0, ...labels.map((l) => shorten(l).length)) * 7.2) + 12),
   );
-
-/** A row as displayed: its category label, visible total, and (when normalised) shares. */
-type ViewRow = Row & { category: string; total: number; partial?: boolean };
-
-const share = (key: string) => `${key}__share`;
-/** The running total up the stack to (and including) a series, drawn by cumulative lines. */
-const cumulative = (key: string) => `${key}__cumulative`;
 
 /** Series longer than this get an overview strip to brush a span of buckets. */
 const OVERVIEW_MIN = 24;
@@ -161,11 +155,14 @@ export function SeriesView({
   const mark = timeseries && ['bar', 'line', 'area'].includes(linkedMark) ? linkedMark : data.mark;
   const composition = mark === 'meter' || mark === 'funnel';
   // A span selects existing buckets only; people are never re-aggregated across them.
-  const [range, setRange] = useUrlParam(`${data.id}.range`, 'all');
+  // The brush previews while it moves and writes the URL once it settles.
+  const [range, previewRange, setRange] = useBufferedUrlParam(`${data.id}.range`, 'all');
   const buckets = timeseries ? data.rows.map((row) => row.bucket) : [];
   const [spanStart, spanEnd] = timeseries ? spanOf(range, buckets) : [0, data.rows.length - 1];
   const spanned = timeseries && (spanStart > 0 || spanEnd < data.rows.length - 1);
   const preset = PRESETS.indexOf(spanned ? range : 'all');
+  const rangeOf = (start: number, end: number) =>
+    start === 0 && end === buckets.length - 1 ? 'all' : `${buckets[start]}~${buckets[end]}`;
   const selectedRows = spanned ? data.rows.slice(spanStart, spanEnd + 1) : data.rows;
   const overview = timeseries && data.rows.length > OVERVIEW_MIN;
 
@@ -184,32 +181,16 @@ export function SeriesView({
   const format = (value: number) =>
     (data.value_format === 'integer' ? integer : decimal).format(value);
 
-  const rows: ViewRow[] = (selectedRows as Row[])
-    .filter((row) => !groupSpec || row[groupSpec.key] === group)
-    .map((row) => {
-      const total = visible.reduce((sum, series) => sum + Number(row[series.key]), 0);
-      const shares = normalized
-        ? Object.fromEntries(
-            visible.map((series) => [
-              share(series.key),
-              total ? (Number(row[series.key]) / total) * 100 : 0,
-            ]),
-          )
-        : {};
-      let running = 0;
-      const stacked = stackedLines
-        ? Object.fromEntries(
-            visible.map((series) => {
-              running += Number(normalized ? shares[share(series.key)] : row[series.key]);
-              return [cumulative(series.key), running];
-            }),
-          )
-        : {};
-      return { ...row, ...shares, ...stacked, category: String(row[categoryKey]), total };
-    });
   // A ranking follows the series on show; otherwise the source order stands
   // (calendar order, a funnel's stages, the analysis's concentration sort).
-  if (data.rank) rows.sort((a, b) => b.total - a.total);
+  const rows = viewRows(selectedRows as Row[], {
+    visible,
+    categoryKey,
+    group: groupSpec ? { key: groupSpec.key, value: group } : null,
+    normalized,
+    stackedLines,
+    rank: data.rank,
+  });
   // A lead chart has the height of two stacked peers, so it ranks more rows.
   const topN = data.top_n !== null && roomy ? Math.ceil(data.top_n * 1.5) : data.top_n;
   const limited = topN !== null && rows.length > topN;
@@ -220,12 +201,7 @@ export function SeriesView({
   const dim = (row: ViewRow) => !!focused && row !== focused;
   const anyPartial = rows.some((row) => row.partial);
   // The overview always spans every bucket, drawn as the visible series' total.
-  const overviewRows = overview
-    ? data.rows.map((row) => ({
-        bucket: row.bucket,
-        total: visible.reduce((sum, series) => sum + Number(row[series.key]), 0),
-      }))
-    : [];
+  const overviewRows = overview ? overviewTotals(data.rows as Row[], visible) : [];
   const nouns = plural(data.category.label.replace(/ \(UTC\)$/, ''));
 
   const columns: ColumnSpec[] = [
@@ -454,10 +430,12 @@ export function SeriesView({
                     }
                   : undefined
               }
-              aria-label={`${title}. Use the arrow keys on the chart to inspect ${nouns}, or choose Data.`}
             >
+              {/* The name goes on the chart's SVG, the element that takes focus (role
+                  "application"); on the wrapper div it would name nothing. */}
               <ComposedChart
                 accessibilityLayer
+                aria-label={`${title}. Use the arrow keys on the chart to inspect ${nouns}, or choose Data.`}
                 data={chartRows}
                 layout={horizontal ? 'vertical' : 'horizontal'}
                 // A reference line's label needs its own band above the first bar.
@@ -622,7 +600,10 @@ export function SeriesView({
                   use the arrow keys, to choose the span shown above
                 </p>
                 <ChartContainer config={config} className="aspect-auto h-[76px] w-full">
+                  {/* Only the brush's own handles take focus: a second, unnamed tab stop
+                      on the overview's surface would announce nothing useful. */}
                   <ComposedChart
+                    accessibilityLayer={false}
                     data={overviewRows}
                     margin={{ top: 4, right: 16, left: 16, bottom: 4 }}
                   >
@@ -638,11 +619,11 @@ export function SeriesView({
                       tickFormatter={(value) => formatBucket(String(value), data.frequency)}
                       onChange={({ startIndex, endIndex }) => {
                         if (startIndex === undefined || endIndex === undefined) return;
-                        setRange(
-                          startIndex === 0 && endIndex === buckets.length - 1
-                            ? 'all'
-                            : `${buckets[startIndex]}~${buckets[endIndex]}`,
-                        );
+                        previewRange(rangeOf(startIndex, endIndex));
+                      }}
+                      onDragEnd={({ startIndex, endIndex }) => {
+                        if (startIndex === undefined || endIndex === undefined) return;
+                        setRange(rangeOf(startIndex, endIndex));
                       }}
                     >
                       <AreaChart data={overviewRows}>

@@ -170,10 +170,27 @@ def test_plot_recent_activity_30d_filters_zero_d30_and_caps_top_n(channels_csv: 
     assert "#hiero-hips" not in passed_df["channel_label"].tolist()
 
 
+def test_category_breakdown_ranks_categories_and_splits_recent_from_earlier() -> None:
+    """The chart and its CSV share one frame: busiest category first, earlier = total - last 90 days."""
+    channels = pd.DataFrame(
+        {
+            "category": ["Dev", "General", "Dev", "Events"],
+            "total": [100, 300, 50, 10],
+            "d90": [40, 20, 10, 10],
+        }
+    )
+    categories = runner.category_breakdown(channels)
+    assert categories.to_dict("records") == [
+        {"category": "General", "total": 300, "last_90d": 20, "earlier": 280},
+        {"category": "Dev", "total": 150, "last_90d": 50, "earlier": 100},
+        {"category": "Events", "total": 10, "last_90d": 10, "earlier": 0},
+    ]
+
+
 def test_plot_category_breakdown_writes_png(tmp_path: Path, channels_csv: Path) -> None:
     """Test that plot_category_breakdown writes a PNG file."""
     output = tmp_path / "categories.png"
-    runner.plot_category_breakdown(runner.load_channels_df(), output)
+    runner.plot_category_breakdown(runner.category_breakdown(runner.load_channels_df()), output)
 
     assert output.exists() and output.stat().st_size > 0
 

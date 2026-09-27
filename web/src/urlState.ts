@@ -4,7 +4,7 @@
  * no `hashchange`, so writes notify subscribers directly.
  */
 
-import { useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 const listeners = new Set<() => void>();
 
@@ -56,20 +56,75 @@ export function useUrlParam(
   return [value, set];
 }
 
+/**
+ * A hash key driven by a continuous control (a brush drag). `preview` updates the
+ * view at once but writes the URL only after `delay` ms of quiet: Safari throws
+ * once a page calls `replaceState` 100 times in 30 seconds, which one long drag
+ * can do. `set` writes immediately, dropping any pending preview.
+ */
+export function useBufferedUrlParam(
+  key: string,
+  fallback: string,
+  delay = 300,
+): [string, (value: string) => void, (value: string) => void] {
+  const [stored] = useUrlParam(key, fallback);
+  const [pending, setPending] = useState<string | null>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const commit = useCallback(
+    (value: string) => {
+      window.clearTimeout(timer.current);
+      timer.current = undefined;
+      setPending(null);
+      writeParams({ [key]: value === fallback ? null : value });
+    },
+    [key, fallback],
+  );
+  // A preview still pending at unmount is written rather than lost.
+  const flush = useRef<(() => void) | null>(null);
+  useEffect(() => () => flush.current?.(), []);
+
+  const preview = (value: string) => {
+    setPending(value);
+    window.clearTimeout(timer.current);
+    flush.current = () => commit(value);
+    timer.current = window.setTimeout(() => {
+      flush.current = null;
+      commit(value);
+    }, delay);
+  };
+  const set = (value: string) => {
+    flush.current = null;
+    commit(value);
+  };
+  return [pending ?? stored, preview, set];
+}
+
 /** A comma-separated list held in one key (e.g. hidden series). */
 export function useUrlList(key: string): [string[], (value: string[]) => void] {
   const [raw, setRaw] = useUrlParam(key);
   return [raw ? raw.split(',') : [], (value) => setRaw(value.join(','))];
 }
 
+/** A hand-edited or truncated link can carry any text; anything but a non-negative integer reads as 0. */
+export function parseIndex(raw: string | undefined): number {
+  const parsed = Number.parseInt(raw ?? '', 10);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 0;
+}
+
 /** A small integer held in one key (a tab or slide index). */
 export function useUrlIndex(key: string): [number, (value: number) => void] {
   const [raw, setRaw] = useUrlParam(key, '0');
-  const parsed = Number.parseInt(raw, 10);
-  return [
-    Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 0,
-    (value) => setRaw(String(value)),
-  ];
+  return [parseIndex(raw), (value) => setRaw(String(value))];
+}
+
+/** Drop every hash key under `prefix.` — a section's view state — in one history update. */
+export function clearParams(prefix: string) {
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  writeParams(
+    Object.fromEntries(
+      [...params.keys()].filter((key) => key.startsWith(`${prefix}.`)).map((key) => [key, null]),
+    ),
+  );
 }
 
 /** A boolean flag held in one key ("1" when on, absent when off). */

@@ -132,17 +132,22 @@ def plot_recent_activity_30d(channels: pd.DataFrame, output_path: Path, top_n: i
     )
 
 
-def plot_category_breakdown(channels: pd.DataFrame, output_path: Path) -> None:
-    """Channel grouping by topical category — total vs last-90-day activity."""
+def category_breakdown(channels: pd.DataFrame) -> pd.DataFrame:
+    """Messages per topical category: all-time, last 90 days, and the earlier remainder, busiest first."""
     grouped = (
         channels.groupby("category", as_index=False)
         .agg(total=("total", "sum"), last_90d=("d90", "sum"))
-        .sort_values("total", ascending=False)
+        .sort_values("total", ascending=False, kind="stable")
+        .reset_index(drop=True)
     )
+    grouped["earlier"] = grouped["total"] - grouped["last_90d"]
+    return grouped
+
+
+def plot_category_breakdown(categories: pd.DataFrame, output_path: Path) -> None:
+    """Channel grouping by topical category — total vs last-90-day activity."""
     plot_stacked_bar(
-        df=grouped.rename(columns={"total": "earlier", "last_90d": "last 90 days"}).assign(
-            earlier=lambda d: d["earlier"] - d["last 90 days"]
-        ),
+        df=categories.rename(columns={"last_90d": "last 90 days"}),
         x_col="category",
         stack_cols=["last 90 days", "earlier"],
         labels=["Last 90 days", "Earlier history"],
@@ -178,8 +183,7 @@ def main() -> None:
     channels = load_channels_df()
     monthly = load_monthly_df()
 
-    categories = channels.groupby("category", as_index=False).agg(total=("total", "sum"), last_90d=("d90", "sum"))
-    categories["earlier"] = categories["total"] - categories["last_90d"]
+    categories = category_breakdown(channels)
     save_dataframe(categories, data_dir / "hiero_discord_channel_categories.csv")
     save_dataframe(channels[["channel_label", "d30"]], data_dir / "hiero_discord_recent_activity_30d.csv")
     save_dataframe(monthly, data_dir / "hiero_discord_monthly_traffic.csv")
@@ -192,6 +196,6 @@ def main() -> None:
 
     plot_monthly_traffic(monthly, charts_dir / "hiero_discord_monthly_traffic.png")
     plot_recent_activity_30d(channels, charts_dir / "hiero_discord_recent_activity_30d.png")
-    plot_category_breakdown(channels, charts_dir / "hiero_discord_channel_categories.png")
+    plot_category_breakdown(categories, charts_dir / "hiero_discord_channel_categories.png")
 
     logger.info("Hiero Discord charts written to %s", charts_dir)
