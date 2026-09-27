@@ -307,7 +307,9 @@ describe('Interactive charts', () => {
         provenance={provenance}
       />,
     );
-    expect(await screen.findByRole('alert')).toHaveTextContent('could not be loaded');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Could not load chart data: Role activity',
+    );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Retry chart' }));
     await screen.findByRole('button', { name: 'Maintainers' });

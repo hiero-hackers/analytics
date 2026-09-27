@@ -58,7 +58,10 @@ export function SectionTable({
   // The tabs carry independent row sets, so a period the previous tab offered
   // may not exist on this one; fall back to its all-time rows rather than
   // rendering an undefined table.
-  const periodRows = (period && active.periods?.[period]) || active.rows;
+  // The period actually shown, so the tabs (and a printed "Time range") never
+  // name a window this tab lacks.
+  const effectivePeriod = period && active.periods?.[period] ? period : null;
+  const periodRows = (effectivePeriod && active.periods?.[effectivePeriod]) || active.rows;
   // The dashboard focus narrows this table only when it has that dimension's column.
   const [focus, setFocus] = useFocus();
   const focusColumn = focus
@@ -119,7 +122,7 @@ export function SectionTable({
         controls={
           <PeriodTabs
             periods={Object.keys(active.periods ?? {})}
-            active={period}
+            active={effectivePeriod}
             onChange={setPeriod}
             labels={periodLabels}
           />

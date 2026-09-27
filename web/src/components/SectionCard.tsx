@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { stamp } from '../format';
+import { usePrintMode } from '../printContext';
 
 export function SectionCard({
   id,
@@ -45,10 +46,12 @@ export function SectionCard({
   children: ReactNode;
 }) {
   const titleId = useId();
+  const printing = usePrintMode();
+  // Paper shows every card open; the reader's own collapse returns afterwards.
   const [open, setOpen] = useState(true);
 
   return (
-    <Collapsible asChild open={open} onOpenChange={setOpen}>
+    <Collapsible asChild open={printing || open} onOpenChange={setOpen}>
       <Card
         id={id}
         role="region"

@@ -10,6 +10,7 @@ import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
 import { fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
 import { downloadCsvText } from '../csv';
+import { usePrintMode } from '../printContext';
 import { CopyLinkButton } from './CopyLinkButton';
 import { DownloadButton } from './CsvDownloadButton';
 import { SectionCard } from './SectionCard';
@@ -37,6 +38,7 @@ function Figure({
   lead = false,
   axis,
   provenance,
+  hidden = false,
 }: {
   chart: ChartSpec;
   /** URL key for this figure's own tab, so a shared link opens the same variant. */
@@ -50,6 +52,8 @@ function Figure({
   /** Set when the card owns this chart's axis: it renders one tab row for all
    *  the charts that share it, so this figure shows none of its own. */
   axis?: { index: number; onSelect: (index: number) => void };
+  /** A slideshow's off-screen slide: mounted, so its variant and loaded data survive. */
+  hidden?: boolean;
 }) {
   const [own, setOwn] = useUrlIndex(stateKey);
   const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
@@ -57,6 +61,7 @@ function Figure({
   const fullRow = stretch || needsFullRow(chart, variant);
   return (
     <figure
+      hidden={hidden}
       aria-label={`${chart.title} — ${active.label}`}
       className={cn(
         'm-0 min-w-0 rounded-xl border bg-background/40 p-3',
@@ -76,8 +81,8 @@ function Figure({
       {active.interactive ? (
         <Suspense
           fallback={
-            <p role="status" className="p-10 text-center text-muted-foreground">
-              Loading chart…
+            <p role="status" data-print-pending className="p-10 text-center text-muted-foreground">
+              Loading chart: {chart.title} ({active.label})…
             </p>
           }
         >
@@ -143,6 +148,7 @@ export function ChartSectionCard({
   section: ChartSection;
   provenance: Manifest['provenance'];
 }) {
+  const printing = usePrintMode();
   // In the URL so Copy link reproduces the view; shared axes as `<section>.tab=<i>,<j>`.
   const [rawSlide, setSlide] = useUrlIndex(`${section.id}.slide`);
   const [rawShared, setRawShared] = useUrlList(`${section.id}.tab`);
@@ -249,7 +255,7 @@ export function ChartSectionCard({
       ))}
       {section.slideshow && count > 1 ? (
         <div>
-          <div className="mb-2.5 flex items-center gap-3">
+          <div className="mb-2.5 flex items-center gap-3" data-print-hide>
             <Button
               variant="outline"
               size="sm"
@@ -266,14 +272,19 @@ export function ChartSectionCard({
               <ChevronRightIcon data-icon="inline-end" />
             </Button>
           </div>
-          <Figure
-            key={section.charts[slide].title}
-            chart={section.charts[slide]}
-            stateKey={`${section.id}.${slide}.tab`}
-            provenance={provenance}
-            slide
-            axis={axisFor(section.charts[slide])}
-          />
+          {/* Every slide stays mounted, so each keeps its chosen variant across
+              slide changes and print; paper prints them all, in order. */}
+          {section.charts.map((chart, index) => (
+            <Figure
+              key={chart.title}
+              chart={chart}
+              stateKey={`${section.id}.${index}.tab`}
+              provenance={provenance}
+              slide
+              axis={axisFor(chart)}
+              hidden={!printing && index !== slide}
+            />
+          ))}
         </div>
       ) : (
         // Two columns at most for legibility; items-start stops a short chart

@@ -4,11 +4,12 @@
  * first in the DOM and is capitalised only by CSS, so the accessible name stays as written.
  */
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { InfoIcon } from 'lucide-react';
 import { cn } from 'cn';
 import type { MetricTile } from '../api';
 import { readFigure, type Figure } from '../metricFigure';
+import { usePrintMode } from '../printContext';
 import { ExplanationDialog, type Explanation } from './ExplanationDialog';
 
 /** "open PRs %" beside "72%" says the unit twice; the figure keeps it. */
@@ -48,6 +49,7 @@ const TILE =
   'group/figure relative flex min-w-0 flex-col justify-between gap-4 rounded-xl border bg-card p-4 text-left shadow-xs';
 
 export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
+  const printing = usePrintMode();
   const [explained, setExplained] = useState<Explanation | null>(null);
 
   if (tiles.length === 0) {
@@ -85,22 +87,32 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
           );
           // Two columns on a phone: with an odd count the first tile spans the row.
           const span = tiles.length % 2 === 1 && index === 0 && 'max-[599px]:col-span-2';
+          // Paper has no buttons: an explainable tile prints as a plain tile, and
+          // the button stays mounted (hidden) so focus survives print/cancel.
           return explainable ? (
-            <button
-              key={tile.label}
-              type="button"
-              title="How is this measured?"
-              className={cn(
-                TILE,
-                span,
-                'cursor-pointer outline-none transition-[border-color,box-shadow] hover:border-link/40 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-ring',
-              )}
-              onClick={() =>
-                setExplained({ title: tile.label, note: tile.note, methodology: tile.methodology })
-              }
-            >
-              {body}
-            </button>
+            <Fragment key={tile.label}>
+              <button
+                type="button"
+                hidden={printing}
+                data-print-hide
+                title="How is this measured?"
+                className={cn(
+                  TILE,
+                  span,
+                  'cursor-pointer outline-none transition-[border-color,box-shadow] hover:border-link/40 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-ring',
+                )}
+                onClick={() =>
+                  setExplained({
+                    title: tile.label,
+                    note: tile.note,
+                    methodology: tile.methodology,
+                  })
+                }
+              >
+                {body}
+              </button>
+              {printing && <div className={cn(TILE, span)}>{body}</div>}
+            </Fragment>
           ) : (
             <div key={tile.label} className={cn(TILE, span)}>
               {body}

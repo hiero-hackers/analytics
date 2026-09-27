@@ -1,6 +1,7 @@
 /** Rolling-period selector for tables; "All time" is the null period. */
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { usePrintMode } from '../printContext';
 
 const SEGMENT =
   'h-7 rounded-md border-0 bg-transparent px-2.5 text-xs font-medium text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-xs';
@@ -20,30 +21,39 @@ export function PeriodTabs({
   /** Display labels per period key ("30d" -> "30 days"). */
   labels?: Record<string, string>;
 }) {
+  const printing = usePrintMode();
   if (periods.length === 0) {
     return null;
   }
+  const label =
+    active !== null && periods.includes(active) ? (labels?.[active] ?? active) : 'All time';
   return (
-    <ToggleGroup
-      type="single"
-      spacing={0}
-      aria-label="Time range"
-      value={active ?? ALL_TIME}
-      // "" means the active option was clicked again: keep the window.
-      onValueChange={(value) => value && onChange(value === ALL_TIME ? null : value)}
-      className="max-w-full overflow-x-auto rounded-lg bg-muted p-0.5"
-    >
-      {periods.map((key) => (
-        <ToggleGroupItem key={key} value={key} className={SEGMENT}>
-          {labels?.[key] ?? key}
-        </ToggleGroupItem>
-      ))}
-      {/* Last, not first: the windows read shortest to longest (30 days →
+    <>
+      {printing && <p className="print-selection">Time range: {label}</p>}
+      <ToggleGroup
+        hidden={printing}
+        data-print-hide
+        data-scroll-restore
+        type="single"
+        spacing={0}
+        aria-label="Time range"
+        value={active ?? ALL_TIME}
+        // "" means the active option was clicked again: keep the window.
+        onValueChange={(value) => value && onChange(value === ALL_TIME ? null : value)}
+        className="max-w-full overflow-x-auto rounded-lg bg-muted p-0.5"
+      >
+        {periods.map((key) => (
+          <ToggleGroupItem key={key} value={key} className={SEGMENT}>
+            {labels?.[key] ?? key}
+          </ToggleGroupItem>
+        ))}
+        {/* Last, not first: the windows read shortest to longest (30 days →
           1 year), and all-time is the end of that scale rather than a
           separate mode sitting before it. */}
-      <ToggleGroupItem value={ALL_TIME} className={SEGMENT}>
-        All time
-      </ToggleGroupItem>
-    </ToggleGroup>
+        <ToggleGroupItem value={ALL_TIME} className={SEGMENT}>
+          All time
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </>
   );
 }

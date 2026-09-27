@@ -14,15 +14,18 @@
 @import '@fontsource-variable/bricolage-grotesque/opsz.css';
 
 /* Dark = OS dark without an explicit light choice, or an explicit dark choice.
-   `:root` itself is matched too, so the palette's dark values can use it. */
+   `:root` itself is matched too, so the palette's dark values can use it.
+   Screen only: paper always prints the light palette (see print.css). */
 @custom-variant dark {
-  @media (prefers-color-scheme: dark) {
+  @media screen and (prefers-color-scheme: dark) {
     &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
       @slot;
     }
   }
-  &:where([data-theme='dark'], [data-theme='dark'] *) {
-    @slot;
+  @media screen {
+    &:where([data-theme='dark'], [data-theme='dark'] *) {
+      @slot;
+    }
   }
 }
 

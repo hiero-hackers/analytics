@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { XIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { usePrintMode } from '../printContext';
 import { safeUrl } from '../safety';
 
 /** One evidence line, in the legacy panel's field order. */
@@ -32,16 +33,20 @@ export function EvidencePanel({
   items: EvidenceItem[];
   onClose: () => void;
 }) {
+  const printing = usePrintMode();
+  // Stays mounted but hidden while printing, and ignores Escape meanwhile, so
+  // an open panel is still open after print/cancel.
   useEffect(() => {
+    if (printing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, printing]);
 
   return (
-    <div className="mt-3 rounded-lg border p-3">
+    <div className="mt-3 rounded-lg border p-3" hidden={printing} data-print-hide>
       <div className="mb-1.5 flex flex-wrap items-baseline gap-x-2.5">
         <h3 className="text-sm font-semibold">
           HIP-{hip} · {repo}
@@ -54,7 +59,7 @@ export function EvidencePanel({
           Close
         </Button>
       </div>
-      <ol className="max-h-[300px] overflow-y-auto">
+      <ol className="max-h-[300px] overflow-y-auto" data-scroll-restore>
         {items.map((item) => {
           const href = safeUrl(`https://github.com/${repo}/pull/${item.n}`);
           return (

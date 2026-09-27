@@ -7,7 +7,8 @@ import { cn } from 'cn';
 // container the table's scroll box (both axes, capped height). A sticky header
 // sticks to its nearest scrolling ancestor — with a separate outer scroll box
 // it would stick to this inner overflow-x container and never move — and the
-// row virtualiser needs a ref to the element that actually scrolls.
+// row virtualiser needs a ref to the element that actually scrolls. The
+// container always scrolls sideways, so it opts in to print's scroll restore.
 function Table({
   className,
   containerRef,
@@ -21,6 +22,7 @@ function Table({
     <div
       ref={containerRef}
       data-slot="table-container"
+      data-scroll-restore
       className={cn('relative w-full overflow-x-auto', containerClassName)}
     >
       <table

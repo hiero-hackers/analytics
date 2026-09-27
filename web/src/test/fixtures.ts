@@ -1,11 +1,11 @@
 /**
  * A miniature but structurally complete data API: two orgs, one macro with
  * charts + tables + metrics (only for the primary org) and one macro both
- * orgs share, so org-tab behaviour is exercised. `stubApi` serves it through
- * a fetch stub keyed by URL suffix — the same contract the real API honours.
+ * orgs share, so org-tab behaviour is exercised. The component suite serves these
+ * routes through `stubApi`; the browser suite writes them to a static API tree.
+ * Keep this module plain data so both runners can use the same typed contract.
  */
 
-import { vi } from 'vitest';
 import type { BoardView, Manifest, MatrixView, SectionDoc } from '../api';
 
 export const GOV_DOC: SectionDoc = {
@@ -31,7 +31,7 @@ export const GOV_DOC: SectionDoc = {
   periods: { '30d': [{ user: 'alice', count: 4, last_seen: '2026-07-20T00:00:00' }] },
 };
 
-const CONTRIB_DOC: SectionDoc = {
+export const CONTRIB_DOC: SectionDoc = {
   id: 'profiles',
   title: 'Contributor profiles',
   description: 'Per-contributor activity.',
@@ -43,7 +43,7 @@ const CONTRIB_DOC: SectionDoc = {
   row_count: 2,
 };
 
-const HACKERS_DOC: SectionDoc = {
+export const HACKERS_DOC: SectionDoc = {
   ...CONTRIB_DOC,
   rows: [{ contributor: 'erin' }],
   row_count: 1,
@@ -54,7 +54,7 @@ const HACKERS_DOC: SectionDoc = {
  * different shapes (the first column is labelled for the role it names), which
  * is what the Organisation-diversity tables look like once merged.
  */
-const AFFILIATIONS_DOC: SectionDoc = {
+export const AFFILIATIONS_DOC: SectionDoc = {
   id: 'affiliations',
   title: 'Organisation affiliations — reference',
   description: 'Each maintainer and the organisation they were mapped to.',
@@ -109,7 +109,7 @@ const AFFILIATIONS_DOC: SectionDoc = {
   ],
 };
 
-const HIP_EVIDENCE_DOC: SectionDoc = {
+export const HIP_EVIDENCE_DOC: SectionDoc = {
   id: 'hip-evidence',
   title: 'Evidence (per PR)',
   description: 'The audit trail.',
@@ -191,7 +191,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
   row_count: 1,
 };
 
-const MATRIX_DOC: MatrixView = {
+export const MATRIX_DOC: MatrixView = {
   id: 'hip-matrix',
   kind: 'matrix',
   macro: 'HIPs',
@@ -255,7 +255,7 @@ const MATRIX_DOC: MatrixView = {
   generated_at: '2026-07-25T09:00:00+00:00',
 };
 
-const BOARD_DOC: BoardView = {
+export const BOARD_DOC: BoardView = {
   id: 'hip-board',
   kind: 'board',
   macro: 'HIPs',
@@ -480,7 +480,7 @@ export const MANIFEST: Manifest = {
   },
 };
 
-const ROUTES: Record<string, unknown> = {
+export const ROUTES: Record<string, unknown> = {
   'manifest.json': MANIFEST,
   'hiero-ledger/roles.json': GOV_DOC,
   'hiero-ledger/hip-evidence.json': HIP_EVIDENCE_DOC,
@@ -494,28 +494,3 @@ const ROUTES: Record<string, unknown> = {
   'hiero-ledger/maintainer_affiliations.csv': 'login,organisation\nalice,Hashgraph\n',
   'hiero-ledger/committer_affiliations.csv': 'login,organisation\ndave,BlockyDevs\n',
 };
-
-/**
- * Stub global fetch to serve the fixture API; returns the spy for assertions.
- * `overrides` lets a test intercept specific routes (e.g. to delay or fail a
- * request) while every other route still serves its normal fixture — so a
- * test controlling one request doesn't have to also know every other request
- * the page happens to make.
- */
-export function stubApi(overrides: Record<string, () => Response | Promise<Response>> = {}) {
-  return vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      const key = String(url);
-      const override = Object.entries(overrides).find(([suffix]) => key.endsWith(suffix));
-      if (override) return override[1]();
-      const match = Object.entries(ROUTES).find(([suffix]) => key.endsWith(suffix));
-      if (!match) {
-        return new Response('not found', { status: 404 });
-      }
-      // CSV companions are served verbatim; everything else is a JSON document.
-      const body = typeof match[1] === 'string' ? match[1] : JSON.stringify(match[1]);
-      return new Response(body, { status: 200 });
-    }),
-  );
-}

@@ -431,7 +431,12 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
               <ul className="mt-2 flex flex-wrap gap-1.5">
                 {neighbours.get(focusNode.id)!.map((link) => (
                   <li key={link.id}>
-                    <Button variant="outline" size="sm" onClick={() => setSelected(link.id)}>
+                    <Button
+                      data-print-keep
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelected(link.id)}
+                    >
                       {short(link.id)}
                       <span className="text-muted-foreground tabular-nums">
                         {integer.format(link.shared)} shared

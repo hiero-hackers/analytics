@@ -79,9 +79,11 @@ export default function InteractiveChart({
         {lead}
         <div
           role="status"
+          // Print preparation waits until no chart is pending.
+          data-print-pending
           className="flex h-[340px] items-center justify-center text-sm text-muted-foreground"
         >
-          Loading interactive chart…
+          Loading interactive chart: {title} ({variant.label})…
         </div>
       </>
     );
@@ -91,9 +93,10 @@ export default function InteractiveChart({
         {lead}
         <div
           role="alert"
-          className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-4 text-sm"
+          data-print-error
+          className="print-chart-status mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-4 text-sm"
         >
-          Interactive data could not be loaded.
+          Could not load chart data: {title} ({variant.label}).
           <Button
             variant="outline"
             size="sm"

@@ -349,6 +349,8 @@ export function SeriesView({
                   return (
                     <Button
                       key={series.key}
+                      // The legend: paper needs it to read the colours.
+                      data-print-keep
                       size="sm"
                       variant="ghost"
                       aria-pressed={!off}
@@ -594,7 +596,8 @@ export function SeriesView({
               </ComposedChart>
             </ChartContainer>
             {overview && (
-              <div className="rounded-lg border px-2 pt-2">
+              // A control, not a figure: the chosen span prints in the header line.
+              <div className="rounded-lg border px-2 pt-2" data-print-hide>
                 <p className="px-1 text-xs text-muted-foreground">
                   Overview of all {data.rows.length} buckets · drag the handles, or focus one and
                   use the arrow keys, to choose the span shown above
@@ -674,6 +677,7 @@ export function SeriesView({
                 <TableCell className="font-medium">
                   {dimension ? (
                     <Button
+                      data-print-keep
                       variant="link"
                       size="sm"
                       className="h-auto p-0 font-medium"

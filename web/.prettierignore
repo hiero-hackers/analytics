@@ -2,3 +2,8 @@ dist
 dist-ssr
 coverage
 package-lock.json
+
+# Playwright staging and local verification artifacts
+.e2e/
+playwright-report/
+test-results/

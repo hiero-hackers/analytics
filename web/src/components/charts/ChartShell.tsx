@@ -14,6 +14,7 @@ import type { ChartDocumentMeta, Manifest } from '../../api';
 import type { CsvExport } from '../../csv';
 import { DIMENSION_LABELS, dimensionOf, useFocus } from '../../focus';
 import { stamp } from '../../format';
+import { usePrintMode } from '../../printContext';
 import { useUrlIndex } from '../../urlState';
 import { CsvDownloadButton } from '../CsvDownloadButton';
 import { VariantTabs } from '../VariantTabs';
@@ -62,6 +63,7 @@ export function ChartShell({
   const [focus, setFocus] = useFocus();
   const supported = focus ? data.dimensions.some((d) => dimensionOf(d) === focus.dimension) : false;
   const [expanded, setExpanded] = useState(false);
+  const printing = usePrintMode();
   const leading = useContext(ChartLeading);
   const expandRef = useRef<HTMLButtonElement>(null);
   const heading = period !== title ? `${title} · ${period}` : title;
@@ -91,7 +93,9 @@ export function ChartShell({
           <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {/* Chart/Data says nothing on paper; the printed view is self-evident. */}
           <VariantTabs
+            printSelection={false}
             appearance="segmented"
             labels={['Chart', 'Data']}
             active={view}
@@ -180,7 +184,10 @@ export function ChartShell({
   );
   return (
     <>
-      {expanded ? (
+      {/* While printing, an expanded chart also prints in place. Its dialog keeps
+          its own copy mounted (hidden by print.css), so the open explanation and
+          scroll position are still there afterwards. */}
+      {expanded && !printing ? (
         <div className="flex h-[340px] items-center justify-center text-sm text-muted-foreground">
           Chart opened in expanded view
         </div>

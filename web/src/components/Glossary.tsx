@@ -3,17 +3,28 @@
  * mark emphasis with *asterisks* — the only inline markup the contract allows.
  */
 
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { Glossary as GlossaryData } from '../api';
 import { emphasized } from '../markup';
+import { usePrintMode } from '../printContext';
 
 export function Glossary({ glossary }: { glossary: GlossaryData }) {
+  const printing = usePrintMode();
+  // Folded on screen, always open on paper; the fold returns after printing.
+  const [open, setOpen] = useState(false);
   return (
-    <Collapsible className="group/glossary mb-6 rounded-lg border bg-card">
+    <Collapsible
+      open={printing || open}
+      onOpenChange={setOpen}
+      className="glossary group/glossary mb-6 rounded-lg border bg-card"
+    >
       {/* Radix trigger, not shadcn's Button, which paints its expanded state. */}
-      <CollapsibleTrigger className="flex h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
+      <CollapsibleTrigger
+        data-print-keep
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+      >
         <ChevronRightIcon
           aria-hidden="true"
           className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]/glossary:rotate-90"

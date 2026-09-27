@@ -34,6 +34,10 @@ import { FocusBar } from './components/FocusBar';
 import { useSectionDocs } from './useSectionDocs';
 import { useViewDocs } from './useViewDocs';
 import { ViewCards } from './components/ViewCards';
+import { PrintLayout } from './components/PrintFooter';
+import { PrintControls, PrintProvider } from './printing';
+import { stamp } from './format';
+import './print.css';
 
 const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
 
@@ -168,11 +172,19 @@ function OrgPanel({
 
   return (
     <>
+      {/* Keyed by tab and org: navigating away cancels a pending preparation. */}
+      <PrintControls key={`${org}/${macro}`} ready={settled} />
+      {!settled && (
+        <p data-print-only>
+          Incomplete document: this tab is still loading. Close print preview and use Print tab when
+          loading finishes.
+        </p>
+      )}
       <MetricTiles tiles={entry.metrics?.[macro] ?? []} />
       {/* A section that could not load leaves a named gap rather than blanking
           the tab — the rest of the page is still worth reading. */}
       {unavailable.length > 0 && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive" className="mb-6" data-print-incomplete>
           <CircleAlertIcon />
           <AlertTitle>
             Could not load {unavailable.length === 1 ? 'this section' : 'these sections'}:{' '}
@@ -231,7 +243,14 @@ function Dashboard({
   const dataAsOf = manifest.provenance.data_as_of;
 
   return (
-    <>
+    <PrintLayout provenance={manifest.provenance}>
+      <p data-print-only className="print-title">
+        {activeMacro} · {shownOrg}
+      </p>
+      <p data-print-only>
+        Generated {stamp(manifest.generated_at)} UTC. Periods and filters are stated beside each
+        table or chart.
+      </p>
       <div className="mb-6 border-b pb-6">
         <p className="mb-2.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <OrgAvatar org={shownOrg} className="size-5 rounded" />
@@ -267,23 +286,26 @@ function Dashboard({
         </OrgContext.Provider>
       ) : (
         // Sized to read as information rather than an error.
-        <Empty className="my-12">
-          <EmptyHeader>
-            <EmptyTitle>
-              No {activeMacro} data for {shownOrg}
-            </EmptyTitle>
-            {manifest.macro_absent_notes?.[activeMacro] && (
-              <EmptyDescription>{manifest.macro_absent_notes[activeMacro]}</EmptyDescription>
-            )}
-          </EmptyHeader>
-        </Empty>
+        <>
+          <PrintControls />
+          <Empty className="my-12">
+            <EmptyHeader>
+              <EmptyTitle>
+                No {activeMacro} data for {shownOrg}
+              </EmptyTitle>
+              {manifest.macro_absent_notes?.[activeMacro] && (
+                <EmptyDescription>{manifest.macro_absent_notes[activeMacro]}</EmptyDescription>
+              )}
+            </EmptyHeader>
+          </Empty>
+        </>
       )}
       {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
       <div className="mt-10 flex flex-wrap items-baseline justify-between gap-4 border-t pt-4">
         {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
         <ProvenanceFooter provenance={manifest.provenance} />
       </div>
-    </>
+    </PrintLayout>
   );
 }
 
@@ -320,36 +342,44 @@ export default function App() {
 
   return (
     // The header renders in every state; only the content beneath it changes shape.
-    <SidebarProvider
-      className="flex-col"
-      style={{ '--sidebar-width': '17.5rem' } as React.CSSProperties}
-    >
-      <AppHeader
-        nav={nav}
-        // A focused repository or person belongs to one organisation.
-        onOrg={(next) => {
-          writeParams({ focus: null });
-          setOrg(next);
-        }}
-        toc={nav?.orgHasMacro ? toc : []}
-        onTab={setMacro}
-        dataAsOf={manifest?.provenance.data_as_of}
-      />
-      <div className="flex flex-1">
-        <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
-        {/* min-w-0: otherwise a wide table or nowrap stamp widens the page sideways. */}
-        <SidebarInset className="min-w-0">
-          <div className="mx-auto w-full max-w-[1440px] p-4 min-[600px]:p-6 lg:p-8">
-            {error ? (
-              <FatalError message={error} onRetry={retry} />
-            ) : !manifest || !nav ? (
-              <Skeleton label="Loading dashboard" rows={5} />
-            ) : (
-              <Dashboard manifest={manifest} nav={nav} onToc={setToc} />
-            )}
-          </div>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+    <PrintProvider>
+      <SidebarProvider
+        className="flex-col"
+        style={{ '--sidebar-width': '17.5rem' } as React.CSSProperties}
+      >
+        <AppHeader
+          nav={nav}
+          // A focused repository or person belongs to one organisation.
+          onOrg={(next) => {
+            writeParams({ focus: null });
+            setOrg(next);
+          }}
+          toc={nav?.orgHasMacro ? toc : []}
+          onTab={setMacro}
+          dataAsOf={manifest?.provenance.data_as_of}
+        />
+        <div className="flex flex-1">
+          <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
+          {/* min-w-0: otherwise a wide table or nowrap stamp widens the page sideways. */}
+          <SidebarInset className="min-w-0">
+            <div className="mx-auto w-full max-w-[1440px] p-4 min-[600px]:p-6 lg:p-8">
+              {error ? (
+                <FatalError message={error} onRetry={retry} />
+              ) : !manifest || !nav ? (
+                <>
+                  <p data-print-only>
+                    Incomplete document: dashboard data is still loading. Close print preview and
+                    wait for the dashboard to finish loading.
+                  </p>
+                  <Skeleton label="Loading dashboard" rows={5} />
+                </>
+              ) : (
+                <Dashboard manifest={manifest} nav={nav} onToc={setToc} />
+              )}
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </PrintProvider>
   );
 }

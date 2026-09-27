@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import { THEME_STORAGE_KEY } from '../theme';
-import { MANIFEST, stubApi } from './fixtures';
+import { MANIFEST } from './fixtures';
+import { stubApi } from './stubApi';
 
 beforeEach(() => {
   vi.unstubAllGlobals();

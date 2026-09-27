@@ -83,6 +83,7 @@ export function AppHeader({
   const parent = nav ? nav.topOf(nav.activeMacro) : null;
   return (
     <header
+      data-print-hide
       className={cn(
         'sticky top-0 z-30 flex h-(--header-h) shrink-0 items-center border-b bg-card/90 px-3 backdrop-blur-xl backdrop-saturate-150 transition-shadow duration-200 md:px-0',
         scrolled && 'shadow-[0_6px_20px_-12px_rgb(15_23_42/0.35)]',

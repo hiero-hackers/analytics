@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { PRINT_ROW_LIMIT, usePrintMode } from '../printContext';
 import type { DataTableInstance } from '../useDataTable';
 
 // Typical rendered height of one row; the virtualiser corrects itself from
@@ -53,13 +54,17 @@ export function DataTable({
   /** At the toolbar's end: what a reader does with the rows (download, an external link). */
   actions?: ReactNode;
 }) {
+  const printing = usePrintMode();
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
   const globalFilter = (table.state.globalFilter as string) ?? '';
-  const virtualized = rows.length > VIRTUALIZE_ABOVE;
+  // Paper gets real rows, never a virtual window.
+  const virtualized = !printing && rows.length > VIRTUALIZE_ABOVE;
   const virtualizer = useVirtualizer({
-    count: virtualized ? rows.length : 0,
-    getScrollElement: () => scrollRef.current,
+    // Observation pauses while printing, keeping the screen measurements and
+    // offset: restoring against the shorter printed table would lose them.
+    count: rows.length > VIRTUALIZE_ABOVE ? rows.length : 0,
+    getScrollElement: () => (printing ? null : scrollRef.current),
     estimateSize: () => ROW_HEIGHT,
     overscan: OVERSCAN,
   });
@@ -69,15 +74,38 @@ export function DataTable({
     virtualized && virtualRows.length
       ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
       : 0;
-  const visibleRows = virtualized ? virtualRows.map((item) => rows[item.index]) : rows;
+  const visibleRows = printing
+    ? [
+        ...rows.slice(0, PRINT_ROW_LIMIT),
+        // The screen viewport beyond the cap stays mounted (hidden) so its focused links survive.
+        ...virtualRows
+          .filter((item) => item.index >= PRINT_ROW_LIMIT)
+          .map((item) => rows[item.index]),
+      ]
+    : virtualized
+      ? virtualRows.map((item) => rows[item.index])
+      : rows;
   const columnCount = table.getVisibleFlatColumns().length;
   const total = table.getCoreRowModel().rows.length;
   const count = (n: number) => n.toLocaleString('en-US');
 
   return (
     <>
+      {printing && globalFilter && (
+        <p className="print-selection">
+          Filter: “{globalFilter}”. {count(rows.length)} of {count(total)} rows match; rows outside
+          this filter are not printed.
+        </p>
+      )}
+      {printing && rows.length > PRINT_ROW_LIMIT && (
+        <p className="print-selection" data-print-truncated>
+          Showing {count(PRINT_ROW_LIMIT)} of {count(rows.length)} rows in the current order.{' '}
+          {count(rows.length - PRINT_ROW_LIMIT)} rows are not printed. Download CSV from this table
+          on the dashboard for the complete selection.
+        </p>
+      )}
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-64" hidden={printing} data-print-hide>
           <SearchIcon
             aria-hidden="true"
             className="pointer-events-none absolute top-2 left-2.5 size-4 text-muted-foreground"
@@ -142,10 +170,17 @@ export function DataTable({
                       index === 0 && STICKY_FIRST,
                     )}
                   >
+                    {printing && (
+                      <span className="first-letter:uppercase">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </span>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
+                      hidden={printing}
+                      data-print-hide
                       className={cn(
                         'group/sort -mx-2 h-7 px-2 font-medium text-inherit hover:bg-background/70',
                         numeric && 'flex-row-reverse',
@@ -178,11 +213,13 @@ export function DataTable({
               <TableCell colSpan={columnCount} className="py-6 text-center text-muted-foreground">
                 {globalFilter ? (
                   <>
-                    No rows match —{' '}
+                    {printing ? 'No rows match this filter.' : 'No rows match —'}{' '}
                     <Button
                       type="button"
                       variant="link"
                       size="sm"
+                      hidden={printing}
+                      data-print-hide
                       className="px-0"
                       onClick={() => table.setGlobalFilter('')}
                     >
@@ -204,11 +241,15 @@ export function DataTable({
             <TableRow
               key={row.id}
               className="border-row-line even:bg-muted/20 hover:bg-link/5"
+              hidden={printing && index >= PRINT_ROW_LIMIT}
               data-index={virtualized ? virtualRows[index].index : index}
               ref={virtualized ? virtualizer.measureElement : undefined}
             >
               {row.getVisibleCells().map((cell, cellIndex) => {
-                const numeric = cell.column.columnDef.meta?.numeric;
+                // On paper any number aligns right, declared numeric or not.
+                const numeric =
+                  cell.column.columnDef.meta?.numeric ||
+                  (printing && typeof row.original[cell.column.id] === 'number');
                 return (
                   <TableCell
                     key={cell.id}

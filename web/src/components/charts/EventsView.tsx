@@ -76,6 +76,8 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
         {data.types.map((type) => (
           <Button
             key={type.key}
+            // The legend: paper needs it to read the colours.
+            data-print-keep
             size="sm"
             variant="ghost"
             aria-pressed={!hidden.includes(type.key)}
