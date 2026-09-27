@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import InteractiveChart from '../components/InteractiveChart';
 import { shade } from '../components/charts/format';
+import { relaxLayout, strengthSteps } from '../components/charts/networkLayout';
 import { validateChartDocument } from '../chartData';
 import { downloadCsv } from '../csv';
 import type {
@@ -248,6 +249,62 @@ describe('Network', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
     await userEvent.click(screen.getByRole('button', { name: 'Reset view' }));
+  });
+
+  it('relaxes a packed layout so no two repositories overlap, the same way every time', () => {
+    // Twelve linked repositories seeded almost on top of each other, as the PNG's core is.
+    const nodes = Array.from({ length: 12 }, (_, i) => ({
+      id: `repo-${i}`,
+      x: (i % 3) * 0.5,
+      y: Math.floor(i / 3) * 0.5,
+      radius: 20 + (i % 4) * 5,
+    }));
+    const edges = nodes.slice(1).map((node) => ({ source: 'repo-0', target: node.id }));
+    const first = relaxLayout(nodes, edges);
+    for (const [i, a] of nodes.entries()) {
+      for (const b of nodes.slice(i + 1)) {
+        const [p, q] = [first.get(a.id)!, first.get(b.id)!];
+        expect(Math.hypot(p.x - q.x, p.y - q.y)).toBeGreaterThan((a.radius + b.radius) * 0.95);
+      }
+    }
+    expect(relaxLayout(nodes, edges)).toEqual(first);
+  });
+
+  it('offers link-strength steps from the spread of shared members', () => {
+    expect(strengthSteps([])).toEqual([]);
+    expect(strengthSteps([1, 1, 1])).toEqual([1]);
+    expect(strengthSteps([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toEqual([1, 6, 8, 10]);
+  });
+
+  it('thins the web to strong links in the chart, table and CSV alike', async () => {
+    show({ ...network, id: 'net-strong' }, 'Network');
+    await userEvent.click(await screen.findByRole('radio', { name: '≥ 2 shared' }));
+    expect(window.location.hash).toContain('net-strong.min=2');
+    expect(screen.getByText('Showing 1 of 2 links')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^hiero-sdk-rust, SDKs: .* linked to 0 repositories/ }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('radio', { name: 'Data' }));
+    expect(within(screen.getByRole('table')).queryByText('hiero-sdk-rust (1)')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Download CSV' }));
+    const rows = vi.mocked(downloadCsv).mock.calls[0][0].rows;
+    expect(rows.find((row) => row.repo === 'hiero-sdk-go')?.linked).toBe('hiero-sdk-js (2)');
+  });
+
+  it('shows every pair in the matrix view and selects a repository from its name', async () => {
+    window.location.hash = '#net-matrix.mode=matrix';
+    const { container } = show({ ...network, id: 'net-matrix' }, 'Network');
+    const select = await screen.findByRole('button', { name: 'Select hiero-sdk-js' });
+    // Four repositories: a 4 × 4 grid of cells.
+    expect(container.querySelectorAll('rect[rx="2"]')).toHaveLength(16);
+    const cell = container.querySelector('rect[rx="2"]:nth-of-type(2)')!;
+    fireEvent.pointerEnter(cell);
+    expect(
+      screen.getByText(/× .*: (2 shared maintainers|no link at this threshold)/),
+    ).toBeInTheDocument();
+    await userEvent.click(select);
+    expect(select).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /sdk-go\s*2 shared/ })).toBeInTheDocument();
   });
 
   it('search narrows the data view to matching repositories', async () => {

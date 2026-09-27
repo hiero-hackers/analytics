@@ -64,3 +64,7 @@ export function spanOf(range: string, buckets: string[]): [number, number] {
   const end = buckets.indexOf(to);
   return to !== undefined && start >= 0 && end >= start ? [start, end] : [0, last];
 }
+
+/** A repository name without the organisation's `hiero-` prefix, for dense labels. */
+export const shortRepo = (repo: string) =>
+  repo.startsWith('hiero-') ? repo.slice('hiero-'.length) : repo;
