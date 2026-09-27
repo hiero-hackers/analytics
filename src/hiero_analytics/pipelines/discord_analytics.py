@@ -29,13 +29,14 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pandas as pd
 
 from hiero_analytics.config.charts import MUTED_HISTORICAL_COLOR, PRIMARY_PALETTE
 from hiero_analytics.config.paths import INPUTS_DIR, ensure_org_dirs
+from hiero_analytics.export.save import save_dataframe, write_output_meta
 from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 from hiero_analytics.plotting.lines import plot_date_line
 
@@ -172,10 +173,22 @@ def plot_monthly_traffic(series: pd.DataFrame, output_path: Path) -> None:
 
 def main() -> None:
     """Generate the Hiero Discord chart bundle."""
-    _, charts_dir = ensure_org_dirs(ORG)
+    data_dir, charts_dir = ensure_org_dirs(ORG)
 
     channels = load_channels_df()
     monthly = load_monthly_df()
+
+    categories = channels.groupby("category", as_index=False).agg(total=("total", "sum"), last_90d=("d90", "sum"))
+    categories["earlier"] = categories["total"] - categories["last_90d"]
+    save_dataframe(categories, data_dir / "hiero_discord_channel_categories.csv")
+    save_dataframe(channels[["channel_label", "d30"]], data_dir / "hiero_discord_recent_activity_30d.csv")
+    save_dataframe(monthly, data_dir / "hiero_discord_monthly_traffic.csv")
+
+    for name in ("channel_categories", "recent_activity_30d", "monthly_traffic"):
+        write_output_meta(
+            data_dir / f"hiero_discord_{name}.csv",
+            generated_at=datetime.combine(SNAPSHOT_DATE, datetime.min.time(), tzinfo=UTC),
+        )
 
     plot_monthly_traffic(monthly, charts_dir / "hiero_discord_monthly_traffic.png")
     plot_recent_activity_30d(channels, charts_dir / "hiero_discord_recent_activity_30d.png")

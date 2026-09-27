@@ -383,7 +383,9 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(
             scorecard_mod,
             "fetch_repo_scorecard",
-            lambda name: ScorecardRecord(repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW),
+            lambda name, **_kwargs: ScorecardRecord(
+                repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW
+            ),
         )
         mp.setattr(
             codeowner_mod,
@@ -649,3 +651,27 @@ def test_every_emitted_kpi_tile_explains_itself(outputs_root: Path):
         if not tile.get("note") or not tile.get("methodology")
     ]
     assert not unexplained, f"KPI tiles with no explanation: {unexplained}"
+
+
+def test_every_chart_variant_has_a_data_source():
+    """A newly added dashboard chart cannot silently reintroduce image rendering."""
+    for macro in CHART_MACROS:
+        for specs in macro["charts"].values():
+            for spec in specs:
+                for _caption, variants in spec["files"]:
+                    for _label, filename in variants:
+                        assert filename in spec.get("interactive_sources", {}), filename
+
+
+def test_every_produced_chart_has_interactive_data(outputs_root: Path):
+    """Exercise the real pipelines and exporter, rather than just checking declarations."""
+    import json
+
+    manifest = json.loads((outputs_root / "data/api/v1/manifest.json").read_text())
+    for org in manifest["orgs"].values():
+        for section in org["chart_sections"]:
+            for chart in section["charts"]:
+                for variant in chart["variants"]:
+                    assert variant.get("interactive"), variant["file"]
+                    target = outputs_root / "data/api/v1" / variant["interactive"]["path"]
+                    assert target.exists()

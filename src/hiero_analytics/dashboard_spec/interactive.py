@@ -316,3 +316,177 @@ SCORECARD_CHECKS = {
         "0–10 scale. Replaces the stacked breakdown, whose bar lengths implied the checks add up to the score."
     ),
 }
+
+
+def status_meter(file: str, label: str, unit: str, population: str) -> dict:
+    """A snapshot split into a few statuses, headline status first, as one part-to-whole meter."""
+    return {
+        "kind": "categories",
+        "file": file,
+        "category": "status",
+        "category_label": label,
+        "series": [{"key": "count", "label": unit}],
+        "mark": "meter",
+        "window": "snapshot",
+        "metric": file.removesuffix(".csv"),
+        "unit": unit,
+        "population": population,
+    }
+
+
+def ranked_counts(file: str, category: str, label: str, key: str, unit: str, population: str) -> dict:
+    """An explorable ranking backed by the complete analysis table."""
+    return {
+        "kind": "categories",
+        "file": file,
+        "category": category,
+        "category_label": label,
+        "series": [{"key": key, "label": unit}],
+        "orientation": "horizontal",
+        "rank": True,
+        "top_n": 15,
+        "window": "snapshot",
+        "metric": file.removesuffix(".csv"),
+        "unit": unit,
+        "population": population,
+    }
+
+
+OVERVIEW_SOURCES = {
+    "contributor_counts.png": {
+        **ranked_counts(
+            "contributor_counts.csv",
+            "repo",
+            "Repository",
+            "contributors",
+            "Contributors",
+            "Distinct contributors recorded in each repository. People active in several repositories count in each.",
+        ),
+        "strip_org_prefix": True,
+    },
+    "language_distribution.png": ranked_counts(
+        "language_distribution.csv",
+        "language",
+        "Language",
+        "count",
+        "Repositories",
+        "Repositories grouped by their primary language reported by GitHub; not lines of code.",
+    ),
+    "push_activity.png": status_meter(
+        "push_activity.csv",
+        "Push activity",
+        "Repositories",
+        "Repositories with a push in the 30 days before collection versus other repositories.",
+    ),
+}
+
+SINGLE_EMPLOYER_SOURCES = {
+    f"{stem}.png": ranked_counts(
+        f"{stem}.csv",
+        "organisation",
+        "Organisation",
+        key,
+        unit,
+        f"{population} Independent and unresolved affiliations follow the diversity table's counting rules.",
+    )
+    for stem, key, unit, population in [
+        (
+            "single_employer_teams_by_org",
+            "teams",
+            "Teams",
+            "Governance teams whose resolved members share one employer.",
+        ),
+        (
+            "single_employer_repos_by_org",
+            "repos",
+            "Repositories",
+            "Repositories whose resolved maintainers share one employer.",
+        ),
+        (
+            "single_employer_repos_by_org_committers",
+            "repos",
+            "Repositories",
+            "Repositories whose resolved committers share one employer.",
+        ),
+    ]
+}
+
+OWNERSHIP_SOURCES = {
+    "org_codeowner_summary.png": status_meter(
+        "org_codeowner_summary.csv",
+        "CODEOWNERS file",
+        "Repositories",
+        "Repositories with or without a CODEOWNERS file in the standard GitHub locations.",
+    ),
+    "org_runner_chart.png": {
+        **ranked_counts(
+            "org_runner_summary.csv",
+            "repo",
+            "Repository",
+            "Standard",
+            "Workflow jobs",
+            "Workflow job runner declarations, grouped by repository. Indeterminate declarations cannot be classified.",
+        ),
+        "series": [{"key": key, "label": key} for key in ["Self-Hosted", "Standard", "Indeterminate"]],
+        "stacked": True,
+        "strip_org_prefix": True,
+    },
+}
+
+HIP_STATUS_SOURCE = {
+    **ranked_counts(
+        "hip_activity_by_status.csv",
+        "bucket",
+        "HIP status",
+        "merged",
+        "HIPs",
+        "Each HIP counts once under its strongest PR evidence. No citing PR for a Final/Active HIP is a citation gap, not proof it is unimplemented.",
+    ),
+    "rank": False,
+    "stacked": True,
+    "series": [
+        {"key": "merged", "label": "With merged implementation PRs"},
+        {"key": "open_only", "label": "With open PRs only"},
+        {"key": "none_awaiting", "label": "Awaiting implementation evidence"},
+        {"key": "citation_gap", "label": "Citation gap (Final/Active)"},
+    ],
+}
+
+DISCORD_SOURCES = {
+    "hiero_discord_channel_categories.png": {
+        **ranked_counts(
+            "hiero_discord_channel_categories.csv",
+            "category",
+            "Topic",
+            "earlier",
+            "Messages",
+            "Messages from a manual Discord snapshot, split into its last 90 days and earlier history.",
+        ),
+        "series": [{"key": "last_90d", "label": "Last 90 days"}, {"key": "earlier", "label": "Earlier history"}],
+        "stacked": True,
+    },
+    "hiero_discord_recent_activity_30d.png": {
+        **ranked_counts(
+            "hiero_discord_recent_activity_30d.csv",
+            "channel_label",
+            "Channel",
+            "d30",
+            "Messages",
+            "Messages in the 30 days before the manual Discord snapshot. Show all to inspect every channel.",
+        ),
+        "top_n": 5,
+    },
+    "hiero_discord_monthly_traffic.png": {
+        "kind": "timeseries",
+        "file": "hiero_discord_monthly_traffic.csv",
+        "category": "month",
+        "category_label": "Month (UTC)",
+        "frequency": "month",
+        "normalize_dates": True,
+        "series": [{"key": "messages", "label": "Messages"}],
+        "mark": "area",
+        "metric": "discord_messages",
+        "unit": "Messages",
+        "population": "Monthly messages from a manual Discord snapshot.",
+    },
+}

@@ -152,9 +152,15 @@ function validEvents(data: EventsDocument): boolean {
   );
 }
 
+/** Marks every series kind draws, plus the single-series forms only categories take. */
+const MARKS = ['bar', 'line', 'area'];
+const CATEGORY_MARKS = ['meter', 'funnel'];
+
 function validSeries(data: SeriesDocument): boolean {
+  const categoryMark = CATEGORY_MARKS.includes(data.mark);
   return (
-    ['bar', 'line', 'area'].includes(data.mark) &&
+    (MARKS.includes(data.mark) ||
+      (categoryMark && data.kind === 'categories' && data.series?.length === 1)) &&
     ['vertical', 'horizontal'].includes(data.orientation) &&
     ['integer', 'decimal'].includes(data.value_format) &&
     typeof data.stacked === 'boolean' &&
@@ -162,6 +168,7 @@ function validSeries(data: SeriesDocument): boolean {
     typeof data.rank === 'boolean' &&
     (data.top_n === null || (Number.isSafeInteger(data.top_n) && data.top_n > 0)) &&
     (data.reference === null || (finite(data.reference?.value) && text(data.reference.label))) &&
+    (data.value_max == null || (finite(data.value_max) && data.value_max > 0)) &&
     !!data.category &&
     text(data.category.key) &&
     text(data.category.label) &&

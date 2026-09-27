@@ -5,7 +5,7 @@
  * rows, the expanded dialog and the explanatory footer — so migrating another
  * chart is a spec declaration, not a new component.
  *
- * A failed load offers Retry and keeps the PNG (when one exists) in view.
+ * A failed load offers Retry; chart images are never substituted for data.
  */
 
 import { useEffect, useState } from 'react';
@@ -43,12 +43,10 @@ export default function InteractiveChart({
   variant,
   title,
   provenance,
-  fallback,
 }: {
   variant: ChartVariant;
   title: string;
   provenance: Manifest['provenance'];
-  fallback?: React.ReactNode;
 }) {
   const path = variant.interactive!.path;
   const [result, setResult] = useState<{
@@ -99,7 +97,6 @@ export default function InteractiveChart({
             Retry chart
           </Button>
         </div>
-        {fallback}
       </div>
     );
   return (

@@ -82,7 +82,11 @@ export interface ChartWindow {
 
 /** Bars, lines and areas over periods or categories. */
 interface ChartDocumentBase extends ChartDocumentMeta {
-  mark: 'bar' | 'line' | 'area';
+  /**
+   * `meter` (a snapshot split into statuses, headline first) and `funnel`
+   * (nested stages in order) are categories-only and draw one series.
+   */
+  mark: 'bar' | 'line' | 'area' | 'meter' | 'funnel';
   stacked: boolean;
   /** Draw each row as shares of its visible total; the table keeps counts. */
   normalize: boolean;
@@ -93,6 +97,8 @@ interface ChartDocumentBase extends ChartDocumentMeta {
   /** Rows charted before "Show all"; the data view always lists every row. */
   top_n: number | null;
   reference: { value: number; label: string } | null;
+  /** A bounded scale's ceiling (e.g. 10 for a 0–10 score); absent on older documents. */
+  value_max?: number | null;
   category: { key: string; label: string };
   series: ChartSeries[];
   details: ChartDetail[];
@@ -100,6 +106,7 @@ interface ChartDocumentBase extends ChartDocumentMeta {
 
 export interface TimeseriesDocument extends ChartDocumentBase {
   kind: 'timeseries';
+  mark: 'bar' | 'line' | 'area';
   /** `snapshot`: point-in-time measurements on the listed dates, never gap-filled. */
   frequency: 'year' | 'month' | 'week' | 'day' | 'snapshot';
   timezone: 'UTC';
@@ -178,14 +185,11 @@ export type ChartDocument = SeriesDocument | MatrixDocument | NetworkDocument | 
 
 export interface ChartVariant {
   interactive?: { kind: ChartDocument['kind']; path: string };
-  /** Absent on legacy manifests, which always provide images. */
+  /** Whether a PNG exists for external reports; the dashboard never shows it. */
   image_available?: boolean;
   label: string;
+  /** The PNG name the variant is keyed by: a stable ID, not something to fetch. */
   file: string;
-  /** Intrinsic pixel size, when the emitter could read it — lets the browser
-   *  reserve the image's box so loading charts don't shift the page. */
-  width?: number;
-  height?: number;
   /**
    * This tab's own "how to read this" and derivation steps. A chart's tabs show
    * different populations (maintainers / committers) or different spans, so the
@@ -405,10 +409,9 @@ export interface SectionDoc {
   variants?: SectionVariant[];
 }
 
-/** Deploy-relative roots: the app, the API, and the chart PNGs ship together. */
+/** Deploy-relative roots: the app and the API ship together. */
 const BASE = import.meta.env.BASE_URL;
 export const API_ROOT = `${BASE}data/api/v1`;
-export const chartUrl = (file: string): string => `${BASE}${file}`;
 
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url);

@@ -50,3 +50,17 @@ export function shade(value: unknown, scale: MatrixDocument['scale']): number | 
   const step = Math.ceil(((n - scale.min) / (scale.max - scale.min)) * scale.steps);
   return Math.min(scale.steps, Math.max(1, step));
 }
+
+/**
+ * The inclusive bucket span a `range` value selects: a preset (`all`, the
+ * latest `24` or `12`) or a brushed `first~last`. Anything that no longer
+ * matches the document (a stale link) falls back to every bucket.
+ */
+export function spanOf(range: string, buckets: string[]): [number, number] {
+  const last = buckets.length - 1;
+  if (range === '12' || range === '24') return [Math.max(0, last - Number(range) + 1), last];
+  const [from, to] = range.split('~');
+  const start = buckets.indexOf(from);
+  const end = buckets.indexOf(to);
+  return to !== undefined && start >= 0 && end >= start ? [start, end] : [0, last];
+}

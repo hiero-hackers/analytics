@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import InteractiveChart from '../components/InteractiveChart';
+import { spanOf } from '../components/charts/format';
 import { validateChartDocument } from '../chartData';
 import { downloadCsv } from '../csv';
 import type { CategoriesDocument, ChartDocument, ChartVariant, TimeseriesDocument } from '../api';
@@ -126,6 +127,46 @@ async function showData() {
 }
 
 describe('Interactive charts', () => {
+  it('shares chart style, range and scale in the URL while exporting original selected counts', async () => {
+    const rows = Array.from({ length: 30 }, (_, index) => ({
+      ...data.rows[0],
+      bucket: `2026-01-${String(index + 1).padStart(2, '0')}`,
+    }));
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        ...data,
+        id: 'explore',
+        frequency: 'day',
+        rows,
+        window: { kind: 'calendar', first: rows[0].bucket, last: rows.at(-1)!.bucket },
+      }),
+    } as Response);
+    render(
+      <InteractiveChart
+        variant={variant('test/explore-controls.json')}
+        title="Role activity"
+        provenance={provenance}
+      />,
+    );
+    await screen.findByRole('radio', { name: 'Line' });
+    await userEvent.click(screen.getByRole('radio', { name: 'Line' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Latest 12' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Share (%)' }));
+    expect(window.location.hash).toContain('explore.mark=line');
+    expect(window.location.hash).toContain('explore.range=12');
+    expect(window.location.hash).toContain('explore.scale=share');
+    await showData();
+    expect(screen.getAllByRole('row')).toHaveLength(13);
+    expect(screen.queryByText('2026-01-01', { selector: 'td' })).not.toBeInTheDocument();
+    expect(screen.getByText('2026-01-19', { selector: 'td' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Download CSV' }));
+    const payload = vi.mocked(downloadCsv).mock.calls[0][0];
+    expect(payload.rows).toHaveLength(12);
+    expect(payload.rows[0].general_user).toBe(10);
+    expect(payload.rows[0].maintainer).toBe(5);
+  });
+
   it('uses the selected series for the table and downloaded CSV', async () => {
     render(
       <InteractiveChart
@@ -198,18 +239,17 @@ describe('Interactive charts', () => {
     expect(screen.queryByText('2026-01', { selector: 'td' })).not.toBeInTheDocument();
   });
 
-  it('retries failed requests and keeps a legacy fallback available', async () => {
+  it('retries failed requests without substituting a chart image', async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
     render(
       <InteractiveChart
         variant={variant('test/retry.json')}
         title="Role activity"
         provenance={provenance}
-        fallback={<img src="legacy.png" alt="Legacy chart" />}
       />,
     );
     expect(await screen.findByRole('alert')).toHaveTextContent('could not be loaded');
-    expect(screen.getByRole('img', { name: 'Legacy chart' })).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Retry chart' }));
     await screen.findByRole('button', { name: 'Maintainers' });
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -330,7 +370,106 @@ describe('Interactive charts', () => {
     expect(within(screen.getByRole('table')).getByText('50')).toBeInTheDocument();
   });
 
+  it('draws a status meter that leads with the headline share', async () => {
+    serve({
+      ...repos,
+      id: 'owners',
+      mark: 'meter',
+      rank: false,
+      top_n: null,
+      unit: 'Repositories',
+      dimensions: ['status'],
+      category: { key: 'status', label: 'CODEOWNERS file' },
+      window: { kind: 'snapshot', days: null, end: '2026-02-12T12:00:00Z' },
+      series: [{ key: 'count', label: 'Repositories', color: 'var(--chart-1)' }],
+      rows: [
+        { status: 'Present', count: 29 },
+        { status: 'Missing', count: 15 },
+      ],
+    });
+    render(
+      <InteractiveChart
+        variant={variant('test/owners.json', 'categories')}
+        title="Code owners"
+        provenance={provenance}
+      />,
+    );
+    // The headline, and again beside its legend entry.
+    expect(await screen.findAllByText('65.9%')).toHaveLength(2);
+    expect(screen.getByText(/29 of 44 repositories/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', {
+        name: '44 repositories: Present 29 (65.9%), Missing 15 (34.1%).',
+      }),
+    ).toBeInTheDocument();
+    await showData();
+    expect(firstCells()).toEqual(['Present', 'Missing']);
+  });
+
+  it('draws a funnel with conversion and drop-off between stages, per cohort', async () => {
+    serve({ ...funnel, id: 'funnel-mark', mark: 'funnel' });
+    render(
+      <InteractiveChart
+        variant={variant('test/funnel-mark.json', 'categories')}
+        title="Funnel"
+        provenance={provenance}
+      />,
+    );
+    const stages = await screen.findByRole('list', { name: '2 stages' });
+    expect(within(stages).getByText('88.6%')).toBeInTheDocument();
+    expect(within(stages).getByText('· 4 drop off')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('radio', { name: 'all' }));
+    expect(within(stages).getByText('90.5%')).toBeInTheDocument();
+    expect(within(stages).getByText('· 15 drop off')).toBeInTheDocument();
+    expect(within(stages).getByText('158')).toBeInTheDocument();
+  });
+
+  it('reads a brushed span from the URL and applies it to the table and CSV', async () => {
+    const months = Array.from({ length: 36 }, (_, i) => {
+      const date = new Date(Date.UTC(2023, i, 1));
+      return date.toISOString().slice(0, 7);
+    });
+    const buckets = months.map((bucket, i) => ({ ...data.rows[0], bucket, general_user: i }));
+    expect(spanOf('all', months)).toEqual([0, 35]);
+    expect(spanOf('12', months)).toEqual([24, 35]);
+    expect(spanOf('2024-03~2024-08', months)).toEqual([14, 19]);
+    // A reversed or stale span falls back to every bucket.
+    expect(spanOf('2024-08~2024-03', months)).toEqual([0, 35]);
+    expect(spanOf('1999-01~2024-03', months)).toEqual([0, 35]);
+
+    window.location.hash = '#span.range=2024-03~2024-08';
+    serve({
+      ...data,
+      id: 'span',
+      rows: buckets,
+      window: { kind: 'calendar', first: months[0], last: months.at(-1)! },
+    });
+    render(
+      <InteractiveChart variant={variant('test/span.json')} title="Span" provenance={provenance} />,
+    );
+    expect(await screen.findByText(/\(6 of 36 buckets\)/)).toBeInTheDocument();
+    // A brushed span is not one of the presets, so none is checked and Reset appears.
+    for (const name of ['All periods', 'Latest 24', 'Latest 12']) {
+      expect(screen.getByRole('radio', { name })).toHaveAttribute('data-state', 'off');
+    }
+    await showData();
+    expect(firstCells()).toEqual(months.slice(14, 20));
+    await userEvent.click(screen.getByRole('button', { name: 'Download CSV' }));
+    expect(vi.mocked(downloadCsv).mock.calls[0][0].rows.map((row) => row.general_user)).toEqual([
+      14, 15, 16, 17, 18, 19,
+    ]);
+    await userEvent.click(screen.getByRole('button', { name: 'Reset span' }));
+    expect(window.location.hash).not.toContain('span.range');
+    expect(screen.getAllByRole('row')).toHaveLength(37);
+  });
+
   it('rejects malformed documents before rendering', () => {
+    expect(() => validateChartDocument({ ...funnel, mark: 'funnel' })).not.toThrow();
+    // Meters and funnels draw one series, and never over time.
+    expect(() => validateChartDocument({ ...repos, mark: 'meter' })).toThrow();
+    expect(() => validateChartDocument({ ...data, mark: 'funnel' })).toThrow();
+    expect(() => validateChartDocument({ ...repos, value_max: 10 })).not.toThrow();
+    expect(() => validateChartDocument({ ...repos, value_max: -1 })).toThrow();
     expect(() => validateChartDocument(data)).not.toThrow();
     expect(() => validateChartDocument(repos)).not.toThrow();
     expect(() => validateChartDocument(funnel)).not.toThrow();

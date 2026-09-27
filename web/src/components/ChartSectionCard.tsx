@@ -1,47 +1,40 @@
-/**
- * One chart section as its own card, mirroring the legacy dashboard: a title
- * and description, then each chart as a figure with variant tabs (All /
- * Active…), optional slideshow navigation, horizontal scroll for wide charts,
- * and a lightbox that reveals the "how to read this" note and step-by-step
- * methodology. The PNGs carry their provenance footer in the image itself.
- *
- * Charts that offer the *same* set of variant labels share one axis, owned by
- * the card: the Organisation-diversity card has three Maintainers/Committers
- * charts, and per-figure tabs let a reader end up comparing a maintainer donut
- * with a committer repo mix while the description promised the tabs switch the
- * view. Charts with any other label set (the period-tabbed cards elsewhere)
- * keep their own tabs, so nothing else changes.
- */
+/** Data-driven chart cards with shared variant axes and URL-backed selections. */
 
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { useUrlIndex, useUrlList } from '../urlState';
-import { ChevronLeftIcon, ChevronRightIcon, Maximize2Icon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
-import { chartUrl, fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
+import { fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
 import { downloadCsvText } from '../csv';
-import { ChartLightbox, type LightboxContent } from './ChartLightbox';
 import { CopyLinkButton } from './CopyLinkButton';
 import { DownloadButton } from './CsvDownloadButton';
 import { SectionCard } from './SectionCard';
 import { VariantTabs } from './VariantTabs';
 
-/** The light mat every chart PNG sits on: its baked-in white ground, framed,
- *  so in dark mode it reads as a mounted print rather than a hole in the page. */
 const InteractiveChart = lazy(() => import('./InteractiveChart'));
-
-const MAT = 'rounded-lg border border-edge-faint bg-chart-ground';
 
 /**
  * A chart's variant axis, identified by its ordered label set. Serialised
  * rather than joined so no separator can be confused with a label.
  */
+/**
+ * Whether a chart needs the full row: hand-flagged `wide` / `full_row` charts,
+ * and the kinds that need the width by shape — heatmaps, networks, timelines.
+ */
+const WIDE_KINDS = ['matrix', 'network', 'events'];
+const needsFullRow = (chart: ChartSpec, variant: number) =>
+  Boolean(
+    chart.wide ||
+    chart.full_row ||
+    WIDE_KINDS.includes(chart.variants[variant]?.interactive?.kind ?? ''),
+  );
+
 const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant) => variant.label));
 
 function Figure({
   chart,
   stateKey,
-  onZoom,
   slide = false,
   stretch = false,
   axis,
@@ -51,7 +44,6 @@ function Figure({
   /** URL key for this figure's own tab, so a shared link opens the same variant. */
   stateKey: string;
   provenance: Manifest['provenance'];
-  onZoom: (chart: ChartSpec, variant: number) => void;
   slide?: boolean;
   /** Span the full row even though the chart itself is half-width shaped. */
   stretch?: boolean;
@@ -62,32 +54,10 @@ function Figure({
   const [own, setOwn] = useUrlIndex(stateKey);
   const variant = Math.min(axis ? axis.index : own, chart.variants.length - 1);
   const active = chart.variants[variant];
-  // A tall/square chart (a heatmap) in a ~340px gallery cell is illegible, but
-  // the `wide` scroll-box treatment would shrink it to the box height instead.
-  // It gets the full row with natural page flow: the dimensions ship with the
-  // variant, so the shape decides — nobody hand-flags heatmaps.
-  const tall = Boolean(active.width && active.height && active.width / active.height <= 1.05);
-  // Full row without the scroll box: wide-aspect charts with few bars scale to
-  // fit; only hand-flagged `wide` charts (many bars) get horizontal scrolling.
-  // Heatmaps, networks and timelines need the width whether or not a PNG
-  // (and so its dimensions) exists.
-  const wideKind = ['matrix', 'network', 'events'].includes(active.interactive?.kind ?? '');
-  const fullRow = chart.wide || chart.full_row || tall || stretch || wideKind;
-  const img = (
-    <img
-      src={chartUrl(active.file)}
-      alt={chart.title}
-      loading="lazy"
-      // Intrinsic size (when known) reserves the aspect-ratio box up front, so
-      // a screen of lazy-loading charts doesn't shove content around as each
-      // one arrives. CSS still controls the displayed width.
-      width={active.width}
-      height={active.height}
-      className={chart.wide ? 'block h-[460px] w-auto max-w-none' : 'h-auto w-full'}
-    />
-  );
+  const fullRow = stretch || needsFullRow(chart, variant);
   return (
     <figure
+      aria-label={`${chart.title} — ${active.label}`}
       className={cn(
         'm-0 min-w-0 rounded-xl border bg-background/40 p-3',
         (slide || fullRow) && 'col-span-full',
@@ -101,8 +71,6 @@ function Figure({
           ariaLabel={`${chart.title} view`}
         />
       )}
-      {/* A real button, so the enlarged view and its notes are reachable from
-          the keyboard; the image inside keeps the chart's alt text. */}
       {active.interactive ? (
         <Suspense
           fallback={
@@ -116,25 +84,28 @@ function Figure({
             variant={active}
             title={chart.title}
             provenance={provenance}
-            fallback={active.image_available !== false ? img : undefined}
           />
         </Suspense>
       ) : (
-        <button
-          type="button"
-          aria-label={`Enlarge chart: ${chart.title}`}
-          onClick={() => onZoom(chart, variant)}
-          className={cn(
-            MAT,
-            'group/chart relative block w-full cursor-zoom-in p-1.5 transition-colors outline-none hover:border-edge-strong focus-visible:ring-2 focus-visible:ring-ring',
-            chart.wide && 'overflow-x-auto overflow-y-hidden',
-          )}
+        <div
+          role="status"
+          className="flex min-h-48 flex-col justify-center gap-2 rounded-lg border border-dashed p-6 text-sm"
         >
-          <span className="mb-2 ml-auto w-fit flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5 text-xs text-foreground shadow-sm opacity-80 transition-opacity group-hover/chart:opacity-100">
-            <Maximize2Icon className="size-3" /> Explore
-          </span>
-          {img}
-        </button>
+          <p className="font-medium">Chart data is not available yet</p>
+          <p className="text-muted-foreground">
+            This view will appear when its source dataset is published in the next analytics
+            refresh.
+          </p>
+          <details className="text-muted-foreground">
+            <summary className="cursor-pointer">About this chart</summary>
+            <p className="mt-2">{active.note ?? chart.note}</p>
+            <ol className="mt-2 list-inside list-decimal">
+              {(active.methodology ?? chart.methodology ?? []).map((step, index) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ol>
+          </details>
+        </div>
       )}
       <figcaption
         className={cn(
@@ -157,21 +128,10 @@ export function ChartSectionCard({
 }) {
   // Slide and shared tabs live in the URL: "Copy link" reproduces the view.
   const [rawSlide, setSlide] = useUrlIndex(`${section.id}.slide`);
-  const [zoom, setZoom] = useState<LightboxContent | null>(null);
   // One selection per shared axis, keyed by its label set; the URL holds them
   // as `<section>.tab=<i>,<j>` in axis order.
   const [rawShared, setRawShared] = useUrlList(`${section.id}.tab`);
 
-  const onZoom = (chart: ChartSpec, variant: number) =>
-    setZoom({
-      src: chartUrl(chart.variants[variant].file),
-      alt: chart.title,
-      // The tab's own text where it has one: on a role-tabbed chart the
-      // chart-level note describes maintainers, and showing it on the
-      // Committers tab misdescribes the population the reader is looking at.
-      note: chart.variants[variant].note ?? chart.note,
-      methodology: chart.variants[variant].methodology ?? chart.methodology,
-    });
   const count = section.charts.length;
   const slide = Math.min(rawSlide, count - 1);
 
@@ -215,13 +175,8 @@ export function ChartSectionCard({
   // stay half — a trailing odd one out at half width reads better than one
   // chart rendering huge next to its same-shaped siblings. Variant 0's shape
   // decides, keeping the grid stable while variant tabs switch.
-  const isFullRow = (chart: ChartSpec) => {
-    const first = chart.variants[0];
-    const tall = Boolean(first.width && first.height && first.width / first.height <= 1.05);
-    return Boolean(chart.wide || chart.full_row || tall);
-  };
-  const halfCount = section.charts.filter((chart) => !isFullRow(chart)).length;
-  const stretched = section.charts.map((chart) => isFullRow(chart) || halfCount === 1);
+  const halfCount = section.charts.filter((chart) => !needsFullRow(chart, 0)).length;
+  const stretched = section.charts.map((chart) => needsFullRow(chart, 0) || halfCount === 1);
 
   // A card whose tabs show different populations declares a companion CSV per
   // tab; offering one for the whole card would hand a reader on the Committers
@@ -297,7 +252,6 @@ export function ChartSectionCard({
             chart={section.charts[slide]}
             stateKey={`${section.id}.${slide}.tab`}
             provenance={provenance}
-            onZoom={onZoom}
             slide
             axis={axisFor(section.charts[slide])}
           />
@@ -310,14 +264,12 @@ export function ChartSectionCard({
               chart={chart}
               stateKey={`${section.id}.${index}.tab`}
               provenance={provenance}
-              onZoom={onZoom}
               stretch={stretched[index]}
               axis={axisFor(chart)}
             />
           ))}
         </div>
       )}
-      {zoom && <ChartLightbox content={zoom} onClose={() => setZoom(null)} />}
     </SectionCard>
   );
 }

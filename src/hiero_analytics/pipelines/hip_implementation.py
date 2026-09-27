@@ -129,7 +129,7 @@ def _plot_adoption_funnel(funnel: pd.DataFrame, org: str, charts_dir) -> None:
     )
 
 
-def _plot_activity_by_status(summary: pd.DataFrame, org: str, charts_dir) -> None:
+def activity_by_status(summary: pd.DataFrame) -> pd.DataFrame:
     """Implementation evidence for the statuses where implementation is expected.
 
     "No evidence" splits by what HIP-1 implies: for an approved spec it means
@@ -138,7 +138,7 @@ def _plot_activity_by_status(summary: pd.DataFrame, org: str, charts_dir) -> Non
     """
     summary = summary[summary["status_bucket"].isin(_BUCKET_LABELS)]
     if summary.empty:
-        return
+        return pd.DataFrame(columns=["bucket", "merged", "open_only", "none_awaiting", "citation_gap"])
     counts = summary.groupby(["status_bucket", "evidence_class"]).size().unstack(fill_value=0).reindex(_BUCKET_LABELS)
     for column in ("merged", "open_only", "none"):
         if column not in counts:
@@ -148,6 +148,13 @@ def _plot_activity_by_status(summary: pd.DataFrame, org: str, charts_dir) -> Non
     is_approved = frame["status_bucket"] == "approved_accepted"
     frame["none_awaiting"] = frame["none"].where(is_approved, 0)
     frame["citation_gap"] = frame["none"].where(~is_approved, 0)
+    return frame
+
+
+def _plot_activity_by_status(summary: pd.DataFrame, org: str, charts_dir) -> None:
+    frame = activity_by_status(summary)
+    if frame.empty:
+        return
     labels = [
         "Merged implementation PRs",
         "Open PRs only",
@@ -201,6 +208,7 @@ def main(org: str = ORG) -> None:
         "hip_repo_activity.csv": build_repo_activity(evidence),
         "hip_repo_engagement.csv": engagement,
         "hip_summary.csv": summary,
+        "hip_activity_by_status.csv": activity_by_status(summary),
         "hip_approved_no_activity.csv": _approved_no_activity(summary),
         "hip_process_checks.csv": build_process_checks(summary),
         "hip_adoption_funnel.csv": build_adoption_funnel(summary),

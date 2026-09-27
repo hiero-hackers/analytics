@@ -6,7 +6,7 @@ Use shadcn chart components with Recharts for bars, lines, areas, and small comp
 
 This document is the implementation plan and its progress record.
 
-**Status:** Steps 1–4 are implemented. 37 chart variants per organisation have interactive versions (listed under steps 2 and 3). Each switches from PNG to interactive once its CSV exists in the output directory. Connected exploration (step 4) links them: a dashboard-wide focus, chart state in shareable URLs, and previous-period comparisons. What remains is the few charts listed under "Still PNG" and the event-level work described at the end of step 4.
+**Status:** Every declared chart variant now has a numeric dataset adapter. React renders interactive charts only; an older bundle without data shows an availability message, and a failed request offers Retry. The remaining 12 image-only variants were migrated: employer concentration (3), HIP status (1), ownership/runners (2), hackers overview (3), and Discord (3). PNG generation remains available for external reports, but the dashboard does not request chart images.
 
 ## Reference direction
 
@@ -33,32 +33,15 @@ Repository filters should only affect charts whose datasets support that dimensi
 
 ## What the repository has today
 
-- `web/src/components/ChartSectionCard.tsx` renders a variant with `InteractiveChart` when it has an `interactive` reference, and as a PNG otherwise. `InteractiveChart` loads the document and picks a view in `components/charts/` (`SeriesView`, `MatrixView`, `NetworkView`, `EventsView`); all share `ChartShell` (Chart / Data, CSV, expanded dialog, footer). It is lazy-loaded; with Recharts it is a separate 120 kB (gzipped) chunk.
-- `web/src/api.ts` describes image variants plus the `ChartDocument` type (`TimeseriesDocument` | `CategoriesDocument`). `web/src/chartData.ts` validates and caches documents.
+- `web/src/components/ChartSectionCard.tsx` renders a variant with `InteractiveChart` when it has an `interactive` reference, and shows an explicit missing-data state otherwise. `InteractiveChart` loads the document and picks a view in `components/charts/` (`SeriesView`, `MatrixView`, `NetworkView`, `EventsView`); all share `ChartShell` (Chart / Data, CSV, expanded dialog, footer). It is lazy-loaded; with Recharts it is a separate 120 kB (gzipped) chunk.
+- `web/src/api.ts` describes image variants plus the `ChartDocument` type (series, categories, matrices, networks, and events). `web/src/chartData.ts` validates and caches documents.
 - `src/hiero_analytics/export/chart_data.py` builds chart documents from CSVs. Dashboard specs declare them through `interactive_sources`, keyed by the PNG filename; shared series, colours and counting rules live in `dashboard_spec/interactive.py`. `_org_chart_sections` publishes a variant when either its PNG or its dataset exists.
 - Recharts and `components/ui/chart.tsx` are installed. Role colours are the `--chart-general|triage|committer|maintainer` tokens in `app.css`; neutral series use `--chart-1`…`--chart-5`. All have dark-mode values. Domain palettes (difficulty, employers) reuse the PNGs' hex colours.
 - Existing chart notes, methodology, share links, period tabs, CSV exports, and provenance remain part of the experience.
 
-Local dataset inventory (`outputs/data/org/hiero-ledger`, generated 2026-09-07; its PNGs are newer, from 2026-09-26):
+All source datasets are exported by their owning pipelines. A contract test runs the pipeline suite on fixture data and requires every produced chart variant to have a loadable interactive document. A second guard requires every declared chart to name a data source.
 
-| Dataset | Local state | Presentation |
-| --- | --- | --- |
-| `maintainer_pipeline_{yearly,monthly,weekly,daily}.csv` | Present | Stacked bars per period (done) |
-| `maintainer_pipeline_by_repo{,_365d,_30d,_7d}.csv` | Only the all-time file | Ranked horizontal stacked bars (done) |
-| `affiliation_distribution{,_committers}.csv` | Maintainers only | Ranked employer bars (done) |
-| `repo_affiliation_composition{,_committers}.csv`, `team_affiliation_composition.csv` | Committer file missing | 100% horizontal bars with a 50% line (done) |
-| `hip_adoption_funnel.csv` | Present, 8 rows across cohorts | Stage bars with cohort selection (done) |
-| `hip_repo_engagement.csv` | Present, 39 rows | Ranked horizontal bars (done) |
-| `difficulty_by_repo{,_365d,_30d,_7d}.csv` | Missing (only stale `_30_days` names) | Ranked stacked bars (done) |
-| `difficulty_over_time{_all,}_event_based_weekly.csv` | Labelled file only | Stacked area of point-in-time counts (done) |
-| `repo_growth_timeline.csv` | Missing | Monthly bars and cumulative line (done) |
-| `org_scorecard.csv` | Missing; the scorecard pipeline now saves it | Ranked score bars (done) |
-| `{contributor,team,org,repo}_activity_heatmap.csv` | Present | Heatmap grid (done) |
-| `{maintainer,committer,triage,all}_network_{nodes,edges}.csv` | Missing; the pipelines now save them | SVG network with the PNG's layout (done) |
-| `release_timeline.csv` | Missing | Release scatter per window (done) |
-| `org_scorecard_checks.csv` | Missing; the scorecard pipeline now saves it | Checks matrix (done) |
-
-Missing files only mean the local output is stale. The contract test runs every pipeline on fixture data and checks that every declared interactive variant with data publishes. Re-run the pipelines before judging the dashboard from this directory.
+The GitHub-backed pipelines refresh the data on the analytics schedule. Client rendering uses the latest published snapshot; it does not create a streaming feed. Discord requires manual input in `inputs/`; its CSV sidecars preserve the archive snapshot date so rerendering it does not extend the series to today.
 
 ## Data flow
 
@@ -90,7 +73,7 @@ Every document shares the metadata fields (`id`, `metric`, `unit`, `population`,
 - `network`: `nodes` (repository, active and total members, category, and the PNG layout's `x`/`y`) and `edges` (shared members), read from a nodes CSV plus `edges_file`.
 - `events`: individual timestamped events (releases) in a trailing window, with a `type` (release / prerelease) and the row order (busiest first).
 
-For the two series kinds, drawing is declared, not coded: `mark` (`bar` | `line` | `area`), `stacked`, `normalize` (draw shares of each row's visible total; the table keeps counts), `orientation`, `rank` (re-rank by the visible series), `top_n` (rows before "Show all"), `reference` (e.g. a 50% line), and `details` (values shown in the tooltip and table but not drawn). A source can supply its own `note` when the PNG's note does not describe the interactive view. Examples: the PNG pools small repositories and the interactive chart does not, and the pie shows the top 2 employers while the bars rank them all. The counting rule travels separately as `population`, so no chart note can replace it.
+For the two series kinds, drawing is declared, not coded: `mark` (`bar` | `line` | `area`, plus the categories-only single-series `meter` and `funnel`), `stacked`, `normalize` (draw shares of each row's visible total; the table keeps counts), `orientation`, `rank` (re-rank by the visible series), `top_n` (rows before "Show all"), `reference` (a fixed line such as 50%, or `{"stat": "median"}`, which the exporter computes from the published rows and writes into the label), `value_max` (a bounded scale's ceiling, e.g. 10 for Scorecard), and `details` (values shown in the tooltip and table but not drawn). A source can supply its own `note` when the PNG's note does not describe the interactive view. Examples: the PNG pools small repositories and the interactive chart does not, and the pie shows the top 2 employers while the bars rank them all. The counting rule travels separately as `population`, so no chart note can replace it.
 
 Implemented dataset fields: `schema_version`, `id`, `kind`, `org`, `source`, `metric`, `unit`, `population`, `dimensions`, `category`, `series` (with colours), `details`, `rows`, `window`, and the drawing fields above. Time series also carry `frequency`, `timezone`, and a per-row `partial` flag. `window.kind` is `calendar`, `trailing` (with `days`), `all`, or `snapshot`, so snapshot metrics are labelled as snapshots. `note`, `methodology`, `generated_at`, and `stale` are added when available. Still open from the list below: a separate `data_as_of` (how far the data reaches, as opposed to when it was generated) and declared filters beyond `dimensions`.
 
@@ -139,7 +122,7 @@ These counts are unique people within each bucket, classified by their highest r
 - Build the typed chart data contract, monthly/yearly/daily/weekly adapters, and optional manifest references.
 - Render role activity end to end, including the data view, selected-data CSV, tooltip, legend, and expanded view.
 - Publish interactive variants when their datasets exist, independently of image availability.
-- Retain an explicit image fallback for older bundles and unmigrated charts.
+- Show a missing-data explanation for older image-only bundles; use Retry for failed data requests.
 
 ### 2. Standard charts — done
 
@@ -153,10 +136,15 @@ Interactive now, all declared in the dashboard specs:
 - Repository growth: new repositories per month as bars, cumulative count as a line.
 - OpenSSF scorecard: aggregate score per repository. The scorecard pipeline now saves `org_scorecard.csv`.
 
-Still PNG:
+Remaining families — now migrated:
 
-- Single-employer teams/repos by org, and HIP activity by status: their plotted frames are computed in the pipeline and never saved. Each needs a CSV first.
-- Code-owner and runner summaries, and the Contributors-tab overview charts, which were not inventoried in this step.
+- Single-employer teams and repositories: ranked employer bars, using the same diversity calculations as the report.
+- HIP implementation evidence: stacked status bars, counting HIPs once under their strongest evidence, with distinct awaiting-evidence and citation-gap segments.
+- CODEOWNERS coverage and runners: coverage bars and stacked runner declarations per repository.
+- Hackers overview: complete contributor rankings, repository language distribution, and push activity. The CSV retains all repositories; the report image still limits its ranking to 20.
+- Discord: topic composition, monthly area chart, and ranked recent channels. The interactive view can show every channel.
+
+Time series offer Bars / Line / Area and All periods / Latest 24 / Latest 12. Series longer than 24 buckets add an overview strip below the chart: a brush over every bucket, operable by drag or by the arrow keys on a focused handle. The chosen span is held in the URL as `<id>.range=<first>~<last>` and drives the chart, data table and CSV together; a stale or reversed span falls back to every bucket. The period controls select existing buckets, without recomputing distinct people across a range. Stacked count charts offer Counts / Share (%); the tooltip explains percentages while data tables and downloads retain the original numeric counts. All controls are shared through the URL.
 
 Prefer bars for discrete monthly additions and lines for cumulative totals. Keep funnel cohorts separate and denominators explicit. Avoid arbitrary smoothed curves that imply intermediate measurements.
 
@@ -195,10 +183,21 @@ There is no comparison for:
 
 A source can opt out with `"compare": False`.
 
-**Not done, deliberately.** There is no arbitrary date-range filtering: distinct-contributor counts for an arbitrary range need event-level aggregation, and the exported fixed-window totals cannot be re-cut or summed to produce them. Two focus limits also remain:
+**Not done, deliberately.** The latest-bucket zoom does not provide arbitrary date-range aggregation: distinct-contributor counts for an arbitrary range need event-level aggregation, and the exported fixed-window totals cannot be re-cut or summed to produce them. Two focus limits also remain:
 
 - The focus does not narrow the time series, because a per-repository monthly breakdown is not exported.
 - Section tables do not yet *set* the focus.
+
+### 5. Forms beyond bars — done
+
+Some charts were bars only because the PNG was. The data's job now picks the form:
+
+- **Status meter** (`mark: "meter"`): CODEOWNERS present / missing and repository push activity. Two bars made the reader do the division, so the meter leads with the headline status's share ("65.9% Present · 29 of 44 repositories") over one part-to-whole track. The headline is drawn in the series hue and the other statuses in neutral steps (emphasis, not identity), and every segment is labelled directly. Specs use `status_meter()`; source order is kept, so the headline status must come first.
+- **Funnel** (`mark: "funnel"`): HIP adoption. Stages are centred and sized against the first. Between two stages the chart states the conversion and the drop-off ("67.7% continue · 10 drop off"); each stage shows its count and share of the first. The cohort switch is unchanged.
+- **Org median** on the Scorecard ranking, with the axis fixed to 0–10 so it cannot imply a higher maximum.
+- **Overview + detail** brush on long time series (repository growth, weekly difficulty), described under step 2.
+
+Both new marks draw exactly one series and are rejected on time series, in the exporter and the web validator alike. Dual-axis combinations (e.g. new repositories as bars and a cumulative line on a second scale) are deliberately not offered: two charts share the card instead.
 
 ## Completion checks
 
@@ -210,4 +209,4 @@ A source can opt out with `"compare": False`.
 - Measure bundle size and lazy-load the chart renderer; virtualize large supporting tables.
 - Check missing/failed datasets and compatibility with older image-only manifests.
 
-The first deliverable should be the role-activity chart and its matching data view. This establishes the reusable data contract and interaction design before converting the remaining catalog.
+The chart catalog is migrated. A manifest built before a pipeline's CSV existed lists that chart without data, so re-emit the data API (`hiero_analytics.pipelines.data_api`) after running a single pipeline. Future chart additions must provide a source adapter and pass the pipeline-to-document contract checks.

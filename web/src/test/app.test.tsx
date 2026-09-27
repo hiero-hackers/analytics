@@ -177,24 +177,18 @@ describe('Section tables', () => {
 });
 
 describe('Charts', () => {
-  it('renders variant tabs and opens the lightbox with note and methodology', async () => {
+  it('keeps variant tabs and explains missing data without requesting chart images', async () => {
     await openGovernance();
-
     expect(screen.getByRole('radio', { name: 'By year' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'By month' })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByAltText('Unique active contributors by role'));
-    const lightbox = await screen.findByRole('dialog');
-    expect(within(lightbox).getByText('How to read this chart.')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Step-by-step methodology')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Step two.')).toBeInTheDocument();
-
-    await userEvent.keyboard('{Escape}');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    // Focus goes back to the chart that opened it, not to <body>.
-    expect(
-      screen.getByRole('button', { name: 'Enlarge chart: Unique active contributors by role' }),
-    ).toHaveFocus();
+    await userEvent.click(screen.getByRole('radio', { name: 'By month' }));
+    const figure = screen.getByRole('figure', {
+      name: 'Unique active contributors by role — By month',
+    });
+    expect(within(figure).getByRole('status')).toHaveTextContent('Chart data is not available yet');
+    expect(figure.querySelector('img')).toBeNull();
+    await userEvent.click(within(figure).getByText('About this chart'));
+    expect(within(figure).getByText('How to read this chart.')).toBeVisible();
+    expect(within(figure).getByText('Step two.')).toBeVisible();
   });
 });
 
@@ -206,7 +200,8 @@ describe('Organisation diversity card (#435)', () => {
     return await screen.findByText('Organisation diversity');
   };
 
-  const chartSrc = (title: string) => screen.getByAltText(title).getAttribute('src');
+  const chartVariant = (title: string) =>
+    screen.getByRole('figure', { name: new RegExp(`^${title} —`) }).getAttribute('aria-label');
 
   it('gives the card one role axis, so every role-tabbed chart switches together', async () => {
     await openDiversity();
@@ -215,17 +210,15 @@ describe('Organisation diversity card (#435)', () => {
     // share the axis, must not be able to disagree about the active role.
     const axes = screen.getAllByRole('radiogroup', { name: 'Organisation diversity view' });
     expect(axes).toHaveLength(1);
-    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut.png');
-    expect(chartSrc('Single-employer repos by org')).toContain('single_employer_repos_by_org.png');
+    expect(chartVariant('Role-holders by organisation')).toContain('Maintainers');
+    expect(chartVariant('Single-employer repos by org')).toContain('Maintainers');
 
     await userEvent.click(within(axes[0]).getByRole('radio', { name: 'Committers' }));
 
-    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut_committers.png');
-    expect(chartSrc('Single-employer repos by org')).toContain(
-      'single_employer_repos_by_org_committers.png',
-    );
+    expect(chartVariant('Role-holders by organisation')).toContain('Committers');
+    expect(chartVariant('Single-employer repos by org')).toContain('Committers');
     // The chart with no role axis is untouched by the card's tabs.
-    expect(chartSrc('Single-employer teams by org')).toContain('single_employer_teams_by_org.png');
+    expect(chartVariant('Single-employer teams by org')).toContain('Single-employer teams by org');
   });
 
   it('leaves a chart with its own variant set on its own tabs', async () => {
@@ -242,21 +235,17 @@ describe('Organisation diversity card (#435)', () => {
     expect(within(own).getByRole('radio', { name: 'By year' })).toBeChecked();
   });
 
-  it('shows the active tab’s note and methodology in the lightbox', async () => {
+  it('shows the active tab’s methodology when data is unavailable', async () => {
     await openDiversity();
     const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
-
     await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
-    await userEvent.click(screen.getByAltText('Role-holders by organisation'));
-
-    // The committer tab must describe committers — it used to show the
-    // maintainer note, which misdescribed its own population.
-    const lightbox = await screen.findByRole('dialog');
-    expect(within(lightbox).getByText('The committer bench by employer.')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Count committers.')).toBeInTheDocument();
-    expect(
-      within(lightbox).queryByText('The maintainer bench by employer.'),
-    ).not.toBeInTheDocument();
+    const figure = screen.getByRole('figure', {
+      name: 'Role-holders by organisation — Committers',
+    });
+    await userEvent.click(within(figure).getByText('About this chart'));
+    expect(within(figure).getByText('The committer bench by employer.')).toBeVisible();
+    expect(within(figure).getByText('Count committers.')).toBeVisible();
+    expect(within(figure).queryByText('The maintainer bench by employer.')).not.toBeInTheDocument();
   });
 
   it('downloads the active tab’s companion CSV', async () => {

@@ -5,7 +5,7 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
-from hiero_analytics.dashboard_spec.interactive import SCORECARD_CHECKS
+from hiero_analytics.dashboard_spec.interactive import OWNERSHIP_SOURCES, SCORECARD_CHECKS
 
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
@@ -44,6 +44,9 @@ CHART_MACRO = {
                         "orientation": "horizontal",
                         "rank": True,
                         "top_n": 15,
+                        # Where each repository sits against the organisation.
+                        "reference": {"stat": "median", "label": "Org median"},
+                        "value_max": 10,
                         "window": "snapshot",
                         "metric": "openssf_scorecard",
                         "unit": "OpenSSF Scorecard score (0–10)",
@@ -56,6 +59,7 @@ CHART_MACRO = {
             },
             {
                 "id": "ownership",
+                "interactive_sources": OWNERSHIP_SOURCES,
                 "group": "Ownership",
                 "title": "Code owners & CI runners",
                 "description": (

@@ -14,6 +14,7 @@ from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 from hiero_analytics.dashboard_spec.interactive import (
     ROLE_ACTIVITY,
     ROLE_BY_REPO,
+    SINGLE_EMPLOYER_SOURCES,
     SPAN_WINDOWS,
     affiliation_share,
     composition,
@@ -155,6 +156,7 @@ CHART_MACRO = {
                     "role tabs. See the affiliations and repo-diversity tables below for the underlying detail."
                 ),
                 "interactive_sources": {
+                    **SINGLE_EMPLOYER_SOURCES,
                     "affiliation_donut.png": affiliation_share("maintainer", "maintainers", ""),
                     "affiliation_donut_committers.png": affiliation_share("committer", "committers", "_committers"),
                     **{

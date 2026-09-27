@@ -2,7 +2,9 @@
 
 import {
   Area,
+  AreaChart,
   Bar,
+  Brush,
   CartesianGrid,
   Cell,
   ComposedChart,
@@ -26,7 +28,17 @@ import { dimensionOf, matches, toggle, useFocus } from '../../focus';
 import { useUrlFlag, useUrlList, useUrlParam } from '../../urlState';
 import { VariantTabs } from '../VariantTabs';
 import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
-import { decimal, formatBucket, integer, percent, plural, shorten, windowText } from './format';
+import { Funnel, Meter } from './Composition';
+import {
+  decimal,
+  formatBucket,
+  integer,
+  percent,
+  plural,
+  shorten,
+  spanOf,
+  windowText,
+} from './format';
 
 const FREQUENCY = {
   year: 'Yearly buckets · UTC',
@@ -43,6 +55,10 @@ const AXIS_HEIGHT = 56;
 type ViewRow = Row & { category: string; total: number; partial?: boolean };
 
 const share = (key: string) => `${key}__share`;
+
+/** Series longer than this get an overview strip to brush a span of buckets. */
+const OVERVIEW_MIN = 24;
+const PRESETS = ['all', '24', '12'];
 
 function formatDetail(value: unknown, format: ChartDetail['format']) {
   const n = Number(value);
@@ -118,6 +134,23 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
       : undefined;
   const [focus, setFocus] = useFocus();
   const timeseries = data.kind === 'timeseries';
+  const [scale, setScale] = useUrlParam(`${data.id}.scale`, 'counts');
+  const canChooseScale = data.stacked && data.series.length > 1 && !data.normalize;
+  const normalized = data.normalize || (canChooseScale && scale === 'share');
+
+  const [linkedMark, setMark] = useUrlParam(`${data.id}.mark`, data.mark);
+  const mark = timeseries && ['bar', 'line', 'area'].includes(linkedMark) ? linkedMark : data.mark;
+  const composition = mark === 'meter' || mark === 'funnel';
+  // The visible span of buckets: a preset or a brushed range. It selects
+  // existing buckets only, never re-aggregating people across them.
+  const [range, setRange] = useUrlParam(`${data.id}.range`, 'all');
+  const buckets = timeseries ? data.rows.map((row) => row.bucket) : [];
+  const [spanStart, spanEnd] = timeseries ? spanOf(range, buckets) : [0, data.rows.length - 1];
+  const spanned = timeseries && (spanStart > 0 || spanEnd < data.rows.length - 1);
+  const preset = PRESETS.indexOf(spanned ? range : 'all');
+  const selectedRows = spanned ? data.rows.slice(spanStart, spanEnd + 1) : data.rows;
+  const overview = timeseries && data.rows.length > OVERVIEW_MIN;
+
   const horizontal = !timeseries && data.orientation === 'horizontal';
   const categoryKey = timeseries ? 'bucket' : data.category.key;
   const groupSpec = data.kind === 'categories' ? data.group : null;
@@ -128,11 +161,11 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
   const format = (value: number) =>
     (data.value_format === 'integer' ? integer : decimal).format(value);
 
-  const rows: ViewRow[] = (data.rows as Row[])
+  const rows: ViewRow[] = (selectedRows as Row[])
     .filter((row) => !groupSpec || row[groupSpec.key] === group)
     .map((row) => {
       const total = visible.reduce((sum, series) => sum + Number(row[series.key]), 0);
-      const shares = data.normalize
+      const shares = normalized
         ? Object.fromEntries(
             visible.map((series) => [
               share(series.key),
@@ -152,6 +185,13 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
   const chartRows = focused && !topRows.includes(focused) ? [...topRows, focused] : topRows;
   const dim = (row: ViewRow) => !!focused && row !== focused;
   const anyPartial = rows.some((row) => row.partial);
+  // The overview always spans every bucket, drawn as the visible series' total.
+  const overviewRows = overview
+    ? data.rows.map((row) => ({
+        bucket: row.bucket,
+        total: visible.reduce((sum, series) => sum + Number(row[series.key]), 0),
+      }))
+    : [];
   const nouns = plural(data.category.label.replace(/ \(UTC\)$/, ''));
 
   const columns: ColumnSpec[] = [
@@ -184,11 +224,13 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
 
   const valueAxis = {
     type: 'number' as const,
-    allowDecimals: data.value_format === 'decimal' && !data.normalize,
+    allowDecimals: data.value_format === 'decimal' && !normalized,
     tickLine: false,
     axisLine: false,
-    domain: data.normalize ? [0, 100] : undefined,
-    tickFormatter: (value: number) => (data.normalize ? `${value}%` : format(Number(value))),
+    domain: normalized ? [0, 100] : data.value_max ? [0, data.value_max] : undefined,
+    // Even steps across a bounded scale: 0, 2, … 10 rather than 0, 3, … 9, 10.
+    tickCount: data.value_max && !normalized ? 6 : undefined,
+    tickFormatter: (value: number) => (normalized ? `${value}%` : format(Number(value))),
   };
   const categoryAxis = {
     type: 'category' as const,
@@ -208,6 +250,49 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
       subtitle={subtitle}
       controls={
         <>
+          {canChooseScale && (
+            <VariantTabs
+              labels={['Counts', 'Share (%)']}
+              active={normalized ? 1 : 0}
+              onSelect={(index) => setScale(index ? 'share' : 'counts')}
+              ariaLabel={`${title} scale`}
+            />
+          )}
+          {timeseries && (
+            <div className="flex flex-wrap items-center gap-3">
+              <VariantTabs
+                labels={['Bars', 'Line', 'Area']}
+                active={['bar', 'line', 'area'].indexOf(mark)}
+                onSelect={(index) => setMark(['bar', 'line', 'area'][index])}
+                ariaLabel={`${title} chart style`}
+              />
+              {data.rows.length > 12 && (
+                <VariantTabs
+                  labels={['All periods', 'Latest 24', 'Latest 12']}
+                  active={preset}
+                  onSelect={(index) => setRange(PRESETS[index])}
+                  ariaLabel={`${title} visible periods`}
+                />
+              )}
+              {spanned && (
+                <span className="text-xs text-muted-foreground" aria-live="polite">
+                  Showing {formatBucket(buckets[spanStart], data.frequency)} –{' '}
+                  {formatBucket(buckets[spanEnd], data.frequency)} ({rows.length} of{' '}
+                  {data.rows.length} buckets)
+                  {preset < 0 && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="ml-2 h-auto p-0 text-xs"
+                      onClick={() => setRange('all')}
+                    >
+                      Reset span
+                    </Button>
+                  )}
+                </span>
+              )}
+            </div>
+          )}
           {groupSpec && (
             <VariantTabs
               labels={groupSpec.values}
@@ -247,7 +332,14 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
       }
       empty={!rows.length}
       focusFound={!dimension || !focus || focus.dimension !== dimension || !!focused}
-      windowNote={windowText(data.window, anyPartial)}
+      windowNote={[
+        windowText(data.window, anyPartial),
+        normalized
+          ? 'Each row shows the percentage of its visible series; the data table and CSV retain the original counts.'
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       csv={() => ({
         name: `${data.id}${group ? `-${group.replace(/\W+/g, '-')}` : ''}-selected`,
         title: `${title} — ${[period !== title ? period : null, group].filter(Boolean).join(' · ') || data.unit}`,
@@ -256,175 +348,245 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
           Object.fromEntries(columns.map((column) => [column.key, row[column.key]])),
         ),
       })}
-      chart={(expanded) => (
-        <>
-          <ChartContainer
-            config={config}
-            className={`${horizontal ? '' : expanded ? 'h-[min(55vh,520px)]' : 'h-[340px]'} w-full aspect-auto`}
-            style={horizontal ? { height: chartRows.length * ROW_HEIGHT + AXIS_HEIGHT } : undefined}
-            aria-label={`${title}. Use the arrow keys on the chart to inspect ${nouns}, or choose Data.`}
-          >
-            <ComposedChart
-              accessibilityLayer
-              data={chartRows}
-              layout={horizontal ? 'vertical' : 'horizontal'}
-              margin={{ top: horizontal ? 4 : 20, right: 16, left: 0, bottom: 5 }}
-              barCategoryGap="25%"
+      chart={(expanded) =>
+        composition ? (
+          mark === 'meter' ? (
+            <Meter rows={rows} series={visible[0]} unit={data.unit} format={format} />
+          ) : (
+            <Funnel rows={rows} series={visible[0]} format={format} />
+          )
+        ) : (
+          <>
+            <ChartContainer
+              config={config}
+              className={`${horizontal ? '' : expanded ? 'h-[min(55vh,520px)]' : 'h-[340px]'} w-full aspect-auto`}
+              style={
+                horizontal
+                  ? {
+                      height:
+                        chartRows.length * ROW_HEIGHT + AXIS_HEIGHT + (data.reference ? 16 : 0),
+                    }
+                  : undefined
+              }
+              aria-label={`${title}. Use the arrow keys on the chart to inspect ${nouns}, or choose Data.`}
             >
-              <CartesianGrid vertical={horizontal} horizontal={!horizontal} strokeDasharray="3 3" />
-              {horizontal ? (
-                <>
-                  <XAxis {...valueAxis} />
-                  <YAxis {...categoryAxis} width={160} interval={0} />
-                </>
-              ) : (
-                <>
-                  <XAxis {...categoryAxis} minTickGap={24} tickMargin={12} />
-                  <YAxis {...valueAxis} width={data.normalize ? 48 : 45} />
-                </>
-              )}
-              {data.reference && (
-                <ReferenceLine
-                  {...(horizontal ? { x: data.reference.value } : { y: data.reference.value })}
-                  stroke="var(--ink)"
-                  strokeDasharray="4 4"
-                  label={{
-                    value: data.reference.label,
-                    position: horizontal ? 'insideTopRight' : 'insideTopLeft',
-                    fill: 'var(--muted)',
-                    fontSize: 11,
+              <ComposedChart
+                accessibilityLayer
+                data={chartRows}
+                layout={horizontal ? 'vertical' : 'horizontal'}
+                // A reference line's label needs its own band above the first bar.
+                margin={{
+                  top: horizontal && !data.reference ? 4 : 20,
+                  right: 16,
+                  left: 0,
+                  bottom: 5,
+                }}
+                barCategoryGap="25%"
+              >
+                <CartesianGrid
+                  vertical={horizontal}
+                  horizontal={!horizontal}
+                  strokeDasharray="3 3"
+                />
+                {horizontal ? (
+                  <>
+                    <XAxis {...valueAxis} />
+                    <YAxis {...categoryAxis} width={160} interval={0} />
+                  </>
+                ) : (
+                  <>
+                    <XAxis {...categoryAxis} minTickGap={24} tickMargin={12} />
+                    <YAxis {...valueAxis} width={normalized ? 48 : 45} />
+                  </>
+                )}
+                {data.reference && (
+                  <ReferenceLine
+                    {...(horizontal ? { x: data.reference.value } : { y: data.reference.value })}
+                    stroke="var(--ink)"
+                    strokeDasharray="4 4"
+                    label={{
+                      value: data.reference.label,
+                      position: horizontal ? 'top' : 'insideTopLeft',
+                      fill: 'var(--muted)',
+                      fontSize: 11,
+                    }}
+                  />
+                )}
+                <ChartTooltip
+                  cursor={
+                    mark === 'bar'
+                      ? { fill: 'var(--raise)' }
+                      : { stroke: 'var(--edge-strong)', strokeDasharray: '3 3' }
+                  }
+                  content={({ active, payload }) => {
+                    const row = payload?.[0]?.payload as ViewRow | undefined;
+                    if (!active || !row) return null;
+                    // Dense compositions list only the segments present in the row.
+                    const listed =
+                      visible.length > 4
+                        ? visible.filter((series) => Number(row[series.key]) !== 0)
+                        : visible;
+                    return (
+                      <div className="grid min-w-44 gap-1.5 rounded-lg border bg-card px-3 py-2 text-xs shadow-xl">
+                        <p className="font-medium">
+                          {row.category}
+                          {row.partial ? ' · possibly incomplete' : ''}
+                        </p>
+                        {listed.map((series) => (
+                          <div key={series.key} className="flex items-center justify-between gap-6">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
+                              <span
+                                className="size-2.5 shrink-0 rounded-[2px]"
+                                style={{ backgroundColor: series.color }}
+                              />
+                              {series.label}
+                            </span>
+                            <span className="font-mono font-medium tabular-nums">
+                              {format(Number(row[series.key]))}
+                              {normalized
+                                ? ` · ${percent.format(Number(row[share(series.key)]))}%`
+                                : ''}
+                            </span>
+                          </div>
+                        ))}
+                        {showTotal && (
+                          <div className="flex justify-between gap-6 border-t pt-1.5 font-semibold">
+                            <span>Selected series total</span>
+                            <span className="tabular-nums">{format(row.total)}</span>
+                          </div>
+                        )}
+                        {data.details.map((detail) => (
+                          <div key={detail.key} className="flex justify-between gap-6">
+                            <span className="text-muted-foreground">{detail.label}</span>
+                            <span className="tabular-nums">
+                              {formatDetail(row[detail.key], detail.format)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
                   }}
                 />
-              )}
-              <ChartTooltip
-                cursor={
-                  data.mark === 'bar'
-                    ? { fill: 'var(--raise)' }
-                    : { stroke: 'var(--edge-strong)', strokeDasharray: '3 3' }
-                }
-                content={({ active, payload }) => {
-                  const row = payload?.[0]?.payload as ViewRow | undefined;
-                  if (!active || !row) return null;
-                  // Dense compositions list only the segments present in the row.
-                  const listed =
-                    visible.length > 4
-                      ? visible.filter((series) => Number(row[series.key]) !== 0)
-                      : visible;
+                {visible.map((series, i) => {
+                  const key = normalized ? share(series.key) : series.key;
+                  const stackId = data.stacked ? 'stack' : undefined;
+                  if (mark === 'line') {
+                    return (
+                      <Line
+                        key={series.key}
+                        dataKey={key}
+                        type="linear"
+                        stroke={series.color}
+                        strokeWidth={2}
+                        dot={chartRows.length <= 24}
+                        isAnimationActive={false}
+                      />
+                    );
+                  }
+                  if (mark === 'area') {
+                    return (
+                      <Area
+                        key={series.key}
+                        dataKey={key}
+                        type="linear"
+                        stackId={stackId}
+                        stroke={series.color}
+                        fill={series.color}
+                        fillOpacity={0.4}
+                        isAnimationActive={false}
+                      />
+                    );
+                  }
+                  const top = !data.stacked || i === visible.length - 1;
                   return (
-                    <div className="grid min-w-44 gap-1.5 rounded-lg border bg-card px-3 py-2 text-xs shadow-xl">
-                      <p className="font-medium">
-                        {row.category}
-                        {row.partial ? ' · possibly incomplete' : ''}
-                      </p>
-                      {listed.map((series) => (
-                        <div key={series.key} className="flex items-center justify-between gap-6">
-                          <span className="flex items-center gap-1.5 text-muted-foreground">
-                            <span
-                              className="size-2.5 shrink-0 rounded-[2px]"
-                              style={{ backgroundColor: series.color }}
-                            />
-                            {series.label}
-                          </span>
-                          <span className="font-mono font-medium tabular-nums">
-                            {format(Number(row[series.key]))}
-                            {data.normalize
-                              ? ` · ${percent.format(Number(row[share(series.key)]))}%`
-                              : ''}
-                          </span>
-                        </div>
-                      ))}
-                      {showTotal && (
-                        <div className="flex justify-between gap-6 border-t pt-1.5 font-semibold">
-                          <span>Selected series total</span>
-                          <span className="tabular-nums">{format(row.total)}</span>
-                        </div>
-                      )}
-                      {data.details.map((detail) => (
-                        <div key={detail.key} className="flex justify-between gap-6">
-                          <span className="text-muted-foreground">{detail.label}</span>
-                          <span className="tabular-nums">
-                            {formatDetail(row[detail.key], detail.format)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                }}
-              />
-              {visible.map((series, i) => {
-                const key = data.normalize ? share(series.key) : series.key;
-                const stackId = data.stacked ? 'stack' : undefined;
-                if (data.mark === 'line') {
-                  return (
-                    <Line
+                    <Bar
                       key={series.key}
                       dataKey={key}
-                      type="linear"
-                      stroke={series.color}
-                      strokeWidth={2}
-                      dot={chartRows.length <= 24}
-                      isAnimationActive={false}
-                    />
-                  );
-                }
-                if (data.mark === 'area') {
-                  return (
-                    <Area
-                      key={series.key}
-                      dataKey={key}
-                      type="linear"
                       stackId={stackId}
-                      stroke={series.color}
                       fill={series.color}
-                      fillOpacity={0.4}
+                      radius={top ? (horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]) : 0}
+                      maxBarSize={horizontal ? 24 : 64}
                       isAnimationActive={false}
-                    />
+                      className={dimension ? 'cursor-pointer' : undefined}
+                      onClick={
+                        dimension
+                          ? (entry: { payload?: ViewRow }) =>
+                              entry.payload &&
+                              setFocus(toggle(focus, dimension, entry.payload.category))
+                          : undefined
+                      }
+                    >
+                      {focused &&
+                        chartRows.map((row) => (
+                          <Cell key={row.category} fillOpacity={dim(row) ? 0.3 : 1} />
+                        ))}
+                    </Bar>
                   );
-                }
-                const top = !data.stacked || i === visible.length - 1;
-                return (
-                  <Bar
-                    key={series.key}
-                    dataKey={key}
-                    stackId={stackId}
-                    fill={series.color}
-                    radius={top ? (horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]) : 0}
-                    maxBarSize={horizontal ? 24 : 64}
-                    isAnimationActive={false}
-                    className={dimension ? 'cursor-pointer' : undefined}
-                    onClick={
-                      dimension
-                        ? (entry: { payload?: ViewRow }) =>
-                            entry.payload &&
-                            setFocus(toggle(focus, dimension, entry.payload.category))
-                        : undefined
-                    }
+                })}
+              </ComposedChart>
+            </ChartContainer>
+            {overview && (
+              <div className="rounded-lg border px-2 pt-2">
+                <p className="px-1 text-xs text-muted-foreground">
+                  Overview of all {data.rows.length} buckets · drag the handles, or focus one and
+                  use the arrow keys, to choose the span shown above
+                </p>
+                <ChartContainer config={config} className="aspect-auto h-[76px] w-full">
+                  <ComposedChart
+                    data={overviewRows}
+                    margin={{ top: 4, right: 16, left: 16, bottom: 4 }}
                   >
-                    {focused &&
-                      chartRows.map((row) => (
-                        <Cell key={row.category} fillOpacity={dim(row) ? 0.3 : 1} />
-                      ))}
-                  </Bar>
-                );
-              })}
-            </ComposedChart>
-          </ChartContainer>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">
-              Hover or use the arrow keys to inspect values
-              {data.series.length > 1 ? '; use the series buttons to compare groups' : ''}
-              {dimension ? '. Click a bar to focus the dashboard on it' : ''}.
-            </p>
-            {limited && (
-              <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
-                {showAll
-                  ? `Show top ${data.top_n}`
-                  : `Show all ${integer.format(rows.length)} ${nouns}`}
-              </Button>
+                    <Brush
+                      dataKey="bucket"
+                      height={64}
+                      startIndex={spanStart}
+                      endIndex={spanEnd}
+                      travellerWidth={10}
+                      stroke="var(--link)"
+                      fill="var(--surface)"
+                      ariaLabel={`${title}: choose the visible span`}
+                      tickFormatter={(value) => formatBucket(String(value), data.frequency)}
+                      onChange={({ startIndex, endIndex }) => {
+                        if (startIndex === undefined || endIndex === undefined) return;
+                        setRange(
+                          startIndex === 0 && endIndex === buckets.length - 1
+                            ? 'all'
+                            : `${buckets[startIndex]}~${buckets[endIndex]}`,
+                        );
+                      }}
+                    >
+                      <AreaChart data={overviewRows}>
+                        <Area
+                          dataKey="total"
+                          type="linear"
+                          stroke="var(--muted)"
+                          fill="var(--muted)"
+                          fillOpacity={0.2}
+                          isAnimationActive={false}
+                        />
+                      </AreaChart>
+                    </Brush>
+                  </ComposedChart>
+                </ChartContainer>
+              </div>
             )}
-          </div>
-        </>
-      )}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                Hover or use the arrow keys to inspect values
+                {data.series.length > 1 ? '; use the series buttons to compare groups' : ''}
+                {dimension ? '. Click a bar to focus the dashboard on it' : ''}.
+              </p>
+              {limited && (
+                <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+                  {showAll
+                    ? `Show top ${data.top_n}`
+                    : `Show all ${integer.format(rows.length)} ${nouns}`}
+                </Button>
+              )}
+            </div>
+          </>
+        )
+      }
       table={
         <Table containerClassName={TABLE_CONTAINER}>
           <TableHeader className="sticky top-0 bg-muted">

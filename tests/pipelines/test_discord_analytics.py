@@ -213,3 +213,28 @@ def test_main_writes_three_charts(
     assert expected == actual
     for png in charts_dir.glob("*.png"):
         assert png.stat().st_size > 0
+
+
+def test_main_exports_chart_data_at_manual_snapshot_date(channels_csv, monthly_csv, tmp_path, monkeypatch):
+    """Rerendering a manual archive must not extend its calendar series to today."""
+    import json
+
+    from hiero_analytics.dashboard_spec.interactive import DISCORD_SOURCES
+    from hiero_analytics.export.chart_data import chart_document
+
+    data_dir = tmp_path / "data"
+    charts_dir = tmp_path / "charts"
+    monkeypatch.setattr(runner, "ensure_org_dirs", lambda _org: (data_dir, charts_dir))
+    for name in ("plot_monthly_traffic", "plot_recent_activity_30d", "plot_category_breakdown"):
+        monkeypatch.setattr(runner, name, lambda *_args: None)
+    runner.main()
+    documents = {}
+    for name, source in DISCORD_SOURCES.items():
+        path = data_dir / source["file"]
+        stamp = json.loads(Path(f"{path}.meta.json").read_text())["generated_at"]
+        documents[name] = chart_document(source, path, "hiero-ledger", stamp)
+        assert stamp.startswith("2026-05-12")
+    assert documents["hiero_discord_monthly_traffic.png"]["rows"][-1]["bucket"] == "2026-05"
+    categories = documents["hiero_discord_channel_categories.png"]["rows"]
+    assert sum(row["earlier"] + row["last_90d"] for row in categories) == 911
+    assert len(documents["hiero_discord_recent_activity_30d.png"]["rows"]) == 6

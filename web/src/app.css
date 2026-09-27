@@ -90,12 +90,6 @@
      under it too (see the media rule after this block). */
   --jump-h: 88px;
 
-  /* Deliberately outside the light/dark flip below: chart PNGs carry a
-     baked-in white ground, so the mat they sit on (bg-chart-ground) must match
-     it in either scheme — in dark mode that reads as a light frame, a mounted
-     print rather than a hole. It stops being a constant when the charts
-     themselves become theme-aware (see the chart legibility issue). */
-  --chart-ground: #fff;
   --chart-general: #64748b;
   --chart-triage: #b77913;
   --chart-committer: #168575;
@@ -250,7 +244,6 @@
   --color-edge-faint: var(--edge-faint);
   --color-row-line: var(--row-line);
   --color-link: var(--link);
-  --color-chart-ground: var(--chart-ground);
   --color-link-ink: var(--link-ink);
   --color-ok: var(--ok);
   --color-ok-ink: var(--ok-ink);

@@ -13,6 +13,7 @@ from hiero_analytics.dashboard_spec.interactive import (
     ACTIVITY_HEATMAP_SOURCES,
     CONTRIBUTOR_HEATMAP,
     CONTRIBUTOR_NETWORK,
+    OVERVIEW_SOURCES,
     REPO_GROWTH_SOURCES,
 )
 
@@ -73,6 +74,7 @@ CHART_MACRO = {
         "hiero-hackers": [
             {
                 "id": "org-overview",
+                "interactive_sources": OVERVIEW_SOURCES,
                 "title": "Organization overview (org-wide)",
                 "group": "Org overview",
                 "description": (

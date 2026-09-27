@@ -270,11 +270,13 @@ def _team_composition_chart(team_membership, affiliations, data_dir, charts_dir,
         )
 
 
-def _single_employer_chart(team_membership, affiliations, charts_dir, *, suffix, title, organisation_colors):
+def _single_employer_chart(team_membership, affiliations, data_dir, charts_dir, *, suffix, title, organisation_colors):
     """Single-employer teams by controlling org, as a bar (possibly active-filtered)."""
     diversity = build_team_affiliation_diversity(team_membership, affiliations)
+    counts = build_single_employer_team_counts(diversity)
+    save_dataframe(counts, data_dir / f"single_employer_teams_by_org{suffix}.csv")
     plot_and_save(
-        build_single_employer_team_counts(diversity),
+        counts,
         plot_bar,
         output_path=charts_dir / f"single_employer_teams_by_org{suffix}.png",
         x_col="organisation",
@@ -288,8 +290,10 @@ def _repo_diversity_views(role_lookup, affiliations, data_dir, charts_dir, *, ro
     """Per-repo diversity table plus its single-employer-repos-by-org companion chart."""
     diversity = build_repo_affiliation_diversity(role_lookup, affiliations, role=role)
     save_dataframe(diversity, data_dir / f"repo_affiliation_diversity{suffix}.csv")
+    counts = build_single_employer_repo_counts(diversity, count_col=role_column(role))
+    save_dataframe(counts, data_dir / f"single_employer_repos_by_org{suffix}.csv")
     plot_and_save(
-        build_single_employer_repo_counts(diversity, count_col=role_column(role)),
+        counts,
         plot_bar,
         output_path=charts_dir / f"single_employer_repos_by_org{suffix}.png",
         x_col="organisation",
@@ -490,6 +494,7 @@ def main(org: str = ORG) -> None:
     _single_employer_chart(
         team_membership,
         affiliations,
+        org_data_dir,
         org_charts_dir,
         suffix="",
         title=f"{org} — single-employer governance teams, by controlling organisation",

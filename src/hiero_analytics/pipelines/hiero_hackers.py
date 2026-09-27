@@ -77,9 +77,9 @@ def main(org: str = ORG) -> None:
     # Generate contributor counts chart and CSV (only if data exists)
     contributors_df = build_contributor_counts(activity_records)
     if not contributors_df.empty:
-        contributors_df = contributors_df.sort_values("contributors", ascending=False).head(20)
+        contributors_df = contributors_df.sort_values("contributors", ascending=False)
         plot_bar(
-            df=contributors_df,
+            df=contributors_df.head(20),
             x_col="repo",
             y_col="contributors",
             title=f"{title_prefix} — Top 20 Repositories by Contributors",

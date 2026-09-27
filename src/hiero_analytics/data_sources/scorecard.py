@@ -15,14 +15,15 @@ from .serialization import parse_github_datetime
 
 logger = logging.getLogger(__name__)
 
-SCORECARD_API = os.getenv("SCORECARD_API", "https://api.scorecard.dev/projects/github.com/hiero-ledger")
+SCORECARD_API = os.getenv("SCORECARD_API", "https://api.scorecard.dev/projects/github.com/{org}")
 
 
-def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
+def fetch_repo_scorecard(repo: str, *, org: str = "hiero-ledger") -> ScorecardRecord | None:
     """
     Fetch latest OpenSSF Scorecard for a repository.
 
     Args:
+        org: GitHub organisation that owns the repository.
         repo: Repository in format `eg: hiero-python-sdk`
 
     Returns:
@@ -32,7 +33,7 @@ def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
         requests.RequestException: On network failures or non-404 HTTP errors,
             so a transient outage is never silently recorded as a missing scorecard.
     """
-    url = f"{SCORECARD_API}/{repo}"
+    url = f"{SCORECARD_API.format(org=org)}/{repo}"
 
     try:
         response = requests.get(url, timeout=HTTP_TIMEOUT_SECONDS)

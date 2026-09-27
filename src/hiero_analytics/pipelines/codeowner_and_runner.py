@@ -128,6 +128,7 @@ def main(org: str = ORG) -> None:
     codeowners = get_codeowners_for_repos(client, org, repos)
 
     codeowners_summary_df = prepare_org_codeowners_summary(codeowners)
+    save_dataframe(codeowners_summary_df, org_data_dir / "org_codeowner_summary.csv")
     if not codeowners_summary_df.empty:
         plot_bar(
             df=codeowners_summary_df,
@@ -157,6 +158,7 @@ def main(org: str = ORG) -> None:
     generate_runner_markdown_report(records=runners, output_file=str(org_data_dir / "runner_report.md"))
 
     runner_stacked_df = prepare_stacked_runner_summary(runners)
+    save_dataframe(runner_stacked_df, org_data_dir / "org_runner_summary.csv")
     if not runner_stacked_df.empty:
         plot_stacked_bar(
             df=runner_stacked_df,

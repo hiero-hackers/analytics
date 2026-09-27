@@ -10,6 +10,8 @@ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import HIP_STATUS_SOURCE
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "The HIP process — specs in the hiero-ledger governance repo and the PRs that "
@@ -42,7 +44,9 @@ CHART_MACRO = {
                         "group": {"key": "cohort", "label": "Cohort", "default": "created since 2024-09"},
                         "series": [{"key": "hips", "label": "HIPs", "color": "var(--heat-4)"}],
                         "details": [{"key": "pct_of_proposed", "label": "Share of proposed", "format": "percent"}],
-                        # Horizontal bars in stage order read top to bottom as a funnel.
+                        # Stages in order, each a subset of the one before: drawn as a
+                        # funnel with stage-to-stage conversion and drop-off.
+                        "mark": "funnel",
                         "orientation": "horizontal",
                         "window": "snapshot",
                         "metric": "hip_adoption_funnel",
@@ -62,6 +66,7 @@ CHART_MACRO = {
             },
             {
                 "id": "hip-activity-by-status",
+                "interactive_sources": {"hip_activity_by_status.png": HIP_STATUS_SOURCE},
                 "group": "Adoption",
                 "title": "Implementation evidence — approved & final specs",
                 "description": (

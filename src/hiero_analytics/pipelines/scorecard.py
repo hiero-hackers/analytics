@@ -29,7 +29,7 @@ def fetch_org_repos(client: GitHubClient, org: str):
     return fetch_org_repos_graphql(client, org)
 
 
-def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
+def fetch_all_scorecards(repos, *, org: str = ORG) -> list[ScorecardRecord]:
     """Fetch scorecards for each repository in the organization.
 
     A transient failure is retried once; a second failure propagates, so the
@@ -41,10 +41,10 @@ def fetch_all_scorecards(repos) -> list[ScorecardRecord]:
         logger.info("Fetching scorecard (%d/%d): %s", i, len(repos), repo.name)
 
         try:
-            sc = fetch_repo_scorecard(repo.name)
+            sc = fetch_repo_scorecard(repo.name, org=org)
         except requests.RequestException:
             logger.warning("Scorecard fetch failed for %s; retrying once", repo.name)
-            sc = fetch_repo_scorecard(repo.name)
+            sc = fetch_repo_scorecard(repo.name, org=org)
         if sc:
             scorecards.append(sc)
 
@@ -61,11 +61,10 @@ def main(org: str = ORG):
         logger.warning("No repositories found for org: %s", org)
         return
 
-    scorecards = fetch_all_scorecards(repos)
+    scorecards = fetch_all_scorecards(repos, org=org)
 
     if not scorecards:
-        logger.warning("No scorecards fetched")
-        return
+        logger.warning("No scorecards published; exporting empty datasets")
 
     df = scorecard_to_dataframe(scorecards)
     # The interactive scorecard chart reads this; the PNG never needed a CSV.

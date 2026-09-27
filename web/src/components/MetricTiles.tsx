@@ -3,7 +3,7 @@
  *
  * A figure is a single number with no axis and no rows behind it, so it is the
  * easiest thing here to misread. Each one with an explanation is therefore a
- * button that opens the same dialog a chart does — its "how to read this" note
+ * button that opens an explanation dialog — its "how to read this" note
  * and the steps that produced it — and says so with an info mark.
  *
  * The label comes first in the DOM (the number is shown above it by
@@ -14,7 +14,7 @@
 import { useState } from 'react';
 import { InfoIcon } from 'lucide-react';
 import type { MetricTile } from '../api';
-import { ChartLightbox, type LightboxContent } from './ChartLightbox';
+import { ExplanationDialog, type Explanation } from './ExplanationDialog';
 
 // flex-col-reverse shows the number above its (DOM-first) label; justify-end
 // packs from the top in a reversed column, so every number sits on one line
@@ -26,7 +26,7 @@ const VALUE =
 const LABEL = 'text-xs font-medium leading-snug text-muted-foreground';
 
 export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
-  const [explained, setExplained] = useState<LightboxContent | null>(null);
+  const [explained, setExplained] = useState<Explanation | null>(null);
 
   if (tiles.length === 0) {
     return null;
@@ -44,7 +44,6 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
               className={`${FIGURE} group/figure cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring`}
               onClick={() =>
                 setExplained({
-                  alt: tile.label,
                   title: tile.label,
                   note: tile.note,
                   methodology: tile.methodology,
@@ -68,7 +67,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
           );
         })}
       </div>
-      {explained && <ChartLightbox content={explained} onClose={() => setExplained(null)} />}
+      {explained && <ExplanationDialog content={explained} onClose={() => setExplained(null)} />}
     </section>
   );
 }

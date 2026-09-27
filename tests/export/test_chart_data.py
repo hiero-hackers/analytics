@@ -352,3 +352,44 @@ def test_dimensions_use_the_focus_vocabulary(tmp_path):
         "contributor",
         "column",
     ]
+
+
+def test_meter_and_funnel_marks_are_category_only_and_single_series(tmp_path):
+    """Part-to-whole and staged forms draw one series over categories, never over time."""
+    from hiero_analytics.dashboard_spec.interactive import OWNERSHIP_SOURCES
+
+    path = tmp_path / "org_codeowner_summary.csv"
+    pd.DataFrame({"status": ["Present", "Missing"], "count": [29, 15]}).to_csv(path, index=False)
+    data = chart_document(OWNERSHIP_SOURCES["org_codeowner_summary.png"], path, "org")
+    assert data["mark"] == "meter"
+    # The headline status stays first: a meter reads its first segment as the share.
+    assert [row["status"] for row in data["rows"]] == ["Present", "Missing"]
+    assert data["rank"] is False
+
+    counts = write_counts(tmp_path, "month", ["2026-01"], [1])
+    with pytest.raises(ValueError, match="mark for timeseries"):
+        chart_document(roles("month", buckets=1, mark="funnel"), counts, "org", "2026-01-15T00:00:00Z")
+    repos = tmp_path / "repos.csv"
+    pd.DataFrame({"repo": ["a"], "general_user": 1, "triage": 0, "committer": 0, "maintainer": 0}).to_csv(
+        repos, index=False
+    )
+    with pytest.raises(ValueError, match="exactly one series"):
+        chart_document({**ROLE_BY_REPO, "mark": "meter"}, repos, "org")
+
+
+def test_median_reference_is_computed_from_the_published_rows(tmp_path):
+    """The org median follows the data and names its value; unsupported stats fail."""
+    path = tmp_path / "org_scorecard.csv"
+    pd.DataFrame({"repo": ["a", "b", "c", "d"], "score": [2.0, 5.5, 6.5, 9.0]}).to_csv(path, index=False)
+    source = {
+        **ROLE_BY_REPO,
+        "series": [{"key": "score", "label": "Score"}],
+        "values": "number",
+        "reference": {"stat": "median", "label": "Org median"},
+    }
+    assert chart_document(source, path, "org")["reference"] == {"value": 6.0, "label": "Org median 6"}
+    with pytest.raises(ValueError, match="reference"):
+        chart_document({**source, "reference": {"stat": "mean"}}, path, "org")
+    assert chart_document({**source, "value_max": 10}, path, "org")["value_max"] == 10
+    fixed = {"value": 50, "label": "Majority"}
+    assert chart_document({**source, "reference": fixed}, path, "org")["reference"] == fixed

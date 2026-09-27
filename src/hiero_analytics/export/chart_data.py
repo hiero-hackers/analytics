@@ -40,6 +40,9 @@ from hiero_analytics.domain.repo_categories import CATEGORY_ORDER
 
 FORMATS = {"year": "%Y", "month": "%Y-%m", "week": "%G-W%V-%u", "day": "%Y-%m-%d", "snapshot": "%Y-%m-%d"}
 MARKS = {"bar", "line", "area"}
+# Part-to-whole and staged forms that only make sense over categories: a
+# meter for a snapshot split into a few statuses, a funnel for nested stages.
+CATEGORY_MARKS = {"meter", "funnel"}
 DETAIL_FORMATS = {"number", "decimal", "percent"}
 
 # Colours for series with no declared colour, cycling. Mirrors the web
@@ -224,6 +227,24 @@ def _categories(source: dict, csv_path: Path, org: str, generated_at: str | None
         "details": details,
         "rows": frame.to_dict(orient="records"),
     }
+
+
+def _reference(reference: dict | None, body: dict) -> dict | None:
+    """A fixed line (``value``), or the median of the one charted series (``stat``).
+
+    The median is of the published rows, so it moves with the data rather than
+    being a stale constant; its label carries the value so the line is readable
+    without a tooltip.
+    """
+    if reference is None or "value" in reference:
+        return reference
+    if reference.get("stat") != "median" or len(body["series"]) != 1 or body.get("group"):
+        raise ValueError(f"Unsupported chart reference: {reference}")
+    values = [row[body["series"][0]["key"]] for row in body["rows"]]
+    if not values:
+        return None
+    median = round(float(pd.Series(values).median()), 2)
+    return {"value": median, "label": f"{reference.get('label', 'Median')} {median:g}"}
 
 
 def _window(source: dict, generated_at: str | None) -> dict:
@@ -461,9 +482,11 @@ def chart_document(source: dict, csv_path: Path, org: str, generated_at: str | N
             document["note"] = note
         return document
     mark = source.get("mark", "bar")
-    if mark not in MARKS:
-        raise ValueError(f"Unknown chart mark: {mark}")
+    if mark not in MARKS and not (kind == "categories" and mark in CATEGORY_MARKS):
+        raise ValueError(f"Unknown chart mark for {kind}: {mark}")
     body = SERIES_KINDS[kind](source, csv_path, org, generated_at)
+    if mark in CATEGORY_MARKS and len(body["series"]) != 1:
+        raise ValueError(f"{csv_path.name}: a {mark} draws exactly one series")
     document = {
         **document,
         # What the rows can be sliced by; the UI must not offer anything else.
@@ -480,7 +503,9 @@ def chart_document(source: dict, csv_path: Path, org: str, generated_at: str | N
         # Re-rank by the series on show; otherwise keep the source's order.
         "rank": bool(source.get("rank", False)),
         "top_n": source.get("top_n"),
-        "reference": source.get("reference"),
+        "reference": _reference(source.get("reference"), body),
+        # A bounded scale's ceiling (a 0–10 score), so the axis never implies more.
+        "value_max": source.get("value_max"),
         "group": None,
         **body,
     }
