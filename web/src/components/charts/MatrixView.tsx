@@ -115,6 +115,7 @@ export function MatrixView({ data, title, period, provenance }: ViewProps<Matrix
 
   const controls = (
     <Input
+      className="h-8 max-w-xs"
       placeholder={`Search ${nouns}…`}
       aria-label={`Search ${nouns}`}
       value={query}

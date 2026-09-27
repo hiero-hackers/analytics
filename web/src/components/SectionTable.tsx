@@ -84,45 +84,15 @@ export function SectionTable({
       description={active.description}
       generatedAt={active.generated_at}
       stale={active.stale}
-      actions={
-        <>
-          {/* The link names the active tab, so what a reader shares is what
-              they are looking at. */}
-          <CopyLinkButton sectionId={active.id} />
-          {action && (
-            <Button asChild variant="outline" size="sm">
-              <a href={action} target="_blank" rel="noopener noreferrer">
-                <ExternalLinkIcon data-icon="inline-start" />
-                {active.action?.label}
-              </a>
-            </Button>
-          )}
-          <CsvDownloadButton
-            provenance={provenance}
-            payload={() => ({
-              name: active.id,
-              title: active.title,
-              columns: active.columns,
-              rows: table.getRowModel().rows.map((row) => row.original),
-              // "N of M" in the preamble: the focus and the search both narrow the export.
-              total: periodRows.length,
-              dataAsOf: active.generated_at,
-            })}
-          />
-        </>
-      }
+      // The link names the active tab, so what a reader shares is what they
+      // are looking at.
+      headerActions={<CopyLinkButton sectionId={active.id} quiet />}
     >
       <VariantTabs
         labels={variants.map((variant) => variant.label)}
         active={index}
         onSelect={setIndex}
         ariaLabel="Role"
-      />
-      <PeriodTabs
-        periods={Object.keys(active.periods ?? {})}
-        active={period}
-        onChange={setPeriod}
-        labels={periodLabels}
       />
       {focus && focusColumn && (
         <p
@@ -145,7 +115,41 @@ export function SectionTable({
           </Button>
         </p>
       )}
-      <DataTable table={table} />
+      <DataTable
+        table={table}
+        controls={
+          <PeriodTabs
+            periods={Object.keys(active.periods ?? {})}
+            active={period}
+            onChange={setPeriod}
+            labels={periodLabels}
+          />
+        }
+        actions={
+          <>
+            {action && (
+              <Button asChild variant="outline" size="sm">
+                <a href={action} target="_blank" rel="noopener noreferrer">
+                  <ExternalLinkIcon data-icon="inline-start" />
+                  {active.action?.label}
+                </a>
+              </Button>
+            )}
+            <CsvDownloadButton
+              provenance={provenance}
+              payload={() => ({
+                name: active.id,
+                title: active.title,
+                columns: active.columns,
+                rows: table.getRowModel().rows.map((row) => row.original),
+                // "N of M" in the preamble: the focus and the search both narrow the export.
+                total: periodRows.length,
+                dataAsOf: active.generated_at,
+              })}
+            />
+          </>
+        }
+      />
     </SectionCard>
   );
 }

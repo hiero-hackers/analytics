@@ -24,6 +24,8 @@ export interface NavModel {
   topOf: (macro: string) => string;
   /** Whether the shown org has anything for the active macro. */
   orgHasMacro: boolean;
+  /** Whether the shown org has anything for a tab (an umbrella: for any of its members). */
+  hasData: (tab: string) => boolean;
 }
 
 export function navModel(manifest: Manifest, macro: string, org: string): NavModel {
@@ -52,10 +54,13 @@ export function navModel(manifest: Manifest, macro: string, org: string): NavMod
   // explanation instead of a blank page (see App).
   const shownOrg = orgs.includes(org) ? org : orgs[0];
   const entry = manifest.orgs[shownOrg];
-  const orgHasMacro =
-    (entry.sections ?? []).some((section) => section.macro === activeMacro) ||
-    (entry.chart_sections ?? []).some((section) => section.macro === activeMacro) ||
-    (entry.views ?? []).some((view) => view.macro === activeMacro);
+  const present = new Set([
+    ...(entry.sections ?? []).map((section) => section.macro),
+    ...(entry.chart_sections ?? []).map((section) => section.macro),
+    ...(entry.views ?? []).map((view) => view.macro),
+  ]);
+  const orgHasMacro = present.has(activeMacro);
+  const hasData = (tab: string) => macros.some((name) => topOf(name) === tab && present.has(name));
   return {
     orgs,
     shownOrg,
@@ -66,5 +71,6 @@ export function navModel(manifest: Manifest, macro: string, org: string): NavMod
     subTabs: macros.filter((name) => parents[name] === activeTop),
     topOf,
     orgHasMacro,
+    hasData,
   };
 }

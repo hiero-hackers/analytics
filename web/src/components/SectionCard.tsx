@@ -10,7 +10,8 @@
  */
 
 import { useId, useState, type ReactNode } from 'react';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Clock3Icon } from 'lucide-react';
+import { cn } from 'cn';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +34,7 @@ export function SectionCard({
   generatedAt,
   stale,
   actions,
+  headerActions,
   children,
 }: {
   id?: string;
@@ -43,6 +45,8 @@ export function SectionCard({
   generatedAt?: string;
   stale?: boolean;
   actions?: ReactNode;
+  /** Small actions beside the title (a chart card's Copy link), instead of a row of their own. */
+  headerActions?: ReactNode;
   children: ReactNode;
 }) {
   const titleId = useId();
@@ -60,7 +64,7 @@ export function SectionCard({
       >
         <CardHeader>
           <CardTitle>
-            <h2 id={titleId} className="text-base font-semibold tracking-tight">
+            <h2 id={titleId} className="font-display text-[17px] font-semibold tracking-tight">
               {title}
             </h2>
           </CardTitle>
@@ -68,6 +72,7 @@ export function SectionCard({
             {description}
           </CardDescription>
           <CardAction className="flex items-center gap-1.5">
+            {headerActions}
             {badge !== undefined && (
               <Badge variant="secondary" className="tabular-nums">
                 {badge}
@@ -92,10 +97,11 @@ export function SectionCard({
           )}
           <CardContent>{children}</CardContent>
           {generatedAt && (
-            <CardFooter className="border-t text-muted-foreground">
-              <p className={stale ? 'font-medium text-warn-ink' : undefined}>
-                data as of {stamp(generatedAt)}
-                {stale ? ' — older than the scheduled refresh' : ''}
+            <CardFooter className="border-t py-3 text-xs text-muted-foreground">
+              <p className={cn('flex items-center gap-1.5', stale && 'font-medium text-warn-ink')}>
+                <Clock3Icon aria-hidden="true" className="size-3.5" />
+                Data as of {stamp(generatedAt)} UTC
+                {stale ? ', older than the scheduled refresh' : ''}
               </p>
             </CardFooter>
           )}

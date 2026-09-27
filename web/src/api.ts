@@ -12,7 +12,16 @@
  * compile-time error here and a test failure on the Python side.
  */
 export type ColumnFormat =
-  'hip' | 'date' | 'link' | 'evidence' | 'status' | 'flag' | 'presence' | 'number' | 'staleness';
+  | 'hip'
+  | 'date'
+  | 'link'
+  | 'evidence'
+  | 'status'
+  | 'flag'
+  | 'presence'
+  | 'number'
+  | 'percent'
+  | 'staleness';
 
 export interface ColumnSpec {
   key: string;

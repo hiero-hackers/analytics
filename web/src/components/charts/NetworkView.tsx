@@ -204,9 +204,10 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
   const cx = bounds.width / 2;
   const cy = bounds.height / 2;
 
-  const controls = (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+  const toolbar = (
+    <>
       <VariantTabs
+        appearance="segmented"
         labels={['Graph', 'Matrix']}
         active={matrix ? 1 : 0}
         onSelect={(index) => setMode(index ? 'matrix' : 'graph')}
@@ -214,14 +215,25 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
       />
       {steps.length > 1 && (
         <VariantTabs
+          appearance="segmented"
           labels={steps.map((step, i) => (i ? `≥ ${step} shared` : 'All links'))}
           active={steps.indexOf(minShared)}
           onSelect={(index) => setMin(String(steps[index]))}
           ariaLabel={`${title}: minimum shared ${member}`}
         />
       )}
+      {minShared > (steps[0] ?? 0) && (
+        <span className="text-xs text-muted-foreground" aria-live="polite">
+          Showing {integer.format(edges.length)} of {integer.format(data.edges.length)} links
+        </span>
+      )}
+    </>
+  );
+
+  const controls = (
+    <div className="flex flex-wrap items-center gap-2">
       <Input
-        className="max-w-xs"
+        className="h-8 max-w-xs"
         placeholder="Find a repository…"
         aria-label="Find a repository"
         value={query}
@@ -234,11 +246,6 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
         <Button variant="outline" size="sm" onClick={() => setSelected(null)}>
           Clear focus
         </Button>
-      )}
-      {minShared > (steps[0] ?? 0) && (
-        <span className="text-xs text-muted-foreground" aria-live="polite">
-          Showing {integer.format(edges.length)} of {integer.format(data.edges.length)} links
-        </span>
       )}
     </div>
   );
@@ -494,6 +501,7 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
       ]
         .filter(Boolean)
         .join(' · ')}
+      toolbar={toolbar}
       controls={controls}
       empty={!data.nodes.length}
       focusFound={!dashboardFocus || dashboardFocus.dimension !== 'repo' || !!selected}

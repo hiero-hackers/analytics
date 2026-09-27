@@ -170,7 +170,7 @@ describe('Section tables', () => {
     await openGovernance();
 
     expect(screen.getByText('2026-07-20')).toBeInTheDocument(); // date format trims time
-    expect(screen.getByText(/data as of 2026-07-25 10:00/)).toBeInTheDocument();
+    expect(screen.getByText(/Data as of 2026-07-25 10:00/)).toBeInTheDocument();
     const action = screen.getByRole('link', { name: 'Suggest a correction' });
     expect(action).toHaveAttribute('href', 'https://example.test/correct');
   });
@@ -329,7 +329,7 @@ describe('Role-tabbed tables (#435)', () => {
     expect(within(screen.getByRole('table')).queryByText('maintainer')).not.toBeInTheDocument();
     expect(screen.getByText('dave')).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
-    expect(screen.getByText(/data as of 2026-07-26 10:00/)).toBeInTheDocument();
+    expect(screen.getByText(/Data as of 2026-07-26 10:00/)).toBeInTheDocument();
     expect(screen.getByText(/whose highest role anywhere is committer/)).toBeInTheDocument();
   });
 

@@ -69,6 +69,18 @@ describe('Sidebar tabs', () => {
     expect(within(nav).getByRole('button', { name: 'HIPs' })).not.toHaveAttribute('aria-current');
   });
 
+  it('marks the tabs the selected organisation has no data for', async () => {
+    window.location.hash = 'org=hiero-hackers';
+    render(<App />);
+    const nav = await screen.findByRole('navigation', { name: 'Dashboard' });
+    // hiero-hackers has contributor tables only.
+    const governance = await within(nav).findByRole('button', { name: 'Governance' });
+    expect(governance).toHaveAttribute('aria-description', 'No data for hiero-hackers');
+    expect(within(nav).getByRole('button', { name: 'Contributors' })).not.toHaveAttribute(
+      'aria-description',
+    );
+  });
+
   it('writes the hash even when the active tab is clicked again', async () => {
     // A shared link can carry a widget and org the reader then clears by hand;
     // clicking the tab they are on must still put `tab=` back in the URL.

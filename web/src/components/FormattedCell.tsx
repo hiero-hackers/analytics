@@ -18,7 +18,12 @@ type Tone = 'ok' | 'warn' | 'neg' | 'info' | 'neutral';
 
 export function FormattedCell({ value, format }: { value: unknown; format?: ColumnFormat }) {
   if (value === null || value === undefined || value === '') {
-    return null;
+    // An explicit "none", so an empty cell never reads as a rendering fault.
+    return (
+      <span aria-label="none" className="text-muted-foreground/50">
+        —
+      </span>
+    );
   }
   const text = String(value);
   switch (format) {
@@ -27,6 +32,25 @@ export function FormattedCell({ value, format }: { value: unknown; format?: Colu
       // degrades to plain text rather than NaN.
       const numeric = typeof value === 'number' ? value : Number(text);
       return <>{Number.isFinite(numeric) ? NUMBER_FORMAT.format(numeric) : text}</>;
+    }
+    case 'percent': {
+      // A 0–100 share: the figure, and a bar on a fixed 0–100 track so a
+      // column of shares compares at a glance. The bar is decoration; the
+      // figure carries the value.
+      const numeric = typeof value === 'number' ? value : Number(text);
+      if (!Number.isFinite(numeric)) return <>{text}</>;
+      const width = Math.min(100, Math.max(0, numeric));
+      return (
+        <span className="inline-flex items-center justify-end gap-2.5">
+          <span
+            aria-hidden="true"
+            className="h-1.5 w-14 overflow-hidden rounded-full bg-muted max-sm:hidden"
+          >
+            <span className="block h-full rounded-full bg-link/70" style={{ width: `${width}%` }} />
+          </span>
+          <span className="w-10 text-right">{NUMBER_FORMAT.format(numeric)}%</span>
+        </span>
+      );
     }
     case 'hip':
       return <span className="font-semibold whitespace-nowrap tabular-nums">HIP-{text}</span>;

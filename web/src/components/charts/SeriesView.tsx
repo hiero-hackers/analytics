@@ -13,6 +13,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChartAreaIcon, ChartColumnIcon, ChartLineIcon } from 'lucide-react';
+import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
 import {
@@ -93,12 +95,15 @@ function Comparison({
   const [current, previous] = [find(pair.current), find(pair.previous)];
   const label = (bucket: string) => formatBucket(bucket, data.frequency);
   return (
-    <div className="rounded-lg border px-3 py-2 text-xs">
-      <p className="text-muted-foreground">
+    // A quiet strip, not a boxed panel: it annotates the chart below it.
+    <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 rounded-lg bg-muted/60 px-3 py-2 text-xs">
+      <p className="font-medium text-foreground">
         {label(pair.current)} compared with {label(pair.previous)}
-        {data.rows.at(-1)?.partial ? ' (the incomplete current bucket is left out)' : ''}:
+        <span className="font-normal text-muted-foreground">
+          {data.rows.at(-1)?.partial ? ' (the incomplete current bucket is left out)' : ''}
+        </span>
       </p>
-      <ul className="mt-1.5 flex flex-wrap gap-x-5 gap-y-1">
+      <ul className="flex flex-wrap gap-x-5 gap-y-1">
         {visible.map((series) => {
           const now = Number(current[series.key]);
           const before = Number(previous[series.key]);
@@ -106,7 +111,11 @@ function Comparison({
           const sign = change > 0 ? '+' : change < 0 ? '−' : '±';
           return (
             <li key={series.key} className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-sm" style={{ backgroundColor: series.color }} />
+              <span
+                aria-hidden="true"
+                className="size-2 rounded-full"
+                style={{ backgroundColor: series.color }}
+              />
               <span className="text-muted-foreground">{series.label}</span>
               <span className="font-semibold tabular-nums">{format(now)}</span>
               <span
@@ -285,95 +294,128 @@ export function SeriesView({
       period={period}
       provenance={provenance}
       subtitle={subtitle}
-      controls={
+      toolbar={
         <>
+          {timeseries && (
+            <VariantTabs
+              appearance="segmented"
+              labels={['Bars', 'Line', 'Area']}
+              icons={[
+                <ChartColumnIcon key="bar" />,
+                <ChartLineIcon key="line" />,
+                <ChartAreaIcon key="area" />,
+              ]}
+              active={['bar', 'line', 'area'].indexOf(mark)}
+              onSelect={(index) => setMark(['bar', 'line', 'area'][index])}
+              ariaLabel={`${title} chart style`}
+            />
+          )}
+          {canStackLines && (
+            <VariantTabs
+              appearance="segmented"
+              labels={['Cumulative', 'Separate lines']}
+              active={stackedLines ? 0 : 1}
+              onSelect={(index) => setLineMode(index ? 'separate' : 'cumulative')}
+              ariaLabel={`${title} line stacking`}
+            />
+          )}
           {canChooseScale && (
             <VariantTabs
+              appearance="segmented"
               labels={['Counts', 'Share (%)']}
               active={normalized ? 1 : 0}
               onSelect={(index) => setScale(index ? 'share' : 'counts')}
               ariaLabel={`${title} scale`}
             />
           )}
-          {timeseries && (
-            <div className="flex flex-wrap items-center gap-3">
-              <VariantTabs
-                labels={['Bars', 'Line', 'Area']}
-                active={['bar', 'line', 'area'].indexOf(mark)}
-                onSelect={(index) => setMark(['bar', 'line', 'area'][index])}
-                ariaLabel={`${title} chart style`}
-              />
-              {canStackLines && (
-                <VariantTabs
-                  labels={['Cumulative', 'Separate lines']}
-                  active={stackedLines ? 0 : 1}
-                  onSelect={(index) => setLineMode(index ? 'separate' : 'cumulative')}
-                  ariaLabel={`${title} line stacking`}
-                />
-              )}
-              {data.rows.length > 12 && (
-                <VariantTabs
-                  labels={['All periods', 'Latest 24', 'Latest 12']}
-                  active={preset}
-                  onSelect={(index) => setRange(PRESETS[index])}
-                  ariaLabel={`${title} visible periods`}
-                />
-              )}
-              {spanned && (
-                <span className="text-xs text-muted-foreground" aria-live="polite">
-                  Showing {formatBucket(buckets[spanStart], data.frequency)} –{' '}
-                  {formatBucket(buckets[spanEnd], data.frequency)} ({rows.length} of{' '}
-                  {data.rows.length} buckets)
-                  {preset < 0 && (
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="ml-2 h-auto p-0 text-xs"
-                      onClick={() => setRange('all')}
-                    >
-                      Reset span
-                    </Button>
-                  )}
-                </span>
-              )}
-            </div>
+          {timeseries && data.rows.length > 12 && (
+            <VariantTabs
+              appearance="segmented"
+              labels={['All periods', 'Latest 24', 'Latest 12']}
+              active={preset}
+              onSelect={(index) => setRange(PRESETS[index])}
+              ariaLabel={`${title} visible periods`}
+            />
           )}
           {groupSpec && (
             <VariantTabs
+              appearance="segmented"
               labels={groupSpec.values}
               active={groupSpec.values.indexOf(group ?? groupSpec.default)}
               onSelect={(index) => setGroup(groupSpec.values[index])}
               ariaLabel={`${title} ${groupSpec.label.toLowerCase()}`}
             />
           )}
-          {data.series.length > 1 && (
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Visible series">
-              {data.series.map((series) => (
+          {spanned && (
+            <span className="text-xs text-muted-foreground" aria-live="polite">
+              {formatBucket(buckets[spanStart], data.frequency)} –{' '}
+              {formatBucket(buckets[spanEnd], data.frequency)} ({rows.length} of {data.rows.length}{' '}
+              buckets)
+              {preset < 0 && (
                 <Button
-                  key={series.key}
+                  variant="link"
                   size="sm"
-                  variant="outline"
-                  aria-pressed={!hidden.includes(series.key)}
-                  disabled={visible.length === 1 && visible[0].key === series.key}
-                  className={hidden.includes(series.key) ? 'opacity-50' : 'bg-card'}
-                  onClick={() =>
-                    setHidden(
-                      hidden.includes(series.key)
-                        ? hidden.filter((key) => key !== series.key)
-                        : [...hidden, series.key],
-                    )
-                  }
+                  className="ml-2 h-auto p-0 text-xs"
+                  onClick={() => setRange('all')}
                 >
-                  <span className="size-2.5 rounded-sm" style={{ backgroundColor: series.color }} />
-                  {series.label}
+                  Reset span
                 </Button>
-              ))}
-            </div>
-          )}
-          {data.kind === 'timeseries' && (
-            <Comparison data={data} visible={visible} format={format} />
+              )}
+            </span>
           )}
         </>
+      }
+      controls={
+        (data.series.length > 1 || data.kind === 'timeseries') && (
+          <div className="space-y-2.5">
+            {data.series.length > 1 && (
+              // The legend is the series switch: a swatch and name per series,
+              // struck through when hidden.
+              <div
+                className="flex flex-wrap gap-x-1 gap-y-1"
+                role="group"
+                aria-label="Visible series"
+              >
+                {data.series.map((series) => {
+                  const off = hidden.includes(series.key);
+                  return (
+                    <Button
+                      key={series.key}
+                      size="sm"
+                      variant="ghost"
+                      aria-pressed={!off}
+                      disabled={visible.length === 1 && visible[0].key === series.key}
+                      className={cn(
+                        'h-7 gap-1.5 rounded-full px-2.5 text-xs font-medium',
+                        off ? 'text-muted-foreground line-through decoration-1' : 'text-foreground',
+                      )}
+                      onClick={() =>
+                        setHidden(
+                          off
+                            ? hidden.filter((key) => key !== series.key)
+                            : [...hidden, series.key],
+                        )
+                      }
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'size-2.5 rounded-full transition-opacity',
+                          off && 'opacity-30',
+                        )}
+                        style={{ backgroundColor: series.color }}
+                      />
+                      {series.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+            {data.kind === 'timeseries' && (
+              <Comparison data={data} visible={visible} format={format} />
+            )}
+          </div>
+        )
       }
       empty={!rows.length}
       focusFound={!dimension || !focus || focus.dimension !== dimension || !!focused}
@@ -627,10 +669,10 @@ export function SeriesView({
               </div>
             )}
             <div className="flex flex-wrap items-center justify-between gap-2">
+              {/* Hover and arrow-key reading is announced by the chart's own
+                  label; only the non-obvious gesture is spelled out. */}
               <p className="text-xs text-muted-foreground">
-                Hover or use the arrow keys to inspect values
-                {data.series.length > 1 ? '; use the series buttons to compare groups' : ''}
-                {dimension ? '. Click a bar to focus the dashboard on it' : ''}.
+                {dimension ? 'Click a bar to focus the dashboard on it.' : ''}
               </p>
               {limited && (
                 <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>

@@ -76,15 +76,19 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
 
   const controls =
     data.types.length > 1 ? (
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Visible release types">
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Visible release types">
         {data.types.map((type) => (
           <Button
             key={type.key}
             size="sm"
-            variant="outline"
+            variant="ghost"
             aria-pressed={!hidden.includes(type.key)}
             disabled={visible.length === 1 && visible[0].key === type.key}
-            className={hidden.includes(type.key) ? 'opacity-50' : 'bg-card'}
+            className={
+              hidden.includes(type.key)
+                ? 'h-7 gap-1.5 rounded-full px-2.5 text-xs font-medium text-muted-foreground line-through decoration-1'
+                : 'h-7 gap-1.5 rounded-full px-2.5 text-xs font-medium'
+            }
             onClick={() =>
               setHidden(
                 hidden.includes(type.key)

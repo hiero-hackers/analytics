@@ -23,6 +23,10 @@
 /* The one typeface, self-hosted: the CSP allows fonts from 'self' only, so it
    ships as woff2 in the bundle (browsers fetch only the Latin subset they need). */
 @import '@fontsource-variable/public-sans';
+/* The display face, for navigation and headings only: the optical-size build,
+   so a 13px tab label gets the calm text cut and a page title the display cut
+   from one file. Public Sans keeps every number, table and paragraph. */
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
 
 /* Dark = the OS prefers dark and no explicit light choice, or an explicit dark
    choice. `:root` is listed alongside its descendants so the variant also
@@ -219,9 +223,12 @@
   --color-sidebar-border: var(--edge);
   --color-sidebar-ring: var(--link);
 
-  /* Type: one family (Public Sans, self-hosted above). Preflight gives <html>
-     the sans stack, so this reaches everything — Dialog and Sheet portals too. */
+  /* Type: Public Sans (self-hosted above) for everything a reader reads or
+     compares — preflight gives <html> the sans stack, so it reaches Dialog and
+     Sheet portals too — and Bricolage Grotesque (`font-display`) for the
+     wayfinding: the sidebar, page titles and card titles. */
   --font-sans: 'Public Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Public Sans Variable', ui-sans-serif, sans-serif;
 
   /* shadcn's radius scale, derived from one --radius like its generated CSS. */
   --radius-sm: calc(var(--radius) * 0.6);

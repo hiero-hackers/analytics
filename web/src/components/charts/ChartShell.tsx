@@ -8,7 +8,8 @@
  * selection, so the three can never disagree.
  */
 
-import { useRef, useState, type ReactNode } from 'react';
+import { useContext, useRef, useState, type ReactNode } from 'react';
+import { ChartLeading } from './leading';
 import { CrosshairIcon } from 'lucide-react';
 import { Maximize2Icon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ export function ChartShell({
   period,
   provenance,
   subtitle,
+  toolbar,
   controls,
   chart,
   table,
@@ -46,7 +48,12 @@ export function ChartShell({
   focusFound = true,
 }: ViewProps<ChartDocumentMeta> & {
   subtitle: string;
-  /** Above the chart and table alike: cohort tabs, series toggles, search. */
+  /**
+   * The chart's settings, as one row of segmented switches under the header:
+   * mark, scale, span, cohort. Shown for the chart and the table alike.
+   */
+  toolbar?: ReactNode;
+  /** Under the toolbar, for chart and table alike: series toggles, search, comparisons. */
   controls?: ReactNode;
   chart: (expanded: boolean) => ReactNode;
   table: ReactNode;
@@ -62,6 +69,7 @@ export function ChartShell({
   const [focus, setFocus] = useFocus();
   const supported = focus ? data.dimensions.some((d) => dimensionOf(d) === focus.dimension) : false;
   const [expanded, setExpanded] = useState(false);
+  const leading = useContext(ChartLeading);
   const expandRef = useRef<HTMLButtonElement>(null);
   const heading = period !== title ? `${title} · ${period}` : title;
   // The unit leads the subtitle, without saying the same thing twice: the
@@ -84,7 +92,7 @@ export function ChartShell({
 
   const content = (
     // A container, so the toolbar can drop its labels in a narrow card.
-    <div className="@container min-w-0 space-y-4">
+    <div className="@container min-w-0 space-y-3.5">
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="min-w-0">
           {/* The dialog's own title already names the chart. */}
@@ -93,6 +101,7 @@ export function ChartShell({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <VariantTabs
+            appearance="segmented"
             labels={['Chart', 'Data']}
             active={view}
             onSelect={setView}
@@ -120,6 +129,16 @@ export function ChartShell({
           )}
         </div>
       </div>
+      {(leading || toolbar) && (
+        <div
+          role="group"
+          aria-label={`${title} settings`}
+          className="flex flex-wrap items-center gap-2"
+        >
+          {leading}
+          {toolbar}
+        </div>
+      )}
       {controls}
       {focus && (!supported || !focusFound) && (
         <p className="flex flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground">

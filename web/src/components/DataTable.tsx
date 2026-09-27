@@ -13,7 +13,7 @@
  * purely about what reaches the DOM.
  */
 
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, SearchIcon, XIcon } from 'lucide-react';
@@ -43,7 +43,17 @@ const OVERSCAN = 12;
 /** Below this, a table renders whole — the DOM cost is already negligible. */
 export const VIRTUALIZE_ABOVE = 100;
 
-export function DataTable({ table }: { table: DataTableInstance }) {
+export function DataTable({
+  table,
+  controls,
+  actions,
+}: {
+  table: DataTableInstance;
+  /** Beside the search: the switches that choose which rows (a time range). */
+  controls?: ReactNode;
+  /** At the end of the toolbar: what a reader does with the rows (download, an external action). */
+  actions?: ReactNode;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = table.getRowModel().rows;
   const globalFilter = (table.state.globalFilter as string) ?? '';
@@ -62,37 +72,46 @@ export function DataTable({ table }: { table: DataTableInstance }) {
       : 0;
   const visibleRows = virtualized ? virtualRows.map((item) => rows[item.index]) : rows;
   const columnCount = table.getVisibleFlatColumns().length;
+  const total = table.getCoreRowModel().rows.length;
+  const count = (n: number) => n.toLocaleString('en-US');
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="relative w-full sm:max-w-xs">
+      {/* One toolbar: find rows, choose which rows, then act on them. */}
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="relative w-full sm:w-64">
           <SearchIcon
             aria-hidden="true"
-            className="pointer-events-none absolute top-2.5 left-3 size-4 text-muted-foreground"
+            className="pointer-events-none absolute top-2 left-2.5 size-4 text-muted-foreground"
           />
           <Input
             placeholder="Search this table…"
             aria-label="Filter rows"
             value={globalFilter}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="h-9 bg-background pl-9 pr-9"
+            className="h-8 bg-background pr-8 pl-8 text-xs"
           />
           {globalFilter && (
             <Button
               variant="ghost"
-              size="icon-sm"
+              size="icon-xs"
               aria-label="Clear filter"
-              className="absolute top-0.5 right-0.5"
+              className="absolute top-1.5 right-1.5"
               onClick={() => table.setGlobalFilter('')}
             >
               <XIcon />
             </Button>
           )}
         </div>
-        <span role="status" className="text-xs text-muted-foreground tabular-nums">
-          {rows.length.toLocaleString('en-US')} {globalFilter ? 'matching' : 'total'} rows
-        </span>
+        {controls}
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+          <span role="status" className="text-xs text-muted-foreground tabular-nums">
+            {rows.length === total
+              ? `${count(total)} ${total === 1 ? 'row' : 'rows'}`
+              : `${count(rows.length)} of ${count(total)} rows`}
+          </span>
+          {actions}
+        </div>
       </div>
       <Table
         containerRef={scrollRef}
@@ -120,7 +139,8 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                       sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined
                     }
                     className={cn(
-                      'bg-muted px-4 py-2 text-xs',
+                      'h-10 border-b bg-muted/85 px-4 text-xs font-medium backdrop-blur-sm',
+                      sorted ? 'text-foreground' : 'text-muted-foreground',
                       align(numeric),
                       index === 0 && STICKY_FIRST,
                     )}
@@ -129,15 +149,24 @@ export function DataTable({ table }: { table: DataTableInstance }) {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={cn('-mx-2', numeric && 'flex-row-reverse')}
+                      className={cn(
+                        'group/sort -mx-2 h-7 px-2 font-medium text-inherit hover:bg-background/70',
+                        numeric && 'flex-row-reverse',
+                      )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {/* Sentence case on screen; the label stays as published. */}
+                      <span className="first-letter:uppercase">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </span>
                       {/* Always an icon, so sorting never shifts the column. */}
                       <SortIcon
                         data-icon={numeric ? 'inline-start' : 'inline-end'}
                         aria-hidden="true"
-                        className={sorted ? undefined : 'opacity-40'}
+                        className={cn(
+                          'transition-opacity',
+                          sorted ? 'text-link' : 'opacity-30 group-hover/sort:opacity-70',
+                        )}
                       />
                     </Button>
                   </TableHead>
@@ -177,7 +206,7 @@ export function DataTable({ table }: { table: DataTableInstance }) {
           {visibleRows.map((row, index) => (
             <TableRow
               key={row.id}
-              className="even:bg-muted/25 hover:bg-link/5"
+              className="border-row-line even:bg-muted/20 hover:bg-link/5"
               data-index={virtualized ? virtualRows[index].index : index}
               ref={virtualized ? virtualizer.measureElement : undefined}
             >

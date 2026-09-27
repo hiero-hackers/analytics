@@ -16,6 +16,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { fetchManifest, type ChartSection, type Manifest } from './api';
 import { AppHeader, FreshnessStatus } from './components/AppHeader';
 import { OrgAvatar } from './components/OrgSwitcher';
+import { OrgContext } from './orgContext';
 import { PAGE_TITLE_ID } from './hooks/use-header-scroll';
 import { NARROW_HEADER, useMediaQuery } from './hooks/use-media-query';
 import { AppSidebar } from './components/AppSidebar';
@@ -244,7 +245,7 @@ function Dashboard({
             </>
           )}
         </p>
-        <h1 id={PAGE_TITLE_ID} className="text-3xl font-semibold tracking-tight">
+        <h1 id={PAGE_TITLE_ID} className="font-display text-4xl font-bold tracking-tight">
           {activeMacro}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -276,7 +277,9 @@ function Dashboard({
       {glossary && <Glossary glossary={glossary} />}
       <FocusBar />
       {orgHasMacro ? (
-        <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
+        <OrgContext.Provider value={shownOrg}>
+          <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
+        </OrgContext.Provider>
       ) : (
         // A tab the selected org has no content for: the manifest's "why",
         // sized to read as information rather than an error.

@@ -17,6 +17,7 @@ import { EventsView } from './charts/EventsView';
 import { MatrixView } from './charts/MatrixView';
 import { NetworkView } from './charts/NetworkView';
 import { SeriesView } from './charts/SeriesView';
+import { ChartLeading } from './charts/leading';
 
 function View({
   data,
@@ -45,12 +46,15 @@ export default function InteractiveChart({
   title,
   provenance,
   roomy,
+  leading,
 }: {
   variant: ChartVariant;
   title: string;
   provenance: Manifest['provenance'];
   /** The chart has more height than its peers (a gallery's lead): rankings show more rows. */
   roomy?: boolean;
+  /** The container's own switches (the card's period tabs), placed first in the chart's toolbar. */
+  leading?: React.ReactNode;
 }) {
   const path = variant.interactive!.path;
   const [result, setResult] = useState<{
@@ -72,18 +76,25 @@ export default function InteractiveChart({
       active = false;
     };
   }, [path, attempt]);
+  // The container's switches stay reachable while loading or after a failure,
+  // so a reader can move to another period instead of waiting on this one.
+  const lead = leading ? <div className="mb-3">{leading}</div> : null;
   if (result?.path !== path)
     return (
-      <div
-        role="status"
-        className="flex h-[340px] items-center justify-center text-sm text-muted-foreground"
-      >
-        Loading interactive chart…
-      </div>
+      <>
+        {lead}
+        <div
+          role="status"
+          className="flex h-[340px] items-center justify-center text-sm text-muted-foreground"
+        >
+          Loading interactive chart…
+        </div>
+      </>
     );
   if (!result.data)
     return (
       <div>
+        {lead}
         <div
           role="alert"
           className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-4 text-sm"
@@ -104,13 +115,15 @@ export default function InteractiveChart({
       </div>
     );
   return (
-    <View
-      key={path}
-      data={result.data}
-      title={title}
-      period={variant.label}
-      provenance={provenance}
-      roomy={roomy}
-    />
+    <ChartLeading.Provider value={leading}>
+      <View
+        key={path}
+        data={result.data}
+        title={title}
+        period={variant.label}
+        provenance={provenance}
+        roomy={roomy}
+      />
+    </ChartLeading.Provider>
   );
 }

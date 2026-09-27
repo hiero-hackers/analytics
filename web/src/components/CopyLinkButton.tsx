@@ -20,7 +20,14 @@ const LABELS: Record<CopyStatus, string> = {
 
 const ICONS = { idle: LinkIcon, copied: CheckIcon, failed: XIcon } as const;
 
-export function CopyLinkButton({ sectionId }: { sectionId: string }) {
+export function CopyLinkButton({
+  sectionId,
+  quiet = false,
+}: {
+  sectionId: string;
+  /** A ghost button for a card header, where an outlined one competes with the title. */
+  quiet?: boolean;
+}) {
   const [status, setStatus] = useState<CopyStatus>('idle');
   const timer = useRef<number | undefined>(undefined);
   const clickId = useRef(0);
@@ -40,10 +47,20 @@ export function CopyLinkButton({ sectionId }: { sectionId: string }) {
 
   const Icon = ICONS[status];
   return (
-    <Button type="button" variant="outline" size="sm" onClick={onCopy}>
+    <Button
+      type="button"
+      variant={quiet ? 'ghost' : 'outline'}
+      size="sm"
+      className={quiet ? 'text-muted-foreground hover:text-foreground' : undefined}
+      onClick={onCopy}
+    >
       <Icon data-icon="inline-start" />
       {/* Announced when it flips, so the result isn't visual-only. */}
-      <span aria-live="polite">{LABELS[status]}</span>
+      {/* In a card header on a phone the label would push the title onto two
+          lines; it stays the accessible name there. */}
+      <span aria-live="polite" className={quiet ? 'max-sm:sr-only' : undefined}>
+        {LABELS[status]}
+      </span>
     </Button>
   );
 }

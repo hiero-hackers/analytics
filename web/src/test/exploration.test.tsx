@@ -221,7 +221,9 @@ describe('Focus', () => {
     );
     // The repository table narrows and says so; the per-person table is untouched.
     expect(screen.getByText(/1 of 3 rows/)).toBeInTheDocument();
-    const repoTable = screen.getByText('hiero-ledger/hiero-sdk-go').closest('table')!;
+    const repoTable = screen
+      .getByRole('link', { name: 'hiero-ledger/hiero-sdk-go' })
+      .closest('table')!;
     expect(bodyRows(repoTable)).toHaveLength(1);
     const peopleTable = screen.getByText('bo').closest('table')!;
     expect(bodyRows(peopleTable)).toHaveLength(2);
@@ -238,9 +240,8 @@ describe('Focus', () => {
     const bar = screen.getByRole('region', { name: 'Dashboard focus' });
     await userEvent.click(within(bar).getByRole('button', { name: 'Clear focus' }));
     expect(screen.queryByRole('region', { name: 'Dashboard focus' })).not.toBeInTheDocument();
-    expect(bodyRows(screen.getByText('hiero-ledger/hiero-sdk-go').closest('table')!)).toHaveLength(
-      3,
-    );
+    const repoLink = screen.getByRole('link', { name: 'hiero-ledger/hiero-sdk-go' });
+    expect(bodyRows(repoLink.closest('table')!)).toHaveLength(3);
   });
 
   it('applies a focus arriving in a shared link and follows Back/forward', async () => {
@@ -251,8 +252,8 @@ describe('Focus', () => {
       window.history.replaceState(null, '', '/#focus=repo:hiero-sdk-js');
       window.dispatchEvent(new HashChangeEvent('hashchange'));
     });
-    expect(screen.getByText('hiero-ledger/hiero-sdk-js')).toBeInTheDocument();
-    expect(screen.queryByText('hiero-ledger/hiero-cli')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'hiero-ledger/hiero-sdk-js' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'hiero-ledger/hiero-cli' })).not.toBeInTheDocument();
   });
 
   it('notes when a chart has the dimension but not the focused value', async () => {

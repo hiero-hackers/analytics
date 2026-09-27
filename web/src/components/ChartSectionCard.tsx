@@ -67,7 +67,9 @@ function Figure({
         lead && !fullRow && 'lg:row-span-2',
       )}
     >
-      {!axis && (
+      {/* An interactive chart takes its own tabs into its toolbar; the
+          no-data placeholder keeps them above it. */}
+      {!axis && !active.interactive && (
         <VariantTabs
           labels={chart.variants.map((option) => option.label)}
           active={variant}
@@ -89,6 +91,17 @@ function Figure({
             title={chart.title}
             provenance={provenance}
             roomy={lead}
+            leading={
+              axis ? undefined : (
+                <VariantTabs
+                  appearance="segmented"
+                  labels={chart.variants.map((option) => option.label)}
+                  active={variant}
+                  onSelect={setOwn}
+                  ariaLabel={`${chart.title} view`}
+                />
+              )
+            }
           />
         </Suspense>
       ) : (
@@ -209,27 +222,25 @@ export function ChartSectionCard({
       id={section.id}
       title={section.title}
       description={section.description}
+      headerActions={<CopyLinkButton sectionId={section.id} quiet />}
       actions={
-        <>
-          <CopyLinkButton sectionId={section.id} />
-          {download && (
-            <DownloadButton
-              onClick={() =>
-                // The chart's companion table, stamped with the provenance
-                // preamble like every other browser download.
-                fetchApiText(download.path).then((text) =>
-                  downloadCsvText(
-                    download.name,
-                    section.title,
-                    text,
-                    provenance,
-                    download.generated_at,
-                  ),
-                )
-              }
-            />
-          )}
-        </>
+        download && (
+          <DownloadButton
+            onClick={() =>
+              // The chart's companion table, stamped with the provenance
+              // preamble like every other browser download.
+              fetchApiText(download.path).then((text) =>
+                downloadCsvText(
+                  download.name,
+                  section.title,
+                  text,
+                  provenance,
+                  download.generated_at,
+                ),
+              )
+            }
+          />
+        )
       }
     >
       {/* One row per shared axis, above the gallery: the card's charts switch

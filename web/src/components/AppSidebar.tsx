@@ -8,7 +8,6 @@ import {
   PackageIcon,
   LayoutDashboardIcon,
   ArrowUpRightIcon,
-  ChevronRightIcon,
   Code2Icon,
   XIcon,
 } from 'lucide-react';
@@ -40,6 +39,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { cn } from 'cn';
 import type { NavModel } from '../nav';
 import { useActiveSection } from '../useActiveSection';
 import { scrollToGroup, type TocEntry } from '../toc';
@@ -62,6 +62,15 @@ function NavigationIcon({ name }: { name: string }) {
   return <Icon aria-hidden="true" className="size-4 shrink-0" />;
 }
 
+/** A group heading in the display face: sentence case, no tracking, no eyebrow. */
+function GroupHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarGroupLabel className="mb-1 h-7 px-3 font-display text-[13px] font-semibold text-foreground/70">
+      {children}
+    </SidebarGroupLabel>
+  );
+}
+
 function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string) => void }) {
   const { isMobile, setOpenMobile } = useSidebar();
   const select = (macro: string) => {
@@ -71,49 +80,62 @@ function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string
   };
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em]">
-        Workspace
-      </SidebarGroupLabel>
+      <GroupHeading>Pages</GroupHeading>
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="gap-0.5">
           {nav
-            ? nav.topTabs.map((tab) => (
-                <SidebarMenuItem key={tab}>
-                  <SidebarMenuButton
-                    className="relative h-11 gap-3 rounded-xl px-3 text-[13px] text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground data-[active=true]:bg-brand-soft data-[active=true]:text-brand data-[active=true]:font-semibold data-[active=true]:shadow-xs"
-                    isActive={tab === nav.activeTop}
-                    aria-current={tab === nav.activeTop ? 'page' : undefined}
-                    // An umbrella opens on its first member.
-                    onClick={() => select(nav.macros.find((m) => nav.topOf(m) === tab) ?? tab)}
-                  >
-                    <NavigationIcon name={tab} />
-                    <span className="flex-1">{tab}</span>
-                    {tab === nav.activeTop && (
-                      <ChevronRightIcon
-                        aria-hidden="true"
-                        className="ml-auto size-3.5 opacity-60"
-                      />
+            ? nav.topTabs.map((tab) => {
+                const active = tab === nav.activeTop;
+                const empty = !nav.hasData(tab);
+                return (
+                  <SidebarMenuItem key={tab}>
+                    <SidebarMenuButton
+                      className={cn(
+                        // The active tab is marked by a brand edge, not a filled pill.
+                        'relative h-10 gap-3 rounded-lg px-3 font-display text-[14px] font-medium text-foreground/75 transition-colors',
+                        'before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand before:opacity-0 before:transition-opacity',
+                        'hover:bg-sidebar-accent hover:text-foreground',
+                        'data-[active=true]:bg-brand-soft/60 data-[active=true]:font-semibold data-[active=true]:text-brand data-[active=true]:before:opacity-100',
+                        empty && !active && 'text-muted-foreground/70',
+                      )}
+                      isActive={active}
+                      aria-current={active ? 'page' : undefined}
+                      aria-description={empty ? `No data for ${nav.shownOrg}` : undefined}
+                      // An umbrella opens on its first member.
+                      onClick={() => select(nav.macros.find((m) => nav.topOf(m) === tab) ?? tab)}
+                    >
+                      <NavigationIcon name={tab} />
+                      <span className="flex-1 truncate">{tab}</span>
+                      {empty && (
+                        <span
+                          aria-hidden="true"
+                          className="rounded-md border border-dashed px-1.5 py-px font-sans text-[10px] font-medium text-muted-foreground"
+                        >
+                          No data
+                        </span>
+                      )}
+                    </SidebarMenuButton>
+                    {active && nav.subTabs.length > 0 && (
+                      <SidebarMenuSub>
+                        {nav.subTabs.map((sub) => (
+                          <SidebarMenuSubItem key={sub}>
+                            <SidebarMenuSubButton asChild isActive={sub === nav.activeMacro}>
+                              <button
+                                type="button"
+                                className="font-display"
+                                aria-current={sub === nav.activeMacro ? 'page' : undefined}
+                                onClick={() => select(sub)}
+                              >
+                                <span>{sub}</span>
+                              </button>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
                     )}
-                  </SidebarMenuButton>
-                  {tab === nav.activeTop && nav.subTabs.length > 0 && (
-                    <SidebarMenuSub>
-                      {nav.subTabs.map((sub) => (
-                        <SidebarMenuSubItem key={sub}>
-                          <SidebarMenuSubButton asChild isActive={sub === nav.activeMacro}>
-                            <button
-                              type="button"
-                              aria-current={sub === nav.activeMacro ? 'page' : undefined}
-                              onClick={() => select(sub)}
-                            >
-                              <span>{sub}</span>
-                            </button>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  )}
-                </SidebarMenuItem>
-              ))
+                  </SidebarMenuItem>
+                );
+              })
             : Array.from({ length: 6 }, (_, index) => (
                 <SidebarMenuItem key={index}>
                   <SidebarMenuSkeleton />
@@ -125,41 +147,66 @@ function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string
   );
 }
 
+/**
+ * The page's groups on a progress rail: the track fills in the brand colour
+ * up to the group the reader is in, so the sidebar shows how far down a long
+ * page they are, not just a list of links. Groups already passed keep a
+ * filled node; the current one gets a ring.
+ */
 function OnThisPage({ entries }: { entries: TocEntry[] }) {
   const active = useActiveSection(entries.map((entry) => entry.id));
+  const current = Math.max(
+    0,
+    entries.findIndex((entry) => entry.id === active),
+  );
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em]">
-        On this page{' '}
-        <span
-          aria-hidden="true"
-          className="ml-auto rounded-md bg-muted px-1.5 py-0.5 text-[9px] tracking-normal"
-        >
-          {entries.length}
-        </span>
-      </SidebarGroupLabel>
+      <GroupHeading>On this page</GroupHeading>
       <SidebarGroupContent>
-        <SidebarMenu>
-          {entries.map((entry, index) => (
-            <SidebarMenuItem key={entry.id}>
-              <SidebarMenuButton
-                size="sm"
-                className="h-auto min-h-9 gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground data-[active=true]:bg-transparent data-[active=true]:text-foreground"
-                isActive={entry.id === active}
-                aria-current={entry.id === active ? 'location' : undefined}
-                onClick={() => scrollToGroup(entry.id)}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`flex size-5 shrink-0 items-center justify-center rounded-full border text-[9px] tabular-nums ${entry.id === active ? 'border-brand/30 bg-brand-soft text-brand' : 'border-border text-muted-foreground'}`}
+        <ol className="relative ml-3 pr-1">
+          {entries.map((entry, index) => {
+            const passed = index < current;
+            const here = index === current;
+            return (
+              <li key={entry.id} className="relative">
+                {/* The rail segment from this node down to the next one. */}
+                {index < entries.length - 1 && (
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'absolute top-[15px] bottom-[-15px] left-[4px] w-0.5 rounded-full transition-colors duration-300 motion-reduce:transition-none',
+                      passed ? 'bg-brand' : 'bg-sidebar-border',
+                    )}
+                  />
+                )}
+                <button
+                  type="button"
+                  aria-current={here ? 'location' : undefined}
+                  onClick={() => scrollToGroup(entry.id)}
+                  className={cn(
+                    'group/toc relative flex w-full items-start gap-3 rounded-md py-1.5 pr-2 pl-0 text-left text-[13px] leading-snug outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                    here
+                      ? 'font-medium text-foreground'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
                 >
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className="whitespace-normal leading-snug">{entry.name}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'relative z-10 mt-[5px] size-2.5 shrink-0 rounded-full border-2 transition-all duration-300 motion-reduce:transition-none',
+                      here
+                        ? 'border-brand bg-sidebar ring-4 ring-brand/15'
+                        : passed
+                          ? 'border-brand bg-brand'
+                          : 'border-sidebar-border bg-sidebar group-hover/toc:border-foreground/40',
+                    )}
+                  />
+                  <span>{entry.name}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
       </SidebarGroupContent>
     </SidebarGroup>
   );
@@ -192,23 +239,8 @@ export function AppSidebar({
           </Button>
         </SidebarHeader>
       )}
-      <div className="mx-4 mb-2 mt-6 rounded-xl border bg-card p-3.5 shadow-xs">
-        <div className="flex items-center gap-3">
-          <img
-            src={`${import.meta.env.BASE_URL}brand/hiero-mark.svg`}
-            alt=""
-            width={36}
-            height={36}
-            className="size-9 rounded-lg bg-brand-soft p-1"
-          />
-          <div>
-            <p className="text-xs font-semibold">Ecosystem insights</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">Built in the open</p>
-          </div>
-        </div>
-      </div>
-      <SidebarContent className="gap-0 px-2 py-2">
-        <nav aria-label="Dashboard" className="flex flex-col gap-5">
+      <SidebarContent className="gap-0 px-2 pt-5 pb-2">
+        <nav aria-label="Dashboard" className="flex flex-col gap-6">
           <TabsGroup nav={nav} onTab={onTab} />
           {!isMobile && toc.length > 0 && <OnThisPage entries={toc} />}
         </nav>
@@ -218,23 +250,29 @@ export function AppSidebar({
           href="https://github.com/hiero-hackers/analytics"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-2.5 rounded-lg p-2 text-xs text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          className="group flex items-center gap-3 rounded-lg p-2 outline-none transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Code2Icon className="size-4" />
-          <span className="flex-1">Contribute on GitHub</span>
-          <ArrowUpRightIcon className="size-3.5" />
+          <span className="grid size-8 shrink-0 place-items-center rounded-lg border bg-card text-muted-foreground transition-colors group-hover:text-foreground">
+            <Code2Icon aria-hidden="true" className="size-4" />
+          </span>
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block font-display text-[13px] font-semibold text-foreground">
+              Contribute on GitHub
+            </span>
+            <span className="block truncate text-[11px] text-muted-foreground">
+              hiero-hackers/analytics
+            </span>
+          </span>
+          <ArrowUpRightIcon
+            aria-hidden="true"
+            className="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
+          />
         </a>
-        {isMobile ? (
+        {isMobile && (
           <div className="flex items-center justify-between px-2">
             <span className="text-xs text-muted-foreground">Appearance</span>
             <ThemeToggle />
           </div>
-        ) : (
-          <p className="px-2 text-[10px] leading-relaxed text-muted-foreground">
-            Hiero · A Linux Foundation
-            <br />
-            Decentralized Trust project
-          </p>
         )}
       </SidebarFooter>
     </Sidebar>

@@ -171,6 +171,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
     { key: 'flag', label: 'flag', format: 'flag' },
     { key: 'presence', label: 'presence', format: 'presence' },
     { key: 'number', label: 'number', format: 'number' },
+    { key: 'percent', label: 'share %', format: 'percent' },
     { key: 'staleness', label: 'staleness', format: 'staleness' },
   ],
   rows: [
@@ -183,6 +184,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
       flag: 'true',
       presence: 'true',
       number: 2490,
+      percent: 62,
       staleness: 'overdue',
     },
   ],
