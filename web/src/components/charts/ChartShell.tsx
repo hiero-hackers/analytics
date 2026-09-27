@@ -26,6 +26,8 @@ export interface ViewProps<T> {
   title: string;
   period: string;
   provenance: Manifest['provenance'];
+  /** More height than its peers: rankings may show more rows before "Show all". */
+  roomy?: boolean;
 }
 
 export function ChartShell({
@@ -62,13 +64,32 @@ export function ChartShell({
   const [expanded, setExpanded] = useState(false);
   const expandRef = useRef<HTMLButtonElement>(null);
   const heading = period !== title ? `${title} · ${period}` : title;
+  // The unit leads the subtitle, without saying the same thing twice: the
+  // variant label often repeats it ("Maintainers" beside a unit of
+  // "Maintainers (share of repository)").
+  const unit = data.unit.toLowerCase();
+  const parts = subtitle.split(' · ').filter(Boolean);
+  const detail = parts[0]?.toLowerCase().startsWith(unit)
+    ? subtitle
+    : [
+        data.unit,
+        ...(parts[0] && unit.startsWith(parts[0].toLowerCase()) ? parts.slice(1) : parts),
+      ].join(' · ');
+  // A snapshot already names its time; repeating it as "Source generated" adds a line and nothing else.
+  const freshness = data.generated_at
+    ? `Source generated ${stamp(data.generated_at)} UTC${data.stale ? ' · older than the scheduled refresh' : ''}`
+    : 'Source freshness is unavailable.';
+  const showFreshness =
+    !data.generated_at || data.stale || !windowNote.includes(stamp(data.generated_at));
 
   const content = (
-    <div className="min-w-0 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold">{data.unit}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+    // A container, so the toolbar can drop its labels in a narrow card.
+    <div className="@container min-w-0 space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+        <div className="min-w-0">
+          {/* The dialog's own title already names the chart. */}
+          {!expanded && <p className="text-sm font-semibold">{title}</p>}
+          <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <VariantTabs
@@ -78,6 +99,7 @@ export function ChartShell({
             ariaLabel={`${title} display`}
           />
           <CsvDownloadButton
+            compact={!expanded}
             provenance={provenance}
             payload={() => {
               const source = csv();
@@ -90,9 +112,10 @@ export function ChartShell({
               variant="outline"
               size="sm"
               aria-label={`Expand interactive chart: ${title}`}
+              title="Expand"
               onClick={() => setExpanded(true)}
             >
-              <Maximize2Icon /> Expand
+              <Maximize2Icon /> <span className="hidden @lg:inline">Expand</span>
             </Button>
           )}
         </div>
@@ -124,24 +147,24 @@ export function ChartShell({
         table
       )}
       <div className="border-t pt-4 text-xs leading-relaxed text-muted-foreground">
-        {data.note && <p className="mb-2">{data.note}</p>}
+        {/* The counting rule and the window stay visible; the reading guide
+            folds away with the methodology, so a footer never outgrows its chart. */}
         <p>{data.population}</p>
         <p className="mt-2">{windowNote}</p>
-        <p className={data.stale ? 'mt-1 text-warn-ink' : 'mt-1'}>
-          {data.generated_at
-            ? `Source generated ${stamp(data.generated_at)} UTC${data.stale ? ' · older than the scheduled refresh' : ''}`
-            : 'Source freshness is unavailable.'}
-        </p>
-        {data.methodology?.length ? (
+        {showFreshness && <p className={data.stale ? 'mt-1 text-warn-ink' : 'mt-1'}>{freshness}</p>}
+        {data.note || data.methodology?.length ? (
           <details className="mt-3">
             <summary className="cursor-pointer font-medium text-foreground">
-              How this is measured
+              {data.note ? 'How to read this and how it is measured' : 'How this is measured'}
             </summary>
-            <ol className="mt-2 list-decimal space-y-1 pl-5">
-              {data.methodology.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
+            {data.note && <p className="mt-2">{data.note}</p>}
+            {data.methodology?.length ? (
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                {data.methodology.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            ) : null}
           </details>
         ) : null}
       </div>

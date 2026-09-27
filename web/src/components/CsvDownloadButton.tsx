@@ -6,11 +6,25 @@ import type { Manifest } from '../api';
 import { downloadCsv, type CsvExport } from '../csv';
 
 /** The button itself, for callers whose download is not a CsvExport (a chart's companion file). */
-export function DownloadButton({ onClick }: { onClick: () => void }) {
+export function DownloadButton({
+  onClick,
+  compact = false,
+}: {
+  onClick: () => void;
+  /** Icon-only below the enclosing `@container`'s `lg` width (a narrow chart card). */
+  compact?: boolean;
+}) {
   return (
-    <Button type="button" variant="outline" size="sm" onClick={onClick}>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={onClick}
+      aria-label={compact ? 'Download CSV' : undefined}
+      title={compact ? 'Download CSV' : undefined}
+    >
       <DownloadIcon data-icon="inline-start" />
-      Download CSV
+      {compact ? <span className="hidden @lg:inline">Download CSV</span> : 'Download CSV'}
     </Button>
   );
 }
@@ -18,9 +32,11 @@ export function DownloadButton({ onClick }: { onClick: () => void }) {
 export function CsvDownloadButton({
   payload,
   provenance,
+  compact,
 }: {
   payload: () => CsvExport;
   provenance: Manifest['provenance'];
+  compact?: boolean;
 }) {
-  return <DownloadButton onClick={() => downloadCsv(payload(), provenance)} />;
+  return <DownloadButton compact={compact} onClick={() => downloadCsv(payload(), provenance)} />;
 }

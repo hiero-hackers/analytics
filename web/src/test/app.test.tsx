@@ -221,6 +221,15 @@ describe('Organisation diversity card (#435)', () => {
     expect(chartVariant('Single-employer teams by org')).toContain('Single-employer teams by org');
   });
 
+  it('leads an odd run of half-width charts with a two-row chart', async () => {
+    await openDiversity();
+    const figure = (title: string) =>
+      screen.getByRole('figure', { name: new RegExp(`^${title} —`) });
+    // Three half-width charts: the first spans two rows, the others stack beside it.
+    expect(figure('Role-holders by organisation')).toHaveClass('lg:row-span-2');
+    expect(figure('Single-employer teams by org')).not.toHaveClass('lg:row-span-2');
+  });
+
   it('leaves a chart with its own variant set on its own tabs', async () => {
     // The period-tabbed pipeline card shares no axis with anything, so its
     // tabs stay under the figure and keep their own state.

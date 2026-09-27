@@ -50,6 +50,12 @@ const FREQUENCY = {
 /** Height per horizontal bar, plus room for the value axis. */
 const ROW_HEIGHT = 32;
 const AXIS_HEIGHT = 56;
+/** The category axis fits its longest (shortened) label, so short names leave the room to the bars. */
+const labelWidth = (labels: string[]) =>
+  Math.min(
+    184,
+    Math.max(64, Math.ceil(Math.max(0, ...labels.map((l) => shorten(l).length)) * 7.2) + 12),
+  );
 
 /** A row as displayed: its category label, visible total, and (when normalised) shares. */
 type ViewRow = Row & { category: string; total: number; partial?: boolean };
@@ -117,7 +123,13 @@ function Comparison({
   );
 }
 
-export function SeriesView({ data, title, period, provenance }: ViewProps<SeriesDocument>) {
+export function SeriesView({
+  data,
+  title,
+  period,
+  provenance,
+  roomy = false,
+}: ViewProps<SeriesDocument>) {
   // Everything a reader changes lives in the URL, so a copied link reopens it.
   const [hidden, setHidden] = useUrlList(`${data.id}.hide`);
   const [showAll, setShowAll] = useUrlFlag(`${data.id}.all`);
@@ -178,9 +190,11 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
   // A ranking follows the series on show; otherwise the source order stands
   // (calendar order, a funnel's stages, the analysis's concentration sort).
   if (data.rank) rows.sort((a, b) => b.total - a.total);
-  const limited = data.top_n !== null && rows.length > data.top_n;
+  // A lead chart has the height of two stacked peers, so it ranks more rows.
+  const topN = data.top_n !== null && roomy ? Math.ceil(data.top_n * 1.5) : data.top_n;
+  const limited = topN !== null && rows.length > topN;
   const focused = rows.find((row) => matches(focus, dimension, row.category));
-  const topRows = limited && !showAll ? rows.slice(0, data.top_n ?? undefined) : rows;
+  const topRows = limited && !showAll ? rows.slice(0, topN ?? undefined) : rows;
   // A focused row beyond the top N still appears, so the focus is always visible.
   const chartRows = focused && !topRows.includes(focused) ? [...topRows, focused] : topRows;
   const dim = (row: ViewRow) => !!focused && row !== focused;
@@ -217,7 +231,12 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
   const subtitle = [
     period !== title ? period : null,
     groupSpec ? `${groupSpec.label}: ${group}` : null,
-    timeseries ? FREQUENCY[data.frequency] : `${integer.format(rows.length)} ${nouns}`,
+    timeseries
+      ? FREQUENCY[data.frequency]
+      : // A meter's headline already gives the total; counting its statuses says nothing.
+        mark === 'meter'
+        ? null
+        : `${integer.format(rows.length)} ${nouns}`,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -391,7 +410,11 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
                 {horizontal ? (
                   <>
                     <XAxis {...valueAxis} />
-                    <YAxis {...categoryAxis} width={160} interval={0} />
+                    <YAxis
+                      {...categoryAxis}
+                      width={labelWidth(chartRows.map((row) => row.category))}
+                      interval={0}
+                    />
                   </>
                 ) : (
                   <>
@@ -579,7 +602,7 @@ export function SeriesView({ data, title, period, provenance }: ViewProps<Series
               {limited && (
                 <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
                   {showAll
-                    ? `Show top ${data.top_n}`
+                    ? `Show top ${topN}`
                     : `Show all ${integer.format(rows.length)} ${nouns}`}
                 </Button>
               )}

@@ -197,6 +197,8 @@ Some charts were bars only because the PNG was. The data's job now picks the for
 - **Org median** on the Scorecard ranking, with the axis fixed to 0–10 so it cannot imply a higher maximum.
 - **Overview + detail** brush on long time series (repository growth, weekly difficulty), described under step 2.
 
+**Card layout.** A gallery has two columns at most; three abreast left each chart too narrow to read. An odd run of three or more half-width charts leads with its first chart spanning two rows (conventionally the card's main ranking), with the shorter charts stacked beside it; that lead chart ranks 1.5× its `top_n` rows before "Show all". Charts never stretch to a taller neighbour's height. Each chart names itself in its header (unit and scope beneath), the label column fits its longest label, and narrow cards show Download and Expand as icons. The footer keeps the counting rule and window visible, folds the reading note in with the methodology, and omits "Source generated" when the snapshot line already gives that time.
+
 Both new marks draw exactly one series and are rejected on time series, in the exporter and the web validator alike. Dual-axis combinations (e.g. new repositories as bars and a cumulative line on a second scale) are deliberately not offered: two charts share the card instead.
 
 ## Completion checks

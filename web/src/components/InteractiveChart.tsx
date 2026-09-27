@@ -26,6 +26,7 @@ function View({
   title: string;
   period: string;
   provenance: Manifest['provenance'];
+  roomy?: boolean;
 }) {
   switch (data.kind) {
     case 'matrix':
@@ -43,10 +44,13 @@ export default function InteractiveChart({
   variant,
   title,
   provenance,
+  roomy,
 }: {
   variant: ChartVariant;
   title: string;
   provenance: Manifest['provenance'];
+  /** The chart has more height than its peers (a gallery's lead): rankings show more rows. */
+  roomy?: boolean;
 }) {
   const path = variant.interactive!.path;
   const [result, setResult] = useState<{
@@ -106,6 +110,7 @@ export default function InteractiveChart({
       title={title}
       period={variant.label}
       provenance={provenance}
+      roomy={roomy}
     />
   );
 }

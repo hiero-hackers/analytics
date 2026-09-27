@@ -37,6 +37,7 @@ function Figure({
   stateKey,
   slide = false,
   stretch = false,
+  lead = false,
   axis,
   provenance,
 }: {
@@ -47,6 +48,8 @@ function Figure({
   slide?: boolean;
   /** Span the full row even though the chart itself is half-width shaped. */
   stretch?: boolean;
+  /** The gallery's lead chart: two rows tall, with the shorter charts stacked beside it. */
+  lead?: boolean;
   /** Set when the card owns this chart's axis: it renders one tab row for all
    *  the charts that share it, so this figure shows none of its own. */
   axis?: { index: number; onSelect: (index: number) => void };
@@ -61,6 +64,7 @@ function Figure({
       className={cn(
         'm-0 min-w-0 rounded-xl border bg-background/40 p-3',
         (slide || fullRow) && 'col-span-full',
+        lead && !fullRow && 'lg:row-span-2',
       )}
     >
       {!axis && (
@@ -84,6 +88,7 @@ function Figure({
             variant={active}
             title={chart.title}
             provenance={provenance}
+            roomy={lead}
           />
         </Suspense>
       ) : (
@@ -107,14 +112,17 @@ function Figure({
           </details>
         </div>
       )}
-      <figcaption
-        className={cn(
-          'mt-3 text-left text-xs font-medium text-foreground',
-          slide && 'text-sm font-semibold',
-        )}
-      >
-        {chart.title}
-      </figcaption>
+      {/* An interactive chart names itself in its header; the placeholder does not. */}
+      {!active.interactive && (
+        <figcaption
+          className={cn(
+            'mt-3 text-left text-xs font-medium text-foreground',
+            slide && 'text-sm font-semibold',
+          )}
+        >
+          {chart.title}
+        </figcaption>
+      )}
     </figure>
   );
 }
@@ -177,6 +185,13 @@ export function ChartSectionCard({
   // decides, keeping the grid stable while variant tabs switch.
   const halfCount = section.charts.filter((chart) => !needsFullRow(chart, 0)).length;
   const stretched = section.charts.map((chart) => needsFullRow(chart, 0) || halfCount === 1);
+  // An odd run of three or more half-width charts would leave a lone chart on
+  // its last row. Instead the first — conventionally the card's main ranking,
+  // and so its tallest — spans two rows and the shorter ones stack beside it.
+  const leadIndex =
+    halfCount >= 3 && halfCount % 2 === 1
+      ? section.charts.findIndex((chart) => !needsFullRow(chart, 0))
+      : -1;
 
   // A card whose tabs show different populations declares a companion CSV per
   // tab; offering one for the whole card would hand a reader on the Committers
@@ -257,7 +272,10 @@ export function ChartSectionCard({
           />
         </div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-4">
+        // Two columns at most: three abreast left each chart too narrow to
+        // read. items-start keeps a short chart from stretching into an empty
+        // box beside a tall neighbour.
+        <div className="grid grid-flow-row-dense grid-cols-1 items-start gap-4 lg:grid-cols-2">
           {section.charts.map((chart, index) => (
             <Figure
               key={chart.title}
@@ -265,6 +283,7 @@ export function ChartSectionCard({
               stateKey={`${section.id}.${index}.tab`}
               provenance={provenance}
               stretch={stretched[index]}
+              lead={index === leadIndex}
               axis={axisFor(chart)}
             />
           ))}
