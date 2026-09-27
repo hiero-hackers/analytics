@@ -3,7 +3,7 @@
  * page" contents, and the phone layout (tabs in a Sheet, groups in a strip).
  */
 
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
@@ -219,5 +219,45 @@ describe('Navigation search', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No sections match');
     await userEvent.keyboard('{Escape}');
     expect(trigger).toHaveFocus();
+  });
+});
+
+describe('Header status', () => {
+  it('states the data age in words and flags it past the weekly refresh', async () => {
+    const { FreshnessStatus } = await import('../components/AppHeader');
+    const asOf = '2026-07-19T00:00:00Z';
+    const at = (hours: number) => Date.parse(asOf) + hours * 3_600_000;
+    const { rerender } = render(<FreshnessStatus dataAsOf={asOf} now={at(5)} />);
+    expect(screen.getByText('Updated 5 hours ago')).toBeInTheDocument();
+    rerender(<FreshnessStatus dataAsOf={asOf} now={at(100)} />);
+    expect(screen.getByText('Updated 4 days ago')).toBeInTheDocument();
+    // 132 h mirrors the exporter's STALE_AFTER.
+    rerender(<FreshnessStatus dataAsOf={asOf} now={at(24 * 71)} />);
+    expect(screen.getByText('71 days old, refresh overdue')).toHaveClass('text-warn-ink');
+    expect(screen.getByText('2026-07-19 00:00 UTC').closest('p')).toHaveTextContent(
+      'Data as of 2026-07-19 00:00 UTC',
+    );
+  });
+
+  it('shows each organisation’s GitHub avatar, falling back to its own initial', async () => {
+    const { OrgAvatar } = await import('../components/OrgSwitcher');
+    const { container } = render(
+      <>
+        <OrgAvatar org="hiero-ledger" />
+        <OrgAvatar org="hiero-hackers" />
+      </>,
+    );
+    const avatars = [...container.querySelectorAll('img')];
+    // github.com/<org>.png resolves to the organisation's real avatar by id.
+    expect(avatars.map((img) => img.getAttribute('src'))).toEqual([
+      'https://github.com/hiero-ledger.png?size=64',
+      'https://github.com/hiero-hackers.png?size=64',
+    ]);
+    avatars.forEach((img) => fireEvent.error(img));
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+    expect([...container.querySelectorAll('span')].map((mark) => mark.textContent)).toEqual([
+      'L',
+      'H',
+    ]);
   });
 });

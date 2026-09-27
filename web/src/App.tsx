@@ -12,9 +12,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
-import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { fetchManifest, type ChartSection, type Manifest } from './api';
-import { AppHeader, Freshness } from './components/AppHeader';
+import { AppHeader, FreshnessStatus } from './components/AppHeader';
+import { OrgAvatar } from './components/OrgSwitcher';
+import { PAGE_TITLE_ID } from './hooks/use-header-scroll';
+import { NARROW_HEADER, useMediaQuery } from './hooks/use-media-query';
 import { AppSidebar } from './components/AppSidebar';
 import { ChartSectionCard } from './components/ChartSectionCard';
 import { Glossary } from './components/Glossary';
@@ -221,7 +224,7 @@ function Dashboard({
   nav: NavModel;
   onToc: (entries: TocEntry[]) => void;
 }) {
-  const { isMobile } = useSidebar();
+  const narrowHeader = useMediaQuery(NARROW_HEADER);
   const { activeMacro, shownOrg, orgHasMacro } = nav;
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
   const dataAsOf = manifest.provenance.data_as_of;
@@ -230,14 +233,20 @@ function Dashboard({
     <>
       {/* The active page owns the h1; content cards use h2 headings. */}
       <div className="mb-6 border-b pb-6">
-        <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground">
-          {shownOrg}{' '}
-          <span aria-hidden="true" className="px-2">
-            /
-          </span>{' '}
-          Analytics
+        {/* Where this page sits: the organisation, and the umbrella tab for a sub-tab. */}
+        <p className="mb-2.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <OrgAvatar org={shownOrg} className="size-5 rounded" />
+          {shownOrg}
+          {nav.topOf(activeMacro) !== activeMacro && (
+            <>
+              <span aria-hidden="true">/</span>
+              {nav.topOf(activeMacro)}
+            </>
+          )}
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight">{activeMacro}</h1>
+        <h1 id={PAGE_TITLE_ID} className="text-3xl font-semibold tracking-tight">
+          {activeMacro}
+        </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {(
             {
@@ -254,9 +263,11 @@ function Dashboard({
             } as Record<string, string>
           )[activeMacro] ?? 'Explore activity and insights across the Hiero ecosystem.'}
         </p>
-        {/* The header shows freshness on wide screens; phones get it here. */}
-        {isMobile && dataAsOf && (
-          <Freshness dataAsOf={dataAsOf} className="mt-0.5 text-xs text-muted-foreground" />
+        {/* The header shows freshness on wide screens; narrower ones get it here. */}
+        {narrowHeader && dataAsOf && (
+          <div className="mt-3">
+            <FreshnessStatus dataAsOf={dataAsOf} />
+          </div>
         )}
       </div>
       {/* Every macro ships its own explainer, listing only what that tab

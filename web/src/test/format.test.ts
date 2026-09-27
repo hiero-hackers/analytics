@@ -42,3 +42,17 @@ describe('dateStamp', () => {
     expect(dateStamp('not-a-date')).toBe('not-a-date');
   });
 });
+
+describe('readFigure', () => {
+  it('draws shares and parts of a whole as meters, and counts with separators', async () => {
+    const { readFigure } = await import('../metricFigure');
+    expect(readFigure(1457)).toEqual({ kind: 'count', value: '1,457' });
+    expect(readFigure('72%')).toEqual({ kind: 'share', value: '72', percent: 72 });
+    expect(readFigure('26 of 44')).toMatchObject({ kind: 'part', value: '26', of: '44' });
+    expect((readFigure('26 of 44') as { percent: number }).percent).toBeCloseTo(59.09, 1);
+    // A share never overflows its meter; anything unrecognised is shown as written.
+    expect(readFigure('120%')).toMatchObject({ percent: 100 });
+    expect(readFigure('0 of 0')).toEqual({ kind: 'text', value: '0 of 0' });
+    expect(readFigure('>3x')).toEqual({ kind: 'text', value: '>3x' });
+  });
+});

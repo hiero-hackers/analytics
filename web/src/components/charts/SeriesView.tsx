@@ -61,6 +61,8 @@ const labelWidth = (labels: string[]) =>
 type ViewRow = Row & { category: string; total: number; partial?: boolean };
 
 const share = (key: string) => `${key}__share`;
+/** The running total up the stack to (and including) a series, drawn by cumulative lines. */
+const cumulative = (key: string) => `${key}__cumulative`;
 
 /** Series longer than this get an overview strip to brush a span of buckets. */
 const OVERVIEW_MIN = 24;
@@ -170,6 +172,13 @@ export function SeriesView({
   // Categories that name repositories, people, employers or teams take part in the focus.
   const dimension = timeseries ? null : dimensionOf(data.category.key);
   const showTotal = data.stacked && data.series.length > 1;
+  // Line has no stacking of its own, so a stacked document's lines default to
+  // cumulative: each line is the running total up the stack, and the top one
+  // is the total. Every row is already a count on its date, so this sums
+  // across series, never across periods.
+  const [lineMode, setLineMode] = useUrlParam(`${data.id}.lines`, 'cumulative');
+  const canStackLines = mark === 'line' && data.stacked && visible.length > 1;
+  const stackedLines = canStackLines && lineMode !== 'separate';
   const format = (value: number) =>
     (data.value_format === 'integer' ? integer : decimal).format(value);
 
@@ -185,7 +194,16 @@ export function SeriesView({
             ]),
           )
         : {};
-      return { ...row, ...shares, category: String(row[categoryKey]), total };
+      let running = 0;
+      const stacked = stackedLines
+        ? Object.fromEntries(
+            visible.map((series) => {
+              running += Number(normalized ? shares[share(series.key)] : row[series.key]);
+              return [cumulative(series.key), running];
+            }),
+          )
+        : {};
+      return { ...row, ...shares, ...stacked, category: String(row[categoryKey]), total };
     });
   // A ranking follows the series on show; otherwise the source order stands
   // (calendar order, a funnel's stages, the analysis's concentration sort).
@@ -285,6 +303,14 @@ export function SeriesView({
                 onSelect={(index) => setMark(['bar', 'line', 'area'][index])}
                 ariaLabel={`${title} chart style`}
               />
+              {canStackLines && (
+                <VariantTabs
+                  labels={['Cumulative', 'Separate lines']}
+                  active={stackedLines ? 0 : 1}
+                  onSelect={(index) => setLineMode(index ? 'separate' : 'cumulative')}
+                  ariaLabel={`${title} line stacking`}
+                />
+              )}
               {data.rows.length > 12 && (
                 <VariantTabs
                   labels={['All periods', 'Latest 24', 'Latest 12']}
@@ -355,6 +381,13 @@ export function SeriesView({
         windowText(data.window, anyPartial),
         normalized
           ? 'Each row shows the percentage of its visible series; the data table and CSV retain the original counts.'
+          : null,
+        stackedLines
+          ? `Cumulative lines: each line adds its series to the ones below it (${visible
+              .map((series) => series.label)
+              .join(
+                ' → ',
+              )}), so the top line is the visible total. The tooltip, data table and CSV give each series on its own.`
           : null,
       ]
         .filter(Boolean)
@@ -497,7 +530,7 @@ export function SeriesView({
                     return (
                       <Line
                         key={series.key}
-                        dataKey={key}
+                        dataKey={stackedLines ? cumulative(series.key) : key}
                         type="linear"
                         stroke={series.color}
                         strokeWidth={2}

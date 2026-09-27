@@ -167,6 +167,33 @@ describe('Interactive charts', () => {
     expect(payload.rows[0].maintainer).toBe(5);
   });
 
+  it('stacks a stacked chart’s lines cumulatively by default, with separate lines on request', async () => {
+    serve({ ...data, id: 'stack-lines' });
+    render(
+      <InteractiveChart
+        variant={variant('test/stack-lines.json')}
+        title="Role activity"
+        provenance={provenance}
+      />,
+    );
+    await userEvent.click(await screen.findByRole('radio', { name: 'Line' }));
+    expect(screen.getByRole('radio', { name: 'Cumulative' })).toHaveAttribute('data-state', 'on');
+    expect(
+      screen.getByText(
+        /Cumulative lines: .*General contributors → Triage → Committers → Maintainers/,
+      ),
+    ).toBeInTheDocument();
+    // The table still gives each series on its own, never the running total.
+    await showData();
+    expect(within(screen.getAllByRole('row')[1]).getAllByRole('cell')[1]).toHaveTextContent('10');
+    await userEvent.click(screen.getByRole('radio', { name: 'Separate lines' }));
+    expect(window.location.hash).toContain('stack-lines.lines=separate');
+    expect(screen.queryByText(/Cumulative lines:/)).not.toBeInTheDocument();
+    // Bars and areas stack natively, so the choice only appears for lines.
+    await userEvent.click(screen.getByRole('radio', { name: 'Area' }));
+    expect(screen.queryByRole('radio', { name: 'Cumulative' })).not.toBeInTheDocument();
+  });
+
   it('uses the selected series for the table and downloaded CSV', async () => {
     render(
       <InteractiveChart

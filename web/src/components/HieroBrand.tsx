@@ -21,9 +21,9 @@ export function HieroBrand({ compact = false }: { compact?: boolean }) {
       {!compact && (
         <span
           aria-hidden="true"
-          className="hidden border-l pl-3 text-[11px] font-semibold tracking-[0.14em] text-muted-foreground min-[1100px]:block"
+          className="hidden border-l pl-3 text-sm font-medium text-muted-foreground min-[1100px]:block"
         >
-          ANALYTICS
+          Analytics
         </span>
       )}
     </div>

@@ -13,6 +13,13 @@ import {
 import type { NavModel } from '../nav';
 import { scrollToGroup, type TocEntry } from '../toc';
 
+/** The shortcut as this platform writes it; both work everywhere. */
+const SHORTCUT =
+  typeof navigator !== 'undefined' &&
+  /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)
+    ? '⌘ K'
+    : 'Ctrl K';
+
 /** A small navigation finder: searches real pages and the current page's sections. */
 export function NavigationSearch({
   nav,
@@ -77,9 +84,9 @@ export function NavigationSearch({
           <span className="hidden lg:inline">Find a section…</span>
           <kbd
             aria-hidden="true"
-            className="ml-auto hidden rounded border bg-card px-1.5 py-0.5 text-[10px] lg:inline"
+            className="ml-auto hidden rounded border bg-card px-1.5 py-0.5 text-[10px] font-medium lg:inline"
           >
-            ⌘ K
+            {SHORTCUT}
           </kbd>
         </Button>
       </DialogTrigger>
