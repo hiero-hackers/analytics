@@ -660,8 +660,6 @@ def test_every_chart_variant_has_a_data_source():
 
 def test_every_produced_chart_has_interactive_data(outputs_root: Path):
     """Every published chart variant has an interactive document on disk."""
-    import json
-
     manifest = json.loads((outputs_root / "data/api/v1/manifest.json").read_text())
     for org in manifest["orgs"].values():
         for section in org["chart_sections"]:
