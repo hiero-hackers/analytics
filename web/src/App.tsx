@@ -323,7 +323,10 @@ export default function App() {
   return (
     // The header renders in every state below; only the content beneath it
     // changes shape — chrome never pops in after the fact.
-    <SidebarProvider className="flex-col">
+    <SidebarProvider
+      className="flex-col"
+      style={{ '--sidebar-width': '17.5rem' } as React.CSSProperties}
+    >
       <AppHeader
         nav={nav}
         // A focused repository or person belongs to one organisation.
@@ -331,6 +334,8 @@ export default function App() {
           writeParams({ focus: null });
           setOrg(next);
         }}
+        toc={nav?.orgHasMacro ? toc : []}
+        onTab={setMacro}
         dataAsOf={manifest?.provenance.data_as_of}
       />
       <div className="flex flex-1">

@@ -19,7 +19,7 @@ export function GroupStrip({ entries }: { entries: TocEntry[] }) {
   return (
     <nav
       aria-label="Jump to"
-      className="sticky top-13 z-10 -mx-3 mb-2 flex gap-1 overflow-x-auto border-b bg-background px-3 py-2 min-[600px]:-mx-4 min-[600px]:px-4"
+      className="sticky top-(--header-h) z-10 -mx-3 mb-2 flex gap-1 overflow-x-auto border-b bg-background px-3 py-2 min-[600px]:-mx-4 min-[600px]:px-4"
     >
       {entries.map((entry) => (
         <Button

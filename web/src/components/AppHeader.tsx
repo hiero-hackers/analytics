@@ -1,17 +1,14 @@
-/**
- * The sticky app header: wordmark, the global org switcher, the data's
- * freshness, and the theme menu. It renders in every state — loading, error,
- * loaded — so the chrome never pops in after the fact; the parts that need a
- * manifest simply wait for one.
- */
-
+/** Global scope and navigation, kept visible while exploring the dashboard. */
+import { Clock3Icon, ChevronRightIcon } from 'lucide-react';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { stamp } from '../format';
 import type { NavModel } from '../nav';
+import type { TocEntry } from '../toc';
 import { ThemeToggle } from './ThemeToggle';
+import { HieroBrand } from './HieroBrand';
+import { NavigationSearch } from './NavigationSearch';
 
-/** "Data as of …" — the manifest's data watermark, not the build time. */
 export function Freshness({ dataAsOf, className }: { dataAsOf: string; className?: string }) {
   return (
     <p className={className}>
@@ -24,51 +21,68 @@ export function AppHeader({
   nav,
   onOrg,
   dataAsOf,
+  toc,
+  onTab,
 }: {
   nav: NavModel | null;
   onOrg: (org: string) => void;
   dataAsOf?: string | null;
+  toc: TocEntry[];
+  onTab: (tab: string) => void;
 }) {
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
   return (
-    <header className="sticky top-0 z-20 flex h-13 shrink-0 items-center gap-2 border-b bg-card px-3 md:px-4">
-      <SidebarTrigger className="md:hidden" aria-label="Open sections" />
-      {/* On wide screens the wordmark column is the sidebar's width, so the org
-          switcher starts exactly where the content column does (16px header
-          padding + sidebar + 8px gap = sidebar + the content's 24px padding). */}
-      <div className="md:w-(--sidebar-width)">
-        <div className="flex items-center gap-2 text-[15px] font-semibold tracking-tight whitespace-nowrap">
-          <span
-            aria-hidden="true"
-            className="flex size-7 items-center justify-center rounded-lg bg-link text-sm font-bold text-white"
-          >
-            H
-          </span>
-          Hiero analytics
-        </div>
-      </div>
-      {nav && nav.orgs.length > 1 && (
-        // The org is the outermost scope — everything below is "this org's
-        // view" — so it sits in the header, above the tabs it filters.
-        <NativeSelect
-          aria-label="Organisation"
-          value={nav.shownOrg}
-          onChange={(event) => onOrg(event.target.value)}
-        >
-          {nav.orgs.map((org) => (
-            <NativeSelectOption key={org} value={org}>
-              {org}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-      )}
-      <div className="ml-auto flex items-center gap-3">
-        {dataAsOf && !isMobile && (
-          <Freshness dataAsOf={dataAsOf} className="text-xs text-muted-foreground" />
+    <header className="sticky top-0 z-30 flex h-(--header-h) shrink-0 items-center border-b bg-card/95 px-3 backdrop-blur-xl md:px-0">
+      <div className="flex shrink-0 items-center gap-2 md:w-(--sidebar-width) md:justify-between md:border-r md:px-5">
+        {isMobile && <SidebarTrigger className="size-8" aria-label="Open sections" />}
+        <HieroBrand />
+        {!isMobile && (
+          <SidebarTrigger
+            className="size-8 shrink-0 text-muted-foreground"
+            aria-label={open ? 'Collapse navigation' : 'Expand navigation'}
+          />
         )}
-        {/* No room beside the org switcher on a phone: there the theme
-            switch sits at the foot of the navigation Sheet (AppSidebar). */}
-        {!isMobile && <ThemeToggle />}
+      </div>
+      <div className="flex min-w-0 flex-1 items-center gap-2 pl-3 md:gap-4 md:px-6">
+        {nav && nav.orgs.length > 1 && (
+          <div className="min-w-0">
+            <span className="mb-0.5 hidden text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground md:block">
+              Organization
+            </span>
+            <NativeSelect
+              aria-label="Organisation"
+              value={nav.shownOrg}
+              onChange={(event) => onOrg(event.target.value)}
+              className="h-8 max-w-[125px] rounded-lg border-transparent bg-transparent pl-0 text-xs font-semibold shadow-none hover:bg-muted md:max-w-none md:text-[13px]"
+            >
+              {nav.orgs.map((org) => (
+                <NativeSelectOption key={org} value={org}>
+                  {org}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          </div>
+        )}
+        {nav && (
+          <div className="hidden min-w-0 items-center gap-3 text-xs text-muted-foreground min-[1200px]:flex">
+            <ChevronRightIcon className="size-3.5" />
+            <span className="truncate">{nav.activeMacro}</span>
+          </div>
+        )}
+        <div className="ml-auto flex shrink-0 items-center gap-2 md:gap-3">
+          {dataAsOf && !isMobile && (
+            <div className="hidden items-center gap-2 border-r pr-4 text-muted-foreground min-[1280px]:flex">
+              <Clock3Icon className="size-3.5" />
+              <Freshness dataAsOf={dataAsOf} className="text-[10px]" />
+            </div>
+          )}
+          <NavigationSearch nav={nav} toc={toc} onTab={onTab} />
+          {!isMobile && (
+            <div className="border-l pl-3">
+              <ThemeToggle />
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -55,7 +55,11 @@
      Signal): cool-tinted neutrals so they sit with the blue heat ramp and
      Signal. Every text role is ≥ 4.5:1 (WCAG AA) on Paper and Sheet in both
      themes. */
-  --page: #f6f7f9; /* Paper: page ground */
+  --header-h: 72px;
+  --brand: #a7184e;
+  --brand-soft: #faedf2;
+  --sidebar-surface: #f8f9fb;
+  --page: #f3f5f8; /* Paper: page ground */
   --surface: #fff; /* Sheet: cards, inputs, popovers */
   --ink: #15181c; /* Ink: primary text; also the active fill (--accent) */
   --muted: #59616c; /* Graphite: secondary text (5.9:1 on Paper) */
@@ -82,9 +86,9 @@
   /* Shape: one radius, from which shadcn derives its scale (lg = 8px). */
   --radius: 0.5rem;
   /* Scroll offset for jump targets (groups, shared-link cards): the sticky
-     header (52px) plus a small buffer — and on phones the sticky group strip
+     header (72px) plus a small buffer — and on phones the sticky group strip
      under it too (see the media rule after this block). */
-  --jump-h: 60px;
+  --jump-h: 88px;
 
   /* Deliberately outside the light/dark flip below: chart PNGs carry a
      baked-in white ground, so the mat they sit on (bg-chart-ground) must match
@@ -121,7 +125,7 @@
 }
 @media (max-width: 767px) {
   :root {
-    --jump-h: 104px;
+    --jump-h: 124px;
   }
 }
 
@@ -139,7 +143,10 @@
     --chart-3: #a891f2;
     --chart-4: #e0b54a;
     --chart-5: #f07a92;
-    --page: #0d0f12;
+    --brand: #f18ab4;
+    --brand-soft: #321d2b;
+    --sidebar-surface: #11151b;
+    --page: #0d1117;
     --surface: #15181c;
     --ink: #e3e6ea;
     --muted: #9ba4af; /* 7.6:1 on Paper */
@@ -189,6 +196,8 @@
    bg-accent), text-primary-foreground (not text-on-accent). */
 @theme inline {
   /* shadcn semantic tokens */
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
   --color-background: var(--page);
   --color-foreground: var(--ink);
   --color-card: var(--surface);
@@ -207,7 +216,7 @@
   --color-border: var(--edge);
   --color-input: var(--edge-input);
   --color-ring: var(--link);
-  --color-sidebar: var(--page);
+  --color-sidebar: var(--sidebar-surface);
   --color-sidebar-foreground: var(--ink);
   --color-sidebar-primary: var(--accent);
   --color-sidebar-primary-foreground: var(--on-accent);

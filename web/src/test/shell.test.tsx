@@ -3,7 +3,7 @@
  * page" contents, and the phone layout (tabs in a Sheet, groups in a strip).
  */
 
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
@@ -192,5 +192,32 @@ describe('Phone layout', () => {
     expect(screen.getByText('2026-07-25 21:00 UTC').closest('p')).toHaveTextContent(
       'Data as of 2026-07-25 21:00 UTC',
     );
+  });
+});
+
+describe('Navigation search', () => {
+  it('finds a page with the keyboard shortcut and navigates with Enter', async () => {
+    render(<App />);
+    await screen.findByRole('button', { name: 'Governance' });
+    await userEvent.keyboard('{Control>}k{/Control}');
+    const dialog = screen.getByRole('dialog', { name: 'Explore the dashboard' });
+    const input = within(dialog).getByRole('textbox', { name: 'Search pages and sections' });
+    await userEvent.type(input, 'Governance{Enter}');
+    expect(await screen.findByText('Role holders')).toBeInTheDocument();
+    await waitFor(() => expect(window.location.hash).toContain('tab=Governance'));
+    expect(screen.queryByRole('dialog', { name: 'Explore the dashboard' })).not.toBeInTheDocument();
+  });
+
+  it('handles no matches and returns focus when dismissed', async () => {
+    render(<App />);
+    const trigger = screen.getByRole('button', { name: 'Search dashboard' });
+    await userEvent.click(trigger);
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Search pages and sections' }),
+      'zzzz',
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('No sections match');
+    await userEvent.keyboard('{Escape}');
+    expect(trigger).toHaveFocus();
   });
 });

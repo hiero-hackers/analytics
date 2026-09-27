@@ -29,6 +29,7 @@ export function ThemeToggle() {
       size="sm"
       spacing={0}
       aria-label="Theme"
+      className="rounded-lg border bg-background p-1"
       value={choice}
       onValueChange={(value) => {
         // Radix reports "" when the active item is clicked again; a theme is
@@ -39,7 +40,13 @@ export function ThemeToggle() {
       }}
     >
       {OPTIONS.map(({ value, label, Icon }) => (
-        <ToggleGroupItem key={value} value={value} aria-label={label} title={`${label} theme`}>
+        <ToggleGroupItem
+          key={value}
+          value={value}
+          aria-label={label}
+          title={`${label} theme`}
+          className="size-7 rounded-md border-0 bg-transparent text-muted-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-sm"
+        >
           <Icon />
         </ToggleGroupItem>
       ))}
