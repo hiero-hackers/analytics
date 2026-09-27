@@ -1,11 +1,6 @@
 /**
- * What the sticky header needs to know about the page's scroll position:
- * whether the page has scrolled at all (the header lifts off the content),
- * and whether the page title has passed under the header (the header then
- * names the page itself, so the reader never loses where they are).
- *
- * One snapshot for both, read on scroll and resize. The title is found by id
- * rather than by ref because the header and the page are siblings.
+ * Whether the page has scrolled and whether its title has passed under the
+ * sticky header. The title is found by id because header and page are siblings.
  */
 
 import { useSyncExternalStore } from 'react';

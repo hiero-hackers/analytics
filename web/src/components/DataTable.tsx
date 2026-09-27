@@ -36,8 +36,7 @@ const ROW_HEIGHT = 49;
 
 /** Text reads left, numbers right in tabular figures so their digits line up. */
 const align = (numeric?: boolean) => (numeric ? 'text-right tabular-nums' : undefined);
-/** On narrow screens the first column (who/what the row is) stays in view while
- *  the rest scrolls sideways; it needs an opaque ground to scroll under. */
+/** On narrow screens the first column stays in view; its cells need an opaque background. */
 const STICKY_FIRST = 'max-md:sticky max-md:left-0 max-md:z-10';
 const OVERSCAN = 12;
 /** Below this, a table renders whole — the DOM cost is already negligible. */
@@ -51,7 +50,7 @@ export function DataTable({
   table: DataTableInstance;
   /** Beside the search: the switches that choose which rows (a time range). */
   controls?: ReactNode;
-  /** At the end of the toolbar: what a reader does with the rows (download, an external action). */
+  /** At the toolbar's end: what a reader does with the rows (download, an external link). */
   actions?: ReactNode;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -77,7 +76,6 @@ export function DataTable({
 
   return (
     <>
-      {/* One toolbar: find rows, choose which rows, then act on them. */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-64">
           <SearchIcon
@@ -115,8 +113,7 @@ export function DataTable({
       </div>
       <Table
         containerRef={scrollRef}
-        // The scroll box: capped at 520px or 60% of the dynamic viewport,
-        // whichever is less, so a long table never traps the page scroll.
+        // Capped height so a long table never traps the page scroll.
         containerClassName="max-h-[min(520px,60dvh)] overflow-auto rounded-lg border"
       >
         <TableHeader className="sticky top-0 z-20">
@@ -155,7 +152,7 @@ export function DataTable({
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {/* Sentence case on screen; the label stays as published. */}
+                      {/* CSS sentence case keeps the accessible name as published. */}
                       <span className="first-letter:uppercase">
                         {flexRender(header.column.columnDef.header, header.getContext())}
                       </span>

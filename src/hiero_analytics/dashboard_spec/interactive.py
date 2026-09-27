@@ -1,9 +1,6 @@
-"""Shared declarations for interactive chart sources.
+"""Shared presets for chart specs' ``interactive_sources`` (read by ``export/chart_data.py``).
 
-A chart spec's ``interactive_sources`` maps a PNG filename to the CSV that
-feeds its interactive version and how to draw it; ``export/chart_data.py``
-reads these. The presets here keep a series' label and colour identical on
-every card that shows it, and keep each counting rule written once.
+They keep a series' label and colour identical on every card, and each counting rule written once.
 """
 
 from __future__ import annotations
@@ -67,7 +64,6 @@ ROLE_BY_REPO = {
         "several repositories is counted in each, so repository counts must not be added to obtain "
         "unique people. Bots are excluded."
     ),
-    # The PNG pools small repositories into "Other Repos"; this view lists every one.
     "note": (
         "Each bar is a repository, counting people active there over the selected span, grouped by the "
         "governance role they hold in that repo (general → triage → committer → maintainer). The chart "
@@ -77,7 +73,7 @@ ROLE_BY_REPO = {
 
 
 def affiliation_share(role: str, plural: str, suffix: str) -> dict:
-    """Ranked employer bars for one role, replacing the top-2 pie."""
+    """Ranked employer bars for one role."""
     return {
         "kind": "categories",
         "file": f"affiliation_distribution{suffix}.csv",
@@ -95,7 +91,6 @@ def affiliation_share(role: str, plural: str, suffix: str) -> dict:
             "as 'Independent'; people with no curated affiliation are excluded, so shares are of resolved "
             "people only."
         ),
-        # The PNG pools all but the two largest employers; this view ranks every one.
         "note": (
             "Every employer with at least one resolved role-holder, largest first. Check the "
             "affiliations-known tile before reading the bars as the whole population."
@@ -185,7 +180,6 @@ def activity_heatmap(
         "window": "snapshot",
         "metric": "weighted_activity",
         "unit": "Weighted monthly activity score",
-        # Weighted, never raw counts: say so wherever the number appears.
         "population": (
             f"A weighted score, not a count: {_WEIGHTS}. Other activity (comments, labels) is not scored. "
             f"Columns are the last {HEATMAP_MONTHS} complete calendar months (UTC); the current month is "
@@ -263,7 +257,7 @@ CONTRIBUTOR_NETWORK = {
     ),
 }
 
-# Released-in-window events; the PNG spans 548 days for its "Last 18 months" tab.
+# 548 days mirrors the PNG's "Last 18 months" tab.
 RELEASE_TIMELINE_SOURCES = {
     f"release_timeline{suffix}.png": {
         "kind": "events",
@@ -313,7 +307,7 @@ SCORECARD_CHECKS = {
     ),
     "note": (
         "One row per repository, one column per check; stronger colour means a higher check score on a fixed "
-        "0–10 scale. Replaces the stacked breakdown, whose bar lengths implied the checks add up to the score."
+        "0–10 scale. Scorecard weights the checks into its score, so they do not add up to it."
     ),
 }
 

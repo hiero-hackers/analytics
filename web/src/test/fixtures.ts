@@ -31,7 +31,7 @@ export const GOV_DOC: SectionDoc = {
   periods: { '30d': [{ user: 'alice', count: 4, last_seen: '2026-07-20T00:00:00' }] },
 };
 
-export const CONTRIB_DOC: SectionDoc = {
+const CONTRIB_DOC: SectionDoc = {
   id: 'profiles',
   title: 'Contributor profiles',
   description: 'Per-contributor activity.',
@@ -43,7 +43,7 @@ export const CONTRIB_DOC: SectionDoc = {
   row_count: 2,
 };
 
-export const HACKERS_DOC: SectionDoc = {
+const HACKERS_DOC: SectionDoc = {
   ...CONTRIB_DOC,
   rows: [{ contributor: 'erin' }],
   row_count: 1,
@@ -54,7 +54,7 @@ export const HACKERS_DOC: SectionDoc = {
  * different shapes (the first column is labelled for the role it names), which
  * is what the Organisation-diversity tables look like once merged.
  */
-export const AFFILIATIONS_DOC: SectionDoc = {
+const AFFILIATIONS_DOC: SectionDoc = {
   id: 'affiliations',
   title: 'Organisation affiliations — reference',
   description: 'Each maintainer and the organisation they were mapped to.',
@@ -109,7 +109,7 @@ export const AFFILIATIONS_DOC: SectionDoc = {
   ],
 };
 
-export const HIP_EVIDENCE_DOC: SectionDoc = {
+const HIP_EVIDENCE_DOC: SectionDoc = {
   id: 'hip-evidence',
   title: 'Evidence (per PR)',
   description: 'The audit trail.',
@@ -191,7 +191,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
   row_count: 1,
 };
 
-export const MATRIX_DOC: MatrixView = {
+const MATRIX_DOC: MatrixView = {
   id: 'hip-matrix',
   kind: 'matrix',
   macro: 'HIPs',
@@ -255,7 +255,7 @@ export const MATRIX_DOC: MatrixView = {
   generated_at: '2026-07-25T09:00:00+00:00',
 };
 
-export const BOARD_DOC: BoardView = {
+const BOARD_DOC: BoardView = {
   id: 'hip-board',
   kind: 'board',
   macro: 'HIPs',

@@ -52,7 +52,7 @@ const FREQUENCY = {
 /** Height per horizontal bar, plus room for the value axis. */
 const ROW_HEIGHT = 32;
 const AXIS_HEIGHT = 56;
-/** The category axis fits its longest (shortened) label, so short names leave the room to the bars. */
+/** Fit the category axis to its longest shortened label, leaving the rest to the bars. */
 const labelWidth = (labels: string[]) =>
   Math.min(
     184,
@@ -76,10 +76,7 @@ function formatDetail(value: unknown, format: ChartDetail['format']) {
   return (format === 'decimal' ? decimal : integer).format(n);
 }
 
-/**
- * The exporter's comparable pair (last complete bucket vs the one before) as
- * one line per visible series; never the partial current bucket.
- */
+/** Last complete bucket vs the one before, per visible series; never the partial current bucket. */
 function Comparison({
   data,
   visible,
@@ -95,7 +92,6 @@ function Comparison({
   const [current, previous] = [find(pair.current), find(pair.previous)];
   const label = (bucket: string) => formatBucket(bucket, data.frequency);
   return (
-    // A quiet strip, not a boxed panel: it annotates the chart below it.
     <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 rounded-lg bg-muted/60 px-3 py-2 text-xs">
       <p className="font-medium text-foreground">
         {label(pair.current)} compared with {label(pair.previous)}
@@ -164,8 +160,7 @@ export function SeriesView({
   const [linkedMark, setMark] = useUrlParam(`${data.id}.mark`, data.mark);
   const mark = timeseries && ['bar', 'line', 'area'].includes(linkedMark) ? linkedMark : data.mark;
   const composition = mark === 'meter' || mark === 'funnel';
-  // The visible span of buckets: a preset or a brushed range. It selects
-  // existing buckets only, never re-aggregating people across them.
+  // A span selects existing buckets only; people are never re-aggregated across them.
   const [range, setRange] = useUrlParam(`${data.id}.range`, 'all');
   const buckets = timeseries ? data.rows.map((row) => row.bucket) : [];
   const [spanStart, spanEnd] = timeseries ? spanOf(range, buckets) : [0, data.rows.length - 1];
@@ -181,10 +176,8 @@ export function SeriesView({
   // Categories that name repositories, people, employers or teams take part in the focus.
   const dimension = timeseries ? null : dimensionOf(data.category.key);
   const showTotal = data.stacked && data.series.length > 1;
-  // Line has no stacking of its own, so a stacked document's lines default to
-  // cumulative: each line is the running total up the stack, and the top one
-  // is the total. Every row is already a count on its date, so this sums
-  // across series, never across periods.
+  // Lines don't stack, so a stacked document's lines default to cumulative (running total
+  // up the stack). This sums across series, never across periods.
   const [lineMode, setLineMode] = useUrlParam(`${data.id}.lines`, 'cumulative');
   const canStackLines = mark === 'line' && data.stacked && visible.length > 1;
   const stackedLines = canStackLines && lineMode !== 'separate';
@@ -251,7 +244,7 @@ export function SeriesView({
       ? [{ key: 'partial', label: 'Possibly incomplete', format: 'flag' as const }]
       : []),
   ];
-  // Recharts draws from these keys; the colour comes straight from each series.
+  // Labels only: each mark takes its colour straight from its series.
   const config: ChartConfig = Object.fromEntries(
     data.series.map((series) => [series.key, { label: series.label }]),
   );
@@ -369,8 +362,7 @@ export function SeriesView({
         (data.series.length > 1 || data.kind === 'timeseries') && (
           <div className="space-y-2.5">
             {data.series.length > 1 && (
-              // The legend is the series switch: a swatch and name per series,
-              // struck through when hidden.
+              // The legend doubles as the series switch.
               <div
                 className="flex flex-wrap gap-x-1 gap-y-1"
                 role="group"
@@ -669,8 +661,7 @@ export function SeriesView({
               </div>
             )}
             <div className="flex flex-wrap items-center justify-between gap-2">
-              {/* Hover and arrow-key reading is announced by the chart's own
-                  label; only the non-obvious gesture is spelled out. */}
+              {/* Hover and arrow keys are announced by the chart's label; only clicking is spelled out. */}
               <p className="text-xs text-muted-foreground">
                 {dimension ? 'Click a bar to focus the dashboard on it.' : ''}
               </p>

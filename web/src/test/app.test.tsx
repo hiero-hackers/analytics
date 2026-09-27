@@ -16,7 +16,6 @@ beforeEach(() => {
   stubApi();
 });
 
-/** Pick an org in the header's switcher (a native select since the shell redesign). */
 const chooseOrg = (org: string) =>
   userEvent.selectOptions(screen.getByRole('combobox', { name: 'Organisation' }), org);
 
@@ -76,10 +75,8 @@ describe('App shell', () => {
     expect(screen.getByText('maintainers')).toBeInTheDocument();
     expect(screen.getByText('103')).toBeInTheDocument();
     expect(screen.getByText('How to read this — what each column means')).toBeInTheDocument();
-    // Each group appears twice: once in the sidebar's "On this page" (a
-    // button — deliberately not a fragment link, which would clobber the
-    // tab/org hash state), once as its header. The chart card renders under its own named group — there
-    // is no generic "Charts" section any more.
+    // Each group appears in the sidebar and as its header; the sidebar entry is a button because a
+    // fragment link would clobber the tab/org hash state.
     const toc = screen.getByRole('navigation', { name: 'Dashboard' });
     expect(within(toc).getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
     expect(screen.getAllByText('Pipeline charts')).toHaveLength(2);
@@ -93,7 +90,6 @@ describe('App shell', () => {
       'href',
       'https://example.test/issues',
     );
-    // Provenance: the data watermark sits in the header, the code revision in the footer.
     expect(screen.getByText('2026-07-25 21:00 UTC').closest('p')).toHaveTextContent(
       'Data as of 2026-07-25 21:00 UTC',
     );
@@ -468,8 +464,7 @@ describe('Section groups', () => {
     expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
     expect(tocEntries(groups).map((entry) => entry.id)).toEqual(ids);
 
-    // Every table-of-contents entry scrolls its own group, even under name
-    // collisions. (The phone strip and the sidebar list share these entries.)
+    // Every entry scrolls its own group, even under name collisions.
     render(<GroupStrip entries={tocEntries(groups)} />);
     const scrolled: Element[] = [];
     const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (

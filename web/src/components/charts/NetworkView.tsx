@@ -1,15 +1,7 @@
 /**
- * The `network` kind: repositories linked by shared members, drawn as SVG
- * with the PNG's sizing rules — bubble area ~ sqrt(active members), link
- * width ~ shared members. Positions start from the PNG's layout
- * (plotting/network.py) and are relaxed so no bubble or label hides another
- * (see networkLayout.ts).
- *
- * Hover, search or select a repository to highlight it and its neighbours;
- * the neighbour list and the data view say exactly how many members each link
- * shares. A link-strength filter thins the web to its strong ties, and the
- * Matrix view shows every pair at once. Pan by dragging, zoom with the
- * buttons (or Ctrl/⌘ + wheel, so the page still scrolls normally).
+ * The `network` kind: repositories linked by shared members, sized like
+ * plotting/network.py (bubble area ~ √active members, link width ~ shared).
+ * Wheel zoom needs Ctrl/⌘ so a plain wheel still scrolls the page.
  */
 
 import { useMemo, useRef, useState, type PointerEvent, type WheelEvent } from 'react';
@@ -33,13 +25,13 @@ import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
 import { integer, shortRepo as short, windowText } from './format';
 import { relaxLayout, strengthSteps } from './networkLayout';
 
-/** SVG units per layout unit: roughly the PNG's points per unit at 16 inches wide. */
+/** SVG units per layout unit: roughly plotting/network.py's points per unit at 16 inches wide. */
 const UNIT = 110;
 const PAD = 48;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
 
-/** The PNG's marker area (140 + 260·√active, in pt²) as a radius, enlarged for card width. */
+/** plotting/network.py's marker area (140 + 260·√active pt²) as a radius, enlarged for card width. */
 const radius = (active: number) => 1.6 * Math.sqrt((140 + 260 * Math.sqrt(active)) / Math.PI);
 /** Room a node claims: its bubble with the label below it, or the label's half-width if wider. */
 const LABEL_BELOW = 17;
@@ -48,8 +40,7 @@ const claim = (id: string, r: number) => Math.max(r + LABEL_BELOW, labelHalf(id)
 
 export function NetworkView({ data, title, period, provenance }: ViewProps<NetworkDocument>) {
   const [query, setQuery] = useUrlParam(`${data.id}.q`);
-  // The selected repository *is* the dashboard focus: selecting one here also
-  // filters every repository table, and a focus set elsewhere selects it here.
+  // The selected repository is the dashboard focus, so it filters every repository table too.
   const [dashboardFocus, setFocus] = useFocus();
   const selected =
     data.nodes.find((node) => focusMatches(dashboardFocus, 'repo', node.id))?.id ?? null;

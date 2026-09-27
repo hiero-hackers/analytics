@@ -1,11 +1,6 @@
 /**
- * The dashboard's scope: which GitHub organisation every number describes.
- *
- * Drawn as the organisation's GitHub avatar and name, the way GitHub shows
- * it, so the scope is recognisable at a glance rather than read from a label.
- * The control underneath is the native <select>, laid invisibly over the pill: it
- * keeps the platform's keyboard handling and phone picker, and costs nothing
- * a popover library would.
+ * The organisation switcher: avatar and name over an invisible native <select>,
+ * which keeps the platform's keyboard handling and phone picker.
  */
 
 import { useState } from 'react';
@@ -13,22 +8,14 @@ import { ChevronsUpDownIcon } from 'lucide-react';
 import { cn } from 'cn';
 
 /**
- * The organisation's GitHub avatar.
- *
- * Loaded from `github.com/<org>.png`, which redirects to the avatar by the
- * organisation's numeric id: the login-based avatars.githubusercontent.com URL
- * returns GitHub's generic placeholder for organisations (it works for
- * people, which ContributorCell relies on). Both hosts are in the CSP's
- * img-src.
- *
- * Offline, blocked, or for an unknown login, it falls back to a monogram: the
- * initial past the shared `hiero-` prefix (hiero-ledger → L, hiero-hackers →
- * H) on a tint of a hue fixed per name, so organisations stay distinct.
+ * Loaded from `github.com/<org>.png`: the login-based avatars.githubusercontent.com
+ * URL returns a generic placeholder for organisations. Both hosts are in the CSP's
+ * img-src. On failure it falls back to a monogram past the `hiero-` prefix.
  */
 const HUES = ['var(--brand)', 'var(--link)', 'var(--chart-committer)', 'var(--chart-3)'];
 
 export function OrgAvatar({ org, className }: { org: string; className?: string }) {
-  // Keyed by org, so switching to another organisation tries its avatar afresh.
+  // Keyed by org, so switching organisation retries the avatar.
   const [failed, setFailed] = useState<string | null>(null);
   const box = cn('size-6 shrink-0 rounded-md border', className);
   if (failed !== org) {

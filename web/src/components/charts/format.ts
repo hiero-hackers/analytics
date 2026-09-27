@@ -51,11 +51,7 @@ export function shade(value: unknown, scale: MatrixDocument['scale']): number | 
   return Math.min(scale.steps, Math.max(1, step));
 }
 
-/**
- * The inclusive bucket span a `range` value selects: a preset (`all`, the
- * latest `24` or `12`) or a brushed `first~last`. Anything that no longer
- * matches the document (a stale link) falls back to every bucket.
- */
+/** Inclusive bucket span of a preset (`all`, `24`, `12`) or brushed `first~last`; a stale range selects all. */
 export function spanOf(range: string, buckets: string[]): [number, number] {
   const last = buckets.length - 1;
   if (range === '12' || range === '24') return [Math.max(0, last - Number(range) + 1), last];
@@ -65,6 +61,6 @@ export function spanOf(range: string, buckets: string[]): [number, number] {
   return to !== undefined && start >= 0 && end >= start ? [start, end] : [0, last];
 }
 
-/** A repository name without the organisation's `hiero-` prefix, for dense labels. */
+/** A repository name without its `hiero-` prefix, for dense labels. */
 export const shortRepo = (repo: string) =>
   repo.startsWith('hiero-') ? repo.slice('hiero-'.length) : repo;

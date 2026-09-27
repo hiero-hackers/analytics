@@ -1,11 +1,7 @@
 /**
- * The frame every interactive chart shares: heading, Chart / Data switch, CSV
- * download of the selected rows, the expanded dialog, and the explanatory
- * footer (note, counting rule, window, freshness, methodology).
- *
- * Views own their selection state (hidden series, search, the selected node)
- * and hand the shell the chart, the table and the CSV built from that one
- * selection, so the three can never disagree.
+ * The frame every interactive chart shares: heading, Chart / Data switch, CSV,
+ * expanded dialog and explanatory footer. Views build the chart, table and CSV
+ * from one selection, so the three can never disagree.
  */
 
 import { useContext, useRef, useState, type ReactNode } from 'react';
@@ -48,12 +44,9 @@ export function ChartShell({
   focusFound = true,
 }: ViewProps<ChartDocumentMeta> & {
   subtitle: string;
-  /**
-   * The chart's settings, as one row of segmented switches under the header:
-   * mark, scale, span, cohort. Shown for the chart and the table alike.
-   */
+  /** Segmented settings (mark, scale, span, cohort), shown for chart and table alike. */
   toolbar?: ReactNode;
-  /** Under the toolbar, for chart and table alike: series toggles, search, comparisons. */
+  /** Series toggles, search or comparisons under the toolbar, for chart and table alike. */
   controls?: ReactNode;
   chart: (expanded: boolean) => ReactNode;
   table: ReactNode;
@@ -72,9 +65,7 @@ export function ChartShell({
   const leading = useContext(ChartLeading);
   const expandRef = useRef<HTMLButtonElement>(null);
   const heading = period !== title ? `${title} · ${period}` : title;
-  // The unit leads the subtitle, without saying the same thing twice: the
-  // variant label often repeats it ("Maintainers" beside a unit of
-  // "Maintainers (share of repository)").
+  // Lead with the unit, dropping a first part that merely repeats it ("Maintainers" vs "Maintainers (share …)").
   const unit = data.unit.toLowerCase();
   const parts = subtitle.split(' · ').filter(Boolean);
   const detail = parts[0]?.toLowerCase().startsWith(unit)
@@ -83,10 +74,10 @@ export function ChartShell({
         data.unit,
         ...(parts[0] && unit.startsWith(parts[0].toLowerCase()) ? parts.slice(1) : parts),
       ].join(' · ');
-  // A snapshot already names its time; repeating it as "Source generated" adds a line and nothing else.
   const freshness = data.generated_at
     ? `Source generated ${stamp(data.generated_at)} UTC${data.stale ? ' · older than the scheduled refresh' : ''}`
     : 'Source freshness is unavailable.';
+  // Skip the freshness line when the window note (a snapshot) already states that time.
   const showFreshness =
     !data.generated_at || data.stale || !windowNote.includes(stamp(data.generated_at));
 
@@ -166,8 +157,6 @@ export function ChartShell({
         table
       )}
       <div className="border-t pt-4 text-xs leading-relaxed text-muted-foreground">
-        {/* The counting rule and the window stay visible; the reading guide
-            folds away with the methodology, so a footer never outgrows its chart. */}
         <p>{data.population}</p>
         <p className="mt-2">{windowNote}</p>
         {showFreshness && <p className={data.stale ? 'mt-1 text-warn-ink' : 'mt-1'}>{freshness}</p>}

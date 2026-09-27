@@ -1,11 +1,6 @@
 /**
- * The interactive replacement for a chart PNG: loads one `ChartDocument` the
- * exporter publishes (export/chart_data.py) and hands it to the view for its
- * kind. Every view shares `ChartShell` — Chart / Data, CSV of the selected
- * rows, the expanded dialog and the explanatory footer — so migrating another
- * chart is a spec declaration, not a new component.
- *
- * A failed load offers Retry; chart images are never substituted for data.
+ * Loads one exported `ChartDocument` (export/chart_data.py) and renders the view
+ * for its kind. A failed load offers Retry; chart images are never substituted.
  */
 
 import { useEffect, useState } from 'react';
@@ -51,9 +46,9 @@ export default function InteractiveChart({
   variant: ChartVariant;
   title: string;
   provenance: Manifest['provenance'];
-  /** The chart has more height than its peers (a gallery's lead): rankings show more rows. */
+  /** Taller than its peers (a gallery's lead): rankings show more rows. */
   roomy?: boolean;
-  /** The container's own switches (the card's period tabs), placed first in the chart's toolbar. */
+  /** The container's own switches (the card's period tabs), placed first in the toolbar. */
   leading?: React.ReactNode;
 }) {
   const path = variant.interactive!.path;
@@ -76,8 +71,7 @@ export default function InteractiveChart({
       active = false;
     };
   }, [path, attempt]);
-  // The container's switches stay reachable while loading or after a failure,
-  // so a reader can move to another period instead of waiting on this one.
+  // Keep the container's switches reachable while loading or failed, so a reader can switch period.
   const lead = leading ? <div className="mb-3">{leading}</div> : null;
   if (result?.path !== path)
     return (

@@ -20,7 +20,7 @@ const SHORTCUT =
     ? '⌘ K'
     : 'Ctrl K';
 
-/** A small navigation finder: searches real pages and the current page's sections. */
+/** Finder over the dashboard's pages and the current page's sections. */
 export function NavigationSearch({
   nav,
   toc,

@@ -55,9 +55,8 @@ export function CopyLinkButton({
       onClick={onCopy}
     >
       <Icon data-icon="inline-start" />
-      {/* Announced when it flips, so the result isn't visual-only. */}
-      {/* In a card header on a phone the label would push the title onto two
-          lines; it stays the accessible name there. */}
+      {/* Live so the result is announced; visually hidden in a phone card header,
+          where it would wrap the title, but still the accessible name. */}
       <span aria-live="polite" className={quiet ? 'max-sm:sr-only' : undefined}>
         {LABELS[status]}
       </span>

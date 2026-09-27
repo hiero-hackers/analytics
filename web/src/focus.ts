@@ -1,10 +1,6 @@
 /**
- * The dashboard-wide focus: one repository, contributor, organisation or team
- * held in the URL (`focus=repo:hiero-sdk-js`). Clicking a bar, a heatmap row
- * or a network node sets it; every table with that column filters to it, and
- * every chart with that dimension highlights it. Charts and tables without
- * the dimension are left alone and say so — a focus never implies filtering
- * a dataset cannot do.
+ * The dashboard-wide focus held in the URL (`focus=repo:hiero-sdk-js`): tables
+ * with that column filter to it, charts with that dimension highlight it.
  */
 
 import { useUrlParam } from './urlState';
@@ -40,10 +36,7 @@ export function dimensionOf(key: string): FocusDimension | null {
   return KEYS[key] ?? null;
 }
 
-/**
- * One comparable form per value: repositories drop an `owner/` prefix (the
- * tables keep it, the charts do not), and every dimension ignores case.
- */
+/** Case-insensitive; repositories drop an `owner/` prefix (tables keep it, charts do not). */
 export function normalise(dimension: FocusDimension, value: unknown): string {
   const text = String(value ?? '')
     .trim()

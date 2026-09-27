@@ -7,9 +7,8 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
 
-// jsdom has no matchMedia; the sidebar's useIsMobile needs one. Width queries
-// answer from window.innerWidth (jsdom: 1024, i.e. desktop) so a test can go
-// "mobile" by setting innerWidth before rendering; anything else is false.
+// jsdom has no matchMedia; useIsMobile needs one. max-width queries answer from
+// window.innerWidth, so a test goes "mobile" by setting innerWidth before rendering.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) => {
     const max = /max-width:\s*(\d+)px/.exec(query);

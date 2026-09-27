@@ -1,10 +1,6 @@
 /**
- * Global scope and navigation, kept visible while exploring the dashboard.
- *
- * Left to right: the brand, the scope (the organisation, and — once the page
- * title has scrolled under the header — the page), then how fresh the data
- * is, search, and the theme. The header lifts off the page with a shadow once
- * the page scrolls; nothing else in it moves.
+ * Sticky header: brand, scope (the organisation, plus the page once its title
+ * has scrolled under the header), data freshness, search and theme.
  */
 import { useState } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
@@ -20,7 +16,7 @@ import { HieroBrand } from './HieroBrand';
 import { NavigationSearch } from './NavigationSearch';
 import { OrgAvatar, OrgSwitcher } from './OrgSwitcher';
 
-export function Freshness({ dataAsOf, className }: { dataAsOf: string; className?: string }) {
+function Freshness({ dataAsOf, className }: { dataAsOf: string; className?: string }) {
   return (
     <p className={className}>
       Data as of <time dateTime={dataAsOf}>{stamp(dataAsOf)} UTC</time>
@@ -28,17 +24,13 @@ export function Freshness({ dataAsOf, className }: { dataAsOf: string; className
   );
 }
 
-/** Mirrors STALE_AFTER in export/data_api.py: the weekly refresh plus a day and a half of slack. */
+/** Mirrors STALE_AFTER in export/data_api.py: the weekly refresh plus 1.5 days of slack. */
 const STALE_AFTER_HOURS = 132;
 const relative = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
-/**
- * How old the data is, in words, with the exact watermark beneath. Past the
- * refresh window it says so in the warning ink; the words carry the state, so
- * the dot is never the only signal.
- */
+/** How old the data is, in words: the words carry the stale state, never the dot alone. */
 export function FreshnessStatus({ dataAsOf, now }: { dataAsOf: string; now?: number }) {
-  // Read once when shown: the age is a summary, not a ticking clock.
+  // Read once: the age is a summary, not a ticking clock.
   const [mounted] = useState(() => Date.now());
   const hours = Math.max(0, ((now ?? mounted) - Date.parse(dataAsOf)) / 3_600_000);
   const stale = hours > STALE_AFTER_HOURS;
@@ -122,8 +114,7 @@ export function AppHeader({
                 <span className="truncate">{nav.shownOrg}</span>
               </span>
             )}
-            {/* The page, once its own title has scrolled away: the header then
-                says where the reader is without repeating a visible heading. */}
+            {/* Shown once the page title scrolls away, never repeating a visible heading. */}
             <span
               aria-hidden={!titleHidden}
               className={cn(

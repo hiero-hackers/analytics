@@ -1,14 +1,7 @@
 /**
- * The network as a repository × repository matrix. A dense graph (hundreds of
- * links among a few dozen repositories) hides most pairs under the others in
- * any node-link drawing; a matrix shows every pair in its own cell.
- *
- * Rows and columns are grouped by repository type, then ordered by how many
- * members each repository shares in total, so blocks of tightly linked
- * repositories read as dark squares. Shading is one sequential hue on a
- * logarithmic scale (shared counts are heavily skewed), with the legend giving
- * each shade's exact range. Hovering a cell reads the pair out; a repository
- * name is a button that selects it, like a bubble in the graph.
+ * The network as a repository × repository matrix, so every pair of a dense
+ * graph gets its own cell. Rows are grouped by type, then ordered by total shared
+ * members; shading is logarithmic because shared counts are heavily skewed.
  */
 
 import { useMemo, useState } from 'react';
@@ -104,7 +97,6 @@ export function AdjacencyMatrix({
         fontWeight={active ? 600 : 400}
         fill={active ? 'var(--ink)' : 'var(--muted)'}
         dominantBaseline="middle"
-        // Row names end at the grid; column names rise away from it.
         textAnchor={axis === 'row' ? 'end' : 'start'}
       >
         {short(node.id)}
@@ -118,7 +110,7 @@ export function AdjacencyMatrix({
         {readout}
       </p>
       <div className="overflow-auto rounded-lg border bg-card">
-        {/* Grows with the card up to half again its natural size; scrolls, never shrinks, when narrow. */}
+        {/* Scrolls rather than shrinks when narrow; grows up to 1.5× in a wide card. */}
         <svg
           viewBox={`0 0 ${width} ${height}`}
           style={{ minWidth: width, maxWidth: width * 1.5 }}
@@ -127,7 +119,6 @@ export function AdjacencyMatrix({
           className="mx-auto block w-full"
           onPointerLeave={() => setHover(null)}
         >
-          {/* Row and column labels, each a button that selects the repository. */}
           {order.map((node, i) => (
             <g
               key={`row-${node.id}`}
@@ -160,7 +151,7 @@ export function AdjacencyMatrix({
             </g>
           ))}
 
-          {/* Crosshair / selection bands behind the cells. */}
+          {/* Hover and selection bands come first so they sit behind the cells. */}
           {[hover?.row, selectedIndex >= 0 ? selectedIndex : undefined].map(
             (index, k) =>
               index !== undefined && (
@@ -216,7 +207,6 @@ export function AdjacencyMatrix({
             }),
           )}
 
-          {/* Rules between repository types. */}
           {bands.map((index) => (
             <g key={`band-${index}`} stroke="var(--edge-strong)" strokeWidth={1}>
               <line

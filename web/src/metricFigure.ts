@@ -4,7 +4,6 @@ import type { MetricTile } from './api';
 
 const count = new Intl.NumberFormat('en-US');
 
-/** What a tile's value is, so it can be drawn as that kind of number. */
 export type Figure =
   | { kind: 'share'; value: string; percent: number }
   | { kind: 'part'; value: string; of: string; percent: number }

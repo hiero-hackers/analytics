@@ -43,7 +43,6 @@ export function EvidencePanel({
   return (
     <div className="mt-3 rounded-lg border p-3">
       <div className="mb-1.5 flex flex-wrap items-baseline gap-x-2.5">
-        {/* "HIP-1200 · repo": the pair the evidence is for — an identifier, not a meta string. */}
         <h3 className="text-sm font-semibold">
           HIP-{hip} · {repo}
         </h3>
@@ -82,7 +81,6 @@ export function EvidencePanel({
                 </span>
                 {item.q && <Badge variant="warn">not counted — “{item.q}”</Badge>}
               </div>
-              {/* The matched text itself: a literal excerpt of the PR, so monospace. */}
               {item.x && (
                 <div className="mt-0.5 truncate font-mono text-[11px] text-soft">{item.x}</div>
               )}

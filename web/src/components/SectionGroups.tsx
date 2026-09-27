@@ -1,9 +1,6 @@
 /**
- * A tab's collapsible section groups, and the on-page table of contents over
- * them. On wide screens the table of contents lives in the sidebar ("On this
- * page", see AppSidebar); on phones it is the sticky strip rendered here. Only
- * one of the two is ever mounted. With a single group, sections render bare —
- * a header and a contents list would both be redundant.
+ * A tab's collapsible section groups, plus the phone table of contents (the
+ * sidebar holds it on wide screens). A single group renders bare.
  */
 
 import { ChevronDownIcon } from 'lucide-react';
@@ -13,7 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { anchorId, scrollToGroup, tocEntries, type Group, type TocEntry } from '../toc';
 import { useActiveSection } from '../useActiveSection';
 
-/** The phone table of contents: a sticky strip under the header that scrolls sideways. */
+/** Sticky, sideways-scrolling strip under the header. */
 export function GroupStrip({ entries }: { entries: TocEntry[] }) {
   const active = useActiveSection(entries.map((entry) => entry.id));
   return (
@@ -51,8 +48,7 @@ export function SectionGroups({ groups }: { groups: Group[] }) {
             id={entries[index].id}
             className="group/section-group mt-6 scroll-mt-(--jump-h) first:mt-0"
           >
-            {/* The Radix trigger styled directly: a quiet ruled heading row, not
-                a button look (shadcn's Button paints its expanded state). */}
+            {/* Radix trigger, not shadcn's Button, which paints its expanded state. */}
             <CollapsibleTrigger className="mb-3 flex w-full items-center gap-2 border-b py-2 text-left text-sm font-semibold outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring">
               <ChevronDownIcon
                 aria-hidden="true"

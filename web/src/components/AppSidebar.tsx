@@ -12,14 +12,9 @@ import {
   XIcon,
 } from 'lucide-react';
 /**
- * Section navigation. "Sections" lists the manifest's tabs (an umbrella tab's
- * members nest under it); "On this page" is the active tab's table of
- * contents, highlighting the group the reader is in. On phones the sidebar is
- * a Sheet opened from the header, carrying the tabs only — the page's own
- * sticky strip (SectionGroups) covers its groups there.
- *
- * Tabs are buttons, not links: the URL hash is the app's state store, and a
- * click always writes it, even on the tab already active.
+ * Tab navigation and the active tab's "On this page" list; on phones a Sheet
+ * with the tabs only (SectionGroups' strip covers the groups there). Tabs are
+ * buttons, not links: the URL hash is the app's state store.
  */
 
 import {
@@ -62,7 +57,6 @@ function NavigationIcon({ name }: { name: string }) {
   return <Icon aria-hidden="true" className="size-4 shrink-0" />;
 }
 
-/** A group heading in the display face: sentence case, no tracking, no eyebrow. */
 function GroupHeading({ children }: { children: React.ReactNode }) {
   return (
     <SidebarGroupLabel className="mb-1 h-7 px-3 font-display text-[13px] font-semibold text-foreground/70">
@@ -91,7 +85,6 @@ function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string
                   <SidebarMenuItem key={tab}>
                     <SidebarMenuButton
                       className={cn(
-                        // The active tab is marked by a brand edge, not a filled pill.
                         'relative h-10 gap-3 rounded-lg px-3 font-display text-[14px] font-medium text-foreground/75 transition-colors',
                         'before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand before:opacity-0 before:transition-opacity',
                         'hover:bg-sidebar-accent hover:text-foreground',
@@ -147,12 +140,7 @@ function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string
   );
 }
 
-/**
- * The page's groups on a progress rail: the track fills in the brand colour
- * up to the group the reader is in, so the sidebar shows how far down a long
- * page they are, not just a list of links. Groups already passed keep a
- * filled node; the current one gets a ring.
- */
+/** The page's groups on a progress rail filled up to the group the reader is in. */
 function OnThisPage({ entries }: { entries: TocEntry[] }) {
   const active = useActiveSection(entries.map((entry) => entry.id));
   const current = Math.max(
@@ -169,7 +157,6 @@ function OnThisPage({ entries }: { entries: TocEntry[] }) {
             const here = index === current;
             return (
               <li key={entry.id} className="relative">
-                {/* The rail segment from this node down to the next one. */}
                 {index < entries.length - 1 && (
                   <span
                     aria-hidden="true"
@@ -223,8 +210,7 @@ export function AppSidebar({
 }) {
   const { isMobile, setOpenMobile } = useSidebar();
   return (
-    // Below the sticky header on wide screens, rather than the default full
-    // viewport height from the top edge.
+    // Below the sticky header on wide screens.
     <Sidebar className="md:top-(--header-h) md:h-[calc(100svh-var(--header-h))]">
       {isMobile && (
         <SidebarHeader className="flex-row items-center justify-between border-b px-5 py-5">

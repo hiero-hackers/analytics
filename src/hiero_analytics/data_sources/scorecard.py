@@ -23,8 +23,8 @@ def fetch_repo_scorecard(repo: str, *, org: str = "hiero-ledger") -> ScorecardRe
     Fetch latest OpenSSF Scorecard for a repository.
 
     Args:
-        org: GitHub organisation that owns the repository.
         repo: Repository in format `eg: hiero-python-sdk`
+        org: GitHub organisation that owns the repository.
 
     Returns:
         ScorecardRecord, or None when the repository has no scorecard (404).

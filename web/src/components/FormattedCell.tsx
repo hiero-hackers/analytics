@@ -34,9 +34,7 @@ export function FormattedCell({ value, format }: { value: unknown; format?: Colu
       return <>{Number.isFinite(numeric) ? NUMBER_FORMAT.format(numeric) : text}</>;
     }
     case 'percent': {
-      // A 0–100 share: the figure, and a bar on a fixed 0–100 track so a
-      // column of shares compares at a glance. The bar is decoration; the
-      // figure carries the value.
+      // A 0–100 share; the bar (fixed 0–100 track) is decoration, the figure carries the value.
       const numeric = typeof value === 'number' ? value : Number(text);
       if (!Number.isFinite(numeric)) return <>{text}</>;
       const width = Math.min(100, Math.max(0, numeric));

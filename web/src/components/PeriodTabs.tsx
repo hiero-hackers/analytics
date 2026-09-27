@@ -1,15 +1,11 @@
-/**
- * Rolling-period selector for tables: a segmented bar of windows, shortest
- * first, with "All time" (the null period) at the end of the scale. A
- * single-select ToggleGroup, so it reads as one choice among options.
- */
+/** Rolling-period selector for tables; "All time" is the null period. */
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const SEGMENT =
   'h-7 rounded-md border-0 bg-transparent px-2.5 text-xs font-medium text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-xs';
 
-/** The value standing for "no window" — every row, not a rolling period. */
+/** ToggleGroup value for the null "All time" period. */
 const ALL_TIME = '__all__';
 
 export function PeriodTabs({
@@ -35,8 +31,6 @@ export function PeriodTabs({
       value={active ?? ALL_TIME}
       // "" means the active option was clicked again: keep the window.
       onValueChange={(value) => value && onChange(value === ALL_TIME ? null : value)}
-      // One muted track, the segmented look the chart toolbars use, which
-      // sets it apart from the outlined role tabs.
       className="max-w-full overflow-x-auto rounded-lg bg-muted p-0.5"
     >
       {periods.map((key) => (

@@ -219,7 +219,6 @@ describe('Focus', () => {
     expect(screen.getByRole('region', { name: 'Dashboard focus' })).toHaveTextContent(
       'Focused on repository hiero-sdk-go',
     );
-    // The repository table narrows and says so; the per-person table is untouched.
     expect(screen.getByText(/1 of 3 rows/)).toBeInTheDocument();
     const repoTable = screen
       .getByRole('link', { name: 'hiero-ledger/hiero-sdk-go' })
@@ -227,7 +226,6 @@ describe('Focus', () => {
     expect(bodyRows(repoTable)).toHaveLength(1);
     const peopleTable = screen.getByText('bo').closest('table')!;
     expect(bodyRows(peopleTable)).toHaveLength(2);
-    // The monthly chart has no repository breakdown, and says it is organisation-wide.
     expect(
       screen.getByText(/Shows the whole organisation: this chart has no repository breakdown/),
     ).toBeInTheDocument();

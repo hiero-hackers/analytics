@@ -1,4 +1,7 @@
-/** Data-driven chart cards with shared variant axes and URL-backed selections. */
+/**
+ * Chart section cards. Charts offering the same variant labels share one card-level
+ * tab row; every selection lives in the URL.
+ */
 
 import { lazy, Suspense } from 'react';
 import { useUrlIndex, useUrlList } from '../urlState';
@@ -14,14 +17,7 @@ import { VariantTabs } from './VariantTabs';
 
 const InteractiveChart = lazy(() => import('./InteractiveChart'));
 
-/**
- * A chart's variant axis, identified by its ordered label set. Serialised
- * rather than joined so no separator can be confused with a label.
- */
-/**
- * Whether a chart needs the full row: hand-flagged `wide` / `full_row` charts,
- * and the kinds that need the width by shape — heatmaps, networks, timelines.
- */
+/** Hand-flagged charts and wide kinds (heatmaps, networks, timelines) take a full row. */
 const WIDE_KINDS = ['matrix', 'network', 'events'];
 const needsFullRow = (chart: ChartSpec, variant: number) =>
   Boolean(
@@ -30,6 +26,7 @@ const needsFullRow = (chart: ChartSpec, variant: number) =>
     WIDE_KINDS.includes(chart.variants[variant]?.interactive?.kind ?? ''),
   );
 
+/** A chart's variant axis: its ordered label set, serialised so no separator can clash. */
 const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant) => variant.label));
 
 function Figure({
@@ -67,8 +64,7 @@ function Figure({
         lead && !fullRow && 'lg:row-span-2',
       )}
     >
-      {/* An interactive chart takes its own tabs into its toolbar; the
-          no-data placeholder keeps them above it. */}
+      {/* Interactive charts render their tabs in their own toolbar. */}
       {!axis && !active.interactive && (
         <VariantTabs
           labels={chart.variants.map((option) => option.label)}
@@ -147,10 +143,8 @@ export function ChartSectionCard({
   section: ChartSection;
   provenance: Manifest['provenance'];
 }) {
-  // Slide and shared tabs live in the URL: "Copy link" reproduces the view.
+  // In the URL so Copy link reproduces the view; shared axes as `<section>.tab=<i>,<j>`.
   const [rawSlide, setSlide] = useUrlIndex(`${section.id}.slide`);
-  // One selection per shared axis, keyed by its label set; the URL holds them
-  // as `<section>.tab=<i>,<j>` in axis order.
   const [rawShared, setRawShared] = useUrlList(`${section.id}.tab`);
 
   const count = section.charts.length;
@@ -198,9 +192,8 @@ export function ChartSectionCard({
   // decides, keeping the grid stable while variant tabs switch.
   const halfCount = section.charts.filter((chart) => !needsFullRow(chart, 0)).length;
   const stretched = section.charts.map((chart) => needsFullRow(chart, 0) || halfCount === 1);
-  // An odd run of three or more half-width charts would leave a lone chart on
-  // its last row. Instead the first — conventionally the card's main ranking,
-  // and so its tallest — spans two rows and the shorter ones stack beside it.
+  // An odd count (3+) of half-width charts would strand the last one, so the
+  // first (usually the tallest) spans two rows and the others stack beside it.
   const leadIndex =
     halfCount >= 3 && halfCount % 2 === 1
       ? section.charts.findIndex((chart) => !needsFullRow(chart, 0))
@@ -283,9 +276,8 @@ export function ChartSectionCard({
           />
         </div>
       ) : (
-        // Two columns at most: three abreast left each chart too narrow to
-        // read. items-start keeps a short chart from stretching into an empty
-        // box beside a tall neighbour.
+        // Two columns at most for legibility; items-start stops a short chart
+        // stretching beside a tall neighbour.
         <div className="grid grid-flow-row-dense grid-cols-1 items-start gap-4 lg:grid-cols-2">
           {section.charts.map((chart, index) => (
             <Figure

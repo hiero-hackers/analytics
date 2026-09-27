@@ -1,8 +1,3 @@
-/**
- * The app shell: the header's theme menu, the sidebar's tabs and "On this
- * page" contents, and the phone layout (tabs in a Sheet, groups in a strip).
- */
-
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -99,7 +94,7 @@ describe('Sidebar tabs', () => {
     await openGovernance();
     const nav = screen.getByRole('navigation', { name: 'Dashboard' });
 
-    // HIPs is no longer a top-level tab; it appears as Governance's member.
+    // HIPs is a member of Governance, not a top-level tab.
     const member = within(nav).getByRole('button', { name: 'HIPs' });
     expect(member.closest('[data-sidebar="menu-sub"]')).not.toBeNull();
 

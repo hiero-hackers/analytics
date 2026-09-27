@@ -1,8 +1,4 @@
-/**
- * The `events` kind: one mark per timestamped event (a release) on a time
- * axis, one row per repository, busiest at the top — the PNG's layout, with
- * each release's tag and exact time on hover and in the data view.
- */
+/** The `events` kind: one mark per timestamped event (a release), one row per repository. */
 
 import { CartesianGrid, Cell, Scatter, ScatterChart, XAxis, YAxis, ZAxis } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -47,7 +43,7 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
       .filter((row) => row.type === type)
       .map((row) => ({ ...row, t: Date.parse(String(row.time)), y: index.get(String(row[key]))! }));
 
-  // The exporter always sets the end; the latest event is the fallback for older documents.
+  // Fall back to the latest event when the document has no window end.
   const end = data.window.end
     ? Date.parse(data.window.end)
     : Math.max(0, ...data.rows.map((row) => Date.parse(String(row.time))));

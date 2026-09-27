@@ -1,12 +1,7 @@
 /**
- * The reader's theme choice: follow the OS ("system", the default) or force
- * light/dark. A forced choice is `data-theme` on <html>, which the stylesheet's
- * palette and `dark` variant key on; "system" is the attribute's absence.
- *
- * The choice persists in localStorage. public/theme-init.js applies it before
- * first paint and must agree with this file on the key and values. Storage can
- * be unavailable (privacy modes, sandboxed frames), so every access is guarded
- * and failure means "system", never a crash.
+ * The theme choice: a forced light/dark is `data-theme` on <html>, "system" its
+ * absence. public/theme-init.js applies it before first paint and must agree on
+ * the storage key and values. Storage failures fall back to "system".
  */
 
 export type ThemeChoice = 'system' | 'light' | 'dark';
@@ -23,7 +18,6 @@ export function readTheme(): ThemeChoice {
   }
 }
 
-/** Apply `choice` to <html> and remember it for the next visit. */
 export function applyTheme(choice: ThemeChoice): void {
   const root = document.documentElement;
   if (choice === 'system') {

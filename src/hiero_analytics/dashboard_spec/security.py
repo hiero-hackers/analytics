@@ -44,7 +44,6 @@ CHART_MACRO = {
                         "orientation": "horizontal",
                         "rank": True,
                         "top_n": 15,
-                        # Where each repository sits against the organisation.
                         "reference": {"stat": "median", "label": "Org median"},
                         "value_max": 10,
                         "window": "snapshot",

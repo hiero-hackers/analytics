@@ -4,10 +4,7 @@ const MOBILE_BREAKPOINT = 768;
 const QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
 
 export function useIsMobile() {
-  // Local change: shadcn starts at `undefined` (read as false) and corrects
-  // itself in an effect, which suits server rendering. This app renders only
-  // in the browser, so read the query up front: phones get their layout on
-  // the first render instead of flashing the desktop one first.
+  // Browser-only app: read the query up front so phones never flash the desktop layout.
   const [isMobile, setIsMobile] = React.useState(() => window.matchMedia(QUERY).matches);
 
   React.useEffect(() => {

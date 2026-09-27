@@ -1,9 +1,3 @@
-/**
- * The theme plumbing: the stored choice round-trips, "system" means no
- * data-theme attribute, unavailable storage degrades to "system" instead of
- * throwing, and the pre-paint script in public/ agrees with src/theme.ts.
- */
-
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { THEME_STORAGE_KEY, applyTheme, readTheme } from '../theme';
 // The real file, as text — the test runs exactly what browsers run.
@@ -59,8 +53,7 @@ describe('theme', () => {
   });
 
   it('the pre-paint script applies what theme.ts stored', () => {
-    // public/theme-init.js cannot import theme.ts (it runs before the bundle),
-    // so this is what keeps the two agreeing on the key and the values.
+    // theme-init.js runs before the bundle and cannot import theme.ts; this keeps the two in sync.
     const run = () => new Function(script)();
 
     applyTheme('dark');

@@ -1,11 +1,6 @@
 /**
- * The theme switch: follow the OS (the default), or force light or dark. One
- * click, current state always visible. The choice is applied and persisted by
- * theme.ts; the pre-paint script in public/ restores it on the next visit.
- *
- * A segmented ToggleGroup rather than a dropdown menu: the menu's popup
- * machinery (Floating UI, Popper, Menu) cost about 10 kB gzipped for three
- * options, and ToggleGroup already ships for the dashboard's other switches.
+ * System / light / dark switch; theme.ts applies and persists the choice. A
+ * ToggleGroup rather than a dropdown, which would add about 10 kB gzipped.
  */
 
 import { useState } from 'react';
@@ -32,8 +27,7 @@ export function ThemeToggle() {
       className="rounded-lg border bg-background p-1"
       value={choice}
       onValueChange={(value) => {
-        // Radix reports "" when the active item is clicked again; a theme is
-        // always chosen, so that click changes nothing.
+        // Radix reports "" when the active item is clicked again; keep the choice.
         if (!value) return;
         applyTheme(value as ThemeChoice);
         setChoice(value as ThemeChoice);

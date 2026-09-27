@@ -88,11 +88,9 @@ _ISOLATE_COLS = 8
 
 
 def network_layout(graph: nx.Graph, seed: int = 42) -> tuple[dict, list, tuple[float, float] | None]:
-    """Positions for every node, plus where the "not linked" caption goes.
+    """Node positions and the "not linked" caption point, shared by the PNG and the interactive network.
 
-    The single layout both the PNG and the interactive network use, so the two
-    draw the same picture. Returns ``(pos, isolated, caption)``; ``caption`` is
-    None when every node is linked.
+    Returns ``(pos, isolated, caption)``; ``caption`` is None when every node is linked.
     """
     pos, isolated = _packed_layout(graph, seed)
     if not isolated:
@@ -116,12 +114,7 @@ def network_layout(graph: nx.Graph, seed: int = 42) -> tuple[dict, list, tuple[f
 
 
 def network_tables(nodes: pd.DataFrame, edges: pd.DataFrame, seed: int = 42) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """The drawn network as node and edge tables, positions included.
-
-    Nodes gain ``category`` (repository type) and the ``x``/``y`` the PNG uses;
-    edges keep only pairs whose repositories are nodes. The interactive chart
-    reads these, so it shows exactly the graph the PNG shows.
-    """
+    """The drawn network as node and edge tables, with each node's ``category`` and PNG ``x``/``y``."""
     graph = _graph(nodes, edges)
     pos, _isolated, _caption = network_layout(graph, seed)
     node_table = nodes[["repo", "active_members", "total_members"]].copy()

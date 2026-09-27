@@ -1,9 +1,6 @@
 /**
- * The dashboard focus, stated once at the top of the tab: what is focused,
- * what it does and does not change, and how to clear it. On wide screens it
- * docks under the sticky header, so the reader always knows why a table is
- * shorter without it ever covering the header's controls. On phones the
- * group strip already holds that place, so the bar stays in the page flow.
+ * States the dashboard focus and how to clear it. Sticky under the header on
+ * wide screens only: on phones the group strip already holds that place.
  */
 
 import { CrosshairIcon, XIcon } from 'lucide-react';

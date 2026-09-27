@@ -1,27 +1,13 @@
 /**
- * A row of exclusive variant switches: a chart's own tabs, a card's shared
- * role axis, and a table's role tabs — one component so the three cannot drift
- * into three styles. A single-select ToggleGroup (radiogroup/radio to
- * assistive tech): the choice swaps the data inside one card rather than
- * showing separate panels, so it is not a Tabs widget.
- *
- * Deliberately *not* `PeriodTabs`: that carries an "All time" null state, which
- * a role axis has no equivalent of (there is no "all roles" table). The two
- * also look different — separate outlined options here, one segmented bar
- * there — so a reader can tell the axes apart on a table that has both.
+ * Exclusive variant switches for chart tabs, a card's shared role axis and table role tabs.
+ * A single-select ToggleGroup rather than Tabs: the choice swaps data inside one card.
+ * Separate from `PeriodTabs`, whose "All time" null state has no role-axis equivalent.
  */
 
 import type { ReactNode } from 'react';
 import { cn } from 'cn';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-/**
- * `outline` (the default): separate outlined options, for a card's own axis
- * and a table's role tabs. `segmented`: one muted track with the active
- * option lifted onto the card surface, for a chart's toolbar, where several
- * small switches sit side by side and must read as one row of settings rather
- * than a stack of button groups.
- */
 export function VariantTabs({
   labels,
   active,
@@ -35,8 +21,9 @@ export function VariantTabs({
   active: number;
   onSelect: (index: number) => void;
   ariaLabel: string;
+  /** `outline` for card and table axes; `segmented` (one muted track) for chart toolbars. */
   appearance?: 'outline' | 'segmented';
-  /** Draw these instead of the labels; each label stays the option's accessible name and tooltip. */
+  /** Draw these instead of labels; each label stays the accessible name and tooltip. */
   icons?: ReactNode[];
   className?: string;
 }) {
@@ -73,8 +60,7 @@ export function VariantTabs({
       variant="outline"
       aria-label={ariaLabel}
       value={String(active)}
-      // Radix reports "" when the active option is clicked again; a variant is
-      // always selected, so that click changes nothing.
+      // Radix reports "" when the active option is re-clicked; a variant stays selected.
       onValueChange={(value) => value && onSelect(Number(value))}
       className={cn('mb-3 max-w-full flex-wrap', className)}
     >

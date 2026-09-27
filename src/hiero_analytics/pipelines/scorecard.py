@@ -67,7 +67,6 @@ def main(org: str = ORG):
         logger.warning("No scorecards published; exporting empty datasets")
 
     df = scorecard_to_dataframe(scorecards)
-    # The interactive scorecard chart reads this; the PNG never needed a CSV.
     save_dataframe(df, org_data_dir / "org_scorecard.csv")
     plot_and_save(
         df,
@@ -79,8 +78,7 @@ def main(org: str = ORG):
     )
 
     df_stacked = scorecard_stacked_dataframe(scorecards)
-    # Per-check scores for the interactive checks matrix: -1 (inconclusive) is
-    # kept as-is and unreported checks stay blank, never a zero score.
+    # -1 (inconclusive) is kept and unreported checks stay blank, never a zero score.
     save_dataframe(scorecard_stacked_dataframe(scorecards, missing=None), org_data_dir / "org_scorecard_checks.csv")
     plot_and_save(
         df_stacked,

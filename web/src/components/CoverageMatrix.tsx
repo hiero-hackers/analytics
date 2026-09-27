@@ -97,8 +97,7 @@ export function CoverageMatrix({
         />
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span id="hipmx-status-label">Governance:</span>
-          {/* Single choice that can be cleared: clicking the active status
-              again reports "" — no status filter, every row. */}
+          {/* Clicking the active status again reports "", clearing the filter. */}
           <ToggleGroup
             type="single"
             variant="outline"
@@ -202,10 +201,8 @@ export function CoverageMatrix({
       <div className="hipmx-legend gap-x-5">
         <span className="inline-flex items-center gap-1.5">
           fewer
-          {/* Keyed off the ramp's *length*, not its colours: the swatches wear
-              the same m1–m5 classes as the cells, so both follow the theme
-              together. Painting the shipped hex here left the legend light in
-              dark mode. */}
+          {/* Keyed off the ramp's *length*, not its colours: the swatches share
+              the cells' m1–m5 classes, so both follow the theme. */}
           {view.ramp.map((_shade, index) => (
             <i key={index} className={`m${index + 1}`} />
           ))}

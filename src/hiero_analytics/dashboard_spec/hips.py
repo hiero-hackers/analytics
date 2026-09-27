@@ -44,8 +44,7 @@ CHART_MACRO = {
                         "group": {"key": "cohort", "label": "Cohort", "default": "created since 2024-09"},
                         "series": [{"key": "hips", "label": "HIPs", "color": "var(--heat-4)"}],
                         "details": [{"key": "pct_of_proposed", "label": "Share of proposed", "format": "percent"}],
-                        # Stages in order, each a subset of the one before: drawn as a
-                        # funnel with stage-to-stage conversion and drop-off.
+                        # Each stage is a subset of the one before, so it draws as a funnel.
                         "mark": "funnel",
                         "orientation": "horizontal",
                         "window": "snapshot",

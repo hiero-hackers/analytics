@@ -296,7 +296,8 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
     Mirrors what the legacy dashboard renders: each spec entry is a card with
     a title and description; each chart inside carries its variant tabs
     (e.g. All / Active 90d), its "how to read this" note, its step-by-step
-    methodology, and the wide flag (rendered as a horizontal scroll). Variants with a produced PNG or interactive dataset are listed.
+    methodology, and the wide flag (rendered as a horizontal scroll). Only
+    variants with a produced PNG or interactive dataset are listed.
     """
     chart_dir = paths.ORG_CHARTS_DIR / org
     sections = []
@@ -320,7 +321,7 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
                         _stamp_freshness(document, csv_path)
                         # A source's own note describes the interactive view and wins over the PNG's.
                         document = {**variant_annotations(filename), **document}
-                        # Named after the PNG it replaces: two charts can share one CSV.
+                        # Keyed by the PNG stem, not the CSV: two charts can share one CSV.
                         document["id"] = Path(filename).stem
                         target = org_dir / "charts" / f"{document['id']}.json"
                         target.parent.mkdir(parents=True, exist_ok=True)

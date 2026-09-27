@@ -143,7 +143,6 @@ def test_chart_note_does_not_replace_counting_rule(tmp_path, monkeypatch):
     output = tmp_path / "api" / "org"
     result = data_api._org_chart_sections("org", source, output)
     variant = result[0]["charts"][0]["variants"][0]
-    # Chart presence is independent of the legacy image generation step.
     assert variant["image_available"] is False
     assert variant["interactive"] == {"kind": "timeseries", "path": "org/charts/roles.json"}
     document = json.loads((output / "charts/roles.json").read_text())

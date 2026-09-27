@@ -82,7 +82,7 @@ export interface ChartDocumentMeta {
   stale?: boolean;
 }
 
-/** `trailing`: the `days` before `end`; `all`: every recorded event; `snapshot`: the state at `end`. */
+/** `trailing`: the `days` before `end`; `all`: every event; `snapshot`: the state at `end`. */
 export interface ChartWindow {
   kind: 'snapshot' | 'all' | 'trailing';
   days: number | null;
@@ -91,10 +91,7 @@ export interface ChartWindow {
 
 /** Bars, lines and areas over periods or categories. */
 interface ChartDocumentBase extends ChartDocumentMeta {
-  /**
-   * `meter` (a snapshot split into statuses, headline first) and `funnel`
-   * (nested stages in order) are categories-only and draw one series.
-   */
+  /** `meter` (statuses, headline first) and `funnel` (stages in order) are single-series. */
   mark: 'bar' | 'line' | 'area' | 'meter' | 'funnel';
   stacked: boolean;
   /** Draw each row as shares of its visible total; the table keeps counts. */
@@ -106,7 +103,7 @@ interface ChartDocumentBase extends ChartDocumentMeta {
   /** Rows charted before "Show all"; the data view always lists every row. */
   top_n: number | null;
   reference: { value: number; label: string } | null;
-  /** A bounded scale's ceiling (e.g. 10 for a 0–10 score); absent on older documents. */
+  /** A bounded scale's ceiling (e.g. 10 for a 0–10 score). */
   value_max?: number | null;
   category: { key: string; label: string };
   series: ChartSeries[];
@@ -161,12 +158,12 @@ export interface NetworkNode {
   active: number;
   total: number;
   category: string;
-  /** The PNG's own layout, in its coordinate space (y up). */
+  /** Precomputed layout position (y up). */
   x: number;
   y: number;
 }
 
-/** Repositories linked by shared members, with the PNG's layout. */
+/** Repositories linked by shared members, with a precomputed layout. */
 export interface NetworkDocument extends ChartDocumentMeta {
   kind: 'network';
   member_label: string;

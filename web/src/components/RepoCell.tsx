@@ -1,8 +1,6 @@
 /**
- * A repository name as GitHub shows it: the owner muted, the name in weight,
- * linking to the repository. Bare names ("hiero-sdk-js") resolve against the
- * organisation the dashboard is showing; anything that does not look like a
- * repository name renders as plain text.
+ * A repository name linked to GitHub, owner muted. Bare names resolve against the
+ * dashboard's organisation; anything not shaped like a repository stays plain text.
  */
 
 import { useContext } from 'react';

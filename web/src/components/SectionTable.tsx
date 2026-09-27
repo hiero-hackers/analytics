@@ -59,8 +59,7 @@ export function SectionTable({
   // may not exist on this one; fall back to its all-time rows rather than
   // rendering an undefined table.
   const periodRows = (period && active.periods?.[period]) || active.rows;
-  // The dashboard focus narrows this table only when it has that column (a
-  // repository focus leaves a per-person table alone, and says nothing).
+  // The dashboard focus narrows this table only when it has that dimension's column.
   const [focus, setFocus] = useFocus();
   const focusColumn = focus
     ? active.columns.find((column) => dimensionOf(column.key) === focus.dimension)

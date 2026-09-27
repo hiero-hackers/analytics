@@ -1,8 +1,6 @@
 /**
- * The tab's "how to read this" explainer, rendered from the manifest's
- * term/definition data and folded away by default. Definitions may mark
- * emphasis with *asterisks* — the only inline markup the glossary contract
- * allows.
+ * The tab's "how to read this" explainer, folded by default. Definitions may
+ * mark emphasis with *asterisks* — the only inline markup the contract allows.
  */
 
 import { Fragment } from 'react';
@@ -14,8 +12,7 @@ import { emphasized } from '../markup';
 export function Glossary({ glossary }: { glossary: GlossaryData }) {
   return (
     <Collapsible className="group/glossary mb-6 rounded-lg border bg-card">
-      {/* The Radix trigger styled directly, not a shadcn Button: this is a
-          disclosure row, and Button paints its expanded state as a filled bar. */}
+      {/* Radix trigger, not shadcn's Button, which paints its expanded state. */}
       <CollapsibleTrigger className="flex h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
         <ChevronRightIcon
           aria-hidden="true"
@@ -23,9 +20,8 @@ export function Glossary({ glossary }: { glossary: GlossaryData }) {
         />
         {glossary.title}
       </CollapsibleTrigger>
-      {/* Mounted while closed (as <details> was), just not displayed — the
-          terms stay in the document. forceMount makes Radix skip its own
-          `hidden`, hence the explicit data-state rule. */}
+      {/* Mounted while closed so the terms stay in the document; forceMount
+          skips Radix's own `hidden`, hence the data-state rule. */}
       <CollapsibleContent
         forceMount
         className="px-4 pt-1 pb-4 text-xs/relaxed data-[state=closed]:hidden"

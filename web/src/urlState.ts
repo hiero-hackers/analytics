@@ -1,17 +1,7 @@
 /**
- * The URL hash as a small shared store — the app's only router and the home
- * of every piece of view state worth sharing.
- *
- * Two kinds of write:
- * - navigation (`push`): tab and org changes add a history entry, so Back
- *   returns to the previous tab exactly as before;
- * - view state (the default, `replace`): a chart's tab, search box, hidden
- *   series or focus rewrite the current entry, so typing in a search box does
- *   not bury Back under a hundred entries — yet "Copy link" still captures it.
- *
- * `replaceState` fires no `hashchange`, so writes notify subscribers directly;
- * the browser's own hash changes (Back, a pasted link) arrive via `hashchange`.
- * A value equal to its fallback is removed, keeping shared URLs short.
+ * The URL hash as a shared store. Navigation writes `push` a history entry; view
+ * state replaces the current one so typing doesn't bury Back. `replaceState` fires
+ * no `hashchange`, so writes notify subscribers directly.
  */
 
 import { useSyncExternalStore } from 'react';
@@ -54,10 +44,7 @@ export function writeParams(
   for (const listener of listeners) listener();
 }
 
-/**
- * One hash key as React state. `fallback` is what an absent key means, and
- * writing the fallback removes the key again.
- */
+/** One hash key as React state; writing `fallback` removes the key. */
 export function useUrlParam(
   key: string,
   fallback = '',

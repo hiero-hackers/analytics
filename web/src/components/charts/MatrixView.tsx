@@ -1,8 +1,7 @@
 /**
- * The `matrix` kind: a heatmap drawn as a table, in the coverage matrix's
- * idiom — theme-aware `--heat-*` shades, every cell labelled with its exact
- * value. It is an ARIA grid: one cell is in the tab order, arrow keys move
- * between cells, and the focused (or hovered) cell is read out above the grid.
+ * The `matrix` kind: a heatmap as an ARIA grid with every cell labelled. One cell
+ * is in the tab order, arrow keys move between cells, and the focused or hovered
+ * cell is read out above the grid.
  */
 
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react';

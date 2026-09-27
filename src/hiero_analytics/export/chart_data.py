@@ -1,28 +1,8 @@
 """Validated numeric datasets for interactive charts.
 
-One document shape serves every migrated chart. A dashboard spec declares a
-chart's source under ``interactive_sources`` (keyed by the PNG it replaces):
-which CSV, which column is the category, which columns are series, and how to
-draw them. This module reads the CSV, checks it, and emits the JSON document
-the web app renders — it never aggregates, so the numbers are the analysis's.
-
-Five kinds:
-
-``timeseries``
-    Rows are calendar buckets (year / month / ISO week / day), or ``snapshot``
-    dates for point-in-time measurements. Calendar series are completed to the
-    source's generation time: flows fill with zero, stocks carry forward.
-``categories``
-    Rows are repositories, organisations, stages… optionally split by a
-    ``group`` column (e.g. a funnel cohort) that the reader selects.
-``matrix``
-    A heatmap: one row per entity, one value per column (months, checks),
-    drawn as a table of coloured cells on an explicit, fixed scale.
-``network``
-    Repositories linked by shared members, with the node positions the PNG's
-    layout computed, from a nodes CSV plus an edges CSV.
-``events``
-    Individual timestamped events (releases) in a trailing window, one row each.
+Reads the CSV a dashboard spec's ``interactive_sources`` entry names, checks it,
+and emits the JSON document the web app renders. It never aggregates, so the
+numbers are the analysis's. Kinds: timeseries, categories, matrix, network, events.
 """
 
 from __future__ import annotations
@@ -40,13 +20,11 @@ from hiero_analytics.domain.repo_categories import CATEGORY_ORDER
 
 FORMATS = {"year": "%Y", "month": "%Y-%m", "week": "%G-W%V-%u", "day": "%Y-%m-%d", "snapshot": "%Y-%m-%d"}
 MARKS = {"bar", "line", "area"}
-# Part-to-whole and staged forms that only make sense over categories: a
-# meter for a snapshot split into a few statuses, a funnel for nested stages.
+# Only valid over categories: a meter splits a snapshot, a funnel draws nested stages.
 CATEGORY_MARKS = {"meter", "funnel"}
 DETAIL_FORMATS = {"number", "decimal", "percent"}
 
-# Colours for series with no declared colour, cycling. Mirrors the web
-# `--chart-1`..`--chart-5` tokens, which carry their own dark-mode values.
+# Cycled for series with no declared colour; mirrors the web `--chart-1`..`--chart-5` tokens.
 FALLBACK_COLORS = [f"var(--chart-{index})" for index in range(1, 6)]
 
 
@@ -137,9 +115,8 @@ def _read(source: dict, csv_path: Path, org: str) -> tuple[pd.DataFrame, list[di
 def _calendar(frame: pd.DataFrame, source: dict, series: list[dict], generated_at: str | None) -> pd.DataFrame:
     """Complete a calendar series up to its generation bucket and window it.
 
-    A missing sidecar is not evidence that a historic dataset is current, so
-    the series is anchored to its latest bucket, or its generation time if
-    that is later — never to today.
+    Anchored to the later of its latest bucket and generation time, never to
+    today: a missing sidecar is no evidence that a historic dataset is current.
     """
     category, frequency = source["category"], source["frequency"]
     anchor = bucket_start(frame.iloc[-1][category], frequency)
@@ -180,7 +157,6 @@ def _timeseries(source: dict, csv_path: Path, org: str, generated_at: str | None
     frame, series, details = _read(source, csv_path, org)
     category, frequency = source["category"], source["frequency"]
     if source.get("normalize_dates"):
-        # CSVs that store a bucket as its start date ("2024-01-01").
         frame[category] = pd.to_datetime(frame[category], utc=True).dt.strftime(FORMATS[frequency].removesuffix("-%u"))
     for value in frame[category]:
         bucket_start(value, frequency)
@@ -230,12 +206,7 @@ def _categories(source: dict, csv_path: Path, org: str, generated_at: str | None
 
 
 def _reference(reference: dict | None, body: dict) -> dict | None:
-    """A fixed line (``value``), or the median of the one charted series (``stat``).
-
-    The median is of the published rows, so it moves with the data rather than
-    being a stale constant; its label carries the value so the line is readable
-    without a tooltip.
-    """
+    """A fixed line (``value``), or the published rows' median of the one series (``stat``)."""
     if reference is None or "value" in reference:
         return reference
     if reference.get("stat") != "median" or len(body["series"]) != 1 or body.get("group"):
@@ -414,7 +385,6 @@ def _events(source: dict, csv_path: Path, org: str, generated_at: str | None) ->
         "category": {"key": category, "label": source["category_label"]},
         "label": {"key": label, "label": source["label_label"]},
         "types": [flag["false"], flag["true"]],
-        # Busiest first, ties alphabetical: the order the timeline's rows take.
         "categories": sorted(counts.index, key=lambda name: (-counts[name], name)),
         "window": {"kind": "trailing", "days": days, "end": end.isoformat() if end else None},
         "rows": events.to_dict(orient="records"),
@@ -436,12 +406,7 @@ def _dimension(key: str) -> str:
 
 
 def _comparison(rows: list[dict], frequency: str) -> dict | None:
-    """The last complete bucket against the one before it, when both exist.
-
-    Calendar buckets of one size are comparable windows; the partial current
-    bucket never is, and a snapshot series has no buckets to compare. The
-    counts themselves stay in ``rows`` — this only names the pair.
-    """
+    """The last complete bucket against the one before it; the partial current bucket never compares."""
     if frequency == "snapshot":
         return None
     complete = [row["bucket"] for row in rows if not row["partial"]]
@@ -489,7 +454,6 @@ def chart_document(source: dict, csv_path: Path, org: str, generated_at: str | N
         raise ValueError(f"{csv_path.name}: a {mark} draws exactly one series")
     document = {
         **document,
-        # What the rows can be sliced by; the UI must not offer anything else.
         "dimensions": [
             "period" if kind == "timeseries" else _dimension(body["category"]["key"]),
             *([body["group"]["key"]] if body.get("group") else []),

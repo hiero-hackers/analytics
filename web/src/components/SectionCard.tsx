@@ -1,12 +1,7 @@
 /**
- * The chrome every content card shares — tables, bespoke views and chart
- * galleries all render through this, so a change to the header, the actions
- * or the "data as of" treatment cannot apply to one kind and miss the others.
- *
- * A shadcn Card, collapsible as a whole: the header (title, description, size
- * badge, collapse toggle) stays visible, the actions, content and freshness
- * footer fold away. The card is a labelled region and keeps its `id`, which
- * shared `#widget=` links scroll to and briefly flash (App adds `flash`).
+ * The collapsible chrome every content card shares (tables, bespoke views, chart
+ * galleries), so header, actions and "data as of" stay consistent. The card keeps
+ * its `id` for shared `#widget=` links, which scroll to it and flash it.
  */
 
 import { useId, useState, type ReactNode } from 'react';
@@ -58,8 +53,7 @@ export function SectionCard({
         id={id}
         role="region"
         aria-labelledby={titleId}
-        // scroll-mt: land below the sticky header. [&.flash]: the shared-link
-        // highlight, toggled as a class by App's jump effect.
+        // scroll-mt clears the sticky header; App toggles `flash` on shared-link jumps.
         className="mb-6 rounded-xl shadow-xs [--card-spacing:--spacing(5)] scroll-mt-(--jump-h) transition-colors duration-500 [&.flash]:bg-(--flash)"
       >
         <CardHeader>
@@ -90,8 +84,6 @@ export function SectionCard({
           </CardAction>
         </CardHeader>
         <CollapsibleContent className="flex flex-col gap-(--card-spacing)">
-          {/* Actions wrap onto as many rows as they need — on a phone three
-              buttons no longer push the page sideways. */}
           {actions && (
             <CardContent className="flex flex-wrap items-center gap-2">{actions}</CardContent>
           )}

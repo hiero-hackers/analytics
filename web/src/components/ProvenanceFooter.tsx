@@ -1,8 +1,4 @@
-/**
- * The page footer's code revision. The data watermark ("Data as of …") lives
- * in the header, where it is visible without scrolling; this names the code
- * that rendered it.
- */
+/** The page footer's code revision; the data watermark lives in the header. */
 
 import type { Manifest } from '../api';
 

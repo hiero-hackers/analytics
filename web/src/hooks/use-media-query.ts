@@ -13,8 +13,5 @@ export function useMediaQuery(query: string): boolean {
   );
 }
 
-/**
- * Below this width the header has no room for the freshness status, so the
- * page heading shows it instead — exactly one of the two, at every width.
- */
+/** Below this width the page heading shows the freshness status instead of the header. */
 export const NARROW_HEADER = '(max-width: 1099px)';

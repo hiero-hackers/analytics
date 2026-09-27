@@ -1,11 +1,6 @@
 /**
- * Scroll-spy for the on-page table of contents: which of `ids` the reader is
- * currently in. A section counts as current once its top has scrolled up into
- * the band just below the sticky header; the last such section wins, so a long
- * section stays current while its body fills the screen.
- *
- * Without IntersectionObserver (old browsers, jsdom) nothing is highlighted —
- * the table of contents still works, it just doesn't track.
+ * Scroll-spy: which of `ids` the reader is in — the last section whose top has
+ * scrolled into the band below the sticky header. Inert without IntersectionObserver.
  */
 
 import { useEffect, useState } from 'react';
@@ -24,8 +19,7 @@ export function useActiveSection(ids: string[]): string | null {
       .filter((el): el is HTMLElement => el !== null);
     const observer = new IntersectionObserver(
       () => {
-        // Recompute from positions rather than trusting the entry list: it only
-        // carries the elements whose intersection changed.
+        // Recompute from positions: the entry list only carries changed elements.
         const passed = elements.filter(
           (el) => el.getBoundingClientRect().top <= window.innerHeight * 0.45,
         );

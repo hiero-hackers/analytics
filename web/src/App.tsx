@@ -1,9 +1,6 @@
 /**
- * The analytics dashboard, driven entirely by the data-API manifest. The shell
- * is a sticky header (wordmark, org switcher, freshness, theme), a sidebar of
- * tabs with the active tab's table of contents, and the tab itself: metric
- * tiles, the "how to read this" glossary, then collapsible section groups of
- * views, chart-section cards and tables.
+ * The analytics dashboard, driven entirely by the data-API manifest: a sticky
+ * header, a sidebar of tabs, and the active tab's tiles, glossary and section groups.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -48,7 +45,7 @@ function OrgPanel({
   org: string;
   manifest: Manifest;
   macro: string;
-  /** Reports this tab's table of contents to the sidebar (empty while loading). */
+  /** Reports this tab's table of contents to the sidebar. */
   onToc: (entries: TocEntry[]) => void;
 }) {
   const entry = manifest.orgs[org];
@@ -156,8 +153,7 @@ function OrgPanel({
         ];
       });
 
-  // The sidebar's "On this page" lists these groups; keyed by content so a
-  // re-render with the same groups doesn't re-report them.
+  // Keyed by content so a re-render with the same groups doesn't re-report them.
   const toc = tocEntries(groups);
   const tocKey = JSON.stringify(toc);
   useEffect(() => {
@@ -232,9 +228,7 @@ function Dashboard({
 
   return (
     <>
-      {/* The active page owns the h1; content cards use h2 headings. */}
       <div className="mb-6 border-b pb-6">
-        {/* Where this page sits: the organisation, and the umbrella tab for a sub-tab. */}
         <p className="mb-2.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <OrgAvatar org={shownOrg} className="size-5 rounded" />
           {shownOrg}
@@ -264,7 +258,6 @@ function Dashboard({
             } as Record<string, string>
           )[activeMacro] ?? 'Explore activity and insights across the Hiero ecosystem.'}
         </p>
-        {/* The header shows freshness on wide screens; narrower ones get it here. */}
         {narrowHeader && dataAsOf && (
           <div className="mt-3">
             <FreshnessStatus dataAsOf={dataAsOf} />
@@ -281,8 +274,7 @@ function Dashboard({
           <OrgPanel org={shownOrg} manifest={manifest} macro={activeMacro} onToc={onToc} />
         </OrgContext.Provider>
       ) : (
-        // A tab the selected org has no content for: the manifest's "why",
-        // sized to read as information rather than an error.
+        // Sized to read as information rather than an error.
         <Empty className="my-12">
           <EmptyHeader>
             <EmptyTitle>
@@ -335,8 +327,7 @@ export default function App() {
   const [toc, setToc] = useState<TocEntry[]>([]);
 
   return (
-    // The header renders in every state below; only the content beneath it
-    // changes shape — chrome never pops in after the fact.
+    // The header renders in every state; only the content beneath it changes shape.
     <SidebarProvider
       className="flex-col"
       style={{ '--sidebar-width': '17.5rem' } as React.CSSProperties}
@@ -354,12 +345,8 @@ export default function App() {
       />
       <div className="flex flex-1">
         <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
-        {/* min-w-0: a flex item defaults to min-width:auto and would widen to
-            its longest unbreakable line (a nowrap stamp, a wide table) instead
-            of shrinking to the viewport — the page would scroll sideways. */}
+        {/* min-w-0: otherwise a wide table or nowrap stamp widens the page sideways. */}
         <SidebarInset className="min-w-0">
-          {/* Left-aligned next to the sidebar (not centred), so the content
-              edge lines up with the header's org switcher at every width. */}
           <div className="mx-auto w-full max-w-[1440px] p-4 min-[600px]:p-6 lg:p-8">
             {error ? (
               <FatalError message={error} onRetry={retry} />

@@ -529,11 +529,7 @@ def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
 
 
 def test_data_api_ships_every_interactive_chart(outputs_root: Path):
-    """Each interactive reference resolves to a document inside the API tree.
-
-    Every source whose CSV the pipelines produced must publish: a declared
-    source that silently falls back to its PNG is a migration that never shipped.
-    """
+    """Every interactive reference resolves, and every source whose CSV was produced publishes."""
     api_dir = outputs_root / "data" / "api" / "v1"
     manifest = json.loads((api_dir / "manifest.json").read_text())
 
@@ -549,7 +545,6 @@ def test_data_api_ships_every_interactive_chart(outputs_root: Path):
                             continue
                         document = json.loads(path.read_text())
                         assert document["kind"] == reference["kind"]
-                        # Each kind carries its own drawable content under its own key.
                         content = {"network": "nodes"}.get(document["kind"], "rows")
                         assert document["population"] and content in document
                         published.add(Path(reference["path"]).name)
@@ -654,7 +649,7 @@ def test_every_emitted_kpi_tile_explains_itself(outputs_root: Path):
 
 
 def test_every_chart_variant_has_a_data_source():
-    """A newly added dashboard chart cannot silently reintroduce image rendering."""
+    """Every chart variant a spec lists declares an interactive source."""
     for macro in CHART_MACROS:
         for specs in macro["charts"].values():
             for spec in specs:
@@ -664,7 +659,7 @@ def test_every_chart_variant_has_a_data_source():
 
 
 def test_every_produced_chart_has_interactive_data(outputs_root: Path):
-    """Exercise the real pipelines and exporter, rather than just checking declarations."""
+    """Every published chart variant has an interactive document on disk."""
     import json
 
     manifest = json.loads((outputs_root / "data/api/v1/manifest.json").read_text())

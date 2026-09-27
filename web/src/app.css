@@ -1,36 +1,20 @@
 /*
- * The dashboard stylesheet: Tailwind v4 (preflight included) plus shadcn/ui,
- * on top of the design the generated dashboard established.
- *
- * - The semantic palette below is the single source of colors. Dark mode is
- *   one token flip, not per-rule overrides. shadcn's semantic names (primary,
- *   muted-foreground, border, …) are mapped onto it in `@theme inline` — never
- *   paste shadcn's default palette, because two names collide in meaning (see
- *   the mapping). Components never introduce raw hex values.
- * - Theme: the OS preference by default; `data-theme="light"|"dark"` on <html>
- *   forces one (set before first paint by public/theme-init.js, persisted by
- *   src/theme.ts). The `dark` variant below matches exactly those two cases, so
- *   `dark:` utilities inside shadcn components agree with the tokens.
- * - The component classes further down are the pre-Tailwind vocabulary, being
- *   migrated to shadcn components; don't add new ones.
+ * Tailwind v4 plus shadcn/ui. The semantic palette below is the single source
+ * of colour; dark mode is one token flip. shadcn's names are mapped onto it in
+ * `@theme inline` — never paste shadcn's default palette (two names collide in
+ * meaning). A forced theme is `data-theme` on <html>, else the OS preference.
  */
 
 @import 'tailwindcss';
-/* Animation utilities (animate-in/out, fade, zoom) shadcn's overlays use. */
 @import 'tw-animate-css';
-/* shadcn's state variants (data-open:, data-checked:, …) its components use. */
 @import 'shadcn/tailwind.css';
-/* The one typeface, self-hosted: the CSP allows fonts from 'self' only, so it
-   ships as woff2 in the bundle (browsers fetch only the Latin subset they need). */
+/* Fonts are self-hosted: the CSP allows fonts from 'self' only. */
 @import '@fontsource-variable/public-sans';
-/* The display face, for navigation and headings only: the optical-size build,
-   so a 13px tab label gets the calm text cut and a page title the display cut
-   from one file. Public Sans keeps every number, table and paragraph. */
+/* Display face for navigation and headings; the opsz build serves both sizes. */
 @import '@fontsource-variable/bricolage-grotesque/opsz.css';
 
-/* Dark = the OS prefers dark and no explicit light choice, or an explicit dark
-   choice. `:root` is listed alongside its descendants so the variant also
-   works on `:root` itself — the palette's dark values below use it. */
+/* Dark = OS dark without an explicit light choice, or an explicit dark choice.
+   `:root` itself is matched too, so the palette's dark values can use it. */
 @custom-variant dark {
   @media (prefers-color-scheme: dark) {
     &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
@@ -55,10 +39,7 @@
 }
 
 :root {
-  /* The six named colours of the design (Paper, Sheet, Ink, Graphite, Rule,
-     Signal): cool-tinted neutrals so they sit with the blue heat ramp and
-     Signal. Every text role is ≥ 4.5:1 (WCAG AA) on Paper and Sheet in both
-     themes. */
+  /* Every text role is ≥ 4.5:1 (WCAG AA) on Paper and Sheet in both themes. */
   --header-h: 72px;
   --brand: #a7184e;
   --brand-soft: #faedf2;
@@ -87,19 +68,17 @@
   --warn-ink: #8a6200; /* warning text */
   --neg: #b3261e; /* error text */
 
-  /* Shape: one radius, from which shadcn derives its scale (lg = 8px). */
+  /* shadcn derives its radius scale from this (lg = 8px). */
   --radius: 0.5rem;
-  /* Scroll offset for jump targets (groups, shared-link cards): the sticky
-     header (72px) plus a small buffer — and on phones the sticky group strip
-     under it too (see the media rule after this block). */
+  /* Scroll offset for jump targets: the sticky header plus a buffer (plus the
+     group strip on phones, below). */
   --jump-h: 88px;
 
   --chart-general: #64748b;
   --chart-triage: #b77913;
   --chart-committer: #168575;
   --chart-maintainer: #3975dc;
-  /* Neutral series colours for interactive charts with no domain palette
-     (export/chart_data.py FALLBACK_COLORS). Distinct from the role hues above. */
+  /* Fallback series colours (export/chart_data.py FALLBACK_COLORS). */
   --chart-1: #c2570c;
   --chart-2: #0f7f86;
   --chart-3: #6d4fc2;
@@ -127,9 +106,8 @@
   }
 }
 
-/* The dark flip, written once: the `dark` variant emits it both under
-   `@media (prefers-color-scheme: dark)` for `:root:not([data-theme='light'])`
-   and for `:root[data-theme='dark']`, so the two cases cannot drift apart. */
+/* The dark flip, written once: the `dark` variant emits it for both the OS
+   preference and an explicit choice, so the two cannot drift apart. */
 :root {
   @variant dark {
     --chart-general: #94a3b8;
@@ -184,16 +162,10 @@
   }
 }
 
-/* Utilities over the palette. The shadcn block maps its semantic names onto
-   our tokens by *meaning*, which is not always by name:
-     shadcn `muted` is a background        → our --raise (our --muted is text)
-     shadcn `muted-foreground` is 2nd text → our --muted
-     shadcn `accent` is a hover background → our --raise (our --accent is the
-                                             near-black active fill → primary)
-   So in markup: text-muted-foreground (not text-muted), bg-primary (not
-   bg-accent), text-primary-foreground (not text-on-accent). */
+/* shadcn names map onto our tokens by meaning, not name: shadcn `muted` and
+   `accent` are backgrounds (our --raise); `muted-foreground` is our --muted and
+   `primary` our --accent. In markup: text-muted-foreground, bg-primary. */
 @theme inline {
-  /* shadcn semantic tokens */
   --color-brand: var(--brand);
   --color-brand-soft: var(--brand-soft);
   --color-background: var(--page);
@@ -223,14 +195,10 @@
   --color-sidebar-border: var(--edge);
   --color-sidebar-ring: var(--link);
 
-  /* Type: Public Sans (self-hosted above) for everything a reader reads or
-     compares — preflight gives <html> the sans stack, so it reaches Dialog and
-     Sheet portals too — and Bricolage Grotesque (`font-display`) for the
-     wayfinding: the sidebar, page titles and card titles. */
+  /* Public Sans for content; `font-display` for the sidebar and titles. */
   --font-sans: 'Public Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Bricolage Grotesque Variable', 'Public Sans Variable', ui-sans-serif, sans-serif;
 
-  /* shadcn's radius scale, derived from one --radius like its generated CSS. */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -239,7 +207,6 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Our own tokens with no shadcn counterpart. */
   --color-page: var(--page);
   --color-ink: var(--ink);
   --color-soft: var(--soft);
@@ -262,16 +229,13 @@
 /* ---- Base ---------------------------------------------------------------- */
 
 @layer base {
-  /* shadcn's base rule: preflight zeroes border widths with `border: 0 solid`
-     but leaves the colour at currentColor, so every `border` utility would
-     draw black. Components expect the theme's border colour by default. */
+  /* shadcn's base rule: preflight leaves border colour at currentColor. */
   *,
   ::before,
   ::after {
     border-color: var(--color-border);
   }
-  /* Preflight resets buttons to cursor: default; the dashboard's controls
-     show a pointer (shadcn init --pointer writes the same rule). */
+  /* Preflight resets buttons to cursor: default (same as shadcn init --pointer). */
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
@@ -280,8 +244,7 @@
     color: var(--ink);
     background: var(--page);
   }
-  /* Motion is decoration here, never information: honour the OS setting by
-     flattening every transition and animation (Dialog/Sheet fades included). */
+  /* Motion is decoration, never information: honour reduced motion everywhere. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -294,20 +257,8 @@
 }
 
 /* ---- Bespoke views -----------------------------------------------------------
-   Everything else is shadcn components and utilities. What remains here is the
-   information design of the two bespoke HIP views, which no component
-   expresses — kept as CSS, expressed through the semantic tokens so both
-   follow the light/dark flip.
-
-   Coverage matrix (.hipmx*): a heat map, not a data table — separate-bordered
-   cells, banded two-row sticky header, heat buckets m1–m5 plus "open only"
-   (mo) and "none" (m0) states, keyboard-focusable evidence cells (ck/sel) and
-   the board-jump row flash. The legend swatches wear the same m1–m5 classes as
-   the cells, so the two cannot drift apart; the buckets read --heat-*, which
-   mirrors HIP_EVIDENCE_RAMP (config/charts.py) and inverts for dark mode.
-
-   Governance board (.hipboard*): lifecycle lanes of fixed width that scroll
-   sideways as a row, each with its own capped, scrolling chip list. */
+   The two HIP views no component expresses: the coverage matrix (.hipmx*, a
+   heat map, not a data table) and the governance board lanes (.hipboard*). */
 
 @layer components {
   .hipmx-wrap {
@@ -490,7 +441,7 @@
     padding-bottom: 4px;
   }
   .hipboard-col {
-    flex: 0 0 194px; /* border-box since preflight: 172px content + padding + border */
+    flex: 0 0 194px; /* border-box: 172px content + padding + border */
     background: var(--raise);
     border: 1px solid var(--edge);
     border-radius: var(--radius);

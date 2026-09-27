@@ -1,8 +1,6 @@
 /**
- * The dashboard's navigation, derived from the manifest and the hash state:
- * which orgs and tabs exist, in what order, and which are active. Pure, so the
- * header (org switcher), the sidebar (tabs) and the content (the active panel)
- * all read one answer instead of each re-deriving it.
+ * The dashboard's navigation, derived purely from the manifest and hash state,
+ * so header, sidebar and content all read one answer.
  */
 
 import type { Manifest } from './api';
@@ -39,19 +37,15 @@ export function navModel(manifest: Manifest, macro: string, org: string): NavMod
       ]),
     ),
   ];
-  // The manifest's family order wins where it knows the macro; anything it
-  // doesn't list (older manifest, ad-hoc macro) keeps its derived position.
+  // The manifest's family order wins; macros it doesn't list keep their derived position.
   const declared = (manifest.macro_order ?? []).filter((name) => derived.includes(name));
   const macros = [...declared, ...derived.filter((name) => !declared.includes(name))];
   const activeMacro = macros.includes(macro) ? macro : macros[0];
-  // Umbrella tabs: a macro with a parent renders as a sub-tab of that parent.
-  // The hash keeps storing the actual macro, so old links keep working.
+  // A macro with a parent renders as its sub-tab; the hash still stores the macro itself.
   const parents = manifest.macro_parents ?? {};
   const topOf = (name: string) => parents[name] ?? name;
   const activeTop = topOf(activeMacro);
-  // The org filter is global: it lists every org and the selection sticks as
-  // tabs change. A tab the selected org has no content for renders a short
-  // explanation instead of a blank page (see App).
+  // The org selection is global and sticks across tabs, even ones it has no data for.
   const shownOrg = orgs.includes(org) ? org : orgs[0];
   const entry = manifest.orgs[shownOrg];
   const present = new Set([

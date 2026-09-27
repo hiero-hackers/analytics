@@ -1,17 +1,7 @@
 /**
- * The tab's headline figures as stat tiles.
- *
- * A figure is a single number with no axis and no rows behind it, so it is the
- * easiest thing here to misread. Each tile therefore says what kind of number
- * it is: a count reads as a plain figure, a share ("72%") or a part of a whole
- * ("26 of 44") also draws a meter on a same-hue track, so the proportion reads
- * at a glance and two shares compare without mental arithmetic. A tile with
- * an explanation is a button that opens its "how to read this" note and the
- * steps that produced it, and says so with an info mark.
- *
- * The label comes first in the DOM, so a tile is announced as "maintainers
- * 103"; capitalisation is visual only (`first-letter`), which keeps that
- * accessible name exactly the label the pipeline wrote.
+ * The tab's headline figures as stat tiles. Shares ("72%") and parts ("26 of 44") also
+ * draw a meter; a tile with an explanation is a button that opens it. The label comes
+ * first in the DOM and is capitalised only by CSS, so the accessible name stays as written.
  */
 
 import { useState } from 'react';
@@ -93,8 +83,7 @@ export function MetricTiles({ tiles }: { tiles: MetricTile[] }) {
               </div>
             </>
           );
-          // Two columns on a phone: an odd number of tiles lets the first span
-          // the row instead of leaving the last one alone.
+          // Two columns on a phone: with an odd count the first tile spans the row.
           const span = tiles.length % 2 === 1 && index === 0 && 'max-[599px]:col-span-2';
           return explainable ? (
             <button

@@ -1,8 +1,4 @@
-/**
- * A governance role (maintainer, committer, triage) with the colour the role
- * has in every chart, so a table row and the chart above it speak the same
- * visual language. The word always carries the role; the dot only echoes it.
- */
+/** A governance role with its chart colour; the word carries the role, the dot only echoes it. */
 
 const ROLE_COLORS: Record<string, string> = {
   maintainer: 'var(--chart-maintainer)',

@@ -1,22 +1,15 @@
-/**
- * The on-page table of contents over a tab's section groups — shared by the
- * groups themselves (their anchor ids), the sidebar's "On this page" list and
- * the phone strip, so all three agree on which id belongs to which group.
- */
+/** A tab's section-group table of contents, shared by the groups, sidebar and phone strip. */
 
 import type { ReactNode } from 'react';
 
 export type Group = [name: string, content: ReactNode];
 
-/** One table-of-contents line: the group's anchor id and display name. */
 export interface TocEntry {
   id: string;
   name: string;
 }
 
-// Position-qualified so two groups can never collide on a key or an anchor —
-// distinct names can slug to the same string ("Roles & teams" / "Roles teams"),
-// and a name could in principle repeat.
+// Position-qualified: distinct names can slug alike ("Roles & teams" / "Roles teams").
 export const anchorId = (name: string, index: number) =>
   `grp-${index}-${name.replace(/\W+/g, '-')}`;
 
@@ -27,11 +20,7 @@ export function tocEntries(groups: Group[]): TocEntry[] {
     : [];
 }
 
-/**
- * Deliberately a scroll, NOT an <a href="#…">: the URL hash is the app's state
- * store (tab/org via useHashState), and fragment navigation would overwrite it
- * — resetting the active tab (#342). Scrolling leaves the hash alone.
- */
+/** A scroll, not an <a href="#…">: fragment navigation would overwrite the hash state (#342). */
 export function scrollToGroup(id: string) {
   document.getElementById(id)?.scrollIntoView();
 }

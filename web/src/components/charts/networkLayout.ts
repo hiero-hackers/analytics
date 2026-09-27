@@ -1,24 +1,10 @@
 /**
- * Declutters the network layout for the browser.
- *
- * The exported positions are the PNG's spring layout: faithful, but it packs a
- * dense core of repositories on top of each other while a few loosely linked
- * outliers stretch the canvas, so most of the core is drawn tiny and its
- * labels collide. This relaxes those positions with a small force simulation:
- *
- * - links pull linked repositories together (weaker for well-connected hubs),
- * - every repository repels overlap with a collision radius that includes its
- *   label, so no bubble or name hides another,
- * - a gentle, flatter-than-round gravity pulls outliers in and keeps the
- *   drawing wide rather than tall, to suit the card.
- *
- * It starts from the exported positions and uses no randomness, so the same
- * document always gives the same picture, and the neighbourhoods the PNG
- * shows survive. Repositories with no links take no part; the caller lays
- * them out in a row of their own.
+ * Relaxes the exported spring layout with a small force simulation (springs,
+ * label-aware collisions, wide gravity) so no bubble or label hides another.
+ * Deterministic: it starts from the exported positions and uses no randomness.
  */
 
-export interface LayoutNode {
+interface LayoutNode {
   id: string;
   x: number;
   y: number;
@@ -26,7 +12,7 @@ export interface LayoutNode {
   radius: number;
 }
 
-export interface LayoutEdge {
+interface LayoutEdge {
   source: string;
   target: string;
 }
@@ -124,10 +110,7 @@ export function relaxLayout(
   return new Map(nodes.map((node, i) => [node.id, { x: x[i], y: y[i] }]));
 }
 
-/**
- * Link-strength steps from the data's own spread: every link, then the
- * median, upper quartile and top decile of shared members, deduplicated.
- */
+/** Link-strength thresholds: every link, then the median, upper quartile and top decile of shared members. */
 export function strengthSteps(shared: number[]): number[] {
   const sorted = [...shared].sort((a, b) => a - b);
   if (!sorted.length) return [];

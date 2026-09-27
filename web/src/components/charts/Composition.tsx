@@ -1,17 +1,7 @@
 /**
- * The two single-series category forms that bars under-serve.
- *
- * `Meter`: a snapshot split into a few statuses (CODEOWNERS present / missing).
- * Two bars make the reader do the division; the meter leads with the headline
- * status's share and draws the whole as one track, headline in the series hue
- * and the rest in neutral steps, so it reads as emphasis rather than identity.
- *
- * `Funnel`: nested stages in order (proposed ⊇ approved ⊇ …). Each stage is
- * centred and sized against the first, and the gap between two stages states
- * the conversion and the drop-off — the numbers a funnel exists to show.
- *
- * Both label every value directly, so nothing depends on hover and the data
- * view remains the table twin.
+ * Single-series category forms: `Meter` leads with the headline status's share
+ * of one track; `Funnel` sizes nested stages against the first and states each
+ * step's conversion and drop-off. Every value is labelled, so nothing needs hover.
  */
 
 import type { ChartSeries, Row } from '../../api';

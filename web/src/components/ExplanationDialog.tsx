@@ -1,13 +1,4 @@
-/**
- * The explanation dialog behind every headline figure: the title, the "how to
- * read this" note, and the step-by-step methodology. Charts carry the same
- * text in their own footer, so this dialog never shows a chart.
- *
- * A shadcn Dialog: Escape and the close button dismiss it, focus is trapped
- * inside while open and returns to the figure that opened it. The methodology
- * is shown in full rather than folded away — the reader opened the dialog to
- * see how the number was made.
- */
+/** The explanation behind a headline figure: its "how to read this" note and full methodology. */
 
 import { useRef } from 'react';
 import {
@@ -33,16 +24,14 @@ export function ExplanationDialog({
   onClose: () => void;
 }) {
   const steps = content.methodology ?? [];
-  // Radix returns focus to a DialogTrigger on close; this dialog is opened
-  // from state (a figure click), so it has none and focus would fall to
-  // <body>. Remember what had focus when it opened and put it back.
+  // Opened from state, not a DialogTrigger, so Radix has nowhere to return focus;
+  // remember the opener ourselves.
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="max-h-[92dvh] overflow-y-auto sm:max-w-xl"
-        // Radix wires aria-describedby to DialogDescription; without a note
-        // there is none, so say so rather than point at nothing.
+        // Without a note there is no DialogDescription for aria-describedby to point at.
         {...(!content.note && { 'aria-describedby': undefined })}
         onOpenAutoFocus={() => {
           returnFocus.current = document.activeElement as HTMLElement | null;

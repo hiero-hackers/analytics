@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-/** GitHub identities retain their searchable text and a fallback when images fail. */
+/** A GitHub login with its avatar; initials stand in when the image fails. */
 export function ContributorCell({ login }: { login: string }) {
   const [failed, setFailed] = useState(false);
   if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{0,38}(\[bot\])?$/.test(login)) return <>{login}</>;
