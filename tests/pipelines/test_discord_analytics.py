@@ -255,3 +255,24 @@ def test_main_exports_chart_data_at_manual_snapshot_date(channels_csv, monthly_c
     categories = documents["hiero_discord_channel_categories.png"]["rows"]
     assert sum(row["earlier"] + row["last_90d"] for row in categories) == 911
     assert len(documents["hiero_discord_recent_activity_30d.png"]["rows"]) == 6
+
+
+# --------------------------------------------------------------------------- #
+# Invariant Validation tests
+# --------------------------------------------------------------------------- #
+
+
+def test_load_channels_df_valid_invariants(channels_csv: Path) -> None:
+    """Test that load_channels_df succeeds when d30 <= d90 <= d365 <= total."""
+    df = runner.load_channels_df()
+    assert len(df) == 6
+
+
+def test_load_channels_df_violates_invariant(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that load_channels_df raises ValueError when d30 <= d90 <= d365 <= total is violated."""
+    invalid_csv = tmp_path / "invalid_channels.csv"
+    invalid_csv.write_text("channel,last_message,d30,d90,d365,total\ndev-chat,2026-05-01,100,50,200,300\n")
+    monkeypatch.setenv("HIERO_DISCORD_CHANNELS_CSV", str(invalid_csv))
+
+    with pytest.raises(ValueError, match="violates d30<=d90<=d365<=total"):
+        runner.load_channels_df()
