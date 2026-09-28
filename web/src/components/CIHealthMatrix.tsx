@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { CIHealthMatrixView, CIHealthCell } from '../api';
 import { CIHealthEvidencePanel } from './CIHealthEvidencePanel';
@@ -10,13 +10,21 @@ function cellClass(status: CIHealthCell['status']): string {
 function haystack(row: CIHealthMatrixView['rows'][number]): string {
   return [
     row.label,
-    ...row.cells.map((cell) => `${cell.label} ${cell.status} ${cell.evidence} ${cell.location}`),
+    ...row.cells.map(
+      (cell) => `${cell.label} ${cell.status} ${cell.evidence} ${cell.location}`,
+    ),
   ]
     .join(' ')
     .toLowerCase();
 }
 
-export function CIHealthMatrix({ view }: { view: CIHealthMatrixView }) {
+export function CIHealthMatrix({
+  view,
+  onFilteredRows,
+}: {
+  view: CIHealthMatrixView;
+  onFilteredRows?: (viewId: string, rows: CIHealthMatrixView['rows']) => void;
+}) {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [selected, setSelected] = useState<{
@@ -34,13 +42,19 @@ export function CIHealthMatrix({ view }: { view: CIHealthMatrixView }) {
     );
   }, [view.rows, query, status]);
 
+  useEffect(() => {
+    onFilteredRows?.(view.id, rows);
+  }, [onFilteredRows, rows, view.id]);
+
   const toggleCell = (repo: string, cell: CIHealthCell) => {
     if (cell.status === 'pass' || cell.status === 'na') {
       return;
     }
 
     setSelected((current) =>
-      current?.repo === repo && current.cell.key === cell.key ? null : { repo, cell },
+      current?.repo === repo && current.cell.key === cell.key
+        ? null
+        : { repo, cell },
     );
   };
 
@@ -62,7 +76,9 @@ export function CIHealthMatrix({ view }: { view: CIHealthMatrixView }) {
               key={option}
               type="button"
               className={option === status ? 'cimx-fbtn active' : 'cimx-fbtn'}
-              onClick={() => setStatus((current) => (current === option ? '' : option))}
+              onClick={() =>
+                setStatus((current) => (current === option ? '' : option))
+              }
             >
               {option}
             </button>
@@ -87,15 +103,24 @@ export function CIHealthMatrix({ view }: { view: CIHealthMatrixView }) {
                 <th>{row.label}</th>
 
                 {row.cells.map((cell) => {
-                  const clickable = cell.status === 'fail' || cell.status === 'review';
+                  const clickable =
+                    cell.status === 'fail' || cell.status === 'review';
 
-                  const isSelected = selected?.repo === row.key && selected.cell.key === cell.key;
+                  const isSelected =
+                    selected?.repo === row.key &&
+                    selected.cell.key === cell.key;
 
                   return (
                     <td
                       key={cell.key}
-                      className={`${cellClass(cell.status)}${isSelected ? ' selected' : ''}`}
-                      title={clickable ? `${cell.status}: click for evidence` : cell.status}
+                      className={`${cellClass(cell.status)}${
+                        isSelected ? ' selected' : ''
+                      }`}
+                      title={
+                        clickable
+                          ? `${cell.status}: click for evidence`
+                          : cell.status
+                      }
                       {...(clickable && {
                         onClick: () => toggleCell(row.key, cell),
                         onKeyDown: (event: React.KeyboardEvent) => {
