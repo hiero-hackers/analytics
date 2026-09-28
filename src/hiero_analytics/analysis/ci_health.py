@@ -16,7 +16,12 @@ def extract_action_references(workflow_text: str) -> list[str]:
 
 
 def is_sha_pinned(reference: str) -> bool:
-    """Return whether an Actions reference is pinned to a full commit SHA."""
+    """Return whether an Actions reference is pinned to an immutable revision."""
+    if reference.startswith("$/"):
+        return True
+    if reference.startswith("docker://"):
+        _, _, digest = reference.rpartition("@")
+        return bool(re.fullmatch(r"sha256:[0-9a-fA-F]{64}", digest))
     _, _, ref = reference.rpartition("@")
     return bool(re.fullmatch(r"[0-9a-fA-F]{40}", ref))
 

@@ -44,6 +44,33 @@ def test_is_sha_pinned_rejects_invalid_sha_lengths() -> None:
     assert not is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef012345678")
 
 
+def test_is_sha_pinned_accepts_full_commit_sha() -> None:
+    """Accept a full 40-character commit SHA."""
+    assert is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef01234567")
+
+
+def test_is_sha_pinned_accepts_dollar_references() -> None:
+    """Accept immutable dollar-prefixed references."""
+    assert is_sha_pinned("$/some-reference")
+
+
+def test_is_sha_pinned_accepts_full_docker_digest() -> None:
+    """Accept Docker references with a full SHA-256 digest."""
+    assert is_sha_pinned(
+        "docker://ghcr.io/owner/image@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    )
+
+
+def test_is_sha_pinned_rejects_partial_docker_digest() -> None:
+    """Reject Docker references with an incomplete digest."""
+    assert not is_sha_pinned("docker://ghcr.io/owner/image@sha256:0123456789abcdef")
+
+
+def test_is_sha_pinned_rejects_local_action() -> None:
+    """Reject local actions that are not pinned to an immutable revision."""
+    assert not is_sha_pinned("./some-local-action")
+
+
 def test_find_unpinned_actions() -> None:
     """Test detection of Actions references that are not SHA pinned."""
     workflow = """
