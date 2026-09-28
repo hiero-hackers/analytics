@@ -140,19 +140,14 @@ export function ViewCards({
   provenance: Manifest['provenance'];
 }) {
   const [jump, setJump] = useState<JumpRequest | null>(null);
-  const [ciHealthRows, setCiHealthRows] = useState<
-    Record<string, CIHealthMatrixView['rows']>
-  >({});
+  const [ciHealthRows, setCiHealthRows] = useState<Record<string, CIHealthMatrixView['rows']>>({});
   const jumpCounter = useRef(0);
 
-  const onCiHealthRows = useCallback(
-    (viewId: string, rows: CIHealthMatrixView['rows']) => {
-      setCiHealthRows((current) =>
-        current[viewId] === rows ? current : { ...current, [viewId]: rows },
-      );
-    },
-    [],
-  );
+  const onCiHealthRows = useCallback((viewId: string, rows: CIHealthMatrixView['rows']) => {
+    setCiHealthRows((current) =>
+      current[viewId] === rows ? current : { ...current, [viewId]: rows },
+    );
+  }, []);
 
   const matrix = views.find((view): view is MatrixView => view.kind === 'matrix');
   const evidence = useMemo(() => {
@@ -202,8 +197,7 @@ export function ViewCards({
               <StatusBoard
                 view={view}
                 onJump={(hip) =>
-                  view.target_view === matrix?.id &&
-                  setJump({ hip, nonce: ++jumpCounter.current })
+                  view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
                 }
               />
             ) : view.kind === 'matrix' ? (

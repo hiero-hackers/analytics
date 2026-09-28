@@ -10,9 +10,7 @@ function cellClass(status: CIHealthCell['status']): string {
 function haystack(row: CIHealthMatrixView['rows'][number]): string {
   return [
     row.label,
-    ...row.cells.map(
-      (cell) => `${cell.label} ${cell.status} ${cell.evidence} ${cell.location}`,
-    ),
+    ...row.cells.map((cell) => `${cell.label} ${cell.status} ${cell.evidence} ${cell.location}`),
   ]
     .join(' ')
     .toLowerCase();
@@ -52,9 +50,7 @@ export function CIHealthMatrix({
     }
 
     setSelected((current) =>
-      current?.repo === repo && current.cell.key === cell.key
-        ? null
-        : { repo, cell },
+      current?.repo === repo && current.cell.key === cell.key ? null : { repo, cell },
     );
   };
 
@@ -76,9 +72,7 @@ export function CIHealthMatrix({
               key={option}
               type="button"
               className={option === status ? 'cimx-fbtn active' : 'cimx-fbtn'}
-              onClick={() =>
-                setStatus((current) => (current === option ? '' : option))
-              }
+              onClick={() => setStatus((current) => (current === option ? '' : option))}
             >
               {option}
             </button>
@@ -103,24 +97,15 @@ export function CIHealthMatrix({
                 <th>{row.label}</th>
 
                 {row.cells.map((cell) => {
-                  const clickable =
-                    cell.status === 'fail' || cell.status === 'review';
+                  const clickable = cell.status === 'fail' || cell.status === 'review';
 
-                  const isSelected =
-                    selected?.repo === row.key &&
-                    selected.cell.key === cell.key;
+                  const isSelected = selected?.repo === row.key && selected.cell.key === cell.key;
 
                   return (
                     <td
                       key={cell.key}
-                      className={`${cellClass(cell.status)}${
-                        isSelected ? ' selected' : ''
-                      }`}
-                      title={
-                        clickable
-                          ? `${cell.status}: click for evidence`
-                          : cell.status
-                      }
+                      className={`${cellClass(cell.status)}${isSelected ? ' selected' : ''}`}
+                      title={clickable ? `${cell.status}: click for evidence` : cell.status}
                       {...(clickable && {
                         onClick: () => toggleCell(row.key, cell),
                         onKeyDown: (event: React.KeyboardEvent) => {
