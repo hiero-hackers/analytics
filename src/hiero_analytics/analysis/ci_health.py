@@ -161,6 +161,30 @@ CODEQL_PATTERNS = (
 )
 
 
+def strip_yaml_comments(text: str) -> str:
+    """Remove YAML comments while preserving hash characters in quoted values."""
+    lines: list[str] = []
+
+    for line in text.splitlines():
+        quote: str | None = None
+        output: list[str] = []
+
+        for index, char in enumerate(line):
+            if char in {"'", '"'}:
+                if quote is None:
+                    quote = char
+                elif quote == char:
+                    quote = None
+            elif char == "#" and quote is None and (index == 0 or line[index - 1].isspace()):
+                break
+
+            output.append(char)
+
+        lines.append("".join(output))
+
+    return "\n".join(lines)
+
+
 def find_workflow_names_containing(
     workflows: list[dict[str, str]],
     patterns: tuple[str, ...],
@@ -170,7 +194,7 @@ def find_workflow_names_containing(
 
     for workflow in workflows:
         name = workflow["name"]
-        text = workflow["text"].lower()
+        text = strip_yaml_comments(workflow["text"]).lower()
 
         if any(pattern in name.lower() or pattern in text for pattern in patterns):
             matches.append(name)
