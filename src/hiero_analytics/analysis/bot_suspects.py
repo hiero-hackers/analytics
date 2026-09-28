@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 
 import pandas as pd
+import yaml
 
 from hiero_analytics.config.paths import SRC
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -39,19 +40,17 @@ DISMISSALS_PATH = SRC / "data" / "bot_suspect_dismissals.yaml"
 def load_dismissed_suspects(path=DISMISSALS_PATH) -> set[str]:
     """Lowercased logins a maintainer has confirmed are real people, not bots.
 
-    One bare login per line (comments and blank lines ignored) — see the file
-    itself for the format. Missing file just means nothing's been dismissed yet.
+    A YAML mapping of ``login: "reason"`` (see the file itself, and
+    ``affiliations.yaml``, whose format this mirrors) — the reason strings
+    aren't used here, only the keys. An empty mapping (``{}``) or a
+    comments-only file both mean nothing's been dismissed yet.
     """
     if not path.exists():
         logger.warning("Bot-suspect dismissals file not found: %s", path)
         return set()
 
-    dismissed: set[str] = set()
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        body = raw.split("#", 1)[0].strip().lower()
-        if body:
-            dismissed.add(body)
-    return dismissed
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return {str(login).strip().lower() for login in data}
 
 
 def build_bot_suspects(

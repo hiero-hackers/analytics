@@ -97,15 +97,23 @@ def test_dismissed_lookup_is_case_insensitive():
     assert suspects.empty
 
 
-def test_load_dismissed_suspects_parses_bare_logins(tmp_path: Path):
-    """One lowercase login per line; comments and blank lines are ignored."""
+def test_load_dismissed_suspects_parses_yaml_mapping_keys(tmp_path: Path):
+    """A real YAML mapping of login -> reason; only the keys (lowercased) matter."""
     dismissals = tmp_path / "bot_suspect_dismissals.yaml"
     dismissals.write_text(
-        "# header comment\n\ncijujohn  # reviewed by someone, human login\nJoshMarinacci # trailing comment\n",
+        '# header comment\ncijujohn: "human login, coincidence"  # reviewed by someone\nJoshMarinacci: "surname ends in ci"\n',
         encoding="utf-8",
     )
 
     assert load_dismissed_suspects(dismissals) == {"cijujohn", "joshmarinacci"}
+
+
+def test_load_dismissed_suspects_empty_mapping_returns_empty_set(tmp_path: Path):
+    """A comments-only file or an explicit '{}' both mean nothing's dismissed yet."""
+    dismissals = tmp_path / "bot_suspect_dismissals.yaml"
+    dismissals.write_text("# nothing confirmed yet\n{}\n", encoding="utf-8")
+
+    assert load_dismissed_suspects(dismissals) == set()
 
 
 def test_load_dismissed_suspects_missing_file_returns_empty_set(tmp_path: Path):
