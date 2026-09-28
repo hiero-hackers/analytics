@@ -1,6 +1,7 @@
 """Tests for GitHub Actions workflow security checks."""
 
 from hiero_analytics.analysis.ci_health import (
+    CODEQL_PATTERNS,
     check_actions_sha_pinned,
     check_explicit_permissions,
     check_repository_security_configuration,
@@ -8,6 +9,7 @@ from hiero_analytics.analysis.ci_health import (
     find_permissions_with_lines,
     find_unpinned_actions,
     find_unpinned_actions_with_lines,
+    find_workflow_names_containing,
     is_sha_pinned,
 )
 
@@ -168,6 +170,47 @@ def test_check_actions_sha_pinned_passes_when_all_actions_are_pinned() -> None:
     assert result.status == "pass"
     assert result.evidence == "All GitHub Actions are pinned to full commit SHAs."
     assert result.location == ""
+
+
+def test_find_workflow_names_containing_ignores_comments() -> None:
+    """Ignore security-control patterns appearing only in YAML comments."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": """
+name: Security
+
+# TODO: add codeql
+# uses: github/codeql-action/init
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "test"
+""",
+        }
+    ]
+
+    assert find_workflow_names_containing(workflows, CODEQL_PATTERNS) == []
+
+
+def test_find_workflow_names_containing_detects_active_codeql() -> None:
+    """Detect an active CodeQL workflow reference."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": """
+name: Security
+
+jobs:
+  codeql:
+    steps:
+      - uses: github/codeql-action/init@0123456789abcdef0123456789abcdef01234567
+""",
+        }
+    ]
+
+    assert find_workflow_names_containing(workflows, CODEQL_PATTERNS) == ["security.yml"]
 
 
 def test_find_permissions_with_lines() -> None:
