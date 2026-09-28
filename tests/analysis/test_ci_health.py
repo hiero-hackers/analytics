@@ -10,6 +10,7 @@ from hiero_analytics.analysis.ci_health import (
     find_unpinned_actions,
     find_unpinned_actions_with_lines,
     find_workflow_names_containing,
+    has_explicit_permissions,
     is_sha_pinned,
 )
 
@@ -229,6 +230,64 @@ jobs:
     assert find_permissions_with_lines(workflow) == [3, 8]
 
 
+def test_has_explicit_permissions_accepts_workflow_permissions() -> None:
+    """Accept workflow-level permissions coverage."""
+    workflow = """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+"""
+
+    assert has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_accepts_per_job_permissions() -> None:
+    """Accept permissions declared for every job."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+  test:
+    permissions:
+      contents: read
+"""
+
+    assert has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_rejects_partial_job_permissions() -> None:
+    """Reject workflows where only some jobs declare permissions."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+  test:
+    runs-on: ubuntu-latest
+"""
+
+    assert not has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_rejects_missing_permissions() -> None:
+    """Reject workflows without explicit permissions coverage."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+"""
+
+    assert not has_explicit_permissions(workflow)
+
+
 def test_check_explicit_permissions_passes_with_top_level_permissions() -> None:
     """Test that top-level permissions produce a passing check result."""
     workflows = [
@@ -256,7 +315,7 @@ jobs:
 
 
 def test_check_explicit_permissions_passes_with_job_permissions() -> None:
-    """Test that job-level permissions produce a passing check result."""
+    """Test that every job declaring permissions produces a passing check."""
     workflows = [
         {
             "name": "build.yml",
@@ -264,6 +323,10 @@ def test_check_explicit_permissions_passes_with_job_permissions() -> None:
 
 jobs:
   build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+  test:
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -276,6 +339,33 @@ jobs:
     assert result.check == "explicit_permissions"
     assert result.band == "permissions"
     assert result.status == "pass"
+    assert result.location == (".github/workflows/build.yml:5; .github/workflows/build.yml:9")
+
+
+def test_check_explicit_permissions_fails_with_partial_job_permissions() -> None:
+    """Test that partial job-level permissions coverage fails."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
+""",
+        }
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "fail"
+    assert "build.yml" in result.evidence
     assert result.location == ".github/workflows/build.yml:5"
 
 
@@ -365,7 +455,7 @@ jobs:
     assert result.check == "explicit_permissions"
     assert result.band == "permissions"
     assert result.status == "pass"
-    assert result.evidence == ("All 2 workflow(s) explicitly declare GitHub Actions permissions.")
+    assert result.evidence == ("All 2 workflow(s) have explicit GitHub Actions permissions coverage.")
     assert result.location == (".github/workflows/build.yml:3; .github/workflows/release.yml:5")
 
 

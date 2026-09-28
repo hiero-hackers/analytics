@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+import yaml
+
 from hiero_analytics.analysis.ci_health_types import CheckResult
 
 USES_PATTERN = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)", re.MULTILINE)
@@ -58,6 +60,27 @@ def find_permissions_with_lines(workflow_text: str) -> list[int]:
     return lines
 
 
+def has_explicit_permissions(workflow_text: str) -> bool:
+    """Return whether a workflow has effective explicit permissions coverage."""
+    try:
+        workflow = yaml.safe_load(workflow_text)
+    except yaml.YAMLError:
+        return False
+
+    if not isinstance(workflow, dict):
+        return False
+
+    if "permissions" in workflow:
+        return True
+
+    jobs = workflow.get("jobs")
+
+    if not isinstance(jobs, dict) or not jobs:
+        return False
+
+    return all(isinstance(job, dict) and "permissions" in job for job in jobs.values())
+
+
 def check_actions_sha_pinned(
     workflows: list[dict[str, str]],
 ) -> CheckResult:
@@ -105,7 +128,7 @@ def check_actions_sha_pinned(
 def check_explicit_permissions(
     workflows: list[dict[str, str]],
 ) -> CheckResult:
-    """Check whether each GitHub Actions workflow explicitly declares permissions."""
+    """Check whether each workflow has explicit permissions coverage."""
     if not workflows:
         return CheckResult(
             check="explicit_permissions",
@@ -119,21 +142,28 @@ def check_explicit_permissions(
     locations: list[str] = []
 
     for workflow in workflows:
-        permission_lines = find_permissions_with_lines(workflow["text"])
+        workflow_name = workflow["name"]
+        workflow_text = workflow["text"]
+        permission_lines = find_permissions_with_lines(workflow_text)
 
-        if not permission_lines:
-            missing_permissions.append(workflow["name"])
-            locations.append(f".github/workflows/{workflow['name']}")
+        if not has_explicit_permissions(workflow_text):
+            missing_permissions.append(workflow_name)
+
+            if permission_lines:
+                locations.extend(f".github/workflows/{workflow_name}:{line_number}" for line_number in permission_lines)
+            else:
+                locations.append(f".github/workflows/{workflow_name}")
+
             continue
 
-        locations.extend(f".github/workflows/{workflow['name']}:{line_number}" for line_number in permission_lines)
+        locations.extend(f".github/workflows/{workflow_name}:{line_number}" for line_number in permission_lines)
 
     if not missing_permissions:
         return CheckResult(
             check="explicit_permissions",
             band="permissions",
             status="pass",
-            evidence=(f"All {len(workflows)} workflow(s) explicitly declare GitHub Actions permissions."),
+            evidence=(f"All {len(workflows)} workflow(s) have explicit GitHub Actions permissions coverage."),
             location="; ".join(locations),
         )
 
@@ -142,8 +172,8 @@ def check_explicit_permissions(
         band="permissions",
         status="fail",
         evidence=(
-            f"Found {len(missing_permissions)} workflow(s) without an "
-            "explicit permissions declaration: " + ", ".join(missing_permissions)
+            f"Found {len(missing_permissions)} workflow(s) without "
+            "complete explicit permissions coverage: " + ", ".join(missing_permissions)
         ),
         location="; ".join(locations),
     )
