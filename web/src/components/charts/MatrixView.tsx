@@ -5,6 +5,7 @@
  */
 
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useElementSize } from '@/hooks/use-element-size';
 import { CrosshairIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,10 +21,19 @@ import type { ColumnSpec, MatrixDocument, Row } from '../../api';
 import { dimensionOf, matches as focusMatches, toggle, useFocus } from '../../focus';
 import { useUrlFlag, useUrlParam } from '../../urlState';
 import { ContributorCell } from '../ContributorCell';
-import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
-import { decimal, formatBucket, integer, plural, shade, windowText } from './format';
+import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
+import { decimal, formatBucket, integer, plural, rangeText, shade, windowText } from './format';
 
 const MONTH = /^\d{4}-\d{2}$/;
+/** Printed rows shrink to fit the page between these heights, then run onto another page. */
+const PRINT_ROW = { min: 16, max: 30, avatar: 22 };
+/** Rough width of a 10px printed character, for sizing the printed name column. */
+const PRINT_CHAR = 6;
+/** The printed grid's column headings and colour scale, until measured. */
+const PRINT_FRAME = { head: 48, legend: 24 };
+/** Between printed rows (border-spacing), and around the grid (its border, the legend's gap). */
+const PRINT_ROW_GAP = 2;
+const PRINT_CHROME = 16;
 
 function cellStyle(level: number | null, steps: number) {
   if (level === null || level === 0) return undefined;
@@ -43,6 +53,9 @@ export function MatrixView({ data, title, period, provenance }: ViewProps<Matrix
   const [active, setActive] = useState<[number, number]>([0, 0]);
   const [readout, setReadout] = useState<[number, number] | null>(null);
   const gridRef = useRef<HTMLTableElement>(null);
+  // Measured on the printed sheet only, where the rows share out the height they leave.
+  const [headRef, head] = useElementSize();
+  const [legendRef, legendBox] = useElementSize();
   const format = (value: unknown) =>
     (data.value_format === 'integer' ? integer : decimal).format(Number(value));
   const columnLabel = (label: string) => (MONTH.test(label) ? formatBucket(label, 'month') : label);
@@ -126,150 +139,213 @@ export function MatrixView({ data, title, period, provenance }: ViewProps<Matrix
     />
   );
 
-  const chart = () => (
-    <div className="space-y-3">
-      <p aria-live="polite" className="min-h-5 text-xs text-muted-foreground">
-        {focused && readout
-          ? `${describe(focused, data.columns[readout[1]])} (${data.value_label.toLowerCase()})`
-          : 'Hover a cell, or focus the grid and use the arrow keys, to read exact values.'}
-      </p>
-      <div className="overflow-x-auto rounded-lg border">
-        <table
-          ref={gridRef}
-          role="grid"
-          aria-label={`${title}: ${data.value_label} by ${data.row.label.toLowerCase()}`}
-          aria-rowcount={shown.length + 1}
-          className="w-full border-separate border-spacing-0.5 text-xs"
-        >
-          <thead>
-            <tr>
-              <th scope="col" className="sticky left-0 bg-card px-2 py-1.5 text-left font-medium">
-                {data.row.label}
-              </th>
-              {data.columns.map((column) => (
+  // Paper fits every column to the page width, and the rows to its height where they can.
+  const chart = (_expanded: boolean, sheet?: SheetBox) => {
+    const rowHeight = sheet
+      ? Math.min(
+          PRINT_ROW.max,
+          Math.max(
+            data.avatars ? PRINT_ROW.avatar : PRINT_ROW.min,
+            Math.floor(
+              (sheet.height -
+                (head?.height ?? PRINT_FRAME.head) -
+                (legendBox?.height ?? PRINT_FRAME.legend) -
+                PRINT_CHROME) /
+                Math.max(shown.length, 1),
+            ) - PRINT_ROW_GAP,
+          ),
+        )
+      : undefined;
+    // Wide enough that names print on one line, with the role beside them.
+    const nameWidth = sheet
+      ? Math.min(
+          sheet.width * 0.28,
+          24 +
+            (data.avatars ? 26 : 0) +
+            PRINT_CHAR *
+              Math.max(
+                data.row.label.length,
+                ...shown.map(
+                  (row) =>
+                    String(row[data.row.key]).length +
+                    (data.sublabel ? String(row[data.sublabel.key] ?? '').length + 3 : 0),
+                ),
+              ),
+        )
+      : undefined;
+    return (
+      <div className="space-y-3">
+        {!sheet && (
+          <p aria-live="polite" className="min-h-5 text-xs text-muted-foreground">
+            {focused && readout
+              ? `${describe(focused, data.columns[readout[1]])} (${data.value_label.toLowerCase()})`
+              : 'Hover a cell, or focus the grid and use the arrow keys, to read exact values.'}
+          </p>
+        )}
+        <div className={sheet ? 'rounded-lg border' : 'overflow-x-auto rounded-lg border'}>
+          <table
+            // The printed copy is not the grid a reader navigates.
+            ref={sheet ? undefined : gridRef}
+            role="grid"
+            aria-label={`${title}: ${data.value_label} by ${data.row.label.toLowerCase()}`}
+            aria-rowcount={shown.length + 1}
+            className={
+              sheet
+                ? 'w-full table-fixed border-separate border-spacing-0.5 text-[10px] leading-tight'
+                : 'w-full border-separate border-spacing-0.5 text-xs'
+            }
+          >
+            <thead ref={sheet ? headRef : undefined}>
+              <tr>
                 <th
-                  key={column.key}
                   scope="col"
-                  className="max-w-24 px-1 py-1.5 text-center font-medium break-words"
+                  className="sticky left-0 bg-card px-2 py-1.5 text-left font-medium"
+                  style={sheet ? { width: nameWidth } : undefined}
                 >
-                  {columnLabel(column.label)}
+                  {data.row.label}
                 </th>
-              ))}
-              {data.total && (
-                <th scope="col" className="px-2 py-1.5 text-right font-medium">
-                  {data.total.label}
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {shown.map((row, r) => (
-              <tr
-                key={String(row[data.row.key])}
-                className={
-                  row === focusRow ? 'outline-2 -outline-offset-1 outline-link' : undefined
-                }
-              >
-                <th
-                  scope="row"
-                  className="sticky left-0 max-w-56 bg-card px-2 py-1 text-left font-normal"
-                >
-                  <span className="flex items-center gap-1">
-                    {dimension && (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className={row === focusRow ? 'text-link' : 'text-soft'}
-                        aria-pressed={row === focusRow}
-                        aria-label={`Focus the dashboard on ${String(row[data.row.key])}`}
-                        title="Focus the dashboard on this row"
-                        onClick={() => setFocus(toggle(focus, dimension, row[data.row.key]))}
-                      >
-                        <CrosshairIcon />
-                      </Button>
-                    )}
-                    {data.avatars ? (
-                      <ContributorCell login={String(row[data.row.key])} />
-                    ) : (
-                      <span className="font-medium">{String(row[data.row.key])}</span>
-                    )}
-                  </span>
-                  {data.sublabel && row[data.sublabel.key] ? (
-                    <span className="mt-0.5 block text-[11px] text-soft">
-                      {String(row[data.sublabel.key])}
-                    </span>
-                  ) : null}
-                </th>
-                {data.columns.map((column, c) => {
-                  const value = row[column.key];
-                  const level = shade(value, data.scale);
-                  return (
-                    <td
-                      key={column.key}
-                      role="gridcell"
-                      data-cell={`${r}:${c}`}
-                      tabIndex={r === activeRow && c === activeColumn ? 0 : -1}
-                      aria-label={describe(row, column)}
-                      title={describe(row, column)}
-                      onKeyDown={(event) => move(event, r, c)}
-                      onFocus={() => {
-                        setActive([r, c]);
-                        setReadout([r, c]);
-                      }}
-                      onMouseEnter={() => setReadout([r, c])}
-                      style={cellStyle(level, data.scale.steps)}
-                      className={`min-w-14 rounded-sm px-1.5 py-1.5 text-center tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                        level === null
-                          ? 'border border-dashed text-soft'
-                          : level === 0
-                            ? 'bg-muted/40 text-soft'
-                            : ''
-                      }`}
-                    >
-                      {value === null ? '?' : format(value)}
-                    </td>
-                  );
-                })}
+                {data.columns.map((column) => (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    className={
+                      sheet
+                        ? 'px-0 py-1 text-center text-[9px] font-medium break-words hyphens-auto'
+                        : 'max-w-24 px-1 py-1.5 text-center font-medium break-words'
+                    }
+                  >
+                    {columnLabel(column.label)}
+                  </th>
+                ))}
                 {data.total && (
-                  <td className="px-2 text-right font-semibold tabular-nums">
-                    {format(row[data.total.key])}
-                  </td>
+                  <th
+                    scope="col"
+                    className="px-2 py-1.5 text-right font-medium"
+                    style={sheet ? { width: 56 } : undefined}
+                  >
+                    {data.total.label}
+                  </th>
                 )}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div
-          className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
-          aria-label="Colour scale"
-        >
-          <span>{data.value_label}:</span>
-          <span className="inline-flex items-center gap-1">
-            <i className="inline-block size-3 rounded-sm bg-muted/40" /> {format(data.scale.min)}
-          </span>
-          {legend.map(({ level, text }) => (
-            <span key={level} className="inline-flex items-center gap-1">
-              <i
-                className="inline-block size-3 rounded-sm"
-                style={cellStyle(level, data.scale.steps)}
-              />
-              {text}
-            </span>
-          ))}
-          {data.missing && <span>? {data.missing}</span>}
+            </thead>
+            <tbody>
+              {shown.map((row, r) => (
+                <tr
+                  key={String(row[data.row.key])}
+                  className={
+                    row === focusRow ? 'outline-2 -outline-offset-1 outline-link' : undefined
+                  }
+                  style={rowHeight ? { height: rowHeight } : undefined}
+                >
+                  <th
+                    scope="row"
+                    className={`sticky left-0 bg-card px-2 text-left font-normal ${sheet ? 'py-0' : 'max-w-56 py-1'}`}
+                  >
+                    <span
+                      className={sheet ? 'flex items-baseline gap-1' : 'flex items-center gap-1'}
+                    >
+                      {dimension && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className={row === focusRow ? 'text-link' : 'text-soft'}
+                          aria-pressed={row === focusRow}
+                          aria-label={`Focus the dashboard on ${String(row[data.row.key])}`}
+                          title="Focus the dashboard on this row"
+                          onClick={() => setFocus(toggle(focus, dimension, row[data.row.key]))}
+                        >
+                          <CrosshairIcon />
+                        </Button>
+                      )}
+                      {data.avatars ? (
+                        <ContributorCell login={String(row[data.row.key])} compact={!!sheet} />
+                      ) : (
+                        <span className="font-medium">{String(row[data.row.key])}</span>
+                      )}
+                      {sheet && data.sublabel && row[data.sublabel.key] ? (
+                        <span className="text-soft">· {String(row[data.sublabel.key])}</span>
+                      ) : null}
+                    </span>
+                    {!sheet && data.sublabel && row[data.sublabel.key] ? (
+                      <span className="mt-0.5 block text-[11px] text-soft">
+                        {String(row[data.sublabel.key])}
+                      </span>
+                    ) : null}
+                  </th>
+                  {data.columns.map((column, c) => {
+                    const value = row[column.key];
+                    const level = shade(value, data.scale);
+                    return (
+                      <td
+                        key={column.key}
+                        role="gridcell"
+                        data-cell={`${r}:${c}`}
+                        tabIndex={r === activeRow && c === activeColumn ? 0 : -1}
+                        aria-label={describe(row, column)}
+                        title={describe(row, column)}
+                        onKeyDown={(event) => move(event, r, c)}
+                        onFocus={() => {
+                          setActive([r, c]);
+                          setReadout([r, c]);
+                        }}
+                        onMouseEnter={() => setReadout([r, c])}
+                        style={cellStyle(level, data.scale.steps)}
+                        className={`${sheet ? 'px-0 py-0' : 'min-w-14 px-1.5 py-1.5'} rounded-sm text-center tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                          level === null
+                            ? 'border border-dashed text-soft'
+                            : level === 0
+                              ? 'bg-muted/40 text-soft'
+                              : ''
+                        }`}
+                      >
+                        {value === null ? '?' : format(value)}
+                      </td>
+                    );
+                  })}
+                  {data.total && (
+                    <td className="px-2 text-right font-semibold tabular-nums">
+                      {format(row[data.total.key])}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {limited && (
-          <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
-            {showAll
-              ? `Show top ${data.top_n}`
-              : `Show all ${integer.format(matches.length)} ${nouns}`}
-          </Button>
-        )}
+        <div
+          ref={sheet ? legendRef : undefined}
+          className="flex flex-wrap items-center justify-between gap-2"
+        >
+          <div
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
+            aria-label="Colour scale"
+          >
+            <span>{data.value_label}:</span>
+            <span className="inline-flex items-center gap-1">
+              <i className="inline-block size-3 rounded-sm bg-muted/40" /> {format(data.scale.min)}
+            </span>
+            {legend.map(({ level, text }) => (
+              <span key={level} className="inline-flex items-center gap-1">
+                <i
+                  className="inline-block size-3 rounded-sm"
+                  style={cellStyle(level, data.scale.steps)}
+                />
+                {text}
+              </span>
+            ))}
+            {data.missing && <span>? {data.missing}</span>}
+          </div>
+          {limited && !sheet && (
+            <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+              {showAll
+                ? `Show top ${data.top_n}`
+                : `Show all ${integer.format(matches.length)} ${nouns}`}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const table = (
     <Table containerClassName={TABLE_CONTAINER}>
@@ -316,6 +392,23 @@ export function MatrixView({ data, title, period, provenance }: ViewProps<Matrix
       empty={!matches.length}
       emptyText={query ? `No ${nouns} match “${query}”.` : undefined}
       focusFound={!focus || focus.dimension !== dimension || !!focusRow}
+      printFilters={[
+        { label: 'Date range', value: rangeText(data.window) },
+        !!query && {
+          label: 'Search',
+          value: `“${query}” · ${integer.format(matches.length)} ${nouns}`,
+        },
+        limited && {
+          label: 'Showing',
+          value: showAll
+            ? `all ${integer.format(matches.length)} ${nouns}`
+            : `top ${data.top_n} of ${integer.format(matches.length)} ${nouns}`,
+        },
+      ]}
+      // Wide when it has many columns, tall when it has many rows.
+      printAspect={
+        (200 + data.columns.length * 44 + (data.total ? 60 : 0)) / (40 + shown.length * 24)
+      }
       windowNote={windowText(data.window)}
       csv={() => ({
         name: `${data.id}-selected`,

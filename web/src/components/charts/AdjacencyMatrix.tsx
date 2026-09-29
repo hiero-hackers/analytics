@@ -25,6 +25,7 @@ export function AdjacencyMatrix({
   member,
   selected,
   onSelect,
+  fit = false,
 }: {
   nodes: NetworkNode[];
   edges: { source: string; target: string; shared: number }[];
@@ -32,6 +33,8 @@ export function AdjacencyMatrix({
   member: string;
   selected: string | null;
   onSelect: (id: string) => void;
+  /** Shrink to the height it is given (a printed page) instead of scrolling. */
+  fit?: boolean;
 }) {
   const [hover, setHover] = useState<{ row: number; col: number } | null>(null);
 
@@ -105,18 +108,20 @@ export function AdjacencyMatrix({
   };
 
   return (
-    <div className="space-y-2">
-      <p className="min-h-5 text-xs text-foreground" aria-live="polite">
-        {readout}
-      </p>
-      <div className="overflow-auto rounded-lg border bg-card">
+    <div className={fit ? 'flex min-h-0 flex-1 flex-col gap-2' : 'space-y-2'}>
+      {!fit && (
+        <p className="min-h-5 text-xs text-foreground" aria-live="polite">
+          {readout}
+        </p>
+      )}
+      <div className={`rounded-lg border bg-card ${fit ? 'flex min-h-0 flex-1' : 'overflow-auto'}`}>
         {/* Scrolls rather than shrinks when narrow; grows up to 1.5× in a wide card. */}
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          style={{ minWidth: width, maxWidth: width * 1.5 }}
+          style={fit ? undefined : { minWidth: width, maxWidth: width * 1.5 }}
           role="group"
           aria-label={`Shared ${member} between every pair of ${n} repositories, grouped by type. Use Data for the full list.`}
-          className="mx-auto block w-full"
+          className={fit ? 'block h-full min-h-0 w-full' : 'mx-auto block w-full'}
           onPointerLeave={() => setHover(null)}
         >
           {order.map((node, i) => (

@@ -1,23 +1,39 @@
 /**
  * The frame every interactive chart shares: heading, Chart / Data switch, CSV,
- * expanded dialog and explanatory footer. Views build the chart, table and CSV
- * from one selection, so the three can never disagree.
+ * print preview, expanded dialog and explanatory footer. Views build the chart,
+ * table, CSV and printed sheet from one selection, so the four can never disagree.
  */
 
-import { useContext, useRef, useState, type ReactNode } from 'react';
-import { ChartLeading } from './leading';
-import { CrosshairIcon } from 'lucide-react';
-import { Maximize2Icon } from 'lucide-react';
+import { lazy, Suspense, useContext, useRef, useState, type ReactNode } from 'react';
+import { ChartLeading, ChartSectionTitle } from './leading';
+import { CrosshairIcon, Maximize2Icon, PrinterIcon, XIcon } from 'lucide-react';
+import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { ChartDocumentMeta, Manifest } from '../../api';
 import type { CsvExport } from '../../csv';
 import { DIMENSION_LABELS, dimensionOf, useFocus } from '../../focus';
 import { stamp } from '../../format';
+import { OrgContext } from '../../orgContext';
 import { usePrintMode } from '../../printContext';
 import { useUrlIndex } from '../../urlState';
 import { CsvDownloadButton } from '../CsvDownloadButton';
+import { PrintFilter } from '../PrintFilter';
 import { VariantTabs } from '../VariantTabs';
+import type { SheetBox } from './ChartPrintDialog';
+
+// Loaded when a reader first opens a print preview.
+const ChartPrintDialog = lazy(() =>
+  import('./ChartPrintDialog').then((module) => ({ default: module.ChartPrintDialog })),
+);
+
+export type { SheetBox };
+
+/** A selection the printed sheet states that no switch shows: a search, hidden series, a span. */
+export interface PrintFilterSpec {
+  label: string;
+  value: string;
+}
 
 export interface ViewProps<T> {
   data: T;
@@ -43,13 +59,16 @@ export function ChartShell({
   empty,
   emptyText = 'No data is available for this selection.',
   focusFound = true,
+  printFilters = [],
+  printAspect = 2,
 }: ViewProps<ChartDocumentMeta> & {
   subtitle: string;
   /** Segmented settings (mark, scale, span, cohort), shown for chart and table alike. */
   toolbar?: ReactNode;
   /** Series toggles, search or comparisons under the toolbar, for chart and table alike. */
   controls?: ReactNode;
-  chart: (expanded: boolean) => ReactNode;
+  /** The chart itself; `sheet` is its room on the printed page when drawing the print preview. */
+  chart: (expanded: boolean, sheet?: SheetBox) => ReactNode;
   table: ReactNode;
   csv: () => Omit<CsvExport, 'total' | 'dataAsOf'>;
   windowNote: string;
@@ -57,6 +76,10 @@ export function ChartShell({
   emptyText?: string;
   /** Whether the focused value appears in this chart (when it has the dimension). */
   focusFound?: boolean;
+  /** Printed as filters beside the switches' own choices. */
+  printFilters?: (PrintFilterSpec | false | null | undefined)[];
+  /** The chart's natural width ÷ height, which picks the printed orientation. */
+  printAspect?: number;
 }) {
   // Chart / Data lives in the URL, so a shared link opens the same view.
   const [view, setView] = useUrlIndex(`${data.id}.view`);
@@ -66,6 +89,14 @@ export function ChartShell({
   const printing = usePrintMode();
   const leading = useContext(ChartLeading);
   const expandRef = useRef<HTMLButtonElement>(null);
+  const printRef = useRef<HTMLButtonElement>(null);
+  const org = useContext(OrgContext);
+  const section = useContext(ChartSectionTitle);
+  const [previewing, setPreviewing] = useState(false);
+  // The URL at the moment Print found nothing to print: every selection lives
+  // there, so the message stands until the reader changes one.
+  const [nothingAt, setNothingAt] = useState<string | null>(null);
+  const nothingToPrint = empty && nothingAt === window.location.hash;
   const heading = period !== title ? `${title} · ${period}` : title;
   // Lead with the unit, dropping a first part that merely repeats it ("Maintainers" vs "Maintainers (share …)").
   const unit = data.unit.toLowerCase();
@@ -110,6 +141,23 @@ export function ChartShell({
               return { ...source, total: source.rows.length, dataAsOf: data.generated_at };
             }}
           />
+          <Button
+            ref={printRef}
+            variant="outline"
+            size="sm"
+            aria-label={`Print chart: ${title}`}
+            title="Print chart"
+            onClick={() => {
+              if (empty) {
+                setNothingAt(window.location.hash);
+              } else {
+                setNothingAt(null);
+                setPreviewing(true);
+              }
+            }}
+          >
+            <PrinterIcon /> <span className="hidden @lg:inline">Print</span>
+          </Button>
           {!expanded && (
             <Button
               ref={expandRef}
@@ -133,6 +181,26 @@ export function ChartShell({
           {leading}
           {toolbar}
         </div>
+      )}
+      {nothingToPrint && (
+        <Alert data-print-hide>
+          <PrinterIcon />
+          <AlertTitle>Nothing to print for this selection</AlertTitle>
+          <AlertDescription>
+            {emptyText} Choose another period or view, show a hidden series, or clear the search or
+            focus, then print again.
+          </AlertDescription>
+          <AlertAction>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label="Dismiss"
+              onClick={() => setNothingAt(null)}
+            >
+              <XIcon />
+            </Button>
+          </AlertAction>
+        </Alert>
       )}
       {controls}
       {focus && (!supported || !focusFound) && (
@@ -182,8 +250,74 @@ export function ChartShell({
       </div>
     </div>
   );
+  // The printed sheet: the same switches, controls and chart, drawn for paper.
+  const explanation =
+    data.note || data.methodology?.length ? (
+      <>
+        {data.note && (
+          <p>
+            <span className="font-medium text-foreground">How to read this. </span>
+            {data.note}
+          </p>
+        )}
+        {data.methodology?.length ? (
+          <div>
+            <p className="font-medium text-foreground">How it is measured</p>
+            <ol className="list-decimal pl-4">
+              {data.methodology.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+      </>
+    ) : undefined;
+  const filters = (
+    <>
+      {/* A card's shared tab names the variant; a chart's own tabs print themselves. */}
+      {!leading && period !== title && <PrintFilter label="View" value={period} />}
+      {leading}
+      {toolbar}
+      {printFilters.map(
+        (filter) =>
+          filter && <PrintFilter key={filter.label} label={filter.label} value={filter.value} />,
+      )}
+      {focus && (
+        <PrintFilter
+          label="Focus"
+          value={`${DIMENSION_LABELS[focus.dimension]} ${focus.value}${
+            supported && focusFound ? '' : ' (not in this chart)'
+          }`}
+        />
+      )}
+    </>
+  );
+
   return (
     <>
+      {previewing && (
+        <Suspense fallback={null}>
+          <ChartPrintDialog
+            open={previewing}
+            onOpenChange={setPreviewing}
+            onClosed={() => requestAnimationFrame(() => printRef.current?.focus())}
+            aspect={printAspect}
+            title={title}
+            eyebrow={[org, section].filter(Boolean).join(' · ')}
+            subtitle={detail}
+            filters={filters}
+            legend={controls}
+            chart={(box) => chart(false, box)}
+            notes={
+              <>
+                <p>{data.population}</p>
+                <p>{windowNote}</p>
+              </>
+            }
+            explanation={explanation}
+          />
+        </Suspense>
+      )}
       {/* While printing, an expanded chart also prints in place. Its dialog keeps
           its own copy mounted (hidden by print.css), so the open explanation and
           scroll position are still there afterwards. */}

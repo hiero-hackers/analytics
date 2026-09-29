@@ -12,7 +12,8 @@ import { VariantTabs } from '../components/VariantTabs';
 import { BOARD_DOC, MANIFEST, MATRIX_DOC } from './fixtures';
 
 const printState = vi.hoisted(() => ({ printing: false }));
-vi.mock('../printContext', () => ({
+vi.mock('../printContext', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../printContext')>()),
   usePrintMode: () => printState.printing,
   PRINT_ROW_LIMIT: 500,
 }));

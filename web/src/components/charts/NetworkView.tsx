@@ -21,8 +21,8 @@ import { matches as focusMatches, useFocus } from '../../focus';
 import { useUrlParam } from '../../urlState';
 import { VariantTabs } from '../VariantTabs';
 import { AdjacencyMatrix } from './AdjacencyMatrix';
-import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
-import { integer, shortRepo as short, windowText } from './format';
+import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
+import { integer, rangeText, shortRepo as short, windowText } from './format';
 import { relaxLayout, strengthSteps } from './networkLayout';
 
 /** SVG units per layout unit: roughly plotting/network.py's points per unit at 16 inches wide. */
@@ -226,7 +226,8 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
         />
       )}
       {minShared > (steps[0] ?? 0) && (
-        <span className="text-xs text-muted-foreground" aria-live="polite">
+        // Printed as a filter instead.
+        <span className="text-xs text-muted-foreground" aria-live="polite" data-sheet-hide>
           Showing {integer.format(edges.length)} of {integer.format(data.edges.length)} links
         </span>
       )}
@@ -253,10 +254,14 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
     </div>
   );
 
-  const chart = (expanded: boolean) => {
+  const chart = (expanded: boolean, sheet?: SheetBox) => {
     const focusNode = focus ? data.nodes.find((node) => node.id === focus) : undefined;
     return (
-      <div className="space-y-3">
+      // On paper the graph (or matrix) takes the page's height left by its legend and focus.
+      <div
+        className={sheet ? 'flex flex-col gap-3' : 'space-y-3'}
+        style={sheet ? { height: sheet.height } : undefined}
+      >
         {matrix ? (
           <AdjacencyMatrix
             nodes={data.nodes}
@@ -265,41 +270,47 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
             member={member}
             selected={focus}
             onSelect={select}
+            fit={!!sheet}
           />
         ) : (
-          <div className="relative overflow-hidden rounded-lg border bg-card">
-            <div className="absolute top-2 right-2 z-10 flex gap-1">
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Zoom in"
-                onClick={() => zoomBy(1.25)}
-              >
-                <PlusIcon />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Zoom out"
-                onClick={() => zoomBy(0.8)}
-              >
-                <MinusIcon />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Reset view"
-                onClick={() => setView({ zoom: 1, x: 0, y: 0 })}
-              >
-                <RotateCcwIcon />
-              </Button>
-            </div>
+          <div
+            className={`relative overflow-hidden rounded-lg border bg-card ${sheet ? 'flex min-h-0 flex-1' : ''}`}
+          >
+            {!sheet && (
+              <div className="absolute top-2 right-2 z-10 flex gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Zoom in"
+                  onClick={() => zoomBy(1.25)}
+                >
+                  <PlusIcon />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Zoom out"
+                  onClick={() => zoomBy(0.8)}
+                >
+                  <MinusIcon />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Reset view"
+                  onClick={() => setView({ zoom: 1, x: 0, y: 0 })}
+                >
+                  <RotateCcwIcon />
+                </Button>
+              </div>
+            )}
             <svg
-              ref={attachSvg}
+              // The printed copy neither zooms nor pans; the reader's own zoom still applies.
+              ref={sheet ? undefined : attachSvg}
               role="group"
               aria-label={`${title}: ${data.nodes.length} repositories, ${edges.length} links. Tab to a repository and press Enter to show its links.`}
               viewBox={`0 0 ${bounds.width} ${bounds.height}`}
-              className={`block w-full cursor-grab touch-none select-none active:cursor-grabbing ${expanded ? 'max-h-[74vh]' : 'max-h-[640px]'}`}
+              className={`block w-full cursor-grab touch-none select-none active:cursor-grabbing ${sheet ? 'h-full min-h-0' : expanded ? 'max-h-[74vh]' : 'max-h-[640px]'}`}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={() => (drag.current = null)}
@@ -452,11 +463,13 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
             )}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            {matrix
-              ? 'Hover a cell to read a pair; select a repository name to show its links.'
-              : 'Hover, select or search a repository to show its links. Drag to pan; zoom with the buttons or Ctrl/⌘ + scroll.'}
-          </p>
+          !sheet && (
+            <p className="text-xs text-muted-foreground">
+              {matrix
+                ? 'Hover a cell to read a pair; select a repository name to show its links.'
+                : 'Hover, select or search a repository to show its links. Drag to pan; zoom with the buttons or Ctrl/⌘ + scroll.'}
+            </p>
+          )
         )}
       </div>
     );
@@ -512,6 +525,20 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
       controls={controls}
       empty={!data.nodes.length}
       focusFound={!dashboardFocus || dashboardFocus.dimension !== 'repo' || !!selected}
+      printFilters={[
+        { label: 'Date range', value: rangeText(data.window) },
+        !!needle && { label: 'Search', value: `“${query.trim()}”` },
+        minShared > (steps[0] ?? 0) && {
+          label: 'Links shown',
+          value: `${integer.format(edges.length)} of ${integer.format(data.edges.length)}`,
+        },
+        !matrix &&
+          (view.zoom !== 1 || view.x !== 0 || view.y !== 0) && {
+            label: 'Zoom',
+            value: `${Math.round(view.zoom * 100)}%, as on screen`,
+          },
+      ]}
+      printAspect={matrix ? 1.1 : bounds.width / bounds.height}
       windowNote={windowText(data.window)}
       csv={() => ({
         name: `${data.id}${focus ? `-${focus}` : ''}-selected`,

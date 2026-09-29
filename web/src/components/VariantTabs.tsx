@@ -4,10 +4,12 @@
  * Separate from `PeriodTabs`, whose "All time" null state has no role-axis equivalent.
  */
 
-import type { ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { cn } from 'cn';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { usePrintMode } from '../printContext';
+import { filterLabel } from '../chartPrint';
+import { PrintSheetContext, usePrintMode } from '../printContext';
+import { PrintFilter } from './PrintFilter';
 
 export function VariantTabs({
   labels,
@@ -32,8 +34,18 @@ export function VariantTabs({
   printSelection?: boolean;
 }) {
   const printing = usePrintMode();
+  const sheet = useContext(PrintSheetContext);
   if (labels.length < 2) {
     return null;
+  }
+  // A printed chart's sheet is its own copy: the choice as a filter, no control.
+  if (sheet) {
+    return printSelection ? (
+      <PrintFilter
+        label={filterLabel(ariaLabel, sheet.title)}
+        value={labels[active] ?? labels[0]}
+      />
+    ) : null;
   }
   // Paper states the selection in words; the control stays mounted (hidden) so
   // focus and the choice survive print/cancel.

@@ -201,3 +201,100 @@ Local verification after the port: 167 Vitest tests, and 21 Playwright tests in
 each of Chromium and Firefox. Lint, Prettier and the typecheck/build pass; lint
 keeps its five existing warnings and adds none. Printed output from real data was
 not re-reviewed in this pass.
+
+## Printing one chart (30 September 2026)
+
+Every interactive chart has a **Print** action beside Download CSV and Expand
+(icon-only in a narrow card; its accessible name is "Print chart: <title>"). It
+opens a print preview rather than the browser dialog, so the reader sees the page
+before printing it.
+
+**One renderer.** The preview does not redraw the chart from a copy of its state.
+`ChartShell` hands its own view's switches, legend and `chart()` render function
+to `ChartPrintDialog`, which lays them out as a sheet of paper. Every selection
+already lives in the URL (variant, chart style, scale, span, hidden series,
+cohort, search, focus, show-all) or in the view's closure (the network's zoom),
+so the sheet shows exactly what the card shows. The views receive the sheet's
+chart area as `sheet` and size themselves to it: bars over time take its height,
+rankings and timelines fit their rows between a minimum and maximum row height,
+heatmaps switch to a fixed-width grid with every column on the page, and the
+network graph and adjacency matrix scale into the area.
+
+**The sheet is the printout.** It is drawn at its printed size in millimetres and
+only scaled down (CSS transform) on screen, so the measured layout, the chart's
+pixel size and the page count in the preview are the ones printed. While the
+preview is open, `<html data-print-scope="chart">` and a page rule
+(`@page { size: A4|letter portrait|landscape; margin: 12mm }`) are in place, and
+print.css prints the sheet alone: the dashboard, overlays and the dialog's own
+controls are left out, and the tab's print mode (`PrintProvider`) is skipped. The
+browser's own print command prints the same sheet while the preview is open.
+Every tab-print rule is scoped to `:where(html:not([data-print-scope='chart']))`,
+which adds no specificity, so tab printing cascades as before.
+
+**On the page:** the chart title with its organisation and card, the unit line,
+the selection as filters ("Chart style Line", "Hidden series Triage", "Showing
+top 10 of 40 repositories", "Search …", "Focus …"), the date range (the buckets
+shown for a timeseries; the window's dates otherwise), the legend (series drawn;
+switched-off ones are listed among the filters), the chart, the population and
+window notes. The source line (data date, code revision), the source's
+generated time and the view's URL were dropped from the sheet as clutter; the printed date is optional and off by default.
+Reading notes and methodology are optional and off by default, so they do not
+take the chart's room. Paper cannot hover, so values are printed on the marks:
+stack totals on bars, point values on short lines and areas, the latest value on
+long series. Heatmaps keep their cell values; funnels and meters are labelled
+already. The sheet always uses the light palette, including in dark mode.
+
+**Paper.** A4 or Letter, remembered per browser (the default follows the
+reader's region). Orientation is _Best fit_ unless chosen: each view states its
+natural shape (`printAspect`), and the orientation that draws it largest wins.
+Wide timeseries print landscape; long rankings, timelines, networks and tall
+heatmaps print portrait. A selection that cannot fit one page even at the
+minimum row height (every row of a very long ranking) runs onto further pages;
+the preview marks the page breaks and says how many pages it needs.
+
+**Download.** The preview also saves the page as a file, without the print
+dialog: a PDF (one page per printed page, at the paper's exact size), or a PNG
+or JPG of the whole sheet. `chartExport.ts` renders the sheet in the browser at
+288 dpi with `modern-screenshot` (loaded only when a file is saved). It lays the
+sheet on paper with the print margins, and writes the PDF itself: one
+losslessly compressed image per page, using the browser's `CompressionStream`,
+with no PDF library. GitHub avatars are left out, because the page's CSP
+(`connect-src 'self'`) does not let a script read them; their initials stand in.
+The PDF is an image of the page, so its text cannot be selected; Print keeps
+the text.
+
+**No browser header or footer.** The browser prints its own date, title and URL
+in the page margin. The chart's page rule sets the margin to 0, and the sheet
+pads itself by 12 mm instead (`box-decoration-break: clone`, so every printed
+page gets it). The browser then has no margin to print them in. Checked in
+Chromium with its header and footer option switched on.
+
+**Nothing to print.** If the selection has no data (an empty period, a search
+with no match), Print shows "Nothing to print for this selection" with the
+chart's own empty-state reason, instead of opening an empty preview. The message
+lasts until the selection changes.
+
+The CSS minifier (Lightning CSS) folds `translate: none` into the `transform`
+shorthand, which would leave the dialog's centring offset on paper; print.css
+resets Tailwind's `--tw-translate-*` variables instead.
+
+### Verification
+
+- Vitest: 12 new tests. They cover paper geometry and orientation, the page
+  rule, regional defaults and storage, filter naming, date ranges, the preview's
+  filters, legend and notes, printing and restoring the page, and the empty
+  message. Also that tab printing is skipped while a chart prints.
+- Playwright (Chromium and Firefox): 5 new tests. In Chromium, PDFs are generated
+  for A4 and Letter in both orientations and checked for page size and one page.
+  The tests also cover the sheet-only print document, a 120-row ranking that
+  prints portrait on two pages, the empty-selection message, dark mode, and focus
+  and tab printing after the preview closes.
+- Real data (hiero-ledger and hiero-hackers): every chart on every tab was
+  previewed and printed to PDF in Chromium. That covers bars, stacked bars,
+  lines, areas, horizontal rankings, funnel, meter, heatmaps (with and without
+  avatars), network graph, adjacency matrix and release timeline. Each fits one
+  page, with no content past the sheet's edges, and the preview's page count
+  matched the PDF. Filter combinations were also printed: variant, chart style,
+  hidden series, latest-24 span, show-all with share scale, network threshold
+  and focus, hidden release types, dark mode, A4/Letter portrait/landscape.
+  Safari's native print was not verified.

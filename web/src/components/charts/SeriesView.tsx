@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
+  LabelList,
   Line,
   ReferenceLine,
   XAxis,
@@ -33,11 +34,13 @@ import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
 import { Funnel, Meter } from './Composition';
 import { cumulative, overviewTotals, share, viewRows, type ViewRow } from './seriesRows';
 import {
+  bucketLong,
   decimal,
   formatBucket,
   integer,
   percent,
   plural,
+  rangeText,
   shorten,
   spanOf,
   windowText,
@@ -59,6 +62,12 @@ const labelWidth = (labels: string[]) =>
     184,
     Math.max(64, Math.ceil(Math.max(0, ...labels.map((l) => shorten(l).length)) * 7.2) + 12),
   );
+
+/** A printed ranking squeezes its rows to fit the page down to this, then runs onto another. */
+const PRINT_ROW_MIN = 10;
+const PRINT_ROW_MAX = 40;
+/** Printed value labels: at most this many marks carry one, so none collide. */
+const LABELS_MAX = { bars: 36, ranked: 60, points: 24 };
 
 /** Series longer than this get an overview strip to brush a span of buckets. */
 const OVERVIEW_MIN = 24;
@@ -237,6 +246,43 @@ export function SeriesView({
     .filter(Boolean)
     .join(' · ');
 
+  // What the printed sheet states beside the switches' own choices.
+  const printFilters = [
+    {
+      label: 'Date range',
+      value:
+        timeseries && buckets.length
+          ? `${bucketLong(buckets[spanStart], data.frequency)} – ${bucketLong(buckets[spanEnd], data.frequency)} · ${
+              spanned ? `${spanEnd - spanStart + 1} of ${buckets.length}` : buckets.length
+            } buckets`
+          : 'first' in data.window
+            ? windowText(data.window)
+            : rangeText(data.window),
+    },
+    hidden.length > 0 && {
+      label: 'Hidden series',
+      value: data.series
+        .filter((series) => hidden.includes(series.key))
+        .map((series) => series.label)
+        .join(', '),
+    },
+    limited && {
+      label: 'Showing',
+      value: showAll
+        ? `all ${integer.format(rows.length)} ${nouns}`
+        : `top ${topN} of ${integer.format(rows.length)} ${nouns}`,
+    },
+  ];
+  // The shape the chart reads best at: wide over time, as tall as its rows when ranked.
+  const printAspect =
+    mark === 'funnel'
+      ? 900 / (rows.length * 64)
+      : horizontal && !composition
+        ? 900 / (chartRows.length * 22 + AXIS_HEIGHT)
+        : mark === 'meter'
+          ? 3
+          : 2;
+
   const valueAxis = {
     type: 'number' as const,
     allowDecimals: data.value_format === 'decimal' && !normalized,
@@ -316,7 +362,8 @@ export function SeriesView({
             />
           )}
           {spanned && (
-            <span className="text-xs text-muted-foreground" aria-live="polite">
+            // Printed as the date range instead.
+            <span className="text-xs text-muted-foreground" aria-live="polite" data-sheet-hide>
               {formatBucket(buckets[spanStart], data.frequency)} –{' '}
               {formatBucket(buckets[spanEnd], data.frequency)} ({rows.length} of {data.rows.length}{' '}
               buckets)
@@ -343,6 +390,7 @@ export function SeriesView({
                 className="flex flex-wrap gap-x-1 gap-y-1"
                 role="group"
                 aria-label="Visible series"
+                data-print-legend
               >
                 {data.series.map((series) => {
                   const off = hidden.includes(series.key);
@@ -389,6 +437,8 @@ export function SeriesView({
       }
       empty={!rows.length}
       focusFound={!dimension || !focus || focus.dimension !== dimension || !!focused}
+      printFilters={printFilters}
+      printAspect={printAspect}
       windowNote={[
         windowText(data.window, anyPartial),
         normalized
@@ -412,8 +462,67 @@ export function SeriesView({
           Object.fromEntries(columns.map((column) => [column.key, row[column.key]])),
         ),
       })}
-      chart={(expanded) =>
-        composition ? (
+      chart={(expanded, sheet) => {
+        // A printed ranking fits its rows to the page; bars over time take the page's height.
+        const rowHeight = sheet
+          ? Math.min(
+              PRINT_ROW_MAX,
+              Math.max(
+                PRINT_ROW_MIN,
+                Math.floor(
+                  (sheet.height - AXIS_HEIGHT - (data.reference ? 16 : 0)) / chartRows.length,
+                ),
+              ),
+            )
+          : ROW_HEIGHT;
+        // Paper cannot hover: print the values on the marks while they stay legible,
+        // and otherwise a series over time still states its latest value.
+        const labelling = (all: boolean) =>
+          !sheet || normalized ? null : all ? 'all' : timeseries ? 'latest' : null;
+        const barLabels = labelling(
+          chartRows.length * (data.stacked ? 1 : visible.length) <=
+            (horizontal ? LABELS_MAX.ranked : LABELS_MAX.bars),
+        );
+        // A stack labels its top line only; separate lines are labelled while few.
+        const topOnly = mark === 'line' ? stackedLines : data.stacked;
+        const pointLabels =
+          topOnly || visible.length <= 3 ? labelling(chartRows.length <= LABELS_MAX.points) : null;
+        const valueLabel = (
+          dataKey: string,
+          position: 'top' | 'right',
+          mode: 'all' | 'latest',
+          bars = false,
+        ) => {
+          // A zero bar is not drawn, so a bar chart names its latest drawn bar.
+          const latest =
+            (bars ? chartRows.findLast((row) => Number(row[dataKey]) !== 0) : undefined) ??
+            chartRows.at(-1);
+          return mode === 'all' ? (
+            <LabelList
+              dataKey={dataKey}
+              position={position}
+              offset={4}
+              fontSize={10}
+              fill="var(--ink)"
+              formatter={(value: unknown) => format(Number(value))}
+            />
+          ) : (
+            // Only the latest bucket's mark: its value names where the series ends.
+            <LabelList
+              valueAccessor={(entry: { payload?: ViewRow }) =>
+                entry.payload && entry.payload.category === latest?.category
+                  ? format(Number(entry.payload[dataKey]))
+                  : null
+              }
+              position="top"
+              offset={4}
+              fontSize={10}
+              fontWeight={600}
+              fill="var(--ink)"
+            />
+          );
+        };
+        return composition ? (
           mark === 'meter' ? (
             <Meter rows={rows} series={visible[0]} unit={data.unit} format={format} />
           ) : (
@@ -423,14 +532,16 @@ export function SeriesView({
           <>
             <ChartContainer
               config={config}
-              className={`${horizontal ? '' : expanded ? 'h-[min(55vh,520px)]' : 'h-[340px]'} w-full aspect-auto`}
+              className={`${horizontal || sheet ? '' : expanded ? 'h-[min(55vh,520px)]' : 'h-[340px]'} w-full aspect-auto`}
               style={
                 horizontal
                   ? {
                       height:
-                        chartRows.length * ROW_HEIGHT + AXIS_HEIGHT + (data.reference ? 16 : 0),
+                        chartRows.length * rowHeight + AXIS_HEIGHT + (data.reference ? 16 : 0),
                     }
-                  : undefined
+                  : sheet
+                    ? { height: sheet.height }
+                    : undefined
               }
             >
               {/* The name goes on the chart's SVG, the element that takes focus (role
@@ -443,7 +554,8 @@ export function SeriesView({
                 // A reference line's label needs its own band above the first bar.
                 margin={{
                   top: horizontal && !data.reference ? 4 : 20,
-                  right: 16,
+                  // Room for the printed value beyond the longest bar.
+                  right: barLabels && horizontal ? 44 : 16,
                   left: 0,
                   bottom: 5,
                 }}
@@ -461,6 +573,7 @@ export function SeriesView({
                       {...categoryAxis}
                       width={labelWidth(chartRows.map((row) => row.category))}
                       interval={0}
+                      fontSize={rowHeight < 16 ? 9 : undefined}
                     />
                   </>
                 ) : (
@@ -550,7 +663,16 @@ export function SeriesView({
                         strokeWidth={2}
                         dot={chartRows.length <= 24}
                         isAnimationActive={false}
-                      />
+                      >
+                        {/* Stacked lines label the top one only: it is the visible total. */}
+                        {pointLabels &&
+                          (!stackedLines || i === visible.length - 1) &&
+                          valueLabel(
+                            stackedLines ? cumulative(series.key) : key,
+                            'top',
+                            pointLabels,
+                          )}
+                      </Line>
                     );
                   }
                   if (mark === 'area') {
@@ -564,7 +686,11 @@ export function SeriesView({
                         fill={series.color}
                         fillOpacity={0.4}
                         isAnimationActive={false}
-                      />
+                      >
+                        {pointLabels &&
+                          (!data.stacked || i === visible.length - 1) &&
+                          valueLabel(data.stacked ? 'total' : key, 'top', pointLabels)}
+                      </Area>
                     );
                   }
                   const top = !data.stacked || i === visible.length - 1;
@@ -590,12 +716,21 @@ export function SeriesView({
                         chartRows.map((row) => (
                           <Cell key={row.category} fillOpacity={dim(row) ? 0.3 : 1} />
                         ))}
+                      {/* A stack is labelled once, with its total, above its top segment. */}
+                      {barLabels &&
+                        top &&
+                        valueLabel(
+                          data.stacked ? 'total' : key,
+                          horizontal ? 'right' : 'top',
+                          barLabels,
+                          true,
+                        )}
                     </Bar>
                   );
                 })}
               </ComposedChart>
             </ChartContainer>
-            {overview && (
+            {overview && !sheet && (
               // A control, not a figure: the chosen span prints in the header line.
               <div className="rounded-lg border px-2 pt-2" data-print-hide>
                 <p className="px-1 text-xs text-muted-foreground">
@@ -644,22 +779,24 @@ export function SeriesView({
                 </ChartContainer>
               </div>
             )}
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              {/* Hover and arrow keys are announced by the chart's label; only clicking is spelled out. */}
-              <p className="text-xs text-muted-foreground">
-                {dimension ? 'Click a bar to focus the dashboard on it.' : ''}
-              </p>
-              {limited && (
-                <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
-                  {showAll
-                    ? `Show top ${topN}`
-                    : `Show all ${integer.format(rows.length)} ${nouns}`}
-                </Button>
-              )}
-            </div>
+            {!sheet && (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                {/* Hover and arrow keys are announced by the chart's label; only clicking is spelled out. */}
+                <p className="text-xs text-muted-foreground">
+                  {dimension ? 'Click a bar to focus the dashboard on it.' : ''}
+                </p>
+                {limited && (
+                  <Button variant="outline" size="sm" onClick={() => setShowAll(!showAll)}>
+                    {showAll
+                      ? `Show top ${topN}`
+                      : `Show all ${integer.format(rows.length)} ${nouns}`}
+                  </Button>
+                )}
+              </div>
+            )}
           </>
-        )
-      }
+        );
+      }}
       table={
         <Table containerClassName={TABLE_CONTAINER}>
           <TableHeader className="sticky top-0 bg-muted">

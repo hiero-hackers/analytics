@@ -41,7 +41,10 @@
   color-scheme: dark;
 }
 
-:root {
+/* A printed chart's sheet (print.css) keeps the light palette on screen too:
+   its preview is paper, whatever the reader's theme. */
+:root,
+[data-print-sheet] {
   /* Every text role is ≥ 4.5:1 (WCAG AA) on Paper and Sheet in both themes. */
   --header-h: 72px;
   --brand: #a7184e;
@@ -49,6 +52,7 @@
   --sidebar-surface: #f8f9fb;
   --page: #f3f5f8; /* Paper: page ground */
   --surface: #fff; /* Sheet: cards, inputs, popovers */
+  --paper: #fff; /* A printed page, previewed on screen: white in every theme */
   --ink: #15181c; /* Ink: primary text; also the active fill (--accent) */
   --muted: #59616c; /* Graphite: secondary text (5.9:1 on Paper) */
   --edge: #e2e5e9; /* Rule: card & divider borders */
@@ -174,6 +178,7 @@
   --color-background: var(--page);
   --color-foreground: var(--ink);
   --color-card: var(--surface);
+  --color-paper: var(--paper);
   --color-card-foreground: var(--ink);
   --color-popover: var(--surface);
   --color-popover-foreground: var(--ink);

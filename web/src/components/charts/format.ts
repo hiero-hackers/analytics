@@ -42,6 +42,30 @@ export function windowText(
   return until ? `Snapshot as of ${until}.` : 'Snapshot; its date is unavailable.';
 }
 
+/** A bucket in full, for a printed date range: "Mar 2026" rather than the axis's "Mar 26". */
+export function bucketLong(bucket: string, frequency: TimeseriesDocument['frequency']) {
+  if (frequency === 'year' || frequency === 'week') return bucket;
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    month: 'short',
+    year: 'numeric',
+    ...(frequency === 'month' ? {} : { day: 'numeric' as const }),
+  }).format(new Date(`${bucket}${frequency === 'month' ? '-01' : ''}T00:00:00Z`));
+}
+
+const isoDay = (time: number) => new Date(time).toISOString().slice(0, 10);
+
+/** The dates a window covers, stated for paper (the window note says how they were chosen). */
+export function rangeText(window: ChartWindow) {
+  const end = window.end ? Date.parse(window.end) : NaN;
+  if (Number.isNaN(end))
+    return window.kind === 'trailing' ? `Last ${window.days} days` : 'Not stated';
+  if (window.kind === 'trailing' && window.days)
+    return `${isoDay(end - window.days * 86_400_000)} – ${isoDay(end)} (${window.days} days)`;
+  if (window.kind === 'all') return `All recorded activity to ${isoDay(end)}`;
+  return `Snapshot on ${isoDay(end)}`;
+}
+
 /** The shade for a value: 0 = none, 1..steps on the linear scale, null = missing. */
 export function shade(value: unknown, scale: MatrixDocument['scale']): number | null {
   if (value === null || value === undefined) return null;

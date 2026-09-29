@@ -25,7 +25,8 @@ export function PrintProvider({ children }: { children: ReactNode }) {
   const restorePending = useRef(false);
   const scroll = useRef<{ element: HTMLElement; top: number; left: number }[]>([]);
   const begin = useCallback(() => {
-    if (active.current) return;
+    // A chart's print preview prints its own sheet: the tab stays as it is on screen.
+    if (active.current || document.documentElement.dataset.printScope === 'chart') return;
     active.current = true;
     restorePending.current = false;
     if (focusFrame.current !== undefined) cancelAnimationFrame(focusFrame.current);

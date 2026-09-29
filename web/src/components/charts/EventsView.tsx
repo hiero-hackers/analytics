@@ -15,11 +15,15 @@ import type { ColumnSpec, EventsDocument, Row } from '../../api';
 import { dimensionOf, matches, toggle, useFocus } from '../../focus';
 import { stamp } from '../../format';
 import { useUrlList } from '../../urlState';
-import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
-import { integer, plural, shorten, windowText } from './format';
+import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
+import { integer, plural, rangeText, shorten, windowText } from './format';
 
 const ROW_HEIGHT = 28;
 const AXIS_HEIGHT = 48;
+/** A printed timeline fits its rows to the page between these heights, then runs on. */
+const PRINT_ROW = { min: 11, max: 40 };
+/** The caption under the printed timeline. */
+const CAPTION = 24;
 const DAY = 86_400_000;
 
 type Point = Row & { t: number; y: number };
@@ -72,7 +76,12 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
 
   const controls =
     data.types.length > 1 ? (
-      <div className="flex flex-wrap gap-1" role="group" aria-label="Visible release types">
+      <div
+        className="flex flex-wrap gap-1"
+        role="group"
+        aria-label="Visible release types"
+        data-print-legend
+      >
         {data.types.map((type) => (
           <Button
             key={type.key}
@@ -105,91 +114,101 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
       </div>
     ) : null;
 
-  const chart = () => (
-    <>
-      <ChartContainer
-        config={config}
-        className="aspect-auto w-full"
-        style={{ height: Math.max(order.length, 3) * ROW_HEIGHT + AXIS_HEIGHT }}
-      >
-        <ScatterChart
-          aria-label={`${title}: ${integer.format(rows.length)} releases across ${order.length} ${nouns}. Choose Data for the full list.`}
-          margin={{ top: 8, right: 16, left: 0, bottom: 4 }}
+  const chart = (_expanded: boolean, sheet?: SheetBox) => {
+    const lines = Math.max(order.length, 3);
+    const rowHeight = sheet
+      ? Math.min(
+          PRINT_ROW.max,
+          Math.max(PRINT_ROW.min, Math.floor((sheet.height - AXIS_HEIGHT - CAPTION) / lines)),
+        )
+      : ROW_HEIGHT;
+    return (
+      <>
+        <ChartContainer
+          config={config}
+          className="aspect-auto w-full"
+          style={{ height: lines * rowHeight + AXIS_HEIGHT }}
         >
-          <CartesianGrid horizontal={false} strokeDasharray="3 3" />
-          <XAxis
-            type="number"
-            dataKey="t"
-            domain={[start, end]}
-            scale="time"
-            tickLine={false}
-            axisLine={false}
-            minTickGap={32}
-            tickFormatter={(value) => tick.format(new Date(Number(value)))}
-          />
-          <YAxis
-            type="number"
-            dataKey="y"
-            domain={[-0.5, order.length - 0.5]}
-            ticks={order.map((_, i) => i)}
-            interval={0}
-            tickLine={false}
-            axisLine={false}
-            width={190}
-            tickFormatter={(value) => {
-              const name = order[order.length - 1 - Number(value)];
-              return name ? `${shorten(name, 22)} (${counts.get(name) ?? 0})` : '';
-            }}
-          />
-          <ZAxis range={[48, 48]} />
-          <ChartTooltip
-            cursor={false}
-            content={({ active, payload }) => {
-              const point = payload?.[0]?.payload as Point | undefined;
-              if (!active || !point) return null;
-              return (
-                <div className="grid gap-1 rounded-lg border bg-card px-3 py-2 text-xs shadow-xl">
-                  <p className="font-medium">{String(point[data.label.key]) || '(untagged)'}</p>
-                  <p className="text-muted-foreground">{String(point[key])}</p>
-                  <p className="tabular-nums">{stamp(String(point.time))} UTC</p>
-                  <p>{typeLabel.get(String(point.type))}</p>
-                </div>
-              );
-            }}
-          />
-          {visible.map((type) => (
-            <Scatter
-              key={type.key}
-              name={type.label}
-              data={points(type.key)}
-              fill={type.color}
-              fillOpacity={type.key === 'prerelease' ? 0.7 : 0.55}
-              shape={type.key === 'prerelease' ? 'diamond' : 'circle'}
-              isAnimationActive={false}
-              className={dimension ? 'cursor-pointer' : undefined}
-              onClick={
-                dimension
-                  ? (point: { payload?: Point }) =>
-                      point.payload && setFocus(toggle(focus, dimension, point.payload[key]))
-                  : undefined
-              }
-            >
-              {anyFocused &&
-                points(type.key).map((point) => (
-                  <Cell
-                    key={`${String(point[key])}|${String(point.time)}`}
-                    fillOpacity={isFocused(point) ? 0.9 : 0.12}
-                  />
-                ))}
-            </Scatter>
-          ))}
-        </ScatterChart>
-      </ChartContainer>
-      <p className="text-xs text-muted-foreground">
-        Each mark is one release; the number beside a repository is its count in this window.
-      </p>
-    </>
-  );
+          <ScatterChart
+            aria-label={`${title}: ${integer.format(rows.length)} releases across ${order.length} ${nouns}. Choose Data for the full list.`}
+            margin={{ top: 8, right: 16, left: 0, bottom: 4 }}
+          >
+            <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+            <XAxis
+              type="number"
+              dataKey="t"
+              domain={[start, end]}
+              scale="time"
+              tickLine={false}
+              axisLine={false}
+              minTickGap={32}
+              tickFormatter={(value) => tick.format(new Date(Number(value)))}
+            />
+            <YAxis
+              type="number"
+              dataKey="y"
+              domain={[-0.5, order.length - 0.5]}
+              ticks={order.map((_, i) => i)}
+              interval={0}
+              tickLine={false}
+              axisLine={false}
+              width={190}
+              fontSize={rowHeight < 16 ? 9 : undefined}
+              tickFormatter={(value) => {
+                const name = order[order.length - 1 - Number(value)];
+                return name ? `${shorten(name, 22)} (${counts.get(name) ?? 0})` : '';
+              }}
+            />
+            <ZAxis range={[48, 48]} />
+            <ChartTooltip
+              cursor={false}
+              content={({ active, payload }) => {
+                const point = payload?.[0]?.payload as Point | undefined;
+                if (!active || !point) return null;
+                return (
+                  <div className="grid gap-1 rounded-lg border bg-card px-3 py-2 text-xs shadow-xl">
+                    <p className="font-medium">{String(point[data.label.key]) || '(untagged)'}</p>
+                    <p className="text-muted-foreground">{String(point[key])}</p>
+                    <p className="tabular-nums">{stamp(String(point.time))} UTC</p>
+                    <p>{typeLabel.get(String(point.type))}</p>
+                  </div>
+                );
+              }}
+            />
+            {visible.map((type) => (
+              <Scatter
+                key={type.key}
+                name={type.label}
+                data={points(type.key)}
+                fill={type.color}
+                fillOpacity={type.key === 'prerelease' ? 0.7 : 0.55}
+                shape={type.key === 'prerelease' ? 'diamond' : 'circle'}
+                isAnimationActive={false}
+                className={dimension ? 'cursor-pointer' : undefined}
+                onClick={
+                  dimension
+                    ? (point: { payload?: Point }) =>
+                        point.payload && setFocus(toggle(focus, dimension, point.payload[key]))
+                    : undefined
+                }
+              >
+                {anyFocused &&
+                  points(type.key).map((point) => (
+                    <Cell
+                      key={`${String(point[key])}|${String(point.time)}`}
+                      fillOpacity={isFocused(point) ? 0.9 : 0.12}
+                    />
+                  ))}
+              </Scatter>
+            ))}
+          </ScatterChart>
+        </ChartContainer>
+        <p className="text-xs text-muted-foreground">
+          Each mark is one release; the number beside a repository is its count in this window.
+        </p>
+      </>
+    );
+  };
 
   const table = (
     <Table containerClassName={TABLE_CONTAINER}>
@@ -232,6 +251,17 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
       empty={!rows.length}
       focusFound={!focus || focus.dimension !== dimension || anyFocused}
       emptyText="No releases were published in this window."
+      printFilters={[
+        { label: 'Date range', value: rangeText(data.window) },
+        hidden.length > 0 && {
+          label: 'Hidden release types',
+          value: data.types
+            .filter((type) => hidden.includes(type.key))
+            .map((type) => type.label)
+            .join(', '),
+        },
+      ]}
+      printAspect={900 / (Math.max(order.length, 3) * 24 + AXIS_HEIGHT)}
       windowNote={windowText(data.window)}
       csv={() => ({
         name: `${data.id}-selected`,

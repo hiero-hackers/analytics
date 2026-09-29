@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { fetchApiText, type ChartSection, type ChartSpec, type Manifest } from '../api';
 import { downloadCsvText } from '../csv';
 import { usePrintMode } from '../printContext';
+import { ChartSectionTitle } from './charts/leading';
 import { CopyLinkButton } from './CopyLinkButton';
 import { DownloadButton } from './CsvDownloadButton';
 import { SectionCard } from './SectionCard';
@@ -32,6 +33,7 @@ const axisOf = (chart: ChartSpec) => JSON.stringify(chart.variants.map((variant)
 
 function Figure({
   chart,
+  section,
   stateKey,
   slide = false,
   stretch = false,
@@ -41,6 +43,8 @@ function Figure({
   hidden = false,
 }: {
   chart: ChartSpec;
+  /** The card's title, which the printed chart names above its own. */
+  section: string;
   /** URL key for this figure's own tab, so a shared link opens the same variant. */
   stateKey: string;
   provenance: Manifest['provenance'];
@@ -86,24 +90,26 @@ function Figure({
             </p>
           }
         >
-          <InteractiveChart
-            key={active.interactive.path}
-            variant={active}
-            title={chart.title}
-            provenance={provenance}
-            roomy={lead}
-            leading={
-              axis ? undefined : (
-                <VariantTabs
-                  appearance="segmented"
-                  labels={chart.variants.map((option) => option.label)}
-                  active={variant}
-                  onSelect={setOwn}
-                  ariaLabel={`${chart.title} view`}
-                />
-              )
-            }
-          />
+          <ChartSectionTitle.Provider value={section}>
+            <InteractiveChart
+              key={active.interactive.path}
+              variant={active}
+              title={chart.title}
+              provenance={provenance}
+              roomy={lead}
+              leading={
+                axis ? undefined : (
+                  <VariantTabs
+                    appearance="segmented"
+                    labels={chart.variants.map((option) => option.label)}
+                    active={variant}
+                    onSelect={setOwn}
+                    ariaLabel={`${chart.title} view`}
+                  />
+                )
+              }
+            />
+          </ChartSectionTitle.Provider>
         </Suspense>
       ) : (
         <div
@@ -278,6 +284,7 @@ export function ChartSectionCard({
             <Figure
               key={chart.title}
               chart={chart}
+              section={section.title}
               stateKey={`${section.id}.${index}.tab`}
               provenance={provenance}
               slide
@@ -294,6 +301,7 @@ export function ChartSectionCard({
             <Figure
               key={chart.title}
               chart={chart}
+              section={section.title}
               stateKey={`${section.id}.${index}.tab`}
               provenance={provenance}
               stretch={stretched[index]}
