@@ -12,6 +12,7 @@ import {
   filterLabel,
   PAPER_STORAGE_KEY,
   pageRule,
+  pageTops,
   storedPaper,
 } from '../chartPrint';
 import { PrintSheetContext } from '../printContext';
@@ -166,6 +167,15 @@ describe('paper', () => {
     expect(defaultPaper('not a locale')).toBe('a4');
     window.localStorage.setItem(PAPER_STORAGE_KEY, 'a4');
     expect(storedPaper()).toBe('a4');
+  });
+
+  it('breaks pages between rows, leaving space rather than splitting one', () => {
+    // Rows end at 100, 190, 290 and 390px; 200px fit on a page.
+    expect(pageTops([100, 190, 290, 390], 400, 200)).toEqual([0, 190, 390]);
+    // A sheet that fits needs no break.
+    expect(pageTops([100], 180, 200)).toEqual([0]);
+    // With no break in the lower half of a page, the page is cut where it ends.
+    expect(pageTops([20], 450, 200)).toEqual([0, 200, 400]);
   });
 
   it('names downloaded files after the chart and its paper', () => {

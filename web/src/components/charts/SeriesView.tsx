@@ -532,6 +532,8 @@ export function SeriesView({
           <>
             <ChartContainer
               config={config}
+              // One row per category: a printed page may break between them (breakPoints).
+              data-print-rows={horizontal || undefined}
               className={`${horizontal || sheet ? '' : expanded ? 'h-[min(55vh,520px)]' : 'h-[340px]'} w-full aspect-auto`}
               style={
                 horizontal

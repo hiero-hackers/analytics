@@ -263,6 +263,13 @@ with no PDF library. GitHub avatars are left out, because the page's CSP
 The PDF is an image of the page, so its text cannot be selected; Print keeps
 the text.
 
+A PDF that runs past one page breaks only between rows: under a heatmap row, or
+midway between two rows of a ranking or timeline (`breakPoints` and `pageTops`
+in `chartPrint.ts`). A page ends at the last break that fits and leaves white
+space rather than splitting a row. The preview's page-break guides use the same
+breaks. Native Print still breaks rankings and timelines where the page ends,
+because the browser cannot split a single SVG between its rows.
+
 **No browser header or footer.** The browser prints its own date, title and URL
 in the page margin. The chart's page rule sets the margin to 0, and the sheet
 pads itself by 12 mm instead (`box-decoration-break: clone`, so every printed

@@ -126,6 +126,8 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
       <>
         <ChartContainer
           config={config}
+          // One row per repository: a printed page may break between them (breakPoints).
+          data-print-rows
           className="aspect-auto w-full"
           style={{ height: lines * rowHeight + AXIS_HEIGHT }}
         >

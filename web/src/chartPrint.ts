@@ -53,6 +53,50 @@ export function pageRule(paper: Paper, orientation: Orientation) {
   return `@page { size: ${PAPERS[paper].size} ${orientation}; margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }`;
 }
 
+/**
+ * Where a sheet may break between pages, in its own CSS pixels from the top:
+ * under its header or a footer note, under a heatmap row, or between two rows
+ * of a ranking or timeline (charts marked `data-print-rows`), never through one.
+ */
+export function breakPoints(sheet: HTMLElement): number[] {
+  const box = sheet.getBoundingClientRect();
+  // The preview scales the sheet on screen; positions are wanted at print size.
+  const ratio = box.height / sheet.offsetHeight || 1;
+  const at = (y: number) => (y - box.top) / ratio;
+  const points = [...sheet.querySelectorAll('header, footer > *, [data-print-chart] tr')].map(
+    (element) => at(element.getBoundingClientRect().bottom),
+  );
+  // Recharts draws an axis's labels in their own layer, apart from the axis group.
+  for (const labels of sheet.querySelectorAll('[data-print-rows] .recharts-yAxis-tick-labels')) {
+    const centres = [...labels.querySelectorAll('.recharts-cartesian-axis-tick-value')]
+      .map((tick) => {
+        const { top, bottom } = tick.getBoundingClientRect();
+        return at((top + bottom) / 2);
+      })
+      .sort((a, b) => a - b);
+    // Midway between two row labels is the gap between their bars.
+    for (let index = 1; index < centres.length; index++) {
+      points.push((centres[index - 1] + centres[index]) / 2);
+    }
+  }
+  return points.sort((a, b) => a - b);
+}
+
+/**
+ * Where each page starts, for a sheet `height` tall with `page` of it fitting
+ * on each page. A page ends at the last break that fits, leaving white space
+ * rather than splitting a row; only a row taller than half a page is cut.
+ */
+export function pageTops(breaks: number[], height: number, page: number): number[] {
+  const tops = [0];
+  while (height - tops[tops.length - 1] > page + 0.5) {
+    const top = tops[tops.length - 1];
+    const fits = breaks.filter((point) => point > top + page / 2 && point <= top + page);
+    tops.push(fits.length ? fits[fits.length - 1] : top + page);
+  }
+  return tops;
+}
+
 /** Regions whose default office paper is Letter; everywhere else prints on A4. */
 const LETTER_REGIONS = new Set(['US', 'CA', 'MX', 'PH', 'CL', 'CO', 'VE', 'GT', 'CR', 'PA', 'PR']);
 

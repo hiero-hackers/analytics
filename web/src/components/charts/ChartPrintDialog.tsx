@@ -20,9 +20,11 @@ import {
 } from '@/components/ui/dialog';
 import {
   bestOrientation,
+  breakPoints,
   contentBox,
   MARGIN,
   pageRule,
+  pageTops,
   PAPERS,
   paperBox,
   PX_PER_MM,
@@ -173,23 +175,51 @@ export function ChartPrintDialog({
   const [withExplanation, setWithExplanation] = useState(false);
   // Off by default too: the sheet already states when its data was generated.
   const [withDate, setWithDate] = useState(false);
-  const [measureSheet, sheet] = useElementSize();
-  // The sheet element itself, which Download renders to a file.
+  const recommended = bestOrientation(aspect, paper);
+  const orientation = choice === 'auto' ? recommended : choice;
+  const contentHeight = contentBox(paper, orientation).height * PX_PER_MM;
+  // The sheet (which Download renders to a file), its height, and where each of
+  // its pages starts: between rows, the same breaks the downloaded PDF uses.
   const sheetNode = useRef<HTMLElement | null>(null);
+  const [layout, setLayout] = useState({ height: 0, tops: [0] });
   const sheetRef = useCallback(
     (element: HTMLElement | null) => {
       sheetNode.current = element;
-      return measureSheet(element);
+      if (!element) return;
+      let frame = 0;
+      // Once the charts inside have drawn, whenever the sheet resizes or they redraw.
+      const measure = () => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const next = {
+            height: element.offsetHeight,
+            tops: pageTops(breakPoints(element), element.offsetHeight, contentHeight),
+          };
+          // Unchanged layouts are dropped, so re-rendering cannot feed back into itself.
+          setLayout((current) =>
+            current.height === next.height && current.tops.join() === next.tops.join()
+              ? current
+              : next,
+          );
+        });
+      };
+      const resized = new ResizeObserver(measure);
+      const redrawn = new MutationObserver(measure);
+      resized.observe(element);
+      redrawn.observe(element, { subtree: true, childList: true, attributes: true });
+      return () => {
+        cancelAnimationFrame(frame);
+        resized.disconnect();
+        redrawn.disconnect();
+      };
     },
-    [measureSheet],
+    [contentHeight],
   );
   const [format, setFormat] = useState<FileFormat>('pdf');
   const [saving, setSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const [stageRef, stage] = useElementSize();
-  const sheetHeight = sheet?.height ?? 0;
-  const recommended = bestOrientation(aspect, paper);
-  const orientation = choice === 'auto' ? recommended : choice;
+  const sheetHeight = layout.height;
   // Escape that dismisses the browser's print dialog must not close the preview too.
   const printingRef = useRef(false);
 
@@ -209,10 +239,9 @@ export function ChartPrintDialog({
   const page = paperBox(paper, orientation);
   const pageWidth = page.width * PX_PER_MM;
   const pageHeight = page.height * PX_PER_MM;
-  const contentHeight = contentBox(paper, orientation).height * PX_PER_MM;
   const margin = MARGIN * PX_PER_MM;
-  // A tall selection (every row of a long ranking) runs on; the browser breaks it into pages.
-  const pages = Math.max(1, Math.ceil(sheetHeight / contentHeight - 0.001));
+  // A tall selection (every row of a long ranking) runs on to further pages.
+  const pages = layout.tops.length;
   // The whole first page fits the stage's width and its height cap (64dvh, at most 680px).
   const stageCap = Math.min(window.innerHeight * 0.64, 680);
   const scale = stage
@@ -295,13 +324,14 @@ export function ChartPrintDialog({
                   withDate={withDate}
                 />
               </div>
-              {Array.from({ length: pages - 1 }, (_, index) => (
+              {layout.tops.slice(1).map((top) => (
                 <div
-                  key={index}
+                  key={top}
                   data-print-chrome
+                  data-page-break
                   aria-hidden="true"
                   className="absolute inset-x-0 border-t border-dashed border-link"
-                  style={{ top: (margin + (index + 1) * contentHeight) * scale }}
+                  style={{ top: (margin + top) * scale }}
                 />
               ))}
             </div>

@@ -6,7 +6,9 @@
  */
 
 import {
+  breakPoints,
   contentBox,
+  pageTops,
   MARGIN,
   PAPERS,
   paperBox,
@@ -78,13 +80,14 @@ async function layOut(sheet: HTMLElement, paper: Paper, orientation: Orientation
     context.drawImage(drawn, margin, margin);
     return [canvas];
   }
-  const slice = content.height * PX_PER_MM * scale;
-  const count = Math.max(1, Math.ceil(drawn.height / slice - 0.001));
-  return Array.from({ length: count }, (_, index) => {
+  // The same pages as the preview: each ends between rows, never through one.
+  const tops = pageTops(breakPoints(sheet), sheet.offsetHeight, content.height * PX_PER_MM);
+  return tops.map((top, index) => {
     const { canvas, context } = blank(width, pageHeight * scale);
-    const top = index * slice;
-    const height = Math.min(slice, drawn.height - top);
-    context.drawImage(drawn, 0, top, drawn.width, height, margin, margin, drawn.width, height);
+    const from = Math.round(top * scale);
+    const to = Math.round((tops[index + 1] ?? sheet.offsetHeight) * scale);
+    const height = Math.min(to, drawn.height) - from;
+    context.drawImage(drawn, 0, from, drawn.width, height, margin, margin, drawn.width, height);
     return canvas;
   });
 }

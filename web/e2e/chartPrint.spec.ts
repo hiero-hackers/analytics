@@ -204,7 +204,31 @@ test('a long ranking prints portrait and states when it needs more than one page
     const printed = await printedPdf(page, testInfo.outputPath('ranking.pdf'));
     expect(printed.pages).toBe(2);
   }
-  // The downloaded PDF breaks the same sheet into the same pages.
+  // Pages break between rows, never through one: each break sits midway between
+  // two neighbouring row labels, measured at print size.
+  const breaks = await sheet(page).evaluate((element: HTMLElement) => {
+    const box = element.getBoundingClientRect();
+    const ratio = box.height / element.offsetHeight;
+    const at = (y: number) => (y - box.top) / ratio;
+    const centres = [
+      ...element.querySelectorAll(
+        '[data-print-rows] .recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value',
+      ),
+    ]
+      .map((label) => {
+        const { top, bottom } = label.getBoundingClientRect();
+        return at((top + bottom) / 2);
+      })
+      .sort((a, b) => a - b);
+    return [...document.querySelectorAll('[data-page-break]')].map((line) => {
+      const y = at(line.getBoundingClientRect().top);
+      const below = centres.findIndex((centre) => centre > y);
+      return below > 0 ? Math.abs(y - (centres[below - 1] + centres[below]) / 2) : Infinity;
+    });
+  });
+  expect(breaks).toHaveLength(1);
+  expect(breaks[0]).toBeLessThan(0.5);
+  // The downloaded PDF breaks the sheet at the same places, into the same pages.
   expect(pdfPages((await download(page, 'PDF')).bytes).pages).toBe(2);
 });
 
