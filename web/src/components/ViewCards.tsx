@@ -5,8 +5,16 @@
  * section — same rows the evidence table shows, no duplicated payload.
  */
 
-import { useMemo, useRef, useState } from 'react';
-import type { BoardView, Manifest, MatrixView, Row, SectionDoc, ViewDoc } from '../api';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import type {
+  BoardView,
+  CIHealthMatrixView,
+  Manifest,
+  MatrixView,
+  Row,
+  SectionDoc,
+  ViewDoc,
+} from '../api';
 import { CoverageMatrix, type JumpRequest } from './CoverageMatrix';
 import { type CsvExportSource } from '../csv';
 import { CopyLinkButton } from './CopyLinkButton';
@@ -14,6 +22,7 @@ import { CsvDownloadButton } from './CsvDownloadButton';
 import type { EvidenceItem } from './EvidencePanel';
 import { SectionCard } from './SectionCard';
 import { StatusBoard } from './StatusBoard';
+import { CIHealthMatrix } from './CIHealthMatrix';
 
 /** Per-cell evidence keyed "<entity>|<repo>", newest merged first. */
 function evidenceByCell(rows: Row[]): Map<string, EvidenceItem[]> {
@@ -72,6 +81,34 @@ function matrixExport(view: MatrixView): CsvExportSource {
   };
 }
 
+function ciHealthMatrixExport(
+  view: CIHealthMatrixView,
+  rows: CIHealthMatrixView['rows'] = view.rows,
+): CsvExportSource {
+  return {
+    name: 'ci_health_matrix',
+    title: view.title,
+    columns: [
+      { key: 'repo', label: 'repository' },
+      ...view.columns.map((column) => ({
+        key: column.key,
+        label: column.label,
+      })),
+    ],
+    rows: rows.map((row) => {
+      const record: Row = {
+        repo: row.label,
+      };
+
+      for (const cell of row.cells) {
+        record[cell.key] = cell.status;
+      }
+
+      return record;
+    }),
+  };
+}
+
 function boardExport(view: BoardView): CsvExportSource {
   return {
     name: 'hip_governance_board',
@@ -103,7 +140,14 @@ export function ViewCards({
   provenance: Manifest['provenance'];
 }) {
   const [jump, setJump] = useState<JumpRequest | null>(null);
+  const [ciHealthRows, setCiHealthRows] = useState<Record<string, CIHealthMatrixView['rows']>>({});
   const jumpCounter = useRef(0);
+
+  const onCiHealthRows = useCallback((viewId: string, rows: CIHealthMatrixView['rows']) => {
+    setCiHealthRows((current) =>
+      current[viewId] === rows ? current : { ...current, [viewId]: rows },
+    );
+  }, []);
 
   const matrix = views.find((view): view is MatrixView => view.kind === 'matrix');
   const evidence = useMemo(() => {
@@ -114,7 +158,13 @@ export function ViewCards({
   return (
     <>
       {views.map((view) => {
-        const exportSource = view.kind === 'board' ? boardExport(view) : matrixExport(view);
+        const exportSource =
+          view.kind === 'board'
+            ? boardExport(view)
+            : view.kind === 'matrix'
+              ? matrixExport(view)
+              : ciHealthMatrixExport(view, ciHealthRows[view.id]);
+
         return (
           <SectionCard
             key={view.id}
@@ -131,7 +181,10 @@ export function ViewCards({
                   provenance={provenance}
                   payload={() => ({
                     ...exportSource,
-                    total: exportSource.rows.length,
+                    total:
+                      view.kind === 'ci_health_matrix'
+                        ? view.rows.length
+                        : exportSource.rows.length,
                     dataAsOf: view.generated_at,
                   })}
                 />
@@ -147,8 +200,10 @@ export function ViewCards({
                   view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
                 }
               />
-            ) : (
+            ) : view.kind === 'matrix' ? (
               <CoverageMatrix view={view} evidence={evidence} jump={jump} />
+            ) : (
+              <CIHealthMatrix view={view} onFilteredRows={onCiHealthRows} />
             )}
           </SectionCard>
         );

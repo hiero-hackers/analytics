@@ -110,6 +110,38 @@ export interface MatrixCell {
   open: number;
 }
 
+export interface CIHealthCell {
+  key: string;
+  label: string;
+  status: 'pass' | 'fail' | 'review' | 'na';
+  evidence: string;
+  location: string;
+}
+
+export interface CIHealthRow {
+  key: string;
+  label: string;
+  cells: CIHealthCell[];
+}
+
+/** Repository x CI-health-check matrix. */
+export interface CIHealthMatrixView {
+  id: string;
+  kind: 'ci_health_matrix';
+  macro: string;
+  group?: string;
+  title: string;
+  description: string;
+  badge: string;
+  source: string;
+  row_header: string;
+  columns: { key: string; label: string }[];
+  rows: CIHealthRow[];
+  filters: string[];
+  generated_at?: string;
+  stale?: boolean;
+}
+
 /** The trailing parity note of a matrix row (e.g. which SDKs lack PRs). */
 export interface GapNote {
   kind: 'complete' | 'none' | 'partial';
@@ -174,7 +206,7 @@ export interface BoardView {
   stale?: boolean;
 }
 
-export type ViewDoc = MatrixView | BoardView;
+export type ViewDoc = MatrixView | BoardView | CIHealthMatrixView;
 
 export interface MetricTile {
   label: string;

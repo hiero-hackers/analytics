@@ -44,6 +44,19 @@
   --warn-ink: #8a6200; /* warning text */
   --neg: #b3261e; /* error text */
 
+  /* CI health matrix status palette. These are intended for filled matrix
+   cells, so they are softer than the general marker/text colors above. */
+  --ci-pass: #eaf5ea;
+  --ci-pass-ink: #237523;
+  --ci-fail: #efb0b0;
+  --ci-fail-ink: #8f2929;
+  --ci-review: #f2d58b;
+  --ci-review-ink: #6f5200;
+  --ci-na: #f1f1f1;
+  --ci-na-ink: #777;
+  --on-ci-fail: #fff;
+  --on-ci-review: #1b1b1b;
+
   /* Shape & motion: shared control geometry, one hover timing everywhere. */
   --r-card: 12px;
   --r-control: 6px;
@@ -106,6 +119,15 @@
     --warn-ink: #d9b05c;
     --neg: #e57373;
 
+    --ci-pass: #203a27;
+    --ci-pass-ink: #7fd08a;
+    --ci-fail: #7a2525;
+    --ci-fail-ink: #f46f6f;
+    --ci-review: #a1761f;
+    --ci-review-ink: #ffc21c;
+    --ci-na: #262626;
+    --ci-na-ink: #888;
+
     /* The ramp inverts on a dark ground: "more" has to mean *brighter*, since
        ink-on-white becomes light-on-black. Reusing the light ramp here would
        put its palest, loudest bucket on the lowest counts and sink the highest
@@ -144,6 +166,10 @@
   --color-warn: var(--warn);
   --color-warn-ink: var(--warn-ink);
   --color-neg: var(--neg);
+  --color-ci-fail: var(--ci-fail);
+  --color-ci-review: var(--ci-review);
+  --color-on-ci-fail: var(--on-ci-fail);
+  --color-on-ci-review: var(--on-ci-review);
 }
 
 /* ---- Page & element defaults --------------------------------------------- */
@@ -1329,6 +1355,311 @@
   }
   .hipboard-info button {
     margin-left: auto;
+  }
+
+  /* ---- CI health matrix --------------------------------------------------
+    Repository x check status matrix. Kept separate from the HIP matrix
+    because the two views have different data and interaction models.
+    Status colors use the shared semantic palette so light/dark mode follows
+    the dashboard automatically.
+  */
+  .cimx-wrap {
+    overflow: auto;
+    max-height: 560px;
+    max-height: min(560px, 60vh);
+    max-height: min(560px, 60dvh);
+    border: 1px solid var(--edge-faint);
+    border-radius: var(--r-frame);
+    padding: 0 6px 6px 0;
+  }
+
+  .cimx {
+    border-collapse: separate;
+    border-spacing: 2px;
+    font-size: 12px;
+    width: 100%;
+    min-width: 680px;
+  }
+
+  .cimx thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+    text-align: center;
+    font-size: 11px;
+  }
+
+  .cimx th {
+    border-bottom: none;
+    cursor: default;
+    padding: 5px 8px;
+    color: var(--muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .cimx th:hover {
+    background: none;
+  }
+
+  .cimx thead th:first-child {
+    text-align: left;
+    min-width: 310px;
+  }
+
+  .cimx tbody th {
+    min-width: 310px;
+    position: static;
+    background: none;
+    text-align: left;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .cimx tbody tr:hover th {
+    background: var(--raise);
+  }
+
+  .cimx td {
+    width: 150px;
+    min-width: 150px;
+    height: 30px;
+    text-align: center;
+    border-bottom: none;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-weight: 600;
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  .cimx td.cimx-pass {
+    background: var(--ci-pass);
+    border: 1px solid var(--edge-input);
+    color: var(--ci-pass-ink);
+  }
+
+  .cimx td.cimx-fail {
+    background: var(--ci-fail);
+    border: 1px solid var(--ci-fail);
+    color: var(--ci-fail-ink);
+    cursor: pointer;
+  }
+
+  .cimx td.cimx-review {
+    background: var(--ci-review);
+    border: 1px solid var(--ci-review);
+    color: var(--ci-review-ink);
+    cursor: pointer;
+  }
+
+  .cimx td.cimx-na {
+    background: var(--ci-na);
+    border: 1px dashed var(--edge-strong);
+    color: var(--ci-na-ink);
+  }
+
+  .cimx td.cimx-fail:hover,
+  .cimx td.cimx-review:hover {
+    filter: brightness(0.95);
+  }
+
+  .cimx td.selected {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  .cimx td:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  .cimx-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .cimx-filters .search {
+    margin-bottom: 0;
+  }
+
+  .cimx-fbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--soft);
+  }
+
+  .cimx-fbtn {
+    padding: 3px 11px;
+    border: 1px solid var(--edge-input);
+    background: var(--surface);
+    border-radius: var(--r-pill);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  .cimx-fbtn:hover {
+    border-color: var(--soft);
+  }
+
+  .cimx-fbtn.active {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+
+  .cimx-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .cimx-legend .cimx-cell {
+    width: 22px;
+    height: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 2px;
+    padding: 0;
+  }
+
+  .cimx-legend .cimx-pass {
+    background: var(--ci-pass);
+    border: 1px solid var(--edge-input);
+  }
+
+  .cimx-legend .cimx-fail {
+    background: var(--ci-fail);
+    border: 1px solid var(--ci-fail);
+  }
+
+  .cimx-legend .cimx-review {
+    background: var(--ci-review);
+    border: 1px solid var(--ci-review);
+  }
+
+  .cimx-legend .cimx-na {
+    background: var(--ci-na);
+    border: 1px dashed var(--edge-strong);
+  }
+
+  .cimx-evidence {
+    margin-top: 12px;
+    border: 1px solid var(--edge);
+    border-radius: var(--r-frame);
+    padding: 12px 14px;
+    background: var(--surface);
+  }
+
+  .cimx-evidence-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .cimx-evidence-head h3 {
+    font-size: 13.5px;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .cimx-evidence-head button {
+    margin-left: auto;
+  }
+
+  .cimx-status {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: var(--r-pill);
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+
+  .cimx-status.fail {
+    background: var(--ci-fail);
+    color: var(--on-ci-fail);
+  }
+
+  .cimx-status.review {
+    background: var(--ci-review);
+    color: var(--on-ci-review);
+  }
+
+  .cimx-status.pass {
+    background: var(--raise);
+    color: var(--ok-ink);
+  }
+
+  .cimx-status.na {
+    background: var(--raise);
+    color: var(--soft);
+  }
+
+  .cimx-evidence-body h4 {
+    margin: 10px 0 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cimx-evidence-body h4:first-child {
+    margin-top: 0;
+  }
+
+  .cimx-evidence-body p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .cimx-evidence-body ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+  }
+
+  .cimx-evidence-body li {
+    padding: 3px 0;
+    font-size: 12px;
+  }
+
+  .cimx-evidence-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--soft);
+  }
+
+  @media (max-width: 720px) {
+    .cimx {
+      min-width: 620px;
+    }
+
+    .cimx td {
+      width: 130px;
+      min-width: 130px;
+    }
+
+    .cimx th {
+      padding: 4px 6px;
+    }
   }
 
   /* ---- Responsive layout (component layer) ---------------------------------

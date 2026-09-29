@@ -1,0 +1,567 @@
+"""Tests for GitHub Actions workflow security checks."""
+
+from hiero_analytics.analysis.ci_health import (
+    CODEQL_PATTERNS,
+    check_actions_sha_pinned,
+    check_explicit_permissions,
+    check_repository_security_configuration,
+    extract_action_references,
+    find_permissions_with_lines,
+    find_unpinned_actions,
+    find_unpinned_actions_with_lines,
+    find_workflow_names_containing,
+    has_explicit_permissions,
+    is_sha_pinned,
+)
+
+
+def test_extract_action_references() -> None:
+    """Test extraction of Actions references from workflow YAML."""
+    workflow = """
+    jobs:
+      build:
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-java@main
+        permissions:
+          uses: something/example@v1
+    """
+
+    assert extract_action_references(workflow) == [
+        "actions/checkout@v4",
+        "actions/setup-java@main",
+        "something/example@v1",
+    ]
+
+
+def test_is_sha_pinned() -> None:
+    """Test detection of full commit SHA references."""
+    assert is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef01234567")
+    assert not is_sha_pinned("actions/checkout@v4")
+    assert not is_sha_pinned("actions/checkout@main")
+
+
+def test_is_sha_pinned_rejects_invalid_sha_lengths() -> None:
+    """Test that only full-length commit SHAs are accepted."""
+    assert not is_sha_pinned("actions/checkout@0123456789abcdef")
+    assert not is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef012345678")
+
+
+def test_is_sha_pinned_accepts_full_commit_sha() -> None:
+    """Accept a full 40-character commit SHA."""
+    assert is_sha_pinned("actions/checkout@0123456789abcdef0123456789abcdef01234567")
+
+
+def test_is_sha_pinned_accepts_dollar_references() -> None:
+    """Accept immutable dollar-prefixed references."""
+    assert is_sha_pinned("$/some-reference")
+
+
+def test_is_sha_pinned_accepts_full_docker_digest() -> None:
+    """Accept Docker references with a full SHA-256 digest."""
+    assert is_sha_pinned(
+        "docker://ghcr.io/owner/image@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    )
+
+
+def test_is_sha_pinned_rejects_partial_docker_digest() -> None:
+    """Reject Docker references with an incomplete digest."""
+    assert not is_sha_pinned("docker://ghcr.io/owner/image@sha256:0123456789abcdef")
+
+
+def test_is_sha_pinned_rejects_local_action() -> None:
+    """Reject local actions that are not pinned to an immutable revision."""
+    assert not is_sha_pinned("./some-local-action")
+
+
+def test_find_unpinned_actions() -> None:
+    """Test detection of Actions references that are not SHA pinned."""
+    workflow = """
+    jobs:
+      build:
+        steps:
+          - uses: actions/checkout@v4
+          - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+          - uses: actions/setup-node@main
+    """
+
+    assert find_unpinned_actions(workflow) == [
+        "actions/checkout@v4",
+        "actions/setup-node@main",
+    ]
+
+
+def test_find_unpinned_actions_with_lines() -> None:
+    """Test detection of unpinned Actions references with line numbers."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+      - uses: actions/setup-node@main
+"""
+
+    assert find_unpinned_actions_with_lines(workflow) == [
+        ("actions/checkout@v4", 6),
+        ("actions/setup-node@main", 8),
+    ]
+
+
+def test_check_actions_sha_pinned_fails_for_unpinned_actions() -> None:
+    """Test that unpinned Actions produce a failing check result."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+""",
+        },
+        {
+            "name": "release.yml",
+            "text": """jobs:
+  release:
+    steps:
+      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+""",
+        },
+    ]
+
+    result = check_actions_sha_pinned(workflows)
+
+    assert result.check == "actions_sha_pinned"
+    assert result.band == "actions"
+    assert result.status == "fail"
+    assert "actions/checkout@v4" in result.evidence
+    assert result.location == ".github/workflows/build.yml:4"
+
+
+def test_check_actions_sha_pinned_passes_when_all_actions_are_pinned() -> None:
+    """Test that fully pinned workflows produce a passing check result."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """
+            jobs:
+              build:
+                steps:
+                  - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+                  - uses: actions/setup-java@0123456789abcdef0123456789abcdef01234567
+            """,
+        },
+        {
+            "name": "release.yml",
+            "text": """
+            jobs:
+              release:
+                steps:
+                  - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+            """,
+        },
+    ]
+
+    result = check_actions_sha_pinned(workflows)
+
+    assert result.check == "actions_sha_pinned"
+    assert result.band == "actions"
+    assert result.status == "pass"
+    assert result.evidence == "All GitHub Actions are pinned to full commit SHAs."
+    assert result.location == ""
+
+
+def test_find_workflow_names_containing_ignores_comments() -> None:
+    """Ignore security-control patterns appearing only in YAML comments."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": """
+name: Security
+
+# TODO: add codeql
+# uses: github/codeql-action/init
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "test"
+""",
+        }
+    ]
+
+    assert find_workflow_names_containing(workflows, CODEQL_PATTERNS) == []
+
+
+def test_find_workflow_names_containing_detects_active_codeql() -> None:
+    """Detect an active CodeQL workflow reference."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": """
+name: Security
+
+jobs:
+  codeql:
+    steps:
+      - uses: github/codeql-action/init@0123456789abcdef0123456789abcdef01234567
+""",
+        }
+    ]
+
+    assert find_workflow_names_containing(workflows, CODEQL_PATTERNS) == ["security.yml"]
+
+
+def test_find_permissions_with_lines() -> None:
+    """Test detection of explicit permissions declarations with line numbers."""
+    workflow = """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      packages: read
+"""
+
+    assert find_permissions_with_lines(workflow) == [3, 8]
+
+
+def test_has_explicit_permissions_accepts_workflow_permissions() -> None:
+    """Accept workflow-level permissions coverage."""
+    workflow = """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+"""
+
+    assert has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_accepts_per_job_permissions() -> None:
+    """Accept permissions declared for every job."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+  test:
+    permissions:
+      contents: read
+"""
+
+    assert has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_rejects_partial_job_permissions() -> None:
+    """Reject workflows where only some jobs declare permissions."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+  test:
+    runs-on: ubuntu-latest
+"""
+
+    assert not has_explicit_permissions(workflow)
+
+
+def test_has_explicit_permissions_rejects_missing_permissions() -> None:
+    """Reject workflows without explicit permissions coverage."""
+    workflow = """name: CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+"""
+
+    assert not has_explicit_permissions(workflow)
+
+
+def test_check_explicit_permissions_passes_with_top_level_permissions() -> None:
+    """Test that top-level permissions produce a passing check result."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+""",
+        }
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "pass"
+    assert "All 1 workflow(s)" in result.evidence
+    assert result.location == ".github/workflows/build.yml:3"
+
+
+def test_check_explicit_permissions_passes_with_job_permissions() -> None:
+    """Test that every job declaring permissions produces a passing check."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+  test:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+""",
+        }
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "pass"
+    assert result.location == (".github/workflows/build.yml:5; .github/workflows/build.yml:9")
+
+
+def test_check_explicit_permissions_fails_with_partial_job_permissions() -> None:
+    """Test that partial job-level permissions coverage fails."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
+""",
+        }
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "fail"
+    assert "build.yml" in result.evidence
+    assert result.location == ".github/workflows/build.yml:5"
+
+
+def test_check_explicit_permissions_passes_with_empty_permissions() -> None:
+    """Test that an explicit empty permissions block passes."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+""",
+        }
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "pass"
+    assert result.location == ".github/workflows/build.yml:3"
+
+
+def test_check_explicit_permissions_fails_when_permissions_are_missing() -> None:
+    """Test that missing permissions produce a failing check result."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+""",
+        },
+        {
+            "name": "release.yml",
+            "text": """name: Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+""",
+        },
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "fail"
+    assert "2 workflow(s)" in result.evidence
+    assert "build.yml" in result.evidence
+    assert "release.yml" in result.evidence
+    assert result.location == (".github/workflows/build.yml; .github/workflows/release.yml")
+
+
+def test_check_explicit_permissions_passes_when_all_workflows_declare_permissions() -> None:
+    """Test that all workflows with explicit permissions pass."""
+    workflows = [
+        {
+            "name": "build.yml",
+            "text": """name: CI
+
+permissions:
+  contents: read
+""",
+        },
+        {
+            "name": "release.yml",
+            "text": """name: Release
+
+jobs:
+  release:
+    permissions:
+      contents: read
+""",
+        },
+    ]
+
+    result = check_explicit_permissions(workflows)
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "pass"
+    assert result.evidence == ("All 2 workflow(s) have explicit GitHub Actions permissions coverage.")
+    assert result.location == (".github/workflows/build.yml:3; .github/workflows/release.yml:5")
+
+
+def test_check_explicit_permissions_returns_na_without_workflows() -> None:
+    """Test that repositories without workflows return not applicable."""
+    result = check_explicit_permissions([])
+
+    assert result.check == "explicit_permissions"
+    assert result.band == "permissions"
+    assert result.status == "na"
+    assert result.evidence == "Repository has no GitHub Actions workflows."
+    assert result.location == ""
+
+
+def test_repository_security_configuration_pass():
+    """Pass when sign-off, DCO, and CodeQL controls are detected."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+        {
+            "name": "codeql.yml",
+            "text": "uses: github/codeql-action/upload-sarif@v3\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "pass"
+    assert "DCO workflow detected" in result.evidence
+    assert "CodeQL workflow detected" in result.evidence
+
+
+def test_repository_security_configuration_fail_without_signoff():
+    """Fail when web commit sign-off is disabled."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+        {
+            "name": "codeql.yml",
+            "text": "uses: github/codeql-action/upload-sarif@v3\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=True,
+        has_issues_enabled=True,
+        has_discussions_enabled=True,
+        has_projects_enabled=True,
+        web_commit_signoff_required=False,
+    )
+
+    assert result.status == "fail"
+    assert "web commit sign-off disabled" in result.evidence
+
+
+def test_repository_security_configuration_review_without_codeql():
+    """Request review when CodeQL is not detected."""
+    workflows = [
+        {
+            "name": "dco.yml",
+            "text": "name: DCO\n",
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "review"
+    assert "CodeQL workflow not detected" in result.evidence
+
+
+def test_repository_security_configuration_detects_codeql_by_content():
+    """Detect CodeQL even when the workflow filename is generic."""
+    workflows = [
+        {
+            "name": "security.yml",
+            "text": ("name: Security\nuses: github/codeql-action/init@v3\n"),
+        },
+    ]
+
+    result = check_repository_security_configuration(
+        workflows,
+        has_wiki_enabled=False,
+        has_issues_enabled=True,
+        has_discussions_enabled=False,
+        has_projects_enabled=False,
+        web_commit_signoff_required=True,
+    )
+
+    assert result.status == "review"
+    assert "CodeQL workflow detected" in result.evidence

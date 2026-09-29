@@ -28,6 +28,7 @@ matplotlib.use("Agg")
 
 import hiero_analytics.config.paths as paths
 import hiero_analytics.pipelines.affiliation as affiliation_mod
+import hiero_analytics.pipelines.ci_health as ci_health_mod
 import hiero_analytics.pipelines.codeowner_and_runner as codeowner_mod
 import hiero_analytics.pipelines.contributor_activity as activity_mod
 import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
@@ -43,7 +44,9 @@ import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
+from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
+from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -89,6 +92,7 @@ CHART_COMPANION_CSVS = {
     "repo_affiliation_composition_committers.csv",
     "team_affiliation_composition.csv",
     "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
+    "ci_health_checks.csv",
     "contributor_activity_heatmap.csv",
     "org_activity_heatmap.csv",
     "team_activity_heatmap.csv",
@@ -386,6 +390,52 @@ def outputs_root(tmp_path_factory) -> Path:
             lambda name: ScorecardRecord(repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW),
         )
         mp.setattr(
+            ci_health_mod,
+            "fetch_org_repos",
+            lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
+        )
+        mp.setattr(
+            ci_health_mod,
+            "fetch_repo_ci_health_graphql",
+            lambda _c, _owner, _repo: CIHealthRecord(
+                workflows=[
+                    {
+                        "name": "ci.yml",
+                        "text": "uses: actions/checkout@v4",
+                    }
+                ],
+                has_wiki_enabled=False,
+                has_issues_enabled=True,
+                has_discussions_enabled=False,
+                has_projects_enabled=False,
+                web_commit_signoff_required=True,
+            ),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "check_actions_sha_pinned",
+            lambda _workflows: CheckResult(
+                check="actions_sha_pinned",
+                band="actions",
+                status="fail",
+                evidence=(
+                    "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4"
+                ),
+                location=".github/workflows/ci.yml",
+            ),
+        )
+        mp.setattr(
+            ci_health_mod,
+            "check_explicit_permissions",
+            lambda _workflows: CheckResult(
+                check="explicit_permissions",
+                band="permissions",
+                status="fail",
+                evidence=("Found 1 workflow(s) without an explicit permissions declaration: ci.yml"),
+                location=".github/workflows/ci.yml",
+            ),
+        )
+        mp.setattr(
             codeowner_mod,
             "get_codeowners_for_repos",
             lambda _c, _org, repos: [CodeOwnersRecord(repo=r.name, status=i % 2 == 0) for i, r in enumerate(repos)],
@@ -484,24 +534,39 @@ def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
                     assert set(period_rows[0]) == declared
 
 
-def test_data_api_emits_the_hip_views(outputs_root: Path):
-    """The HIP board and coverage matrix ship as view documents for the org.
+def test_data_api_emits_the_bespoke_views(outputs_root: Path):
+    """The bespoke dashboard views ship as view documents for the org.
 
-    These are the bespoke views the frontend renders as components; if the
-    pipeline produced HIP data but the API listed no views, the HIPs tab would
-    silently lose its centrepieces.
+    These are the views the frontend renders as custom components; if a
+    pipeline produced the underlying data but the API listed no view, the
+    corresponding dashboard component would silently disappear.
     """
     api_dir = outputs_root / "data" / "api" / "v1"
     manifest = json.loads((api_dir / "manifest.json").read_text())
 
     views = manifest["orgs"][PRIMARY]["views"]
-    assert [(view["id"], view["kind"]) for view in views] == [("hip-board", "board"), ("hip-matrix", "matrix")]
+    view_pairs = {(view["id"], view["kind"]) for view in views}
+
+    assert ("hip-board", "board") in view_pairs
+    assert ("hip-matrix", "matrix") in view_pairs
+    assert ("ci-health-matrix", "ci_health_matrix") in view_pairs
+
     for view in views:
         document = json.loads((api_dir / view["path"]).read_text())
-        assert document["macro"] == "HIPs"
+
+        if view["id"] in {"hip-board", "hip-matrix"}:
+            assert document["macro"] == "HIPs"
+
+        if view["id"] == "ci-health-matrix":
+            assert document["macro"] == "Security & scorecards"
+
     matrix = json.loads((api_dir / PRIMARY / "hip-matrix.json").read_text())
     assert matrix["rows"], "matrix emitted with no rows"
     assert matrix["bands"], "matrix emitted with no header bands"
+
+    ci_health_matrix = json.loads((api_dir / PRIMARY / "ci-health-matrix.json").read_text())
+    assert ci_health_matrix["rows"], "CI health matrix emitted with no rows"
+    assert ci_health_matrix["columns"], "CI health matrix emitted with no columns"
 
 
 def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
