@@ -35,6 +35,13 @@
   },
   {
    "hip": 1485,
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5817,
+   "pr_title": "feat: support state overrides in eth_call and eth_estimateGas",
+   "snippet": "'s `contracts/call` API as described in HIP-1485. The relay validates the override set,"
+  },
+  {
+   "hip": 1485,
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 13654,
    "pr_title": "Add callTracer support for debug methods in web3",
@@ -104,8 +111,8 @@
    "snippet": "`HIP-432`: Long Term Scheduled Transaction"
   }
  ],
- "row_count": 11,
- "generated_at": "2026-09-26T09:12:52.590277+00:00",
+ "row_count": 12,
+ "generated_at": "2026-09-29T20:11:46.045723+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

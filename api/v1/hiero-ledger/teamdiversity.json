@@ -26,7 +26,8 @@
   },
   {
    "key": "top_org_pct",
-   "label": "largest org %"
+   "label": "largest org %",
+   "format": "percent"
   },
   {
    "key": "hhi",
@@ -1380,7 +1381,7 @@
   }
  ],
  "row_count": 111,
- "generated_at": "2026-09-26T09:11:12.521699+00:00",
+ "generated_at": "2026-09-29T20:10:03.531591+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

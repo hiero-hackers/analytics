@@ -1,0 +1,575 @@
+{
+ "note": "Each bar is normalised to 100%, so segments are each employer's share of that row's role-holders; the dashed line marks 50%. Rows are ordered most-concentrated first. The six largest employers get their own colour; smaller ones pool into 'Other orgs'. The data view shows the underlying counts.",
+ "methodology": [
+  "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
+  "Map each to an organisation via the affiliations file.",
+  "Count holders per organisation within the repo; the largest employers across all repos get their own colour, the rest pool into 'Other orgs', and solo/unmapped holders show as 'Independent'/'Unknown'.",
+  "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first (by the largest single employer's share); ties are grouped by the leading organisation's colour.",
+  "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are single-employer repos; multi-colour bars are cross-org."
+ ],
+ "schema_version": 1,
+ "id": "repo_affiliation_composition",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "repo_affiliation_composition.csv",
+ "metric": "employer_composition",
+ "unit": "Maintainers (share of repository)",
+ "population": "People holding the maintainer role in each repository, by curated employer; a person is counted in every repository where they hold it.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": true,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": 15,
+ "reference": {
+  "value": 50,
+  "label": "Majority"
+ },
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:00.912688+00:00"
+ },
+ "series": [
+  {
+   "key": "Hashgraph",
+   "label": "Hashgraph",
+   "color": "#1F77B4"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
+  },
+  {
+   "key": "DSR Corporation",
+   "label": "DSR Corporation",
+   "color": "#9467BD"
+  },
+  {
+   "key": "Linux Foundation",
+   "label": "Linux Foundation",
+   "color": "#2CA02C"
+  },
+  {
+   "key": "Hedera",
+   "label": "Hedera",
+   "color": "#E377C2"
+  },
+  {
+   "key": "Hashgraph Online",
+   "label": "Hashgraph Online",
+   "color": "#17BECF"
+  },
+  {
+   "key": "Other orgs",
+   "label": "Other orgs",
+   "color": "#CBD5E1"
+  },
+  {
+   "key": "Independent",
+   "label": "Independent",
+   "color": "#94A3B8"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "hiero-block-node",
+   "Hashgraph": 4,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Hashgraph": 4,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "Hashgraph": 4,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-docs",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "roadmap",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-hederium",
+   "Hashgraph": 0,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "heka-identity-platform",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "DSR Corporation": 4,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "Hashgraph": 14,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "awesome-contributions",
+   "Hashgraph": 6,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 1
+  },
+  {
+   "repo": "solo-docs",
+   "Hashgraph": 8,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 1
+  },
+  {
+   "repo": "homebrew-tools",
+   "Hashgraph": 4,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Hashgraph": 1,
+   "LimeChain": 4,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 0
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "Hashgraph": 3,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "solo",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 1
+  },
+  {
+   "repo": "solo-build-actions",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "Hashgraph": 1,
+   "LimeChain": 3,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "Hashgraph": 1,
+   "LimeChain": 3,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "tsc-eligibility-check",
+   "Hashgraph": 1,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 2,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "solo-charts",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 1
+  },
+  {
+   "repo": "solo-containers",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-contracts",
+   "Hashgraph": 7,
+   "LimeChain": 5,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "Hashgraph": 7,
+   "LimeChain": 5,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Hashgraph": 4,
+   "LimeChain": 3,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": ".github",
+   "Hashgraph": 9,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 1,
+   "Other orgs": 2,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero",
+   "Hashgraph": 9,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 1,
+   "Other orgs": 2,
+   "Independent": 1
+  },
+  {
+   "repo": "tsc",
+   "Hashgraph": 9,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 1,
+   "Other orgs": 2,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "DSR Corporation": 5,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "DSR Corporation": 5,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-solo-action",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-local-node",
+   "Hashgraph": 1,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 0
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "Hashgraph": 1,
+   "LimeChain": 0,
+   "DSR Corporation": 4,
+   "Linux Foundation": 0,
+   "Hedera": 1,
+   "Hashgraph Online": 0,
+   "Other orgs": 2,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 2,
+   "Other orgs": 3,
+   "Independent": 0
+  },
+  {
+   "repo": "governance",
+   "Hashgraph": 9,
+   "LimeChain": 2,
+   "DSR Corporation": 0,
+   "Linux Foundation": 9,
+   "Hedera": 1,
+   "Hashgraph Online": 1,
+   "Other orgs": 2,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-cli",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 4,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "Hashgraph": 1,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 1
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 2,
+   "Independent": 0
+  },
+  {
+   "repo": "hiero-website",
+   "Hashgraph": 1,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 2
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 4
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:00.912688+00:00",
+ "stale": false
+}

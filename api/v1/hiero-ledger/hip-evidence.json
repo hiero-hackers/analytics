@@ -1769,6 +1769,20 @@
   {
    "hip": 1261,
    "hip_title": "Simple Fees",
+   "repo": "hiero-ledger/governance",
+   "pr_number": 753,
+   "pr_title": "chore: add ddeskov-limechain and Fantomasa to hiero-sdk-js-maintainers",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "rsion`, `ping`/`pingAll`, fee estimate (HIP-1261) and mirror balance JSON-RPC methods (#",
+   "url": "https://github.com/hiero-ledger/governance/pull/753"
+  },
+  {
+   "hip": 1261,
+   "hip_title": "Simple Fees",
    "repo": "hiero-ledger/hiero-consensus-node",
    "pr_number": 22070,
    "pr_title": "chore: Implement simple fee for crypto create delete",
@@ -11793,6 +11807,20 @@
   {
    "hip": 367,
    "hip_title": "Unlimited Token Associations Per Account",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5828,
+   "pr_title": "build(deps): bump the minor-and-patch-npm-daily group across 1 directory with 8 updates",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "elationships</code> is deprecated as of HIP-367 and truncated at 1000 relationships. Re",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/5828"
+  },
+  {
+   "hip": 367,
+   "hip_title": "Unlimited Token Associations Per Account",
    "repo": "hiero-ledger/hiero-sdk-go",
    "pr_number": 930,
    "pr_title": "feat(HIP-367) Mirror Node Queries",
@@ -11831,6 +11859,20 @@
    "counted": false,
    "snippet": "ces` (because of the decision regarding HIP-367). 2. #1838 3. #1839 **Related is",
    "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/1840"
+  },
+  {
+   "hip": 367,
+   "hip_title": "Unlimited Token Associations Per Account",
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "pr_number": 4393,
+   "pr_title": "chore(release): v2.89.0",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-28 11:28:02+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "tokenRelationships` is deprecated as of HIP-367 and truncated at 1000 relationships. Re",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/4393"
   },
   {
    "hip": 206,
@@ -11903,8 +11945,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 846,
- "generated_at": "2026-09-26T09:12:52.589356+00:00",
+ "row_count": 849,
+ "generated_at": "2026-09-29T20:11:46.044651+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

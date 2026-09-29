@@ -1,0 +1,86 @@
+{
+ "note": "Each repository's overall OpenSSF Scorecard score (0\u201310), a measure of security practices. Repositories without a published scorecard are omitted.",
+ "methodology": [
+  "List the organisation's public repositories.",
+  "Request each repository's published score from the public OpenSSF Scorecard API \u2014 the score is read, never computed here.",
+  "Omit repositories with no published scorecard rather than plotting them as zero, since 'unscored' and 'scored badly' are different findings.",
+  "Plot the remaining repositories by overall score (0\u201310)."
+ ],
+ "schema_version": 1,
+ "id": "org_scorecard",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "org_scorecard.csv",
+ "metric": "openssf_scorecard",
+ "unit": "OpenSSF Scorecard score (0\u201310)",
+ "population": "Each repository's aggregate OpenSSF Scorecard score, as published by the Scorecard API. Repositories without a published scorecard are absent.",
+ "dimensions": [
+  "repo"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "decimal",
+ "rank": true,
+ "top_n": 15,
+ "reference": {
+  "value": 6.55,
+  "label": "Org median 6.55"
+ },
+ "value_max": 10,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:12:33.573708+00:00"
+ },
+ "series": [
+  {
+   "key": "score",
+   "label": "Score",
+   "color": "var(--chart-committer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "hiero-enterprise-js",
+   "score": 8.0
+  },
+  {
+   "repo": "analytics",
+   "score": 9.3
+  },
+  {
+   "repo": "sdk-automations",
+   "score": 9.2
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "score": 6.8
+  },
+  {
+   "repo": "hiero-notifications",
+   "score": 5.8
+  },
+  {
+   "repo": "hiero-receipts",
+   "score": 6.2
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "score": 6.3
+  },
+  {
+   "repo": "hiero-x402",
+   "score": 6.2
+  }
+ ],
+ "generated_at": "2026-09-29T20:12:33.573708+00:00",
+ "stale": false
+}

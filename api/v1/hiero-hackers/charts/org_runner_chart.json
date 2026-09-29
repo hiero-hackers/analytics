@@ -1,0 +1,175 @@
+{
+ "note": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard (GitHub-hosted), or indeterminate (could not be classified).",
+ "methodology": [
+  "Read every GitHub Actions workflow file in each repository.",
+  "Classify each job's `runs-on` label as self-hosted, standard (a GitHub-hosted image), or indeterminate when the label cannot be resolved (e.g. a variable or a custom group name).",
+  "Count jobs, not repositories, and stack them per repository \u2014 so a repository with many jobs contributes proportionally more."
+ ],
+ "schema_version": 1,
+ "id": "org_runner_chart",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "org_runner_summary.csv",
+ "metric": "org_runner_summary",
+ "unit": "Workflow jobs",
+ "population": "Workflow job runner declarations, grouped by repository. Indeterminate declarations cannot be classified.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:12:59.949304+00:00"
+ },
+ "series": [
+  {
+   "key": "Self-Hosted",
+   "label": "Self-Hosted",
+   "color": "var(--chart-1)"
+  },
+  {
+   "key": "Standard",
+   "label": "Standard",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "Indeterminate",
+   "label": "Indeterminate",
+   "color": "var(--chart-3)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "hiero-enterprise-js",
+   "Self-Hosted": 0,
+   "Standard": 7,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "analytics",
+   "Self-Hosted": 0,
+   "Standard": 12,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "sdk-automations",
+   "Self-Hosted": 0,
+   "Standard": 12,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-workflow-orchestrator",
+   "Self-Hosted": 0,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-hybrid-workflow-app",
+   "Self-Hosted": 0,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-enterprise-proxy",
+   "Self-Hosted": 0,
+   "Standard": 4,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-did-sdk-rs",
+   "Self-Hosted": 0,
+   "Standard": 4,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "vscode-hedera-transaction-viewer",
+   "Self-Hosted": 0,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-dart",
+   "Self-Hosted": 0,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-block-verifier-js",
+   "Self-Hosted": 0,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "Self-Hosted": 0,
+   "Standard": 5,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-streams-rs",
+   "Self-Hosted": 0,
+   "Standard": 11,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "hiero-journal-rs",
+   "Self-Hosted": 0,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-notifications",
+   "Self-Hosted": 0,
+   "Standard": 10,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-receipts",
+   "Self-Hosted": 0,
+   "Standard": 9,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-checkout",
+   "Self-Hosted": 0,
+   "Standard": 3,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "Self-Hosted": 0,
+   "Standard": 8,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-x402",
+   "Self-Hosted": 0,
+   "Standard": 5,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-tck-action",
+   "Self-Hosted": 0,
+   "Standard": 6,
+   "Indeterminate": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:12:59.949304+00:00",
+ "stale": false
+}

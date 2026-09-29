@@ -1,0 +1,57 @@
+{
+ "note": "The committer view of the same chart: repositories where every resolved committer shares one employer. Because committer curation is thinner, more repos fall below the 'enough of the roster is known' bar and are left uncounted \u2014 treat this as a floor, not a total.",
+ "methodology": [
+  "Same construction over each repository's committers \u2014 people with write access there and no maintainer seat anywhere.",
+  "Repos where unmapped committers outnumber resolved ones are never flagged, so thin curation under-counts rather than over-claims."
+ ],
+ "schema_version": 1,
+ "id": "single_employer_repos_by_org_committers",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "single_employer_repos_by_org_committers.csv",
+ "metric": "single_employer_repos_by_org_committers",
+ "unit": "Repositories",
+ "population": "Repositories whose resolved committers share one employer. Independent and unresolved affiliations follow the diversity table's counting rules.",
+ "dimensions": [
+  "organisation"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:02.243252+00:00"
+ },
+ "series": [
+  {
+   "key": "repos",
+   "label": "Repositories",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "repos": 2
+  },
+  {
+   "organisation": "BlockyDevs",
+   "repos": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:02.243252+00:00",
+ "stale": false
+}

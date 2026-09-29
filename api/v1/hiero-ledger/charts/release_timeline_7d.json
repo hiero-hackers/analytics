@@ -1,0 +1,152 @@
+{
+ "schema_version": 1,
+ "id": "release_timeline_7d",
+ "kind": "events",
+ "org": "hiero-ledger",
+ "source": "release_timeline.csv",
+ "metric": "releases",
+ "unit": "Published releases",
+ "population": "Each published GitHub release, by repository and publication time (UTC). Drafts are excluded; prereleases are marked. Repositories with no release in the window are not shown.",
+ "dimensions": [
+  "repo",
+  "type"
+ ],
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "label": {
+  "key": "tag_name",
+  "label": "Tag"
+ },
+ "types": [
+  {
+   "key": "release",
+   "label": "Release",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "prerelease",
+   "label": "Prerelease",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "categories": [
+  "hiero-cryptography",
+  "hiero-mirror-node",
+  "hiero-sdk-go",
+  "hiero-sdk-js",
+  "solo",
+  "hiero-gradle-conventions",
+  "hiero-sdk-java",
+  "hiero-sdk-tck",
+  "hiero-solo-action",
+  "solo-charts",
+  "solo-containers"
+ ],
+ "window": {
+  "kind": "trailing",
+  "days": 7,
+  "end": "2026-09-29T20:11:15.119876+00:00"
+ },
+ "rows": [
+  {
+   "repo": "solo",
+   "time": "2026-09-23T12:33:31Z",
+   "tag_name": "v0.90.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-09-23T21:22:43Z",
+   "tag_name": "v3.16.0",
+   "type": "release"
+  },
+  {
+   "repo": "solo-containers",
+   "time": "2026-09-24T08:48:25Z",
+   "tag_name": "v0.46.2",
+   "type": "release"
+  },
+  {
+   "repo": "solo-charts",
+   "time": "2026-09-24T13:14:28Z",
+   "tag_name": "v0.66.2",
+   "type": "release"
+  },
+  {
+   "repo": "solo",
+   "time": "2026-09-24T18:55:15Z",
+   "tag_name": "v0.91.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-09-25T15:14:14Z",
+   "tag_name": "v0.164.0-alpha1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-09-25T18:14:54Z",
+   "tag_name": "v3.16.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-09-25T18:57:16Z",
+   "tag_name": "v0.164.0-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "time": "2026-09-28T07:50:09Z",
+   "tag_name": "v0.7.12",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "time": "2026-09-28T08:06:11Z",
+   "tag_name": "v2.78.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "time": "2026-09-28T11:34:57Z",
+   "tag_name": "v2.89.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "time": "2026-09-28T12:56:39Z",
+   "tag_name": "v2.85.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "time": "2026-09-28T15:20:20Z",
+   "tag_name": "v2.89.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "time": "2026-09-29T07:31:35Z",
+   "tag_name": "v2.85.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "time": "2026-09-29T08:21:11Z",
+   "tag_name": "v0.13.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-solo-action",
+   "time": "2026-09-29T17:03:02Z",
+   "tag_name": "v0.25.0",
+   "type": "release"
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:15.119876+00:00",
+ "stale": false
+}

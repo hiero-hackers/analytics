@@ -1,0 +1,58 @@
+{
+ "note": "How many repositories have a CODEOWNERS file (Present) versus none (Missing). Which repositories are missing one is in the table below.",
+ "methodology": [
+  "Check each repository for a CODEOWNERS file in the standard locations (root, .github/, or docs/).",
+  "Resolve duplicates presence-wins: if any check for a repository found a file, the repository counts as having one.",
+  "Count repositories by that answer \u2014 present versus missing \u2014 across the organisation."
+ ],
+ "schema_version": 1,
+ "id": "org_codeowner_summary",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "org_codeowner_summary.csv",
+ "metric": "org_codeowner_summary",
+ "unit": "Repositories",
+ "population": "Repositories with or without a CODEOWNERS file in the standard GitHub locations.",
+ "dimensions": [
+  "status"
+ ],
+ "mark": "meter",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "status",
+  "label": "CODEOWNERS file"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:12:46.784145+00:00"
+ },
+ "series": [
+  {
+   "key": "count",
+   "label": "Repositories",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "status": "Present",
+   "count": 8
+  },
+  {
+   "status": "Missing",
+   "count": 20
+  }
+ ],
+ "generated_at": "2026-09-29T20:12:46.784145+00:00",
+ "stale": false
+}

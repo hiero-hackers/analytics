@@ -1,0 +1,89 @@
+{
+ "note": "How many repositories use each primary language (current snapshot). Repositories with no detected language are grouped as 'Unknown'.",
+ "methodology": [
+  "List the organisation's repositories and read GitHub's primary-language field for each.",
+  "Count repositories per language. This is GitHub's own per-repository classification \u2014 one language per repository, not a line-count breakdown."
+ ],
+ "schema_version": 1,
+ "id": "language_distribution",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "language_distribution.csv",
+ "metric": "language_distribution",
+ "unit": "Repositories",
+ "population": "Repositories grouped by their primary language reported by GitHub; not lines of code.",
+ "dimensions": [
+  "language"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "language",
+  "label": "Language"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:29.610765+00:00"
+ },
+ "series": [
+  {
+   "key": "count",
+   "label": "Repositories",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "language": "TypeScript",
+   "count": 9
+  },
+  {
+   "language": "Unknown",
+   "count": 5
+  },
+  {
+   "language": "Rust",
+   "count": 5
+  },
+  {
+   "language": "JavaScript",
+   "count": 2
+  },
+  {
+   "language": "Java",
+   "count": 2
+  },
+  {
+   "language": "Solidity",
+   "count": 1
+  },
+  {
+   "language": "Python",
+   "count": 1
+  },
+  {
+   "language": "C#",
+   "count": 1
+  },
+  {
+   "language": "Dart",
+   "count": 1
+  },
+  {
+   "language": "Shell",
+   "count": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:29.610765+00:00",
+ "stale": false
+}

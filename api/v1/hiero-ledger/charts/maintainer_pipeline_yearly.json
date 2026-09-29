@@ -1,0 +1,145 @@
+{
+ "note": "The widest view: one bar per calendar year, all the way back, counting everyone active at any point in that year. Each person is counted once, under the highest governance role they hold in any repo (general \u2192 triage \u2192 committer \u2192 maintainer), so a bar's total is the distinct people active. The narrower tabs beside it apply the same rule to shorter spans \u2014 this one is the whole history. Past bars never move; the current year is partial by definition.",
+ "methodology": [
+  "Take every tracked activity event (PRs opened, reviews, merges, issues, labels) and attach the governance role its actor held: maintainer, committer, triage, or general user.",
+  "Bucket events by period (year, month, or week \u2014 the variant tabs) and count *distinct* people active in each role per bucket, so one very busy person does not inflate a tier.",
+  "Stack the tiers to show whether the bench below maintainers is developing; the by-repo variant does the same across repositories instead of time.",
+  "Membership in a bucket is whole-bucket: one tracked event anywhere in the year (or month, or week) counts. No recency window is applied here \u2014 that is what separates this view from the 'active at year end' variant, and from the per-repo activity tables, which use their own recent-activity window."
+ ],
+ "schema_version": 1,
+ "id": "maintainer_pipeline_yearly",
+ "kind": "timeseries",
+ "org": "hiero-ledger",
+ "source": "maintainer_pipeline_yearly.csv",
+ "metric": "active_contributors_by_role",
+ "unit": "Unique active contributors",
+ "population": "Each person is counted once per bucket under the highest governance role they hold in any repository. Bots are excluded. Counts across periods must not be added to obtain unique people.",
+ "dimensions": [
+  "period",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "year",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2025",
+  "previous": "2024"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Period (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2018",
+  "last": "2026"
+ },
+ "series": [
+  {
+   "key": "general_user",
+   "label": "General contributors",
+   "color": "var(--chart-general)"
+  },
+  {
+   "key": "triage",
+   "label": "Triage",
+   "color": "var(--chart-triage)"
+  },
+  {
+   "key": "committer",
+   "label": "Committers",
+   "color": "var(--chart-committer)"
+  },
+  {
+   "key": "maintainer",
+   "label": "Maintainers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2018",
+   "general_user": 14,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2019",
+   "general_user": 47,
+   "triage": 0,
+   "committer": 3,
+   "maintainer": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2020",
+   "general_user": 83,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 7,
+   "partial": false
+  },
+  {
+   "bucket": "2021",
+   "general_user": 110,
+   "triage": 0,
+   "committer": 29,
+   "maintainer": 11,
+   "partial": false
+  },
+  {
+   "bucket": "2022",
+   "general_user": 182,
+   "triage": 0,
+   "committer": 35,
+   "maintainer": 24,
+   "partial": false
+  },
+  {
+   "bucket": "2023",
+   "general_user": 196,
+   "triage": 0,
+   "committer": 48,
+   "maintainer": 32,
+   "partial": false
+  },
+  {
+   "bucket": "2024",
+   "general_user": 219,
+   "triage": 0,
+   "committer": 54,
+   "maintainer": 57,
+   "partial": false
+  },
+  {
+   "bucket": "2025",
+   "general_user": 313,
+   "triage": 3,
+   "committer": 69,
+   "maintainer": 75,
+   "partial": false
+  },
+  {
+   "bucket": "2026",
+   "general_user": 459,
+   "triage": 7,
+   "committer": 68,
+   "maintainer": 77,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:04:38.575222+00:00",
+ "stale": false
+}

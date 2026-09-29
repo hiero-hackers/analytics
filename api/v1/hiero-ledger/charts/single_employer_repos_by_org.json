@@ -1,0 +1,64 @@
+{
+ "note": "Each bar is an organisation; bar height is how many repositories it solely holds \u2014 every resolved holder of that role in the repo shares this one employer (at least two of them, no independents). Taller bars mean more single-employer repos, an organisational bus-factor. Repos dominated by unmapped holders are not counted here. The role tabs switch between maintainers and committers.",
+ "methodology": [
+  "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
+  "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
+  "Flag a repo 'single-employer' when every resolved holder shares the same organisation (at least two such holders, and no independents).",
+  "Group those single-employer repos by the organisation that holds them.",
+  "Plot one bar per organisation \u2014 its height is how many repos it solely holds."
+ ],
+ "schema_version": 1,
+ "id": "single_employer_repos_by_org",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "single_employer_repos_by_org.csv",
+ "metric": "single_employer_repos_by_org",
+ "unit": "Repositories",
+ "population": "Repositories whose resolved maintainers share one employer. Independent and unresolved affiliations follow the diversity table's counting rules.",
+ "dimensions": [
+  "organisation"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:01.569152+00:00"
+ },
+ "series": [
+  {
+   "key": "repos",
+   "label": "Repositories",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "repos": 8
+  },
+  {
+   "organisation": "DSR Corporation",
+   "repos": 1
+  },
+  {
+   "organisation": "LimeChain",
+   "repos": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:01.569152+00:00",
+ "stale": false
+}

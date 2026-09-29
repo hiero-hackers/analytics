@@ -1,0 +1,233 @@
+{
+ "schema_version": 1,
+ "id": "difficulty_by_repo_30d",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "difficulty_by_repo_30d.csv",
+ "metric": "open_issues_by_difficulty",
+ "unit": "Open issues",
+ "population": "Open issues in each repository, by difficulty label. 'Unknown' is an open issue with no difficulty label yet. Each issue is counted once.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 12,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "trailing",
+  "days": 30,
+  "end": "2026-09-29T20:02:57.694784+00:00"
+ },
+ "series": [
+  {
+   "key": "Unknown",
+   "label": "Unknown",
+   "color": "#B3B3B3"
+  },
+  {
+   "key": "Good First Issue",
+   "label": "Good First Issue",
+   "color": "#66C2A5"
+  },
+  {
+   "key": "Beginner",
+   "label": "Beginner",
+   "color": "#8DA0CB"
+  },
+  {
+   "key": "Intermediate",
+   "label": "Intermediate",
+   "color": "#FFD92F"
+  },
+  {
+   "key": "Advanced",
+   "label": "Advanced",
+   "color": "#E78AC3"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "governance",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-block-node",
+   "Unknown": 82,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "Unknown": 92,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-contracts",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Unknown": 9,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "Unknown": 8,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Unknown": 21,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "Unknown": 24,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "Unknown": 5,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Unknown": 4,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "Unknown": 4,
+   "Good First Issue": 3,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "Unknown": 13,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 1,
+   "Intermediate": 1,
+   "Advanced": 3
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "Unknown": 4,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Unknown": 9,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-solo-action",
+   "Unknown": 2,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-website",
+   "Unknown": 1,
+   "Good First Issue": 1,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo",
+   "Unknown": 36,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "tsc",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:02:57.694784+00:00",
+ "stale": false
+}

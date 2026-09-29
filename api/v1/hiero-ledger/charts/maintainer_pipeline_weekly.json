@@ -1,0 +1,107 @@
+{
+ "note": "Each bar is an ISO week (Mon\u2013Sun), counting the distinct people active that week \u2014 once each, under the highest governance role they hold in any repo (general \u2192 triage \u2192 committer \u2192 maintainer). Counts are strictly per-week (not a trailing window), so the current week is week-to-date. Only the most recent 5 weeks are charted \u2014 the '1 month' span; full history stays in the CSV.",
+ "schema_version": 1,
+ "id": "maintainer_pipeline_weekly",
+ "kind": "timeseries",
+ "org": "hiero-ledger",
+ "source": "maintainer_pipeline_weekly.csv",
+ "metric": "active_contributors_by_role",
+ "unit": "Unique active contributors",
+ "population": "Each person is counted once per bucket under the highest governance role they hold in any repository. Bots are excluded. Counts across periods must not be added to obtain unique people.",
+ "dimensions": [
+  "period",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "week",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-W39",
+  "previous": "2026-W38"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Period (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2026-W36",
+  "last": "2026-W40"
+ },
+ "series": [
+  {
+   "key": "general_user",
+   "label": "General contributors",
+   "color": "var(--chart-general)"
+  },
+  {
+   "key": "triage",
+   "label": "Triage",
+   "color": "var(--chart-triage)"
+  },
+  {
+   "key": "committer",
+   "label": "Committers",
+   "color": "var(--chart-committer)"
+  },
+  {
+   "key": "maintainer",
+   "label": "Maintainers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2026-W36",
+   "general_user": 25,
+   "triage": 2,
+   "committer": 39,
+   "maintainer": 40,
+   "partial": false
+  },
+  {
+   "bucket": "2026-W37",
+   "general_user": 16,
+   "triage": 1,
+   "committer": 35,
+   "maintainer": 37,
+   "partial": false
+  },
+  {
+   "bucket": "2026-W38",
+   "general_user": 13,
+   "triage": 1,
+   "committer": 29,
+   "maintainer": 31,
+   "partial": false
+  },
+  {
+   "bucket": "2026-W39",
+   "general_user": 15,
+   "triage": 1,
+   "committer": 35,
+   "maintainer": 46,
+   "partial": false
+  },
+  {
+   "bucket": "2026-W40",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:04:38.580000+00:00",
+ "stale": false
+}

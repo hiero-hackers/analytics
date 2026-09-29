@@ -1,0 +1,138 @@
+{
+ "note": "Repositories ranked by distinct contributors over the last six months; bar height is the number of unique contributors. The static image shows the top 20; the interactive view and CSV hold every repository.",
+ "methodology": [
+  "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
+  "Count the distinct contributors active in each repository.",
+  "Rank the repositories by that count; the static image keeps the top 20, the CSV keeps them all."
+ ],
+ "schema_version": 1,
+ "id": "contributor_counts",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "contributor_counts.csv",
+ "metric": "contributor_counts",
+ "unit": "Contributors",
+ "population": "Distinct contributors recorded in each repository. People active in several repositories count in each.",
+ "dimensions": [
+  "repo"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:29.960273+00:00"
+ },
+ "series": [
+  {
+   "key": "contributors",
+   "label": "Contributors",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "analytics",
+   "contributors": 26
+  },
+  {
+   "repo": "governance",
+   "contributors": 13
+  },
+  {
+   "repo": "hiero-enterprise-js",
+   "contributors": 7
+  },
+  {
+   "repo": "sdk-automations",
+   "contributors": 6
+  },
+  {
+   "repo": "hiero-streams-rs",
+   "contributors": 5
+  },
+  {
+   "repo": "hiero-x402",
+   "contributors": 4
+  },
+  {
+   "repo": "hiero-sdk-v3-prototyping",
+   "contributors": 3
+  },
+  {
+   "repo": "agentic-support-hiero",
+   "contributors": 3
+  },
+  {
+   "repo": "hiero-block-verifier-js",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-checkout",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-tck-action",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-journal-rs",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "contributors": 2
+  },
+  {
+   "repo": "hiero-did-sdk-rs",
+   "contributors": 1
+  },
+  {
+   "repo": "hiero-sdk-csharp",
+   "contributors": 1
+  },
+  {
+   "repo": "hiero-notifications",
+   "contributors": 1
+  },
+  {
+   "repo": "hiero-maintainer-automation-prototype",
+   "contributors": 1
+  },
+  {
+   "repo": "hiero-enterprise-proxy",
+   "contributors": 1
+  },
+  {
+   "repo": "hiero-receipts",
+   "contributors": 1
+  },
+  {
+   "repo": "rs-hiero-mirror-node",
+   "contributors": 1
+  },
+  {
+   "repo": "vscode-hedera-transaction-viewer",
+   "contributors": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:29.960273+00:00",
+ "stale": false
+}

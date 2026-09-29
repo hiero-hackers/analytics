@@ -1,0 +1,115 @@
+{
+ "note": "Stages run top to bottom: proposed, approved by the TSC, merged implementation evidence found, and merged citing PRs in five or more repositories. Switch the cohort to compare recent specs with all specs; the two are never combined.",
+ "methodology": [
+  "Take every spec in the inventory created since September 2024 (the Hiero era) \u2014 older specs are excluded because citation-based stages undercount them.",
+  "Stage 1, proposed: every spec in that cohort.",
+  "Stage 2, approved: those whose frontmatter status is Approved, Accepted, Final, or Active.",
+  "Stage 3, implementation evidence: those with at least one merged PR citing them, after excluding proposals-repo PRs and body-only mentions behind a distancing cue.",
+  "Stage 4, implemented broadly: those with merged citing PRs in five or more repositories. Each band's label is its share of stage 1; counts and the all-time cohort are in the CSV."
+ ],
+ "schema_version": 1,
+ "id": "hip_adoption_funnel",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "hip_adoption_funnel.csv",
+ "metric": "hip_adoption_funnel",
+ "unit": "HIP specs",
+ "population": "Each HIP spec in the cohort is counted at every stage it has reached, so each stage is a subset of the one before. Shares are of the cohort's proposed specs. Citation-based stages undercount specs created before September 2024.",
+ "dimensions": [
+  "stage",
+  "cohort"
+ ],
+ "mark": "funnel",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": {
+  "key": "cohort",
+  "label": "Cohort",
+  "default": "created since 2024-09",
+  "values": [
+   "all specs",
+   "created since 2024-09"
+  ]
+ },
+ "category": {
+  "key": "stage",
+  "label": "Stage"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:46.051776+00:00"
+ },
+ "series": [
+  {
+   "key": "hips",
+   "label": "HIPs",
+   "color": "var(--heat-4)"
+  }
+ ],
+ "details": [
+  {
+   "format": "percent",
+   "key": "pct_of_proposed",
+   "label": "Share of proposed"
+  }
+ ],
+ "rows": [
+  {
+   "stage": "proposed",
+   "cohort": "all specs",
+   "hips": 158,
+   "pct_of_proposed": 100
+  },
+  {
+   "stage": "approved by TSC",
+   "cohort": "all specs",
+   "hips": 144,
+   "pct_of_proposed": 91
+  },
+  {
+   "stage": "implementation evidence",
+   "cohort": "all specs",
+   "hips": 51,
+   "pct_of_proposed": 32
+  },
+  {
+   "stage": "implemented in \u22655 repos",
+   "cohort": "all specs",
+   "hips": 14,
+   "pct_of_proposed": 9
+  },
+  {
+   "stage": "proposed",
+   "cohort": "created since 2024-09",
+   "hips": 35,
+   "pct_of_proposed": 100
+  },
+  {
+   "stage": "approved by TSC",
+   "cohort": "created since 2024-09",
+   "hips": 32,
+   "pct_of_proposed": 91
+  },
+  {
+   "stage": "implementation evidence",
+   "cohort": "created since 2024-09",
+   "hips": 22,
+   "pct_of_proposed": 63
+  },
+  {
+   "stage": "implemented in \u22655 repos",
+   "cohort": "created since 2024-09",
+   "hips": 9,
+   "pct_of_proposed": 26
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:46.051776+00:00",
+ "stale": false
+}

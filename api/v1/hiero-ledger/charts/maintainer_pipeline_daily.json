@@ -1,0 +1,123 @@
+{
+ "note": "The narrowest view: the last seven days, one bar per day, same counting rule as the wider tabs. Useful for spotting whether a quiet week is quiet everywhere or just in one role; too short to read a trend from, which is what the 1 month and 1 year views are for. Today's bar covers activity so far today.",
+ "schema_version": 1,
+ "id": "maintainer_pipeline_daily",
+ "kind": "timeseries",
+ "org": "hiero-ledger",
+ "source": "maintainer_pipeline_daily.csv",
+ "metric": "active_contributors_by_role",
+ "unit": "Unique active contributors",
+ "population": "Each person is counted once per bucket under the highest governance role they hold in any repository. Bots are excluded. Counts across periods must not be added to obtain unique people.",
+ "dimensions": [
+  "period",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "day",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-09-28",
+  "previous": "2026-09-27"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Period (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2026-09-23",
+  "last": "2026-09-29"
+ },
+ "series": [
+  {
+   "key": "general_user",
+   "label": "General contributors",
+   "color": "var(--chart-general)"
+  },
+  {
+   "key": "triage",
+   "label": "Triage",
+   "color": "var(--chart-triage)"
+  },
+  {
+   "key": "committer",
+   "label": "Committers",
+   "color": "var(--chart-committer)"
+  },
+  {
+   "key": "maintainer",
+   "label": "Maintainers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2026-09-23",
+   "general_user": 6,
+   "triage": 1,
+   "committer": 21,
+   "maintainer": 31,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-24",
+   "general_user": 5,
+   "triage": 2,
+   "committer": 26,
+   "maintainer": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-25",
+   "general_user": 5,
+   "triage": 1,
+   "committer": 27,
+   "maintainer": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-26",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-27",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-28",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-29",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:04:38.578263+00:00",
+ "stale": false
+}

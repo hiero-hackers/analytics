@@ -1,0 +1,192 @@
+{
+ "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
+ "methodology": [
+  "Fetch every open issue across the organisation's repositories, with its labels.",
+  "Map each issue's labels to a difficulty level using the shared label vocabulary (domain/labels.py); an issue carrying no difficulty label becomes 'Unknown'.",
+  "Keep only issues labelled with a difficulty \u2014 or newly created \u2014 within the selected span, so the narrower tabs reflect what triage has touched recently; 'All time' keeps the whole open backlog.",
+  "Count the remaining open issues per repository, stacked by difficulty level."
+ ],
+ "schema_version": 1,
+ "id": "difficulty_by_repo",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "difficulty_by_repo.csv",
+ "metric": "open_issues_by_difficulty",
+ "unit": "Open issues",
+ "population": "Open issues in each repository, by difficulty label. 'Unknown' is an open issue with no difficulty label yet. Each issue is counted once.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 12,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "all",
+  "days": null,
+  "end": "2026-09-29T20:11:51.113705+00:00"
+ },
+ "series": [
+  {
+   "key": "Unknown",
+   "label": "Unknown",
+   "color": "#B3B3B3"
+  },
+  {
+   "key": "Good First Issue",
+   "label": "Good First Issue",
+   "color": "#66C2A5"
+  },
+  {
+   "key": "Beginner",
+   "label": "Beginner",
+   "color": "#8DA0CB"
+  },
+  {
+   "key": "Intermediate",
+   "label": "Intermediate",
+   "color": "#FFD92F"
+  },
+  {
+   "key": "Advanced",
+   "label": "Advanced",
+   "color": "#E78AC3"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "agentic-support-hiero",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "analytics",
+   "Unknown": 1,
+   "Good First Issue": 7,
+   "Beginner": 9,
+   "Intermediate": 13,
+   "Advanced": 7
+  },
+  {
+   "repo": "hiero-checkout",
+   "Unknown": 4,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-enterprise-js",
+   "Unknown": 11,
+   "Good First Issue": 1,
+   "Beginner": 2,
+   "Intermediate": 4,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-journal-rs",
+   "Unknown": 1,
+   "Good First Issue": 3,
+   "Beginner": 0,
+   "Intermediate": 1,
+   "Advanced": 1
+  },
+  {
+   "repo": "hiero-notifications",
+   "Unknown": 7,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-receipts",
+   "Unknown": 6,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-v3-prototyping",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-streams-rs",
+   "Unknown": 3,
+   "Good First Issue": 1,
+   "Beginner": 0,
+   "Intermediate": 2,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-x402",
+   "Unknown": 0,
+   "Good First Issue": 0,
+   "Beginner": 2,
+   "Intermediate": 2,
+   "Advanced": 2
+  },
+  {
+   "repo": "rs-hiero-mirror-node",
+   "Unknown": 4,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "sdk-automations",
+   "Unknown": 6,
+   "Good First Issue": 6,
+   "Beginner": 8,
+   "Intermediate": 11,
+   "Advanced": 4
+  },
+  {
+   "repo": "vscode-hedera-transaction-viewer",
+   "Unknown": 2,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:51.113705+00:00",
+ "stale": false
+}

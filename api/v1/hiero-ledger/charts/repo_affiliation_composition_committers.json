@@ -1,0 +1,453 @@
+{
+ "note": "Each bar is normalised to 100%, so segments are each employer's share of that row's role-holders; the dashed line marks 50%. Rows are ordered most-concentrated first. The six largest employers get their own colour; smaller ones pool into 'Other orgs'. The data view shows the underlying counts.",
+ "methodology": [
+  "Same construction over each repository's committers, so only repos that grant committer appear.",
+  "Compare a repo's two bars: a single-colour maintainer bar beside a multi-colour committer bar is a concentrated top with a diverse bench underneath it."
+ ],
+ "schema_version": 1,
+ "id": "repo_affiliation_composition_committers",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "repo_affiliation_composition_committers.csv",
+ "metric": "employer_composition",
+ "unit": "Committers (share of repository)",
+ "population": "People holding the committer role in each repository, by curated employer; a person is counted in every repository where they hold it.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": true,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": 15,
+ "reference": {
+  "value": 50,
+  "label": "Majority"
+ },
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:01.679699+00:00"
+ },
+ "series": [
+  {
+   "key": "Hashgraph",
+   "label": "Hashgraph",
+   "color": "#1F77B4"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
+  },
+  {
+   "key": "BlockyDevs",
+   "label": "BlockyDevs",
+   "color": "#D62728"
+  },
+  {
+   "key": "DSR Corporation",
+   "label": "DSR Corporation",
+   "color": "#9467BD"
+  },
+  {
+   "key": "Launchbadge",
+   "label": "Launchbadge",
+   "color": "#8C564B"
+  },
+  {
+   "key": "Studio Monolith",
+   "label": "Studio Monolith",
+   "color": "#BCBD22"
+  },
+  {
+   "key": "Other orgs",
+   "label": "Other orgs",
+   "color": "#CBD5E1"
+  },
+  {
+   "key": "Independent",
+   "label": "Independent",
+   "color": "#94A3B8"
+  },
+  {
+   "key": "Unknown",
+   "label": "Unknown",
+   "color": "#E5E7EB"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "roadmap",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-cli",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 2,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 1,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "governance",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "Hashgraph": 26,
+   "LimeChain": 9,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 4,
+   "Unknown": 4
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Hashgraph": 3,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "solo",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
+   "repo": "hiero-local-node",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "Hashgraph": 0,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Hashgraph": 0,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "heka-identity-platform",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 1,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 1,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 1,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 1,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "Hashgraph": 3,
+   "LimeChain": 2,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 2,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-block-node",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 1,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-contracts",
+   "Hashgraph": 7,
+   "LimeChain": 7,
+   "BlockyDevs": 1,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 5,
+   "Unknown": 4
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "Hashgraph": 9,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 3,
+   "Studio Monolith": 0,
+   "Other orgs": 12,
+   "Independent": 12,
+   "Unknown": 19
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "BlockyDevs": 1,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 4,
+   "Unknown": 3
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "BlockyDevs": 1,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 4,
+   "Unknown": 3
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 5,
+   "Unknown": 0
+  },
+  {
+   "repo": "solo-build-actions",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
+   "repo": "solo-charts",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
+   "repo": "solo-containers",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
+   "repo": "solo-docs",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 1,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-website",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 1,
+   "Independent": 0,
+   "Unknown": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:01.679699+00:00",
+ "stale": false
+}

@@ -1,0 +1,536 @@
+{
+ "note": "The running total of repositories over time. Flat stretches mean no new repos were created; steps up mark creation months.",
+ "methodology": [
+  "Start from the same monthly creation counts as the per-month chart.",
+  "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
+  "The latest month and its total are annotated on the chart."
+ ],
+ "schema_version": 1,
+ "id": "cumulative_repo_count",
+ "kind": "timeseries",
+ "org": "hiero-ledger",
+ "source": "repo_growth_timeline.csv",
+ "metric": "repositories_created",
+ "unit": "Total repositories",
+ "population": "Repositories currently in the organisation, by the month GitHub records them as created. Deleted or transferred-out repositories are not counted.",
+ "dimensions": [
+  "period"
+ ],
+ "mark": "line",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "month",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-08",
+  "previous": "2026-07"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Month (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2018-10",
+  "last": "2026-09"
+ },
+ "series": [
+  {
+   "key": "cumulative_repos",
+   "label": "Repositories",
+   "color": "var(--chart-committer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2018-10",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2018-11",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2018-12",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2019-01",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2019-02",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2019-03",
+   "cumulative_repos": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2019-04",
+   "cumulative_repos": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2019-05",
+   "cumulative_repos": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2019-06",
+   "cumulative_repos": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2019-07",
+   "cumulative_repos": 4,
+   "partial": false
+  },
+  {
+   "bucket": "2019-08",
+   "cumulative_repos": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2019-09",
+   "cumulative_repos": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2019-10",
+   "cumulative_repos": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2019-11",
+   "cumulative_repos": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2019-12",
+   "cumulative_repos": 5,
+   "partial": false
+  },
+  {
+   "bucket": "2020-01",
+   "cumulative_repos": 6,
+   "partial": false
+  },
+  {
+   "bucket": "2020-02",
+   "cumulative_repos": 6,
+   "partial": false
+  },
+  {
+   "bucket": "2020-03",
+   "cumulative_repos": 6,
+   "partial": false
+  },
+  {
+   "bucket": "2020-04",
+   "cumulative_repos": 7,
+   "partial": false
+  },
+  {
+   "bucket": "2020-05",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-06",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-07",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-08",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-09",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-10",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-11",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2020-12",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2021-01",
+   "cumulative_repos": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2021-02",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-03",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-04",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-05",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-06",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-07",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-08",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-09",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-10",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-11",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2021-12",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2022-01",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2022-02",
+   "cumulative_repos": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2022-03",
+   "cumulative_repos": 11,
+   "partial": false
+  },
+  {
+   "bucket": "2022-04",
+   "cumulative_repos": 13,
+   "partial": false
+  },
+  {
+   "bucket": "2022-05",
+   "cumulative_repos": 13,
+   "partial": false
+  },
+  {
+   "bucket": "2022-06",
+   "cumulative_repos": 13,
+   "partial": false
+  },
+  {
+   "bucket": "2022-07",
+   "cumulative_repos": 14,
+   "partial": false
+  },
+  {
+   "bucket": "2022-08",
+   "cumulative_repos": 14,
+   "partial": false
+  },
+  {
+   "bucket": "2022-09",
+   "cumulative_repos": 15,
+   "partial": false
+  },
+  {
+   "bucket": "2022-10",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2022-11",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2022-12",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-01",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-02",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-03",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-04",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-05",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-06",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-07",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-08",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-09",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-10",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-11",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2023-12",
+   "cumulative_repos": 16,
+   "partial": false
+  },
+  {
+   "bucket": "2024-01",
+   "cumulative_repos": 17,
+   "partial": false
+  },
+  {
+   "bucket": "2024-02",
+   "cumulative_repos": 17,
+   "partial": false
+  },
+  {
+   "bucket": "2024-03",
+   "cumulative_repos": 17,
+   "partial": false
+  },
+  {
+   "bucket": "2024-04",
+   "cumulative_repos": 17,
+   "partial": false
+  },
+  {
+   "bucket": "2024-05",
+   "cumulative_repos": 18,
+   "partial": false
+  },
+  {
+   "bucket": "2024-06",
+   "cumulative_repos": 18,
+   "partial": false
+  },
+  {
+   "bucket": "2024-07",
+   "cumulative_repos": 19,
+   "partial": false
+  },
+  {
+   "bucket": "2024-08",
+   "cumulative_repos": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2024-09",
+   "cumulative_repos": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2024-10",
+   "cumulative_repos": 28,
+   "partial": false
+  },
+  {
+   "bucket": "2024-11",
+   "cumulative_repos": 29,
+   "partial": false
+  },
+  {
+   "bucket": "2024-12",
+   "cumulative_repos": 30,
+   "partial": false
+  },
+  {
+   "bucket": "2025-01",
+   "cumulative_repos": 30,
+   "partial": false
+  },
+  {
+   "bucket": "2025-02",
+   "cumulative_repos": 31,
+   "partial": false
+  },
+  {
+   "bucket": "2025-03",
+   "cumulative_repos": 32,
+   "partial": false
+  },
+  {
+   "bucket": "2025-04",
+   "cumulative_repos": 33,
+   "partial": false
+  },
+  {
+   "bucket": "2025-05",
+   "cumulative_repos": 33,
+   "partial": false
+  },
+  {
+   "bucket": "2025-06",
+   "cumulative_repos": 33,
+   "partial": false
+  },
+  {
+   "bucket": "2025-07",
+   "cumulative_repos": 33,
+   "partial": false
+  },
+  {
+   "bucket": "2025-08",
+   "cumulative_repos": 34,
+   "partial": false
+  },
+  {
+   "bucket": "2025-09",
+   "cumulative_repos": 35,
+   "partial": false
+  },
+  {
+   "bucket": "2025-10",
+   "cumulative_repos": 35,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11",
+   "cumulative_repos": 36,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12",
+   "cumulative_repos": 40,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01",
+   "cumulative_repos": 41,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07",
+   "cumulative_repos": 43,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08",
+   "cumulative_repos": 44,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09",
+   "cumulative_repos": 44,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:46.998427+00:00",
+ "stale": false
+}

@@ -1,0 +1,116 @@
+{
+ "note": "The running total of repositories over time. Flat stretches mean no new repos were created; steps up mark creation months.",
+ "methodology": [
+  "Start from the same monthly creation counts as the per-month chart.",
+  "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
+  "The latest month and its total are annotated on the chart."
+ ],
+ "schema_version": 1,
+ "id": "cumulative_repo_count",
+ "kind": "timeseries",
+ "org": "hiero-hackers",
+ "source": "repo_growth_timeline.csv",
+ "metric": "repositories_created",
+ "unit": "Total repositories",
+ "population": "Repositories currently in the organisation, by the month GitHub records them as created. Deleted or transferred-out repositories are not counted.",
+ "dimensions": [
+  "period"
+ ],
+ "mark": "line",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "month",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-08",
+  "previous": "2026-07"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Month (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2025-10",
+  "last": "2026-09"
+ },
+ "series": [
+  {
+   "key": "cumulative_repos",
+   "label": "Repositories",
+   "color": "var(--chart-committer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2025-10",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01",
+   "cumulative_repos": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02",
+   "cumulative_repos": 3,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03",
+   "cumulative_repos": 6,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04",
+   "cumulative_repos": 6,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05",
+   "cumulative_repos": 15,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06",
+   "cumulative_repos": 17,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07",
+   "cumulative_repos": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08",
+   "cumulative_repos": 27,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09",
+   "cumulative_repos": 28,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:13:03.245401+00:00",
+ "stale": false
+}

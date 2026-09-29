@@ -1,0 +1,82 @@
+{
+ "note": "Each bar is a spec-status bucket where implementation is expected. \u201cNo evidence\u201d is split by what HIP-1 implies: for approved specs it means awaiting implementation (actionable); for Final/Active specs the implementation merged by definition, so it is a citation gap instead. Derived from hip_summary.csv.",
+ "methodology": [
+  "Sweep every merged and open PR in the organisation and match HIP references locally from titles, branch names, and descriptions, across the naming variants seen in the wild (HIP-1200, HIP 1200, hip_1200, hip1200, URL forms). Bare issue numbers (#1200) never match.",
+  "Validate every matched number against the spec inventory parsed from the proposals repository's frontmatter; unknown numbers go to the review table instead of being counted.",
+  "Exclude PRs from the proposals repository itself \u2014 spec-authoring PRs are the specification, not its implementation.",
+  "Drop references whose only mention sits in a PR body behind a distancing cue (\u201cwaiting on\u201d, \u201cprepares for\u201d, \u201cblocked by\u201d\u2026) from every count; they stay in the evidence table with the cue shown, so each exclusion is auditable.",
+  "Classify each spec by its strongest remaining evidence: merged implementation PRs, open PRs only, or no reference found \u2014 absence of evidence, not evidence of absence."
+ ],
+ "schema_version": 1,
+ "id": "hip_activity_by_status",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "hip_activity_by_status.csv",
+ "metric": "hip_activity_by_status",
+ "unit": "HIPs",
+ "population": "Each HIP counts once under its strongest PR evidence. No citing PR for a Final/Active HIP is a citation gap, not proof it is unimplemented.",
+ "dimensions": [
+  "bucket",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "bucket",
+  "label": "HIP status"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:46.054851+00:00"
+ },
+ "series": [
+  {
+   "key": "merged",
+   "label": "With merged implementation PRs",
+   "color": "var(--chart-1)"
+  },
+  {
+   "key": "open_only",
+   "label": "With open PRs only",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "none_awaiting",
+   "label": "Awaiting implementation evidence",
+   "color": "var(--chart-3)"
+  },
+  {
+   "key": "citation_gap",
+   "label": "Citation gap (Final/Active)",
+   "color": "var(--chart-4)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "Approved / Accepted",
+   "merged": 12,
+   "open_only": 0,
+   "none_awaiting": 11,
+   "citation_gap": 0
+  },
+  {
+   "bucket": "Final / Active",
+   "merged": 39,
+   "open_only": 0,
+   "none_awaiting": 0,
+   "citation_gap": 82
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:46.054851+00:00",
+ "stale": false
+}

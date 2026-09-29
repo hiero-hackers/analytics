@@ -1,0 +1,205 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
+  "Map each contributor to an organisation via the affiliations file; drop those with no organisation.",
+  "Sum the contributors' monthly scores within each organisation.",
+  "Rank organisations by total and colour each cell by its monthly score."
+ ],
+ "schema_version": 1,
+ "id": "org_activity_heatmap",
+ "kind": "matrix",
+ "org": "hiero-ledger",
+ "source": "org_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each person counts toward their curated employer; people with no curated affiliation are excluded.",
+ "dimensions": [
+  "organisation",
+  "column"
+ ],
+ "row": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "sublabel": null,
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-03",
+   "label": "2026-03"
+  },
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 12262,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": false,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:05.295889+00:00"
+ },
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "activity score": 58107,
+   "2026-03": 12262,
+   "2026-04": 10221,
+   "2026-05": 10737,
+   "2026-06": 8498,
+   "2026-07": 8478,
+   "2026-08": 7911
+  },
+  {
+   "organisation": "Independent",
+   "activity score": 18098,
+   "2026-03": 2915,
+   "2026-04": 4112,
+   "2026-05": 2642,
+   "2026-06": 2618,
+   "2026-07": 2613,
+   "2026-08": 3198
+  },
+  {
+   "organisation": "LimeChain",
+   "activity score": 15228,
+   "2026-03": 3354,
+   "2026-04": 3032,
+   "2026-05": 2210,
+   "2026-06": 2020,
+   "2026-07": 2463,
+   "2026-08": 2149
+  },
+  {
+   "organisation": "BlockyDevs",
+   "activity score": 4142,
+   "2026-03": 1809,
+   "2026-04": 1194,
+   "2026-05": 929,
+   "2026-06": 115,
+   "2026-07": 92,
+   "2026-08": 3
+  },
+  {
+   "organisation": "OpenElements",
+   "activity score": 1956,
+   "2026-03": 171,
+   "2026-04": 404,
+   "2026-05": 407,
+   "2026-06": 295,
+   "2026-07": 272,
+   "2026-08": 407
+  },
+  {
+   "organisation": "DevLabs",
+   "activity score": 708,
+   "2026-03": 99,
+   "2026-04": 114,
+   "2026-05": 99,
+   "2026-06": 132,
+   "2026-07": 179,
+   "2026-08": 85
+  },
+  {
+   "organisation": "DSR Corporation",
+   "activity score": 689,
+   "2026-03": 163,
+   "2026-04": 175,
+   "2026-05": 132,
+   "2026-06": 97,
+   "2026-07": 119,
+   "2026-08": 3
+  },
+  {
+   "organisation": "Linux Foundation",
+   "activity score": 678,
+   "2026-03": 184,
+   "2026-04": 70,
+   "2026-05": 86,
+   "2026-06": 140,
+   "2026-07": 81,
+   "2026-08": 117
+  },
+  {
+   "organisation": "Onepiece Software",
+   "activity score": 644,
+   "2026-03": 169,
+   "2026-04": 0,
+   "2026-05": 204,
+   "2026-06": 118,
+   "2026-07": 69,
+   "2026-08": 84
+  },
+  {
+   "organisation": "Hashgraph Online",
+   "activity score": 124,
+   "2026-03": 74,
+   "2026-04": 8,
+   "2026-05": 27,
+   "2026-06": 7,
+   "2026-07": 0,
+   "2026-08": 8
+  },
+  {
+   "organisation": "8bees",
+   "activity score": 19,
+   "2026-03": 0,
+   "2026-04": 3,
+   "2026-05": 5,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 11
+  },
+  {
+   "organisation": "Hedera",
+   "activity score": 15,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 15
+  },
+  {
+   "organisation": "Turtle Moon",
+   "activity score": 3,
+   "2026-03": 3,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:05.295889+00:00",
+ "stale": false
+}

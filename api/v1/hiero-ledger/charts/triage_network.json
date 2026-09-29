@@ -1,0 +1,516 @@
+{
+ "note": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos are linked when they share a triage holder (thicker line = more shared). Bubble colour is the repo's category.",
+ "methodology": [
+  "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+  "Make each repository a node, sized by how many holders of that role it has.",
+  "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+  "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+ ],
+ "schema_version": 1,
+ "id": "triage_network",
+ "kind": "network",
+ "org": "hiero-ledger",
+ "source": "triage_network_nodes.csv",
+ "metric": "triage_comembership",
+ "unit": "Repositories linked by shared triage holders",
+ "population": "A node is a repository where someone holds the triage role (their highest role in that repository); its size is how many of those triage holders were active there in the last 90 days. A link joins two repositories that share at least one triage, counted whether active or not.",
+ "dimensions": [
+  "repo",
+  "link"
+ ],
+ "member_label": "triage holders",
+ "categories": [
+  {
+   "key": "SDKs",
+   "label": "SDKs",
+   "color": "#0EA5E9"
+  },
+  {
+   "key": "Core network",
+   "label": "Core network",
+   "color": "#F97316"
+  },
+  {
+   "key": "EVM / smart contracts",
+   "label": "EVM / smart contracts",
+   "color": "#14B8A6"
+  },
+  {
+   "key": "Tooling / DevEx",
+   "label": "Tooling / DevEx",
+   "color": "#F59E0B"
+  },
+  {
+   "key": "Docs / Web",
+   "label": "Docs / Web",
+   "color": "#64748B"
+  },
+  {
+   "key": "Apps / Integrations",
+   "label": "Apps / Integrations",
+   "color": "#EC4899"
+  }
+ ],
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:09:55.600965+00:00"
+ },
+ "nodes": [
+  {
+   "id": "hiero-sdk-java",
+   "active": 5,
+   "total": 12,
+   "category": "SDKs",
+   "x": -0.78,
+   "y": 0.6419
+  },
+  {
+   "id": "hiero-sdk-cpp",
+   "active": 3,
+   "total": 15,
+   "category": "SDKs",
+   "x": 0.1637,
+   "y": 0.3818
+  },
+  {
+   "id": "hiero-sdk-tck",
+   "active": 3,
+   "total": 7,
+   "category": "SDKs",
+   "x": -1.3999,
+   "y": -1.2825
+  },
+  {
+   "id": "hiero-sdk-python",
+   "active": 2,
+   "total": 13,
+   "category": "SDKs",
+   "x": -0.1182,
+   "y": 1.2825
+  },
+  {
+   "id": "hiero-sdk-js",
+   "active": 2,
+   "total": 12,
+   "category": "SDKs",
+   "x": 0.436,
+   "y": -0.5702
+  },
+  {
+   "id": "hiero-sdk-rust",
+   "active": 2,
+   "total": 12,
+   "category": "SDKs",
+   "x": -1.2766,
+   "y": -0.174
+  },
+  {
+   "id": "hiero-sdk-go",
+   "active": 2,
+   "total": 11,
+   "category": "SDKs",
+   "x": -0.5065,
+   "y": -0.923
+  },
+  {
+   "id": "hiero-consensus-node",
+   "active": 2,
+   "total": 3,
+   "category": "Core network",
+   "x": 2.4398,
+   "y": -3.3356
+  },
+  {
+   "id": "hiero-sdk-swift",
+   "active": 1,
+   "total": 15,
+   "category": "SDKs",
+   "x": -0.3163,
+   "y": -0.1529
+  },
+  {
+   "id": "sdk-collaboration-hub",
+   "active": 1,
+   "total": 6,
+   "category": "SDKs",
+   "x": -2.2583,
+   "y": -0.1134
+  },
+  {
+   "id": "hiero-block-node",
+   "active": 1,
+   "total": 2,
+   "category": "Core network",
+   "x": 3.7019,
+   "y": -0.0316
+  },
+  {
+   "id": "hiero-enterprise-java",
+   "active": 0,
+   "total": 12,
+   "category": "Apps / Integrations",
+   "x": -1.4107,
+   "y": 0.8939
+  },
+  {
+   "id": "hiero-website",
+   "active": 0,
+   "total": 5,
+   "category": "Docs / Web",
+   "x": 2.2583,
+   "y": 0.6044
+  },
+  {
+   "id": "solo-build-actions",
+   "active": 0,
+   "total": 3,
+   "category": "Tooling / DevEx",
+   "x": 4.6108,
+   "y": -1.7156
+  },
+  {
+   "id": "hiero-contracts",
+   "active": 0,
+   "total": 1,
+   "category": "EVM / smart contracts",
+   "x": 6.8515,
+   "y": -1.4864
+  },
+  {
+   "id": "hiero-json-rpc-relay",
+   "active": 0,
+   "total": 1,
+   "category": "EVM / smart contracts",
+   "x": 5.1234,
+   "y": 1.7156
+  },
+  {
+   "id": "solo",
+   "active": 0,
+   "total": 1,
+   "category": "Tooling / DevEx",
+   "x": 7.138,
+   "y": 0.7356
+  }
+ ],
+ "edges": [
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-swift",
+   "shared": 14
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-rust",
+   "shared": 11
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-swift",
+   "shared": 11
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-swift",
+   "shared": 10
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-rust",
+   "shared": 10
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-java",
+   "shared": 10
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-cpp",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-java",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-rust",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-rust",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-swift",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-java",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-js",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-go",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "hiero-sdk-swift",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-swift",
+   "shared": 9
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-go",
+   "shared": 9
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-python",
+   "shared": 9
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-swift",
+   "shared": 9
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-python",
+   "shared": 9
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-python",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-python",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-js",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-rust",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-rust",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-js",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-tck",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "hiero-sdk-tck",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-tck",
+   "shared": 7
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-js",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "hiero-sdk-tck",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "sdk-collaboration-hub",
+   "shared": 6
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "sdk-collaboration-hub",
+   "shared": 6
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-tck",
+   "shared": 6
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-tck",
+   "shared": 6
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "sdk-collaboration-hub",
+   "shared": 6
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-python",
+   "shared": 6
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-tck",
+   "shared": 5
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "sdk-collaboration-hub",
+   "shared": 5
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "sdk-collaboration-hub",
+   "shared": 5
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "sdk-collaboration-hub",
+   "shared": 5
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "sdk-collaboration-hub",
+   "shared": 5
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-website",
+   "shared": 4
+  },
+  {
+   "source": "hiero-sdk-tck",
+   "target": "sdk-collaboration-hub",
+   "shared": 4
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-tck",
+   "shared": 3
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "sdk-collaboration-hub",
+   "shared": 3
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-website",
+   "shared": 3
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "hiero-website",
+   "shared": 3
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "solo-build-actions",
+   "shared": 2
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-website",
+   "shared": 2
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-website",
+   "shared": 1
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-website",
+   "shared": 1
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "hiero-website",
+   "shared": 1
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "hiero-website",
+   "shared": 1
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-contracts",
+   "shared": 1
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-json-rpc-relay",
+   "shared": 1
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "solo",
+   "shared": 1
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "hiero-json-rpc-relay",
+   "shared": 1
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "solo",
+   "shared": 1
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "solo-build-actions",
+   "shared": 1
+  },
+  {
+   "source": "hiero-json-rpc-relay",
+   "target": "solo",
+   "shared": 1
+  },
+  {
+   "source": "hiero-json-rpc-relay",
+   "target": "solo-build-actions",
+   "shared": 1
+  },
+  {
+   "source": "solo",
+   "target": "solo-build-actions",
+   "shared": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:09:55.600965+00:00",
+ "stale": false
+}

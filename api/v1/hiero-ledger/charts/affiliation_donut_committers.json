@@ -1,0 +1,130 @@
+{
+ "note": "Every employer with at least one resolved role-holder, largest first. Check the affiliations-known tile before reading the bars as the whole population.",
+ "methodology": [
+  "Same construction as the maintainer tab, over the people whose highest role anywhere is committer: write access in at least one repository and a maintainer seat in none.",
+  "Look up each committer's organisation in the same curated affiliations file, by the same priority order.",
+  "Count distinct resolved committers per organisation, pooling employer-less people as 'Independent' and then, as on the maintainer tab, into 'Other' \u2014 only employers are ranked. Exclude unmapped people from the pie and use the unknown rows in the companion table to assess the known share, which is materially lower than for maintainers."
+ ],
+ "schema_version": 1,
+ "id": "affiliation_donut_committers",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "affiliation_distribution_committers.csv",
+ "metric": "committer_affiliations",
+ "unit": "Committers",
+ "population": "People whose highest role anywhere is committer, by curated employer. Solo contributors appear as 'Independent'; people with no curated affiliation are excluded, so shares are of resolved people only.",
+ "dimensions": [
+  "organisation"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 10,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:01.574381+00:00"
+ },
+ "series": [
+  {
+   "key": "committers",
+   "label": "Committers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "committers": 37
+  },
+  {
+   "organisation": "Independent",
+   "committers": 26
+  },
+  {
+   "organisation": "LimeChain",
+   "committers": 16
+  },
+  {
+   "organisation": "BlockyDevs",
+   "committers": 3
+  },
+  {
+   "organisation": "Launchbadge",
+   "committers": 3
+  },
+  {
+   "organisation": "BugBytes, Inc.",
+   "committers": 1
+  },
+  {
+   "organisation": "DSR Corporation",
+   "committers": 1
+  },
+  {
+   "organisation": "Envision Blockchain",
+   "committers": 1
+  },
+  {
+   "organisation": "FundRequest",
+   "committers": 1
+  },
+  {
+   "organisation": "Hedera",
+   "committers": 1
+  },
+  {
+   "organisation": "OpenElements",
+   "committers": 1
+  },
+  {
+   "organisation": "RECDeFi",
+   "committers": 1
+  },
+  {
+   "organisation": "Robinhood",
+   "committers": 1
+  },
+  {
+   "organisation": "ScalemaiL",
+   "committers": 1
+  },
+  {
+   "organisation": "Studio Monolith",
+   "committers": 1
+  },
+  {
+   "organisation": "VSP",
+   "committers": 1
+  },
+  {
+   "organisation": "contributor",
+   "committers": 1
+  },
+  {
+   "organisation": "dovuofficial",
+   "committers": 1
+  },
+  {
+   "organisation": "luthersystems",
+   "committers": 1
+  },
+  {
+   "organisation": "suku.world",
+   "committers": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:01.574381+00:00",
+ "stale": false
+}

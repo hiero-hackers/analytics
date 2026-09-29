@@ -1,0 +1,68 @@
+{
+ "note": "Each bar is an organisation; bar height is how many governance teams it solely controls \u2014 every resolved member of that team shares this one employer. Taller bars mean more single-employer teams, a governance-capture / bus-factor risk. Teams are counted only where their members resolve to an employer, so teams dominated by unmapped members are not over-counted here.",
+ "methodology": [
+  "Take every team in the governance config and list its members.",
+  "Map each member to an organisation via the affiliations file (same resolution as the other org charts).",
+  "Flag a team 'single-employer' when every member that resolves to an organisation shares the same one (at least two such members, and no independents).",
+  "Group those single-employer teams by the organisation that controls them.",
+  "Plot one bar per organisation \u2014 its height is how many teams it solely controls."
+ ],
+ "schema_version": 1,
+ "id": "single_employer_teams_by_org",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "single_employer_teams_by_org.csv",
+ "metric": "single_employer_teams_by_org",
+ "unit": "Teams",
+ "population": "Governance teams whose resolved members share one employer. Independent and unresolved affiliations follow the diversity table's counting rules.",
+ "dimensions": [
+  "organisation"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:02.482061+00:00"
+ },
+ "series": [
+  {
+   "key": "teams",
+   "label": "Teams",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "teams": 23
+  },
+  {
+   "organisation": "DSR Corporation",
+   "teams": 2
+  },
+  {
+   "organisation": "Linux Foundation",
+   "teams": 2
+  },
+  {
+   "organisation": "LimeChain",
+   "teams": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:02.482061+00:00",
+ "stale": false
+}

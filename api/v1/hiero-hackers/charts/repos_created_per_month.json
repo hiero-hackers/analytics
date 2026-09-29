@@ -1,0 +1,117 @@
+{
+ "note": "The monthly count of new repositories created in the organisation. Zero-creation months are shown as 0 so the full timeline is visible.",
+ "methodology": [
+  "Fetch every repository in the organisation via the GitHub GraphQL API.",
+  "Extract each repository's createdAt timestamp and bucket it by calendar month.",
+  "Count repos created per month; months with zero creations are filled in so the timeline is continuous.",
+  "The peak month and the latest month are annotated on the chart."
+ ],
+ "schema_version": 1,
+ "id": "repos_created_per_month",
+ "kind": "timeseries",
+ "org": "hiero-hackers",
+ "source": "repo_growth_timeline.csv",
+ "metric": "repositories_created",
+ "unit": "Repositories created",
+ "population": "Repositories currently in the organisation, by the month GitHub records them as created. Deleted or transferred-out repositories are not counted.",
+ "dimensions": [
+  "period"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "month",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-08",
+  "previous": "2026-07"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Month (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2025-10",
+  "last": "2026-09"
+ },
+ "series": [
+  {
+   "key": "repos_created",
+   "label": "New repositories",
+   "color": "var(--chart-committer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2025-10",
+   "repos_created": 1,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11",
+   "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12",
+   "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01",
+   "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02",
+   "repos_created": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03",
+   "repos_created": 3,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04",
+   "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05",
+   "repos_created": 9,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06",
+   "repos_created": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07",
+   "repos_created": 10,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08",
+   "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09",
+   "repos_created": 1,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-09-29T20:13:03.245401+00:00",
+ "stale": false
+}

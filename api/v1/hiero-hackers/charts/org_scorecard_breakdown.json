@@ -1,0 +1,250 @@
+{
+ "note": "One row per repository, one column per check; stronger colour means a higher check score on a fixed 0\u201310 scale. Scorecard weights the checks into its score, so they do not add up to it.",
+ "methodology": [
+  "Take the same published scorecards as the overall-score chart.",
+  "Split each repository's result into the individual checks that produced it (Code-Review, Branch-Protection, Maintained, and so on).",
+  "Stack the per-check scores per repository, one colour per check, so a low total traces to a practice."
+ ],
+ "schema_version": 1,
+ "id": "org_scorecard_breakdown",
+ "kind": "matrix",
+ "org": "hiero-hackers",
+ "source": "org_scorecard_checks.csv",
+ "metric": "openssf_scorecard_checks",
+ "unit": "OpenSSF Scorecard check scores",
+ "population": "Each repository's per-check OpenSSF Scorecard results (0\u201310), as published by the Scorecard API. 'Not scored' means Scorecard reported the check as inconclusive or did not report it. The aggregate is Scorecard's own weighted score, not the sum or mean of the checks.",
+ "dimensions": [
+  "repo",
+  "column"
+ ],
+ "row": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "sublabel": null,
+ "total": {
+  "key": "score",
+  "label": "Aggregate score"
+ },
+ "columns": [
+  {
+   "key": "Maintained",
+   "label": "Maintained"
+  },
+  {
+   "key": "Code-Review",
+   "label": "Code-Review"
+  },
+  {
+   "key": "CII-Best-Practices",
+   "label": "CII-Best-Practices"
+  },
+  {
+   "key": "Dangerous-Workflow",
+   "label": "Dangerous-Workflow"
+  },
+  {
+   "key": "Binary-Artifacts",
+   "label": "Binary-Artifacts"
+  },
+  {
+   "key": "Token-Permissions",
+   "label": "Token-Permissions"
+  },
+  {
+   "key": "Pinned-Dependencies",
+   "label": "Pinned-Dependencies"
+  },
+  {
+   "key": "Fuzzing",
+   "label": "Fuzzing"
+  },
+  {
+   "key": "License",
+   "label": "License"
+  },
+  {
+   "key": "Signed-Releases",
+   "label": "Signed-Releases"
+  },
+  {
+   "key": "Security-Policy",
+   "label": "Security-Policy"
+  },
+  {
+   "key": "Branch-Protection",
+   "label": "Branch-Protection"
+  },
+  {
+   "key": "Packaging",
+   "label": "Packaging"
+  },
+  {
+   "key": "SAST",
+   "label": "SAST"
+  }
+ ],
+ "value_label": "Check score (0\u201310)",
+ "scale": {
+  "min": 0,
+  "max": 10,
+  "steps": 5
+ },
+ "missing": "Not scored",
+ "avatars": false,
+ "top_n": null,
+ "value_format": "decimal",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:12:33.713116+00:00"
+ },
+ "rows": [
+  {
+   "repo": "hiero-enterprise-js",
+   "score": 8.0,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 5.0,
+   "Packaging": null,
+   "SAST": 10.0
+  },
+  {
+   "repo": "analytics",
+   "score": 9.3,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 9.0,
+   "Fuzzing": 10.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 5.0,
+   "Packaging": null,
+   "SAST": 10.0
+  },
+  {
+   "repo": "sdk-automations",
+   "score": 9.2,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 10.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 5.0,
+   "Packaging": null,
+   "SAST": 10.0
+  },
+  {
+   "repo": "hiero-verify-fn",
+   "score": 6.8,
+   "Maintained": 0.0,
+   "Code-Review": 0.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 5.0,
+   "Packaging": 10.0,
+   "SAST": 10.0
+  },
+  {
+   "repo": "hiero-notifications",
+   "score": 5.8,
+   "Maintained": 0.0,
+   "Code-Review": 0.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 8.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 0.0,
+   "Packaging": 10.0,
+   "SAST": 10.0
+  },
+  {
+   "repo": "hiero-receipts",
+   "score": 6.2,
+   "Maintained": 0.0,
+   "Code-Review": 0.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 10.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 0.0,
+   "Packaging": null,
+   "SAST": 10.0
+  },
+  {
+   "repo": "hiero-payment-requests",
+   "score": 6.3,
+   "Maintained": 0.0,
+   "Code-Review": 2.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 10.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 0.0,
+   "Packaging": null,
+   "SAST": 9.0
+  },
+  {
+   "repo": "hiero-x402",
+   "score": 6.2,
+   "Maintained": 0.0,
+   "Code-Review": 1.0,
+   "CII-Best-Practices": 0.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 10.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 4.0,
+   "Branch-Protection": 0.0,
+   "Packaging": null,
+   "SAST": 10.0
+  }
+ ],
+ "generated_at": "2026-09-29T20:12:33.713116+00:00",
+ "stale": false
+}

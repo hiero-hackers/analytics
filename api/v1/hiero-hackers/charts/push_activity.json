@@ -1,0 +1,58 @@
+{
+ "note": "The share of repositories that received a push in the last 30 days (active) versus those that did not (inactive).",
+ "methodology": [
+  "List the organisation's repositories with their last-push timestamp.",
+  "Classify each repository by whether it received a push in the last 30 days.",
+  "Count repositories in each state. Pushes are counted, not merged PRs."
+ ],
+ "schema_version": 1,
+ "id": "push_activity",
+ "kind": "categories",
+ "org": "hiero-hackers",
+ "source": "push_activity.csv",
+ "metric": "push_activity",
+ "unit": "Repositories",
+ "population": "Repositories with a push in the 30 days before collection versus other repositories.",
+ "dimensions": [
+  "status"
+ ],
+ "mark": "meter",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "status",
+  "label": "Push activity"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:29.708489+00:00"
+ },
+ "series": [
+  {
+   "key": "count",
+   "label": "Repositories",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "status": "Active",
+   "count": 12
+  },
+  {
+   "status": "Inactive",
+   "count": 16
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:29.708489+00:00",
+ "stale": false
+}

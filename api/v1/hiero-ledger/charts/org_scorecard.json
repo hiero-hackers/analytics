@@ -1,0 +1,178 @@
+{
+ "note": "Each repository's overall OpenSSF Scorecard score (0\u201310), a measure of security practices. Repositories without a published scorecard are omitted.",
+ "methodology": [
+  "List the organisation's public repositories.",
+  "Request each repository's published score from the public OpenSSF Scorecard API \u2014 the score is read, never computed here.",
+  "Omit repositories with no published scorecard rather than plotting them as zero, since 'unscored' and 'scored badly' are different findings.",
+  "Plot the remaining repositories by overall score (0\u201310)."
+ ],
+ "schema_version": 1,
+ "id": "org_scorecard",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "org_scorecard.csv",
+ "metric": "openssf_scorecard",
+ "unit": "OpenSSF Scorecard score (0\u201310)",
+ "population": "Each repository's aggregate OpenSSF Scorecard score, as published by the Scorecard API. Repositories without a published scorecard are absent.",
+ "dimensions": [
+  "repo"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "decimal",
+ "rank": true,
+ "top_n": 15,
+ "reference": {
+  "value": 7.3,
+  "label": "Org median 7.3"
+ },
+ "value_max": 10,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:10.186996+00:00"
+ },
+ "series": [
+  {
+   "key": "score",
+   "label": "Score",
+   "color": "var(--chart-committer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "hiero-sdk-java",
+   "score": 8.1
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "score": 8.7
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "score": 8.9
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "score": 7.1
+  },
+  {
+   "repo": "hiero-cli",
+   "score": 6.6
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "score": 8.1
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "score": 7.3
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "score": 6.8
+  },
+  {
+   "repo": "hiero-docs",
+   "score": 7.7
+  },
+  {
+   "repo": "hiero-local-node",
+   "score": 7.2
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "score": 6.5
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "score": 6.8
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "score": 9.1
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "score": 7.8
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "score": 6.5
+  },
+  {
+   "repo": "solo",
+   "score": 7.3
+  },
+  {
+   "repo": "hiero-block-node",
+   "score": 6.6
+  },
+  {
+   "repo": "hiero-solo-action",
+   "score": 7.2
+  },
+  {
+   "repo": "hiero-website",
+   "score": 9.0
+  },
+  {
+   "repo": "hiero",
+   "score": 7.4
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "score": 9.4
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "score": 8.3
+  },
+  {
+   "repo": "hiero-hederium",
+   "score": 4.9
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "score": 5.8
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "score": 5.8
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "score": 6.1
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "score": 8.2
+  },
+  {
+   "repo": "hiero-contracts",
+   "score": 6.3
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "score": 7.3
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "score": 4.4
+  },
+  {
+   "repo": "heka-identity-platform",
+   "score": 8.2
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:10.186996+00:00",
+ "stale": false
+}

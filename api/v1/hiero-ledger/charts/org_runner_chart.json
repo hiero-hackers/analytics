@@ -1,0 +1,295 @@
+{
+ "note": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard (GitHub-hosted), or indeterminate (could not be classified).",
+ "methodology": [
+  "Read every GitHub Actions workflow file in each repository.",
+  "Classify each job's `runs-on` label as self-hosted, standard (a GitHub-hosted image), or indeterminate when the label cannot be resolved (e.g. a variable or a custom group name).",
+  "Count jobs, not repositories, and stack them per repository \u2014 so a repository with many jobs contributes proportionally more."
+ ],
+ "schema_version": 1,
+ "id": "org_runner_chart",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "org_runner_summary.csv",
+ "metric": "org_runner_summary",
+ "unit": "Workflow jobs",
+ "population": "Workflow job runner declarations, grouped by repository. Indeterminate declarations cannot be classified.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:11:03.776602+00:00"
+ },
+ "series": [
+  {
+   "key": "Self-Hosted",
+   "label": "Self-Hosted",
+   "color": "var(--chart-1)"
+  },
+  {
+   "key": "Standard",
+   "label": "Standard",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "Indeterminate",
+   "label": "Indeterminate",
+   "color": "var(--chart-3)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "hiero-sdk-java",
+   "Self-Hosted": 11,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "Self-Hosted": 9,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "Self-Hosted": 33,
+   "Standard": 1,
+   "Indeterminate": 2
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "Self-Hosted": 21,
+   "Standard": 3,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-cli",
+   "Self-Hosted": 5,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Self-Hosted": 5,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "Self-Hosted": 2,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "Self-Hosted": 267,
+   "Standard": 0,
+   "Indeterminate": 5
+  },
+  {
+   "repo": "hiero-docs",
+   "Self-Hosted": 2,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-local-node",
+   "Self-Hosted": 7,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "Self-Hosted": 9,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Self-Hosted": 33,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "Self-Hosted": 6,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Self-Hosted": 8,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "Self-Hosted": 13,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Self-Hosted": 9,
+   "Standard": 1,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "solo",
+   "Self-Hosted": 33,
+   "Standard": 5,
+   "Indeterminate": 4
+  },
+  {
+   "repo": "hiero-block-node",
+   "Self-Hosted": 30,
+   "Standard": 0,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "hiero-solo-action",
+   "Self-Hosted": 0,
+   "Standard": 8,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "solo-charts",
+   "Self-Hosted": 3,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "solo-containers",
+   "Self-Hosted": 4,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "governance",
+   "Self-Hosted": 4,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-website",
+   "Self-Hosted": 9,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero",
+   "Self-Hosted": 1,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "tsc",
+   "Self-Hosted": 1,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": ".github",
+   "Self-Hosted": 0,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "Self-Hosted": 31,
+   "Standard": 4,
+   "Indeterminate": 7
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "Self-Hosted": 4,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-hederium",
+   "Self-Hosted": 0,
+   "Standard": 5,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "Self-Hosted": 0,
+   "Standard": 7,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "Self-Hosted": 3,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "homebrew-tools",
+   "Self-Hosted": 1,
+   "Standard": 0,
+   "Indeterminate": 3
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "Self-Hosted": 0,
+   "Standard": 11,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "Self-Hosted": 2,
+   "Standard": 0,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-contracts",
+   "Self-Hosted": 9,
+   "Standard": 1,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "Self-Hosted": 0,
+   "Standard": 2,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "Self-Hosted": 11,
+   "Standard": 24,
+   "Indeterminate": 1
+  },
+  {
+   "repo": "heka-identity-platform",
+   "Self-Hosted": 0,
+   "Standard": 12,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "solo-docs",
+   "Self-Hosted": 2,
+   "Standard": 0,
+   "Indeterminate": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:03.776602+00:00",
+ "stale": false
+}

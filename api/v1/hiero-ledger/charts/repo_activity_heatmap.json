@@ -1,0 +1,465 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Take every tracked event in the last six months (bots excluded), keyed by the repository it occurred in.",
+  "Weight each event (issues \u00d72, reviews \u00d73, PRs opened \u00d73, merges \u00d72) and bucket by month.",
+  "Sum the weighted score per repository per month \u2014 each event counts once.",
+  "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score."
+ ],
+ "schema_version": 1,
+ "id": "repo_activity_heatmap",
+ "kind": "matrix",
+ "org": "hiero-ledger",
+ "source": "repo_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each event counts once, in the repository where it happened.",
+ "dimensions": [
+  "repo",
+  "column"
+ ],
+ "row": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "sublabel": null,
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-03",
+   "label": "2026-03"
+  },
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 6254,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": false,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:06.748036+00:00"
+ },
+ "rows": [
+  {
+   "repo": "hiero-consensus-node",
+   "activity score": 27595,
+   "2026-03": 6254,
+   "2026-04": 4532,
+   "2026-05": 4261,
+   "2026-06": 4330,
+   "2026-07": 4605,
+   "2026-08": 3613
+  },
+  {
+   "repo": "hiero-block-node",
+   "activity score": 16598,
+   "2026-03": 2369,
+   "2026-04": 2287,
+   "2026-05": 3250,
+   "2026-06": 2868,
+   "2026-07": 3293,
+   "2026-08": 2531
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "activity score": 11163,
+   "2026-03": 2121,
+   "2026-04": 1818,
+   "2026-05": 1867,
+   "2026-06": 1572,
+   "2026-07": 1782,
+   "2026-08": 2003
+  },
+  {
+   "repo": "solo",
+   "activity score": 10865,
+   "2026-03": 1864,
+   "2026-04": 2124,
+   "2026-05": 1858,
+   "2026-06": 1656,
+   "2026-07": 1529,
+   "2026-08": 1834
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "activity score": 7470,
+   "2026-03": 1271,
+   "2026-04": 1656,
+   "2026-05": 1316,
+   "2026-06": 841,
+   "2026-07": 1030,
+   "2026-08": 1356
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "activity score": 5897,
+   "2026-03": 1717,
+   "2026-04": 1958,
+   "2026-05": 1116,
+   "2026-06": 316,
+   "2026-07": 356,
+   "2026-08": 434
+  },
+  {
+   "repo": "hiero-cli",
+   "activity score": 3945,
+   "2026-03": 1752,
+   "2026-04": 1052,
+   "2026-05": 926,
+   "2026-06": 116,
+   "2026-07": 86,
+   "2026-08": 13
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "activity score": 3284,
+   "2026-03": 720,
+   "2026-04": 1683,
+   "2026-05": 816,
+   "2026-06": 27,
+   "2026-07": 15,
+   "2026-08": 23
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "activity score": 2835,
+   "2026-03": 611,
+   "2026-04": 366,
+   "2026-05": 617,
+   "2026-06": 342,
+   "2026-07": 532,
+   "2026-08": 367
+  },
+  {
+   "repo": "hiero-website",
+   "activity score": 2699,
+   "2026-03": 475,
+   "2026-04": 765,
+   "2026-05": 522,
+   "2026-06": 264,
+   "2026-07": 384,
+   "2026-08": 289
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "activity score": 2055,
+   "2026-03": 207,
+   "2026-04": 347,
+   "2026-05": 534,
+   "2026-06": 277,
+   "2026-07": 218,
+   "2026-08": 472
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "activity score": 1945,
+   "2026-03": 200,
+   "2026-04": 327,
+   "2026-05": 444,
+   "2026-06": 366,
+   "2026-07": 338,
+   "2026-08": 270
+  },
+  {
+   "repo": "solo-docs",
+   "activity score": 1753,
+   "2026-03": 347,
+   "2026-04": 309,
+   "2026-05": 273,
+   "2026-06": 471,
+   "2026-07": 147,
+   "2026-08": 206
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "activity score": 1560,
+   "2026-03": 289,
+   "2026-04": 243,
+   "2026-05": 250,
+   "2026-06": 203,
+   "2026-07": 273,
+   "2026-08": 302
+  },
+  {
+   "repo": "governance",
+   "activity score": 1475,
+   "2026-03": 433,
+   "2026-04": 120,
+   "2026-05": 227,
+   "2026-06": 111,
+   "2026-07": 188,
+   "2026-08": 396
+  },
+  {
+   "repo": "hiero-improvement-proposals",
+   "activity score": 1373,
+   "2026-03": 519,
+   "2026-04": 162,
+   "2026-05": 182,
+   "2026-06": 276,
+   "2026-07": 139,
+   "2026-08": 95
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "activity score": 1105,
+   "2026-03": 174,
+   "2026-04": 216,
+   "2026-05": 267,
+   "2026-06": 125,
+   "2026-07": 168,
+   "2026-08": 155
+  },
+  {
+   "repo": "heka-identity-platform",
+   "activity score": 1056,
+   "2026-03": 109,
+   "2026-04": 356,
+   "2026-05": 277,
+   "2026-06": 87,
+   "2026-07": 162,
+   "2026-08": 65
+  },
+  {
+   "repo": "hiero-cryptography",
+   "activity score": 1049,
+   "2026-03": 247,
+   "2026-04": 145,
+   "2026-05": 128,
+   "2026-06": 202,
+   "2026-07": 129,
+   "2026-08": 198
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "activity score": 979,
+   "2026-03": 243,
+   "2026-04": 448,
+   "2026-05": 167,
+   "2026-06": 37,
+   "2026-07": 43,
+   "2026-08": 41
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "activity score": 562,
+   "2026-03": 135,
+   "2026-04": 3,
+   "2026-05": 178,
+   "2026-06": 102,
+   "2026-07": 73,
+   "2026-08": 71
+  },
+  {
+   "repo": "hiero-contracts",
+   "activity score": 476,
+   "2026-03": 17,
+   "2026-04": 223,
+   "2026-05": 100,
+   "2026-06": 3,
+   "2026-07": 42,
+   "2026-08": 91
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "activity score": 455,
+   "2026-03": 129,
+   "2026-04": 192,
+   "2026-05": 118,
+   "2026-06": 3,
+   "2026-07": 2,
+   "2026-08": 11
+  },
+  {
+   "repo": "homebrew-tools",
+   "activity score": 426,
+   "2026-03": 74,
+   "2026-04": 68,
+   "2026-05": 110,
+   "2026-06": 104,
+   "2026-07": 60,
+   "2026-08": 10
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "activity score": 389,
+   "2026-03": 54,
+   "2026-04": 38,
+   "2026-05": 41,
+   "2026-06": 11,
+   "2026-07": 133,
+   "2026-08": 112
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "activity score": 299,
+   "2026-03": 56,
+   "2026-04": 125,
+   "2026-05": 94,
+   "2026-06": 11,
+   "2026-07": 2,
+   "2026-08": 11
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "activity score": 193,
+   "2026-03": 112,
+   "2026-04": 19,
+   "2026-05": 35,
+   "2026-06": 10,
+   "2026-07": 0,
+   "2026-08": 17
+  },
+  {
+   "repo": "hiero",
+   "activity score": 144,
+   "2026-03": 58,
+   "2026-04": 11,
+   "2026-05": 9,
+   "2026-06": 3,
+   "2026-07": 9,
+   "2026-08": 54
+  },
+  {
+   "repo": "hiero-docs",
+   "activity score": 143,
+   "2026-03": 8,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 88,
+   "2026-08": 45
+  },
+  {
+   "repo": "hiero-local-node",
+   "activity score": 124,
+   "2026-03": 67,
+   "2026-04": 10,
+   "2026-05": 29,
+   "2026-06": 3,
+   "2026-07": 12,
+   "2026-08": 3
+  },
+  {
+   "repo": "hiero-solo-action",
+   "activity score": 124,
+   "2026-03": 6,
+   "2026-04": 58,
+   "2026-05": 25,
+   "2026-06": 13,
+   "2026-07": 8,
+   "2026-08": 14
+  },
+  {
+   "repo": ".github",
+   "activity score": 112,
+   "2026-03": 35,
+   "2026-04": 8,
+   "2026-05": 3,
+   "2026-06": 45,
+   "2026-07": 8,
+   "2026-08": 13
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "activity score": 87,
+   "2026-03": 31,
+   "2026-04": 28,
+   "2026-05": 11,
+   "2026-06": 14,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "repo": "awesome-contributions",
+   "activity score": 40,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 3,
+   "2026-06": 0,
+   "2026-07": 17,
+   "2026-08": 20
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "activity score": 35,
+   "2026-03": 23,
+   "2026-04": 6,
+   "2026-05": 0,
+   "2026-06": 3,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "repo": "tsc",
+   "activity score": 26,
+   "2026-03": 2,
+   "2026-04": 2,
+   "2026-05": 14,
+   "2026-06": 0,
+   "2026-07": 6,
+   "2026-08": 2
+  },
+  {
+   "repo": "hiero-hederium",
+   "activity score": 16,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 13,
+   "2026-08": 3
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "activity score": 8,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 8,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "activity score": 6,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 3,
+   "2026-07": 0,
+   "2026-08": 3
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:06.748036+00:00",
+ "stale": false
+}

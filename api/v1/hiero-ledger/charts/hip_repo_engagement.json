@@ -1,0 +1,307 @@
+{
+ "note": "Repositories ranked by how many distinct HIPs they have merged referencing PRs for. Breadth, not volume \u2014 one PR per HIP counts the same as fifty. Derived from hip_repo_engagement.csv.",
+ "methodology": [
+  "Take every counted (HIP, PR) reference \u2014 merged PRs only, proposals-repo and distancing-cue references already excluded.",
+  "For each repository, count the *distinct* HIPs it has merged a referencing PR for, so one PR per HIP counts the same as fifty.",
+  "Rank repositories by that breadth, keeping zero-reference repositories visible: many are tooling or docs where HIPs may not apply, and relevance is a human call."
+ ],
+ "schema_version": 1,
+ "id": "hip_repo_engagement",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "hip_repo_engagement.csv",
+ "metric": "hip_repo_engagement",
+ "unit": "Distinct HIPs",
+ "population": "Distinct HIP specs cited by merged pull requests in each repository, over all recorded history. Repositories with no citing PRs keep their zero rows.",
+ "dimensions": [
+  "repo"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "all",
+  "days": null,
+  "end": "2026-09-29T20:11:46.048482+00:00"
+ },
+ "series": [
+  {
+   "key": "distinct_hips_merged",
+   "label": "Distinct HIPs",
+   "color": "var(--heat-4)"
+  }
+ ],
+ "details": [
+  {
+   "format": "number",
+   "key": "matched_prs",
+   "label": "Merged PRs citing a HIP"
+  },
+  {
+   "format": "number",
+   "key": "total_prs",
+   "label": "All merged PRs"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "hiero-consensus-node",
+   "distinct_hips_merged": 38,
+   "matched_prs": 228,
+   "total_prs": 5157
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "distinct_hips_merged": 35,
+   "matched_prs": 194,
+   "total_prs": 3620
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "distinct_hips_merged": 14,
+   "matched_prs": 37,
+   "total_prs": 1073
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "distinct_hips_merged": 14,
+   "matched_prs": 24,
+   "total_prs": 476
+  },
+  {
+   "repo": "solo",
+   "distinct_hips_merged": 13,
+   "matched_prs": 13,
+   "total_prs": 2379
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "distinct_hips_merged": 13,
+   "matched_prs": 27,
+   "total_prs": 603
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "distinct_hips_merged": 13,
+   "matched_prs": 15,
+   "total_prs": 497
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "distinct_hips_merged": 12,
+   "matched_prs": 14,
+   "total_prs": 138
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "distinct_hips_merged": 11,
+   "matched_prs": 12,
+   "total_prs": 1363
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "distinct_hips_merged": 11,
+   "matched_prs": 16,
+   "total_prs": 1026
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "distinct_hips_merged": 9,
+   "matched_prs": 10,
+   "total_prs": 278
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "distinct_hips_merged": 9,
+   "matched_prs": 26,
+   "total_prs": 176
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "distinct_hips_merged": 5,
+   "matched_prs": 5,
+   "total_prs": 1049
+  },
+  {
+   "repo": "hiero-block-node",
+   "distinct_hips_merged": 4,
+   "matched_prs": 9,
+   "total_prs": 1586
+  },
+  {
+   "repo": "hiero-website",
+   "distinct_hips_merged": 4,
+   "matched_prs": 4,
+   "total_prs": 374
+  },
+  {
+   "repo": "hiero-contracts",
+   "distinct_hips_merged": 4,
+   "matched_prs": 4,
+   "total_prs": 95
+  },
+  {
+   "repo": "governance",
+   "distinct_hips_merged": 3,
+   "matched_prs": 3,
+   "total_prs": 552
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "distinct_hips_merged": 3,
+   "matched_prs": 2,
+   "total_prs": 272
+  },
+  {
+   "repo": "hiero-cli",
+   "distinct_hips_merged": 2,
+   "matched_prs": 2,
+   "total_prs": 562
+  },
+  {
+   "repo": "tsc",
+   "distinct_hips_merged": 2,
+   "matched_prs": 2,
+   "total_prs": 145
+  },
+  {
+   "repo": "hiero-local-node",
+   "distinct_hips_merged": 1,
+   "matched_prs": 2,
+   "total_prs": 266
+  },
+  {
+   "repo": "hiero-docs",
+   "distinct_hips_merged": 1,
+   "matched_prs": 1,
+   "total_prs": 58
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 407
+  },
+  {
+   "repo": "hiero-cryptography",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 371
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 210
+  },
+  {
+   "repo": "solo-docs",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 174
+  },
+  {
+   "repo": "heka-identity-platform",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 115
+  },
+  {
+   "repo": "hiero-hederium",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 109
+  },
+  {
+   "repo": "solo-charts",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 100
+  },
+  {
+   "repo": "solo-containers",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 100
+  },
+  {
+   "repo": "hiero-solo-action",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 80
+  },
+  {
+   "repo": "homebrew-tools",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 80
+  },
+  {
+   "repo": "hiero",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 78
+  },
+  {
+   "repo": ".github",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 55
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 54
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 45
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 31
+  },
+  {
+   "repo": "awesome-contributions",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 16
+  },
+  {
+   "repo": "identity-collaboration-hub",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 12
+  },
+  {
+   "repo": "tsc-eligibility-check",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 12
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 3
+  }
+ ],
+ "generated_at": "2026-09-29T20:11:46.048482+00:00",
+ "stale": false
+}

@@ -1,0 +1,124 @@
+{
+ "note": "Every employer with at least one resolved role-holder, largest first. Check the affiliations-known tile before reading the bars as the whole population.",
+ "methodology": [
+  "Resolve every person's role per repository from the governance config, then reduce each to the most senior role they hold anywhere \u2014 so the maintainer and committer tabs are disjoint populations and can be compared directly.",
+  "Look up each person's organisation in the curated affiliations file.",
+  "That file resolves each person from public signals in priority order: GPG-key email, profile email, the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph.",
+  "Count distinct people per organisation; people with an identity but no employer are pooled as 'Independent'. Exclude people with no public signal from the pie; they remain visible as unknown rows in the companion affiliations table so its known share can be assessed.",
+  "Rank employers only, keep the two largest, and fold everyone else \u2014 the smaller employers and the whole 'Independent' band \u2014 into a single 'Other' slice, then draw a filled pie of their shares."
+ ],
+ "schema_version": 1,
+ "id": "affiliation_donut",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "affiliation_distribution.csv",
+ "metric": "maintainer_affiliations",
+ "unit": "Maintainers",
+ "population": "People whose highest role anywhere is maintainer, by curated employer. Solo contributors appear as 'Independent'; people with no curated affiliation are excluded, so shares are of resolved people only.",
+ "dimensions": [
+  "organisation"
+ ],
+ "mark": "bar",
+ "stacked": false,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 10,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:10:00.803869+00:00"
+ },
+ "series": [
+  {
+   "key": "maintainers",
+   "label": "Maintainers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "organisation": "Hashgraph",
+   "maintainers": 48
+  },
+  {
+   "organisation": "LimeChain",
+   "maintainers": 15
+  },
+  {
+   "organisation": "Linux Foundation",
+   "maintainers": 9
+  },
+  {
+   "organisation": "DSR Corporation",
+   "maintainers": 5
+  },
+  {
+   "organisation": "Independent",
+   "maintainers": 5
+  },
+  {
+   "organisation": "BlockyDevs",
+   "maintainers": 4
+  },
+  {
+   "organisation": "Hashgraph Online",
+   "maintainers": 2
+  },
+  {
+   "organisation": "Hedera",
+   "maintainers": 2
+  },
+  {
+   "organisation": "Launchbadge",
+   "maintainers": 2
+  },
+  {
+   "organisation": "OpenElements",
+   "maintainers": 2
+  },
+  {
+   "organisation": "The Hashgraph Association",
+   "maintainers": 2
+  },
+  {
+   "organisation": "8bees",
+   "maintainers": 1
+  },
+  {
+   "organisation": "DevLabs",
+   "maintainers": 1
+  },
+  {
+   "organisation": "HashPack",
+   "maintainers": 1
+  },
+  {
+   "organisation": "Hgraph",
+   "maintainers": 1
+  },
+  {
+   "organisation": "Jitty Labs",
+   "maintainers": 1
+  },
+  {
+   "organisation": "Onepiece Software",
+   "maintainers": 1
+  },
+  {
+   "organisation": "Turtle Moon",
+   "maintainers": 1
+  }
+ ],
+ "generated_at": "2026-09-29T20:10:00.803869+00:00",
+ "stale": false
+}

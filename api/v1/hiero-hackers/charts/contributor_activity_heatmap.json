@@ -1,0 +1,585 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Take every tracked event in the last six months \u2014 issues opened, PRs opened, reviews, merges \u2014 excluding bots.",
+  "Weight each event (issues \u00d72, reviews \u00d73, PRs opened \u00d73, merges \u00d72) and bucket it by the month it happened.",
+  "Sum the weighted score per contributor per month.",
+  "Rank contributors by their six-month total and keep the top 25.",
+  "Colour each cell by its monthly score (greener = more active)."
+ ],
+ "schema_version": 1,
+ "id": "contributor_activity_heatmap",
+ "kind": "matrix",
+ "org": "hiero-hackers",
+ "source": "contributor_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each row is one person.",
+ "dimensions": [
+  "contributor",
+  "column"
+ ],
+ "row": {
+  "key": "contributor name",
+  "label": "Contributor"
+ },
+ "sublabel": {
+  "key": "role",
+  "label": "Highest role"
+ },
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-03",
+   "label": "2026-03"
+  },
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 853,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": true,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-09-29T20:09:44.592518+00:00"
+ },
+ "rows": [
+  {
+   "contributor name": "exploreriii",
+   "role": "General User",
+   "activity score": 2631,
+   "2026-03": 362,
+   "2026-04": 249,
+   "2026-05": 130,
+   "2026-06": 214,
+   "2026-07": 853,
+   "2026-08": 823
+  },
+  {
+   "contributor name": "Jexsie",
+   "role": "General User",
+   "activity score": 532,
+   "2026-03": 5,
+   "2026-04": 27,
+   "2026-05": 35,
+   "2026-06": 273,
+   "2026-07": 95,
+   "2026-08": 97
+  },
+  {
+   "contributor name": "MonaaEid",
+   "role": "General User",
+   "activity score": 477,
+   "2026-03": 52,
+   "2026-04": 60,
+   "2026-05": 14,
+   "2026-06": 37,
+   "2026-07": 95,
+   "2026-08": 219
+  },
+  {
+   "contributor name": "danielmarv",
+   "role": "General User",
+   "activity score": 313,
+   "2026-03": 33,
+   "2026-04": 12,
+   "2026-05": 9,
+   "2026-06": 6,
+   "2026-07": 99,
+   "2026-08": 154
+  },
+  {
+   "contributor name": "cheese-cakee",
+   "role": "General User",
+   "activity score": 182,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 15,
+   "2026-07": 26,
+   "2026-08": 141
+  },
+  {
+   "contributor name": "Twiineenock",
+   "role": "General User",
+   "activity score": 157,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 31,
+   "2026-07": 124,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "aceppaluni",
+   "role": "General User",
+   "activity score": 119,
+   "2026-03": 0,
+   "2026-04": 3,
+   "2026-05": 5,
+   "2026-06": 22,
+   "2026-07": 62,
+   "2026-08": 27
+  },
+  {
+   "contributor name": "HousniAbdellatife",
+   "role": "General User",
+   "activity score": 59,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 59
+  },
+  {
+   "contributor name": "hendrikebbers",
+   "role": "General User",
+   "activity score": 54,
+   "2026-03": 10,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 12,
+   "2026-08": 32
+  },
+  {
+   "contributor name": "slegarraga",
+   "role": "General User",
+   "activity score": 33,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 33
+  },
+  {
+   "contributor name": "sudo-anshul",
+   "role": "General User",
+   "activity score": 33,
+   "2026-03": 0,
+   "2026-04": 3,
+   "2026-05": 6,
+   "2026-06": 6,
+   "2026-07": 18,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "iron-prog",
+   "role": "General User",
+   "activity score": 30,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 30
+  },
+  {
+   "contributor name": "loicnaoussi",
+   "role": "General User",
+   "activity score": 30,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 30
+  },
+  {
+   "contributor name": "prajeeta15",
+   "role": "General User",
+   "activity score": 30,
+   "2026-03": 6,
+   "2026-04": 24,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "Adityarya11",
+   "role": "General User",
+   "activity score": 29,
+   "2026-03": 18,
+   "2026-04": 11,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "jwagantall",
+   "role": "General User",
+   "activity score": 28,
+   "2026-03": 0,
+   "2026-04": 5,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 19,
+   "2026-08": 4
+  },
+  {
+   "contributor name": "oGranny",
+   "role": "General User",
+   "activity score": 27,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 10,
+   "2026-08": 15
+  },
+  {
+   "contributor name": "phillip-nyinomujuni",
+   "role": "General User",
+   "activity score": 27,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 27
+  },
+  {
+   "contributor name": "Mounil2005",
+   "role": "General User",
+   "activity score": 26,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 6,
+   "2026-07": 17,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "5affron",
+   "role": "General User",
+   "activity score": 23,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 23
+  },
+  {
+   "contributor name": "piotrswierzy",
+   "role": "General User",
+   "activity score": 22,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 12,
+   "2026-07": 10,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "github-code-quality",
+   "role": "General User",
+   "activity score": 18,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 9,
+   "2026-07": 9,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "undefinedIsMyLife",
+   "role": "General User",
+   "activity score": 18,
+   "2026-03": 18,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "darshit2308",
+   "role": "General User",
+   "activity score": 15,
+   "2026-03": 0,
+   "2026-04": 5,
+   "2026-05": 3,
+   "2026-06": 4,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "harman-2167",
+   "role": "General User",
+   "activity score": 15,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 9,
+   "2026-08": 6
+  },
+  {
+   "contributor name": "DeathGun44",
+   "role": "General User",
+   "activity score": 11,
+   "2026-03": 0,
+   "2026-04": 6,
+   "2026-05": 5,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "Leenaa-patil",
+   "role": "General User",
+   "activity score": 9,
+   "2026-03": 9,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "github-advanced-security",
+   "role": "General User",
+   "activity score": 9,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 3,
+   "2026-07": 6,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "manishdait",
+   "role": "General User",
+   "activity score": 9,
+   "2026-03": 0,
+   "2026-04": 6,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 3,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "mgarbs",
+   "role": "General User",
+   "activity score": 8,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 8
+  },
+  {
+   "contributor name": "Jashk120",
+   "role": "General User",
+   "activity score": 4,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 4,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "Omswastik-11",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 3,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "RawNuke",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "Rowrow620",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "Shriprasad-P",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "aashu2006",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 3,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "ayesigaisaac",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "copilot-swe-agent",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 3,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "leanworld7-netizen",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "parvninama",
+   "role": "General User",
+   "activity score": 3,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 3
+  },
+  {
+   "contributor name": "Anxhul10",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "Gmin2",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 2,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "cweagans",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "ibishal",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 2,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "notjivi",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  },
+  {
+   "contributor name": "thando-ndlovu",
+   "role": "General User",
+   "activity score": 2,
+   "2026-03": 0,
+   "2026-04": 0,
+   "2026-05": 2,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:09:44.592518+00:00",
+ "stale": false
+}

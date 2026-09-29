@@ -1,0 +1,368 @@
+{
+ "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
+ "methodology": [
+  "Fetch every open issue across the organisation's repositories, with its labels.",
+  "Map each issue's labels to a difficulty level using the shared label vocabulary (domain/labels.py); an issue carrying no difficulty label becomes 'Unknown'.",
+  "Keep only issues labelled with a difficulty \u2014 or newly created \u2014 within the selected span, so the narrower tabs reflect what triage has touched recently; 'All time' keeps the whole open backlog.",
+  "Count the remaining open issues per repository, stacked by difficulty level."
+ ],
+ "schema_version": 1,
+ "id": "difficulty_by_repo",
+ "kind": "categories",
+ "org": "hiero-ledger",
+ "source": "difficulty_by_repo.csv",
+ "metric": "open_issues_by_difficulty",
+ "unit": "Open issues",
+ "population": "Open issues in each repository, by difficulty label. 'Unknown' is an open issue with no difficulty label yet. Each issue is counted once.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 12,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "all",
+  "days": null,
+  "end": "2026-09-29T20:02:56.604504+00:00"
+ },
+ "series": [
+  {
+   "key": "Unknown",
+   "label": "Unknown",
+   "color": "#B3B3B3"
+  },
+  {
+   "key": "Good First Issue",
+   "label": "Good First Issue",
+   "color": "#66C2A5"
+  },
+  {
+   "key": "Beginner",
+   "label": "Beginner",
+   "color": "#8DA0CB"
+  },
+  {
+   "key": "Intermediate",
+   "label": "Intermediate",
+   "color": "#FFD92F"
+  },
+  {
+   "key": "Advanced",
+   "label": "Advanced",
+   "color": "#E78AC3"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": ".github",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "awesome-contributions",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "governance",
+   "Unknown": 16,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "heka-identity-platform",
+   "Unknown": 19,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero",
+   "Unknown": 5,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-block-node",
+   "Unknown": 616,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cli",
+   "Unknown": 52,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "Unknown": 1553,
+   "Good First Issue": 3,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-consensus-specifications",
+   "Unknown": 4,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-contracts",
+   "Unknown": 12,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Unknown": 24,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "Unknown": 4,
+   "Good First Issue": 3,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-did-sdk-python",
+   "Unknown": 2,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-docs",
+   "Unknown": 200,
+   "Good First Issue": 4,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "Unknown": 69,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "Unknown": 16,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-hederium",
+   "Unknown": 18,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Unknown": 142,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-local-node",
+   "Unknown": 52,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "Unknown": 256,
+   "Good First Issue": 5,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "Unknown": 116,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-cpp",
+   "Unknown": 10,
+   "Good First Issue": 6,
+   "Beginner": 15,
+   "Intermediate": 23,
+   "Advanced": 4
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Unknown": 35,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "Unknown": 48,
+   "Good First Issue": 8,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "Unknown": 43,
+   "Good First Issue": 5,
+   "Beginner": 12,
+   "Intermediate": 4,
+   "Advanced": 3
+  },
+  {
+   "repo": "hiero-sdk-python",
+   "Unknown": 13,
+   "Good First Issue": 10,
+   "Beginner": 21,
+   "Intermediate": 28,
+   "Advanced": 22
+  },
+  {
+   "repo": "hiero-sdk-rust",
+   "Unknown": 55,
+   "Good First Issue": 1,
+   "Beginner": 2,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-swift",
+   "Unknown": 6,
+   "Good First Issue": 2,
+   "Beginner": 8,
+   "Intermediate": 15,
+   "Advanced": 6
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Unknown": 170,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-solo-action",
+   "Unknown": 11,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-website",
+   "Unknown": 9,
+   "Good First Issue": 1,
+   "Beginner": 1,
+   "Intermediate": 8,
+   "Advanced": 10
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "Unknown": 46,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo",
+   "Unknown": 340,
+   "Good First Issue": 3,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo-charts",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo-containers",
+   "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo-docs",
+   "Unknown": 30,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "tsc",
+   "Unknown": 13,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  }
+ ],
+ "generated_at": "2026-09-29T20:02:56.604504+00:00",
+ "stale": false
+}
