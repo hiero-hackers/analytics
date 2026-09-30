@@ -61,23 +61,35 @@ CONTRIBUTOR_POPULATION = (
 )
 
 METHODOLOGY = [
-    "Read the persisted GitHub activity for the organisation: pull requests with their "
-    "reviews and merges, issues, and issue label events.",
-    "Count one action per event: a pull request opened (at creation), a review "
-    "submitted, a pull request merged (by the merger), an issue opened, and a label "
-    "applied (label removals are not counted).",
+    (
+        "Read the persisted GitHub activity for the organisation: pull requests with their "
+        "reviews and merges, issues, and issue label events."
+    ),
+    (
+        "Count one action per event: a pull request opened (at creation), a review "
+        "submitted, a pull request merged (by the merger), an issue opened, and a label "
+        "applied (label removals are not counted)."
+    ),
     "Drop automation accounts and events whose author GitHub no longer reports.",
-    "Count each window from the events inside it: Week, 1 month and 1 year are the "
-    "7, 30 and 365 days before the analysis ran; All time is everything recorded.",
-    "Active contributors are distinct people with at least one action in the window, "
-    "counted from the events rather than summed from other tables.",
-    "Work mix splits the same actions into building & fixing (PRs opened), reviewing & "
-    "guiding (reviews and merges) and organizing & answering (issues and labels).",
+    (
+        "Count each window from the events inside it: Week, 1 month and 1 year are the "
+        "7, 30 and 365 days before the analysis ran; All time is everything recorded."
+    ),
+    (
+        "Active contributors are distinct people with at least one action in the window, "
+        "counted from the events rather than summed from other tables."
+    ),
+    (
+        "Work mix splits the same actions into building & fixing (PRs opened), reviewing & "
+        "guiding (reviews and merges) and organizing & answering (issues and labels)."
+    ),
 ]
 
 LIMITS = [
-    "At most 100 reviews per pull request and 100 label events per issue are read, so "
-    "unusually long threads can undercount.",
+    (
+        "At most 100 reviews per pull request and 100 label events per issue are read, so "
+        "unusually long threads can undercount."
+    ),
     "A pull request's merge counts for the person who merged it, which may not be its author.",
 ]
 
