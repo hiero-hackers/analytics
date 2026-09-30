@@ -13,7 +13,7 @@
  * manifest; each detail document is fetched only when opened.
  */
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
   fetchEntityDocument,
   fetchEntityIndex,
@@ -79,12 +79,22 @@ export function openEntity(ref: EntityRef | null) {
   writeParams({ [ENTITY_KEY]: ref ? formatEntity(ref) : null, widget: null }, { push: true });
 }
 
+/**
+ * Whether a kind's index is in hand. Only a `loaded` index can say a name has no
+ * tracked activity; `failed` (its fetch errored) and `unpublished` (the org lists
+ * none) mean the answer is not known.
+ */
+export type IndexStatus = 'loaded' | 'failed' | 'unpublished';
+
 /** An org's two indexes, keyed for lookup by any spelling a table or chart uses. */
 export interface EntityDirectory {
   org: string;
   repositories: EntityIndex | null;
   contributors: EntityIndex | null;
+  status: Record<EntityKind, IndexStatus>;
   byName: Record<EntityKind, Map<string, EntityIndexRow>>;
+  /** Fetch any failed index again. */
+  retry: () => void;
 }
 
 export const EntityDirectoryContext = createContext<EntityDirectory | null>(null);
@@ -130,12 +140,15 @@ export function resetEntityCaches() {
 const repoKey = (name: string) => name.trim().toLowerCase().split('/').pop() ?? '';
 const personKey = (login: string) => login.trim().toLowerCase();
 
-/** A directory over an org's two indexes (either may be absent). */
+/** A directory over an org's two indexes (either may be absent: `failed` names which errored). */
 export function directoryOf(
   org: string,
   repositories: EntityIndex | null,
   contributors: EntityIndex | null,
+  { failed = [], retry = () => {} }: { failed?: EntityKind[]; retry?: () => void } = {},
 ): EntityDirectory {
+  const statusOf = (kind: EntityKind, index: EntityIndex | null): IndexStatus =>
+    index ? 'loaded' : failed.includes(kind) ? 'failed' : 'unpublished';
   const repos = new Map<string, EntityIndexRow>();
   for (const row of repositories?.rows ?? []) {
     for (const name of [row.id, row.name, row.full_name]) if (name) repos.set(repoKey(name), row);
@@ -144,12 +157,24 @@ export function directoryOf(
   for (const row of contributors?.rows ?? []) {
     for (const name of [row.id, row.login]) if (name) people.set(personKey(name), row);
   }
-  return { org, repositories, contributors, byName: { repo: repos, contributor: people } };
+  return {
+    org,
+    repositories,
+    contributors,
+    status: {
+      repo: statusOf('repo', repositories),
+      contributor: statusOf('contributor', contributors),
+    },
+    byName: { repo: repos, contributor: people },
+    retry,
+  };
 }
 
 /**
- * The shown org's entity directory, once its indexes arrive. Until then (or when
- * the org publishes none, or a fetch fails) names render as they always have.
+ * The shown org's entity directory: null while its indexes are being fetched,
+ * then a directory saying, per kind, whether its index loaded, failed or is not
+ * published. A failed or missing index leaves that kind's names rendering as
+ * they always have; `retry` fetches the failed ones again.
  */
 export function useEntityDirectory(
   org: string,
@@ -157,21 +182,39 @@ export function useEntityDirectory(
 ): EntityDirectory | null {
   const repositoriesPath = refs?.repositories?.path;
   const contributorsPath = refs?.contributors?.path;
-  const [directory, setDirectory] = useState<EntityDirectory | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [loaded, setLoaded] = useState<{ attempt: number; directory: EntityDirectory } | null>(
+    null,
+  );
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
   useEffect(() => {
     let active = true;
     const settle = (path: string | undefined) =>
-      path ? loadIndex(path).catch(() => null) : Promise.resolve(null);
+      path
+        ? loadIndex(path).then(
+            (index) => ({ index, failed: false }),
+            () => ({ index: null, failed: true }),
+          )
+        : Promise.resolve({ index: null, failed: false });
     void Promise.all([settle(repositoriesPath), settle(contributorsPath)]).then(
       ([repos, people]) => {
-        if (active) setDirectory(repos || people ? directoryOf(org, repos, people) : null);
+        if (!active) return;
+        const failed: EntityKind[] = [
+          ...(repos.failed ? (['repo'] as const) : []),
+          ...(people.failed ? (['contributor'] as const) : []),
+        ];
+        setLoaded({
+          attempt,
+          directory: directoryOf(org, repos.index, people.index, { failed, retry }),
+        });
       },
     );
     return () => {
       active = false;
     };
-  }, [org, repositoriesPath, contributorsPath]);
-  return directory?.org === org ? directory : null;
+  }, [org, repositoriesPath, contributorsPath, attempt, retry]);
+  // Loading (or re-loading after a retry) reads as no directory yet.
+  return loaded?.attempt === attempt && loaded.directory.org === org ? loaded.directory : null;
 }
 
 export function lookupEntity(
@@ -219,7 +262,8 @@ export function useEntityLink(
 ): { href: string; row: EntityIndexRow | null } | null {
   useUrlParam(ENTITY_KEY);
   const directory = useContext(EntityDirectoryContext);
-  if (!kind || !directory) return null;
+  // Only a loaded index can vouch for a name; without one it stays a GitHub link.
+  if (!kind || directory?.status[kind] !== 'loaded') return null;
   const row = lookupEntity(directory, kind, name);
   const id = row?.id ?? unlistedId(kind, name);
   return id ? { href: entityHash({ kind, id }), row } : null;

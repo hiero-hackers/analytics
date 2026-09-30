@@ -505,6 +505,43 @@ export default function EntityView({
       </>
     );
   }
+  if (directory.status[entity.kind] !== 'loaded') {
+    // Not knowing is not the same as knowing there is nothing: never say "no
+    // tracked activity" without the index that would list it.
+    const noun = entity.kind === 'repo' ? 'repository' : 'contributor';
+    return (
+      <>
+        <Header entity={entity} name={entity.id} document={null} returnTo={returnTo} org={org} />
+        {directory.status[entity.kind] === 'failed' ? (
+          <Alert variant="destructive" className="my-6">
+            <CircleAlertIcon />
+            <AlertTitle>
+              Could not load the {noun} details for {org}.
+            </AlertTitle>
+            <AlertDescription className="flex flex-col items-start gap-3">
+              <p>This is usually temporary — try again in a moment.</p>
+              <Button variant="outline" size="sm" onClick={directory.retry}>
+                <RotateCwIcon data-icon="inline-start" />
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Empty className="my-12">
+            <EmptyHeader>
+              <EmptyTitle>
+                No {noun} detail views are published for {org}
+              </EmptyTitle>
+              <EmptyDescription>
+                This organisation’s data does not include {noun} details yet; they appear after the
+                next analytics refresh that produces them.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
+      </>
+    );
+  }
   if (!row) {
     // A name with no tracked activity here: a permission-holder who never
     // acted, an archived repository. Worth saying, with GitHub one click away.

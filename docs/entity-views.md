@@ -129,11 +129,14 @@ about 1,660 files, or 1.3 MB gzipped. See `docs/snapshots.md`.
   "Back to <tab>" and browser Back return exactly where the reader was. Links are
   real hash hrefs: a click adds a history entry, and Forward, "open in new tab"
   and copied links all reopen the view.
-- **Which names link.** Every well-formed repository name and GitHub login links
-  once the org's indexes have loaded (they are fetched once per org, after the
-  manifest), so names behave the same everywhere. A name with no tracked activity
-  in the org opens a short view saying so, with a "View on GitHub" button. An org
-  that publishes no indexes keeps plain GitHub links.
+- **Which names link.** Once a kind's index has loaded (indexes are fetched once
+  per org, after the manifest), every well-formed repository name or GitHub
+  login of that kind links, so names behave the same everywhere. A name with no
+  tracked activity opens a short view saying so, with a "View on GitHub" button.
+  Only a loaded index can say that. While an index is loading, has failed, or
+  isn't published, its names stay plain GitHub links. A detail URL opened then
+  shows loading, a Retry for the failed index, or "not published for this org"
+  instead of a false "no tracked activity".
 - **Where names link.** Table cells (repositories and people), heatmap rows,
   ranking and release-timeline axis labels, chart Data views, and the network's
   focus panel all link. Each keeps a separate GitHub link: an icon beside the

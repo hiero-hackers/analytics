@@ -386,3 +386,48 @@ describe('Entity links in charts', () => {
     expect(table.getByRole('button', { name: 'Focus on hiero-unlisted' })).toBeInTheDocument();
   });
 });
+
+describe('Unavailable entity indexes', () => {
+  it('never reports "no tracked activity" from an index that failed to load, and retries it', async () => {
+    let fail = true;
+    entityApi({
+      'hiero-ledger/entities/contributors.json': () =>
+        fail ? new Response('down', { status: 503 }) : json(CONTRIBUTOR_INDEX)(),
+    });
+    window.history.replaceState(null, '', '/#tab=Governance&entity=contributor:alice');
+    render(<App />);
+    expect(
+      await screen.findByText('Could not load the contributor details for hiero-ledger.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/No tracked activity for alice/)).not.toBeInTheDocument();
+
+    fail = false;
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByRole('region', { name: 'Activity by period' })).toBeInTheDocument();
+  });
+
+  it('keeps names of a kind whose index failed as plain GitHub links', async () => {
+    entityApi({
+      'hiero-ledger/entities/contributors.json': () => new Response('down', { status: 503 }),
+    });
+    const roles = await openGovernance();
+    expect(within(roles).getByRole('link', { name: /^alice$/ })).toHaveAttribute(
+      'href',
+      'https://github.com/alice',
+    );
+    expect(within(roles).queryByRole('link', { name: 'alice on GitHub' })).not.toBeInTheDocument();
+  });
+
+  it('explains an organisation that publishes no detail views instead of loading forever', async () => {
+    window.history.replaceState(
+      null,
+      '',
+      '/#tab=Contributors&org=hiero-hackers&entity=contributor:alice',
+    );
+    render(<App />);
+    expect(
+      await screen.findByText('No contributor detail views are published for hiero-hackers'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('status', { name: 'Loading details' })).not.toBeInTheDocument();
+  });
+});
