@@ -56,6 +56,15 @@ npm run dev                            # the app, on http://localhost:5173
   `'self'` only, so it ships in the bundle via `@fontsource-variable`). Numbers
   that line up in columns use `tabular-nums`.
 
+## Repository and contributor views
+
+Names in tables and charts open a detail view (`src/entities.ts`; the data model
+is in `docs/entity-views.md`); a name with no tracked activity opens one that
+says so. Render a
+repository or person name with `RepoCell`/`ContributorCell` in a table, or
+`EntityLink`/`EntityTick` in a chart, rather than a bare GitHub link, so every
+name behaves the same: an in-dashboard link, with GitHub one separate icon away.
+
 ## Third-party requests
 
 The CSP in `index.html` keeps everything on `'self'` except images from

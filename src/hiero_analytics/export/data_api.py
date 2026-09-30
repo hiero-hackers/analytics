@@ -38,6 +38,7 @@ from __future__ import annotations
 import importlib
 import json
 import logging
+import shutil
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -66,6 +67,7 @@ from hiero_analytics.dashboard_spec import (
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.chart_data import chart_document
 from hiero_analytics.export.csv_safety import sanitize_csv_text
+from hiero_analytics.export.entity_views import build_entity_documents
 from hiero_analytics.export.macro_metrics import macro_metrics
 from hiero_analytics.provenance import resolve_provenance
 
@@ -108,26 +110,30 @@ def _read_meta(csv_path: Path) -> dict:
     return payload if isinstance(payload, dict) else {}
 
 
-def _stamp_freshness(document: dict, csv_path: Path) -> None:
-    """Attach ``generated_at``/``stale`` from the source CSV's sidecar, if any."""
+def _freshness(csv_path: Path) -> dict:
+    """``generated_at``/``stale`` from the source CSV's sidecar; {} when it has none."""
     generated_at = _read_meta(csv_path).get("generated_at")
     if not generated_at:
-        return
-    document["generated_at"] = generated_at
+        return {}
     try:
         generated = datetime.fromisoformat(generated_at)
     except ValueError:
         # Ship the raw stamp without a staleness verdict, but say so — a sidecar
         # that stops parsing should show up in the run log, not vanish.
         logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
-        return
+        return {"generated_at": generated_at}
     # Sidecars are written UTC-aware, but a hand-edited or legacy one may be
     # naive; assume UTC rather than letting the subtraction raise TypeError and
     # fail the entire emit over one stamp.
     if generated.tzinfo is None:
         logger.warning("Naive generated_at %r in sidecar for %s; assuming UTC", generated_at, csv_path)
         generated = generated.replace(tzinfo=UTC)
-    document["stale"] = datetime.now(UTC) - generated > STALE_AFTER
+    return {"generated_at": generated_at, "stale": datetime.now(UTC) - generated > STALE_AFTER}
+
+
+def _stamp_freshness(document: dict, csv_path: Path) -> None:
+    """Attach ``generated_at``/``stale`` from the source CSV's sidecar, if any."""
+    document.update(_freshness(csv_path))
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
@@ -458,6 +464,67 @@ def _org_views(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
     return refs
 
 
+def _source_sections(
+    org: str, table_sources: list[tuple[str, dict]], chart_sections: list[dict]
+) -> dict[str, list[dict]]:
+    """Each table file the org published -> the dashboard sections it feeds.
+
+    Tables by their documents' ``source`` (``table_sources`` pairs a file with the
+    card that shows it); chart cards by the CSVs their charts and downloads read
+    (from the spec). Only sections emitted for this org are named, so a link
+    never leads to a section the org lacks.
+    """
+    index: dict[str, list[dict]] = {}
+
+    def add(name: str | None, entry: dict) -> None:
+        if name and entry not in index.setdefault(name, []):
+            index[name].append(entry)
+
+    for name, ref in table_sources:
+        add(name, {"macro": ref["macro"], "id": ref["id"], "title": ref["title"]})
+    emitted = {section["id"]: section for section in chart_sections}
+    for macro in CHART_MACROS:
+        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
+            section = emitted.get(spec["id"])
+            if section is None:
+                continue
+            entry = {"macro": section["macro"], "id": section["id"], "title": section["title"]}
+            for source in spec.get("interactive_sources", {}).values():
+                add(source.get("file"), entry)
+                add(source.get("edges_file"), entry)
+            csv = spec.get("csv")
+            for name in csv.values() if isinstance(csv, dict) else [csv]:
+                add(name, entry)
+    return index
+
+
+def _org_entities(
+    org: str,
+    org_data_dir: Path,
+    org_dir: Path,
+    sources: dict[str, list[dict]] | None = None,
+) -> dict | None:
+    """Emit the org's repository and contributor documents; their manifest entry, or None.
+
+    The whole ``entities/`` tree is rewritten each emit, so a repository or
+    person no longer in the data does not leave a stale document behind.
+    """
+    entities_dir = org_dir / "entities"
+    if entities_dir.exists():
+        shutil.rmtree(entities_dir)
+    built = build_entity_documents(org, org_data_dir, _freshness, sources)
+    if built is None:
+        return None
+    api_dir = org_dir.parent
+    for relative, document in built.documents.items():
+        path = api_dir / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Compact: hundreds of small documents, each fetched on demand.
+        path.write_text(json.dumps(document, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+    logger.info("Entity documents for %s: %d", org, len(built.documents))
+    return built.manifest_entry
+
+
 def _metric_tiles(family, org_data_dir: Path) -> list[dict]:
     """The macro's headline tiles as JSON objects, [] when none apply.
 
@@ -529,6 +596,8 @@ def emit_data_api() -> Path:
         org_dir.mkdir(parents=True, exist_ok=True)
         org_data_dir = paths.ORG_DATA_DIR / org
         sections = []
+        # (source CSV, the card showing it): where an entity view's figures link back to.
+        table_sources: list[tuple[str, dict]] = []
         for family in TABLE_FAMILIES.values():
             group_of = family.SECTION_GROUP_OF
             # SECTION_ORDER, not SECTION_SPECS: the order groups sections
@@ -542,6 +611,8 @@ def emit_data_api() -> Path:
                     continue
                 document["macro"] = family.CHART_MACRO["name"]
                 sections.append(_write_section(document, org, org_dir))
+                card = sections[-1]
+                table_sources.extend((variant["source"], card) for variant in document.get("variants", [document]))
                 # A role-tabbed card absorbs what used to be sibling sections.
                 # Each absorbed variant keeps its own document *and* its own
                 # manifest entry, tagged with the card that now renders it:
@@ -559,6 +630,7 @@ def emit_data_api() -> Path:
                     sections.append(_write_section(absorbed, org, org_dir))
         chart_sections = _org_chart_sections(org, org_data_dir, org_dir)
         views = _org_views(org, org_data_dir, org_dir)
+        entities = _org_entities(org, org_data_dir, org_dir, _source_sections(org, table_sources, chart_sections))
         if sections or chart_sections or views:
             metrics = {
                 family.CHART_MACRO["name"]: tiles
@@ -571,6 +643,11 @@ def emit_data_api() -> Path:
                 "views": views,
                 "metrics": metrics,
             }
+            # The repository and contributor detail views: an index of each,
+            # whose rows name their lazily fetched documents. Additive: absent
+            # when the entity tables were not produced.
+            if entities:
+                manifest["orgs"][org]["entities"] = entities
 
     manifest_path = api_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=1), encoding="utf-8")

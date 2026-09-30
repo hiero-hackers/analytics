@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import { CrosshairIcon, ExternalLinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Manifest, SectionDoc, SectionVariant } from '../api';
+import type { Manifest, SectionVariant, TableDoc } from '../api';
 import { DIMENSION_LABELS, dimensionOf, matches, useFocus } from '../focus';
 import { safeUrl } from '../safety';
 import { useDataTable } from '../useDataTable';
@@ -25,16 +25,20 @@ import { SectionCard } from './SectionCard';
 import { VariantTabs } from './VariantTabs';
 
 /** The document's own table as a variant, for sections with no role tabs. */
-const soleVariant = (doc: SectionDoc): SectionVariant => ({ ...doc, label: '' });
+const soleVariant = (doc: TableDoc): SectionVariant => ({ ...doc, label: '' });
 
 export function SectionTable({
   doc,
   provenance,
   periodLabels,
+  printColumns,
+  printRowLimit,
 }: {
-  doc: SectionDoc;
+  doc: TableDoc;
   provenance: Manifest['provenance'];
   periodLabels?: Record<string, string>;
+  printColumns?: string[];
+  printRowLimit?: number;
 }) {
   const variants = doc.variants ?? [soleVariant(doc)];
   // A shared link names a section id, and an absorbed variant kept its own —
@@ -119,6 +123,8 @@ export function SectionTable({
       )}
       <DataTable
         table={table}
+        printColumns={printColumns}
+        printRowLimit={printRowLimit}
         controls={
           <PeriodTabs
             periods={Object.keys(active.periods ?? {})}

@@ -1,6 +1,15 @@
 /** The `events` kind: one mark per timestamped event (a release), one row per repository. */
 
-import { CartesianGrid, Cell, Scatter, ScatterChart, XAxis, YAxis, ZAxis } from 'recharts';
+import {
+  CartesianGrid,
+  Cell,
+  Scatter,
+  ScatterChart,
+  XAxis,
+  YAxis,
+  ZAxis,
+  type YAxisTickContentProps,
+} from 'recharts';
 import { Button } from '@/components/ui/button';
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
 import {
@@ -16,6 +25,9 @@ import { dimensionOf, matches, toggle, useFocus } from '../../focus';
 import { stamp } from '../../format';
 import { useUrlList } from '../../urlState';
 import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
+import { EntityTick } from './EntityTick';
+import { EntityLink } from '../EntityLink';
+import { entityKindOf } from '../../entities';
 import { integer, plural, rangeText, shorten, windowText } from './format';
 
 const ROW_HEIGHT = 28;
@@ -160,6 +172,23 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
                 const name = order[order.length - 1 - Number(value)];
                 return name ? `${shorten(name, 22)} (${counts.get(name) ?? 0})` : '';
               }}
+              // Each repository's name opens its detail view.
+              tick={(props: YAxisTickContentProps) => {
+                const name = order[order.length - 1 - Number(props.payload?.value)];
+                return name ? (
+                  <EntityTick
+                    x={Number(props.x)}
+                    y={Number(props.y)}
+                    textAnchor={props.textAnchor}
+                    fontSize={rowHeight < 16 ? 9 : undefined}
+                    kind={entityKindOf(dimension)}
+                    name={name}
+                    label={`${shorten(name, 22)} (${counts.get(name) ?? 0})`}
+                  />
+                ) : (
+                  <g />
+                );
+              }}
             />
             <ZAxis range={[48, 48]} />
             <ChartTooltip
@@ -228,7 +257,9 @@ export function EventsView({ data, title, period, provenance }: ViewProps<Events
             className={isFocused(row) ? 'bg-link/10' : undefined}
           >
             <TableCell className="tabular-nums">{stamp(String(row.time))}</TableCell>
-            <TableCell className="font-medium">{String(row[key])}</TableCell>
+            <TableCell className="font-medium">
+              <EntityLink kind={entityKindOf(dimension)} name={String(row[key])} />
+            </TableCell>
             <TableCell>{String(row[data.label.key])}</TableCell>
             <TableCell>{String(row.type)}</TableCell>
           </TableRow>

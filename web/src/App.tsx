@@ -3,7 +3,7 @@
  * header, a sidebar of tabs, and the active tab's tiles, glossary and section groups.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { CircleAlertIcon, RotateCwIcon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ import { tocEntries, type Group, type TocEntry } from './toc';
 import { useHashState } from './useHashState';
 import { writeParams } from './urlState';
 import { FocusBar } from './components/FocusBar';
+import { EntityDirectoryContext, useEntity, useEntityDirectory } from './entities';
 import { useSectionDocs } from './useSectionDocs';
 import { useViewDocs } from './useViewDocs';
 import { ViewCards } from './components/ViewCards';
@@ -39,7 +40,13 @@ import { PrintControls, PrintProvider } from './printing';
 import { stamp } from './format';
 import './print.css';
 
+// Loaded when a reader first opens a repository or contributor, with its charts.
+const EntityView = lazy(() => import('./components/EntityView'));
+
 const FLASH_MS = 1800; // shared link jump: flash the target for this long, then remove the highlight
+// Charts above a jump target load after the tab settles and push it down mid-scroll;
+// the jump keeps the target in place while the page grows, for at most this long.
+const HOLD_MS = 4000;
 
 function OrgPanel({
   org,
@@ -110,12 +117,29 @@ function OrgPanel({
   const flashTimer = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (!settled || !widget) return;
+    let hold: ResizeObserver | undefined;
+    let holdTimer: number | undefined;
+    // The reader taking over (scrolling, a key, a tap) ends the hold at once.
+    const release = () => {
+      hold?.disconnect();
+      window.clearTimeout(holdTimer);
+      for (const name of ['wheel', 'touchstart', 'keydown'] as const) {
+        window.removeEventListener(name, release);
+      }
+    };
     const jump = () => {
       const target = document.getElementById(absorbedInto[widget] ?? widget);
       target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
       target?.classList.add('flash');
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
       flashTimer.current = window.setTimeout(() => target?.classList.remove('flash'), FLASH_MS);
+      if (!target || typeof ResizeObserver === 'undefined') return;
+      hold = new ResizeObserver(() => target.scrollIntoView({ block: 'start' }));
+      hold.observe(document.body);
+      holdTimer = window.setTimeout(release, HOLD_MS);
+      for (const name of ['wheel', 'touchstart', 'keydown'] as const) {
+        window.addEventListener(name, release, { passive: true });
+      }
     };
     const canRequestFrame = typeof window.requestAnimationFrame === 'function';
     const raf = canRequestFrame ? window.requestAnimationFrame(jump) : undefined;
@@ -125,6 +149,7 @@ function OrgPanel({
         window.cancelAnimationFrame(raf as number);
       }
       if (flashTimer.current) window.clearTimeout(flashTimer.current);
+      release();
       document.getElementById(absorbedInto[widget] ?? widget)?.classList.remove('flash');
     };
   }, [settled, widget, absorbedInto]);
@@ -241,6 +266,39 @@ function Dashboard({
   const { activeMacro, shownOrg, orgHasMacro } = nav;
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
   const dataAsOf = manifest.provenance.data_as_of;
+  const directory = useContext(EntityDirectoryContext);
+  const entity = useEntity();
+  const footer = (
+    // One footer bar: WIP notice left, provenance right — same rule, same baseline.
+    <div className="mt-10 flex flex-wrap items-baseline justify-between gap-4 border-t pt-4">
+      {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
+      <ProvenanceFooter provenance={manifest.provenance} />
+    </div>
+  );
+
+  if (entity) {
+    // A repository or contributor in place of the tab; the tab (and its focus) waits underneath.
+    return (
+      <PrintLayout provenance={manifest.provenance}>
+        <p data-print-only className="print-title">
+          {entity.kind === 'repo' ? 'Repository' : 'Contributor'} · {shownOrg}
+        </p>
+        <OrgContext.Provider value={shownOrg}>
+          <Suspense fallback={<Skeleton label="Loading details" rows={6} />}>
+            <EntityView
+              key={`${shownOrg}/${entity.kind}/${entity.id}`}
+              entity={entity}
+              directory={directory}
+              manifest={manifest}
+              returnTo={activeMacro}
+              onToc={onToc}
+            />
+          </Suspense>
+        </OrgContext.Provider>
+        {footer}
+      </PrintLayout>
+    );
+  }
 
   return (
     <PrintLayout provenance={manifest.provenance}>
@@ -300,11 +358,7 @@ function Dashboard({
           </Empty>
         </>
       )}
-      {/* One footer bar: WIP notice left, provenance right — same rule, same baseline. */}
-      <div className="mt-10 flex flex-wrap items-baseline justify-between gap-4 border-t pt-4">
-        {manifest.wip !== false && <WipFooter issuesUrl={manifest.issues_url} />}
-        <ProvenanceFooter provenance={manifest.provenance} />
-      </div>
+      {footer}
     </PrintLayout>
   );
 }
@@ -339,6 +393,17 @@ export default function App() {
 
   const nav = manifest ? navModel(manifest, macro, org) : null;
   const [toc, setToc] = useState<TocEntry[]>([]);
+  const entity = useEntity();
+  // Every table and chart links the names the shown org has detail views for.
+  const directory = useEntityDirectory(
+    nav?.shownOrg ?? '',
+    nav ? manifest?.orgs[nav.shownOrg]?.entities : undefined,
+  );
+  // Choosing a tab closes an open detail view, as one history entry.
+  const onTab = (next: string) =>
+    entity ? writeParams({ tab: next, entity: null }, { push: true }) : setMacro(next);
+  // A detail view has its own table of contents, whatever the tab behind it holds.
+  const shownToc = nav?.orgHasMacro || entity ? toc : [];
 
   return (
     // The header renders in every state; only the content beneath it changes shape.
@@ -350,16 +415,17 @@ export default function App() {
         <AppHeader
           nav={nav}
           // A focused repository or person belongs to one organisation.
+          // So does an open repository or contributor: both close on switching.
           onOrg={(next) => {
-            writeParams({ focus: null });
+            writeParams({ focus: null, entity: null });
             setOrg(next);
           }}
-          toc={nav?.orgHasMacro ? toc : []}
-          onTab={setMacro}
+          toc={shownToc}
+          onTab={onTab}
           dataAsOf={manifest?.provenance.data_as_of}
         />
         <div className="flex flex-1">
-          <AppSidebar nav={nav} toc={nav?.orgHasMacro ? toc : []} onTab={setMacro} />
+          <AppSidebar nav={nav} toc={shownToc} onTab={onTab} />
           {/* min-w-0: otherwise a wide table or nowrap stamp widens the page sideways. */}
           <SidebarInset className="min-w-0">
             <div className="mx-auto w-full max-w-[1440px] p-4 min-[600px]:p-6 lg:p-8">
@@ -374,7 +440,9 @@ export default function App() {
                   <Skeleton label="Loading dashboard" rows={5} />
                 </>
               ) : (
-                <Dashboard manifest={manifest} nav={nav} onToc={setToc} />
+                <EntityDirectoryContext.Provider value={directory}>
+                  <Dashboard manifest={manifest} nav={nav} onToc={setToc} />
+                </EntityDirectoryContext.Provider>
               )}
             </div>
           </SidebarInset>

@@ -89,11 +89,16 @@ def _series(source: dict, frame: pd.DataFrame, category: str, group: str | None)
     return series
 
 
-def _read(source: dict, csv_path: Path, org: str) -> tuple[pd.DataFrame, list[dict], list[dict]]:
-    """Read and validate the CSV columns a source declares."""
+def _read(
+    source: dict, csv_path: Path, org: str, table: pd.DataFrame | None = None
+) -> tuple[pd.DataFrame, list[dict], list[dict]]:
+    """Read and validate the CSV columns a source declares (or an already-built ``table``)."""
     category = source["category"]
     group = source.get("group", {}).get("key")
-    frame = pd.read_csv(csv_path, dtype={category: str, **({group: str} if group else {})})
+    if table is None:
+        frame = pd.read_csv(csv_path, dtype={category: str, **({group: str} if group else {})})
+    else:
+        frame = table.astype({category: str, **({group: str} if group else {})})
     series = _series(source, frame, category, group)
     details = [{"format": "number", **detail} for detail in source.get("details", [])]
     required = [category, *([group] if group else []), *(s["key"] for s in series), *(d["key"] for d in details)]
@@ -160,9 +165,11 @@ def _bucket_labels(first: datetime, last: datetime, frequency: str) -> list[str]
     return [stamp.strftime(fmt) for stamp in stamps] or [first.strftime(fmt)]
 
 
-def _timeseries(source: dict, csv_path: Path, org: str, generated_at: str | None) -> dict:
+def _timeseries(
+    source: dict, csv_path: Path, org: str, generated_at: str | None, table: pd.DataFrame | None = None
+) -> dict:
     """Rows in time order, with calendar gaps completed and partial buckets flagged."""
-    frame, series, details = _read(source, csv_path, org)
+    frame, series, details = _read(source, csv_path, org, table)
     category, frequency = source["category"], source["frequency"]
     if source.get("normalize_dates"):
         frame[category] = pd.to_datetime(frame[category], utc=True).dt.strftime(FORMATS[frequency].removesuffix("-%u"))
@@ -193,9 +200,11 @@ def _timeseries(source: dict, csv_path: Path, org: str, generated_at: str | None
     }
 
 
-def _categories(source: dict, csv_path: Path, org: str, generated_at: str | None) -> dict:
+def _categories(
+    source: dict, csv_path: Path, org: str, generated_at: str | None, table: pd.DataFrame | None = None
+) -> dict:
     """Category rows in the source's order (the analysis's ranking or sequence)."""
-    frame, series, details = _read(source, csv_path, org)
+    frame, series, details = _read(source, csv_path, org, table)
     category = source["category"]
     group = source.get("group")
     if group:
@@ -428,11 +437,25 @@ SERIES_KINDS = {"timeseries": _timeseries, "categories": _categories}
 OTHER_KINDS = {"matrix": _matrix, "network": _network, "events": _events}
 
 
-def chart_document(source: dict, csv_path: Path, org: str, generated_at: str | None = None) -> dict:
-    """Build the interactive document a dashboard spec source declares."""
+def chart_document(
+    source: dict,
+    csv_path: Path,
+    org: str,
+    generated_at: str | None = None,
+    *,
+    table: pd.DataFrame | None = None,
+) -> dict:
+    """Build the interactive document a dashboard spec source declares.
+
+    ``table`` supplies a timeseries or categories dataset already in memory (one
+    slice of a larger table, such as one repository's monthly activity); the
+    document still names ``csv_path`` as its source.
+    """
     kind = source.get("kind")
     if kind not in SERIES_KINDS and kind not in OTHER_KINDS:
         raise ValueError(f"Unknown interactive chart kind: {kind}")
+    if table is not None and kind not in SERIES_KINDS:
+        raise ValueError(f"An in-memory table can only build a timeseries or categories chart, not {kind}")
     document = {
         "schema_version": 1,
         "id": csv_path.stem,
@@ -458,7 +481,7 @@ def chart_document(source: dict, csv_path: Path, org: str, generated_at: str | N
     mark = source.get("mark", "bar")
     if mark not in MARKS and not (kind == "categories" and mark in CATEGORY_MARKS):
         raise ValueError(f"Unknown chart mark for {kind}: {mark}")
-    body = SERIES_KINDS[kind](source, csv_path, org, generated_at)
+    body = SERIES_KINDS[kind](source, csv_path, org, generated_at, table)
     if mark in CATEGORY_MARKS and len(body["series"]) != 1:
         raise ValueError(f"{csv_path.name}: a {mark} draws exactly one series")
     document = {

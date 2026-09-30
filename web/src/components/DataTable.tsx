@@ -47,12 +47,18 @@ export function DataTable({
   table,
   controls,
   actions,
+  printColumns,
+  printRowLimit = PRINT_ROW_LIMIT,
 }: {
   table: DataTableInstance;
   /** Beside the search: the switches that choose which rows (a time range). */
   controls?: ReactNode;
   /** At the toolbar's end: what a reader does with the rows (download, an external link). */
   actions?: ReactNode;
+  /** A detail view may print a concise set of columns while its CSV keeps the complete table. */
+  printColumns?: string[];
+  /** Maximum paper rows for this table; the full selection remains downloadable as CSV. */
+  printRowLimit?: number;
 }) {
   const printing = usePrintMode();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -76,16 +82,19 @@ export function DataTable({
       : 0;
   const visibleRows = printing
     ? [
-        ...rows.slice(0, PRINT_ROW_LIMIT),
+        ...rows.slice(0, printRowLimit),
         // The screen viewport beyond the cap stays mounted (hidden) so its focused links survive.
         ...virtualRows
-          .filter((item) => item.index >= PRINT_ROW_LIMIT)
+          .filter((item) => item.index >= printRowLimit)
           .map((item) => rows[item.index]),
       ]
     : virtualized
       ? virtualRows.map((item) => rows[item.index])
       : rows;
-  const columnCount = table.getVisibleFlatColumns().length;
+  const columnCount =
+    printing && printColumns
+      ? table.getVisibleFlatColumns().filter((column) => printColumns.includes(column.id)).length
+      : table.getVisibleFlatColumns().length;
   const total = table.getCoreRowModel().rows.length;
   const count = (n: number) => n.toLocaleString('en-US');
 
@@ -97,11 +106,11 @@ export function DataTable({
           this filter are not printed.
         </p>
       )}
-      {printing && rows.length > PRINT_ROW_LIMIT && (
+      {printing && rows.length > printRowLimit && (
         <p className="print-selection" data-print-truncated>
-          Showing {count(PRINT_ROW_LIMIT)} of {count(rows.length)} rows in the current order.{' '}
-          {count(rows.length - PRINT_ROW_LIMIT)} rows are not printed. Download CSV from this table
-          on the dashboard for the complete selection.
+          Showing {count(printRowLimit)} of {count(rows.length)} rows in the current order.{' '}
+          {count(rows.length - printRowLimit)} rows are not printed. Download CSV from this table on
+          the dashboard for the complete selection.
         </p>
       )}
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -148,6 +157,8 @@ export function DataTable({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header, index) => {
+                if (printing && printColumns && !printColumns.includes(header.column.id))
+                  return null;
                 const sorted = header.column.getIsSorted() as string;
                 const numeric = header.column.columnDef.meta?.numeric;
                 const SortIcon =
@@ -241,11 +252,12 @@ export function DataTable({
             <TableRow
               key={row.id}
               className="border-row-line even:bg-muted/20 hover:bg-link/5"
-              hidden={printing && index >= PRINT_ROW_LIMIT}
+              hidden={printing && index >= printRowLimit}
               data-index={virtualized ? virtualRows[index].index : index}
               ref={virtualized ? virtualizer.measureElement : undefined}
             >
               {row.getVisibleCells().map((cell, cellIndex) => {
+                if (printing && printColumns && !printColumns.includes(cell.column.id)) return null;
                 // On paper any number aligns right, declared numeric or not.
                 const numeric =
                   cell.column.columnDef.meta?.numeric ||

@@ -34,6 +34,7 @@ import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
 import hiero_analytics.pipelines.contributor_profiles as profiles_mod
 import hiero_analytics.pipelines.difficulty as difficulty_mod
 import hiero_analytics.pipelines.difficulty_over_time as difficulty_time_mod
+import hiero_analytics.pipelines.entity_activity as entity_mod
 import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
@@ -44,6 +45,7 @@ import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
+from hiero_analytics.dashboard_spec import entities as entity_spec
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -371,9 +373,9 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(activity_mod, "fetch_org_merged_pr_difficulty_graphql", lambda _c, _org, **_k: REPO_PRS)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod):
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
-        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod):
+        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod, entity_mod):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
-        for mod in (role_coverage_mod, activity_mod):
+        for mod in (role_coverage_mod, activity_mod, entity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)
         mp.setattr(affiliation_mod, "load_affiliations", lambda: AFFILIATIONS)
         mp.setattr(affiliation_mod, "load_manual_logins", set)
@@ -604,6 +606,8 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
         for name in (source["file"], source.get("edges_file"))
         if name
     )
+    # The detail views' tables are published as entity documents, not sections.
+    spec_csvs.update(entity_spec.ENTITY_FILES)
     period_suffixes = tuple(f"_{period.key}.csv" for period in ACTIVITY_PERIODS)
 
     orphans = []
@@ -673,3 +677,38 @@ def test_every_produced_chart_has_interactive_data(outputs_root: Path):
                     assert variant.get("interactive"), variant["file"]
                     target = outputs_root / "data/api/v1" / variant["interactive"]["path"]
                     assert target.exists()
+
+
+def test_data_api_publishes_entity_indexes_and_their_documents(outputs_root: Path):
+    """Every org's entity indexes resolve, row by row, to a detail document of their kind."""
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+    for org in (PRIMARY, HACKERS):
+        entry = manifest["orgs"][org]["entities"]
+        for kind, detail_kind in (("repositories", "repository"), ("contributors", "contributor")):
+            index = json.loads((api_dir / entry[kind]["path"]).read_text())
+            assert index["rows"], f"{org} publishes no {kind}"
+            assert entry[kind]["count"] == len(index["rows"])
+            for row in index["rows"]:
+                document = json.loads((api_dir / index["detail_path"].format(id=row["id"])).read_text())
+                assert (document["schema_version"], document["kind"], document["id"]) == (1, detail_kind, row["id"])
+                assert set(document["summary"]) == {"all", "7d", "30d", "365d"}
+                assert document["scope"] and document["methodology"] and document["population"]
+                assert "generated_at" in document
+
+
+def test_repository_views_join_tables_the_pipelines_produce(outputs_root: Path):
+    """Each optional table a repository view joins is one the run actually writes.
+
+    A renamed release, governance, onboarding or security table would otherwise
+    quietly turn into "unavailable" on every repository.
+    """
+    org_data = outputs_root / "data" / "org" / PRIMARY
+    declared = set()
+    for section in entity_spec.REPO_RELATED.values():
+        declared.add(section["file"])
+        declared.update(part["file"] for part in section.get("extra", []))
+        if listing := section.get("list"):
+            declared.add(listing["file"])
+    missing = sorted(name for name in declared if not (org_data / name).exists())
+    assert not missing, f"repository views join tables no pipeline produced: {missing}"

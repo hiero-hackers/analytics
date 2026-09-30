@@ -27,6 +27,13 @@ PIPELINES: tuple[Pipeline, ...] = (
     Pipeline("contributor_profiles", "Analyze contributor profiles", args=("org", "repo")),
     Pipeline("maintainer_pipeline", "Run maintainer analytics pipeline", args=("org",), offline=True),
     Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True, extra_orgs=True),
+    Pipeline(
+        "entity_activity",
+        "Build per-repository and per-contributor activity for the detail views",
+        args=("org",),
+        offline=True,
+        extra_orgs=True,
+    ),
     Pipeline("contributor_heatmap", "Generate contributor activity heatmaps", args=("org",), offline=True),
     Pipeline("role_coverage", "Analyze role coverage for organization", args=("org",), offline=True),
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),

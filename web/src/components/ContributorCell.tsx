@@ -1,6 +1,12 @@
 import { useState } from 'react';
+import { useEntityLink } from '../entities';
+import { GitHubLink } from './EntityLink';
 
-/** A GitHub login with its avatar; initials stand in when the image fails. */
+/**
+ * A GitHub login with its avatar; initials stand in when the image fails. With a
+ * detail view the name opens it, and a separate icon links to GitHub; otherwise
+ * the name links to GitHub.
+ */
 export function ContributorCell({
   login,
   compact = false,
@@ -10,12 +16,15 @@ export function ContributorCell({
   compact?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
+  const detail = useEntityLink('contributor', login);
   if (!/^[a-zA-Z0-9][a-zA-Z0-9-]{0,38}(\[bot\])?$/.test(login)) return <>{login}</>;
-  return (
+  const github = `https://github.com/${encodeURIComponent(login)}`;
+  const person = (
     <a
-      href={`https://github.com/${encodeURIComponent(login)}`}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={detail ? detail.href : github}
+      {...(detail
+        ? { title: `Open the contributor details for ${login}` }
+        : { target: '_blank', rel: 'noopener noreferrer' })}
       className={`group/person inline-flex items-center ${compact ? 'gap-1.5' : 'gap-2.5'} rounded-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring`}
     >
       <span
@@ -41,5 +50,12 @@ export function ContributorCell({
         {login}
       </span>
     </a>
+  );
+  if (!detail) return person;
+  return (
+    <span className="inline-flex items-center gap-1">
+      {person}
+      <GitHubLink href={github} name={login} />
+    </span>
   );
 }

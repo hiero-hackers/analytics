@@ -144,6 +144,7 @@ Available pipelines:
 | `contributor_profiles` | Per-contributor profiles |
 | `maintainer_pipeline` | Maintainer pipeline by governance role |
 | `contributor_activity` | Org-wide contributor activity tables |
+| `entity_activity` | Per-repository and per-contributor activity (by period and month) behind the dashboard's detail views |
 | `contributor_heatmap` | Contributor activity heatmaps |
 | `role_coverage` | Governance roles vs. real activity per repo |
 | `affiliation` | Contributor affiliation mapping |

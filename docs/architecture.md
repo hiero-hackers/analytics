@@ -99,7 +99,10 @@ contract for everything downstream of the pipelines (the web dashboard,
 notebooks, external tools), and it enforces the producer↔spec agreement: a
 produced table missing a spec-declared column fails the emit, so a renamed
 output is a red build rather than a silently blank dashboard column. Breaking
-shape changes bump the version directory; `v1` is additive-only.
+shape changes bump the version directory; `v1` is additive-only. Each org also
+publishes repository and contributor detail documents (an index of each, plus one
+lazily fetched document per entity) from the `entity_activity` pipeline's tables;
+see [entity-views.md](entity-views.md).
 
 **The web dashboard.** `web/` is a static Vite + React app deployed at the Pages
 site root with `data/api/` and `charts/` nested beneath it. It is manifest-driven:

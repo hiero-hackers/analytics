@@ -20,6 +20,7 @@ import type { ColumnSpec, NetworkDocument, Row } from '../../api';
 import { matches as focusMatches, useFocus } from '../../focus';
 import { useUrlParam } from '../../urlState';
 import { VariantTabs } from '../VariantTabs';
+import { EntityLink } from '../EntityLink';
 import { AdjacencyMatrix } from './AdjacencyMatrix';
 import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
 import { integer, rangeText, shortRepo as short, windowText } from './format';
@@ -432,7 +433,7 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
         {focusNode ? (
           <div className="rounded-lg border p-3 text-sm" aria-live="polite">
             <p className="font-semibold">
-              {focusNode.id}{' '}
+              <EntityLink kind="repo" name={focusNode.id} />{' '}
               <span className="font-normal text-muted-foreground">
                 · {focusNode.category} · {integer.format(focusNode.active)} active of{' '}
                 {integer.format(focusNode.total)} {member}
@@ -500,7 +501,13 @@ export function NetworkView({ data, title, period, provenance }: ViewProps<Netwo
                       : 'whitespace-normal'
                 }
               >
-                {column.format ? integer.format(Number(row[column.key])) : String(row[column.key])}
+                {column.format ? (
+                  integer.format(Number(row[column.key]))
+                ) : column.key === 'repo' ? (
+                  <EntityLink kind="repo" name={String(row[column.key])} />
+                ) : (
+                  String(row[column.key])
+                )}
               </TableCell>
             ))}
           </TableRow>

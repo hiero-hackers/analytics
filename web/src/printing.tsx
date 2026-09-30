@@ -165,7 +165,14 @@ async function waitForPrintAssets(signal: AbortSignal) {
   }
 }
 
-export function PrintControls({ ready = true }: { ready?: boolean }) {
+export function PrintControls({
+  ready = true,
+  label = 'Print tab',
+}: {
+  ready?: boolean;
+  /** What the button prints: the tab, or a detail view's page. */
+  label?: string;
+}) {
   const { printing, begin, finish } = useContext(PrintContext);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -219,7 +226,7 @@ export function PrintControls({ ready = true }: { ready?: boolean }) {
         onClick={() => void print()}
       >
         <PrinterIcon data-icon="inline-start" />
-        {busy ? 'Preparing print…' : 'Print tab'}
+        {busy ? 'Preparing print…' : label}
       </Button>
       {error && (
         <Alert variant="destructive" className="basis-full">

@@ -461,3 +461,19 @@ def test_median_reference_is_computed_from_the_published_rows(tmp_path):
     assert chart_document({**source, "value_max": 10}, path, "org")["value_max"] == 10
     fixed = {"value": 50, "label": "Majority"}
     assert chart_document({**source, "reference": fixed}, path, "org")["reference"] == fixed
+
+
+def test_an_in_memory_table_builds_the_same_chart_as_its_csv(tmp_path):
+    """A slice of a larger table charts exactly like the same rows read from a CSV."""
+    path = write_counts(tmp_path, "month", ["2026-01", "2026-03"], [4, 7])
+    from_file = chart_document(roles("month"), path, "org", "2026-03-10T00:00:00+00:00")
+    from_table = chart_document(
+        roles("month"), path, "org", "2026-03-10T00:00:00+00:00", table=pd.read_csv(path, dtype={"month": str})
+    )
+    assert from_table == from_file
+
+
+def test_an_in_memory_table_only_builds_series_charts(tmp_path):
+    """Matrix, network and events documents still read their own files."""
+    with pytest.raises(ValueError, match="only build a timeseries or categories"):
+        chart_document({"kind": "matrix"}, tmp_path / "x.csv", "org", table=pd.DataFrame())

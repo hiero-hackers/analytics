@@ -66,7 +66,11 @@ version before parsing anything older than the current release.
 - **Deletions propagate.** The tree is cleared before each snapshot is written,
   so a section removed from the spec disappears from the latest snapshot rather
   than lingering as an orphan. Earlier commits keep it, which is the point.
-- **No retention policy yet.** One snapshot is ~3.5 MB of JSON across ~20 files,
+- **No retention policy yet.** The repository and contributor detail documents
+  ([entity-views.md](entity-views.md)) grew a snapshot to ~24 MB across ~1,660
+  files (1.3 MB gzipped), and most of them change on every refresh because they
+  carry their generation time, so re-measure the packed history after a few
+  snapshots. Before them, one snapshot was ~3.5 MB of JSON across ~20 files,
   but consecutive snapshots are near-identical and git packs the deltas: a
   rehearsal of two snapshots (3.2 MB each on disk) packed to 632 KB of history
   in total. At the 5-day cadence that is a few MB a year, so there is nothing to

@@ -13,8 +13,9 @@ import {
   ReferenceLine,
   XAxis,
   YAxis,
+  type YAxisTickContentProps,
 } from 'recharts';
-import { ChartAreaIcon, ChartColumnIcon, ChartLineIcon } from 'lucide-react';
+import { ChartAreaIcon, ChartColumnIcon, ChartLineIcon, CrosshairIcon } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '@/components/ui/button';
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
@@ -27,11 +28,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { ChartDetail, ColumnSpec, Row, SeriesDocument, TimeseriesDocument } from '../../api';
-import { dimensionOf, matches, toggle, useFocus } from '../../focus';
+import { entityKindOf, useEntityLink } from '../../entities';
+import { dimensionOf, matches, toggle, useFocus, type FocusDimension } from '../../focus';
 import { useBufferedUrlParam, useUrlFlag, useUrlList, useUrlParam } from '../../urlState';
 import { VariantTabs } from '../VariantTabs';
 import { ChartShell, TABLE_CONTAINER, type ViewProps } from './ChartShell';
 import { Funnel, Meter } from './Composition';
+import { EntityTick } from './EntityTick';
 import { cumulative, overviewTotals, share, viewRows, type ViewRow } from './seriesRows';
 import {
   bucketLong,
@@ -133,13 +136,70 @@ function Comparison({
   );
 }
 
+/**
+ * A category's name in the Data view. With a detail view it opens it, and a
+ * crosshair beside it sets the dashboard focus; otherwise the name itself is
+ * the focus toggle.
+ */
+function CategoryName({
+  dimension,
+  name,
+  pressed,
+  onToggle,
+}: {
+  dimension: FocusDimension;
+  name: string;
+  pressed: boolean;
+  onToggle: () => void;
+}) {
+  const link = useEntityLink(entityKindOf(dimension), name);
+  if (!link) {
+    return (
+      <Button
+        data-print-keep
+        variant="link"
+        size="sm"
+        className="h-auto p-0 font-medium"
+        aria-pressed={pressed}
+        aria-label={`Focus on ${name}`}
+        onClick={onToggle}
+      >
+        {name}
+      </Button>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1">
+      <a
+        href={link.href}
+        title={`Open the details for ${name}`}
+        className="rounded-sm font-medium outline-none underline-offset-4 hover:text-link hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {name}
+      </a>
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        className={pressed ? 'text-link' : 'text-soft'}
+        aria-pressed={pressed}
+        aria-label={`Focus on ${name}`}
+        title="Focus the dashboard on this"
+        onClick={onToggle}
+      >
+        <CrosshairIcon />
+      </Button>
+    </span>
+  );
+}
+
 export function SeriesView({
   data,
   title,
   period,
   provenance,
   roomy = false,
-}: ViewProps<SeriesDocument>) {
+  defaultRange = 'all',
+}: ViewProps<SeriesDocument> & { defaultRange?: string }) {
   // Everything a reader changes lives in the URL, so a copied link reopens it.
   const [hidden, setHidden] = useUrlList(`${data.id}.hide`);
   const [showAll, setShowAll] = useUrlFlag(`${data.id}.all`);
@@ -165,7 +225,7 @@ export function SeriesView({
   const composition = mark === 'meter' || mark === 'funnel';
   // A span selects existing buckets only; people are never re-aggregated across them.
   // The brush previews while it moves and writes the URL once it settles.
-  const [range, previewRange, setRange] = useBufferedUrlParam(`${data.id}.range`, 'all');
+  const [range, previewRange, setRange] = useBufferedUrlParam(`${data.id}.range`, defaultRange);
   const buckets = timeseries ? data.rows.map((row) => row.bucket) : [];
   const [spanStart, spanEnd] = timeseries ? spanOf(range, buckets) : [0, data.rows.length - 1];
   const spanned = timeseries && (spanStart > 0 || spanEnd < data.rows.length - 1);
@@ -576,6 +636,22 @@ export function SeriesView({
                       width={labelWidth(chartRows.map((row) => row.category))}
                       interval={0}
                       fontSize={rowHeight < 16 ? 9 : undefined}
+                      // Repository and contributor names open their detail view.
+                      tick={
+                        entityKindOf(dimension)
+                          ? (props: YAxisTickContentProps) => (
+                              <EntityTick
+                                x={Number(props.x)}
+                                y={Number(props.y)}
+                                textAnchor={props.textAnchor}
+                                fontSize={rowHeight < 16 ? 9 : undefined}
+                                kind={entityKindOf(dimension)}
+                                name={String(props.payload.value)}
+                                label={shorten(String(props.payload.value))}
+                              />
+                            )
+                          : undefined
+                      }
                     />
                   </>
                 ) : (
@@ -815,17 +891,12 @@ export function SeriesView({
               <TableRow key={row.category} className={focused === row ? 'bg-link/10' : undefined}>
                 <TableCell className="font-medium">
                   {dimension ? (
-                    <Button
-                      data-print-keep
-                      variant="link"
-                      size="sm"
-                      className="h-auto p-0 font-medium"
-                      aria-pressed={focused === row}
-                      aria-label={`Focus on ${row.category}`}
-                      onClick={() => setFocus(toggle(focus, dimension, row.category))}
-                    >
-                      {row.category}
-                    </Button>
+                    <CategoryName
+                      dimension={dimension}
+                      name={row.category}
+                      pressed={focused === row}
+                      onToggle={() => setFocus(toggle(focus, dimension, row.category))}
+                    />
                   ) : (
                     row.category
                   )}

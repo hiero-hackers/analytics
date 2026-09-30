@@ -336,6 +336,14 @@ export interface OrgEntry {
   chart_sections: ChartSection[];
   views?: ViewRef[];
   metrics: Record<string, MetricTile[]>;
+  /** The repository and contributor detail views' indexes; absent when not produced. */
+  entities?: EntityRefs;
+}
+
+/** Where an org's entity indexes live, and how many entities each lists. */
+export interface EntityRefs {
+  repositories?: { path: string; count: number };
+  contributors?: { path: string; count: number };
 }
 
 export interface Glossary {
@@ -416,6 +424,119 @@ export interface SectionDoc {
   variants?: SectionVariant[];
 }
 
+/** A table shaped like a section: all-time rows, plus period variants (export/entity_views.py). */
+export type TableDoc = Omit<SectionDoc, 'group' | 'macro'>;
+
+/** The five tracked action counts, their total and the entity's own extra count. */
+export interface EntityCounts {
+  prs_opened: number;
+  reviews_given: number;
+  merges_done: number;
+  issues_opened: number;
+  labels_applied: number;
+  total_actions: number;
+  /** Repositories only: distinct people with a tracked action in the window. */
+  active_contributors?: number;
+  /** Contributors only: repositories with a tracked action by them in the window. */
+  repos_touched?: number;
+}
+
+export type WorkFamily =
+  'building_and_fixing' | 'reviewing_and_guiding' | 'organizing_and_answering';
+
+/** The windows a detail document counts: Week, 1 month, 1 year (their start dates) and all time. */
+export interface EntityWindow {
+  /** When the analysis ran; every window ends here. */
+  end: string | null;
+  /** The latest tracked event in the organisation's data. */
+  data_through?: string | null;
+  periods: { key: string; label: string; days: number | null; start?: string | null }[];
+}
+
+interface EntityDocumentBase {
+  schema_version: 1;
+  org: string;
+  id: string;
+  generated_at?: string;
+  stale?: boolean;
+  /** What the counts cover, and what they do not. */
+  scope: string;
+  population: string;
+  methodology: string[];
+  limits: string[];
+  source: string[];
+  window: EntityWindow;
+  github_url: string;
+  first_active: string | null;
+  last_active: string | null;
+  /** Counts keyed by window: `all`, `365d`, `30d`, `7d`; a quiet window is all zeros. */
+  summary: Record<string, EntityCounts>;
+  mix: Record<string, Record<WorkFamily, { count: number; share: number }>>;
+  /** Tracked actions per month, as a chart document; null without any. */
+  trend: TimeseriesDocument | null;
+}
+
+/** An optional per-repository table joined into a repository's view. */
+export interface RelatedSection {
+  id: string;
+  title: string;
+  source: string[];
+  /** The dashboard sections these figures come from, each a jump target (`#tab=…&widget=…`). */
+  links?: { macro: string; id: string; title: string }[];
+  fields: { key: string; label: string; value: unknown; format?: ColumnFormat }[];
+  generated_at?: string;
+  stale?: boolean;
+  list?: {
+    title: string;
+    source: string;
+    columns: ColumnSpec[];
+    rows: Row[];
+    generated_at?: string;
+    stale?: boolean;
+  };
+}
+
+export interface RepositoryDocument extends EntityDocumentBase {
+  kind: 'repository';
+  name: string;
+  full_name: string;
+  contributors: TableDoc;
+  related: RelatedSection[];
+  /** Titles of the optional sections whose tables this run did not produce. */
+  unavailable: string[];
+}
+
+export interface ContributorDocument extends EntityDocumentBase {
+  kind: 'contributor';
+  login: string;
+  repositories: TableDoc;
+}
+
+export type EntityDocument = RepositoryDocument | ContributorDocument;
+
+export interface EntityIndexRow {
+  id: string;
+  /** Repositories: the bare and `owner/repo` names. */
+  name?: string;
+  full_name?: string;
+  /** Contributors: the GitHub login as GitHub spells it. */
+  login?: string;
+  total_actions: number;
+  last_active: string | null;
+}
+
+export interface EntityIndex {
+  schema_version: 1;
+  kind: 'repositories-index' | 'contributors-index';
+  org: string;
+  generated_at?: string;
+  stale?: boolean;
+  /** Where a row's document lives: `{id}` is replaced by its id. */
+  detail_path: string;
+  window: EntityWindow;
+  rows: EntityIndexRow[];
+}
+
 /** Deploy-relative roots: the app and the API ship together. */
 const BASE = import.meta.env.BASE_URL;
 export const API_ROOT = `${BASE}data/api/v1`;
@@ -436,6 +557,12 @@ export const fetchSection = (ref: SectionRef): Promise<SectionDoc> =>
 
 export const fetchView = (ref: ViewRef): Promise<ViewDoc> =>
   getJson<ViewDoc>(`${API_ROOT}/${ref.path}`);
+
+export const fetchEntityIndex = (path: string): Promise<EntityIndex> =>
+  getJson<EntityIndex>(`${API_ROOT}/${path}`);
+
+export const fetchEntityDocument = (path: string): Promise<EntityDocument> =>
+  getJson<EntityDocument>(`${API_ROOT}/${path}`);
 
 /** Raw text of a file shipped inside the API tree (e.g. a chart's CSV). */
 export const fetchApiText = (path: string): Promise<string> =>

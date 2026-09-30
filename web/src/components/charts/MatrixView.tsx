@@ -21,6 +21,8 @@ import type { ColumnSpec, MatrixDocument, Row } from '../../api';
 import { dimensionOf, matches as focusMatches, toggle, useFocus } from '../../focus';
 import { useUrlFlag, useUrlParam } from '../../urlState';
 import { ContributorCell } from '../ContributorCell';
+import { EntityLink } from '../EntityLink';
+import { entityKindOf } from '../../entities';
 import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './ChartShell';
 import { decimal, formatBucket, integer, plural, rangeText, shade, windowText } from './format';
 
@@ -260,7 +262,12 @@ export function MatrixView({ data, title, period, provenance }: ViewProps<Matrix
                       {data.avatars ? (
                         <ContributorCell login={String(row[data.row.key])} compact={!!sheet} />
                       ) : (
-                        <span className="font-medium">{String(row[data.row.key])}</span>
+                        <span className="font-medium">
+                          <EntityLink
+                            kind={entityKindOf(dimension)}
+                            name={String(row[data.row.key])}
+                          />
+                        </span>
                       )}
                       {sheet && data.sublabel && row[data.sublabel.key] ? (
                         <span className="text-soft">· {String(row[data.sublabel.key])}</span>
