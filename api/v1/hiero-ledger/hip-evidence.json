@@ -59,6 +59,20 @@
  ],
  "rows": [
   {
+   "hip": 1522,
+   "hip_title": "Account Staking Configuration via the Hedera Account Service",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 26944,
+   "pr_title": "feat: account staking configuration via the Hedera Account Service (HIP-1522)",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "uration via the Hedera Account Service (HIP-1522)",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26944"
+  },
+  {
    "hip": 1427,
    "hip_title": "Historical Record File Wrapping for Block Stream Cutover",
    "repo": "hiero-ledger/hiero-mirror-node",
@@ -1772,8 +1786,8 @@
    "repo": "hiero-ledger/governance",
    "pr_number": 753,
    "pr_title": "chore: add ddeskov-limechain and Fantomasa to hiero-sdk-js-maintainers",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-30 06:44:51+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -11945,8 +11959,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 849,
- "generated_at": "2026-09-29T20:11:46.044651+00:00",
+ "row_count": 850,
+ "generated_at": "2026-09-30T15:42:41.945035+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

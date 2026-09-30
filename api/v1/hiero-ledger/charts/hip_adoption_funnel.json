@@ -44,7 +44,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-09-29T20:11:46.051776+00:00"
+  "end": "2026-09-30T15:42:41.955493+00:00"
  },
  "series": [
   {
@@ -64,13 +64,13 @@
   {
    "stage": "proposed",
    "cohort": "all specs",
-   "hips": 158,
+   "hips": 159,
    "pct_of_proposed": 100
   },
   {
    "stage": "approved by TSC",
    "cohort": "all specs",
-   "hips": 144,
+   "hips": 145,
    "pct_of_proposed": 91
   },
   {
@@ -88,28 +88,28 @@
   {
    "stage": "proposed",
    "cohort": "created since 2024-09",
-   "hips": 35,
+   "hips": 36,
    "pct_of_proposed": 100
   },
   {
    "stage": "approved by TSC",
    "cohort": "created since 2024-09",
-   "hips": 32,
-   "pct_of_proposed": 91
+   "hips": 33,
+   "pct_of_proposed": 92
   },
   {
    "stage": "implementation evidence",
    "cohort": "created since 2024-09",
    "hips": 22,
-   "pct_of_proposed": 63
+   "pct_of_proposed": 61
   },
   {
    "stage": "implemented in \u22655 repos",
    "cohort": "created since 2024-09",
    "hips": 9,
-   "pct_of_proposed": 26
+   "pct_of_proposed": 25
   }
  ],
- "generated_at": "2026-09-29T20:11:46.051776+00:00",
+ "generated_at": "2026-09-30T15:42:41.955493+00:00",
  "stale": false
 }

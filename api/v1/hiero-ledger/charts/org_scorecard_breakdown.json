@@ -97,12 +97,12 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-09-29T20:10:10.476687+00:00"
+  "end": "2026-09-30T15:41:12.915346+00:00"
  },
  "rows": [
   {
    "repo": "hiero-sdk-java",
-   "score": 8.1,
+   "score": 8.2,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -116,7 +116,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 4.0
+   "SAST": 6.0
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -138,7 +138,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "score": 8.9,
+   "score": 9.0,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -152,11 +152,11 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 5.0,
    "Packaging": 10.0,
-   "SAST": 6.0
+   "SAST": 7.0
   },
   {
    "repo": "hiero-sdk-js",
-   "score": 7.1,
+   "score": 7.2,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -170,7 +170,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 8.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-cli",
@@ -318,7 +318,7 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "score": 9.1,
+   "score": 9.0,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -332,7 +332,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 10.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-sdk-tck",
@@ -476,7 +476,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 9.0,
    "Packaging": 10.0,
-   "SAST": 10.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -624,14 +624,14 @@
   },
   {
    "repo": "hiero-ethereum-execution-spec-tests",
-   "score": 4.4,
-   "Maintained": 0.0,
+   "score": 5.6,
+   "Maintained": 10.0,
    "Code-Review": 0.0,
    "CII-Best-Practices": 0.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
    "Token-Permissions": 0.0,
-   "Pinned-Dependencies": 8.0,
+   "Pinned-Dependencies": 10.0,
    "Fuzzing": 0.0,
    "License": 10.0,
    "Signed-Releases": null,
@@ -659,6 +659,6 @@
    "SAST": 7.0
   }
  ],
- "generated_at": "2026-09-29T20:10:10.476687+00:00",
+ "generated_at": "2026-09-30T15:41:12.915346+00:00",
  "stale": false
 }

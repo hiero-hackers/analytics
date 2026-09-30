@@ -252,6 +252,16 @@
    "organisations": "BlockyDevs, Hashgraph"
   },
   {
+   "repo": "hiero-sdk-js",
+   "maintainers": 6,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 80,
+   "independent": 0,
+   "unknown": 1,
+   "organisations": "LimeChain, Hashgraph"
+  },
+  {
    "repo": "hiero-sdk-go",
    "maintainers": 5,
    "distinct_orgs": 2,
@@ -293,16 +303,6 @@
   },
   {
    "repo": "hiero-sdk-java",
-   "maintainers": 4,
-   "distinct_orgs": 2,
-   "top_org": "LimeChain",
-   "top_org_pct": 75,
-   "independent": 0,
-   "unknown": 0,
-   "organisations": "LimeChain, Hashgraph"
-  },
-  {
-   "repo": "hiero-sdk-js",
    "maintainers": 4,
    "distinct_orgs": 2,
    "top_org": "LimeChain",
@@ -484,7 +484,7 @@
  ],
  "row_count": 44,
  "label": "Maintainers",
- "generated_at": "2026-09-29T20:10:01.448900+00:00",
+ "generated_at": "2026-09-30T15:41:00.533746+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -742,6 +742,16 @@
      "organisations": "BlockyDevs, Hashgraph"
     },
     {
+     "repo": "hiero-sdk-js",
+     "maintainers": 6,
+     "distinct_orgs": 2,
+     "top_org": "LimeChain",
+     "top_org_pct": 80,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": "LimeChain, Hashgraph"
+    },
+    {
      "repo": "hiero-sdk-go",
      "maintainers": 5,
      "distinct_orgs": 2,
@@ -783,16 +793,6 @@
     },
     {
      "repo": "hiero-sdk-java",
-     "maintainers": 4,
-     "distinct_orgs": 2,
-     "top_org": "LimeChain",
-     "top_org_pct": 75,
-     "independent": 0,
-     "unknown": 0,
-     "organisations": "LimeChain, Hashgraph"
-    },
-    {
-     "repo": "hiero-sdk-js",
      "maintainers": 4,
      "distinct_orgs": 2,
      "top_org": "LimeChain",
@@ -974,7 +974,7 @@
    ],
    "row_count": 44,
    "label": "Maintainers",
-   "generated_at": "2026-09-29T20:10:01.448900+00:00",
+   "generated_at": "2026-09-30T15:41:00.533746+00:00",
    "stale": false
   },
   {
@@ -1031,46 +1031,6 @@
      "organisations": null
     },
     {
-     "repo": "solo-build-actions",
-     "committers": 2,
-     "distinct_orgs": 0,
-     "top_org": null,
-     "top_org_pct": 0,
-     "independent": 0,
-     "unknown": 2,
-     "organisations": null
-    },
-    {
-     "repo": "solo-charts",
-     "committers": 2,
-     "distinct_orgs": 0,
-     "top_org": null,
-     "top_org_pct": 0,
-     "independent": 0,
-     "unknown": 2,
-     "organisations": null
-    },
-    {
-     "repo": "solo-containers",
-     "committers": 2,
-     "distinct_orgs": 0,
-     "top_org": null,
-     "top_org_pct": 0,
-     "independent": 0,
-     "unknown": 2,
-     "organisations": null
-    },
-    {
-     "repo": "solo-docs",
-     "committers": 2,
-     "distinct_orgs": 0,
-     "top_org": null,
-     "top_org_pct": 0,
-     "independent": 0,
-     "unknown": 2,
-     "organisations": null
-    },
-    {
      "repo": "hiero-enterprise-java",
      "committers": 1,
      "distinct_orgs": 0,
@@ -1101,13 +1061,53 @@
      "organisations": null
     },
     {
+     "repo": "solo-build-actions",
+     "committers": 1,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": null
+    },
+    {
+     "repo": "solo-charts",
+     "committers": 1,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": null
+    },
+    {
+     "repo": "solo-containers",
+     "committers": 1,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": null
+    },
+    {
+     "repo": "solo-docs",
+     "committers": 1,
+     "distinct_orgs": 0,
+     "top_org": null,
+     "top_org_pct": 0,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": null
+    },
+    {
      "repo": "solo",
-     "committers": 4,
+     "committers": 3,
      "distinct_orgs": 1,
      "top_org": "Hashgraph",
      "top_org_pct": 100,
      "independent": 0,
-     "unknown": 2,
+     "unknown": 1,
      "organisations": "Hashgraph"
     },
     {
@@ -1161,26 +1161,6 @@
      "organisations": "DSR Corporation"
     },
     {
-     "repo": "hiero-sdk-js",
-     "committers": 2,
-     "distinct_orgs": 1,
-     "top_org": "LimeChain",
-     "top_org_pct": 100,
-     "independent": 0,
-     "unknown": 1,
-     "organisations": "LimeChain"
-    },
-    {
-     "repo": "hiero-sdk-tck",
-     "committers": 2,
-     "distinct_orgs": 1,
-     "top_org": "LimeChain",
-     "top_org_pct": 100,
-     "independent": 0,
-     "unknown": 1,
-     "organisations": "LimeChain"
-    },
-    {
      "repo": "roadmap",
      "committers": 2,
      "distinct_orgs": 1,
@@ -1189,6 +1169,26 @@
      "independent": 0,
      "unknown": 0,
      "organisations": "Hashgraph"
+    },
+    {
+     "repo": "hiero-sdk-js",
+     "committers": 1,
+     "distinct_orgs": 1,
+     "top_org": "LimeChain",
+     "top_org_pct": 100,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "LimeChain"
+    },
+    {
+     "repo": "hiero-sdk-tck",
+     "committers": 1,
+     "distinct_orgs": 1,
+     "top_org": "LimeChain",
+     "top_org_pct": 100,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "LimeChain"
     },
     {
      "repo": "hiero-website",
@@ -1323,7 +1323,7 @@
    ],
    "row_count": 30,
    "label": "Committers",
-   "generated_at": "2026-09-29T20:10:02.145117+00:00",
+   "generated_at": "2026-09-30T15:41:01.599241+00:00",
    "stale": false
   }
  ],

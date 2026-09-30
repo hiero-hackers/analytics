@@ -4,7 +4,7 @@
  "group": "Status & coverage",
  "title": "Where specs sit in governance",
  "description": "Every HIP spec, placed by its current lifecycle status \u2014 the columns read left to right as the pipeline, and the Approved / Accepted column is the implementation triage queue. Statuses come from each spec's frontmatter; click a chip to see the spec's title, and jump from there to its row in the coverage matrix below.",
- "badge": "158 specs",
+ "badge": "159 specs",
  "source": "hip_summary.csv",
  "columns": [
   {
@@ -21,6 +21,12 @@
   {
    "title": "Approved (incl. legacy Accepted)",
    "items": [
+    {
+     "key": 1522,
+     "label": "HIP-1522",
+     "title": "Account Staking Configuration via the Hedera Account Service",
+     "status": "Approved"
+    },
     {
      "key": 1448,
      "label": "HIP-1448",
@@ -983,6 +989,6 @@
  ],
  "target_view": "hip-matrix",
  "macro": "HIPs",
- "generated_at": "2026-09-29T20:11:46.049819+00:00",
+ "generated_at": "2026-09-30T15:42:41.952693+00:00",
  "stale": false
 }

@@ -381,9 +381,9 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-09-29T20:13:03.358864+00:00",
+ "generated_at": "2026-09-30T15:43:54.515902+00:00",
  "provenance": {
-  "git_sha": "67a5c05",
+  "git_sha": "4b26332",
   "data_as_of": "2026-09-26T09:06:05.322827+00:00"
  },
  "orgs": {
@@ -407,14 +407,14 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 17,
+     "row_count": 18,
      "path": "hiero-ledger/understaffed.json"
     },
     {
      "id": "loadshare",
      "macro": "Governance",
      "title": "Who carries the review load",
-     "row_count": 22,
+     "row_count": 21,
      "path": "hiero-ledger/loadshare.json"
     },
     {
@@ -442,7 +442,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2840,
+     "row_count": 2841,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -456,14 +456,14 @@
      "id": "affiliations",
      "macro": "Governance",
      "title": "Organisation affiliations \u2014 reference",
-     "row_count": 103,
+     "row_count": 104,
      "path": "hiero-ledger/affiliations.json"
     },
     {
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 131,
+     "row_count": 130,
      "path": "hiero-ledger/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -500,14 +500,14 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 849,
+     "row_count": 850,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
      "id": "hip-unknown",
      "macro": "HIPs",
      "title": "Unknown HIP numbers (review)",
-     "row_count": 12,
+     "row_count": 11,
      "path": "hiero-ledger/hip-unknown.json"
     },
     {
@@ -877,7 +877,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-ledger/maintainer_pipeline_by_repo_7d.png",
-         "width": 2219,
+         "width": 2206,
          "height": 1051,
          "interactive": {
           "kind": "categories",
@@ -1248,7 +1248,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-09-29T20:11:46.051776+00:00"
+      "generated_at": "2026-09-30T15:42:41.955493+00:00"
      }
     },
     {
@@ -1330,7 +1330,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-09-29T20:11:46.048482+00:00"
+      "generated_at": "2026-09-30T15:42:41.950707+00:00"
      }
     },
     {
@@ -1500,8 +1500,8 @@
         {
          "label": "1 month",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_30d.png",
-         "width": 2092,
-         "height": 1844,
+         "width": 2093,
+         "height": 1781,
          "interactive": {
           "kind": "categories",
           "path": "hiero-ledger/charts/difficulty_by_repo_30d.json"
@@ -1511,7 +1511,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/difficulty_by_repo_7d.png",
          "width": 2093,
-         "height": 1531,
+         "height": 1593,
          "interactive": {
           "kind": "categories",
           "path": "hiero-ledger/charts/difficulty_by_repo_7d.json"
@@ -1617,7 +1617,7 @@
          "label": "Week",
          "file": "charts/org/hiero-ledger/release_timeline_7d.png",
          "width": 1790,
-         "height": 919,
+         "height": 1045,
          "interactive": {
           "kind": "events",
           "path": "hiero-ledger/charts/release_timeline_7d.json"
@@ -1723,7 +1723,7 @@
     "Governance": [
      {
       "label": "maintainers",
-      "value": 103,
+      "value": 104,
       "note": "People whose *highest* role anywhere in the organisation is maintainer. Counted at the highest role so the role tiles partition the permission-holders without double-counting.",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
@@ -1733,7 +1733,7 @@
      },
      {
       "label": "committers",
-      "value": 131,
+      "value": 130,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -1753,7 +1753,7 @@
      },
      {
       "label": "maintainer affiliations known",
-      "value": "100%",
+      "value": "99%",
       "note": "The share of maintainers whose affiliation is resolved to a named employer or Independent. The organisation-diversity pie uses this resolved population as its denominator.",
       "methodology": [
        "Take every row in the maintainer affiliations reference table.",
@@ -1763,7 +1763,7 @@
      },
      {
       "label": "committer affiliations known",
-      "value": "76%",
+      "value": "77%",
       "note": "The share of highest-role committers whose affiliation is resolved to a named employer or Independent. Read the committer organisation-diversity pie against this coverage.",
       "methodology": [
        "Take every row in the committer affiliations reference table.",
@@ -1814,7 +1814,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 7,
+      "value": 6,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -1823,6 +1823,16 @@
       ]
      }
     ]
+   },
+   "entities": {
+    "repositories": {
+     "path": "hiero-ledger/entities/repositories.json",
+     "count": 42
+    },
+    "contributors": {
+     "path": "hiero-ledger/entities/contributors.json",
+     "count": 1471
+    }
    }
   },
   "hiero-hackers": {
@@ -2259,7 +2269,7 @@
         {
          "label": "Week",
          "file": "charts/org/hiero-hackers/difficulty_by_repo_7d.png",
-         "width": 2094,
+         "width": 2095,
          "height": 901,
          "interactive": {
           "kind": "categories",
@@ -2467,6 +2477,16 @@
       ]
      }
     ]
+   },
+   "entities": {
+    "repositories": {
+     "path": "hiero-hackers/entities/repositories.json",
+     "count": 24
+    },
+    "contributors": {
+     "path": "hiero-hackers/entities/contributors.json",
+     "count": 48
+    }
    }
   }
  }

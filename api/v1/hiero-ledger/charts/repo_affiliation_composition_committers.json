@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-09-29T20:10:01.679699+00:00"
+  "end": "2026-09-30T15:41:00.894183+00:00"
  },
  "series": [
   {
@@ -100,6 +100,30 @@
    "Unknown": 0
   },
   {
+   "repo": "hiero-sdk-js",
+   "Hashgraph": 0,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "Hashgraph": 0,
+   "LimeChain": 1,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
    "repo": "hiero-cli",
    "Hashgraph": 0,
    "LimeChain": 0,
@@ -136,6 +160,18 @@
    "Unknown": 0
   },
   {
+   "repo": "solo",
+   "Hashgraph": 2,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
    "repo": "hiero-consensus-node",
    "Hashgraph": 26,
    "LimeChain": 9,
@@ -160,18 +196,6 @@
    "Unknown": 1
   },
   {
-   "repo": "solo",
-   "Hashgraph": 2,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
    "repo": "hiero-local-node",
    "Hashgraph": 1,
    "LimeChain": 1,
@@ -194,30 +218,6 @@
    "Other orgs": 0,
    "Independent": 0,
    "Unknown": 0
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "Hashgraph": 0,
-   "LimeChain": 1,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
-  },
-  {
-   "repo": "hiero-sdk-tck",
-   "Hashgraph": 0,
-   "LimeChain": 1,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
   },
   {
    "repo": "heka-identity-platform",
@@ -352,54 +352,6 @@
    "Unknown": 0
   },
   {
-   "repo": "solo-build-actions",
-   "Hashgraph": 0,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
-   "repo": "solo-charts",
-   "Hashgraph": 0,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
-   "repo": "solo-containers",
-   "Hashgraph": 0,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
-   "repo": "solo-docs",
-   "Hashgraph": 0,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
    "repo": "hiero-enterprise-java",
    "Hashgraph": 0,
    "LimeChain": 0,
@@ -446,8 +398,56 @@
    "Other orgs": 1,
    "Independent": 0,
    "Unknown": 0
+  },
+  {
+   "repo": "solo-build-actions",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "solo-charts",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "solo-containers",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "repo": "solo-docs",
+   "Hashgraph": 0,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
   }
  ],
- "generated_at": "2026-09-29T20:10:01.679699+00:00",
+ "generated_at": "2026-09-30T15:41:00.894183+00:00",
  "stale": false
 }

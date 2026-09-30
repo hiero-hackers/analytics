@@ -62,21 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-09-29T20:11:15.119876+00:00"
+  "end": "2026-09-30T15:42:12.265896+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-go",
-   "time": "2025-09-30T09:34:52Z",
-   "tag_name": "v2.71.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "time": "2025-09-30T15:01:14Z",
-   "tag_name": "v2.64.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-js",
    "time": "2025-10-01T12:07:50Z",
@@ -3442,8 +3430,20 @@
    "time": "2026-09-29T17:03:02Z",
    "tag_name": "v0.25.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-09-30T05:19:33Z",
+   "tag_name": "v0.43.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-09-30T07:39:36Z",
+   "tag_name": "v0.79.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-09-29T20:11:15.119876+00:00",
+ "generated_at": "2026-09-30T15:42:12.265896+00:00",
  "stale": false
 }

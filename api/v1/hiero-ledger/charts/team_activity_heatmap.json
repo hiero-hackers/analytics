@@ -66,7 +66,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-09-29T20:10:05.605495+00:00"
+  "end": "2026-09-30T15:41:06.845757+00:00"
  },
  "rows": [
   {
@@ -730,6 +730,16 @@
    "2026-08": 0
   },
   {
+   "team": "hiero-sdk-js-maintainers",
+   "activity score": 3201,
+   "2026-03": 435,
+   "2026-04": 444,
+   "2026-05": 513,
+   "2026-06": 384,
+   "2026-07": 932,
+   "2026-08": 493
+  },
+  {
    "team": "hiero-sdk-cpp-committers",
    "activity score": 3010,
    "2026-03": 751,
@@ -780,7 +790,7 @@
    "2026-08": 495
   },
   {
-   "team": "hiero-mirror-node-explorer-maintainers",
+   "team": "hiero-mirror-node-explorer-committers",
    "activity score": 1935,
    "2026-03": 210,
    "2026-04": 355,
@@ -790,7 +800,7 @@
    "2026-08": 245
   },
   {
-   "team": "hiero-mirror-node-explorer-committers",
+   "team": "hiero-mirror-node-explorer-maintainers",
    "activity score": 1935,
    "2026-03": 210,
    "2026-04": 355,
@@ -818,16 +828,6 @@
    "2026-06": 327,
    "2026-07": 266,
    "2026-08": 370
-  },
-  {
-   "team": "hiero-sdk-js-maintainers",
-   "activity score": 1753,
-   "2026-03": 417,
-   "2026-04": 388,
-   "2026-05": 485,
-   "2026-06": 270,
-   "2026-07": 169,
-   "2026-08": 24
   },
   {
    "team": "hiero-sdk-go-maintainers",
@@ -1200,6 +1200,6 @@
    "2026-08": 8
   }
  ],
- "generated_at": "2026-09-29T20:10:05.605495+00:00",
+ "generated_at": "2026-09-30T15:41:06.845757+00:00",
  "stale": false
 }

@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-09-29T20:10:02.486353+00:00"
+  "end": "2026-09-30T15:41:02.241933+00:00"
  },
  "series": [
   {
@@ -415,18 +415,6 @@
    "Unknown": 0
   },
   {
-   "team": "hiero-sdk-js-maintainers",
-   "Hashgraph": 1,
-   "LimeChain": 3,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
    "team": "roadmap-viewers",
    "Hashgraph": 22,
    "LimeChain": 1,
@@ -483,6 +471,18 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 1,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "team": "hiero-sdk-js-maintainers",
+   "Hashgraph": 1,
+   "LimeChain": 4,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
    "Independent": 0,
    "Unknown": 1
   },
@@ -1003,6 +1003,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-09-29T20:10:02.486353+00:00",
+ "generated_at": "2026-09-30T15:41:02.241933+00:00",
  "stale": false
 }

@@ -528,6 +528,18 @@
    "organisations": "Hashgraph 9, LimeChain 1, Independent 1"
   },
   {
+   "team": "hiero-sdk-js-maintainers",
+   "members": 6,
+   "resolved": 5,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 80,
+   "hhi": 6800,
+   "unknown": 1,
+   "single_employer": false,
+   "organisations": "LimeChain 4, Hashgraph 1"
+  },
+  {
    "team": "hiero-consensus-node-ci-codeowners",
    "members": 5,
    "resolved": 5,
@@ -625,18 +637,6 @@
   },
   {
    "team": "hiero-sdk-java-maintainers",
-   "members": 4,
-   "resolved": 4,
-   "distinct_orgs": 2,
-   "top_org": "LimeChain",
-   "top_org_pct": 75,
-   "hhi": 6250,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "LimeChain 3, Hashgraph 1"
-  },
-  {
-   "team": "hiero-sdk-js-maintainers",
    "members": 4,
    "resolved": 4,
    "distinct_orgs": 2,
@@ -1381,7 +1381,7 @@
   }
  ],
  "row_count": 111,
- "generated_at": "2026-09-29T20:10:03.531591+00:00",
+ "generated_at": "2026-09-30T15:41:03.995093+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-09-29T20:04:40.480093+00:00"
+  "end": "2026-09-30T15:35:51.575469+00:00"
  },
  "series": [
   {
@@ -66,7 +66,7 @@
    "general_user": 4,
    "triage": 0,
    "committer": 5,
-   "maintainer": 13
+   "maintainer": 12
   },
   {
    "repo": "hiero-sdk-python",
@@ -114,8 +114,8 @@
    "repo": "hiero-sdk-js",
    "general_user": 5,
    "triage": 2,
-   "committer": 2,
-   "maintainer": 0
+   "committer": 0,
+   "maintainer": 2
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -216,6 +216,13 @@
    "maintainer": 2
   },
   {
+   "repo": "solo-charts",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
+  },
+  {
    "repo": "hiero-mirror-node-explorer",
    "general_user": 2,
    "triage": 0,
@@ -223,23 +230,9 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-enterprise-java",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 3
-  },
-  {
    "repo": "sdk-collaboration-hub",
    "general_user": 1,
    "triage": 1,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "solo-charts",
-   "general_user": 2,
-   "triage": 0,
    "committer": 0,
    "maintainer": 2
   },
@@ -251,6 +244,13 @@
    "maintainer": 2
   },
   {
+   "repo": "hiero-consensus-specifications",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
    "repo": "hiero-contracts",
    "general_user": 2,
    "triage": 0,
@@ -258,11 +258,11 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-consensus-specifications",
-   "general_user": 2,
+   "repo": "hiero-enterprise-java",
+   "general_user": 0,
    "triage": 0,
-   "committer": 0,
-   "maintainer": 1
+   "committer": 1,
+   "maintainer": 2
   },
   {
    "repo": "hiero-docs",
@@ -294,6 +294,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-09-29T20:04:40.480093+00:00",
+ "generated_at": "2026-09-30T15:35:51.575469+00:00",
  "stale": false
 }

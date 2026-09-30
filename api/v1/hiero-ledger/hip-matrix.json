@@ -4,7 +4,7 @@
  "group": "Status & coverage",
  "title": "Implementation coverage matrix",
  "description": "Merged PRs referencing each HIP, per component \u2014 every spec in the inventory: specs hottest first (most referencing activity), untouched specs at the bottom. The governance column is each spec's lifecycle status \u2014 often the explanation for a blank row (a deferred or review-stage spec has no implementation yet by design). A dash means no PR reference was found: a lead to check, not proof the work is missing (older specs and the younger SDKs are especially prone to missing references). Click a filled cell to list its PRs \u2014 every count is independently checkable. The long-format source ships as hip_repo_activity.csv alongside the wide download here.",
- "badge": "158 HIPs",
+ "badge": "159 HIPs",
  "source": "hip_repo_activity.csv",
  "row_header": "Governance",
  "note_header": "No SDK PRs found in",
@@ -3603,6 +3603,88 @@
      "swift",
      "python"
     ]
+   }
+  },
+  {
+   "key": 1522,
+   "label": "HIP-1522",
+   "sublabel": "Account Staking Configuration via the Hedera Account Service",
+   "status": "Approved",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 0
+    }
+   ],
+   "note": {
+    "kind": "none",
+    "text": "no SDK activity found"
    }
   },
   {
@@ -13153,6 +13235,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-09-29T20:11:46.047865+00:00",
+ "generated_at": "2026-09-30T15:42:41.949788+00:00",
  "stale": false
 }
