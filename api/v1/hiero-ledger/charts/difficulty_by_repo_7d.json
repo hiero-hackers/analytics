@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-09-30T15:34:21.614347+00:00"
+  "end": "2026-10-01T09:06:07.631629+00:00"
  },
  "series": [
   {
@@ -61,7 +61,15 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 39,
+   "Unknown": 32,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cli",
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -69,7 +77,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 41,
+   "Unknown": 39,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +109,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 9,
+   "Unknown": 10,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -141,10 +149,10 @@
   },
   {
    "repo": "hiero-sdk-python",
-   "Unknown": 3,
+   "Unknown": 4,
    "Good First Issue": 0,
    "Beginner": 0,
-   "Intermediate": 1,
+   "Intermediate": 0,
    "Advanced": 0
   },
   {
@@ -189,13 +197,13 @@
   },
   {
    "repo": "solo",
-   "Unknown": 14,
+   "Unknown": 13,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   }
  ],
- "generated_at": "2026-09-30T15:34:21.614347+00:00",
+ "generated_at": "2026-10-01T09:06:07.631629+00:00",
  "stale": false
 }

@@ -29,8 +29,8 @@
  "frequency": "month",
  "timezone": "UTC",
  "comparison": {
-  "current": "2026-08",
-  "previous": "2026-07"
+  "current": "2026-09",
+  "previous": "2026-08"
  },
  "category": {
   "key": "bucket",
@@ -39,7 +39,7 @@
  "window": {
   "kind": "calendar",
   "first": "2018-10",
-  "last": "2026-09"
+  "last": "2026-10"
  },
  "series": [
   {
@@ -528,9 +528,14 @@
   {
    "bucket": "2026-09",
    "cumulative_repos": 44,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10",
+   "cumulative_repos": 44,
    "partial": true
   }
  ],
- "generated_at": "2026-09-30T15:42:43.542329+00:00",
+ "generated_at": "2026-10-01T09:15:36.030687+00:00",
  "stale": false
 }
