@@ -140,10 +140,12 @@ SECTION_SPECS = [
         "title": "Bot suspects (review)",
         "description": (
             "Contributor logins is_bot_login() does not exclude, but that trip a weaker automation "
-            "signal — a substring like 'automation', 'actions', 'service', 'auto', 'svc', 'ci', or "
-            "'bot' outside the recognised '-bot'/'[bot]' suffix. These stay counted as people "
-            "everywhere else on this dashboard; a maintainer confirming one is automation adds it "
-            "to BOT_LOGINS. False positives (real names tripping a substring) are expected here."
+            "signal — a token prefix or suffix like 'automation', 'actions', 'service', 'auto', "
+            "'svc', 'ci', or 'bot' (never a mid-word match). These stay counted as people everywhere "
+            "else on this dashboard; a maintainer confirming one is automation adds it to "
+            "BOT_LOGINS, confirming one is a real person adds it to bot_suspect_dismissals.yaml "
+            "so it stops reappearing. False positives (a real name's genuine prefix/suffix match) "
+            "are expected here."
         ),
         "columns": [
             ("login", "login"),

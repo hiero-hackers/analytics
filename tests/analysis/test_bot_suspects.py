@@ -122,18 +122,26 @@ def test_load_dismissed_suspects_missing_file_returns_empty_set(tmp_path: Path):
 
 
 def test_signal_false_positive_rate_against_real_contributor_logins():
-    """Regression guard: the heuristic should stay rare against real logins.
+    """Regression guard: the heuristic should stay rare against real, undismissed logins.
 
     affiliations.yaml is the project's actual curated contributor list, so it
     doubles as a sanity check for the suspect signal per review feedback on
     #328 — this fails loudly if a future change to SUSPECT_SIGNALS makes the
     heuristic noisy again, rather than that only being caught by a maintainer
     skimming a much longer bot_suspects.csv by hand.
+
+    Dismissed logins are excluded before counting: once a maintainer confirms
+    a flagged login is a real person and adds it to bot_suspect_dismissals.yaml,
+    it's resolved noise, not open noise, and shouldn't keep eating into this
+    cap — otherwise the guard goes stale exactly when dismissals do their job.
     """
     real_logins = list(yaml.safe_load(AFFILIATIONS_PATH.read_text(encoding="utf-8")).keys())
     assert len(real_logins) > 100  # sanity: this really is the full curated list
 
-    flagged = [login for login in real_logins if bot_suspect_signal(login)]
+    dismissed = load_dismissed_suspects()
+    undismissed = [login for login in real_logins if login.strip().lower() not in dismissed]
+
+    flagged = [login for login in undismissed if bot_suspect_signal(login)]
     # Not zero — "ci" as a real prefix/suffix is an accepted tradeoff (see
     # bot_suspect_signal's docstring) — but should stay a handful, not a flood.
-    assert len(flagged) <= 5, f"suspect signal is flagging real logins broadly: {flagged}"
+    assert len(flagged) <= 5, f"suspect signal is flagging real, undismissed logins broadly: {flagged}"
