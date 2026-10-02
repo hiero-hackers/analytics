@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --all-extras --dev
 
+      - name: Check fuzzing requirements match uv.lock
+        run: |
+          uv export --frozen --no-default-groups --no-emit-project --format requirements-txt -o .clusterfuzzlite/requirements.txt
+          git diff --exit-code -- .clusterfuzzlite/requirements.txt
+
       - name: Run Ruff Lint
         run: uv run ruff check --output-format=github .
 

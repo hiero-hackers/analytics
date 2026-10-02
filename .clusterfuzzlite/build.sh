@@ -1,10 +1,12 @@
 #!/bin/bash -eu
 
-PDM_BUILD_SCM_VERSION=0.0.0 pip3 install .
+# Hash-pinned runtime dependencies, exported from uv.lock. The project itself
+# is bundled from src/ rather than installed, so no build backend is fetched.
+pip3 install --require-hashes -r .clusterfuzzlite/requirements.txt
 
 for fuzzer in fuzz/*_fuzzer.py; do
     fuzzer_name="$(basename -s .py "$fuzzer")"
-    pyinstaller --distpath "$OUT" --onefile --name "$fuzzer_name.pkg" "$fuzzer"
+    pyinstaller --distpath "$OUT" --onefile --paths src --name "$fuzzer_name.pkg" "$fuzzer"
 
     cat > "$OUT/$fuzzer_name" <<EOF
 #!/bin/sh
