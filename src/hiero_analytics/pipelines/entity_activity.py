@@ -41,7 +41,7 @@ ALL_TIME = "all"
 
 def main(org: str = ORG) -> None:
     """Write the entity-activity tables for ``org``."""
-    client, org_data_dir, _ = org_context(org)
+    client, org_data_dir = org_context(org)
     records = load_contributor_activity(client, org)
     label_events = load_issue_label_events(client, org)
     events = combined_activity_events(records, label_events)

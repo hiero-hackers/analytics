@@ -30,7 +30,13 @@ into one must not withdraw ids that consumers and shared links already resolve.
 
 Versioning: breaking shape changes (renamed keys, removed sections) bump the
 version directory so consumers migrate deliberately; additive changes land in
-place. ``v1`` is additive-only from here.
+place. ``v1`` is additive-only, with one recorded exception: in October 2026
+chart variants lost ``file``, ``width`` and ``height`` (the PNG a variant used
+to name, and its pixel size) when chart PNGs stopped being produced. No
+consumer read those fields — the dashboard had drawn every chart from
+``interactive`` since the chart documents landed — so the version stayed at
+``v1`` rather than forcing a migration over a field nothing used. Every listed
+variant now carries ``interactive``.
 """
 
 from __future__ import annotations
@@ -43,7 +49,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
-from PIL import Image
 
 # Paths are read through the module at call time (never bound at import), so
 # the contract tests' path redirection applies no matter the import order.
@@ -53,6 +58,7 @@ from hiero_analytics.dashboard_spec import (
     CHART_METHODOLOGY,
     CHART_NOTES,
     CUSTOM_VIEW_MODULES,
+    FULL_ROW_CHARTS,
     MACRO_ABSENT_NOTES,
     MACRO_GLOSSARIES,
     MACRO_GROUP_ORDER,
@@ -65,7 +71,7 @@ from hiero_analytics.dashboard_spec import (
     table_variants,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
-from hiero_analytics.export.chart_data import chart_document
+from hiero_analytics.export.chart_data import chart_document, is_empty
 from hiero_analytics.export.csv_safety import sanitize_csv_text
 from hiero_analytics.export.entity_views import build_entity_documents
 from hiero_analytics.export.macro_metrics import macro_metrics
@@ -240,75 +246,86 @@ def _section_document(section: dict, group_of: dict, org: str, org_data_dir: Pat
     return document
 
 
-def variant_annotations(filename: str) -> dict:
-    """The note and methodology declared for one chart file, keyed by filename.
+def variant_annotations(chart_id: str) -> dict:
+    """The note and methodology declared for one chart variant, keyed by chart id.
 
-    The lookup is per *file*, not per chart: a chart's tabs show different
+    The lookup is per *variant*, not per card: a card's tabs show different
     populations (maintainers / committers) or different spans, and each has its
-    own entry in the spec. Selecting one entry per chart — as the emitter used
+    own entry in the spec. Selecting one entry per card — as the emitter used
     to — made every entry belonging to a non-first tab unreachable.
     """
     annotations = {}
-    if note := CHART_NOTES.get(filename):
+    if note := CHART_NOTES.get(chart_id):
         annotations["note"] = note
-    if methodology := CHART_METHODOLOGY.get(filename):
+    if methodology := CHART_METHODOLOGY.get(chart_id):
         annotations["methodology"] = methodology
     return annotations
 
 
-def _chart_variant(org: str, chart_dir: Path, label: str, filename: str) -> dict:
-    """One chart variant, carrying its own explanation and pixel size.
+def _source_files(source: dict, org_data_dir: Path) -> list[Path]:
+    """Every CSV a chart source reads: its dataset and, for networks, the edge list."""
+    files = [org_data_dir / source["file"]]
+    if edges := source.get("edges_file"):
+        files.append(org_data_dir / edges)
+    return files
 
-    The dimensions let the browser reserve the image's box before the PNG
-    arrives, so a page of charts doesn't shift under the reader as they load.
-    An unreadable PNG simply ships without them rather than failing the emit.
 
-    Note and methodology are keyed by *filename*, so each tab carries the text
-    describing the population it actually shows. The chart-level fields below
-    remain as the fallback for a variant with no entry of its own (the period
-    tabs that share one explanation), which is also what a v1 consumer written
-    before these fields existed keeps reading.
+def _has_rows(csv_path: Path) -> bool:
+    """Whether the dataset's sidecar records at least one row.
+
+    A pipeline writes the CSV even when the analysis found nothing (so a
+    consumer can tell "no data" from "not run"). Skipping such a dataset here
+    also spares ``chart_document`` a header-less file. A sidecar without
+    ``record_count`` (written by an older ``save_dataframe``) counts as
+    populated; the document's own emptiness check below is the arbiter then.
     """
-    variant = {"label": label, "file": f"charts/org/{org}/{filename}", **variant_annotations(filename)}
+    return _read_meta(csv_path).get("record_count", 1) > 0
+
+
+def _chart_variant(org: str, org_dir: Path, spec: dict, org_data_dir: Path, label: str, chart_id: str) -> dict | None:
+    """One chart variant with its chart document written, or None when its dataset is absent.
+
+    A variant is listed exactly when the CSV its spec names exists and the
+    document built from it shows something: a span tab whose window holds
+    nothing stays off the card, as it did when nothing was drawn for it. The
+    output contract tests make the spec and the pipelines agree on the
+    filenames. The document gets the variant's own note (a
+    source's ``note`` describes the interactive view and wins over the card's)
+    and is written under the chart id, which the dashboard also uses to key the
+    view's URL state — so ids are stable identifiers, not derived names.
+    """
+    source = spec["sources"][chart_id]
+    files = _source_files(source, org_data_dir)
+    csv_path = files[0]
+    if not all(path.exists() for path in files) or not _has_rows(csv_path):
+        return None
     try:
-        with Image.open(chart_dir / filename) as image:
-            variant["width"], variant["height"] = image.width, image.height
-    except (OSError, ValueError):
-        logger.warning("Could not read dimensions for %s", filename)
-    return variant
-
-
-# Aspect ratio beyond which a chart cannot survive a ~340px gallery cell: a
-# panoramic chart (many bars along x) gets illegibly narrow bars, so it earns
-# the full-row scroll treatment `wide` renders as. Derived from the actual PNG
-# rather than hand-set per chart, so a pipeline that changes a chart's shape
-# changes its layout with it; the spec's WIDE_CHARTS remains as the manual
-# override. (Tall charts are the frontend's call — it has the same dimensions
-# per variant and spans them without the scroll box.)
-_WIDE_ASPECT_ABOVE = 2.0
-
-
-def _needs_full_row(variants: list[dict]) -> bool:
-    """Whether any variant is panoramic enough to demand the full-row scroll."""
-    for variant in variants:
-        width, height = variant.get("width"), variant.get("height")
-        if width and height and width / height >= _WIDE_ASPECT_ABOVE:
-            return True
-    return False
+        document = chart_document(source, csv_path, org, _read_meta(csv_path).get("generated_at"))
+    except (ValueError, TypeError, OSError) as exc:
+        raise DataApiContractError(f"Invalid chart dataset {org}/{source['file']}: {exc}") from exc
+    if is_empty(document):
+        return None
+    _stamp_freshness(document, csv_path)
+    document = {**variant_annotations(chart_id), **document, "id": chart_id}
+    target = org_dir / "charts" / f"{chart_id}.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(document, indent=1, allow_nan=False), encoding="utf-8")
+    return {
+        "label": label,
+        "interactive": {"kind": document["kind"], "path": f"{org}/charts/{target.name}"},
+        **variant_annotations(chart_id),
+    }
 
 
 def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dict]:
     """The org's chart sections with their full presentation structure.
 
-    Mirrors what the legacy dashboard renders: each spec entry is a card with
-    a title and description; each chart inside carries its variant tabs
-    (e.g. All / Active 90d), its "how to read this" note, its step-by-step
-    methodology, and the wide flag (rendered as a horizontal scroll). Only
-    variants whose PNG was actually produced are listed; one whose dataset
-    CSV also exists gains an ``interactive`` reference (an additive field, so
-    a consumer that only knows ``file`` still renders every listed variant).
+    Each spec entry is a card with a title and description; each chart inside
+    carries its variant tabs (e.g. All / Active 90d), its "how to read this"
+    note, its step-by-step methodology, and its layout flag. Only variants
+    whose dataset was produced are listed, so a card whose pipeline did not
+    run for this org drops out rather than rendering empty.
     """
-    chart_dir = paths.ORG_CHARTS_DIR / org
     sections = []
     for macro in CHART_MACROS:
         # "*" declares org-independent cards: they apply to any org, and the
@@ -316,45 +333,27 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
         # didn't produce. An explicit org key overrides the wildcard.
         for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
             charts = []
-            for caption, variant_specs in spec["files"]:
-                variants = []
-                for label, filename in variant_specs:
-                    # v1 is additive-only: ``file`` has always named a PNG that
-                    # exists, so a variant without one is not listed at all.
-                    if not (chart_dir / filename).exists():
-                        continue
-                    variant = _chart_variant(org, chart_dir, label, filename)
-                    source = spec.get("interactive_sources", {}).get(filename)
-                    if source and (csv_path := org_data_dir / source["file"]).exists():
-                        try:
-                            document = chart_document(source, csv_path, org, _read_meta(csv_path).get("generated_at"))
-                        except (ValueError, TypeError) as exc:
-                            raise DataApiContractError(f"Invalid chart dataset {org}/{source['file']}: {exc}") from exc
-                        _stamp_freshness(document, csv_path)
-                        # A source's own note describes the interactive view and wins over the PNG's.
-                        document = {**variant_annotations(filename), **document}
-                        # Keyed by the PNG stem, not the CSV: two charts can share one CSV.
-                        document["id"] = Path(filename).stem
-                        target = org_dir / "charts" / f"{document['id']}.json"
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        target.write_text(json.dumps(document, indent=1, allow_nan=False), encoding="utf-8")
-                        variant["interactive"] = {"kind": document["kind"], "path": f"{org}/charts/{target.name}"}
-                    variants.append(variant)
+            for caption, variant_specs in spec["variants"]:
+                variants = [
+                    variant
+                    for label, chart_id in variant_specs
+                    if (variant := _chart_variant(org, org_dir, spec, org_data_dir, label, chart_id))
+                ]
                 if not variants:
                     continue
-                filenames = [filename for _label, filename in variant_specs]
+                chart_ids = [chart_id for _label, chart_id in variant_specs]
                 chart = {"title": caption, "variants": variants}
-                if note := next((CHART_NOTES[f] for f in filenames if f in CHART_NOTES), None):
+                if note := next((CHART_NOTES[c] for c in chart_ids if c in CHART_NOTES), None):
                     chart["note"] = note
-                if methodology := next((CHART_METHODOLOGY[f] for f in filenames if f in CHART_METHODOLOGY), None):
+                if methodology := next((CHART_METHODOLOGY[c] for c in chart_ids if c in CHART_METHODOLOGY), None):
                     chart["methodology"] = methodology
-                # Two different treatments: hand-flagged WIDE_CHARTS have many
-                # bars and need the horizontal scroll box; a merely wide-aspect
-                # chart (few bars, long legend) just spans the full row, scaled
-                # to fit — a scroll box would crop its title and legend.
-                if any(f in WIDE_CHARTS for f in filenames):
+                # Two different treatments: WIDE_CHARTS have many bars and need
+                # the horizontal scroll box; FULL_ROW_CHARTS (few categories,
+                # long legend, or a panoramic timeline) just span the full row,
+                # scaled to fit — a scroll box would crop their legend.
+                if any(c in WIDE_CHARTS for c in chart_ids):
                     chart["wide"] = True
-                elif _needs_full_row(variants):
+                elif any(c in FULL_ROW_CHARTS for c in chart_ids):
                     chart["full_row"] = True
                 charts.append(chart)
             if charts:
@@ -395,7 +394,7 @@ def _copy_download(csv_name: str, org: str, org_data_dir: Path, org_dir: Path) -
 def _attach_download(section: dict, spec: dict, org: str, org_data_dir: Path, org_dir: Path) -> None:
     """Copy a chart card's declared companion CSV(s) into the API and reference them.
 
-    The Pages deploy publishes only the API tree and the chart PNGs, so a CSV
+    The Pages deploy publishes only the API tree, so a CSV
     the dashboard offers for download has to travel inside the API. The copy
     keeps the raw ``outputs/data`` artifact untouched.
 
@@ -489,7 +488,7 @@ def _source_sections(
             if section is None:
                 continue
             entry = {"macro": section["macro"], "id": section["id"], "title": section["title"]}
-            for source in spec.get("interactive_sources", {}).values():
+            for source in spec.get("sources", {}).values():
                 add(source.get("file"), entry)
                 add(source.get("edges_file"), entry)
             csv = spec.get("csv")

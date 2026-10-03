@@ -5,8 +5,8 @@ import json
 import pandas as pd
 import pytest
 
+from hiero_analytics.analysis.network_layout import _graph, network_layout, network_tables
 from hiero_analytics.analysis.scorecard_analysis import CHECK_COLUMNS
-from hiero_analytics.dashboard_spec import CHART_MACROS
 from hiero_analytics.dashboard_spec.interactive import (
     ACTIVITY_HEATMAP_SOURCES,
     RELEASE_TIMELINE_SOURCES,
@@ -18,7 +18,6 @@ from hiero_analytics.dashboard_spec.interactive import (
 )
 from hiero_analytics.export import data_api
 from hiero_analytics.export.chart_data import chart_document
-from hiero_analytics.plotting.network import _graph, network_layout, network_tables
 
 
 def write_counts(tmp_path, frequency, buckets, counts):
@@ -113,7 +112,7 @@ def test_cumulative_series_carry_forward_and_flows_fill_zero(tmp_path):
     )
     created, total = (
         chart_document(REPO_GROWTH_SOURCES[name], path, "org", "2026-05-02T00:00:00Z")
-        for name in ["repos_created_per_month.png", "cumulative_repo_count.png"]
+        for name in ["repos_created_per_month", "cumulative_repo_count"]
     )
     assert [row["bucket"] for row in created["rows"]] == ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05"]
     assert [row["repos_created"] for row in created["rows"]] == [2, 0, 1, 0, 0]
@@ -138,12 +137,9 @@ def test_snapshot_series_keep_their_own_dates(tmp_path):
     assert data["series"][0]["color"] == "var(--chart-1)"
 
 
-def test_chart_note_does_not_replace_counting_rule(tmp_path, monkeypatch):
-    """A PNG's "how to read this" note sits beside the population rule, never over it."""
-    source = tmp_path / "source"
-    source.mkdir()
-    write_counts(source, "year", ["2026"], [9])
-    spec = {
+def _pipeline_spec(source_dir, **source_overrides):
+    """One governance card whose single variant draws from ``counts.csv`` in ``source_dir``."""
+    return {
         "name": "Governance",
         "charts": {
             "org": [
@@ -151,52 +147,83 @@ def test_chart_note_does_not_replace_counting_rule(tmp_path, monkeypatch):
                     "id": "maintainer-pipeline",
                     "title": "Pipeline",
                     "description": "Roles",
-                    "files": [("Role counts", [("All time", "roles.png")])],
-                    "interactive_sources": {"roles.png": {**roles("year"), "file": "counts.csv"}},
+                    "variants": [("Role counts", [("All time", "roles")])],
+                    "sources": {"roles": {**roles("year"), "file": "counts.csv", **source_overrides}},
                 }
             ]
         },
     }
-    monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
-    monkeypatch.setattr(data_api, "CHART_NOTES", {"roles.png": "Read the bars left to right."})
-    monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "images")
-    (tmp_path / "images" / "org").mkdir(parents=True)
-    (tmp_path / "images" / "org" / "roles.png").write_bytes(b"\x89PNG")
+
+
+def test_chart_note_does_not_replace_counting_rule(tmp_path, monkeypatch):
+    """A chart's "how to read this" note sits beside the population rule, never over it."""
+    source = tmp_path / "source"
+    source.mkdir()
+    write_counts(source, "year", ["2026"], [9])
+    monkeypatch.setattr(data_api, "CHART_MACROS", [_pipeline_spec(source)])
+    monkeypatch.setattr(data_api, "CHART_NOTES", {"roles": "Read the bars left to right."})
     output = tmp_path / "api" / "org"
     result = data_api._org_chart_sections("org", source, output)
     variant = result[0]["charts"][0]["variants"][0]
-    assert variant["file"] == "charts/org/org/roles.png"
-    assert variant["interactive"] == {"kind": "timeseries", "path": "org/charts/roles.json"}
+    assert variant == {
+        "label": "All time",
+        "interactive": {"kind": "timeseries", "path": "org/charts/roles.json"},
+        "note": "Read the bars left to right.",
+    }
     document = json.loads((output / "charts/roles.json").read_text())
+    assert document["id"] == "roles"
     assert document["rows"][0]["general_user"] == 9
     assert document["note"] == "Read the bars left to right."
     assert "Bots are excluded" in document["population"]
 
 
-def test_a_dataset_without_its_png_lists_no_variant(tmp_path, monkeypatch):
-    """v1 is additive-only: every listed ``file`` is a PNG that exists, dataset or not."""
+def test_a_variant_without_its_dataset_is_not_listed(tmp_path, monkeypatch):
+    """A card whose pipeline did not run for this org drops out rather than rendering empty."""
     source = tmp_path / "source"
     source.mkdir()
-    write_counts(source, "year", ["2026"], [9])
-    spec = {
-        "name": "Governance",
-        "charts": {
-            "org": [
-                {
-                    "id": "maintainer-pipeline",
-                    "title": "Pipeline",
-                    "description": "Roles",
-                    "files": [("Role counts", [("All time", "roles.png")])],
-                    "interactive_sources": {"roles.png": {**roles("year"), "file": "counts.csv"}},
-                }
-            ]
-        },
-    }
-    monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
-    monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "images")
+    monkeypatch.setattr(data_api, "CHART_MACROS", [_pipeline_spec(source)])
     output = tmp_path / "api" / "org"
     assert data_api._org_chart_sections("org", source, output) == []
     assert not (output / "charts").exists()
+
+
+def test_a_dataset_whose_sidecar_records_no_rows_is_not_listed(tmp_path, monkeypatch):
+    """An analysis that found nothing writes its CSV, but the tab stays off the card."""
+    source = tmp_path / "source"
+    source.mkdir()
+    write_counts(source, "year", [], [])
+    (source / "counts.csv.meta.json").write_text(
+        json.dumps({"generated_at": "2026-01-01T00:00:00+00:00", "record_count": 0})
+    )
+    monkeypatch.setattr(data_api, "CHART_MACROS", [_pipeline_spec(source)])
+    assert data_api._org_chart_sections("org", source, tmp_path / "api" / "org") == []
+
+
+def test_a_network_without_its_edge_list_is_not_listed(tmp_path, monkeypatch):
+    """Both files a network reads must exist; a half-written pair is absent, not an error."""
+    source = tmp_path / "source"
+    source.mkdir()
+    pd.DataFrame(
+        {"repo": ["a"], "active_members": [1], "total_members": [1], "category": ["Other"], "x": [0.0], "y": [0.0]}
+    ).to_csv(source / "net_nodes.csv", index=False)
+    spec = _pipeline_spec(source)
+    spec["charts"]["org"][0]["sources"]["roles"] = {
+        **role_network("maintainer", "maintainers"),
+        "file": "net_nodes.csv",
+        "edges_file": "net_edges.csv",
+    }
+    monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
+    assert data_api._org_chart_sections("org", source, tmp_path / "api" / "org") == []
+
+
+def test_an_invalid_dataset_is_a_contract_error(tmp_path, monkeypatch):
+    """A produced CSV that no longer fits its spec fails the emit loudly."""
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "counts.csv").write_text("year,unrelated\n2026,1\n")
+    monkeypatch.setattr(data_api, "CHART_MACROS", [_pipeline_spec(source)])
+    with pytest.raises(data_api.DataApiContractError, match="counts.csv"):
+        data_api._org_chart_sections("org", source, tmp_path / "api" / "org")
 
 
 def test_ranked_categories_keep_every_row(tmp_path):
@@ -264,15 +291,6 @@ def test_duplicates_and_undeclared_renderers_fail(tmp_path):
         chart_document({**ROLE_BY_REPO, "mark": "donut"}, path, "org")
 
 
-def test_every_interactive_source_replaces_a_declared_chart():
-    """A source keyed by a filename the card never lists would silently never render."""
-    for macro in CHART_MACROS:
-        for specs in macro["charts"].values():
-            for spec in specs:
-                listed = {filename for _caption, variants in spec["files"] for _label, filename in variants}
-                assert set(spec.get("interactive_sources", {})) <= listed, spec["id"]
-
-
 def test_matrix_takes_month_columns_in_order_and_nulls_inconclusive(tmp_path):
     """Months are found by shape, oldest first; Scorecard's -1 is absent, never a score."""
     heat = tmp_path / "heat.csv"
@@ -285,7 +303,7 @@ def test_matrix_takes_month_columns_in_order_and_nulls_inconclusive(tmp_path):
             "2026-01": [10, 3],
         }
     ).to_csv(heat, index=False)
-    data = chart_document(ACTIVITY_HEATMAP_SOURCES["contributor_activity_heatmap.png"], heat, "org")
+    data = chart_document(ACTIVITY_HEATMAP_SOURCES["contributor_activity_heatmap"], heat, "org")
     assert [column["key"] for column in data["columns"]] == ["2026-01", "2026-02"]
     assert data["rows"][1] == {"contributor name": "bo", "role": "", "activity score": 3, "2026-02": 0, "2026-01": 3}
     assert data["scale"] == {"min": 0, "max": 20, "steps": 5}
@@ -324,8 +342,8 @@ def test_count_matrix_with_a_blank_cell_keeps_integer_counts(tmp_path):
     )
 
 
-def test_network_tables_carry_the_png_layout(tmp_path):
-    """The saved positions are the renderer's own, so both views draw one picture."""
+def test_network_tables_carry_the_layout(tmp_path):
+    """The saved positions are the packed layout's own, so the dashboard draws the computed picture."""
     nodes = pd.DataFrame(
         {
             "repo": ["hiero-sdk-js", "hiero-sdk-go", "governance"],
@@ -374,7 +392,7 @@ def test_events_keep_the_trailing_window_busiest_first(tmp_path):
             "is_prerelease": [False, True, False, False],
         }
     ).to_csv(path, index=False)
-    week = RELEASE_TIMELINE_SOURCES["release_timeline_30d.png"]
+    week = RELEASE_TIMELINE_SOURCES["release_timeline_30d"]
     data = chart_document(week, path, "org", "2026-03-15T00:00:00+00:00")
     assert data["categories"] == ["a", "b"]
     assert [(row["repo"], row["tag_name"], row["type"]) for row in data["rows"]] == [
@@ -416,7 +434,7 @@ def test_dimensions_use_the_focus_vocabulary(tmp_path):
     pd.DataFrame({"contributor name": ["ann"], "role": ["Maintainer"], "activity score": [3], "2026-01": [3]}).to_csv(
         heat, index=False
     )
-    assert chart_document(ACTIVITY_HEATMAP_SOURCES["contributor_activity_heatmap.png"], heat, "org")["dimensions"] == [
+    assert chart_document(ACTIVITY_HEATMAP_SOURCES["contributor_activity_heatmap"], heat, "org")["dimensions"] == [
         "contributor",
         "column",
     ]
@@ -428,7 +446,7 @@ def test_meter_and_funnel_marks_are_category_only_and_single_series(tmp_path):
 
     path = tmp_path / "org_codeowner_summary.csv"
     pd.DataFrame({"status": ["Present", "Missing"], "count": [29, 15]}).to_csv(path, index=False)
-    data = chart_document(OWNERSHIP_SOURCES["org_codeowner_summary.png"], path, "org")
+    data = chart_document(OWNERSHIP_SOURCES["org_codeowner_summary"], path, "org")
     assert data["mark"] == "meter"
     # The headline status stays first: a meter reads its first segment as the share.
     assert [row["status"] for row in data["rows"]] == ["Present", "Missing"]
@@ -477,3 +495,40 @@ def test_an_in_memory_table_only_builds_series_charts(tmp_path):
     """Matrix, network and events documents still read their own files."""
     with pytest.raises(ValueError, match="only build a timeseries or categories"):
         chart_document({"kind": "matrix"}, tmp_path / "x.csv", "org", table=pd.DataFrame())
+
+
+def test_a_window_with_nothing_in_it_is_not_listed(tmp_path, monkeypatch):
+    """Span tabs share one full-record CSV; a tab whose window is empty stays off the card."""
+    source = tmp_path / "source"
+    source.mkdir()
+    pd.DataFrame(
+        {
+            "repo": ["org/old"],
+            "published_at": ["2026-01-01T00:00:00+00:00"],
+            "tag_name": ["v1"],
+            "is_prerelease": [False],
+        }
+    ).to_csv(source / "release_timeline.csv", index=False)
+    spec = {
+        "name": "Releases",
+        "charts": {
+            "org": [
+                {
+                    "id": "release-timeline",
+                    "title": "Releases",
+                    "description": "Timeline",
+                    "variants": [
+                        ("Release timeline", [("1 year", "release_timeline_365d"), ("Week", "release_timeline_7d")])
+                    ],
+                    "sources": {
+                        "release_timeline_365d": RELEASE_TIMELINE_SOURCES["release_timeline_365d"],
+                        "release_timeline_7d": RELEASE_TIMELINE_SOURCES["release_timeline_7d"],
+                    },
+                }
+            ]
+        },
+    }
+    monkeypatch.setattr(data_api, "CHART_MACROS", [spec])
+    monkeypatch.setattr(data_api, "_read_meta", lambda _path: {"generated_at": "2026-03-01T00:00:00+00:00"})
+    (section,) = data_api._org_chart_sections("org", source, tmp_path / "api" / "org")
+    assert [variant["label"] for variant in section["charts"][0]["variants"]] == ["1 year"]

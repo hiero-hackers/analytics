@@ -28,9 +28,9 @@ CHART_MACRO = {
         "*": [
             {
                 "id": "issue-difficulty",
-                "interactive_sources": {
+                "sources": {
                     **{
-                        f"difficulty_by_repo{suffix}.png": {
+                        f"difficulty_by_repo{suffix}": {
                             "kind": "categories",
                             "file": f"difficulty_by_repo{suffix}.csv",
                             "category": "repo",
@@ -51,7 +51,7 @@ CHART_MACRO = {
                         for suffix, window in SPAN_WINDOWS
                     },
                     **{
-                        f"{stem}.png": {
+                        f"{stem}": {
                             "kind": "timeseries",
                             "file": f"{stem}.csv",
                             "category": "date",
@@ -82,23 +82,23 @@ CHART_MACRO = {
                     "haven't been triaged with a difficulty yet, since repos no longer rely on a "
                     "good-first-issue-candidate label to surface onboarding-friendly work."
                 ),
-                "files": [
+                "variants": [
                     (
                         "By repo",
                         [
                             # The shared span vocabulary, widest first, matching
                             # the chart tabs and tables everywhere else.
-                            ("All time", "difficulty_by_repo.png"),
-                            ("1 year", "difficulty_by_repo_365d.png"),
-                            ("1 month", "difficulty_by_repo_30d.png"),
-                            ("Week", "difficulty_by_repo_7d.png"),
+                            ("All time", "difficulty_by_repo"),
+                            ("1 year", "difficulty_by_repo_365d"),
+                            ("1 month", "difficulty_by_repo_30d"),
+                            ("Week", "difficulty_by_repo_7d"),
                         ],
                     ),
                     (
                         "Over time (weekly)",
                         [
-                            ("All issues", "difficulty_over_time_all_event_based_weekly.png"),
-                            ("Labelled", "difficulty_over_time_event_based_weekly.png"),
+                            ("All issues", "difficulty_over_time_all_event_based_weekly"),
+                            ("Labelled", "difficulty_over_time_event_based_weekly"),
                         ],
                     ),
                 ],
@@ -110,20 +110,20 @@ CHART_MACRO = {
 CHART_NOTES = {
     # Shared by all "By repo" span tabs (variants without their own note
     # inherit the first one).
-    "difficulty_by_repo.png": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled "
+    "difficulty_by_repo": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled "
     "with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and "
     "'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's "
     "accumulated triage debt.",
-    "difficulty_over_time_event_based_weekly.png": "Open difficulty-labelled issues over the last year, reconstructed from when difficulty labels "
+    "difficulty_over_time_event_based_weekly": "Open difficulty-labelled issues over the last year, reconstructed from when difficulty labels "
     "were actually applied (label events). Each band is a difficulty level; the height is how many "
     "open issues sat at that difficulty on that date.",
-    "difficulty_over_time_all_event_based_weekly.png": "Same series with the 'Unknown' band added: open issues with no difficulty label (or whose "
+    "difficulty_over_time_all_event_based_weekly": "Same series with the 'Unknown' band added: open issues with no difficulty label (or whose "
     "label application date isn't recoverable from events), counted from their creation date. Shows "
     "how the untriaged backlog moves relative to the triaged one.",
 }
 
 CHART_METHODOLOGY = {
-    "difficulty_by_repo.png": [
+    "difficulty_by_repo": [
         "Fetch every open issue across the organisation's repositories, with its labels.",
         (
             "Map each issue's labels to a difficulty level using the shared label vocabulary "
@@ -136,7 +136,7 @@ CHART_METHODOLOGY = {
         ),
         "Count the remaining open issues per repository, stacked by difficulty level.",
     ],
-    "difficulty_over_time_event_based_weekly.png": [
+    "difficulty_over_time_event_based_weekly": [
         (
             "Fetch the label timeline for every issue — each 'labeled' and 'unlabeled' event with its "
             "timestamp — rather than reading only the labels issues carry today."
@@ -153,6 +153,15 @@ CHART_METHODOLOGY = {
 }
 
 WIDE_CHARTS: set[str] = set()
+
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS = {
+    "difficulty_by_repo",
+    "difficulty_by_repo_365d",
+    "difficulty_by_repo_30d",
+    "difficulty_by_repo_7d",
+}
 
 # This tab's "how to read this". Prose only; *asterisks* mark emphasis.
 GLOSSARY = {

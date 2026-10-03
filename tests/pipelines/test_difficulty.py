@@ -5,10 +5,7 @@ from __future__ import annotations
 import os
 from datetime import UTC, datetime, timedelta
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.difficulty as runner
 from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
@@ -78,7 +75,7 @@ def _stub_fetches(
 
 
 def test_main_creates_output_files(monkeypatch: pytest.MonkeyPatch, stub_pipeline_context):
-    """Running main() should create the difficulty CSVs and stacked-bar chart."""
+    """Running main() should create the difficulty CSVs."""
     issues = [
         # Old issue whose difficulty label was applied within the 30-day window.
         _test_issue("hiero-ledger/repo-one", 1, ["good first issue"], created_days_ago=60),
@@ -88,7 +85,7 @@ def test_main_creates_output_files(monkeypatch: pytest.MonkeyPatch, stub_pipelin
     events = [
         _test_label_event("hiero-ledger/repo-one", 1, "good first issue", days_ago=10),
     ]
-    _, data_dir, charts_dir = stub_pipeline_context(runner)
+    _, data_dir = stub_pipeline_context(runner)
     _stub_fetches(monkeypatch, issues, events)
 
     runner.main()
@@ -103,10 +100,6 @@ def test_main_creates_output_files(monkeypatch: pytest.MonkeyPatch, stub_pipelin
             assert csv_path.exists(), f"CSV {csv_file} not created"
             assert os.path.getsize(csv_path) > 0, f"CSV {csv_file} is empty"
 
-        chart_path = charts_dir / f"difficulty_by_repo{suffix}.png"
-        assert chart_path.exists(), f"Chart difficulty_by_repo{suffix}.png not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart difficulty_by_repo{suffix}.png is empty"
-
 
 def test_windows_scope_their_own_labeling_activity(monkeypatch: pytest.MonkeyPatch, stub_pipeline_context):
     """An issue labelled outside a span is excluded from it but counted by wider ones."""
@@ -117,7 +110,7 @@ def test_windows_scope_their_own_labeling_activity(monkeypatch: pytest.MonkeyPat
     events = [
         _test_label_event("hiero-ledger/repo-one", 1, "good first issue", days_ago=60),
     ]
-    _, data_dir, _ = stub_pipeline_context(runner)
+    _, data_dir = stub_pipeline_context(runner)
     _stub_fetches(monkeypatch, issues, events)
 
     runner.main()
@@ -145,7 +138,7 @@ def test_main_handles_empty_timeline_events(monkeypatch: pytest.MonkeyPatch, stu
         # Created within the window without a difficulty label -> Unknown bucket.
         _test_issue("hiero-ledger/repo-one", 2, [], created_days_ago=3),
     ]
-    _, data_dir, charts_dir = stub_pipeline_context(runner)
+    _, data_dir = stub_pipeline_context(runner)
     _stub_fetches(monkeypatch, issues, events=[])
 
     # Should not raise an exception
@@ -153,4 +146,4 @@ def test_main_handles_empty_timeline_events(monkeypatch: pytest.MonkeyPatch, stu
 
     for suffix in SPAN_SUFFIXES:
         assert (data_dir / f"difficulty_distribution{suffix}.csv").exists()
-        assert (charts_dir / f"difficulty_by_repo{suffix}.png").exists()
+        assert (data_dir / f"difficulty_by_repo{suffix}.csv").exists()

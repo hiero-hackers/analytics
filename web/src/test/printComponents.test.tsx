@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ChartSection, ChartVariant } from '../api';
@@ -10,6 +10,7 @@ import { PeriodTabs } from '../components/PeriodTabs';
 import { StatusBoard } from '../components/StatusBoard';
 import { VariantTabs } from '../components/VariantTabs';
 import { BOARD_DOC, MANIFEST, MATRIX_DOC } from './fixtures';
+import { stubApi } from './stubApi';
 
 const printState = vi.hoisted(() => ({ printing: false }));
 vi.mock('../printContext', async (importOriginal) => ({
@@ -20,6 +21,14 @@ vi.mock('../printContext', async (importOriginal) => ({
 
 beforeEach(() => {
   printState.printing = false;
+  vi.unstubAllGlobals();
+  stubApi();
+});
+
+// Served by the stubbed API (see CHART_ROUTES in fixtures.ts).
+const series = (id: string) => ({
+  kind: 'timeseries' as const,
+  path: `hiero-ledger/charts/${id}.json`,
 });
 
 const slideshow: ChartSection = {
@@ -32,15 +41,15 @@ const slideshow: ChartSection = {
     {
       title: 'Contributors',
       variants: [
-        { label: 'All', file: 'all.png' },
-        { label: 'Active', file: 'active.png' },
+        { label: 'All', interactive: series('affiliation_donut') },
+        { label: 'Active', interactive: series('affiliation_donut_committers') },
       ],
     },
     {
       title: 'Pipeline',
       variants: [
-        { label: 'By year', file: 'year.png' },
-        { label: 'By month', file: 'month.png' },
+        { label: 'By year', interactive: series('pipeline_yearly') },
+        { label: 'By month', interactive: series('pipeline_monthly') },
       ],
     },
   ],
@@ -52,9 +61,11 @@ describe('Chart printing', () => {
   it('prints every slide with its selected variant and restores the screen state', async () => {
     const card = () => <ChartSectionCard section={slideshow} provenance={MANIFEST.provenance} />;
     const { rerender } = render(card());
-    await userEvent.click(radio('Active'));
+    // The tabs sit in each chart's toolbar: let both mounted slides load first.
+    await waitFor(() => expect(screen.getAllByText('Everyone counted.')).toHaveLength(2));
+    await userEvent.click(screen.getByRole('radio', { name: 'Active' }));
     await userEvent.click(screen.getByRole('button', { name: 'Next' }));
-    await userEvent.click(radio('By month'));
+    await userEvent.click(screen.getByRole('radio', { name: 'By month' }));
     // Off-screen slides stay mounted (keeping their choice) but out of view.
     expect(screen.queryByRole('figure', { name: /^Contributors/ })).not.toBeInTheDocument();
 
@@ -62,8 +73,8 @@ describe('Chart printing', () => {
     rerender(card());
     expect(screen.getByRole('figure', { name: 'Contributors — Active' })).toBeVisible();
     expect(screen.getByRole('figure', { name: 'Pipeline — By month' })).toBeVisible();
-    expect(screen.getByText('Contributors view: Active')).toBeInTheDocument();
-    expect(screen.getByText('Pipeline view: By month')).toBeInTheDocument();
+    expect(await screen.findByText('Contributors view: Active')).toBeInTheDocument();
+    expect(await screen.findByText('Pipeline view: By month')).toBeInTheDocument();
 
     printState.printing = false;
     rerender(card());
@@ -86,7 +97,6 @@ describe('Chart printing', () => {
     );
     const variant: ChartVariant = {
       label: 'All',
-      file: 'all.png',
       interactive: { kind: 'timeseries', path: 'test/all.json' },
     };
     render(

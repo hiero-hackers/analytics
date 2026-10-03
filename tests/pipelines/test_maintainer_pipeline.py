@@ -7,13 +7,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.maintainer_pipeline as runner
 from hiero_analytics.data_sources.models import ContributorActivityRecord
+from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 
 # Test data factories
 
@@ -78,7 +76,7 @@ def _patch_pipeline(
     """Redirect the pipeline preamble to tmp_path and stub the external fetches."""
     monkeypatch.setattr(
         "hiero_analytics.pipelines.maintainer_pipeline.org_context",
-        lambda _org: (mock_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_client, tmp_path / "data"),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.maintainer_pipeline.fetch_governance_config",
@@ -100,37 +98,27 @@ def test_main_creates_output_files(
     governance_config,
     synthetic_activity,
 ):
-    """Running main() should create the pipeline CSV tables and stacked-bar charts."""
+    """Running main() should create every pipeline CSV table, including each by-repo span."""
     _patch_pipeline(monkeypatch, tmp_path, mock_github_client, governance_config, synthetic_activity)
 
     runner.main()
 
     data_dir = tmp_path / "data"
-    charts_dir = tmp_path / "charts"
 
     expected_csvs = [
         "maintainer_activity_events.csv",
         "maintainer_pipeline_yearly.csv",
+        "maintainer_pipeline_daily.csv",
         "maintainer_pipeline_monthly.csv",
         "maintainer_pipeline_weekly.csv",
         "maintainer_pipeline_by_repo.csv",
-    ]
-    expected_charts = [
-        "maintainer_pipeline_yearly.png",
-        "maintainer_pipeline_monthly.png",
-        "maintainer_pipeline_weekly.png",
-        "maintainer_pipeline_by_repo.png",
+        *(f"maintainer_pipeline_by_repo_{period.key}.csv" for period in ACTIVITY_PERIODS),
     ]
 
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file
         assert csv_path.exists(), f"CSV {csv_file} not created"
         assert os.path.getsize(csv_path) > 0, f"CSV {csv_file} is empty"
-
-    for chart_file in expected_charts:
-        chart_path = charts_dir / chart_file
-        assert chart_path.exists(), f"Chart {chart_file} not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart {chart_file} is empty"
 
 
 def test_main_handles_empty_activity(
@@ -141,8 +129,7 @@ def test_main_handles_empty_activity(
 ):
     """Running main() with no contributor activity should not crash.
 
-    Empty pipelines still write header-only CSV tables, while the chart
-    renders are skipped via plot_and_save's empty-frame guard.
+    Empty pipelines still write header-only CSV tables.
     """
     _patch_pipeline(monkeypatch, tmp_path, mock_github_client, governance_config, records=[])
 
@@ -150,8 +137,7 @@ def test_main_handles_empty_activity(
     runner.main()
 
     data_dir = tmp_path / "data"
-    charts_dir = tmp_path / "charts"
 
     assert (data_dir / "maintainer_activity_events.csv").exists()
     assert (data_dir / "maintainer_pipeline_yearly.csv").exists()
-    assert not (charts_dir / "maintainer_pipeline_yearly.png").exists()
+    assert (data_dir / "maintainer_pipeline_by_repo.csv").exists()

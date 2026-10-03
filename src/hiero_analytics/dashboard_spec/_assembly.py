@@ -14,16 +14,18 @@ from types import ModuleType
 def canonical_macro(family_macro: dict) -> dict:
     """Canonicalize a family's chart macro for consumers.
 
-    Every ``files`` entry becomes ``(caption, [(label, filename), ...])``;
-    family modules may write a bare filename as sugar for a single variant.
+    Every ``variants`` entry becomes ``(caption, [(label, chart_id), ...])``;
+    family modules may write a bare chart id as sugar for a single variant.
+    A chart id names the variant's dataset in the spec's ``sources`` and the
+    chart document the data API writes for it.
     """
     charts = {
         org: [
             {
                 **spec,
-                "files": [
+                "variants": [
                     (caption, [(caption, target)] if isinstance(target, str) else list(target))
-                    for caption, target in spec["files"]
+                    for caption, target in spec["variants"]
                 ],
             }
             for spec in specs
@@ -34,7 +36,7 @@ def canonical_macro(family_macro: dict) -> dict:
 
 
 def merged(families: Sequence[ModuleType], attribute: str) -> dict:
-    """Merge a per-family dict, failing loudly if two families claim a chart."""
+    """Merge a per-family dict keyed by chart id, failing loudly if two families claim a chart."""
     result: dict = {}
     for family in families:
         entries = getattr(family, attribute)

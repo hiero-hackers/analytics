@@ -1,4 +1,4 @@
-"""Build the HIP-implementation evidence tables and charts for an organization.
+"""Build the HIP-implementation evidence tables for an organization.
 
 Maps Hiero Improvement Proposals onto the PRs that reference them across every
 org repository, producing the artifacts behind the dashboard's HIPs tab:
@@ -21,8 +21,8 @@ org repository, producing the artifacts behind the dashboard's HIPs tab:
   carry a release number; a Final spec with no citing PRs is a citation gap).
 - ``hip_adoption_funnel.csv`` — proposal-to-implementation funnel, all-time
   and for the Hiero-era cohort.
-- ``hip_repo_engagement.png`` / ``hip_adoption_funnel.png`` /
-  ``hip_activity_by_status.png`` — the three charts the HIPs macro renders.
+- ``hip_activity_by_status.csv`` — implementation evidence per status bucket
+  (approved/final); written only when there are rows.
 
 Deliberately evidence-only: PR references show where work happened, never that
 a HIP is complete, and spec approvals (TSC dates, tentative releases) are a
@@ -37,7 +37,6 @@ import logging
 import pandas as pd
 
 from hiero_analytics.analysis.hip_implementation import (
-    RECENT_COHORT,
     build_adoption_funnel,
     build_evidence_tables,
     build_hip_summary,
@@ -46,21 +45,18 @@ from hiero_analytics.analysis.hip_implementation import (
     build_repo_engagement,
 )
 from hiero_analytics.config.analysis import HIERO_ERA_START
-from hiero_analytics.config.charts import HIP_EVIDENCE_RAMP
 from hiero_analytics.config.github import HIP_PROPOSALS_REPO
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingError
 from hiero_analytics.data_sources.github_ingest import fetch_hip_inventory, fetch_org_pr_hip_refs_graphql
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
-from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
-from hiero_analytics.plotting.funnel import plot_funnel
 
 logger = logging.getLogger(__name__)
 
-# Display names for the status buckets on the activity chart. The chart keeps
-# only the buckets where implementation is expected — the spec-status funnel
-# chart covers the full governance picture.
+# Display names for the status buckets in the activity table. It keeps only the
+# buckets where implementation is expected — the spec-status funnel covers the
+# full governance picture.
 _BUCKET_LABELS = {
     "approved_accepted": "Approved / Accepted",
     "final_active": "Final / Active",
@@ -88,47 +84,6 @@ def _approved_no_activity(summary: pd.DataFrame) -> pd.DataFrame:
     return rows[_NO_ACTIVITY_COLUMNS].sort_values("hip", ascending=False).reset_index(drop=True)
 
 
-def _plot_engagement(engagement: pd.DataFrame, org: str, charts_dir) -> None:
-    """Repos ranked by distinct HIPs with merged referencing PRs.
-
-    Zero-reference repos are kept deliberately: the empty labelled rows at the
-    bottom are the "not partaking" finding, and the chart's companion CSV is
-    the downloadable source (no separate table duplicates it).
-    """
-    if engagement.empty or not (engagement["distinct_hips_merged"] > 0).any():
-        return
-    plot_bar(
-        df=engagement.rename(columns={"distinct_hips_merged": "distinct HIPs"}),
-        x_col="repo",
-        y_col="distinct HIPs",
-        title=f"{org} — repositories by distinct HIPs with merged PRs",
-        output_path=charts_dir / "hip_repo_engagement.png",
-    )
-
-
-# Funnel bands darken with depth, drawn from the family's shared ramp.
-_FUNNEL_SHADES = HIP_EVIDENCE_RAMP[:4]
-
-
-def _plot_adoption_funnel(funnel: pd.DataFrame, org: str, charts_dir) -> None:
-    """The recent-cohort funnel as a centred funnel silhouette, percent-only.
-
-    Band width is the stage's share of proposed; the only number shown is the
-    percentage — counts stay in the CSV download. The CSV keeps both cohorts.
-    """
-    recent = funnel[funnel["cohort"] == RECENT_COHORT]
-    if recent.empty or int(recent.iloc[0]["hips"]) == 0:
-        return
-    plot_funnel(
-        df=recent.rename(columns={"pct_of_proposed": "share"}),
-        stage_col="stage",
-        share_col="share",
-        title=f"{org} — adoption funnel, specs {RECENT_COHORT.replace('created ', '')}",
-        output_path=charts_dir / "hip_adoption_funnel.png",
-        shades=_FUNNEL_SHADES,
-    )
-
-
 def activity_by_status(summary: pd.DataFrame) -> pd.DataFrame:
     """Implementation evidence for the statuses where implementation is expected.
 
@@ -151,37 +106,9 @@ def activity_by_status(summary: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
-def _plot_activity_by_status(summary: pd.DataFrame, org: str, charts_dir) -> None:
-    frame = activity_by_status(summary)
-    if frame.empty:
-        return
-    labels = [
-        "Merged implementation PRs",
-        "Open PRs only",
-        "No evidence — awaiting implementation",
-        "No citing PRs found (implemented per HIP-1)",
-    ]
-    plot_stacked_bar(
-        df=frame,
-        x_col="bucket",
-        stack_cols=["merged", "open_only", "none_awaiting", "citation_gap"],
-        labels=labels,
-        title=f"{org} — implementation evidence, approved & final specs",
-        output_path=charts_dir / "hip_activity_by_status.png",
-        colors={
-            "Merged implementation PRs": "#2a78d6",
-            "Open PRs only": "#86b6ef",
-            "No evidence — awaiting implementation": "#eda100",
-            "No citing PRs found (implemented per HIP-1)": "#c3c2b7",
-        },
-        sort_categorical=False,
-        value_label="HIPs",
-    )
-
-
 def main(org: str = ORG) -> None:
-    """Build the HIP-implementation evidence tables and charts for ``org``."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    """Build the HIP-implementation evidence tables for ``org``."""
+    client, org_data_dir = org_context(org)
 
     logger.info("Building HIP implementation tables for org: %s", org)
 
@@ -214,13 +141,9 @@ def main(org: str = ORG) -> None:
     }
     for filename, frame in tables.items():
         save_dataframe(frame, org_data_dir / filename)
-    # Chart data only, unlike the tables above: no rows means no chart, so no file.
+    # Unlike the tables above, no rows means no file.
     if not (activity := activity_by_status(summary)).empty:
         save_dataframe(activity, org_data_dir / "hip_activity_by_status.csv")
-
-    _plot_engagement(engagement, org, org_charts_dir)
-    _plot_adoption_funnel(tables["hip_adoption_funnel.csv"], org, org_charts_dir)
-    _plot_activity_by_status(summary, org, org_charts_dir)
 
     logger.info(
         "HIP implementation: %d evidence rows across %d HIPs (%d unknown-number rows for review)",

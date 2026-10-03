@@ -126,7 +126,6 @@ const releases: EventsDocument = {
 const provenance = { git_sha: 'abc', data_as_of: null };
 const variant = (document: ChartDocument, label = 'View'): ChartVariant => ({
   label,
-  file: 'legacy.png',
   interactive: { kind: document.kind, path: `test/${document.id}.json` },
 });
 function show(document: ChartDocument, title = 'Chart') {

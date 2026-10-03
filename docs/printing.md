@@ -305,3 +305,10 @@ resets Tailwind's `--tw-translate-*` variables instead.
   hidden series, latest-24 span, show-all with share scale, network threshold
   and focus, hidden release types, dark mode, A4/Letter portrait/landscape.
   Safari's native print was not verified.
+
+## Chart PNGs retired (3 October 2026)
+
+Chart PNGs are no longer produced: the matplotlib plotting layer and the
+`outputs/charts/` tree were removed, and the data API no longer lists PNG files
+for chart variants. Printing uses the interactive renders only, as it has since
+the port above.

@@ -33,7 +33,6 @@ def api_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     org_data.mkdir(parents=True)
     monkeypatch.setattr(data_api.paths, "DATA_DIR", tmp_path / "data")
     monkeypatch.setattr(data_api.paths, "ORG_DATA_DIR", tmp_path / "data" / "org")
-    monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "charts" / "org")
     monkeypatch.setattr(data_api.paths, "ORG", ORG)
     section = {
         "id": "widgets",
@@ -54,6 +53,32 @@ def _write_widgets(org_data: Path, frame: pd.DataFrame) -> None:
     Path(f"{org_data / 'widgets.csv'}.meta.json").write_text(
         json.dumps({"generated_at": "2026-07-25T10:00:00+00:00", "record_count": len(frame)})
     )
+
+
+def _chart_source(csv_name: str) -> dict:
+    """A minimal categories chart over a widgets-shaped CSV (``name``, ``count``)."""
+    return {
+        "kind": "categories",
+        "file": csv_name,
+        "category": "name",
+        "category_label": "Widget",
+        "series": [{"key": "count", "label": "Count"}],
+        "metric": "widgets",
+        "unit": "Widgets",
+        "population": "Every widget.",
+    }
+
+
+def _widget_chart_spec(**extra) -> dict:
+    """One card with an All / Active pair of variants drawn from widgets*.csv."""
+    return {
+        "id": "w-chart",
+        "title": "Widget charts",
+        "description": "All widget charts.",
+        "variants": [("Widgets", [("All", "widgets"), ("Active", "widgets_active")])],
+        "sources": {"widgets": _chart_source("widgets.csv"), "widgets_active": _chart_source("widgets_active.csv")},
+        **extra,
+    }
 
 
 def test_emits_section_document_and_manifest(api_env: Path, tmp_path: Path):
@@ -243,36 +268,15 @@ def test_all_time_is_never_a_period_variant(api_env: Path, tmp_path: Path, monke
     assert "All time" not in manifest["period_labels"].values()
 
 
-def test_chart_sections_carry_presentation_structure(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_chart_sections_carry_presentation_structure(api_env: Path, monkeypatch: pytest.MonkeyPatch):
     """Chart sections keep their card structure: variants, notes, wide, slideshow."""
     monkeypatch.setattr(
-        data_api,
-        "CHART_MACROS",
-        [
-            {
-                "name": "Testing",
-                "charts": {
-                    ORG: [
-                        {
-                            "id": "w-chart",
-                            "title": "Widget charts",
-                            "description": "All widget charts.",
-                            "slideshow": True,
-                            "files": [
-                                ("Widgets", [("All", "widgets.png"), ("Active", "widgets_active.png")]),
-                            ],
-                        }
-                    ]
-                },
-            }
-        ],
+        data_api, "CHART_MACROS", [{"name": "Testing", "charts": {ORG: [_widget_chart_spec(slideshow=True)]}}]
     )
-    monkeypatch.setattr(data_api, "CHART_NOTES", {"widgets.png": "How to read widgets."})
-    monkeypatch.setattr(data_api, "CHART_METHODOLOGY", {"widgets.png": ["Step one."]})
-    monkeypatch.setattr(data_api, "WIDE_CHARTS", {"widgets.png"})
-    chart_dir = tmp_path / "charts" / "org" / ORG
-    chart_dir.mkdir(parents=True)
-    (chart_dir / "widgets.png").write_bytes(b"\x89PNG")  # the Active variant is not produced
+    monkeypatch.setattr(data_api, "CHART_NOTES", {"widgets": "How to read widgets."})
+    monkeypatch.setattr(data_api, "CHART_METHODOLOGY", {"widgets": ["Step one."]})
+    monkeypatch.setattr(data_api, "WIDE_CHARTS", {"widgets"})
+    # Only widgets.csv is produced: the Active variant has no dataset.
     _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
 
     manifest = json.loads(emit_data_api().read_text())
@@ -286,7 +290,7 @@ def test_chart_sections_carry_presentation_structure(api_env: Path, tmp_path: Pa
     assert chart["variants"] == [
         {
             "label": "All",
-            "file": f"charts/org/{ORG}/widgets.png",
+            "interactive": {"kind": "categories", "path": f"{ORG}/charts/widgets.json"},
             "note": "How to read widgets.",
             "methodology": ["Step one."],
         }
@@ -294,6 +298,28 @@ def test_chart_sections_carry_presentation_structure(api_env: Path, tmp_path: Pa
     assert chart["note"] == "How to read widgets."
     assert chart["methodology"] == ["Step one."]
     assert chart["wide"] is True
+    assert "full_row" not in chart
+
+
+def test_full_row_layout_is_declared_by_the_spec(api_env: Path, monkeypatch: pytest.MonkeyPatch):
+    """A FULL_ROW_CHARTS chart spans its row; a chart in neither set gets no layout flag."""
+    monkeypatch.setattr(data_api, "CHART_MACROS", [{"name": "Testing", "charts": {ORG: [_widget_chart_spec()]}}])
+    monkeypatch.setattr(data_api, "WIDE_CHARTS", set())
+    monkeypatch.setattr(data_api, "FULL_ROW_CHARTS", {"widgets_active"})
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+
+    manifest = json.loads(emit_data_api().read_text())
+
+    (chart,) = manifest["orgs"][ORG]["chart_sections"][0]["charts"]
+    # The flag follows any of the card's variant ids, listed or not: layout is a
+    # property of the card, so it must not flip with which tabs have data.
+    assert chart["full_row"] is True
+    assert "wide" not in chart
+
+    monkeypatch.setattr(data_api, "FULL_ROW_CHARTS", set())
+    manifest = json.loads(emit_data_api().read_text())
+    (chart,) = manifest["orgs"][ORG]["chart_sections"][0]["charts"]
+    assert "full_row" not in chart and "wide" not in chart
 
 
 ROLE_TABBED_SECTION = {
@@ -399,42 +425,20 @@ def test_chart_variants_carry_their_own_note_and_methodology(
     picked one entry per chart, so the reader on the Committers tab was told
     they were looking at maintainers.
     """
-    monkeypatch.setattr(
-        data_api,
-        "CHART_MACROS",
-        [
-            {
-                "name": "Testing",
-                "charts": {
-                    ORG: [
-                        {
-                            "id": "w-chart",
-                            "title": "Widget charts",
-                            "description": "All widget charts.",
-                            "files": [
-                                ("Widgets", [("All", "widgets.png"), ("Active", "widgets_active.png")]),
-                            ],
-                        }
-                    ]
-                },
-            }
-        ],
-    )
+    monkeypatch.setattr(data_api, "CHART_MACROS", [{"name": "Testing", "charts": {ORG: [_widget_chart_spec()]}}])
     monkeypatch.setattr(
         data_api,
         "CHART_NOTES",
-        {"widgets.png": "Every widget.", "widgets_active.png": "Only the active ones."},
+        {"widgets": "Every widget.", "widgets_active": "Only the active ones."},
     )
     monkeypatch.setattr(
         data_api,
         "CHART_METHODOLOGY",
-        {"widgets.png": ["Count them all."], "widgets_active.png": ["Filter, then count."]},
+        {"widgets": ["Count them all."], "widgets_active": ["Filter, then count."]},
     )
-    chart_dir = tmp_path / "charts" / "org" / ORG
-    chart_dir.mkdir(parents=True)
-    for name in ("widgets.png", "widgets_active.png"):
-        (chart_dir / name).write_bytes(b"\x89PNG")
-    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
+    frame = pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]})
+    _write_widgets(api_env, frame)
+    frame.to_csv(api_env / "widgets_active.csv", index=False)
 
     manifest = json.loads(emit_data_api().read_text())
 
@@ -453,34 +457,9 @@ def test_chart_downloads_can_be_declared_per_variant(api_env: Path, tmp_path: Pa
     the button where the active tab has none rather than handing the reader
     another tab's table.
     """
-    monkeypatch.setattr(
-        data_api,
-        "CHART_MACROS",
-        [
-            {
-                "name": "Testing",
-                "charts": {
-                    ORG: [
-                        {
-                            "id": "w-chart",
-                            "title": "Widget charts",
-                            "description": "All widget charts.",
-                            # "Active" declares a companion that no pipeline
-                            # produced, so it must not be offered at all.
-                            "csv": {"All": "widgets.csv", "Active": "widgets_active.csv"},
-                            "files": [
-                                ("Widgets", [("All", "widgets.png"), ("Active", "widgets_active.png")]),
-                            ],
-                        }
-                    ]
-                },
-            }
-        ],
-    )
-    chart_dir = tmp_path / "charts" / "org" / ORG
-    chart_dir.mkdir(parents=True)
-    for name in ("widgets.png", "widgets_active.png"):
-        (chart_dir / name).write_bytes(b"\x89PNG")
+    # "Active" declares a companion that no pipeline produced, so it must not be offered at all.
+    spec = _widget_chart_spec(csv={"All": "widgets.csv", "Active": "widgets_active.csv"})
+    monkeypatch.setattr(data_api, "CHART_MACROS", [{"name": "Testing", "charts": {ORG: [spec]}}])
     _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [1], "last_seen": ["2026-07-01"]}))
 
     manifest = json.loads(emit_data_api().read_text())
@@ -531,9 +510,12 @@ def test_manifest_ships_macro_glossaries_and_period_labels(api_env: Path, monkey
 
 def test_chart_companion_csv_is_copied_and_referenced(api_env: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """A chart's declared CSV travels inside the API tree with a download ref."""
-    charts_dir = tmp_path / "charts" / "org" / ORG
-    charts_dir.mkdir(parents=True)
-    (charts_dir / "funnel.png").write_bytes(b"\x89PNG\r\n\x1a\nnot-a-real-png")
+    source = {
+        **_chart_source("funnel_data.csv"),
+        "category": "stage",
+        "category_label": "Stage",
+        "series": [{"key": "share", "label": "Share"}],
+    }
     monkeypatch.setattr(
         data_api,
         "CHART_MACROS",
@@ -546,7 +528,8 @@ def test_chart_companion_csv_is_copied_and_referenced(api_env: Path, tmp_path: P
                             "id": "funnel",
                             "title": "Funnel",
                             "description": "Stages.",
-                            "files": [("Funnel", [("Funnel", "funnel.png")])],
+                            "variants": [("Funnel", [("Funnel", "funnel")])],
+                            "sources": {"funnel": source},
                             "csv": "funnel_data.csv",
                         }
                     ]

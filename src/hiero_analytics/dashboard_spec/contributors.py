@@ -36,8 +36,8 @@ CHART_MACRO = {
                     "contributors (thicker = more). Colour = repository type. Per-role versions "
                     "(maintainers, committers, triage) live in the Governance tab. Click to enlarge."
                 ),
-                "files": [("Repositories linked by shared contributors", "all_network.png")],
-                "interactive_sources": {"all_network.png": CONTRIBUTOR_NETWORK},
+                "variants": [("Repositories linked by shared contributors", "all_network")],
+                "sources": {"all_network": CONTRIBUTOR_NETWORK},
             },
             {
                 "id": "activity-heatmap",
@@ -50,13 +50,13 @@ CHART_MACRO = {
                     "to their governance team, to their employer, and finally to the repositories the "
                     "work lands in. For employer concentration and authority risk, see the Governance tab."
                 ),
-                "files": [
-                    ("By contributor", "contributor_activity_heatmap.png"),
-                    ("By team", "team_activity_heatmap.png"),
-                    ("By organisation", "org_activity_heatmap.png"),
-                    ("By repository", "repo_activity_heatmap.png"),
+                "variants": [
+                    ("By contributor", "contributor_activity_heatmap"),
+                    ("By team", "team_activity_heatmap"),
+                    ("By organisation", "org_activity_heatmap"),
+                    ("By repository", "repo_activity_heatmap"),
                 ],
-                "interactive_sources": ACTIVITY_HEATMAP_SOURCES,
+                "sources": ACTIVITY_HEATMAP_SOURCES,
             },
             {
                 "id": "repo-growth",
@@ -67,27 +67,27 @@ CHART_MACRO = {
                     "new repos per month; the cumulative view shows the total repo count over time. Data "
                     "comes from each repository's createdAt timestamp."
                 ),
-                "files": [
-                    ("New repos per month", "repos_created_per_month.png"),
-                    ("Cumulative repo count", "cumulative_repo_count.png"),
+                "variants": [
+                    ("New repos per month", "repos_created_per_month"),
+                    ("Cumulative repo count", "cumulative_repo_count"),
                 ],
-                "interactive_sources": REPO_GROWTH_SOURCES,
+                "sources": REPO_GROWTH_SOURCES,
             },
         ],
         "hiero-hackers": [
             {
                 "id": "org-overview",
-                "interactive_sources": OVERVIEW_SOURCES,
+                "sources": OVERVIEW_SOURCES,
                 "title": "Organization overview (org-wide)",
                 "group": "Org overview",
                 "description": (
                     "Org-wide view of hiero-hackers: repositories ranked by contributor count, "
                     "the language mix across repos, and how many repos pushed in the last 30 days."
                 ),
-                "files": [
-                    ("Top repositories by contributors", "contributor_counts.png"),
-                    ("Programming languages", "language_distribution.png"),
-                    ("Repository push activity (30d)", "push_activity.png"),
+                "variants": [
+                    ("Top repositories by contributors", "contributor_counts"),
+                    ("Programming languages", "language_distribution"),
+                    ("Repository push activity (30d)", "push_activity"),
                 ],
             },
             {
@@ -98,8 +98,8 @@ CHART_MACRO = {
                     "Each bubble is a repository, sized by its active contributors; two repos are "
                     "linked when they share contributors. Colour = repository type. Click to enlarge."
                 ),
-                "files": [("Repositories linked by shared contributors", "all_network.png")],
-                "interactive_sources": {"all_network.png": CONTRIBUTOR_NETWORK},
+                "variants": [("Repositories linked by shared contributors", "all_network")],
+                "sources": {"all_network": CONTRIBUTOR_NETWORK},
             },
             {
                 "id": "activity-heatmap",
@@ -109,8 +109,8 @@ CHART_MACRO = {
                     "Weighted monthly activity for the most active contributors over the last six "
                     "months (greener = more active that month)."
                 ),
-                "files": [("Activity heatmap", "contributor_activity_heatmap.png")],
-                "interactive_sources": {"contributor_activity_heatmap.png": CONTRIBUTOR_HEATMAP},
+                "variants": [("Activity heatmap", "contributor_activity_heatmap")],
+                "sources": {"contributor_activity_heatmap": CONTRIBUTOR_HEATMAP},
             },
             {
                 "id": "repo-growth",
@@ -121,11 +121,11 @@ CHART_MACRO = {
                     "new repos per month; the cumulative view shows the total repo count over time. Data "
                     "comes from each repository's createdAt timestamp."
                 ),
-                "files": [
-                    ("New repos per month", "repos_created_per_month.png"),
-                    ("Cumulative repo count", "cumulative_repo_count.png"),
+                "variants": [
+                    ("New repos per month", "repos_created_per_month"),
+                    ("Cumulative repo count", "cumulative_repo_count"),
                 ],
-                "interactive_sources": REPO_GROWTH_SOURCES,
+                "sources": REPO_GROWTH_SOURCES,
             },
         ],
     },
@@ -187,37 +187,41 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 
 WIDE_CHARTS: set[str] = set()
 
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS: set[str] = set()
+
 # "How to read this" notes, keyed by chart filename. These describe how to read the
 # chart (its encoding and window) — never the current data values — so they stay
 # accurate across every refresh. A chart with no entry here simply shows no note.
 CHART_NOTES = {
-    "all_network.png": "Each bubble is a repository, sized by its active contributors; two repos are linked when they "
+    "all_network": "Each bubble is a repository, sized by its active contributors; two repos are linked when they "
     "share contributors. Bubble colour is the repo's category; the link threshold scales with org size.",
-    "contributor_activity_heatmap.png": "Rows are the 25 busiest contributors over the last six months; columns are those months. The "
+    "contributor_activity_heatmap": "Rows are the 25 busiest contributors over the last six months; columns are those months. The "
     "colour and number in each cell are a weighted activity score (issues ×2, reviews ×3, PRs opened "
     "×3, merges ×2) for that month — darker blue = more active. Bots are excluded.",
-    "org_activity_heatmap.png": "Rows are organisations, columns are the last six months; each cell is that org's people's "
+    "org_activity_heatmap": "Rows are organisations, columns are the last six months; each cell is that org's people's "
     "weighted activity that month (issues ×2, reviews ×3, PRs opened ×3, merges ×2) — darker blue = "
     "more active. It shows which employers carry the work over time, the activity counterpart to the "
     "head-count chart. Bots and contributors not mapped to an organisation are excluded.",
-    "team_activity_heatmap.png": "Rows are governance teams, columns are the last six months; each cell is the weighted activity of "
+    "team_activity_heatmap": "Rows are governance teams, columns are the last six months; each cell is the weighted activity of "
     "the team's members that month (same weights as the other heatmaps). A contributor on several teams "
     "counts toward each, so team totals overlap — this measures each team's activity, not a partition. "
     "The 25 busiest teams are shown; bots are excluded.",
-    "repo_activity_heatmap.png": "Rows are repositories, columns are the last six months; each cell is the repo's weighted activity "
+    "repo_activity_heatmap": "Rows are repositories, columns are the last six months; each cell is the repo's weighted activity "
     "that month (issues ×2, reviews ×3, PRs opened ×3, merges ×2) — darker blue = more active. Aggregated "
     "straight from the events, so each counts once. The 25 busiest repositories are shown; bots are "
     "excluded.",
-    "contributor_counts.png": "Repositories ranked by distinct contributors over the last six months; bar height is the "
-    "number of unique contributors. The static image shows the top 20; the interactive view and CSV hold every "
+    "contributor_counts": "Repositories ranked by distinct contributors over the last six months; bar height is the "
+    "number of unique contributors. The chart and its CSV hold every "
     "repository.",
-    "language_distribution.png": "How many repositories use each primary language (current snapshot). Repositories with no "
+    "language_distribution": "How many repositories use each primary language (current snapshot). Repositories with no "
     "detected language are grouped as 'Unknown'.",
-    "push_activity.png": "The share of repositories that received a push in the last 30 days (active) versus those that "
+    "push_activity": "The share of repositories that received a push in the last 30 days (active) versus those that "
     "did not (inactive).",
-    "repos_created_per_month.png": "The monthly count of new repositories created in the organisation. "
+    "repos_created_per_month": "The monthly count of new repositories created in the organisation. "
     "Zero-creation months are shown as 0 so the full timeline is visible.",
-    "cumulative_repo_count.png": "The running total of repositories over time. "
+    "cumulative_repo_count": "The running total of repositories over time. "
     "Flat stretches mean no new repos were created; steps up mark creation months.",
 }
 
@@ -226,7 +230,7 @@ CHART_NOTES = {
 # notes these describe the method, never the current values, so they stay accurate.
 # A chart with no entry simply shows no methodology block.
 CHART_METHODOLOGY = {
-    "all_network.png": [
+    "all_network": [
         (
             "Take every tracked contributor activity (PRs opened, reviews, merges, issues, labels) and "
             "reduce it to which people were active in which repositories."
@@ -242,24 +246,24 @@ CHART_METHODOLOGY = {
             "so a dense organisation stays readable rather than becoming a hairball."
         ),
     ],
-    "contributor_counts.png": [
+    "contributor_counts": [
         "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
         "Count the distinct contributors active in each repository.",
-        "Rank the repositories by that count; the static image keeps the top 20, the CSV keeps them all.",
+        "Rank the repositories by that count; the chart and the CSV keep them all.",
     ],
-    "language_distribution.png": [
+    "language_distribution": [
         "List the organisation's repositories and read GitHub's primary-language field for each.",
         (
             "Count repositories per language. This is GitHub's own per-repository classification — one "
             "language per repository, not a line-count breakdown."
         ),
     ],
-    "push_activity.png": [
+    "push_activity": [
         "List the organisation's repositories with their last-push timestamp.",
         "Classify each repository by whether it received a push in the last 30 days.",
         "Count repositories in each state. Pushes are counted, not merged PRs.",
     ],
-    "contributor_activity_heatmap.png": [
+    "contributor_activity_heatmap": [
         (
             "Take every tracked event in the last six months — issues opened, PRs opened, reviews, merges — "
             "excluding bots."
@@ -269,13 +273,13 @@ CHART_METHODOLOGY = {
         "Rank contributors by their six-month total and keep the top 25.",
         "Colour each cell by its monthly score (greener = more active).",
     ],
-    "org_activity_heatmap.png": [
+    "org_activity_heatmap": [
         "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
         "Map each contributor to an organisation via the affiliations file; drop those with no organisation.",
         "Sum the contributors' monthly scores within each organisation.",
         "Rank organisations by total and colour each cell by its monthly score.",
     ],
-    "team_activity_heatmap.png": [
+    "team_activity_heatmap": [
         "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
         "For each governance team, add up the monthly scores of its members.",
         (
@@ -284,19 +288,19 @@ CHART_METHODOLOGY = {
         ),
         "Rank teams by total, show the busiest 25, and colour each cell by its monthly score.",
     ],
-    "repo_activity_heatmap.png": [
+    "repo_activity_heatmap": [
         "Take every tracked event in the last six months (bots excluded), keyed by the repository it occurred in.",
         "Weight each event (issues ×2, reviews ×3, PRs opened ×3, merges ×2) and bucket by month.",
         "Sum the weighted score per repository per month — each event counts once.",
         "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score.",
     ],
-    "repos_created_per_month.png": [
+    "repos_created_per_month": [
         "Fetch every repository in the organisation via the GitHub GraphQL API.",
         "Extract each repository's createdAt timestamp and bucket it by calendar month.",
         "Count repos created per month; months with zero creations are filled in so the timeline is continuous.",
         "The peak month and the latest month are annotated on the chart.",
     ],
-    "cumulative_repo_count.png": [
+    "cumulative_repo_count": [
         "Start from the same monthly creation counts as the per-month chart.",
         "Compute the running total (cumulative sum) so each month shows the total number of repos that existed by that point.",
         "The latest month and its total are annotated on the chart.",

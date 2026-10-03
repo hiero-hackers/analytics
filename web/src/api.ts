@@ -190,11 +190,9 @@ export type SeriesDocument = TimeseriesDocument | CategoriesDocument;
 export type ChartDocument = SeriesDocument | MatrixDocument | NetworkDocument | EventsDocument;
 
 export interface ChartVariant {
-  interactive?: { kind: ChartDocument['kind']; path: string };
   label: string;
-  /** The variant's PNG, which always exists (v1 lists no variant without one). The
-   *  dashboard keys the variant by it and draws from `interactive` instead. */
-  file: string;
+  /** The chart's dataset, always present: v1 lists no variant without one. */
+  interactive: { kind: ChartDocument['kind']; path: string };
   /**
    * This tab's own "how to read this" and derivation steps. A chart's tabs show
    * different populations (maintainers / committers) or different spans, so the

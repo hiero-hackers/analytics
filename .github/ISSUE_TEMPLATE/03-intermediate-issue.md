@@ -34,7 +34,7 @@ labels: "intermediate"
 **Worth knowing about this repo before you design:**
 
 - The layer rules in [docs/architecture.md](https://github.com/hiero-hackers/analytics/blob/main/docs/architecture.md) are strict — review will hold your solution to them.
-- Tests mirror src (`tests/<pkg>/test_<module>.py`), and the output-contract test pins the pipeline output surface — if your change adds or renames outputs, update the contract deliberately.
+- Tests mirror src (`tests/<pkg>/test_<module>.py`), and the output-contract test pins the pipeline output surface (every CSV and chart dataset) — if your change adds or renames outputs, update the contract deliberately.
 
 **Before opening your PR:**
 

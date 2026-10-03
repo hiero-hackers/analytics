@@ -22,7 +22,7 @@ test('the built app boots offline under a subpath and each macro renders', async
     await expect(page.getByRole('table').first().locator('tbody tr').first()).toBeVisible();
   }
   await pages.getByRole('button', { name: 'Governance', exact: true }).click();
-  // Charts draw from their JSON documents with Recharts, not from the PNGs.
+  // Charts draw from their JSON documents with Recharts.
   const figure = page.getByRole('figure', { name: 'Unique active contributors by role — By year' });
   await expect(figure.locator('svg.recharts-surface').first()).toBeVisible();
   await figure

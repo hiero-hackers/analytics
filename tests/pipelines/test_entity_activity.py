@@ -24,7 +24,7 @@ def _act(repo: str, actor: str, activity_type: str, days_ago: int) -> Contributo
 
 
 def _patch(monkeypatch, stub_pipeline_context, records, labels):
-    _, data_dir, _ = stub_pipeline_context(runner)
+    _, data_dir = stub_pipeline_context(runner)
     monkeypatch.setattr(runner, "load_contributor_activity", lambda _client, _org: records)
     monkeypatch.setattr(runner, "load_issue_label_events", lambda _client, _org: labels)
     return data_dir

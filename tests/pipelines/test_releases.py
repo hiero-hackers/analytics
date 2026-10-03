@@ -47,8 +47,8 @@ def synthetic_releases():
 def test_main_publishes_timeline_and_staleness_tables(
     stub_pipeline_context, monkeypatch, synthetic_repos, synthetic_releases
 ):
-    """A normal run writes both CSVs and every period-tab chart variant; the never-released repo ranks maximally stale."""
-    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
+    """A normal run writes both CSVs; the never-released repo ranks maximally stale."""
+    _client, data_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
     monkeypatch.setattr(
@@ -70,16 +70,10 @@ def test_main_publishes_timeline_and_staleness_tables(
     assert math.isinf(staleness.loc["org/repo2-never-released", "staleness_ratio"])
     assert staleness.loc["org/repo2-never-released", "staleness_bucket"] == "never_released"
 
-    for suffix in ("", "_7d", "_30d", "_365d"):
-        chart = charts_dir / f"release_timeline{suffix}.png"
-        assert chart.exists() and chart.stat().st_size > 0, f"missing {chart.name}"
-
-    assert not (charts_dir / "release_staleness.png").exists()
-
 
 def test_main_skips_cleanly_when_org_has_no_repos(stub_pipeline_context, monkeypatch):
-    """No repos in the org -> no CSVs or charts written, no crash."""
-    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
+    """No repos in the org -> no CSVs written, no crash."""
+    _client, data_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: [])
 
@@ -91,14 +85,13 @@ def test_main_skips_cleanly_when_org_has_no_repos(stub_pipeline_context, monkeyp
     releases_pipeline.main(org="org")
 
     assert list(data_dir.glob("*.csv")) == []
-    assert list(charts_dir.glob("*.png")) == []
 
 
 def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     stub_pipeline_context, monkeypatch, synthetic_repos
 ):
-    """Repos exist but none have released: both CSVs are written, all rank maximally stale, and no charts are plotted because there are no finite ratios."""
-    _client, data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
+    """Repos exist but none have released: both CSVs are written, and all rank maximally stale."""
+    _client, data_dir = stub_pipeline_context(releases_pipeline)
 
     monkeypatch.setattr(releases_pipeline, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
     monkeypatch.setattr(releases_pipeline, "fetch_org_releases_graphql", lambda _client, _org, **_kwargs: [])
@@ -114,46 +107,3 @@ def test_main_writes_empty_but_schema_correct_tables_when_no_releases_exist(
     assert (staleness["release_status"] == "never_released").all()
     assert staleness["staleness_ratio"].apply(math.isinf).all()  # maximally stale, not null
     assert (staleness["staleness_bucket"] == "never_released").all()
-
-    assert list(charts_dir.glob("*.png")) == []
-
-
-def test_period_tabs_only_render_when_something_falls_in_that_window(stub_pipeline_context, monkeypatch):
-    """A repo with only an old release gets the wider-window variants, not Week/1 month."""
-    _client, _data_dir, charts_dir = stub_pipeline_context(releases_pipeline)
-
-    repos = [
-        RepositoryRecord(
-            full_name="org/old-releaser",
-            name="old-releaser",
-            owner="org",
-        )
-    ]
-    records = [
-        ReleaseRecord(
-            repo="org/old-releaser",
-            tag_name="v1",
-            name="v1",
-            published_at=NOW - timedelta(days=100),
-            is_prerelease=False,
-        )
-    ]
-
-    monkeypatch.setattr(
-        releases_pipeline,
-        "fetch_org_repos_graphql",
-        lambda _client, _org: repos,
-    )
-    monkeypatch.setattr(
-        releases_pipeline,
-        "fetch_org_releases_graphql",
-        lambda _client, _org, **_kwargs: records,
-    )
-
-    releases_pipeline.main(org="org")
-
-    produced = {p.name for p in charts_dir.glob("*.png")}
-    assert produced == {
-        "release_timeline.png",
-        "release_timeline_365d.png",
-    }

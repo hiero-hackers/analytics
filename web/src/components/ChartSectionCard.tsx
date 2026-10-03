@@ -24,9 +24,7 @@ const InteractiveChart = lazy(() => import('./InteractiveChart'));
 const WIDE_KINDS = ['matrix', 'network', 'events'];
 const needsFullRow = (chart: ChartSpec, variant: number) =>
   Boolean(
-    chart.wide ||
-    chart.full_row ||
-    WIDE_KINDS.includes(chart.variants[variant]?.interactive?.kind ?? ''),
+    chart.wide || chart.full_row || WIDE_KINDS.includes(chart.variants[variant].interactive.kind),
   );
 
 /** A chart's variant axis: its ordered label set, serialised so no separator can clash. */
@@ -74,76 +72,34 @@ function Figure({
         lead && !fullRow && 'lg:row-span-2',
       )}
     >
-      {/* Interactive charts render their tabs in their own toolbar. */}
-      {!axis && !active.interactive && (
-        <VariantTabs
-          labels={chart.variants.map((option) => option.label)}
-          active={variant}
-          onSelect={setOwn}
-          ariaLabel={`${chart.title} view`}
-        />
-      )}
-      {active.interactive ? (
-        <Suspense
-          fallback={
-            <p role="status" data-print-pending className="p-10 text-center text-muted-foreground">
-              Loading chart: {chartViewName(chart.title, active.label)}…
-            </p>
-          }
-        >
-          <ChartSectionTitle.Provider value={section}>
-            <InteractiveChart
-              key={active.interactive.path}
-              variant={active}
-              title={chart.title}
-              provenance={provenance}
-              roomy={lead}
-              leading={
-                axis ? undefined : (
-                  <VariantTabs
-                    appearance="segmented"
-                    labels={chart.variants.map((option) => option.label)}
-                    active={variant}
-                    onSelect={setOwn}
-                    ariaLabel={`${chart.title} view`}
-                  />
-                )
-              }
-            />
-          </ChartSectionTitle.Provider>
-        </Suspense>
-      ) : (
-        <div
-          role="status"
-          className="flex min-h-48 flex-col justify-center gap-2 rounded-lg border border-dashed p-6 text-sm"
-        >
-          <p className="font-medium">Chart data is not available yet</p>
-          <p className="text-muted-foreground">
-            This view will appear when its source dataset is published in the next analytics
-            refresh.
+      <Suspense
+        fallback={
+          <p role="status" data-print-pending className="p-10 text-center text-muted-foreground">
+            Loading chart: {chartViewName(chart.title, active.label)}…
           </p>
-          <details className="text-muted-foreground">
-            <summary className="cursor-pointer">About this chart</summary>
-            <p className="mt-2">{active.note ?? chart.note}</p>
-            <ol className="mt-2 list-inside list-decimal">
-              {(active.methodology ?? chart.methodology ?? []).map((step, index) => (
-                <li key={index}>{step}</li>
-              ))}
-            </ol>
-          </details>
-        </div>
-      )}
-      {/* An interactive chart names itself in its header; the placeholder does not. */}
-      {!active.interactive && (
-        <figcaption
-          className={cn(
-            'mt-3 text-left text-xs font-medium text-foreground',
-            slide && 'text-sm font-semibold',
-          )}
-        >
-          {chart.title}
-        </figcaption>
-      )}
+        }
+      >
+        <ChartSectionTitle.Provider value={section}>
+          <InteractiveChart
+            key={active.interactive.path}
+            variant={active}
+            title={chart.title}
+            provenance={provenance}
+            roomy={lead}
+            leading={
+              axis ? undefined : (
+                <VariantTabs
+                  appearance="segmented"
+                  labels={chart.variants.map((option) => option.label)}
+                  active={variant}
+                  onSelect={setOwn}
+                  ariaLabel={`${chart.title} view`}
+                />
+              )
+            }
+          />
+        </ChartSectionTitle.Provider>
+      </Suspense>
     </figure>
   );
 }

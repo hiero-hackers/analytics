@@ -21,19 +21,17 @@ def stub_pipeline_context(monkeypatch, tmp_path):
 
     Returns a callable ``stub(module, *, repo_scoped=False)`` that patches the
     module's ``org_context`` (or ``repo_context``) to hand back a mock client and
-    tmp output dirs, and returns ``(client, data_dir, charts_dir)`` for assertions.
+    a tmp output dir, and returns ``(client, data_dir)`` for assertions.
     """
     client = MagicMock()
     data_dir = tmp_path / "data"
-    charts_dir = tmp_path / "charts"
 
     def stub(module, *, repo_scoped: bool = False):
         data_dir.mkdir(parents=True, exist_ok=True)
-        charts_dir.mkdir(parents=True, exist_ok=True)
         if repo_scoped:
-            monkeypatch.setattr(module, "repo_context", lambda _org, _repo: (client, data_dir, charts_dir))
+            monkeypatch.setattr(module, "repo_context", lambda _org, _repo: (client, data_dir))
         else:
-            monkeypatch.setattr(module, "org_context", lambda _org: (client, data_dir, charts_dir))
-        return client, data_dir, charts_dir
+            monkeypatch.setattr(module, "org_context", lambda _org: (client, data_dir))
+        return client, data_dir
 
     return stub

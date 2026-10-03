@@ -11,21 +11,18 @@ from hiero_analytics.config.github import GITHUB_TOKEN
 from hiero_analytics.config.paths import ORG, REPO
 from hiero_analytics.data_sources.github_ingest import fetch_repo_merged_pr_difficulty_graphql
 from hiero_analytics.domain.labels import DIFFICULTY_ORDER
-from hiero_analytics.domain.repos import bare_repo
+from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import repo_context
-from hiero_analytics.plotting.bars import plot_bar
-from hiero_analytics.plotting.lines import plot_line
 
 logger = logging.getLogger(__name__)
 
 
 def main(org: str = ORG, repo: str = REPO) -> None:
-    """Fetch PR data, compute contributor churn metrics, and write charts to disk."""
+    """Fetch PR data, compute contributor churn metrics, and write the tables to disk."""
     if not GITHUB_TOKEN:
         raise OSError("GITHUB_TOKEN not set. Real data is required for churn analysis.")
 
-    short_repo = bare_repo(repo)
-    client, repo_data_dir, repo_charts_dir = repo_context(org, repo)
+    client, repo_data_dir = repo_context(org, repo)
     logger.info("Fetching PR data for %s/%s...", org, repo)
     prs = fetch_repo_merged_pr_difficulty_graphql(client, owner=org, repo=repo, use_cache=True)
 
@@ -78,19 +75,12 @@ def main(org: str = ORG, repo: str = REPO) -> None:
 
     # Save progression data for verification
     csv_path = repo_data_dir / "contributor_progression.csv"
-    gfi_starters.to_csv(csv_path)
+    save_dataframe(gfi_starters.reset_index(), csv_path)
     logger.info("Detailed progression data for GFI starters saved to: %s", csv_path)
 
-    # Visualizations using project utilities
-    plot_bar(
-        df=funnel_df,
-        x_col="stage",
-        y_col="count",
-        title=f"{short_repo}: Contributor Progression Funnel",
-        output_path=repo_charts_dir / "contributor_churn_funnel.png",
-    )
+    save_dataframe(funnel_df, repo_data_dir / "contributor_churn_funnel.csv")
 
-    # Retention Chart - extended range as requested
+    # Retention: contributors still active at each PR-count threshold
     max_prs = int(gfi_starters["pr_count"].max()) if not gfi_starters.empty else 10
     retention_df = pd.DataFrame(
         [
@@ -99,27 +89,13 @@ def main(org: str = ORG, repo: str = REPO) -> None:
         ]
     )
 
-    plot_line(
-        df=retention_df,
-        x_col="min_prs",
-        y_col="contributors",
-        title=f"{short_repo}: Contributor Retention by PR Count",
-        output_path=repo_charts_dir / "contributor_retention.png",
-    )
+    save_dataframe(retention_df, repo_data_dir / "contributor_retention.csv")
 
-    # New Visualization: Level Transitions
+    # Level transitions
     if not transitions.empty:
-        trans_plot_df = transitions.copy()
-        trans_plot_df["transition"] = trans_plot_df["from"] + " -> " + trans_plot_df["to"]
-        plot_bar(
-            df=trans_plot_df,
-            x_col="transition",
-            y_col="count",
-            title=f"{short_repo}: GFI Starter Level Transitions",
-            output_path=repo_charts_dir / "contributor_transitions.png",
-        )
+        save_dataframe(transitions, repo_data_dir / "contributor_transitions.csv")
 
-    # New Visualization: Average Tenure by Max Level reached
+    # Average tenure by Max Level reached
     tenure_by_level = gfi_starters.groupby("max_level")["tenure_days"].mean().reset_index()
     tenure_by_level = tenure_by_level.rename(columns={"tenure_days": "avg_tenure_days"})
     tenure_by_level["max_level"] = pd.Categorical(
@@ -127,10 +103,4 @@ def main(org: str = ORG, repo: str = REPO) -> None:
     )
     tenure_by_level = tenure_by_level.sort_values("max_level")
 
-    plot_bar(
-        df=tenure_by_level,
-        x_col="max_level",
-        y_col="avg_tenure_days",
-        title=f"{short_repo}: Avg Tenure (Days) by Max Level Reached",
-        output_path=repo_charts_dir / "avg_tenure_by_level.png",
-    )
+    save_dataframe(tenure_by_level, repo_data_dir / "avg_tenure_by_level.csv")

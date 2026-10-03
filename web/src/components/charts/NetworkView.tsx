@@ -1,6 +1,7 @@
 /**
  * The `network` kind: repositories linked by shared members, sized like
- * plotting/network.py (bubble area ~ √active members, link width ~ shared).
+ * the retired matplotlib renderer (bubble area ~ √active members, link width ~ shared);
+ * node positions come from analysis/network_layout.py.
  * Wheel zoom needs Ctrl/⌘ so a plain wheel still scrolls the page.
  */
 
@@ -26,7 +27,7 @@ import { ChartShell, TABLE_CONTAINER, type SheetBox, type ViewProps } from './Ch
 import { integer, rangeText, shortRepo as short, windowText } from './format';
 import { relaxLayout, strengthSteps } from './networkLayout';
 
-/** SVG units per layout unit: roughly plotting/network.py's points per unit at 16 inches wide. */
+/** SVG units per layout unit: roughly the retired renderer's points per unit at 16 inches wide. */
 const UNIT = 110;
 const PAD = 48;
 const MIN_ZOOM = 0.5;
@@ -38,7 +39,7 @@ const zoomed = (view: Viewport, factor: number): Viewport => ({
   zoom: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.zoom * factor)),
 });
 
-/** plotting/network.py's marker area (140 + 260·√active pt²) as a radius, enlarged for card width. */
+/** The retired renderer's marker area (140 + 260·√active pt²) as a radius, enlarged for card width. */
 const radius = (active: number) => 1.6 * Math.sqrt((140 + 260 * Math.sqrt(active)) / Math.PI);
 /** Room a node claims: its bubble with the label below it, or the label's half-width if wider. */
 const LABEL_BELOW = 17;

@@ -7,19 +7,16 @@ import logging
 import requests
 
 from hiero_analytics.analysis.scorecard_analysis import (
-    CHECK_COLUMNS,
     scorecard_stacked_dataframe,
     scorecard_to_dataframe,
 )
-from hiero_analytics.config.charts import SCORECARD_CHECK_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import fetch_org_repos_graphql
 from hiero_analytics.data_sources.models import ScorecardRecord
 from hiero_analytics.data_sources.scorecard import fetch_repo_scorecard
-from hiero_analytics.export.save import plot_and_save, save_dataframe
+from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
-from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +49,8 @@ def fetch_all_scorecards(repos, *, org: str = ORG) -> list[ScorecardRecord]:
 
 
 def main(org: str = ORG):
-    """Fetch scorecards for all organisation repos and generate bar charts."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    """Fetch scorecards for all organisation repos and write the score tables."""
+    client, org_data_dir = org_context(org)
 
     repos = fetch_org_repos(client, org)
 
@@ -69,29 +66,7 @@ def main(org: str = ORG):
 
     df = scorecard_to_dataframe(scorecards)
     save_dataframe(df, org_data_dir / "org_scorecard.csv")
-    plot_and_save(
-        df,
-        plot_bar,
-        output_path=org_charts_dir / "org_scorecard.png",
-        x_col="repo",
-        y_col="score",
-        title="OpenSSF Scores by Repository",
-    )
-
-    df_stacked = scorecard_stacked_dataframe(scorecards)
     # -1 (inconclusive) is kept and unreported checks stay blank, never a zero score.
     save_dataframe(scorecard_stacked_dataframe(scorecards, missing=None), org_data_dir / "org_scorecard_checks.csv")
-    plot_and_save(
-        df_stacked,
-        plot_stacked_bar,
-        output_path=org_charts_dir / "org_scorecard_breakdown.png",
-        x_col="repo",
-        stack_cols=CHECK_COLUMNS,
-        labels=CHECK_COLUMNS,
-        colors=SCORECARD_CHECK_COLORS,
-        title="OpenSSF Score Breakdown by Check",
-        annotate_totals=False,
-        rotate_x=45,
-    )
 
-    logger.info("Charts generated successfully.")
+    logger.info("Scorecard tables written.")

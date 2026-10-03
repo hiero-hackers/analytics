@@ -23,8 +23,8 @@ carries the lookup keys:
 snapshot: 2026-08-06 run 31090950169 code 8930636
 ```
 
-Chart PNGs are deliberately excluded: they are heavy, and the numbers behind
-them are already in the JSON.
+There are no chart PNGs: the snapshot is the JSON data API, and the dashboard
+draws every chart from it.
 
 ## Reading it
 

@@ -46,9 +46,9 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "maintainer-pipeline",
-                # Same windows as the PNGs: all years, 12 months, 5 ISO weeks, 7 days.
-                "interactive_sources": {
-                    f"maintainer_pipeline_{name}.png": {
+                # Same windows as the span tabs: all years, 12 months, 5 ISO weeks, 7 days.
+                "sources": {
+                    f"maintainer_pipeline_{name}": {
                         **ROLE_ACTIVITY,
                         "file": f"maintainer_pipeline_{name}.csv",
                         "category": frequency,
@@ -68,24 +68,24 @@ CHART_MACRO = {
                     "How the maintainer/committer pipeline has moved over time — is the bench of "
                     "future maintainers developing? The same spans, per repository, are the next card."
                 ),
-                "files": [
+                "variants": [
                     (
                         "Unique active contributors by role",
                         [
                             # One rule at four resolutions, widest first.
                             # See analysis/maintainer_pipeline.py.
-                            ("All time", "maintainer_pipeline_yearly.png"),
-                            ("1 year", "maintainer_pipeline_monthly.png"),
-                            ("1 month", "maintainer_pipeline_weekly.png"),
-                            ("Week", "maintainer_pipeline_daily.png"),
+                            ("All time", "maintainer_pipeline_yearly"),
+                            ("1 year", "maintainer_pipeline_monthly"),
+                            ("1 month", "maintainer_pipeline_weekly"),
+                            ("Week", "maintainer_pipeline_daily"),
                         ],
                     ),
                 ],
             },
             {
                 "id": "maintainer-pipeline-by-repo",
-                "interactive_sources": {
-                    f"maintainer_pipeline_by_repo{suffix}.png": {
+                "sources": {
+                    f"maintainer_pipeline_by_repo{suffix}": {
                         **ROLE_BY_REPO,
                         "file": f"maintainer_pipeline_by_repo{suffix}.csv",
                         "window": window,
@@ -99,14 +99,14 @@ CHART_MACRO = {
                     "repo over the selected span. Spans match the over-time card, so the two cards "
                     "answer 'when' and 'where' with one vocabulary."
                 ),
-                "files": [
+                "variants": [
                     (
                         "Active contributors by role and repository",
                         [
-                            ("All time", "maintainer_pipeline_by_repo.png"),
-                            ("1 year", "maintainer_pipeline_by_repo_365d.png"),
-                            ("1 month", "maintainer_pipeline_by_repo_30d.png"),
-                            ("Week", "maintainer_pipeline_by_repo_7d.png"),
+                            ("All time", "maintainer_pipeline_by_repo"),
+                            ("1 year", "maintainer_pipeline_by_repo_365d"),
+                            ("1 month", "maintainer_pipeline_by_repo_30d"),
+                            ("Week", "maintainer_pipeline_by_repo_7d"),
                         ],
                     ),
                 ],
@@ -124,13 +124,13 @@ CHART_MACRO = {
                     "all-contributors view lives in the Contributors tab. Use Prev/Next; click to "
                     "enlarge."
                 ),
-                "files": [
-                    ("Maintainers", "maintainer_network.png"),
-                    ("Committers", "committer_network.png"),
-                    ("Triage", "triage_network.png"),
+                "variants": [
+                    ("Maintainers", "maintainer_network"),
+                    ("Committers", "committer_network"),
+                    ("Triage", "triage_network"),
                 ],
-                "interactive_sources": {
-                    f"{key}_network.png": role_network(key, label)
+                "sources": {
+                    f"{key}_network": role_network(key, label)
                     for key, label in [
                         ("maintainer", "maintainers"),
                         ("committer", "committers"),
@@ -158,12 +158,12 @@ CHART_MACRO = {
                     "repository's and each team's mix. The team charts are membership-based and so have no "
                     "role tabs. See the affiliations and repo-diversity tables below for the underlying detail."
                 ),
-                "interactive_sources": {
+                "sources": {
                     **SINGLE_EMPLOYER_SOURCES,
-                    "affiliation_donut.png": affiliation_share("maintainer", "maintainers", ""),
-                    "affiliation_donut_committers.png": affiliation_share("committer", "committers", "_committers"),
+                    "affiliation_donut": affiliation_share("maintainer", "maintainers", ""),
+                    "affiliation_donut_committers": affiliation_share("committer", "committers", "_committers"),
                     **{
-                        f"repo_affiliation_composition{suffix}.png": composition(
+                        f"repo_affiliation_composition{suffix}": composition(
                             "repo",
                             "Repository",
                             f"repo_affiliation_composition{suffix}.csv",
@@ -176,7 +176,7 @@ CHART_MACRO = {
                             ("_committers", "committer", "committers"),
                         ]
                     },
-                    "team_affiliation_composition.png": composition(
+                    "team_affiliation_composition": composition(
                         "team",
                         "Team",
                         "team_affiliation_composition.csv",
@@ -190,30 +190,30 @@ CHART_MACRO = {
                 # re-measures activity, which the activity views already show.
                 # The compact charts share the top rows; the two wide
                 # composition charts then stack full-width, one row each.
-                "files": [
+                "variants": [
                     (
                         "Role-holders by organisation",
                         [
-                            ("Maintainers", "affiliation_donut.png"),
-                            ("Committers", "affiliation_donut_committers.png"),
+                            ("Maintainers", "affiliation_donut"),
+                            ("Committers", "affiliation_donut_committers"),
                         ],
                     ),
-                    ("Single-employer teams by org", "single_employer_teams_by_org.png"),
+                    ("Single-employer teams by org", "single_employer_teams_by_org"),
                     (
                         "Single-employer repos by org",
                         [
-                            ("Maintainers", "single_employer_repos_by_org.png"),
-                            ("Committers", "single_employer_repos_by_org_committers.png"),
+                            ("Maintainers", "single_employer_repos_by_org"),
+                            ("Committers", "single_employer_repos_by_org_committers"),
                         ],
                     ),
                     (
                         "Organisation mix by repo",
                         [
-                            ("Maintainers", "repo_affiliation_composition.png"),
-                            ("Committers", "repo_affiliation_composition_committers.png"),
+                            ("Maintainers", "repo_affiliation_composition"),
+                            ("Committers", "repo_affiliation_composition_committers"),
                         ],
                     ),
-                    ("Organisation mix by team", "team_affiliation_composition.png"),
+                    ("Organisation mix by team", "team_affiliation_composition"),
                 ],
             },
         ],
@@ -593,46 +593,59 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 # Wide charts (vertical bars across many items): the dashboard scrolls these
 # horizontally at a readable height instead of squashing them to the card width.
 WIDE_CHARTS = {
-    "repo_affiliation_composition.png",
-    "repo_affiliation_composition_committers.png",
-    "team_affiliation_composition.png",
+    "repo_affiliation_composition",
+    "repo_affiliation_composition_committers",
+    "team_affiliation_composition",
+}
+
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS = {
+    "maintainer_pipeline_yearly",
+    "maintainer_pipeline_monthly",
+    "maintainer_pipeline_weekly",
+    "maintainer_pipeline_daily",
+    "maintainer_pipeline_by_repo",
+    "maintainer_pipeline_by_repo_365d",
+    "maintainer_pipeline_by_repo_30d",
+    "maintainer_pipeline_by_repo_7d",
 }
 
 # "How to read this" notes, keyed by chart filename. These describe how to read the
 # chart (its encoding and window) — never the current data values — so they stay
 # accurate across every refresh. A chart with no entry here simply shows no note.
 CHART_NOTES = {
-    "maintainer_pipeline_yearly.png": "The widest view: one bar per calendar year, all the way back, counting everyone active at "
+    "maintainer_pipeline_yearly": "The widest view: one bar per calendar year, all the way back, counting everyone active at "
     "any point in that year. Each person is counted once, under the highest governance role they hold "
     "in any repo (general → triage → committer → maintainer), so a bar's total is the distinct people "
     "active. The narrower tabs beside it apply the same rule to shorter spans — this one is the whole "
     "history. Past bars never move; the current year is partial by definition.",
-    "maintainer_pipeline_daily.png": "The narrowest view: the last seven days, one bar per day, same counting rule as the wider "
+    "maintainer_pipeline_daily": "The narrowest view: the last seven days, one bar per day, same counting rule as the wider "
     "tabs. Useful for spotting whether a quiet week is quiet everywhere or just in one role; too "
     "short to read a trend from, which is what the 1 month and 1 year views are for. Today's bar "
     "covers activity so far today.",
-    "maintainer_pipeline_monthly.png": "Each bar is a calendar month, counting the distinct people active that month — once each, under "
+    "maintainer_pipeline_monthly": "Each bar is a calendar month, counting the distinct people active that month — once each, under "
     "the highest governance role they hold in any repo (general → triage → committer → maintainer). "
     "Counts are strictly per-month (not a trailing window), so the current month is month-to-date. "
     "Only the most recent 12 months are charted — the '1 year' span; full history stays in the CSV.",
-    "maintainer_pipeline_weekly.png": "Each bar is an ISO week (Mon–Sun), counting the distinct people active that week — once each, "
+    "maintainer_pipeline_weekly": "Each bar is an ISO week (Mon–Sun), counting the distinct people active that week — once each, "
     "under the highest governance role they hold in any repo (general → triage → committer → "
     "maintainer). Counts are strictly per-week (not a trailing window), so the current week is "
     "week-to-date. Only the most recent 5 weeks are charted — the '1 month' span; full history stays in the CSV.",
-    "maintainer_pipeline_by_repo.png": "Each bar is a repository, counting people active there over the selected span (the tabs match "
+    "maintainer_pipeline_by_repo": "Each bar is a repository, counting people active there over the selected span (the tabs match "
     "the over-time card: all time, 1 year, 1 month, week), grouped by the governance role they hold "
     "in that repo (general → triage → committer → maintainer). A person active in several repos is "
     "counted in each; smaller repos are pooled into 'Other Repos'.",
-    "maintainer_network.png": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
+    "maintainer_network": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are "
     "linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's "
     "category.",
-    "committer_network.png": "Each bubble is a repository, sized by how many committers are active in it; two repos are "
+    "committer_network": "Each bubble is a repository, sized by how many committers are active in it; two repos are "
     "linked when they share a committer (thicker line = more shared). Bubble colour is the repo's "
     "category.",
-    "triage_network.png": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos "
+    "triage_network": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos "
     "are linked when they share a triage holder (thicker line = more shared). Bubble colour is the "
     "repo's category.",
-    "affiliation_donut.png": "The share of resolved role-holders employed by the two largest organisations, with everyone else "
+    "affiliation_donut": "The share of resolved role-holders employed by the two largest organisations, with everyone else "
     "pooled into 'Other' — the concentration at a glance. Only employers are ranked: solo 'Independent' "
     "contributors always pool into 'Other' rather than competing for a slice, so the named slices are "
     "always the two largest employers. People with no curated affiliation are excluded from the pie and "
@@ -640,38 +653,38 @@ CHART_NOTES = {
     "before interpreting the slices. The per-repo mix chart below breaks 'Independent' out separately, "
     "and the companion CSV keeps every organisation's own row. The role tabs switch between maintainers "
     "and committers.",
-    "affiliation_donut_committers.png": "The committer view of the same chart: people whose highest role anywhere is committer (write "
+    "affiliation_donut_committers": "The committer view of the same chart: people whose highest role anywhere is committer (write "
     "access, no maintainer seat), so this population never overlaps the maintainer tab. Curation is "
     "thinner here, so every percentage is a share of resolved committers only. The committer-affiliations "
     "known tile states the current coverage; weigh the employer slices against that number. Independents "
     "are a larger share of this bench than of the maintainers, and they sit inside 'Other' — read the "
     "affiliations table for the split.",
-    "repo_affiliation_composition.png": "Each bar is a repository, normalised to 100% so the segments show each employer's share of that "
+    "repo_affiliation_composition": "Each bar is a repository, normalised to 100% so the segments show each employer's share of that "
     "repo's role-holders. The dashed line marks 50%: a segment reaching past it means one employer holds "
     "the majority (an organisational bus-factor). Largest employers get their own colour, smaller ones "
     "pool into 'Other orgs', and solo or unmapped holders show as 'Independent' and 'Unknown'. Repos "
     "are ordered most-concentrated first — by the largest single employer's share — and repos with the "
     "same concentration are grouped by their leading organisation (colour), so like sits next to like. "
     "The role tabs switch between maintainers and committers; a repo counts only where it grants that role.",
-    "repo_affiliation_composition_committers.png": "The committer view of the same chart. Repos appear only where someone holds committer as their "
+    "repo_affiliation_composition_committers": "The committer view of the same chart. Repos appear only where someone holds committer as their "
     "highest role, so the set of bars differs from the maintainer tab — a repo whose committer bar is "
     "multi-colour while its maintainer bar is single-colour has a cross-org bench it could promote from.",
-    "team_affiliation_composition.png": "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the "
+    "team_affiliation_composition": "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the "
     "team's members. The dashed line marks 50%: a segment past it means one employer holds the majority "
     "(a capture / bus-factor risk). Largest employers get their own colour, smaller ones pool into "
     "'Other orgs', and solo or unmapped members show as 'Independent' and 'Unknown'. Limited to teams "
     "with at least four resolved members and ordered most-concentrated first; teams with the same "
     "concentration are grouped by their leading organisation (colour). Every team is in the concentration table.",
-    "single_employer_teams_by_org.png": "Each bar is an organisation; bar height is how many governance teams it solely controls — every "
+    "single_employer_teams_by_org": "Each bar is an organisation; bar height is how many governance teams it solely controls — every "
     "resolved member of that team shares this one employer. Taller bars mean more single-employer "
     "teams, a governance-capture / bus-factor risk. Teams are counted only where their members "
     "resolve to an employer, so teams dominated by unmapped members are not over-counted here.",
-    "single_employer_repos_by_org.png": "Each bar is an organisation; bar height is how many repositories it solely holds — every "
+    "single_employer_repos_by_org": "Each bar is an organisation; bar height is how many repositories it solely holds — every "
     "resolved holder of that role in the repo shares this one employer (at least two of them, no "
     "independents). Taller bars mean more single-employer repos, an organisational bus-factor. Repos "
     "dominated by unmapped holders are not counted here. The role tabs switch between maintainers and "
     "committers.",
-    "single_employer_repos_by_org_committers.png": "The committer view of the same chart: repositories where every resolved committer shares one "
+    "single_employer_repos_by_org_committers": "The committer view of the same chart: repositories where every resolved committer shares one "
     "employer. Because committer curation is thinner, more repos fall below the 'enough of the roster "
     "is known' bar and are left uncounted — treat this as a floor, not a total.",
 }
@@ -681,7 +694,7 @@ CHART_NOTES = {
 # notes these describe the method, never the current values, so they stay accurate.
 # A chart with no entry simply shows no methodology block.
 CHART_METHODOLOGY = {
-    "maintainer_pipeline_yearly.png": [
+    "maintainer_pipeline_yearly": [
         (
             "Take every tracked activity event (PRs opened, reviews, merges, issues, labels) and attach "
             "the governance role its actor held: maintainer, committer, triage, or general user."
@@ -701,7 +714,7 @@ CHART_METHODOLOGY = {
             "their own recent-activity window."
         ),
     ],
-    "maintainer_pipeline_by_repo.png": [
+    "maintainer_pipeline_by_repo": [
         (
             "Take the same role-attached activity events as the over-time card, filtered to the "
             "selected span: everything, the last year, the last month, or the last week."
@@ -712,7 +725,7 @@ CHART_METHODOLOGY = {
         ),
         "Pool repositories below the display threshold into 'Other Repos' so the chart stays readable.",
     ],
-    "maintainer_network.png": [
+    "maintainer_network": [
         (
             "Resolve who holds the role in each repository from the governance config's team→permission "
             "grants (maintain/admin → maintainer, write → committer, triage → triage)."
@@ -724,7 +737,7 @@ CHART_METHODOLOGY = {
         ),
         ("Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."),
     ],
-    "affiliation_donut.png": [
+    "affiliation_donut": [
         (
             "Resolve every person's role per repository from the governance config, then reduce each to the "
             "most senior role they hold anywhere — so the maintainer and committer tabs are disjoint "
@@ -746,7 +759,7 @@ CHART_METHODOLOGY = {
             "whole 'Independent' band — into a single 'Other' slice, then draw a filled pie of their shares."
         ),
     ],
-    "affiliation_donut_committers.png": [
+    "affiliation_donut_committers": [
         (
             "Same construction as the maintainer tab, over the people whose highest role anywhere is "
             "committer: write access in at least one repository and a maintainer seat in none."
@@ -759,7 +772,7 @@ CHART_METHODOLOGY = {
             "the known share, which is materially lower than for maintainers."
         ),
     ],
-    "single_employer_teams_by_org.png": [
+    "single_employer_teams_by_org": [
         "Take every team in the governance config and list its members.",
         "Map each member to an organisation via the affiliations file (same resolution as the other org charts).",
         (
@@ -769,7 +782,7 @@ CHART_METHODOLOGY = {
         "Group those single-employer teams by the organisation that controls them.",
         "Plot one bar per organisation — its height is how many teams it solely controls.",
     ],
-    "single_employer_repos_by_org.png": [
+    "single_employer_repos_by_org": [
         "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file (same resolution as the other org charts).",
         (
@@ -779,11 +792,11 @@ CHART_METHODOLOGY = {
         "Group those single-employer repos by the organisation that holds them.",
         "Plot one bar per organisation — its height is how many repos it solely holds.",
     ],
-    "single_employer_repos_by_org_committers.png": [
+    "single_employer_repos_by_org_committers": [
         "Same construction over each repository's committers — people with write access there and no maintainer seat anywhere.",
         "Repos where unmapped committers outnumber resolved ones are never flagged, so thin curation under-counts rather than over-claims.",
     ],
-    "repo_affiliation_composition.png": [
+    "repo_affiliation_composition": [
         "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
         "Map each to an organisation via the affiliations file.",
         (
@@ -800,14 +813,14 @@ CHART_METHODOLOGY = {
             "bars are single-employer repos; multi-colour bars are cross-org."
         ),
     ],
-    "repo_affiliation_composition_committers.png": [
+    "repo_affiliation_composition_committers": [
         "Same construction over each repository's committers, so only repos that grant committer appear.",
         (
             "Compare a repo's two bars: a single-colour maintainer bar beside a multi-colour committer bar is "
             "a concentrated top with a diverse bench underneath it."
         ),
     ],
-    "team_affiliation_composition.png": [
+    "team_affiliation_composition": [
         "For each governance team, take its members.",
         "Map each member to an organisation via the affiliations file.",
         (
@@ -828,5 +841,5 @@ CHART_METHODOLOGY = {
 
 # The committer and triage networks are the same construction over a different
 # role, so they share the maintainer network's steps rather than restating them.
-CHART_METHODOLOGY["committer_network.png"] = CHART_METHODOLOGY["maintainer_network.png"]
-CHART_METHODOLOGY["triage_network.png"] = CHART_METHODOLOGY["maintainer_network.png"]
+CHART_METHODOLOGY["committer_network"] = CHART_METHODOLOGY["maintainer_network"]
+CHART_METHODOLOGY["triage_network"] = CHART_METHODOLOGY["maintainer_network"]

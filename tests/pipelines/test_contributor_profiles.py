@@ -1,12 +1,15 @@
 """Pure-function tests for the contributor-profiles runner.
 
-These exercise the data-shaping helpers (no GitHub, no plotting) by importing
+These exercise the data-shaping helpers (no GitHub) by importing
 the runner module directly, mirroring the discord-runner test approach.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
+import pytest
 
 import hiero_analytics.pipelines.contributor_profiles as runner
 
@@ -131,3 +134,43 @@ def test_avg_contribution_mix_classifies_by_peak_difficulty():
     avg = runner.build_avg_contribution_mix(pr_df)
 
     assert set(avg["contributor_type"]) == {"Advanced contributor"}
+
+
+# ---------------------------------------------------------------------------
+# main
+# ---------------------------------------------------------------------------
+
+
+def test_main_writes_both_tables(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """main() writes the average-mix and max-difficulty tables next to each other."""
+    from datetime import UTC, datetime
+
+    from hiero_analytics.data_sources.models import PullRequestDifficultyRecord
+
+    def _pr(number: int, author: str, labels: list[str]) -> PullRequestDifficultyRecord:
+        merged = datetime(2025, 1, number, tzinfo=UTC)
+        return PullRequestDifficultyRecord(
+            repo="org/repo",
+            pr_number=number,
+            pr_created_at=merged,
+            pr_merged_at=merged,
+            pr_additions=1,
+            pr_deletions=1,
+            pr_changed_files=1,
+            issue_number=number,
+            issue_labels=labels,
+            author=author,
+        )
+
+    prs = [_pr(1, "alice", ["beginner"]), _pr(2, "alice", ["advanced"]), _pr(3, "bob", ["good first issue"])]
+    monkeypatch.setattr(runner, "repo_context", lambda _org, _repo: (object(), tmp_path))
+    monkeypatch.setattr(runner, "fetch_repo_merged_pr_difficulty_graphql", lambda *_a, **_k: prs)
+
+    runner.main("org", "repo")
+
+    mix = pd.read_csv(tmp_path / "avg_contribution_mix_by_type.csv")
+    assert set(mix["contributor_type"]) == {"Advanced contributor", "GFI contributor"}
+
+    peak = pd.read_csv(tmp_path / "max_difficulty_distribution.csv")
+    assert list(peak.columns) == ["difficulty", "count"]
+    assert dict(zip(peak["difficulty"], peak["count"], strict=True)) == {"Good First Issue": 1, "Advanced": 1}
