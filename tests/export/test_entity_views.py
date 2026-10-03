@@ -55,7 +55,7 @@ def org_data(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """The entity tables the pipeline writes for RECORDS, in a sandboxed output tree."""
     org_dir = tmp_path / "data" / "org" / ORG
     org_dir.mkdir(parents=True)
-    monkeypatch.setattr(runner, "org_context", lambda _org: (None, org_dir, tmp_path / "charts"))
+    monkeypatch.setattr(runner, "org_context", lambda _org: (None, org_dir))
     monkeypatch.setattr(runner, "load_contributor_activity", lambda _client, _org: RECORDS)
     monkeypatch.setattr(runner, "load_issue_label_events", lambda _client, _org: LABELS)
     runner.main(ORG)
@@ -250,7 +250,6 @@ def test_emit_publishes_entity_documents_and_lists_them_in_the_manifest(
     """The emit writes every document, lists the indexes and clears stale ones."""
     monkeypatch.setattr(data_api.paths, "DATA_DIR", tmp_path / "data")
     monkeypatch.setattr(data_api.paths, "ORG_DATA_DIR", tmp_path / "data" / "org")
-    monkeypatch.setattr(data_api.paths, "ORG_CHARTS_DIR", tmp_path / "charts" / "org")
     monkeypatch.setattr(data_api.paths, "ORG", ORG)
     widgets = {
         "id": "widgets",

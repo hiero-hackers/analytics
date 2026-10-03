@@ -50,7 +50,7 @@ uv run hiero-analytics
 
 **What this does:**
 - Runs all analytics pipelines in one process (one Python start-up instead of one per pipeline), reusing the on-disk fetch cache between pipelines
-- Writes charts to `outputs/charts/` and data tables to `outputs/data/`
+- Writes data tables to `outputs/data/` and the JSON data API to `outputs/data/api/`
 - Isolates failures — if one pipeline errors it is logged and the rest still run; the command exits non-zero if any failed
 
 For faster local debugging, run the explicit `all` command with `--fail-fast`:
@@ -64,7 +64,7 @@ the original traceback is not buried beneath output from later pipelines.
 Without `--fail-fast`, the default behaviour is unchanged: failures are logged,
 the remaining pipelines continue, and all failures are reported at the end.
 
-Everything under `outputs/` is generated and gitignored. The scheduled workflow publishes the dashboard to GitHub Pages instead of committing generated charts and reports.
+Everything under `outputs/` is generated and gitignored. The scheduled workflow publishes the dashboard to GitHub Pages instead of committing generated data and reports.
 
 This is the same command the scheduled **Refresh Analytics Data** workflow runs.
 
@@ -83,7 +83,7 @@ develop locally:
 
 ```bash
 uv run hiero-analytics data_api        # re-emit the API from existing outputs
-python3 -m http.server 8642 -d outputs # serve data + charts (dev proxy target)
+python3 -m http.server 8642 -d outputs # serve the data API (dev proxy target)
 npm run dev --prefix web               # the app, on http://localhost:5173
 ```
 
@@ -95,8 +95,8 @@ adding analytics rarely requires frontend changes.
 
 Nothing generated is committed, and each Pages deploy replaces the last, so every artifact carries its own provenance instead:
 
-- **Charts** have a footer reading `data <watermark> · code <revision> · n=<rows>`. A `-dirty` suffix on the revision means the chart was drawn from uncommitted code and cannot be reproduced from any commit.
-- **The dashboard** stamps the same revision in its page footer (from the API manifest's provenance block), plus a per-section *data as of* badge.
+- **The dashboard** shows the data watermark in its header and the code revision in its page footer (both from the API manifest's provenance block), plus a per-section *data as of* badge. A `-dirty` suffix on the revision means the data was built from uncommitted code and cannot be reproduced from any commit.
+- **The dataset snapshot** archived by each scheduled run carries the same manifest (see `docs/snapshots.md`).
 - **CSVs on disk** (`outputs/data/`) keep their provenance in a `<name>.csv.meta.json` sidecar — `generated_at`, `git_sha`, `record_count`. The CSV body is left clean so `pd.read_csv` works unchanged.
 - **Each scheduled run** archives its dataset snapshot as a `dataset-snapshot-<run>-<sha>` workflow artifact, including a `SNAPSHOT.json` manifest of per-dataset watermarks and SHA-256s.
 
@@ -112,7 +112,7 @@ Without it pandas raises `ParserError` rather than mis-reading the header. Sprea
 
 ### Pull request dashboard previews
 
-Pull requests that change analytics code build the full site (data API + web app + charts) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then serve the folder:
+Pull requests that change analytics code build the full site (data API + web app) and upload it as a **dashboard-preview** workflow artifact. Download and unzip it, then serve the folder:
 
 ```bash
 python3 -m http.server -d .
@@ -140,12 +140,12 @@ Available pipelines:
 |---|---|
 | `difficulty` | Issue difficulty distribution |
 | `difficulty_over_time` | Difficulty trend over time |
-| `onboarding` | Onboarding signal (issues vs. contributors) |
+| `onboarding` | Onboarding signal (issues vs. contributors) — writes `onboarding_signal.csv` and `onboarding_efficiency.csv` |
 | `contributor_profiles` | Per-contributor profiles |
 | `maintainer_pipeline` | Maintainer pipeline by governance role |
 | `contributor_activity` | Org-wide contributor activity tables |
 | `entity_activity` | Per-repository and per-contributor activity (by period and month) behind the dashboard's detail views |
-| `contributor_heatmap` | Contributor activity heatmaps |
+| `contributor_heatmap` | Build contributor activity heatmap tables |
 | `role_coverage` | Governance roles vs. real activity per repo |
 | `affiliation` | Contributor affiliation mapping |
 | `scorecard` | OpenSSF Scorecard results |
@@ -153,10 +153,10 @@ Available pipelines:
 | `releases` | GitHub Releases cadence and per-repo staleness (`latest_release`, `days_since_last_release`) |
 | `hiero_hackers` | Hiero Hackers org composition and activity |
 | `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
-| `repo_growth` | Generate repository-growth timeline charts |
+| `repo_growth` | Generate repository-growth timeline tables |
 | `data_api` | Emits the versioned JSON data API (`outputs/data/api/v1/`) the web dashboard renders — the full run does this last |
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
-| `contributor_churn` | Contributor churn analysis — on-demand, not part of the full run |
+| `contributor_churn` | Contributor churn analysis (funnel, retention, transitions and tenure CSVs) — on-demand, not part of the full run |
 | `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.

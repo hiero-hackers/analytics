@@ -1,8 +1,9 @@
 """Role-holder organisation-diversity analysis.
 
-Reads the curated ``data/affiliations.yaml`` mapping (login -> organisation) and,
-given the current holders of a governance role, classifies each holder and builds
-the distribution + concentration metrics for the organisation-diversity charts.
+Given the curated login -> organisation mapping (read by
+``data_sources.affiliations``) and the current holders of a governance role,
+classifies each holder and builds the distribution + concentration metrics for
+the organisation-diversity charts.
 
 The builders are role-agnostic: pass the role (or the value-column name derived
 from it) and the same code serves maintainers, committers or triage. Maintainer
@@ -15,27 +16,20 @@ large independent tail lowers the HHI rather than inflating one bucket.
 
 from __future__ import annotations
 
-import logging
-import re
 from collections import Counter
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 
 import pandas as pd
-import yaml
 
-from hiero_analytics.config.paths import SRC
+from hiero_analytics.config.charts import SEGMENT_PALETTE
 from hiero_analytics.domain.repos import bare_repo
 
 _HEATMAP_META = {"contributor name", "role", "activity score"}
 
-logger = logging.getLogger(__name__)
-
-AFFILIATIONS_PATH = SRC / "data" / "affiliations.yaml"
 INDEPENDENT = "Independent"
 UNKNOWN_LABEL = "Unknown"
 OTHER_LABEL = "Other orgs"
-_UNKNOWN_VALUES = {"", "?", "unknown", "none"}
 
 DEFAULT_ROLE = "maintainer"
 
@@ -79,44 +73,6 @@ TEAM_DIVERSITY_COLUMNS = [
     "single_employer",
     "organisations",
 ]
-
-
-def load_affiliations(path=AFFILIATIONS_PATH) -> dict[str, str]:
-    """Load the curated login -> organisation map, keyed by lowercased login.
-
-    Unknown markers ('?', blank) are dropped, so a missing key and an explicit
-    '?' are treated identically downstream.
-    """
-    if not path.exists():
-        logger.warning("Affiliations file not found: %s", path)
-        return {}
-
-    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    mapping: dict[str, str] = {}
-    for login, org in raw.items():
-        value = str(org).strip()
-        if value.lower() in _UNKNOWN_VALUES:
-            continue
-        mapping[str(login).strip().lower()] = value
-    return mapping
-
-
-def load_manual_logins(path=AFFILIATIONS_PATH) -> set[str]:
-    """Lowercased logins whose value was hand-set (YAML comment marked manual/MANUAL)."""
-    if not path.exists():
-        return set()
-    manual: set[str] = set()
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        if raw.lstrip().startswith("#") or ":" not in raw:
-            continue
-        body, sep, comment = raw.partition("#")
-        if not sep:
-            continue
-        # 'manual' anywhere in the comment — at the start, appended after the role
-        # tag ('# maintainer # manual'), or the generator's '… · MANUAL — …'.
-        if re.search(r"\bmanual\b", comment, re.IGNORECASE):
-            manual.add(body.split(":", 1)[0].strip().lower())
-    return manual
 
 
 def classify_role_holders(logins: set[str], affiliations: dict[str, str]) -> pd.DataFrame:
@@ -237,48 +193,6 @@ def summarize_affiliation(classified: pd.DataFrame) -> AffiliationSummary:
         top_org=top_org,
         top_share_pct=top_share,
     )
-
-
-def top_n_with_other(
-    distribution: pd.DataFrame,
-    label_col: str,
-    value_col: str,
-    *,
-    top_n: int = 6,
-    always_keep: Collection[str] = (),
-    always_pool: Collection[str] = (),
-) -> pd.DataFrame:
-    """Fold a distribution to its top-N rows plus a single ``Other (k)`` row.
-
-    Keeps a donut readable: the largest ``top_n`` slices stay, the rest collapse
-    into one. Labels in ``always_keep`` survive the fold however small they are,
-    so a band the chart promises to show cannot silently disappear into
-    ``Other``; they do not consume the ``top_n`` budget. Labels in
-    ``always_pool`` are the mirror image: they always land in ``Other``, however
-    large, and never compete for a slot — which is how a non-employer band like
-    ``Independent`` is kept from displacing a real employer from the ranking.
-    Returns the frame unchanged when it already has ``top_n`` rows or fewer, and
-    when pooling would leave nothing ranked at all.
-    """
-    if distribution.empty:
-        return distribution
-    ordered = distribution.sort_values(value_col, ascending=False).reset_index(drop=True)
-    pooled = ordered[ordered[label_col].isin(always_pool)]
-    rankable = ordered[~ordered[label_col].isin(always_pool)]
-    # Pooling every row would leave a pie whose only slice is 'Other' — no
-    # information at all, so show the distribution as it stands instead.
-    if rankable.empty:
-        return ordered
-    if pooled.empty and len(ordered) <= top_n:
-        return ordered
-    pinned = rankable[label_col].isin(always_keep)
-    rest = rankable[~pinned]
-    kept = pd.concat([rest.head(top_n), rankable[pinned]]).sort_values(value_col, ascending=False)
-    tail = pd.concat([rest.iloc[top_n:], pooled])
-    if tail.empty:
-        return kept.reset_index(drop=True)
-    other = pd.DataFrame([{label_col: f"Other ({len(tail)})", value_col: int(tail[value_col].sum())}])
-    return pd.concat([kept, other], ignore_index=True)
 
 
 def build_org_activity_heatmap(contributor_heatmap, affiliations, *, include_unknown=False):
@@ -594,3 +508,49 @@ def build_team_org_composition(
     ]
     groups.sort(key=lambda g: len(g[1]), reverse=True)
     return _build_org_composition(groups, affiliations, label_col="team", top_n=top_n)
+
+
+# Neutral greys for non-employer segments; named employers use the categorical
+# palette shared by every organisation-keyed chart.
+SEGMENT_FIXED_COLORS = {INDEPENDENT: "#94A3B8", OTHER_LABEL: "#CBD5E1", UNKNOWN_LABEL: "#E5E7EB"}
+
+
+def _fixed_segment_color(segment: str) -> str | None:
+    """The fixed grey for a non-employer segment, including folded ``Other (N)`` labels."""
+    if segment in SEGMENT_FIXED_COLORS:
+        return SEGMENT_FIXED_COLORS[segment]
+    if segment.startswith("Other (") and segment.endswith(")") and segment[7:-1].isdigit():
+        return SEGMENT_FIXED_COLORS[OTHER_LABEL]
+    return None
+
+
+def composition_colors(segments: Collection[str]) -> dict[str, str]:
+    """Prominence-ranked employer colours plus fixed non-employer greys.
+
+    ``segments`` is one entry per seat (the affiliation map's values), so the
+    employer with the most people gets the first swatch and every chart drawn
+    from the same map agrees on who is which colour.
+    """
+    seat_counts = Counter(segments)
+    employers = sorted(
+        (segment for segment in seat_counts if _fixed_segment_color(segment) is None),
+        key=lambda segment: (-seat_counts[segment], segment.casefold(), segment),
+    )
+    # Modulo is an overflow fallback: collisions are possible beyond 20
+    # employers, but the chart-visible head fits; dense compositions pool the tail.
+    colors = {employer: SEGMENT_PALETTE[index % len(SEGMENT_PALETTE)] for index, employer in enumerate(employers)}
+    colors.update({segment: color for segment in seat_counts if (color := _fixed_segment_color(segment)) is not None})
+    return colors
+
+
+def chart_colors(segments: Collection[str], organisation_colors: Mapping[str, str] | None) -> dict[str, str]:
+    """The shared colours for one chart, adding greys for its generated neutral labels."""
+    colors = dict(organisation_colors or {})
+    colors.update({segment: color for segment in segments if (color := _fixed_segment_color(segment)) is not None})
+    return colors
+
+
+def segment_colors(segments: Collection[str], affiliations: Mapping[str, str]) -> dict[str, str]:
+    """The colour of each of ``segments`` under the ranking ``affiliations`` (login -> organisation) implies."""
+    colors = chart_colors(segments, composition_colors(list(affiliations.values())))
+    return {segment: colors[segment] for segment in segments if segment in colors}

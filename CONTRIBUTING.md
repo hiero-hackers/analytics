@@ -102,13 +102,12 @@ verified, we'll suggest a lower-level issue rather than merge it.
 
 ## Code quality
 
-Formatting, linting, and type-checking are enforced in CI (the
+Formatting and linting are enforced in CI (the
 [lint workflow](.github/workflows/lint.yml)). Run them locally before pushing:
 
 ```bash
 uv run ruff check src tests     # lint  (add --fix to autofix)
 uv run ruff format src tests    # format
-uv run pyright                  # type-check (report-only in CI for now)
 ```
 
 The [pre-commit hooks](.pre-commit-config.yaml) run a subset automatically on

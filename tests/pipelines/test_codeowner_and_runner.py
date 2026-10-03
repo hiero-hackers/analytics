@@ -6,10 +6,7 @@ import os
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.codeowner_and_runner as runner
 from hiero_analytics.data_sources.models import (
@@ -80,11 +77,11 @@ def test_main_creates_output_files(
     synthetic_codeowners,
     synthetic_runners,
 ):
-    """Running main() should create expected chart and data files."""
+    """Running main() should create the expected data tables and reports."""
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
         "hiero_analytics.pipelines.codeowner_and_runner.org_context",
-        lambda _org: (mock_github_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock fetch functions
@@ -105,24 +102,16 @@ def test_main_creates_output_files(
     runner.main()
 
     # Assert expected output files exist
-    charts_dir = tmp_path / "charts"
     data_dir = tmp_path / "data"
 
-    expected_charts = [
-        "org_codeowner_summary.png",
-        "org_runner_chart.png",
-    ]
     expected_data = [
+        "org_codeowner_summary.csv",
         "repo_wise_codeowner_status.csv",
         "org_runner_status.csv",
         "codeowners_report.md",
+        "org_runner_summary.csv",
         "runner_report.md",
     ]
-
-    for chart_file in expected_charts:
-        chart_path = charts_dir / chart_file
-        assert chart_path.exists(), f"Chart {chart_file} not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart {chart_file} is empty"
 
     for data_file in expected_data:
         data_path = data_dir / data_file

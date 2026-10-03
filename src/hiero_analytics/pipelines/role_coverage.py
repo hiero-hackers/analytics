@@ -31,6 +31,7 @@ from hiero_analytics.analysis.contributor_activity_profile import (
     latest_activity_by_account,
     latest_activity_by_repo_account,
 )
+from hiero_analytics.analysis.network_layout import network_tables
 from hiero_analytics.analysis.repo_summaries import (
     build_repo_activity_overview,
     build_review_load_share,
@@ -62,7 +63,6 @@ from hiero_analytics.domain.periods import ACTIVITY_PERIODS, Period
 from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
-from hiero_analytics.plotting.network import network_tables, render_comembership_network
 
 logger = logging.getLogger(__name__)
 # Thresholds live in config.analysis (ROLE_ACTIVE_DAYS, the network link
@@ -122,7 +122,7 @@ def _build_role_coverage(
         )
         if write_repo_files:
             candidates = find_unbadged_role_work(profiles, holders, now=now, active_within_days=ROLE_ACTIVE_DAYS)
-            repo_data_dir, _ = ensure_repo_dirs(repo_full)
+            repo_data_dir = ensure_repo_dirs(repo_full)
             save_dataframe(coverage, repo_data_dir / "role_coverage.csv")
             save_dataframe(candidates, repo_data_dir / "role_promotion_candidates.csv")
 
@@ -162,13 +162,13 @@ def _write_repo_summaries(combined, org_data_dir, period: Period | None = None):
     logger.info("Review load share: %d repos (>=%d review+merge in window)", len(load_share), LOAD_SHARE_MIN_ACTIONS)
 
 
-def _write_role_networks(combined, org_data_dir, org_charts_dir, org: str = ORG):
+def _write_role_networks(combined, org_data_dir):
     """Co-membership networks per governance role (maintainer, committer, triage).
 
     The Governance tab shows how each permission tier connects the repos; the
     all-contributors network (governance-independent, produced by the
     contributor_activity pipeline for every org) stays the Contributors tab's
-    widest view. A role no repo grants simply renders no chart.
+    widest view. A role no repo grants writes no tables.
     """
     groups = [
         ("maintainer", "maintainers", role_membership(combined, "maintainer"), ROLE_NETWORK_MIN_SHARED["maintainer"]),
@@ -179,18 +179,11 @@ def _write_role_networks(combined, org_data_dir, org_charts_dir, org: str = ORG)
         nodes, edges = build_comembership_network(membership, min_shared=min_shared)
         if nodes.empty:
             continue
-        # The interactive network reads these: same nodes, edges and layout as the PNG.
+        # The interactive network reads these: nodes with laid-out x/y, and the weighted edges.
         node_table, edge_table = network_tables(nodes, edges)
         save_dataframe(node_table, org_data_dir / f"{key}_network_nodes.csv")
         save_dataframe(edge_table, org_data_dir / f"{key}_network_edges.csv")
-        if render_comembership_network(
-            nodes,
-            edges,
-            org_charts_dir / f"{key}_network.png",
-            title=f"{org} — {label} network (repos linked by shared {label})",
-            member_label=label,
-        ):
-            logger.info("%s network: %d repos, %d links (shared>=%d)", label, len(nodes), len(edges), min_shared)
+        logger.info("%s network: %d repos, %d links (shared>=%d)", label, len(nodes), len(edges), min_shared)
 
 
 def _write_team_tables(
@@ -242,7 +235,7 @@ def _write_team_tables(
 
 def main(org: str = ORG) -> None:
     """Build per-repo role-coverage tables for the org's governance roles."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    client, org_data_dir = org_context(org)
     now = datetime.now(UTC)
 
     config = fetch_governance_config(org)
@@ -266,7 +259,7 @@ def main(org: str = ORG) -> None:
     if not combined.empty:
         save_dataframe(combined, org_data_dir / "role_coverage_all.csv")
         _write_repo_summaries(combined, org_data_dir)
-        _write_role_networks(combined, org_data_dir, org_charts_dir, org)
+        _write_role_networks(combined, org_data_dir)
 
     for period in ACTIVITY_PERIODS:
         # Every ACTIVITY_PERIODS entry is a bounded window (all-time is the

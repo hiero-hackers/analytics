@@ -11,7 +11,6 @@ import pytest
 from hiero_analytics import provenance
 from hiero_analytics.provenance import (
     SNAPSHOT_MANIFEST_NAME,
-    Provenance,
     dataset_watermark,
     resolve_provenance,
     write_snapshot_manifest,
@@ -257,28 +256,6 @@ def test_run_git_survives_a_missing_binary(monkeypatch):
 # -------------------------
 # Footer rendering
 # -------------------------
-def test_footer_renders_data_code_and_count():
-    """The full stamp is one line, thousands-separated for scanability."""
-    stamp = Provenance(data_as_of=datetime(2026, 7, 25, 9, 14, tzinfo=UTC), git_sha="abc1234")
-
-    assert stamp.footer(1284) == "data 2026-07-25 09:14 UTC · code abc1234 · n=1,284"
-
-
-def test_footer_omits_unresolvable_parts():
-    """A local run without datasets still gets a useful revision stamp."""
-    stamp = Provenance(data_as_of=None, git_sha="abc1234")
-
-    assert stamp.footer() == "code abc1234"
-
-
-def test_footer_is_empty_when_nothing_is_known():
-    """Nothing to say is better than stamping "unknown" across every chart."""
-    assert Provenance(data_as_of=None, git_sha=None).footer() == ""
-
-
-def test_footer_renders_a_zero_count():
-    """An empty chart is when the count matters most, so zero must not be dropped."""
-    assert Provenance(data_as_of=None, git_sha=None).footer(0) == "n=0"
 
 
 # -------------------------
@@ -359,29 +336,6 @@ def test_manifest_prefers_an_explicit_run_id(tmp_path, monkeypatch):
     path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path, run_id="explicit")
 
     assert json.loads(path.read_text(encoding="utf-8"))["run_id"] == "explicit"
-
-
-def test_footer_reports_each_series_separately():
-    """A single total would hide one series collapsing while the sum held steady."""
-    stamp = Provenance(data_as_of=None, git_sha=None)
-
-    assert stamp.footer({"GFIs": 120, "contributors": 85}) == "n=GFIs 120, contributors 85"
-
-
-def test_footer_omits_an_empty_series_mapping():
-    """No series is not the same as a series of zero; say nothing."""
-    assert Provenance(data_as_of=None, git_sha=None).footer({}) == ""
-
-
-def test_footer_carries_the_run_id():
-    """Watermark, revision, and count can repeat across runs whose archives differ.
-
-    A dataset edited in place moves no watermark, so the run id is what resolves a
-    standalone PNG to exactly one dataset-snapshot artifact.
-    """
-    stamp = Provenance(data_as_of=None, git_sha="abc1234", run_id="17654321")
-
-    assert stamp.footer(5) == "code abc1234 · run 17654321 · n=5"
 
 
 def test_run_id_comes_from_the_ci_environment(tmp_path, monkeypatch):

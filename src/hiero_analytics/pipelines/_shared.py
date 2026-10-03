@@ -21,11 +21,10 @@ from hiero_analytics.data_sources.models import ContributorActivityRecord, Issue
 
 
 class PipelineContext(NamedTuple):
-    """The standard pipeline preamble: an API client plus ensured output dirs."""
+    """The standard pipeline preamble: an API client plus the ensured output dir."""
 
     client: GitHubClient
     data_dir: Path
-    charts_dir: Path
 
 
 _client: GitHubClient | None = None
@@ -45,15 +44,13 @@ def shared_client() -> GitHubClient:
 
 
 def org_context(org: str) -> PipelineContext:
-    """Shared client plus the org's ensured (data, charts) output directories."""
-    data_dir, charts_dir = ensure_org_dirs(org)
-    return PipelineContext(shared_client(), data_dir, charts_dir)
+    """Shared client plus the org's ensured data output directory."""
+    return PipelineContext(shared_client(), ensure_org_dirs(org))
 
 
 def repo_context(org: str, repo: str) -> PipelineContext:
-    """Shared client plus the repo's ensured (data, charts) output directories."""
-    data_dir, charts_dir = ensure_repo_dirs(f"{org}/{repo}")
-    return PipelineContext(shared_client(), data_dir, charts_dir)
+    """Shared client plus the repo's ensured data output directory."""
+    return PipelineContext(shared_client(), ensure_repo_dirs(f"{org}/{repo}"))
 
 
 def load_contributor_activity(client: GitHubClient, org: str) -> list[ContributorActivityRecord]:

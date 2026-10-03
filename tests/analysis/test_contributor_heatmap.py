@@ -8,8 +8,6 @@ from hiero_analytics.analysis.contributor_heatmap import (
     build_activity_heatmap_dataframe,
     build_repo_activity_heatmap,
     build_team_activity_heatmap,
-    grouped_heatmap_chart_data,
-    heatmap_chart_data,
 )
 from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -75,21 +73,6 @@ def test_heatmap_dataframe_empty_records():
     assert "activity score" in df.columns
 
 
-def test_heatmap_chart_data_extracts_matrix():
-    """Chart data is the top rows as (values, row_labels, col_labels)."""
-    records = [_ev("alice", "authored_pull_request", 1), _ev("bob", "authored_issue", 2)]
-    df = build_activity_heatmap_dataframe(records, {})
-    values, row_labels, col_labels = heatmap_chart_data(df)
-    assert row_labels == ["alice", "bob"]
-    assert len(col_labels) == 6
-    assert values.shape == (2, 6)
-
-
-def test_heatmap_chart_data_none_when_empty():
-    """An empty frame produces no chart data."""
-    assert heatmap_chart_data(pd.DataFrame()) is None
-
-
 def test_repo_activity_heatmap_aggregates_and_excludes_bots():
     """Per-repo weighted scores sum the events; bots are excluded; busiest repo first."""
     records = [
@@ -123,14 +106,3 @@ def test_team_activity_heatmap_drops_inactive_teams():
     """A team whose members have no recorded activity is omitted."""
     contrib = build_activity_heatmap_dataframe([_ev("alice", "authored_issue", 1)], {})
     assert build_team_activity_heatmap(contrib, {"empty": {"zoe"}}).empty
-
-
-def test_grouped_heatmap_chart_data_shape_and_empty():
-    """Chart data returns aligned values/labels keyed on the given column, None when empty."""
-    df = build_repo_activity_heatmap(
-        [_ev("alice", "authored_pull_request", 1, repo="o/a"), _ev("bob", "authored_issue", 2, repo="o/b")]
-    )
-    values, rows, cols = grouped_heatmap_chart_data(df, "repo", top_rows=5)
-    assert rows == ["a", "b"]  # a (3) busier than b (2)
-    assert values.shape[0] == 2 and len(cols) >= 1
-    assert grouped_heatmap_chart_data(pd.DataFrame(columns=["repo", "activity score"]), "repo") is None

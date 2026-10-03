@@ -14,23 +14,13 @@ from hiero_analytics.analysis.timeseries import (
     get_difficulty_over_time_event_based,
 )
 from hiero_analytics.config.analysis import DIFFICULTY_OVER_TIME_WINDOW_DAYS, TIMELINE_MAX_WORKERS
-from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest import (
     fetch_org_issue_label_events_graphql,
     fetch_org_issues_graphql,
 )
-from hiero_analytics.domain.labels import DIFFICULTY_LEVELS, DIFFICULTY_ORDER
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
-from hiero_analytics.plotting.lines import plot_stacked_area
-
-# Chart legend labels, positionally matched to the analysis column orders:
-# both run easiest-to-hardest, with "Unknown" first in the all-issues view.
-DIFFICULTY_OVER_TIME_LABELS = [spec.name for spec in DIFFICULTY_LEVELS]
-
-DIFFICULTY_OVER_TIME_ALL_LABELS = [*DIFFICULTY_ORDER]
-
 
 logger = logging.getLogger(__name__)
 
@@ -39,13 +29,10 @@ def _export_series(
     series: list[dict[str, str | int]],
     *,
     columns: list[str],
-    labels: list[str],
     stem: str,
-    title: str,
     org_data_dir: Path,
-    org_charts_dir: Path,
 ) -> None:
-    """Save one difficulty-over-time series as a CSV plus stacked-area chart."""
+    """Save one difficulty-over-time series as a CSV."""
     frame = pd.DataFrame(series)
     if frame.empty:
         logger.info("No difficulty-over-time data available for %s", stem)
@@ -55,22 +42,10 @@ def _export_series(
 
     save_dataframe(frame, org_data_dir / f"{stem}.csv")
 
-    plot_stacked_area(
-        frame,
-        x_col="date",
-        stack_cols=columns,
-        labels=labels,
-        title=title,
-        output_path=org_charts_dir / f"{stem}.png",
-        colors=DIFFICULTY_COLORS,
-        xlabel="Date",
-        ylabel="Open issues",
-    )
-
 
 def main(org: str = ORG) -> None:
-    """Generate an org-wide event-based difficulty-over-time chart."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    """Write the org-wide event-based difficulty-over-time tables."""
+    client, org_data_dir = org_context(org)
     end_at = datetime.now(UTC)
     start_at = end_at - timedelta(days=DIFFICULTY_OVER_TIME_WINDOW_DAYS)
 
@@ -103,11 +78,8 @@ def main(org: str = ORG) -> None:
             today=end_at,
         ),
         columns=DIFFICULTY_OVER_TIME_COLUMN_ORDER,
-        labels=DIFFICULTY_OVER_TIME_LABELS,
         stem="difficulty_over_time_event_based_weekly",
-        title="Open Issues by Difficulty Over Time (Event-Based)",
         org_data_dir=org_data_dir,
-        org_charts_dir=org_charts_dir,
     )
 
     _export_series(
@@ -119,11 +91,8 @@ def main(org: str = ORG) -> None:
             include_unknown=True,
         ),
         columns=DIFFICULTY_OVER_TIME_ALL_COLUMN_ORDER,
-        labels=DIFFICULTY_OVER_TIME_ALL_LABELS,
         stem="difficulty_over_time_all_event_based_weekly",
-        title="All Open Issues by Difficulty Over Time (Event-Based)",
         org_data_dir=org_data_dir,
-        org_charts_dir=org_charts_dir,
     )
 
     logger.info("Event-based difficulty-over-time analytics complete")

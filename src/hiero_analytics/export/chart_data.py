@@ -1,6 +1,6 @@
 """Validated numeric datasets for interactive charts.
 
-Reads the CSV a dashboard spec's ``interactive_sources`` entry names, checks it,
+Reads the CSV a dashboard spec's ``sources`` entry names, checks it,
 and emits the JSON document the web app renders. The analysis's values pass
 through unchanged, never re-aggregated; the only statistic derived here is an
 optional median reference line (``reference: {"stat": "median"}``). Calendar
@@ -17,8 +17,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from hiero_analytics.analysis.affiliation import segment_colors
 from hiero_analytics.analysis.maintainer_pipeline import last_calendar_buckets
 from hiero_analytics.config.charts import REPO_CATEGORY_COLORS
+from hiero_analytics.data_sources.affiliations import load_affiliations
 from hiero_analytics.domain.repo_categories import CATEGORY_ORDER
 
 FORMATS = {"year": "%Y", "month": "%Y-%m", "week": "%G-W%V-%u", "day": "%Y-%m-%d", "snapshot": "%Y-%m-%d"}
@@ -76,10 +78,7 @@ def _series(source: dict, frame: pd.DataFrame, category: str, group: str | None)
         declared = [{"key": column, "label": column} for column in frame.columns if column not in excluded]
     palette = source.get("palette") or {}
     if palette == "organisation":
-        # Deferred: the affiliation pipeline pulls in plotting, which the rest of the export never needs.
-        from hiero_analytics.pipelines.affiliation import segment_colors
-
-        palette = segment_colors([entry["key"] for entry in declared])
+        palette = segment_colors([entry["key"] for entry in declared], load_affiliations())
     series = []
     for index, entry in enumerate(declared):
         color = entry.get("color") or palette.get(entry["key"]) or FALLBACK_COLORS[index % len(FALLBACK_COLORS)]
@@ -508,3 +507,21 @@ def chart_document(
     if note := source.get("note"):
         document["note"] = note
     return document
+
+
+def is_empty(document: dict, source: dict) -> bool:
+    """Whether a chart document has nothing to draw.
+
+    No rows (no nodes for a network) is always empty. A series source may also
+    declare ``hide_when_all_zero``: its rows are kept deliberately (a zero row
+    is the "not partaking" finding once anyone partakes), but a chart in which
+    every value is zero says nothing yet, so the variant stays off the card.
+    """
+    content = "nodes" if document["kind"] == "network" else "rows"
+    rows = document.get(content)
+    if not rows:
+        return True
+    if source.get("hide_when_all_zero") and document["kind"] in SERIES_KINDS:
+        keys = [series["key"] for series in document["series"]]
+        return all(not row[key] for row in rows for key in keys)
+    return False

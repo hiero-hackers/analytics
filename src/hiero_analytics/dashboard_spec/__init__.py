@@ -1,7 +1,7 @@
 """Declarative spec for the dashboard — one module per dashboard family.
 
 Pure data consumed by the dashboard pipeline. Each family module declares its
-chart macro plus the notes/methodology/wide-chart sets for its charts; a
+chart macro plus the notes/methodology/layout sets for its charts; a
 family with table sections (contributors, governance) also declares
 ``SECTION_SPECS``/``SECTION_GROUPS``. This package assembles the families in
 display order (helpers in ``_assembly``) and exposes the table-bearing
@@ -36,6 +36,7 @@ __all__ = [
     "CHART_NOTES",
     "COLUMN_FORMATS",
     "CUSTOM_VIEW_MODULES",
+    "FULL_ROW_CHARTS",
     "MACRO_ABSENT_NOTES",
     "MACRO_GLOSSARIES",
     "MACRO_GROUP_ORDER",
@@ -125,3 +126,4 @@ CHART_METHODOLOGY = merged(_FAMILIES, "CHART_METHODOLOGY")
 # Unlike the merged() dicts above, WIDE_CHARTS is a plain union: it holds flags,
 # so two families marking the same chart wide is redundant, not conflicting.
 WIDE_CHARTS = set().union(*(family.WIDE_CHARTS for family in _FAMILIES))
+FULL_ROW_CHARTS = set().union(*(family.FULL_ROW_CHARTS for family in _FAMILIES))

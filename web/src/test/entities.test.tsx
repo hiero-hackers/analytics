@@ -359,7 +359,6 @@ describe('Entity links in charts', () => {
         <InteractiveChart
           variant={{
             label: 'All time',
-            file: 'x.png',
             interactive: { kind: 'categories', path: 'charts/by-repo.json' },
           }}
           title="Actions by repository"

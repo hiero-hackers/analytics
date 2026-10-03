@@ -27,7 +27,7 @@ def _patch_pipeline(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, inventory, 
     """Redirect pipeline inputs and output directories to tmp_path."""
     monkeypatch.setattr(
         "hiero_analytics.pipelines.hip_implementation.org_context",
-        lambda _org: (MagicMock(), tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (MagicMock(), tmp_path / "data"),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.hip_implementation.fetch_hip_inventory",

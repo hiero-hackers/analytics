@@ -1,9 +1,8 @@
-"""Utilities for saving DataFrames to CSV and rendering charts to disk."""
+"""Utilities for saving DataFrames to CSV with their provenance sidecar."""
 
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -46,29 +45,3 @@ def save_dataframe(
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
     write_output_meta(path, record_count=len(df))
-
-
-def plot_and_save(
-    df: pd.DataFrame,
-    plot_fn: Callable[..., None],
-    *,
-    output_path: Path,
-    csv_path: Path | None = None,
-    **plot_kwargs: object,
-) -> None:
-    """
-    Render a chart and optionally save its source data, skipping empty frames.
-
-    Collapses the ``if not df.empty: plot_x(...); save_dataframe(...)`` block
-    repeated across runners. ``df`` is passed positionally so any chart helper
-    works regardless of its first parameter's name (``df``/``channels``/...).
-    Extra keyword arguments are forwarded to ``plot_fn``; if ``csv_path`` is
-    given the frame is also written there as CSV. Empty frames are skipped.
-    """
-    if df.empty:
-        return
-
-    plot_fn(df, output_path=output_path, **plot_kwargs)
-
-    if csv_path is not None:
-        save_dataframe(df, csv_path)

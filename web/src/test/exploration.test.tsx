@@ -93,7 +93,6 @@ const people: SectionDoc = {
 const provenance = { git_sha: 'abc', data_as_of: null };
 const variant = (id: string, kind: 'timeseries' | 'categories'): ChartVariant => ({
   label: 'View',
-  file: 'legacy.png',
   interactive: { kind, path: `test/${id}.json` },
 });
 const serve = (...documents: unknown[]) => {

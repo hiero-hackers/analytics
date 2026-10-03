@@ -17,7 +17,7 @@ only the rendering.
 
 ```bash
 uv run hiero-analytics data_api        # re-emit the API from existing outputs
-python3 -m http.server 8642 -d outputs # serve data + charts (dev proxy target)
+python3 -m http.server 8642 -d outputs # serve the data API (dev proxy target)
 npm run dev                            # the app, on http://localhost:5173
 ```
 

@@ -183,16 +183,21 @@ describe('Section tables', () => {
 });
 
 describe('Charts', () => {
-  it('keeps variant tabs and explains missing data without requesting chart images', async () => {
+  it('keeps variant tabs and loads each tab’s own chart data', async () => {
     await openGovernance();
     expect(screen.getByRole('radio', { name: 'By year' })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('radio', { name: 'By month' }));
     const figure = screen.getByRole('figure', {
       name: 'Unique active contributors by role — By month',
     });
-    expect(within(figure).getByRole('status')).toHaveTextContent('Chart data is not available yet');
-    expect(figure.querySelector('img')).toBeNull();
-    await userEvent.click(within(figure).getByText('About this chart'));
+    expect(within(figure).getByRole('radio', { name: 'By month' })).toBeChecked();
+    expect(
+      await within(figure).findByText('How to read this and how it is measured'),
+    ).toBeVisible();
+    expect(
+      vi.mocked(fetch).mock.calls.some(([url]) => String(url).endsWith('pipeline_monthly.json')),
+    ).toBe(true);
+    await userEvent.click(within(figure).getByText('How to read this and how it is measured'));
     expect(within(figure).getByText('How to read this chart.')).toBeVisible();
     expect(within(figure).getByText('Step two.')).toBeVisible();
   });
@@ -266,14 +271,16 @@ describe('Organisation diversity card (#435)', () => {
     expect(within(own).getByRole('radio', { name: 'By year' })).toBeChecked();
   });
 
-  it('shows the active tab’s methodology when data is unavailable', async () => {
+  it('shows the active tab’s note and methodology', async () => {
     await openDiversity();
     const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
     await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
     const figure = screen.getByRole('figure', {
       name: 'Role-holders by organisation — Committers',
     });
-    await userEvent.click(within(figure).getByText('About this chart'));
+    await userEvent.click(
+      await within(figure).findByText('How to read this and how it is measured'),
+    );
     expect(within(figure).getByText('The committer bench by employer.')).toBeVisible();
     expect(within(figure).getByText('Count committers.')).toBeVisible();
     expect(within(figure).queryByText('The maintainer bench by employer.')).not.toBeInTheDocument();
@@ -293,7 +300,8 @@ describe('Organisation diversity card (#435)', () => {
     const card = screen.getByRole('region', { name: 'Organisation diversity' });
 
     await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
-    await userEvent.click(within(card).getByRole('button', { name: 'Download CSV' }));
+    // The card's own button leads its header; each loaded chart adds its own after it.
+    await userEvent.click(within(card).getAllByRole('button', { name: 'Download CSV' })[0]);
 
     await vi.waitFor(() =>
       expect(

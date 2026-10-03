@@ -23,6 +23,7 @@ from hiero_analytics.analysis.contributor_activity_profile import (
     build_contributor_profiles,
     build_contributor_profiles_by_repo,
 )
+from hiero_analytics.analysis.network_layout import network_tables
 from hiero_analytics.analysis.prs import filter_gfi_prs, prs_to_dataframe
 from hiero_analytics.config.analysis import CONTRIBUTOR_NETWORK_REPOS_PER_LINK, ROLE_ACTIVE_DAYS
 from hiero_analytics.config.paths import ORG, ensure_repo_dirs
@@ -31,13 +32,12 @@ from hiero_analytics.data_sources.github_ingest import fetch_org_merged_pr_diffi
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import load_contributor_activity, load_issue_label_events, org_context
-from hiero_analytics.plotting.network import network_tables, render_comembership_network
 
 logger = logging.getLogger(__name__)
 
 
-def _build_contributor_network(records, label_events, by_repo, org_data_dir, org_charts_dir, org: str) -> None:
-    """Render the all-contributors co-membership network for the org.
+def _build_contributor_network(records, label_events, by_repo, org_data_dir) -> None:
+    """Write the all-contributors co-membership network tables for the org.
 
     Governance-independent (no roles needed), so it runs for every org. Repos are
     sized by active contributors and linked when they share contributors; the link
@@ -54,18 +54,11 @@ def _build_contributor_network(records, label_events, by_repo, org_data_dir, org
     nodes, edges = build_comembership_network(membership, min_shared=min_shared)
     if nodes.empty:
         return
-    # The interactive network reads these: same nodes, edges and layout as the PNG.
+    # The interactive network reads these: the nodes, edges and layout.
     node_table, edge_table = network_tables(nodes, edges)
     save_dataframe(node_table, org_data_dir / "all_network_nodes.csv")
     save_dataframe(edge_table, org_data_dir / "all_network_edges.csv")
-    if render_comembership_network(
-        nodes,
-        edges,
-        org_charts_dir / "all_network.png",
-        title=f"{org} — contributors network (repos linked by shared contributors)",
-        member_label="contributors",
-    ):
-        logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
+    logger.info("Contributor network: %d repos, %d links (shared>=%d)", len(nodes), len(edges), min_shared)
 
 
 def _write_gfi_completers(client, org: str, org_data_dir) -> None:
@@ -94,7 +87,7 @@ def main(org: str = ORG) -> None:
     ``org`` defaults to the configured primary org; run_all passes each extra org
     explicitly, so multi-org runs stay in one process.
     """
-    client, org_data_dir, org_charts_dir = org_context(org)
+    client, org_data_dir = org_context(org)
 
     logger.info("Building contributor activity tables for org: %s", org)
 
@@ -124,11 +117,11 @@ def main(org: str = ORG) -> None:
     # be seen to shift across repos. Written under each repo's data dir.
     by_repo = build_contributor_profiles_by_repo(records, label_events)
     for repo, repo_profiles in by_repo.items():
-        repo_data_dir, _ = ensure_repo_dirs(repo)
+        repo_data_dir = ensure_repo_dirs(repo)
         save_dataframe(repo_profiles, repo_data_dir / "contributor_activity_profiles.csv")
     logger.info("Wrote per-repo profiles for %d repositories", len(by_repo))
 
     # All-contributors network (no governance needed, so every org gets it).
-    _build_contributor_network(records, label_events, by_repo, org_data_dir, org_charts_dir, org)
+    _build_contributor_network(records, label_events, by_repo, org_data_dir)
 
     logger.info("Contributor activity tables complete")

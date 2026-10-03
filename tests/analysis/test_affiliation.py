@@ -7,6 +7,7 @@ import pandas as pd
 from hiero_analytics.analysis.affiliation import (
     INDEPENDENT,
     OTHER_LABEL,
+    SEGMENT_FIXED_COLORS,
     UNKNOWN_LABEL,
     build_affiliation_distribution,
     build_org_activity_heatmap,
@@ -16,12 +17,12 @@ from hiero_analytics.analysis.affiliation import (
     build_single_employer_team_counts,
     build_team_affiliation_diversity,
     build_team_org_composition,
+    chart_colors,
     classify_role_holders,
+    composition_colors,
     known_share_pct,
-    load_affiliations,
-    load_manual_logins,
+    segment_colors,
     summarize_affiliation,
-    top_n_with_other,
 )
 
 _ROLE_LOOKUP = {
@@ -41,38 +42,6 @@ def _affiliations() -> dict[str, str]:
         "erin": INDEPENDENT,
         "frank": "?",  # explicit unknown -> dropped by loader
     }
-
-
-def test_load_affiliations_lowercases_and_drops_unknown(tmp_path):
-    """Logins lowercase and explicit-unknown markers drop out of the loaded map."""
-    path = tmp_path / "affiliations.yaml"
-    path.write_text(
-        'Alice: "Hashgraph"\nBob: "Independent"\nCarol: "?"\nDave: "unknown"\n',
-        encoding="utf-8",
-    )
-
-    mapping = load_affiliations(path)
-
-    assert mapping == {"alice": "Hashgraph", "bob": "Independent"}
-
-
-def test_load_affiliations_missing_file_returns_empty(tmp_path):
-    """A missing affiliations file yields an empty map, not an error."""
-    assert load_affiliations(tmp_path / "nope.yaml") == {}
-
-
-def test_load_manual_logins_detects_marked_rows(tmp_path):
-    """Only rows whose comment is marked manual/MANUAL are flagged as hand-corrected."""
-    path = tmp_path / "affiliations.yaml"
-    path.write_text(
-        'alice: "Hashgraph"  # maintainer · Alice\n'
-        'bob: "LimeChain"  # manual: confirmed by hand\n'
-        'carol: "Hedera"  # maintainer · MANUAL — moved (resolver: Hashgraph)\n'
-        'dave: "?"  # committer · Dave\n',
-        encoding="utf-8",
-    )
-    assert load_manual_logins(path) == {"bob", "carol"}
-    assert load_manual_logins(tmp_path / "nope.yaml") == set()
 
 
 def test_classify_role_holders_assigns_status():
@@ -523,79 +492,40 @@ def test_org_activity_heatmap_can_include_unknown():
     assert org_hm.iloc[0]["organisation"] == UNKNOWN_LABEL
 
 
-def test_top_n_with_other_folds_the_tail():
-    """Beyond top_n, the remaining rows collapse into a single 'Other (k)' row."""
-    dist = pd.DataFrame({"organisation": ["A", "B", "C", "D", "E"], "maintainers": [10, 8, 6, 4, 2]})
-    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=3)
-    assert list(folded["organisation"]) == ["A", "B", "C", "Other (2)"]
-    assert folded[folded["organisation"] == "Other (2)"]["maintainers"].iloc[0] == 6  # 4 + 2
+def test_organisation_colors_are_stable_across_role_populations():
+    """Role-specific order and generated neutral bands must not alter organisation colours."""
+    shared = composition_colors(["LimeChain", "Hashgraph", "BlockyDevs", INDEPENDENT, OTHER_LABEL, UNKNOWN_LABEL])
+    maintainers = chart_colors(["LimeChain", "Hashgraph", INDEPENDENT], shared)
+    committers = chart_colors(["Other (18)", "BlockyDevs", "Hashgraph", OTHER_LABEL], shared)
+
+    assert maintainers["Hashgraph"] == committers["Hashgraph"]
+    assert maintainers[INDEPENDENT] == SEGMENT_FIXED_COLORS[INDEPENDENT]
+    assert committers[OTHER_LABEL] == SEGMENT_FIXED_COLORS[OTHER_LABEL]
+    assert committers["Other (18)"] == SEGMENT_FIXED_COLORS[OTHER_LABEL]
 
 
-def test_top_n_with_other_noop_when_small():
-    """A distribution already within top_n is returned sorted, unfolded."""
-    dist = pd.DataFrame({"organisation": ["A", "B"], "maintainers": [2, 9]})
-    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=6)
-    assert list(folded["organisation"]) == ["B", "A"]  # sorted desc, no Other row
-    assert "Other" not in " ".join(folded["organisation"])
+def test_prominent_organisation_colors_are_distinct_and_stable():
+    """The chart-visible employer head must not collide or churn for a rare new org."""
+    employers = [employer for rank in range(10, 0, -1) for employer in [f"Employer {11 - rank:02d}"] * rank]
+
+    colors = composition_colors(employers)
+    with_unrelated = composition_colors([*employers, "Unrelated newcomer"])
+    top_ten = [f"Employer {index:02d}" for index in range(1, 11)]
+
+    assert len({colors[employer] for employer in top_ten}) == 10
+    assert with_unrelated["Employer 01"] == colors["Employer 01"]
 
 
-def test_top_n_with_other_never_folds_a_pinned_band():
-    """A tiny Unknown band survives the fold: the donut promises to show it."""
-    dist = pd.DataFrame(
-        {"organisation": ["A", "B", "C", UNKNOWN_LABEL], "maintainers": [10, 8, 6, 1]},
-    )
+def test_segment_colors_follows_the_affiliation_ranking_and_greys_neutral_bands():
+    """Each requested segment gets the colour the whole affiliation map ranks it to; neutrals stay grey."""
+    affiliations = {"alice": "Hashgraph", "bob": "Hashgraph", "carol": "LimeChain", "dave": INDEPENDENT}
+    shared = composition_colors(list(affiliations.values()))
 
-    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=2, always_keep=(UNKNOWN_LABEL,))
+    colors = segment_colors(["LimeChain", INDEPENDENT, "Other (3)", "Not in map"], affiliations)
 
-    assert list(folded["organisation"]) == ["A", "B", UNKNOWN_LABEL, "Other (1)"]
-    # Pinning does not spend the top_n budget, so C alone is what folded away.
-    assert folded[folded["organisation"] == "Other (1)"]["maintainers"].iloc[0] == 6
-    assert folded["maintainers"].sum() == dist["maintainers"].sum()
-
-
-def test_top_n_with_other_pinning_is_a_noop_when_the_band_is_absent():
-    """Nothing to pin means the plain top-N fold, unchanged."""
-    dist = pd.DataFrame({"organisation": ["A", "B", "C"], "maintainers": [10, 8, 6]})
-
-    folded = top_n_with_other(dist, "organisation", "maintainers", top_n=2, always_keep=(UNKNOWN_LABEL,))
-
-    assert list(folded["organisation"]) == ["A", "B", "Other (1)"]
-
-
-def test_load_affiliations_resolves_misiek_blocky_and_seanbohan(tmp_path):
-    """The two contributors from issue #389 resolve to their correct orgs."""
-    path = tmp_path / "affiliations.yaml"
-    path.write_text(
-        'misiek-blocky: "BlockyDevs"  # manual\nseanbohan: "Linux Foundation"  # manual\n',
-        encoding="utf-8",
-    )
-
-    mapping = load_affiliations(path)
-
-    assert mapping == {"misiek-blocky": "BlockyDevs", "seanbohan": "Linux Foundation"}
-    assert load_manual_logins(path) == {"misiek-blocky", "seanbohan"}
-
-
-def test_top_n_with_other_always_pools_named_labels():
-    """A pooled label folds into 'Other' however large, freeing the slot for an employer."""
-    distribution = pd.DataFrame(
-        {
-            "organisation": ["Hashgraph", "Independent", "LimeChain", "BlockyDevs"],
-            "maintainers": [34, 25, 20, 2],
-        }
-    )
-
-    folded = top_n_with_other(distribution, "organisation", "maintainers", top_n=2, always_pool=("Independent",))
-
-    assert folded["organisation"].tolist() == ["Hashgraph", "LimeChain", "Other (2)"]
-    # Independent is inside 'Other', not dropped: the total is still the population.
-    assert int(folded["maintainers"].sum()) == 81
-
-
-def test_top_n_with_other_keeps_frame_when_everything_is_pooled():
-    """Pooling every row would leave a single meaningless slice, so nothing folds."""
-    distribution = pd.DataFrame({"organisation": ["Independent"], "maintainers": [12]})
-
-    folded = top_n_with_other(distribution, "organisation", "maintainers", top_n=2, always_pool=("Independent",))
-
-    assert folded["organisation"].tolist() == ["Independent"]
+    assert colors["LimeChain"] == shared["LimeChain"]
+    assert colors[INDEPENDENT] == SEGMENT_FIXED_COLORS[INDEPENDENT]
+    assert colors["Other (3)"] == SEGMENT_FIXED_COLORS[OTHER_LABEL]
+    # Only requested segments come back, and an unranked employer is left for the caller.
+    assert set(colors) == {"LimeChain", INDEPENDENT, "Other (3)"}
+    assert "Hashgraph" not in colors

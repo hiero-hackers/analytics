@@ -7,10 +7,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
+import pandas as pd
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.contributor_activity as runner
 from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingError
@@ -94,7 +92,7 @@ def _patch_pipeline(
     """Redirect all pipeline inputs and output directories to tmp_path."""
     monkeypatch.setattr(
         "hiero_analytics.pipelines.contributor_activity.org_context",
-        lambda _org: (mock_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_client, tmp_path / "data"),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.contributor_activity.load_contributor_activity",
@@ -109,14 +107,12 @@ def _patch_pipeline(
         lambda _client, _org, **_k: [],
     )
 
-    def _fake_repo_dirs(repo: str) -> tuple[Path, Path]:
-        """Create and return per-repo output dirs under tmp_path."""
+    def _fake_repo_dirs(repo: str) -> Path:
+        """Create and return the per-repo data dir under tmp_path."""
         slug = repo.replace("/", "_")
         repo_data_dir = tmp_path / "repo" / slug / "data"
-        repo_charts_dir = tmp_path / "repo" / slug / "charts"
         repo_data_dir.mkdir(parents=True, exist_ok=True)
-        repo_charts_dir.mkdir(parents=True, exist_ok=True)
-        return repo_data_dir, repo_charts_dir
+        return repo_data_dir
 
     monkeypatch.setattr(
         "hiero_analytics.pipelines.contributor_activity.ensure_repo_dirs",
@@ -134,7 +130,7 @@ def test_main_creates_output_files(
     synthetic_activity,
     synthetic_label_events,
 ):
-    """Running main() should create the profile CSVs and the contributor network chart."""
+    """Running main() should create the profile CSVs and the contributor network tables."""
     _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity, synthetic_label_events)
 
     runner.main(ORG)
@@ -158,9 +154,12 @@ def test_main_creates_output_files(
         assert repo_csv.exists(), f"Per-repo CSV for {repo} not created"
         assert os.path.getsize(repo_csv) > 0, f"Per-repo CSV for {repo} is empty"
 
-    network_chart = tmp_path / "charts" / "all_network.png"
-    assert network_chart.exists(), "Contributor network chart not created"
-    assert os.path.getsize(network_chart) > 0, "Contributor network chart is empty"
+    # alice is active in both repos, so the repos are linked and the network is written.
+    nodes = pd.read_csv(data_dir / "all_network_nodes.csv")
+    edges = pd.read_csv(data_dir / "all_network_edges.csv")
+    assert len(nodes) == 2
+    assert {"x", "y"} <= set(nodes.columns)
+    assert len(edges) == 1
 
 
 def test_main_skips_gfi_completers_when_offline_dataset_missing(

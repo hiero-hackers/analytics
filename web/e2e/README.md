@@ -30,6 +30,5 @@ npm run test:e2e:firefox
 Chromium produces a `governance.pdf` in its test-results directory for visual
 review of running footers and page boundaries. Firefox supports print-media
 checks but Playwright cannot export its native PDF. Charts are drawn from small
-synthetic datasets, and the PNGs the manifest still names are one-pixel
-placeholders the dashboard never shows: printed chart legibility must also be
-reviewed with real dashboard data, as described in the print notes.
+synthetic datasets: printed chart legibility must also be reviewed with real
+dashboard data, as described in the print notes.

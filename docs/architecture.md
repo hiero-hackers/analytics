@@ -4,7 +4,7 @@ How `hiero_analytics` is put together, for contributors. This is the top-down ma
 each module's own docstring is the authoritative detail.
 
 The system is a batch pipeline: **fetch** GitHub data → **analyze** it into tables →
-**render** charts and emit a versioned JSON data API, which the web dashboard
+**emit** tables and a versioned JSON data API, which the web dashboard
 (`web/`, a static Vite + React app) renders. It is an application, not a library —
 its public surface is the `hiero-analytics` CLI, the data API, and the dashboard,
 not an importable Python API.
@@ -22,14 +22,14 @@ data_sources            fetch + cache + persist GitHub data
       ▲
 analysis                pure DataFrame transforms (no I/O, no network)
       ▲
-plotting, export        render charts and emit the JSON data API
+export                  write CSVs and emit the JSON data API
       ▲
 dashboard_spec          declarative: which charts/tables the dashboard shows
       ▲
 pipelines, cli          orchestration — wire a fetch → analysis → output run
 ```
 
-- **`config`** — paths, env parsing (`env.py` clamps/validates), chart style
+- **`config`** — paths, env parsing (`env.py` clamps/validates), chart colour
   constants, logging. `.env` is loaded once in `config/__init__`, before any
   config module reads the environment.
 - **`domain`** — the shared vocabulary that everything agrees on: `roles`
@@ -40,18 +40,18 @@ pipelines, cli          orchestration — wire a fetch → analysis → output r
   all retry/backoff/rate-limit handling; `rate_limit` is a pure policy;
   `adaptive_limiter` an AIMD concurrency limiter), ingestion (`github_ingest/`),
   persistence (`dataset_store`, `cache`, `serialization`), `models`, and
-  `governance_config`.
+  `governance_config`, and `affiliations` (the curated login -> organisation map).
 - **`analysis`** — pure transforms from record lists / DataFrames to output
   DataFrames. No network, no file I/O beyond what it is handed. This is the most
   heavily unit-tested layer and the safest to refactor.
-- **`plotting` / `export`** — `plotting` renders matplotlib charts (all figure
-  creation flows through `plotting/base`, which guarantees figures are closed even
-  on error); `export/save` writes CSVs (+ a freshness sidecar) and
-  `export/data_api` emits the JSON documents the web dashboard fetches. Both are
-  data-agnostic beyond `config`, `domain`, and the spec.
+- **`export`** — `export/save` writes CSVs plus a `.csv.meta.json` sidecar
+  (`generated_at`, `git_sha`, `record_count`); `export/chart_data` builds the
+  JSON chart documents from those CSVs; `export/data_api` emits the JSON
+  documents the web dashboard fetches. It is data-agnostic beyond `config`,
+  `domain`, and the spec.
 - **`dashboard_spec`** — pure data: one module per dashboard *family*
   (`contributors`, `governance`, `onboarding`, `hips`, `security`, `community`)
-  declaring its chart macro, notes, methodology, and optionally its table sections,
+  declaring its charts (keyed by chart id), notes, methodology, and optionally its table sections,
   its own "how to read this" glossary, and a module that builds views a table or
   chart gallery cannot express. The package `__init__` assembles them and fails
   loudly if two families claim the same chart.
@@ -99,22 +99,21 @@ contract for everything downstream of the pipelines (the web dashboard,
 notebooks, external tools), and it enforces the producer↔spec agreement: a
 produced table missing a spec-declared column fails the emit, so a renamed
 output is a red build rather than a silently blank dashboard column. Breaking
-shape changes bump the version directory; `v1` is additive-only. Each org also
+shape changes bump the version directory; `v1` is additive-only, with one recorded exception (October 2026): the PNG-only variant fields `file`, `width` and `height` were removed when chart PNGs were retired. No consumer read them, so the version was not bumped. A chart variant is listed when every CSV its source names exists (a network also needs its edge list), its sidecar does not record zero rows, and the chart document built from it has something to draw — so a span tab whose window is empty stays off the card. Each org also
 publishes repository and contributor detail documents (an index of each, plus one
 lazily fetched document per entity) from the `entity_activity` pipeline's tables;
 see [entity-views.md](entity-views.md).
 
 **The web dashboard.** `web/` is a static Vite + React app deployed at the Pages
-site root with `data/api/` and `charts/` nested beneath it. It is manifest-driven:
+site root with `data/api/` nested beneath it. It is manifest-driven:
 it renders whatever orgs, sections, chart sections, and metric tiles the API
-lists, so adding analytics rarely requires frontend changes. It imports the
-long-standing dashboard stylesheet (`web/src/dashboard.css`) unchanged.
+lists, so adding analytics rarely requires frontend changes. Its styles live in
+`web/src/app.css` on shadcn/ui (see [web/README.md](../web/README.md)).
 
 
 A pipeline's `main(org=ORG)` obtains a GitHub client + output dirs from
 `pipelines/_shared` (one shared client per process), fetches records, runs `analysis`
-transforms, and writes CSVs/PNGs under `outputs/data/org/<org>/` and
-`outputs/charts/org/<org>/`.
+transforms, and writes CSVs (with sidecars) under `outputs/data/org/<org>/`.
 
 Fetching is **incremental** and has two persistence layers, by design:
 
@@ -145,8 +144,8 @@ and contributor profiles are scored from:
 
 An org-level signal using the `createdAt` timestamp that the repos GraphQL query
 already returns. The `repo_growth` pipeline (`analysis/repo_growth`,
-`pipelines/repo_growth`) aggregates repos by creation month and renders two line
-charts:
+`pipelines/repo_growth`) aggregates repos by creation month and writes two timeline
+tables, which the dashboard draws as line charts:
 
 - **Repos created per month** — the pace at which the org spins up new work.
 - **Cumulative repo count** — total repos over time (steeper = faster growth).
@@ -163,20 +162,16 @@ oldest dataset watermark (`data as of`) and the code revision (`GITHUB_SHA` in
 CI, `git rev-parse` locally, suffixed `-dirty` on an uncommitted tree) — and they
 are applied in three places:
 
-- **Every PNG** gets a footer via `plotting/style.draw_provenance_footer`, applied
-  in `plotting/base.save_and_close` because every chart reaches disk through it.
-  The row count comes from the caller, which already holds the frame. The footer
-  never raises: an unstamped chart beats a failed render.
 - **The dashboard** stamps the generation time and revision in its page footer
   (from the manifest's provenance block), on top of the per-section `data as of`
   badges fed by the `.meta.json` sidecars that `export/save.write_output_meta`
-  writes next to each CSV. CSVs downloaded from a table carry the same stamp as
+  writes next to each CSV (they also carry `record_count`). CSVs downloaded from a table carry the same stamp as
   `#` comment lines.
 - **The dataset snapshot** is archived per CI run as an immutable artifact,
   carrying a `SNAPSHOT.json` manifest (revision, per-dataset watermark and
   SHA-256, and any failed pipelines). This is distinct from the Actions *cache*
   of the same directory: the cache is mutable, evictable, and only reachable by
-  the next run, so it can't answer "which data drew this chart?".
+  the next run, so it can't answer "which data drew this view?".
 
 ## Multi-org
 
@@ -189,16 +184,16 @@ another org's roles).
 
 ## The dashboard contract
 
-The data API is assembled by `export/data_api` from whatever CSVs/PNGs exist,
+The data API is assembled by `export/data_api` from whatever CSVs exist,
 following `dashboard_spec`. The join key between producer (a pipeline) and consumer
-(the spec) is the **output filename** — a fragile, stringly-typed seam. Two test
+(the spec) is the **chart id** and its `sources` (source CSV filenames) — a fragile, stringly-typed seam. Two test
 tiers guard it:
 
 - `tests/dashboard_spec/` — internal spec consistency (every note/methodology entry
-  references a listed chart; section groups cover the declared sections).
+  references a listed chart id; section groups cover the declared sections).
 - `tests/contracts/test_output_contract.py` — runs the whole default pipeline set
   against synthetic fetches into a temp `outputs/` and asserts every spec-listed CSV
-  and macro PNG is actually produced (and no orphans), and that the API lists a
+  and every chart source dataset is actually produced (and no orphans), and that the API lists a
   document for every produced section. This is what makes a renamed output fail
   loudly instead of silently blanking a dashboard section.
 
@@ -220,7 +215,7 @@ namespace and asserting the output files. Coverage floor is enforced in CI.
 | Task | Touch |
 |---|---|
 | Add a chart | its family module in `dashboard_spec/` + the producing pipeline |
-| Add a chart *form* | a `plot_*` primitive in `plotting/` (pipelines never touch matplotlib) |
+| Add a chart *kind* | a document builder in `export/chart_data.py` plus a view in `web/src/components/charts/` |
 | Add a bespoke dashboard view | `CUSTOM_VIEWS_MODULE` on the family + a `build_views()` module returning pure data |
 | Add a pipeline | `pipelines/<name>.py` + one `Pipeline` entry in `pipelines/__init__.py` |
 | Add a fetched resource | `models` + `queries/` + `github_ingest/<x>.py` + one `OrgIncrementalResource` |

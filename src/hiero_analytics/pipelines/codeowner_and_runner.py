@@ -8,7 +8,6 @@ from hiero_analytics.analysis.codeowner_workflow_analysis import (
     prepare_stacked_runner_summary,
     runner_records_to_dataframe,
 )
-from hiero_analytics.config.charts import CODEOWNER_STATUS_COLORS, RUNNER_STATUS_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.cache import load_records_cache, save_records_cache
 from hiero_analytics.data_sources.github_client import GitHubClient
@@ -20,7 +19,6 @@ from hiero_analytics.data_sources.models import CodeOwnersRecord, RepositoryReco
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
 from hiero_analytics.pipelines.scorecard import fetch_org_repos
-from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 
 logger = logging.getLogger(__name__)
 
@@ -116,8 +114,8 @@ def generate_runner_markdown_report(records: list[RunnerRecord], output_file: st
 
 
 def main(org: str = ORG) -> None:
-    """Fetch CODEOWNERS and runner data for the organisation and generate reports and charts."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    """Fetch CODEOWNERS and runner data for the organisation and generate reports and tables."""
+    client, org_data_dir = org_context(org)
 
     repos = fetch_org_repos(client, org)
 
@@ -130,14 +128,6 @@ def main(org: str = ORG) -> None:
     codeowners_summary_df = prepare_org_codeowners_summary(codeowners)
     if not codeowners_summary_df.empty:
         save_dataframe(codeowners_summary_df, org_data_dir / "org_codeowner_summary.csv")
-        plot_bar(
-            df=codeowners_summary_df,
-            x_col="status",
-            y_col="count",
-            title="Organization Wide Codeowners File Summary",
-            output_path=org_charts_dir / "org_codeowner_summary.png",
-            colors=CODEOWNER_STATUS_COLORS,
-        )
 
     codeowners_repo_df = prepare_repo_level_codeowner_summary(codeowners)
     if not codeowners_repo_df.empty:
@@ -160,13 +150,3 @@ def main(org: str = ORG) -> None:
     runner_stacked_df = prepare_stacked_runner_summary(runners)
     if not runner_stacked_df.empty:
         save_dataframe(runner_stacked_df, org_data_dir / "org_runner_summary.csv")
-        plot_stacked_bar(
-            df=runner_stacked_df,
-            x_col="repo",
-            stack_cols=["Self-Hosted", "Standard", "Indeterminate"],
-            labels=["Self-Hosted", "Standard", "Indeterminate"],
-            title="Repository Wide Runner Types Breakdown",
-            output_path=org_charts_dir / "org_runner_chart.png",
-            colors=RUNNER_STATUS_COLORS,
-            annotate_totals=False,
-        )

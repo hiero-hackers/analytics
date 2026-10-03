@@ -93,7 +93,6 @@ const funnel: CategoriesDocument = {
 const provenance = { git_sha: 'abc', data_as_of: null };
 const variant = (path: string, kind: ChartDocument['kind'] = 'timeseries'): ChartVariant => ({
   label: '1 year',
-  file: 'legacy.png',
   interactive: { kind, path },
 });
 const serve = (document: unknown) =>

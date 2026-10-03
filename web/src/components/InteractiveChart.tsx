@@ -52,7 +52,7 @@ export default function InteractiveChart({
   /** The container's own switches (the card's period tabs), placed first in the toolbar. */
   leading?: React.ReactNode;
 }) {
-  const path = variant.interactive!.path;
+  const path = variant.interactive.path;
   const [result, setResult] = useState<{
     path: string;
     data?: ChartDocument;

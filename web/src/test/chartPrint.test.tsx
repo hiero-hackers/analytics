@@ -91,7 +91,6 @@ const heatmap: MatrixDocument = {
 const provenance = { git_sha: 'abc1234', data_as_of: '2026-02-12T12:00:00Z' };
 const variant = (path: string): ChartVariant => ({
   label: '1 year',
-  file: 'legacy.png',
   interactive: { kind: 'timeseries', path },
 });
 const serve = (document: unknown) =>

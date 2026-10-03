@@ -1,7 +1,7 @@
 import type { ChartSpec, Manifest, SectionDoc, TimeseriesDocument } from '../src/api';
 import { CONTRIB_DOC, GOV_DOC, MANIFEST, ROUTES } from '../src/test/fixtures.ts';
 
-/** A decodable one-pixel PNG: chart files on disk and the stubbed avatar hosts. */
+/** A decodable one-pixel PNG, served for the stubbed avatar hosts. */
 export const PIXEL_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII=',
   'base64',

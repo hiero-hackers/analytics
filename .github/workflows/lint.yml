@@ -49,12 +49,6 @@ jobs:
       - name: Run Ruff Format Check
         run: uv run ruff format --check .
 
-      # Report-only while the baseline is worked down; flip to blocking
-      # (remove continue-on-error) once pyright is clean.
-      - name: Run Pyright (report-only)
-        continue-on-error: true
-        run: uv run pyright
-
   web-lint:
     name: Web Lint
     runs-on: ubuntu-latest

@@ -30,7 +30,7 @@ labels: "advanced"
 **What tends to bite experienced contributors in this repo:**
 
 - The dependency DAG in [docs/architecture.md](https://github.com/hiero-hackers/analytics/blob/main/docs/architecture.md) is deliberately strict (zero violations today) — a solution that needs a new cross-layer import needs a design conversation first, not an exception.
-- The output-contract test pins every CSV, chart, and dashboard artifact the pipelines produce. Changing the output surface means changing the contract *on purpose*, and downstream dashboard consumers exist.
+- The output-contract test pins every CSV, chart dataset, and dashboard artifact the pipelines produce. Changing the output surface means changing the contract *on purpose*, and downstream dashboard consumers exist.
 - Ingestion has deliberate two-layer staleness semantics (TTL cache vs. the durable incremental dataset store with reuse/refresh windows) — read the module docstrings before touching fetch paths; naive "fixes" here reintroduce bugs we've already removed.
 
 **🤖 AI:** tools are welcome; verified work is required — see the [AI policy](https://github.com/hiero-hackers/analytics/blob/main/CONTRIBUTING.md#ai-policy). Fully automated bot PRs are closed.

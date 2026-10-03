@@ -93,9 +93,8 @@
   --chart-5: #b3334d;
 
   /* HIP coverage-matrix heat ramp: more merged PRs = more ink. Mirrors
-     HIP_EVIDENCE_RAMP (config/charts.py), which the same values reach the
-     matplotlib charts through; the matrix legend now renders these classes
-     rather than the shipped hex, so cells and legend cannot drift apart. */
+     HIP_EVIDENCE_RAMP (config/charts.py); the matrix legend renders these
+     classes rather than the shipped hex, so cells and legend cannot drift apart. */
   --heat-1: #cde2fb;
   --heat-2: #9ec5f4;
   --heat-3: #5598e7;

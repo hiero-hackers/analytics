@@ -12,10 +12,9 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import UTC, datetime
 
-import numpy as np
 import pandas as pd
 
-from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS, HEATMAP_MONTHS, HEATMAP_TOP_ROWS
+from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS, HEATMAP_MONTHS
 from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.domain.roles import ROLE_PRIORITY
@@ -150,22 +149,6 @@ def build_activity_heatmap_dataframe(
     return df.sort_values(by=["activity score", "contributor name"], ascending=[False, True]).reset_index(drop=True)
 
 
-def heatmap_chart_data(
-    heatmap_df: pd.DataFrame,
-    *,
-    top_rows: int = HEATMAP_TOP_ROWS,
-) -> tuple[np.ndarray, list[str], list[str]] | None:
-    """Top-N rows as ``(values, row_labels, col_labels)`` for plotting, or None if empty."""
-    if heatmap_df.empty:
-        return None
-    month_columns = [column for column in heatmap_df.columns if column not in set(_META_COLUMNS)]
-    chart_df = heatmap_df.head(top_rows)
-    if chart_df.empty:
-        return None
-    values = chart_df[month_columns].to_numpy(dtype=float)
-    return values, chart_df["contributor name"].tolist(), month_columns
-
-
 def build_team_activity_heatmap(
     contributor_heatmap: pd.DataFrame,
     team_membership: dict[str, set[str]],
@@ -224,19 +207,3 @@ def build_repo_activity_heatmap(records, *, months_back: int = HEATMAP_MONTHS) -
     if frame.empty:
         return frame
     return frame.sort_values("activity score", ascending=False).reset_index(drop=True)
-
-
-def grouped_heatmap_chart_data(
-    heatmap_df: pd.DataFrame,
-    label_column: str,
-    *,
-    top_rows: int = HEATMAP_TOP_ROWS,
-) -> tuple[np.ndarray, list[str], list[str]] | None:
-    """Top-N rows of a grouped (team/repo/org) heatmap as ``(values, rows, cols)``."""
-    if heatmap_df.empty:
-        return None
-    month_columns = [c for c in heatmap_df.columns if c not in {label_column, "activity score"}]
-    chart_df = heatmap_df.head(top_rows)
-    if chart_df.empty:
-        return None
-    return chart_df[month_columns].to_numpy(dtype=float), chart_df[label_column].tolist(), month_columns

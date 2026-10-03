@@ -88,7 +88,7 @@ reviews:
         unsafe parsing/deserialization of API responses, and any path where
         GitHub-supplied strings reach the filesystem or a shell.
 
-    - path: "src/hiero_analytics/{analysis,plotting,dashboard_spec}/**"
+    - path: "src/hiero_analytics/{analysis,dashboard_spec}/**"
       instructions: |
         This is the correctness-sensitive layer — its output is the numbers and
         charts people trust. In addition to the global rules, flag as critical:

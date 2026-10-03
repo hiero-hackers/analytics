@@ -10,7 +10,6 @@ license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.11, <4"
 dependencies = [
-    "matplotlib>=3.11.1",
     "pandas>=3.0.3",
     "requests>=2.34.2",
     "python-dotenv>=1.2.2",
@@ -42,7 +41,6 @@ dev = [
 
 lint = [
     "ruff>=0.15.22,<1",
-    "pyright>=1.1.390,<2",
     "pre-commit>=4.0,<5",
 ]
 
@@ -63,16 +61,6 @@ package-dir = {"" = "src"}
 
 [tool.pdm.build]
 excludes = ["**/.pytest_cache"]
-
-# Report-only for now (the CI step does not fail the build): establish the
-# baseline, fix incrementally, then ratchet to blocking.
-[tool.pyright]
-include = ["src"]
-# Atheris has no macOS wheel and its stubs omit the fuzzing API, so harnesses
-# only type-check inside the OSS-Fuzz Linux image.
-ignore = ["fuzz"]
-pythonVersion = "3.11"
-typeCheckingMode = "basic"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

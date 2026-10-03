@@ -14,8 +14,6 @@ this codebase can start work from the issue alone.
 **Most rejected drafts describe problems that were already solved.** Read the
 code first, every time. Real examples from seeding this repo:
 
-- "add alt text to chart images" — `alt={chart.title}` was already there; the
-  actual gap was that alt text didn't vary between chart variants.
 - "make the lightbox close on Escape" — Escape already worked; focus trapping
   did not.
 - "default-sort CODEOWNERS by missing-first" — already sorted, and already
@@ -81,7 +79,7 @@ If the change touches these, say so in the issue — contributors hit them blind
 otherwise, and reviewers will send the PR back:
 
 - **The output contract.** `tests/contracts/test_output_contract.py` pins every
-  CSV and PNG the pipelines produce. A new or renamed output fails the build
+  CSV and chart dataset the pipelines produce. A new or renamed output fails the build
   until it is declared. Tell the contributor this is a deliberate contract
   update, not a test to work around.
 - **Charts must self-explain.** Spec tests require every chart to carry both a
@@ -102,8 +100,9 @@ otherwise, and reviewers will send the PR back:
   and write the exact steps and observed result into the issue. A verified repro
   is worth more than a paragraph of theory, and it sometimes reveals a second
   symptom worth naming.
-- **Embed a live chart PNG** with a plain markdown image link when the chart
-  *is* the evidence — those URLs are public and stable.
+- **Link the dashboard view** (https://hiero-hackers.github.io/analytics/, name
+  the tab and chart) when a chart *is* the evidence. Charts are drawn from
+  JSON, so there are no image URLs to embed.
 - Screenshots must be drag-dropped by a human; the GitHub API cannot upload
   issue attachments. Say so rather than promising an image you cannot add.
 - Quantify claims you make. "The payload is large" is weak; "profiles.json is

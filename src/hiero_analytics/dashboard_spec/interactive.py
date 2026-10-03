@@ -1,4 +1,4 @@
-"""Shared presets for chart specs' ``interactive_sources`` (read by ``export/chart_data.py``).
+"""Shared presets for chart specs' ``sources`` (read by ``export/chart_data.py``).
 
 They keep a series' label and colour identical on every card, and each counting rule written once.
 """
@@ -10,7 +10,7 @@ from hiero_analytics.config.analysis import ACTIVITY_WEIGHTS, HEATMAP_MONTHS, HE
 from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.domain.labels import DIFFICULTY_ORDER
 
-# The span tabs every windowed card shares, widest first: (PNG/CSV suffix, window).
+# The span tabs every windowed card shares, widest first: (chart id / CSV suffix, window).
 SPAN_WINDOWS = [("", "all"), ("_365d", 365), ("_30d", 30), ("_7d", 7)]
 
 ROLE_SERIES = [
@@ -143,12 +143,12 @@ REPO_GROWTH = {
 # New repositories are a flow (bars, empty months are zero); the running total is
 # a stock (a line that holds its level through empty months).
 REPO_GROWTH_SOURCES = {
-    "repos_created_per_month.png": {
+    "repos_created_per_month": {
         **REPO_GROWTH,
         "series": [{"key": "repos_created", "label": "New repositories", "color": "var(--chart-committer)"}],
         "unit": "Repositories created",
     },
-    "cumulative_repo_count.png": {
+    "cumulative_repo_count": {
         **REPO_GROWTH,
         "series": [
             {"key": "cumulative_repos", "label": "Repositories", "color": "var(--chart-committer)", "fill": "carry"}
@@ -221,20 +221,20 @@ CONTRIBUTOR_HEATMAP = activity_heatmap(
 )
 
 ACTIVITY_HEATMAP_SOURCES = {
-    "contributor_activity_heatmap.png": CONTRIBUTOR_HEATMAP,
-    "team_activity_heatmap.png": activity_heatmap(
+    "contributor_activity_heatmap": CONTRIBUTOR_HEATMAP,
+    "team_activity_heatmap": activity_heatmap(
         "team_activity_heatmap.csv",
         "team",
         "Team",
         rule="A person on several teams counts toward each, so team rows overlap and must not be added.",
     ),
-    "org_activity_heatmap.png": activity_heatmap(
+    "org_activity_heatmap": activity_heatmap(
         "org_activity_heatmap.csv",
         "organisation",
         "Organisation",
         rule="Each person counts toward their curated employer; people with no curated affiliation are excluded.",
     ),
-    "repo_activity_heatmap.png": activity_heatmap(
+    "repo_activity_heatmap": activity_heatmap(
         "repo_activity_heatmap.csv",
         "repo",
         "Repository",
@@ -257,9 +257,9 @@ CONTRIBUTOR_NETWORK = {
     ),
 }
 
-# 548 days mirrors the PNG's "Last 18 months" tab.
+# 548 days: the "Last 18 months" tab.
 RELEASE_TIMELINE_SOURCES = {
-    f"release_timeline{suffix}.png": {
+    f"release_timeline{suffix}": {
         "kind": "events",
         "file": "release_timeline.csv",
         "category": "repo",
@@ -347,7 +347,7 @@ def ranked_counts(file: str, category: str, label: str, key: str, unit: str, pop
 
 
 OVERVIEW_SOURCES = {
-    "contributor_counts.png": {
+    "contributor_counts": {
         **ranked_counts(
             "contributor_counts.csv",
             "repo",
@@ -358,7 +358,7 @@ OVERVIEW_SOURCES = {
         ),
         "strip_org_prefix": True,
     },
-    "language_distribution.png": ranked_counts(
+    "language_distribution": ranked_counts(
         "language_distribution.csv",
         "language",
         "Language",
@@ -366,7 +366,7 @@ OVERVIEW_SOURCES = {
         "Repositories",
         "Repositories grouped by their primary language reported by GitHub; not lines of code.",
     ),
-    "push_activity.png": status_meter(
+    "push_activity": status_meter(
         "push_activity.csv",
         "Push activity",
         "Repositories",
@@ -375,7 +375,7 @@ OVERVIEW_SOURCES = {
 }
 
 SINGLE_EMPLOYER_SOURCES = {
-    f"{stem}.png": ranked_counts(
+    f"{stem}": ranked_counts(
         f"{stem}.csv",
         "organisation",
         "Organisation",
@@ -406,13 +406,13 @@ SINGLE_EMPLOYER_SOURCES = {
 }
 
 OWNERSHIP_SOURCES = {
-    "org_codeowner_summary.png": status_meter(
+    "org_codeowner_summary": status_meter(
         "org_codeowner_summary.csv",
         "CODEOWNERS file",
         "Repositories",
         "Repositories with or without a CODEOWNERS file in the standard GitHub locations.",
     ),
-    "org_runner_chart.png": {
+    "org_runner_chart": {
         **ranked_counts(
             "org_runner_summary.csv",
             "repo",
@@ -447,7 +447,7 @@ HIP_STATUS_SOURCE = {
 }
 
 DISCORD_SOURCES = {
-    "hiero_discord_channel_categories.png": {
+    "hiero_discord_channel_categories": {
         **ranked_counts(
             "hiero_discord_channel_categories.csv",
             "category",
@@ -459,7 +459,7 @@ DISCORD_SOURCES = {
         "series": [{"key": "last_90d", "label": "Last 90 days"}, {"key": "earlier", "label": "Earlier history"}],
         "stacked": True,
     },
-    "hiero_discord_recent_activity_30d.png": {
+    "hiero_discord_recent_activity_30d": {
         **ranked_counts(
             "hiero_discord_recent_activity_30d.csv",
             "channel_label",
@@ -470,7 +470,7 @@ DISCORD_SOURCES = {
         ),
         "top_n": 5,
     },
-    "hiero_discord_monthly_traffic.png": {
+    "hiero_discord_monthly_traffic": {
         "kind": "timeseries",
         "file": "hiero_discord_monthly_traffic.csv",
         "category": "month",

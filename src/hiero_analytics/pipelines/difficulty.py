@@ -2,8 +2,8 @@
 Run difficulty analytics for an org.
 
 Produces:
-- Difficulty distribution pie charts
-- Difficulty distribution by repository (stacked bar)
+- Difficulty distribution tables
+- Difficulty distribution by repository tables
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ from hiero_analytics.analysis.difficulty_analysis import (
     issues_unlabeled_created_since,
 )
 from hiero_analytics.config.analysis import TIMELINE_MAX_WORKERS
-from hiero_analytics.config.charts import DIFFICULTY_COLORS
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.github_ingest import (
     fetch_org_issue_label_events_graphql,
@@ -35,7 +34,6 @@ from hiero_analytics.domain.labels import (
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import org_context
-from hiero_analytics.plotting.bars import plot_stacked_bar
 
 logger = logging.getLogger(__name__)
 
@@ -49,9 +47,8 @@ def _run_window(
     window_label: str,
     suffix: str,
     org_data_dir: Path,
-    org_charts_dir: Path,
 ) -> None:
-    """Produce the difficulty distribution and per-repo bar outputs for one span.
+    """Produce the difficulty distribution and per-repo outputs for one span.
 
     ``window_days=None`` is the all-time span (the whole open backlog); the
     epoch cutoff makes "labelled or created since" include everything.
@@ -88,8 +85,7 @@ def _run_window(
 
     if df.empty:
         # A quiet window (no labeling or new issues) is data, not an error;
-        # still write the empty CSVs so tabs don't reference missing files,
-        # but skip the chart — the plotting layer rejects empty frames.
+        # still write the empty CSVs so tabs don't reference missing files.
         logger.info("No issues qualified for the %s window", window_label)
         save_dataframe(pd.DataFrame(columns=["difficulty", "count"]), distribution_csv)
         save_dataframe(pd.DataFrame(columns=["repo", *DIFFICULTY_ORDER]), by_repo_csv)
@@ -110,7 +106,7 @@ def _run_window(
     save_dataframe(difficulty_counts, distribution_csv)
 
     # --------------------------------------------------
-    # REPO DIFFICULTY STACKED BAR
+    # REPO DIFFICULTY BREAKDOWN
     # --------------------------------------------------
 
     pivot = (
@@ -123,21 +119,10 @@ def _run_window(
 
     save_dataframe(pivot, by_repo_csv)
 
-    plot_stacked_bar(
-        pivot,
-        x_col="repo",
-        stack_cols=DIFFICULTY_ORDER,
-        labels=DIFFICULTY_ORDER,
-        title=f"Labeled or Newly Created Open Issues By Difficulty ({window_label})",
-        output_path=org_charts_dir / f"difficulty_by_repo{suffix}.png",
-        colors=DIFFICULTY_COLORS,
-        rotate_x=45,
-    )
-
 
 def main(org: str = ORG) -> None:
     """Run the difficulty analytics pipeline for the configured organization."""
-    client, org_data_dir, org_charts_dir = org_context(org)
+    client, org_data_dir = org_context(org)
 
     logger.info("Running difficulty analytics for org: %s", org)
 
@@ -173,7 +158,6 @@ def main(org: str = ORG) -> None:
             window_label=window_label,
             suffix=suffix,
             org_data_dir=org_data_dir,
-            org_charts_dir=org_charts_dir,
         )
 
     logger.info("Difficulty analytics complete")

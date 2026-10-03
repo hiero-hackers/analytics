@@ -84,9 +84,9 @@ jobs:
           path: outputs/data/datasets
           key: analytics-datasets-${{ github.run_id }}
 
-      # Archive the exact snapshot the charts were drawn from. The cache above
+      # Archive the exact snapshot the data was built from. The cache above
       # serves a different purpose: it is mutable, evictable, and reachable only
-      # by the next run, so it cannot answer "what data produced this chart?".
+      # by the next run, so it cannot answer "what data produced this view?".
       # This artifact is immutable and addressable by run, and it carries
       # SNAPSHOT.json (revision, per-dataset watermarks and SHA-256s, and any
       # failed pipelines) so it describes itself without the workflow log.
@@ -108,8 +108,7 @@ jobs:
 
       # Hand-off for the archive-snapshot job: the emitted JSON API plus the
       # run's provenance manifest, staged as the exact tree the archive branch
-      # carries. Chart PNGs are excluded deliberately — heavy, and the numbers
-      # behind them are already in the JSON.
+      # carries. The JSON API is the whole published surface.
       #
       # Success-only on purpose: the durable archive must contain only what was
       # actually published, so this shares the pipeline-success gate with the
@@ -130,7 +129,7 @@ jobs:
           if-no-files-found: error
 
       # The web dashboard (web/): a static Vite build that renders the JSON
-      # data API. The app uses relative URLs, so its data and charts nest
+      # data API. The app uses relative URLs, so its data nests
       # beneath it.
       - name: Set up Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -152,7 +151,6 @@ jobs:
           mkdir -p _site/data _site/v2
           cp -R web/dist/. _site/
           cp -R outputs/data/api _site/data/api
-          cp -R outputs/charts _site/charts
           printf '<!doctype html><meta http-equiv="refresh" content="0; url=../"><link rel="canonical" href="../"><p>Moved to <a href="../">the site root</a>.</p>' > _site/v2/index.html
 
       - name: Upload Pages artifact

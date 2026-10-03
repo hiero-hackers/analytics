@@ -41,16 +41,14 @@ These helpers make it easier for titles to be consistent across the analytics co
 
 ### `chart_style.py`
 
-Defines constants controlling the appearance of charts.
+Defines the colour constants that travel with the chart data the dashboard draws:
 
-Configuration includes:
+* `REPO_CATEGORY_COLORS` — one hue per semantic repository category
+* `HIP_EVIDENCE_RAMP` — the HIP evidence levels, light to dark
+* `DIFFICULTY_COLORS` — the issue difficulty labels
+* `SEGMENT_PALETTE` — swatches ranked onto employers by `analysis.affiliation`
 
-* Default figure size and resolution
-* Default plotting style
-* Font sizes for titles, labels, ticks, and legends
-* Grid visibility and formatting
-
-These settings ensure charts share a consistent visual style across the project.
+Layout and typography belong to the web app (`web/`).
 
 ---
 
@@ -82,12 +80,11 @@ Important paths:
 * `PROJECT_ROOT`
 * `OUTPUTS_DIR`
 * `DATA_DIR`
-* `CHARTS_DIR`
 
-Utility function:
+Utility functions:
 
-* `ensure_output_dirs()`
-  Creates the required output and directories if they do not already exist.
+* `ensure_org_dirs(org)` / `ensure_repo_dirs(repo)`
+  Create and return the org- or repo-level data output directory.
 
 ---
 
