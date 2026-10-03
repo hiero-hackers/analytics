@@ -1,5 +1,9 @@
 *.csv
 .coverage
+
+# Patch files used to hand off diffs (e.g. for applying review feedback
+# outside this working copy) — never meant to be committed.
+*.patch
 # Python-generated files
 __pycache__/
 *.py[oc]
