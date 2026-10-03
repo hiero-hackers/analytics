@@ -508,7 +508,19 @@ def chart_document(
     return document
 
 
-def is_empty(document: dict) -> bool:
-    """Whether a chart document has nothing to draw (no rows, or no nodes for a network)."""
+def is_empty(document: dict, source: dict) -> bool:
+    """Whether a chart document has nothing to draw.
+
+    No rows (no nodes for a network) is always empty. A series source may also
+    declare ``hide_when_all_zero``: its rows are kept deliberately (a zero row
+    is the "not partaking" finding once anyone partakes), but a chart in which
+    every value is zero says nothing yet, so the variant stays off the card.
+    """
     content = "nodes" if document["kind"] == "network" else "rows"
-    return not document.get(content)
+    rows = document.get(content)
+    if not rows:
+        return True
+    if source.get("hide_when_all_zero") and document["kind"] in SERIES_KINDS:
+        keys = [series["key"] for series in document["series"]]
+        return all(not row[key] for row in rows for key in keys)
+    return False

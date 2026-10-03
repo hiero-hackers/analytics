@@ -532,3 +532,42 @@ def test_a_window_with_nothing_in_it_is_not_listed(tmp_path, monkeypatch):
     monkeypatch.setattr(data_api, "_read_meta", lambda _path: {"generated_at": "2026-03-01T00:00:00+00:00"})
     (section,) = data_api._org_chart_sections("org", source, tmp_path / "api" / "org")
     assert [variant["label"] for variant in section["charts"][0]["variants"]] == ["1 year"]
+
+
+def test_hide_when_all_zero_keeps_an_all_zero_chart_off_the_card(tmp_path, monkeypatch):
+    """Zero rows are kept in the data, but a chart that is all zeros is not listed when the source opts in."""
+    source = tmp_path / "source"
+    source.mkdir()
+    pd.DataFrame({"repo": ["a", "b"], "distinct_hips_merged": [0, 0]}).to_csv(source / "engagement.csv", index=False)
+    categories = {
+        "kind": "categories",
+        "file": "engagement.csv",
+        "category": "repo",
+        "category_label": "Repository",
+        "series": [{"key": "distinct_hips_merged", "label": "Distinct HIPs"}],
+        "metric": "m",
+        "unit": "u",
+        "population": "p",
+    }
+
+    def spec(**extra):
+        return {
+            "name": "HIPs",
+            "charts": {
+                "org": [
+                    {
+                        "id": "engagement",
+                        "title": "Engagement",
+                        "description": "d",
+                        "variants": [("Repositories", [("All", "engagement")])],
+                        "sources": {"engagement": {**categories, **extra}},
+                    }
+                ]
+            },
+        }
+
+    monkeypatch.setattr(data_api, "CHART_MACROS", [spec(hide_when_all_zero=True)])
+    assert data_api._org_chart_sections("org", source, tmp_path / "api" / "org") == []
+    monkeypatch.setattr(data_api, "CHART_MACROS", [spec()])
+    (section,) = data_api._org_chart_sections("org", source, tmp_path / "api2" / "org")
+    assert [variant["label"] for variant in section["charts"][0]["variants"]] == ["All"]

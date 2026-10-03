@@ -303,7 +303,7 @@ def _chart_variant(org: str, org_dir: Path, spec: dict, org_data_dir: Path, labe
         document = chart_document(source, csv_path, org, _read_meta(csv_path).get("generated_at"))
     except (ValueError, TypeError, OSError) as exc:
         raise DataApiContractError(f"Invalid chart dataset {org}/{source['file']}: {exc}") from exc
-    if is_empty(document):
+    if is_empty(document, source):
         return None
     _stamp_freshness(document, csv_path)
     document = {**variant_annotations(chart_id), **document, "id": chart_id}

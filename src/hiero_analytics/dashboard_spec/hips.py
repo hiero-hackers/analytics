@@ -108,6 +108,9 @@ CHART_MACRO = {
                         "rank": True,
                         "top_n": 15,
                         "window": "all",
+                        # Zero rows are kept (see population), but until some repository has
+                        # merged HIP work the chart would be all zeros, so it stays hidden.
+                        "hide_when_all_zero": True,
                         "metric": "hip_repo_engagement",
                         "unit": "Distinct HIPs",
                         "population": (
