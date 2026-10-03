@@ -79,42 +79,13 @@ CLI_ONLY_CHART_CARDS = {"discord"}
 # chart source or a tile loader rather than a table section) and
 # non-dashboard reports.
 CHART_COMPANION_CSVS = {
-    "affiliation_distribution.csv",
-    "affiliation_distribution_committers.csv",
-    "repo_affiliation_composition.csv",
-    "repo_affiliation_composition_committers.csv",
-    "team_affiliation_composition.csv",
-    "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
-    "contributor_activity_heatmap.csv",
-    "org_activity_heatmap.csv",
-    "team_activity_heatmap.csv",
-    "repo_activity_heatmap.csv",
-    # Bases; the shared-period variants (_7d/_30d/_365d) are derived below.
-    "difficulty_distribution.csv",
-    "difficulty_by_repo.csv",
-    "difficulty_over_time_event_based_weekly.csv",
-    "difficulty_over_time_all_event_based_weekly.csv",
-    "maintainer_activity_events.csv",
+    "difficulty_distribution.csv",  # base of the shared-period variants (_7d/_30d/_365d) derived below
+    "maintainer_activity_events.csv",  # event-level source behind the maintainer pipeline tables
     "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
-    "maintainer_pipeline_yearly.csv",
-    "maintainer_pipeline_daily.csv",
-    "maintainer_pipeline_monthly.csv",
-    "maintainer_pipeline_weekly.csv",
-    "maintainer_pipeline_by_repo.csv",
-    "maintainer_pipeline_by_repo_365d.csv",
-    "maintainer_pipeline_by_repo_30d.csv",
-    "maintainer_pipeline_by_repo_7d.csv",
-    "org_runner_status.csv",
-    "language_distribution.csv",
-    "push_activity.csv",
-    "contributor_counts.csv",
-    "hip_repo_engagement.csv",  # HIPs-tab engagement chart companion (embedded as its CSV download)
+    "org_runner_status.csv",  # per-repo runner detail behind the org runner summary
     "hip_repo_activity.csv",  # long-format source of the coverage matrix (wide CSV embeds in the page)
     "hip_summary.csv",  # per-HIP ledger data behind the funnel, process checks, and matrix (no table dup)
-    "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
     "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
-    "repo_growth_timeline.csv",  # Repo-growth timeline chart companion
-    "release_timeline.csv",  # Release-timeline chart companion (release_repo_summary.csv has its own table section)
 }
 
 
@@ -582,16 +553,15 @@ def test_every_spec_chart_source_is_produced(outputs_root: Path):
     assert not missing, f"spec lists chart datasets no pipeline produced: {sorted(set(missing))}"
 
 
-def test_no_orphan_org_level_outputs(outputs_root: Path):
-    """Everything produced at org level is spec-listed or explicitly accounted for."""
-    spec_csvs = set()
+def _spec_listed_csvs() -> set[str]:
+    """Every CSV the spec reaches: table sections (with period variants), chart sources, entity tables."""
+    listed = set()
     for spec in ALL_SECTION_SPECS:
-        spec_csvs.add(spec["file"])
+        listed.add(spec["file"])
         if spec.get("periods"):
             stem = Path(spec["file"]).stem
-            spec_csvs.update(period.filename(stem) for period in ACTIVITY_PERIODS)
-    # CSVs an interactive chart reads are spec-listed through its source.
-    spec_csvs.update(
+            listed.update(period.filename(stem) for period in ACTIVITY_PERIODS)
+    listed.update(
         name
         for macro in CHART_MACROS
         for specs in macro["charts"].values()
@@ -600,8 +570,24 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
         for name in (source["file"], source.get("edges_file"))
         if name
     )
-    # The detail views' tables are published as entity documents, not sections.
-    spec_csvs.update(entity_spec.ENTITY_FILES)
+    listed.update(entity_spec.ENTITY_FILES)
+    return listed
+
+
+def test_companion_list_names_only_unlisted_outputs():
+    """The companion allow-list may only name outputs the spec does not already reach.
+
+    Anything the spec lists through a section, a chart source or an entity table
+    is already accounted for; keeping it here too would let the orphan check
+    silently cover an output after the spec stops reading it.
+    """
+    redundant = CHART_COMPANION_CSVS & _spec_listed_csvs()
+    assert not redundant, f"companion entries the spec already lists: {sorted(redundant)}"
+
+
+def test_no_orphan_org_level_outputs(outputs_root: Path):
+    """Everything produced at org level is spec-listed or explicitly accounted for."""
+    spec_csvs = _spec_listed_csvs()
     period_suffixes = tuple(f"_{period.key}.csv" for period in ACTIVITY_PERIODS)
 
     orphans = []
