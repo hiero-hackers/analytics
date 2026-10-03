@@ -40,7 +40,7 @@ pipelines, cli          orchestration — wire a fetch → analysis → output r
   all retry/backoff/rate-limit handling; `rate_limit` is a pure policy;
   `adaptive_limiter` an AIMD concurrency limiter), ingestion (`github_ingest/`),
   persistence (`dataset_store`, `cache`, `serialization`), `models`, and
-  `governance_config`.
+  `governance_config`, and `affiliations` (the curated login -> organisation map).
 - **`analysis`** — pure transforms from record lists / DataFrames to output
   DataFrames. No network, no file I/O beyond what it is handed. This is the most
   heavily unit-tested layer and the safest to refactor.

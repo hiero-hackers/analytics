@@ -20,7 +20,6 @@ from __future__ import annotations
 import logging
 
 from hiero_analytics.analysis.affiliation import (
-    AFFILIATIONS_PATH,
     build_affiliation_distribution,
     build_org_activity_heatmap,
     build_repo_affiliation_diversity,
@@ -31,8 +30,6 @@ from hiero_analytics.analysis.affiliation import (
     build_team_org_composition,
     classify_role_holders,
     known_share_pct,
-    load_affiliations,
-    load_manual_logins,
     role_column,
     summarize_affiliation,
 )
@@ -43,6 +40,7 @@ from hiero_analytics.analysis.contributor_heatmap import (
 )
 from hiero_analytics.config.analysis import AFFILIATION_MIN_KNOWN_SHARE_PCT
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
+from hiero_analytics.data_sources.affiliations import AFFILIATIONS_PATH, load_affiliations, load_manual_logins
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
     build_team_membership,

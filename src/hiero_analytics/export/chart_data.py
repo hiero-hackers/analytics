@@ -17,9 +17,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from hiero_analytics.analysis.affiliation import load_affiliations, segment_colors
+from hiero_analytics.analysis.affiliation import segment_colors
 from hiero_analytics.analysis.maintainer_pipeline import last_calendar_buckets
 from hiero_analytics.config.charts import REPO_CATEGORY_COLORS
+from hiero_analytics.data_sources.affiliations import load_affiliations
 from hiero_analytics.domain.repo_categories import CATEGORY_ORDER
 
 FORMATS = {"year": "%Y", "month": "%Y-%m", "week": "%G-W%V-%u", "day": "%Y-%m-%d", "snapshot": "%Y-%m-%d"}
