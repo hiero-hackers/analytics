@@ -32,56 +32,24 @@
   }
  ],
  "categories": [
+  "hiero-block-node",
   "hiero-mirror-node",
   "hiero-sdk-go",
   "hiero-sdk-js",
-  "hiero-block-node",
   "hiero-cryptography",
   "hiero-enterprise-java",
   "hiero-gradle-conventions",
   "hiero-json-rpc-relay",
   "hiero-sdk-java",
   "hiero-sdk-tck",
-  "hiero-solo-action",
-  "solo",
-  "solo-charts"
+  "hiero-solo-action"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-01T09:15:03.979722+00:00"
+  "end": "2026-10-04T16:17:00.501180+00:00"
  },
  "rows": [
-  {
-   "repo": "solo-charts",
-   "time": "2026-09-24T13:14:28Z",
-   "tag_name": "v0.66.2",
-   "type": "release"
-  },
-  {
-   "repo": "solo",
-   "time": "2026-09-24T18:55:15Z",
-   "tag_name": "v0.91.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2026-09-25T15:14:14Z",
-   "tag_name": "v0.164.0-alpha1",
-   "type": "prerelease"
-  },
-  {
-   "repo": "hiero-cryptography",
-   "time": "2026-09-25T18:14:54Z",
-   "tag_name": "v3.16.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2026-09-25T18:57:16Z",
-   "tag_name": "v0.164.0-rc1",
-   "type": "prerelease"
-  },
   {
    "repo": "hiero-gradle-conventions",
    "time": "2026-09-28T07:50:09Z",
@@ -147,8 +115,32 @@
    "time": "2026-09-30T19:14:34Z",
    "tag_name": "v0.21.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-01T15:06:20Z",
+   "tag_name": "v0.164.0-rc2",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-01T17:31:45Z",
+   "tag_name": "v0.44.1-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-01T18:12:57Z",
+   "tag_name": "v0.164.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-02T19:20:07Z",
+   "tag_name": "v3.17.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-01T09:15:03.979722+00:00",
+ "generated_at": "2026-10-04T16:17:00.501180+00:00",
  "stale": false
 }

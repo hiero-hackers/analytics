@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-01T09:06:07.631629+00:00"
+  "end": "2026-10-04T16:11:54.829703+00:00"
  },
  "series": [
   {
@@ -61,7 +61,7 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 32,
+   "Unknown": 35,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -77,7 +77,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 39,
+   "Unknown": 43,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,14 +101,6 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 11,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-mirror-node",
    "Unknown": 10,
    "Good First Issue": 0,
    "Beginner": 0,
@@ -116,8 +108,16 @@
    "Advanced": 0
   },
   {
-   "repo": "hiero-sdk-cpp",
-   "Unknown": 4,
+   "repo": "hiero-mirror-node",
+   "Unknown": 7,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -133,8 +133,8 @@
   },
   {
    "repo": "hiero-sdk-java",
-   "Unknown": 2,
-   "Good First Issue": 0,
+   "Unknown": 3,
+   "Good First Issue": 2,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
@@ -149,7 +149,7 @@
   },
   {
    "repo": "hiero-sdk-python",
-   "Unknown": 4,
+   "Unknown": 3,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -164,46 +164,22 @@
    "Advanced": 0
   },
   {
-   "repo": "hiero-sdk-swift",
-   "Unknown": 3,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
    "repo": "hiero-sdk-tck",
-   "Unknown": 6,
+   "Unknown": 4,
    "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-solo-action",
-   "Unknown": 2,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-website",
-   "Unknown": 0,
-   "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
    "repo": "solo",
-   "Unknown": 13,
+   "Unknown": 15,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   }
  ],
- "generated_at": "2026-10-01T09:06:07.631629+00:00",
+ "generated_at": "2026-10-04T16:11:54.829703+00:00",
  "stale": false
 }

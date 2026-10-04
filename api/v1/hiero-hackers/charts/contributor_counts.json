@@ -1,9 +1,9 @@
 {
- "note": "Repositories ranked by distinct contributors over the last six months; bar height is the number of unique contributors. The static image shows the top 20; the interactive view and CSV hold every repository.",
+ "note": "Repositories ranked by distinct contributors over the last six months; bar height is the number of unique contributors. The chart and its CSV hold every repository.",
  "methodology": [
   "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
   "Count the distinct contributors active in each repository.",
-  "Rank the repositories by that count; the static image keeps the top 20, the CSV keeps them all."
+  "Rank the repositories by that count; the chart and the CSV keep them all."
  ],
  "schema_version": 1,
  "id": "contributor_counts",
@@ -33,7 +33,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-01T09:15:17.863069+00:00"
+  "end": "2026-10-04T16:17:12.178199+00:00"
  },
  "series": [
   {
@@ -133,6 +133,6 @@
    "contributors": 1
   }
  ],
- "generated_at": "2026-10-01T09:15:17.863069+00:00",
+ "generated_at": "2026-10-04T16:17:12.178199+00:00",
  "stale": false
 }

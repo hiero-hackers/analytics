@@ -25,8 +25,8 @@
  "frequency": "day",
  "timezone": "UTC",
  "comparison": {
-  "current": "2026-09-30",
-  "previous": "2026-09-29"
+  "current": "2026-10-03",
+  "previous": "2026-10-02"
  },
  "category": {
   "key": "bucket",
@@ -34,8 +34,8 @@
  },
  "window": {
   "kind": "calendar",
-  "first": "2026-09-25",
-  "last": "2026-10-01"
+  "first": "2026-09-28",
+  "last": "2026-10-04"
  },
  "series": [
   {
@@ -61,30 +61,6 @@
  ],
  "details": [],
  "rows": [
-  {
-   "bucket": "2026-09-25",
-   "general_user": 5,
-   "triage": 1,
-   "committer": 26,
-   "maintainer": 28,
-   "partial": false
-  },
-  {
-   "bucket": "2026-09-26",
-   "general_user": 5,
-   "triage": 0,
-   "committer": 2,
-   "maintainer": 7,
-   "partial": false
-  },
-  {
-   "bucket": "2026-09-27",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 4,
-   "partial": false
-  },
   {
    "bucket": "2026-09-28",
    "general_user": 6,
@@ -115,9 +91,33 @@
    "triage": 0,
    "committer": 6,
    "maintainer": 13,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-02",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-03",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-04",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
    "partial": true
   }
  ],
- "generated_at": "2026-10-01T09:08:21.499105+00:00",
+ "generated_at": "2026-10-04T16:12:37.374578+00:00",
  "stale": false
 }

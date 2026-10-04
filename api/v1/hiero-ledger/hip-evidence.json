@@ -1433,6 +1433,34 @@
   {
    "hip": 1300,
    "hip_title": "Increased Transaction Size for Governance Accounts",
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "pr_number": 4446,
+   "pr_title": "chore: add dep-bot-prs slash command for sweeping Dependabot PRs",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-02 10:18:33+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "bo transaction and other Solo timeouts, HIP-1300 chromium, random-key DER test) and the",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/4446"
+  },
+  {
+   "hip": 1300,
+   "hip_title": "Increased Transaction Size for Governance Accounts",
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "pr_number": 4447,
+   "pr_title": "ci: fail hung Solo test jobs fast and retry infrastructure failures",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "ancelled by a person | leave | | `main` HIP-1300 chromium test, `TypeError: Cannot read",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/4447"
+  },
+  {
+   "hip": 1300,
+   "hip_title": "Increased Transaction Size for Governance Accounts",
    "repo": "hiero-ledger/hiero-sdk-rust",
    "pr_number": 1177,
    "pr_title": "feat: add tests for hip-1300",
@@ -11835,6 +11863,20 @@
   {
    "hip": 367,
    "hip_title": "Unlimited Token Associations Per Account",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5837,
+   "pr_title": "build(deps): bump the minor-and-patch-npm-daily group across 1 directory with 10 updates",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "elationships</code> is deprecated as of HIP-367 and truncated at 1000 relationships. Re",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/5837"
+  },
+  {
+   "hip": 367,
+   "hip_title": "Unlimited Token Associations Per Account",
    "repo": "hiero-ledger/hiero-sdk-go",
    "pr_number": 930,
    "pr_title": "feat(HIP-367) Mirror Node Queries",
@@ -11959,8 +12001,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 850,
- "generated_at": "2026-10-01T09:15:34.917639+00:00",
+ "row_count": 853,
+ "generated_at": "2026-10-04T16:17:26.449197+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

@@ -136,6 +136,13 @@
    "triage": 0
   },
   {
+   "repo": "hiero-cli",
+   "maintainers": 6,
+   "active_maintainers": 1,
+   "committers": 2,
+   "triage": 0
+  },
+  {
    "repo": "awesome-contributions",
    "maintainers": 7,
    "active_maintainers": 1,
@@ -150,8 +157,8 @@
    "triage": 0
   }
  ],
- "row_count": 17,
- "generated_at": "2026-10-01T09:13:44.369807+00:00",
+ "row_count": 18,
+ "generated_at": "2026-10-04T16:15:57.684449+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -177,11 +184,25 @@
     "triage": 0
    },
    {
+    "repo": "hiero-sdk-swift",
+    "maintainers": 3,
+    "active_maintainers": 0,
+    "committers": 1,
+    "triage": 15
+   },
+   {
     "repo": "tsc-eligibility-check",
     "maintainers": 3,
     "active_maintainers": 0,
     "committers": 0,
     "triage": 0
+   },
+   {
+    "repo": "sdk-collaboration-hub",
+    "maintainers": 4,
+    "active_maintainers": 0,
+    "committers": 8,
+    "triage": 6
    },
    {
     "repo": "hiero-local-node",
@@ -203,6 +224,27 @@
     "active_maintainers": 0,
     "committers": 2,
     "triage": 12
+   },
+   {
+    "repo": "solo-charts",
+    "maintainers": 5,
+    "active_maintainers": 0,
+    "committers": 3,
+    "triage": 0
+   },
+   {
+    "repo": "solo-containers",
+    "maintainers": 5,
+    "active_maintainers": 0,
+    "committers": 3,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-consensus-specifications",
+    "maintainers": 5,
+    "active_maintainers": 0,
+    "committers": 2,
+    "triage": 0
    },
    {
     "repo": "awesome-contributions",
@@ -268,11 +310,18 @@
     "triage": 0
    },
    {
-    "repo": "hiero-sdk-swift",
+    "repo": "hiero-docs",
     "maintainers": 3,
     "active_maintainers": 1,
-    "committers": 1,
-    "triage": 15
+    "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-mirror-node-explorer",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 0,
+    "triage": 0
    },
    {
     "repo": "hiero-sdk-cpp",
@@ -296,13 +345,6 @@
     "triage": 0
    },
    {
-    "repo": "hiero-consensus-specifications",
-    "maintainers": 5,
-    "active_maintainers": 1,
-    "committers": 2,
-    "triage": 0
-   },
-   {
     "repo": "hiero-sdk-go",
     "maintainers": 5,
     "active_maintainers": 1,
@@ -315,6 +357,13 @@
     "active_maintainers": 1,
     "committers": 2,
     "triage": 0
+   },
+   {
+    "repo": "hiero-json-rpc-relay",
+    "maintainers": 7,
+    "active_maintainers": 1,
+    "committers": 14,
+    "triage": 1
    },
    {
     "repo": "hiero-ethereum-execution-spec-tests",

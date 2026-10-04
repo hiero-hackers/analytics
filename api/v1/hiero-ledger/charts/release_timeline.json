@@ -53,9 +53,9 @@
   "solo-containers",
   "hiero-solo-action",
   "hiero-sdk-cpp",
-  "hiero-sdk-tck",
   "hiero-local-node",
   "hiero-sdk-python",
+  "hiero-sdk-tck",
   "hiero-sdk-swift",
   "hiero-sdk-rust",
   "hiero-cli",
@@ -69,87 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-01T09:15:03.979722+00:00"
+  "end": "2026-10-04T16:17:00.501180+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-go",
-   "time": "2025-04-01T13:00:35Z",
-   "tag_name": "v2.59.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2025-04-01T13:17:03Z",
-   "tag_name": "v2.62.0",
-   "type": "release"
-  },
-  {
-   "repo": "solo-charts",
-   "time": "2025-04-01T13:43:57Z",
-   "tag_name": "v0.49.0",
-   "type": "release"
-  },
-  {
-   "repo": "solo-charts",
-   "time": "2025-04-01T19:51:53Z",
-   "tag_name": "v0.49.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-04-02T03:13:59Z",
-   "tag_name": "v0.127.0-rc2",
-   "type": "prerelease"
-  },
-  {
-   "repo": "hiero-mirror-node-explorer",
-   "time": "2025-04-02T08:51:53Z",
-   "tag_name": "v24.13.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2025-04-02T11:49:34Z",
-   "tag_name": "v2.63.0-beta.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "time": "2025-04-02T14:31:38Z",
-   "tag_name": "v2.53.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-tck",
-   "time": "2025-04-03T01:56:18Z",
-   "tag_name": "v0.1.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-cryptography",
-   "time": "2025-04-03T08:44:10Z",
-   "tag_name": "v1.8.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-block-node",
-   "time": "2025-04-03T15:42:29Z",
-   "tag_name": "v0.7.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-block-node",
-   "time": "2025-04-03T15:52:02Z",
-   "tag_name": "v0.8.0-rc1",
-   "type": "prerelease"
-  },
-  {
-   "repo": "solo",
-   "time": "2025-04-04T09:07:19Z",
-   "tag_name": "v0.35.2",
-   "type": "release"
-  },
   {
    "repo": "hiero-cryptography",
    "time": "2025-04-04T17:09:09Z",
@@ -5189,8 +5111,32 @@
    "time": "2026-09-30T19:14:34Z",
    "tag_name": "v0.21.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-01T15:06:20Z",
+   "tag_name": "v0.164.0-rc2",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-01T17:31:45Z",
+   "tag_name": "v0.44.1-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-01T18:12:57Z",
+   "tag_name": "v0.164.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-02T19:20:07Z",
+   "tag_name": "v3.17.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-01T09:15:03.979722+00:00",
+ "generated_at": "2026-10-04T16:17:00.501180+00:00",
  "stale": false
 }
