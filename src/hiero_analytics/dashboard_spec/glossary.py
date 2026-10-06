@@ -119,6 +119,14 @@ TERMS: dict[str, str] = {
         "team membership is not a permission."
     ),
     "organisation mix": "the employers present in the group, largest first.",
+    # --- Bot-suspects review columns --------------------------------------
+    "login": "the GitHub login flagged for review.",
+    "signal matched": (
+        "the weak automation signal that fired — one of *automation*, *actions*, *ci*, *svc*, "
+        "*service*, *auto*, or *bot* appearing as a whole segment of the login, never glued onto "
+        "a longer word — the reason it's here, not proof it's a bot. Confirmed bots move to "
+        "BOT_LOGINS by hand; confirmed people move to bot_suspect_dismissals.yaml."
+    ),
 }
 
 GLOSSARY_NOTE = (
