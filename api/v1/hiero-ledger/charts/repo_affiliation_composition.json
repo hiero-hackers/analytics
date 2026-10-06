@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-04T16:16:01.961414+00:00"
+  "end": "2026-10-06T09:13:02.804339+00:00"
  },
  "series": [
   {
@@ -164,18 +164,6 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Hashgraph": 2,
-   "LimeChain": 0,
-   "DSR Corporation": 0,
-   "Linux Foundation": 0,
-   "Hedera": 0,
-   "Hashgraph Online": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
-   "repo": "hiero-sdk-tck",
    "Hashgraph": 2,
    "LimeChain": 0,
    "DSR Corporation": 0,
@@ -499,6 +487,18 @@
    "Unknown": 0
   },
   {
+   "repo": "hiero-sdk-tck",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
    "repo": "hiero-solo-action",
    "Hashgraph": 1,
    "LimeChain": 1,
@@ -619,6 +619,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-04T16:16:01.961414+00:00",
+ "generated_at": "2026-10-06T09:13:02.804339+00:00",
  "stale": false
 }

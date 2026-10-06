@@ -34,64 +34,17 @@
  "categories": [
   "hiero-block-node",
   "hiero-mirror-node",
-  "hiero-sdk-go",
-  "hiero-sdk-js",
   "hiero-cryptography",
   "hiero-enterprise-java",
-  "hiero-gradle-conventions",
   "hiero-json-rpc-relay",
-  "hiero-sdk-java",
-  "hiero-sdk-tck",
   "hiero-solo-action"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-04T16:17:00.501180+00:00"
+  "end": "2026-10-06T09:14:03.000779+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-gradle-conventions",
-   "time": "2026-09-28T07:50:09Z",
-   "tag_name": "v0.7.12",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "time": "2026-09-28T08:06:11Z",
-   "tag_name": "v2.78.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2026-09-28T11:34:57Z",
-   "tag_name": "v2.89.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-go",
-   "time": "2026-09-28T12:56:39Z",
-   "tag_name": "v2.85.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2026-09-28T15:20:20Z",
-   "tag_name": "v2.89.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-go",
-   "time": "2026-09-29T07:31:35Z",
-   "tag_name": "v2.85.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-tck",
-   "time": "2026-09-29T08:21:11Z",
-   "tag_name": "v0.13.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-solo-action",
    "time": "2026-09-29T17:03:02Z",
@@ -139,8 +92,14 @@
    "time": "2026-10-02T19:20:07Z",
    "tag_name": "v3.17.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-05T18:03:31Z",
+   "tag_name": "v0.44.2",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-04T16:17:00.501180+00:00",
+ "generated_at": "2026-10-06T09:14:03.000779+00:00",
  "stale": false
 }

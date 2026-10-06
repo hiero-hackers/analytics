@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-04T16:12:37.460870+00:00"
+  "end": "2026-10-06T09:08:12.472740+00:00"
  },
  "series": [
   {
@@ -56,7 +56,7 @@
  "rows": [
   {
    "repo": "hiero-sdk-python",
-   "general_user": 235,
+   "general_user": 237,
    "triage": 9,
    "committer": 6,
    "maintainer": 5
@@ -77,7 +77,7 @@
   },
   {
    "repo": "hiero-sdk-cpp",
-   "general_user": 80,
+   "general_user": 82,
    "triage": 10,
    "committer": 0,
    "maintainer": 3
@@ -126,7 +126,7 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "general_user": 37,
+   "general_user": 36,
    "triage": 9,
    "committer": 1,
    "maintainer": 5
@@ -162,7 +162,7 @@
   {
    "repo": "hiero-sdk-swift",
    "general_user": 27,
-   "triage": 2,
+   "triage": 3,
    "committer": 0,
    "maintainer": 3
   },
@@ -177,8 +177,8 @@
    "repo": "hiero-sdk-tck",
    "general_user": 14,
    "triage": 3,
-   "committer": 8,
-   "maintainer": 1
+   "committer": 6,
+   "maintainer": 3
   },
   {
    "repo": "hiero-mirror-node-explorer",
@@ -195,18 +195,18 @@
    "maintainer": 4
   },
   {
+   "repo": "hiero-consensus-specifications",
+   "general_user": 19,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 4
+  },
+  {
    "repo": "hiero-sdk-rust",
    "general_user": 14,
    "triage": 5,
    "committer": 2,
    "maintainer": 2
-  },
-  {
-   "repo": "hiero-consensus-specifications",
-   "general_user": 18,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 4
   },
   {
    "repo": "hiero-enterprise-java",
@@ -318,7 +318,7 @@
    "general_user": 4,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
+   "maintainer": 2
   },
   {
    "repo": "hiero-hederium",
@@ -350,6 +350,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-04T16:12:37.460870+00:00",
+ "generated_at": "2026-10-06T09:08:12.472740+00:00",
  "stale": false
 }

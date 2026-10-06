@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-10-04T16:17:26.452506+00:00"
+  "end": "2026-10-06T09:14:32.515108+00:00"
  },
  "series": [
   {
@@ -59,43 +59,49 @@
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
    "matched_prs": 228,
-   "total_prs": 5184
+   "total_prs": 5195
   },
   {
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 35,
    "matched_prs": 194,
-   "total_prs": 3641
+   "total_prs": 3644
   },
   {
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 14,
    "matched_prs": 38,
-   "total_prs": 1109
+   "total_prs": 1111
   },
   {
    "repo": "hiero-sdk-go",
    "distinct_hips_merged": 14,
    "matched_prs": 24,
-   "total_prs": 477
+   "total_prs": 478
   },
   {
    "repo": "solo",
    "distinct_hips_merged": 13,
    "matched_prs": 13,
-   "total_prs": 2405
+   "total_prs": 2424
   },
   {
    "repo": "hiero-sdk-java",
    "distinct_hips_merged": 13,
    "matched_prs": 27,
-   "total_prs": 608
+   "total_prs": 611
   },
   {
    "repo": "hiero-sdk-cpp",
    "distinct_hips_merged": 13,
    "matched_prs": 15,
-   "total_prs": 503
+   "total_prs": 504
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "distinct_hips_merged": 12,
+   "matched_prs": 13,
+   "total_prs": 1376
   },
   {
    "repo": "hiero-sdk-swift",
@@ -104,16 +110,10 @@
    "total_prs": 138
   },
   {
-   "repo": "hiero-json-rpc-relay",
-   "distinct_hips_merged": 11,
-   "matched_prs": 12,
-   "total_prs": 1374
-  },
-  {
    "repo": "hiero-mirror-node-explorer",
    "distinct_hips_merged": 11,
    "matched_prs": 16,
-   "total_prs": 1032
+   "total_prs": 1033
   },
   {
    "repo": "hiero-sdk-rust",
@@ -137,7 +137,7 @@
    "repo": "hiero-block-node",
    "distinct_hips_merged": 4,
    "matched_prs": 9,
-   "total_prs": 1602
+   "total_prs": 1608
   },
   {
    "repo": "hiero-website",
@@ -191,13 +191,13 @@
    "repo": "hiero-gradle-conventions",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 407
+   "total_prs": 411
   },
   {
    "repo": "hiero-cryptography",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 377
+   "total_prs": 382
   },
   {
    "repo": "hiero-enterprise-java",
@@ -215,7 +215,7 @@
    "repo": "heka-identity-platform",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 119
+   "total_prs": 121
   },
   {
    "repo": "hiero-hederium",
@@ -302,6 +302,6 @@
    "total_prs": 4
   }
  ],
- "generated_at": "2026-10-04T16:17:26.452506+00:00",
+ "generated_at": "2026-10-06T09:14:32.515108+00:00",
  "stale": false
 }

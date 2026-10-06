@@ -31,13 +31,6 @@
  ],
  "rows": [
   {
-   "repo": "hiero-sdk-tck",
-   "maintainers": 2,
-   "active_maintainers": 0,
-   "committers": 9,
-   "triage": 7
-  },
-  {
    "repo": "hiero-hederium",
    "maintainers": 2,
    "active_maintainers": 0,
@@ -148,27 +141,13 @@
    "active_maintainers": 1,
    "committers": 0,
    "triage": 0
-  },
-  {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "maintainers": 12,
-   "active_maintainers": 1,
-   "committers": 13,
-   "triage": 0
   }
  ],
- "row_count": 18,
- "generated_at": "2026-10-04T16:15:57.684449+00:00",
+ "row_count": 16,
+ "generated_at": "2026-10-06T09:12:55.092147+00:00",
  "stale": false,
  "periods": {
   "7d": [
-   {
-    "repo": "hiero-sdk-tck",
-    "maintainers": 2,
-    "active_maintainers": 0,
-    "committers": 9,
-    "triage": 7
-   },
    {
     "repo": "hiero-hederium",
     "maintainers": 2,
@@ -317,13 +296,6 @@
     "triage": 0
    },
    {
-    "repo": "hiero-mirror-node-explorer",
-    "maintainers": 3,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
-   },
-   {
     "repo": "hiero-sdk-cpp",
     "maintainers": 3,
     "active_maintainers": 1,
@@ -357,30 +329,9 @@
     "active_maintainers": 1,
     "committers": 2,
     "triage": 0
-   },
-   {
-    "repo": "hiero-json-rpc-relay",
-    "maintainers": 7,
-    "active_maintainers": 1,
-    "committers": 14,
-    "triage": 1
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 13,
-    "triage": 0
    }
   ],
   "30d": [
-   {
-    "repo": "hiero-sdk-tck",
-    "maintainers": 2,
-    "active_maintainers": 0,
-    "committers": 9,
-    "triage": 7
-   },
    {
     "repo": "hiero-hederium",
     "maintainers": 2,
@@ -513,13 +464,6 @@
     "active_maintainers": 1,
     "committers": 30,
     "triage": 1
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 13,
-    "triage": 0
    }
   ],
   "365d": [
@@ -545,24 +489,10 @@
     "triage": 3
    },
    {
-    "repo": "hiero-sdk-tck",
-    "maintainers": 2,
-    "active_maintainers": 1,
-    "committers": 9,
-    "triage": 7
-   },
-   {
     "repo": "tsc-eligibility-check",
     "maintainers": 3,
     "active_maintainers": 1,
     "committers": 0,
-    "triage": 0
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 13,
     "triage": 0
    }
   ]

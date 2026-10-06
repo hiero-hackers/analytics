@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-10-04T16:12:37.439432+00:00"
+  "end": "2026-10-06T09:08:12.423918+00:00"
  },
  "series": [
   {
@@ -76,7 +76,7 @@
   },
   {
    "repo": "hiero-sdk-python",
-   "general_user": 253,
+   "general_user": 255,
    "triage": 11,
    "committer": 6,
    "maintainer": 5
@@ -132,7 +132,7 @@
   },
   {
    "repo": "hiero-sdk-cpp",
-   "general_user": 99,
+   "general_user": 101,
    "triage": 12,
    "committer": 0,
    "maintainer": 3
@@ -173,18 +173,18 @@
    "maintainer": 4
   },
   {
+   "repo": "hiero-sdk-swift",
+   "general_user": 51,
+   "triage": 4,
+   "committer": 0,
+   "maintainer": 3
+  },
+  {
    "repo": "hiero-cli",
    "general_user": 49,
    "triage": 0,
    "committer": 2,
    "maintainer": 6
-  },
-  {
-   "repo": "hiero-sdk-swift",
-   "general_user": 51,
-   "triage": 3,
-   "committer": 0,
-   "maintainer": 3
   },
   {
    "repo": "hiero-sdk-rust",
@@ -197,8 +197,8 @@
    "repo": "hiero-sdk-tck",
    "general_user": 26,
    "triage": 5,
-   "committer": 9,
-   "maintainer": 2
+   "committer": 7,
+   "maintainer": 4
   },
   {
    "repo": "sdk-collaboration-hub",
@@ -244,7 +244,7 @@
   },
   {
    "repo": "hiero-consensus-specifications",
-   "general_user": 18,
+   "general_user": 19,
    "triage": 0,
    "committer": 0,
    "maintainer": 4
@@ -331,7 +331,7 @@
    "general_user": 4,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
+   "maintainer": 2
   },
   {
    "repo": "solo-charts",
@@ -355,6 +355,6 @@
    "maintainer": 2
   }
  ],
- "generated_at": "2026-10-04T16:12:37.439432+00:00",
+ "generated_at": "2026-10-06T09:08:12.423918+00:00",
  "stale": false
 }

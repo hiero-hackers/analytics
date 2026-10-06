@@ -97,12 +97,12 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-04T16:16:07.020221+00:00"
+  "end": "2026-10-06T09:13:08.172553+00:00"
  },
  "rows": [
   {
    "repo": "hiero-sdk-java",
-   "score": 8.2,
+   "score": 8.3,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -116,13 +116,13 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 6.0
+   "SAST": 7.0
   },
   {
    "repo": "hiero-improvement-proposals",
-   "score": 8.7,
+   "score": 8.8,
    "Maintained": 10.0,
-   "Code-Review": 7.0,
+   "Code-Review": 8.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
@@ -138,12 +138,12 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "score": 9.0,
+   "score": 8.8,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 10.0,
+   "Binary-Artifacts": 9.0,
    "Token-Permissions": 10.0,
    "Pinned-Dependencies": 9.0,
    "Fuzzing": 10.0,
@@ -152,7 +152,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 5.0,
    "Packaging": 10.0,
-   "SAST": 7.0
+   "SAST": 6.0
   },
   {
    "repo": "hiero-sdk-js",
@@ -170,7 +170,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 9.0
+   "SAST": 10.0
   },
   {
    "repo": "hiero-cli",
@@ -331,7 +331,7 @@
    "Signed-Releases": null,
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
-   "Packaging": 10.0,
+   "Packaging": null,
    "SAST": 9.0
   },
   {
@@ -552,7 +552,7 @@
   },
   {
    "repo": "hiero-did-sdk-js",
-   "score": 6.1,
+   "score": 6.0,
    "Maintained": 0.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 0.0,
@@ -566,7 +566,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 9.0
+   "SAST": 8.0
   },
   {
    "repo": "hiero-enterprise-java",
@@ -659,6 +659,6 @@
    "SAST": 7.0
   }
  ],
- "generated_at": "2026-10-04T16:16:07.020221+00:00",
+ "generated_at": "2026-10-06T09:13:08.172553+00:00",
  "stale": false
 }

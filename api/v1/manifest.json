@@ -381,10 +381,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-04T16:18:29.270095+00:00",
+ "generated_at": "2026-10-06T09:15:42.470465+00:00",
  "provenance": {
   "git_sha": "62a5652",
-  "data_as_of": "2026-09-30T15:42:55.591830+00:00"
+  "data_as_of": "2026-10-06T09:06:07.310814+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -393,7 +393,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1476,
+     "row_count": 1481,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -407,7 +407,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 18,
+     "row_count": 16,
      "path": "hiero-ledger/understaffed.json"
     },
     {
@@ -442,7 +442,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2848,
+     "row_count": 2859,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -1167,7 +1167,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-04T16:17:26.455301+00:00"
+      "generated_at": "2026-10-06T09:14:32.519583+00:00"
      }
     },
     {
@@ -1243,7 +1243,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-04T16:17:26.452506+00:00"
+      "generated_at": "2026-10-06T09:14:32.515108+00:00"
      }
     },
     {
@@ -1530,7 +1530,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1476,
+      "value": 1481,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1705,7 +1705,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1476
+     "count": 1481
     }
    }
   },
@@ -2096,6 +2096,13 @@
          "interactive": {
           "kind": "categories",
           "path": "hiero-hackers/charts/difficulty_by_repo_30d.json"
+         }
+        },
+        {
+         "label": "Week",
+         "interactive": {
+          "kind": "categories",
+          "path": "hiero-hackers/charts/difficulty_by_repo_7d.json"
          }
         }
        ],

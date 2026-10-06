@@ -182,16 +182,6 @@
    "organisations": "Hashgraph"
   },
   {
-   "repo": "hiero-sdk-tck",
-   "maintainers": 2,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 100,
-   "independent": 0,
-   "unknown": 0,
-   "organisations": "Hashgraph"
-  },
-  {
    "repo": "hiero-consensus-node",
    "maintainers": 16,
    "distinct_orgs": 2,
@@ -310,6 +300,16 @@
    "independent": 0,
    "unknown": 0,
    "organisations": "LimeChain, Hashgraph"
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "maintainers": 4,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 67,
+   "independent": 0,
+   "unknown": 1,
+   "organisations": "Hashgraph, LimeChain"
   },
   {
    "repo": "hiero-website",
@@ -484,7 +484,7 @@
  ],
  "row_count": 44,
  "label": "Maintainers",
- "generated_at": "2026-10-04T16:16:01.984620+00:00",
+ "generated_at": "2026-10-06T09:13:02.848937+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -672,16 +672,6 @@
      "organisations": "Hashgraph"
     },
     {
-     "repo": "hiero-sdk-tck",
-     "maintainers": 2,
-     "distinct_orgs": 1,
-     "top_org": "Hashgraph",
-     "top_org_pct": 100,
-     "independent": 0,
-     "unknown": 0,
-     "organisations": "Hashgraph"
-    },
-    {
      "repo": "hiero-consensus-node",
      "maintainers": 16,
      "distinct_orgs": 2,
@@ -800,6 +790,16 @@
      "independent": 0,
      "unknown": 0,
      "organisations": "LimeChain, Hashgraph"
+    },
+    {
+     "repo": "hiero-sdk-tck",
+     "maintainers": 4,
+     "distinct_orgs": 2,
+     "top_org": "Hashgraph",
+     "top_org_pct": 67,
+     "independent": 0,
+     "unknown": 1,
+     "organisations": "Hashgraph, LimeChain"
     },
     {
      "repo": "hiero-website",
@@ -974,7 +974,7 @@
    ],
    "row_count": 44,
    "label": "Maintainers",
-   "generated_at": "2026-10-04T16:16:01.984620+00:00",
+   "generated_at": "2026-10-06T09:13:02.848937+00:00",
    "stale": false
   },
   {
@@ -1323,7 +1323,7 @@
    ],
    "row_count": 30,
    "label": "Committers",
-   "generated_at": "2026-10-04T16:16:02.009529+00:00",
+   "generated_at": "2026-10-06T09:13:02.894063+00:00",
    "stale": false
   }
  ],
