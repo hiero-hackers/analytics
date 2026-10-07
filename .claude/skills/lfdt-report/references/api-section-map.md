@@ -20,7 +20,7 @@ Per org, `orgs[org]` holds:
 
 | Key | What it is |
 |---|---|
-| `sections` | Table documents: `id`, `macro`, `title`, `row_count` (all-time rows), `path`, sometimes `absorbed_by`. The document may carry `periods` (`7d`, `30d`, `365d`) with their own rows |
+| `sections` | Table documents: `id`, `macro`, `title`, `row_count` (all-time rows), `path`, sometimes `absorbed_by`. The document may carry `periods`: `{"7d": rows, "30d": rows, "365d": rows}`, plain row lists with the same columns; their count is the list length |
 | `chart_sections` | Cards of charts. Each chart has `variants[]`; a variant's `interactive` gives `kind` and `path`, plus its own `note` and `methodology` |
 | `views` | Bespoke views (the HIPs board and coverage matrix) |
 | `metrics` | `Record<macro, tile[]>`: a list of headline tiles per macro, each `label`, `value`, `note`, `methodology`; no id |

@@ -28,9 +28,10 @@ being told. Check each one every run; the dates say when they were last seen.
   `hip-evidence` table is the PR-level backing for every HIP figure; the
   `hip-unknown` table lists PRs citing a HIP number that is not in the spec
   list, which is a data-quality caveat worth one line.
-- **Two issue-queue documents can disagree.** `issue-difficulty` "By repo"
-  is a snapshot of open issues per repo; "Over time (weekly)" is event-based
-  and can give a different open count on the same day. Report both with
+- **Two issue-queue documents disagree, by a lot.** `issue-difficulty` "By
+  repo" is a snapshot of open issues per repo; "Over time (weekly)" is
+  event-based. On 2026-10-06 they gave 4,336 and 1,714 open issues for
+  hiero-ledger on the same day. Report both with
   their variant titles (SKILL.md step 5, rule 5).
 - **TSC review counts are not published, but TSC activity is.** The
   `tscrepo` section (Governance) shows which repos TSC members work in and
@@ -68,6 +69,13 @@ Report both sides with their ids; never pick one silently.
   Association and Hashgraph Online are separate rows, and a mapping error
   can surface as an employer literally named "contributor". Do not merge
   them; list them as a data defect in the appendix.
-- Methodology text can name a variant that is not published (the yearly
-  pipeline cites an "active at year end" variant). Cite only what the
-  manifest lists.
+- Single-employer teams: `teamdiversity` rows with `distinct_orgs == 1`
+  (40 on 2026-10-06) vs the `org-diversity` "Single-employer teams by org"
+  chart (27), for the same independents reason as repos.
+- Methodology text can be wrong about its own document: the yearly
+  pipeline cites an "active at year end" variant that is not published,
+  and the `affiliation_donut` methodology says only the two largest
+  employers are kept while the document holds every employer (`top_n` 10
+  is the display cut). Cite only what the manifest lists and the document
+  holds; note the mismatch as a data defect.
+- Repo ids are slugs: `.github` appears as `_github`.

@@ -38,9 +38,12 @@ contract. A gap is reported, not fixed.
   first month and say so. If the data stops before the period ends (a draft
   run early, so every bucket in the period is `partial`), the header must
   say "draft against data to <date>; re-run after <period end>", the
-  partial buckets are shown but compared with nothing, and the only
-  year-over-year comparison you may make is between the two complete years
-  before the period. Never extrapolate.
+  partial buckets are shown but compared with nothing. Year-over-year on
+  whole years is then only possible between the two complete years before
+  the period. Complete *months* inside the period may still be compared
+  like-for-like with the same months a year earlier where a series covers
+  both (release events do; the monthly pipeline holds twelve months and
+  does not). Name the months. Never extrapolate.
 - **Is a TAC report the right artefact?** Only LFDT projects file one. For
   any other org in the manifest (e.g. `hiero-hackers`) the draft is an
   API-coverage exercise in the TAC's shape, useful for finding gaps, and the
@@ -49,7 +52,9 @@ contract. A gap is reported, not fixed.
   governance repo publishes every report at
   `https://raw.githubusercontent.com/lf-decentralized-trust/governance/main/tac/project-updates/<year>/<file>.md`
   (names: `YYYY-annual-Hiero.md`, `YYYY-MidYear-Hiero.md`; list the directory
-  with the GitHub contents API if unsure of the case). The prior report has
+  with the GitHub contents API if unsure of the case). For an annual the
+  prior report is last year's annual, in the `<filing year - 1>/`
+  directory; for a mid-year it is this year's annual, in `<filing year>/`. The prior report has
   two goals tables; copy the *forward-looking* one (its "{YEAR-1} Year's
   Goals", or for a mid-year the annual's goals for this year) verbatim into
   the "Performance Against Prior Goals" slot so the maintainer answers
@@ -128,7 +133,8 @@ Rules while reading the manifest:
   (the `1 year` and `All time` windows both cover its whole life); say so
   once and cite one.
 - **`row_count` is the all-time table.** Sections with `periods` carry
-  separate `7d`, `30d` and `365d` tables with their own row counts, and they
+  separate `7d`, `30d` and `365d` tables (`periods` is a dict of row lists
+  with the same columns; their row count is the list length) and they
   differ (on 2026-10-06 `understaffed` had 16 all-time rows, 4 in `365d`,
   26 in `7d`; `gonedark` 14 all-time and 81 in `365d`). For an annual report
   cite the `365d` table and its row count; for a mid-year cite `365d` and say
@@ -207,7 +213,8 @@ Time series:
   period's" releases or HIP activity: the funnel is cohort-based, heatmaps
   cover six months, release windows are trailing. Count releases in the
   period from the `release-timeline` events document (`Last 18 months`
-  variant, filter rows by `published_at`, state whether prereleases are
+  variant; rows carry `repo`, `tag_name`, `time` and `type`, which is
+  `release` or `prerelease`; filter on `time`, state whether prereleases are
   included) and say you derived it.
 - **Org-wide concentration is not published.** HHI, largest-org share and
   single-employer flags exist per repo and per team only. Do not state an
@@ -226,8 +233,9 @@ Follow the template in `references/report-structure.md`. Rules:
    dashboard deep link
    (`https://hiero-hackers.github.io/analytics/#tab=<Macro>&org=<org>&widget=<id>`).
    A short `Source:` line under each block beats inline clutter. Define
-   `BASE` once in the header and write paths relative to it; repeat the
-   data-as-of date only where a document's own `generated_at` differs. Charts are
+   `BASE` (the API root) and `DASH` (the dashboard root) once in the header
+   and write paths relative to them; repeat the data-as-of date only where
+   a document's own `generated_at` differs. Charts are
    drawn from JSON, so there are no image URLs; if the maintainer wants a
    figure, say which chart to print from the dashboard's print button.
 2. **Never write a judgment section yourself.** Progress against goals, next
@@ -256,10 +264,24 @@ Follow the template in `references/report-structure.md`. Rules:
    or two paragraphs that say what the numbers show, at most one short table
    of headline figures, and one `Source:` line. Everything longer (per-repo
    releases, HIP evidence rows, employer breakdowns beyond the top few) goes
-   in "Appendix: Supporting tables", referenced from the body. Plain prose,
+   in "Appendix: Supporting tables", referenced from the body. The prior
+   report's goals table inside the goals slot is exempt: it stays where the
+   maintainer will edit it, and it is quoted, not written. Aim for the
+   filed review's shape: around 2,500 words of body, about thirty
+   paragraphs of three to five sentences, two or three tables. Plain prose,
    no emoji, no hype, no headings the template does not have.
 8. **Start the file with the SPDX line** the governance repo requires:
    `[//]: # (SPDX-License-Identifier: CC-BY-4.0)`.
+9. **Two or three figures, not more.** Render them from the chart documents
+   with `scripts/render_figure.py` as described in `references/figures.md`
+   (active contributors by role per year, maintainers by employer, and the
+   repository count are the defaults), save them in `figures/` beside the
+   draft, and embed each with alt text, an italic caption and a `Source:`
+   line. Then run `scripts/export_report.py` to produce the PNG figures
+   (GitHub attachments do not accept SVG) and a PDF review copy of the
+   draft; both are companions, the markdown is what gets filed. Tell the
+   maintainer in the hand-back how the images get hosted when the report is
+   filed.
 
 ## 6. Data Gaps appendix
 
@@ -283,6 +305,9 @@ what is and is not counted, and the documents that disagree with each other.
   link. Deep links cannot be checked with curl (the dashboard is a
   single-page app and returns the shell for every hash); say they are
   unverified if you could not open one in a browser.
+- Open each figure (or describe it from its SVG) and check the partial
+  bucket is hollow, the series legend is right and the subtitle matches the
+  document's population.
 - Count the `[MAINTAINER INPUT]` slots and list them at the end of your reply,
   so the maintainer knows exactly what is theirs to write.
 - Run `git status`: no tracked file may have changed.
@@ -291,6 +316,8 @@ what is and is not counted, and the documents that disagree with each other.
   plainly that it is untracked. Do not put it under `outputs/`, which is
   gitignored and regenerated by the pipelines, so a hand-finished report there
   can be lost without warning.
+- List every file produced: the markdown, the `figures/` SVGs and PNGs,
+  and the PDF, with the one-line reminder that only the markdown is filed.
 - Report which manifest the draft ran against (`generated_at`, `git_sha`).
 - Do not commit, push, or open a PR. Maintainers file the report with LFDT,
   which means adding it under `tac/project-updates/<year>/` and updating the

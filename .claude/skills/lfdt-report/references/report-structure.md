@@ -93,6 +93,7 @@ sources; leave the narrative tone to the maintainer.
 ### GH Organization Overview                                        (Hiero 2026)
 (data) Repository count, contributor base, and activity trend. Questions:
 "consistent or increasing contribution activity".
+Figure 1: active contributors by role per year (see figures.md).
 
 ### Deliverables                                                    (added)
 (data) Releases (cadence, staleness, repos that shipped) and HIP implementation
@@ -119,6 +120,7 @@ figures only; detail rows go to the supporting-tables appendix.
 (data) Roles, employer diversity, concentration, and the active-maintainer
 trend, with the affiliation known-share tiles beside every employer figure.
 Annual question 5 / mid-year question 5.
+Figure 2: maintainers by employer, known share in the caption.
 > [MAINTAINER INPUT] What is being done about it.
 
 ## Project Adoption                                                 (Hiero 2026)
