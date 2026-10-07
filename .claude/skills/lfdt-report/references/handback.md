@@ -5,7 +5,9 @@ they can skim it. Nothing in it repeats the draft.
 
 ```
 Draft status: data to 6 October 2026; re-run after 31 December 2026 before filing.
-                                   (or: complete period, ready to fill in)
+   (or: complete period, ready to fill in)
+   (or: complete period; figures that name no month are snapshots at 6 October 2026)
+Due: 3 September 2026 per the 2026 schedule (past due by 5 weeks)   <- from inventory.py tac
 
 Files
 - <path>/2027-annual-Hiero.md          the draft (what gets filed)
@@ -31,7 +33,8 @@ To file
 2. Upload figures/*.png to the governance PR (drag into the description),
    replace each ![...](figures/...) line with the <img> GitHub inserts.
 3. Add the file under tac/project-updates/2027/ and the mkdocs.yml nav
-   entry under 2027 → 1H. Open the PR against lf-decentralized-trust/governance.
+   entry under 2027 → Annual (or → MidYear; match the live nav). Open the
+   PR against lf-decentralized-trust/governance.
 
 Data defects seen this run (candidates for analytics issues; see the
 Data notes appendix for ids)

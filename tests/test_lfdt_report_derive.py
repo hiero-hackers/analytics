@@ -95,23 +95,26 @@ def _section_doc() -> dict:
 
 
 def _evidence_doc() -> dict:
-    """HIP evidence where HIP 1 and 2 count as merged, 3 is open only, 4 is excluded by its cue, 5 is Deferred."""
+    """HIP evidence where HIP 1 and 2 count as merged, 3 is open only, 4 is excluded by its cue, 5 is Deferred.
 
-    def row(hip: int, state: str, counted: bool) -> dict:
+    Merge dates: HIP 1 in 2026-01 and 2025-11, HIP 2 at the last second of 2026-06, HIP 5 at the first second of 2026-07.
+    """
+
+    def row(hip: int, state: str, counted: bool, merged: str | None = None) -> dict:
         """One evidence row."""
-        return {"hip": hip, "pr_state": state, "counted": counted, "pr_number": hip * 10}
+        return {"hip": hip, "pr_state": state, "counted": counted, "pr_number": hip * 10, "pr_merged_at": merged}
 
     return {
         "id": "hip-evidence",
         "generated_at": "2026-10-06T09:14:32+00:00",
         "rows": [
-            row(1, "MERGED", True),
-            row(1, "MERGED", True),  # a second merged PR must not count the HIP twice
-            row(2, "MERGED", True),
+            row(1, "MERGED", True, "2026-01-15 10:00:00+00:00"),
+            row(1, "MERGED", True, "2025-11-02 10:00:00+00:00"),  # a second merged PR must not count the HIP twice
+            row(2, "MERGED", True, "2026-06-30 23:59:59+00:00"),
             row(2, "OPEN", True),
             row(3, "OPEN", True),
-            row(4, "MERGED", False),
-            row(5, "MERGED", True),
+            row(4, "MERGED", False, "2026-02-01 00:00:00+00:00"),
+            row(5, "MERGED", True, "2026-07-01 00:00:00+00:00"),
         ],
     }
 
@@ -174,9 +177,17 @@ def _team_diversity_doc() -> dict:
     }
 
 
-def _hips(derive, evidence: dict, funnel: dict | None = None, cohort: str = "all specs", board: dict | None = None):
+def _hips(
+    derive,
+    evidence: dict,
+    funnel: dict | None = None,
+    cohort: str = "all specs",
+    board: dict | None = None,
+    start: str | None = None,
+    end: str | None = None,
+):
     """Run hips_report with fixed file names for the documents."""
-    return derive.hips_report(evidence, "evidence.json", funnel, "funnel.json", cohort, board, "board.json")
+    return derive.hips_report(evidence, "evidence.json", funnel, "funnel.json", cohort, board, "board.json", start, end)
 
 
 def _last(lines: list[str]) -> str:
@@ -277,29 +288,64 @@ def test_months_min_and_max_carry_their_month(derive):
     out = derive.months_report(_monthly_doc(), "m.json", "2026-01", "2026-04", None)
     assert "| Alpha | 15 | 2026-02 | 30 | 2026-03 |" in out
     assert "| Beta | 2 | 2026-01 (+1 tied) | 5 | 2026-03 |" in out
+    assert "| Total (sum of series) | 17 | 2026-02 | 35 | 2026-03 |" in out  # 15+2 and 30+5
 
 
 def test_months_compare_prints_requested_months(derive):
     """--compare months are printed with every series value, even when they lie outside the range."""
     out = derive.months_report(_monthly_doc(), "m.json", "2026-01", "2026-03", ["2025-12"])
     assert "Comparison months (as asked with --compare):" in out
-    assert "| 2025-12 | 10 | 1 |" in out
+    assert "| 2025-12 | 10 | 1 | 11 |" in out
     assert "comparison months 2025-12 read from the same document" in _last(out)
 
 
 def test_months_compare_refuses_a_partial_or_absent_month(derive):
     """A partial or missing comparison month is named and shows no values, so it cannot be compared by accident."""
     out = derive.months_report(_monthly_doc(), "m.json", "2026-01", "2026-03", ["2026-04", "2019-01"])
-    assert "| 2026-04 (partial, not used) | n/a | n/a |" in out
-    assert "| 2019-01 (not in the document) | n/a | n/a |" in out
+    assert "| 2026-04 (partial, not used) | n/a | n/a | n/a |" in out
+    assert "| 2019-01 (not in the document) | n/a | n/a | n/a |" in out
 
 
 def test_months_prints_the_documents_own_comparison_as_adjacent_buckets(derive):
     """The document's comparison pair is printed, labelled as two adjacent buckets and never as since-last-report."""
     out = derive.months_report(_monthly_doc(), "m.json", "2026-01", "2026-03", None)
     assert any("two adjacent buckets" in line and "not 'since the last report'" in line for line in out)
-    assert "| 2026-02 (previous) | 15 | 2 |" in out
-    assert "| 2026-03 (current) | 30 | 5 |" in out
+    assert "| 2026-02 (previous) | 15 | 2 | 17 |" in out
+    assert "| 2026-03 (current) | 30 | 5 | 35 |" in out
+
+
+def test_months_adds_a_per_month_total_column(derive):
+    """Each month's row ends with the sum of its series, under a plain label when people are not stated as disjoint."""
+    out = derive.months_report(_monthly_doc(), "m.json", "2026-01", "2026-03", None)
+    assert out[0] == "| Month | Alpha | Beta | Total (sum of series) |"
+    assert out[2:5] == ["| 2026-01 | 20 | 2 | 22 |", "| 2026-02 | 15 | 2 | 17 |", "| 2026-03 | 30 | 5 | 35 |"]
+    assert "Total (sum of series) is the sum of the series within a single month" in _last(out)
+    assert "never summed across months" in _last(out)
+
+
+def test_months_total_is_labelled_distinct_people_only_when_the_document_counts_each_person_once(derive):
+    """The people wording is used only when the population statement says each person is counted once per bucket."""
+    doc = _monthly_doc()
+    doc["population"] = "Each person is counted once per bucket under the highest governance role they hold."
+    out = derive.months_report(doc, "m.json", "2026-01", "2026-03", None)
+    assert out[0] == "| Month | Alpha | Beta | Total (distinct people, all roles) |"
+    assert any(line.startswith("| Total (distinct people, all roles) | 17 |") for line in out)
+    assert "valid because the document counts each person once per bucket" in _last(out)
+    assert "never summed across months" in _last(out)
+    doc["population"] = "A person may appear in several buckets."
+    assert derive.months_report(doc, "m.json", "2026-01", "2026-03", None)[0].endswith("| Total (sum of series) |")
+
+
+def test_months_total_is_not_shown_for_a_missing_value_or_a_single_series(derive):
+    """A month with a missing series value has no total, and a one-series document gets no Total column."""
+    doc = _monthly_doc()
+    doc["rows"][2]["b"] = None  # 2026-02
+    out = derive.months_report(doc, "m.json", "2026-01", "2026-03", None)
+    assert "| 2026-02 | 15 | n/a | n/a |" in out
+    assert "| Total (sum of series) | 22 | 2026-01 | 35 | 2026-03 |" in out  # 2026-02 is left out of min and max
+    single = _monthly_doc()
+    single["series"] = single["series"][:1]
+    assert derive.months_report(single, "m.json", "2026-01", "2026-03", None)[0] == "| Month | Alpha |"
 
 
 def test_months_without_a_comparison_pair_says_so(derive):
@@ -340,7 +386,24 @@ def test_period_counts_every_table(derive):
     assert "| 7d | 3 |" in out
     assert "| 30d | 2 |" in out
     assert "| 365d | 1 |" in out
-    assert _last(out).startswith("Derived: 1 rows in the 365d table of understaffed")
+    assert out[-2].startswith("Derived: 1 rows in the 365d table of understaffed")
+
+
+def test_period_without_filters_ends_with_a_where_hint_listing_columns(derive):
+    """With no --where the output ends with a hint naming the column keys; with one it does not."""
+    out = derive.period_report(_section_doc(), "s.json", "all", [])
+    assert (
+        _last(out)
+        == "add --where COL=VALUE to count matching rows; columns: repo, maintainers, active_maintainers, flag"
+    )
+    no_columns = _section_doc()
+    del no_columns["columns"]
+    assert _last(derive.period_report(no_columns, "s.json", "all", [])).endswith(
+        "columns: repo, maintainers, active_maintainers, flag"
+    )
+    filtered = derive.period_report(_section_doc(), "s.json", "all", ["maintainers=>1"])
+    assert not any(line.startswith("add --where") for line in filtered)
+    assert _last(filtered).startswith("Derived:")
 
 
 def test_period_where_numeric_comparison(derive):
@@ -512,6 +575,82 @@ def test_hips_rejects_a_document_without_evidence_columns(derive):
         _hips(derive, {"id": "x", "rows": [{"hip": 1, "pr_state": "MERGED"}]})
 
 
+def test_hips_scopes_evidence_by_merge_month_inclusively(derive):
+    """Only counted merged rows whose pr_merged_at month is in the range count; both edges are inclusive."""
+    out = _hips(derive, _evidence_doc(), start="2026-01", end="2026-06")
+    assert "| Rows with counted = true and pr_state = MERGED | 4 |" in out
+    assert "| ...of those, rows whose pr_merged_at month is 2026-01 to 2026-06 | 2 |" in out  # Jan and 30 June only
+    assert "| Distinct HIP numbers among the 2026-01 to 2026-06 rows | 2 |" in out  # HIP 5 merged on 1 July is out
+
+
+def test_hips_range_excludes_hips_whose_only_merges_are_outside_it(derive):
+    """A HIP merged only before or after the range is not counted, and a HIP merged in and out counts once."""
+    out = _hips(derive, _evidence_doc(), start="2025-11", end="2025-11")
+    assert "| Distinct HIP numbers among the 2025-11 to 2025-11 rows | 1 |" in out  # HIP 1's earlier PR
+    out = _hips(derive, _evidence_doc(), start="2026-07", end="2026-07")
+    assert "| Distinct HIP numbers among the 2026-07 to 2026-07 rows | 1 |" in out  # HIP 5 only
+
+
+def test_hips_range_derived_line_names_range_and_field(derive):
+    """The Derived line states the range, the date field used, and the row counts."""
+    derived = _last(_hips(derive, _evidence_doc(), start="2026-01", end="2026-06"))
+    assert derived.startswith("Derived: 2 distinct HIP numbers have at least one row with counted = true")
+    assert "whose pr_merged_at month is 2026-01 to 2026-06 inclusive" in derived
+    assert "(2 such rows of 4 counted merged rows, 7 rows in all)" in derived
+
+
+def test_hips_range_notes_that_a_hip_is_not_first_implemented_in_the_range(derive):
+    """The scoped count includes HIPs with earlier evidence, and the output says so."""
+    out = _hips(derive, _evidence_doc(), start="2026-01", end="2026-06")
+    assert any("not 'first implemented in the range'" in line for line in out)
+
+
+def test_hips_range_leaves_the_funnel_comparison_unscoped_and_says_so(derive):
+    """With a range, the funnel is compared with the any-merge-date count, and the output explains why."""
+    out = _hips(derive, _evidence_doc(), _funnel_doc(evidence_all=2), start="2026-01", end="2026-06")
+    assert "| Distinct HIP numbers among the 2026-01 to 2026-06 rows | 2 |" in out
+    assert "| Distinct HIP numbers among all counted merged rows, any merge date | 3 |" in out
+    assert "| Difference (evidence minus funnel), any merge date | 1 |" in out
+    assert any(line.startswith("Note: the funnel comparison is unscoped. The funnel is cohort-based") for line in out)
+    assert "the funnel comparison is unscoped because the funnel is cohort-based, not period-based" in _last(out)
+    assert "3 HIPs across all merge dates against the funnel's" in _last(out)
+
+
+def test_hips_range_board_check_uses_all_merge_dates(derive):
+    """The Deferred HIP merged after the range is still named, because the funnel comparison is unscoped."""
+    out = _hips(
+        derive, _evidence_doc(), _funnel_doc(evidence_all=2), board=_board_doc(), start="2026-01", end="2026-06"
+    )
+    assert any("HIP-5 (Deferred)" in line and "equal to the difference" in line for line in out)
+
+
+def test_hips_range_excludes_and_reports_rows_without_a_merge_date(derive):
+    """A counted merged row with no readable pr_merged_at cannot be placed in a month, so it is excluded and reported."""
+    doc = _evidence_doc()
+    doc["rows"].append({"hip": 9, "pr_state": "MERGED", "counted": True, "pr_merged_at": None})
+    out = _hips(derive, doc, start="2026-01", end="2026-06")
+    assert any(line.startswith("Warning: 1 counted merged rows have no readable pr_merged_at") for line in out)
+    assert "| Distinct HIP numbers among the 2026-01 to 2026-06 rows | 2 |" in out
+    assert "1 counted merged rows have no readable pr_merged_at" in _last(out)
+
+
+def test_hips_range_warns_when_to_is_the_generation_month(derive):
+    """A range ending in the month the document was generated is a partial month and is flagged."""
+    out = _hips(derive, _evidence_doc(), start="2026-01", end="2026-10")
+    assert any(line.startswith("Warning: --to 2026-10 is the month the document was generated") for line in out)
+    assert not any(
+        line.startswith("Warning") for line in _hips(derive, _evidence_doc(), start="2026-01", end="2026-06")
+    )
+
+
+def test_hips_range_needs_the_merge_date_column(derive):
+    """Scoping by month fails clearly when the rows have no pr_merged_at column."""
+    doc = {"id": "x", "rows": [{"hip": 1, "pr_state": "MERGED", "counted": True}]}
+    with pytest.raises(derive.DeriveError, match="no 'pr_merged_at' column"):
+        _hips(derive, doc, start="2026-01", end="2026-06")
+    assert _hips(derive, doc)  # unscoped needs no date
+
+
 # --- single-employer ------------------------------------------------------
 
 
@@ -629,3 +768,22 @@ def test_main_rejects_a_malformed_month(derive, tmp_path: Path, capsys):
         derive.main(["releases", path, "--from", "2026-13", "--to", "2026-02"])
     assert exc.value.code == 2
     assert "not a month in YYYY-MM form" in capsys.readouterr().err
+
+
+def test_main_hips_with_a_range_and_the_funnel(derive, tmp_path: Path, capsys):
+    """The hips command takes --from and --to together with the funnel and prints the unscoped note."""
+    evidence = _write(tmp_path, "e.json", _evidence_doc())
+    funnel = _write(tmp_path, "f.json", _funnel_doc(evidence_all=2))
+    assert derive.main(["hips", evidence, "--funnel", funnel, "--from", "2026-01", "--to", "2026-06"]) == 0
+    out = capsys.readouterr().out
+    assert "| Distinct HIP numbers among the 2026-01 to 2026-06 rows | 2 |" in out
+    assert "the funnel comparison is unscoped" in out
+
+
+def test_main_hips_range_needs_both_ends_in_order(derive, tmp_path: Path, capsys):
+    """--from without --to, or a reversed range, exits 2 with an error."""
+    evidence = _write(tmp_path, "e.json", _evidence_doc())
+    assert derive.main(["hips", evidence, "--from", "2026-01"]) == 2
+    assert "--from and --to go together" in capsys.readouterr().err
+    assert derive.main(["hips", evidence, "--from", "2026-06", "--to", "2026-01"]) == 2
+    assert "is after --to" in capsys.readouterr().err

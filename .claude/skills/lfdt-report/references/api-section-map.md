@@ -138,8 +138,9 @@ means check the appendix reference.
 ## Mid-year specifics
 
 - The API has no six-month period tab; use the monthly buckets of
-  `maintainer-pipeline` (`1 year` variant, `frequency: month`) and the
-  six-month heatmaps, and say which months.
+  `maintainer-pipeline` (`1 year` variant, `frequency: month`) and say
+  which months. The heatmaps cover the last six complete months at the data
+  date, so they match the period only when the draft is run in July.
 - "Are PRs and issues resolved promptly": the manifest has no time-to-close or
   time-to-merge. `issue-difficulty` describes the open queue only. Gap.
 - "Are Discord questions answered promptly": gap even when the Community macro

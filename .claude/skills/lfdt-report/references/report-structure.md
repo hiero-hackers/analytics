@@ -53,8 +53,9 @@ None of that is this skill's job.
   `tac/project-updates/<year>/` (the 2026 directory uses both spellings of
   "annual"; keep Hiero's lower-case one).
 - First line: `[//]: # (SPDX-License-Identifier: CC-BY-4.0)`.
-- Add the file to `mkdocs.yml` nav under the year and "1H" (annual) or "2H"
-  (mid-year).
+- Add the file to `mkdocs.yml` nav under the year's group for the report
+  type. The live 2026 nav uses "Annual" and "MidYear"; the instruction
+  page's "1H"/"2H" wording is older. Check the live `mkdocs.yml`.
 
 ## Template
 
@@ -194,10 +195,14 @@ about 700 (Besu) to 2,500 words (Hiero). Hiero has not filed a mid-year yet,
 so match the mid-year shape, keep Hiero's register, and aim for 900 to
 1,200 words of body with one figure at most.
 
-Period: the six months since the annual review was filed (name them). Every
-data statement is "in the six months" or "at <date>"; derive the six-month
-figures with `derive.py months` and `derive.py releases` and say so once in
-the appendix.
+Period: January to June (the schedule page sets the due date, usually late
+August or September; name the months). Every data statement is "in the six
+months" or "at <date>"; derive the six-month figures with `derive.py months`
+and `derive.py releases` and say so once in the appendix. The monthly
+active-by-role series holds twelve months, so "the six months before" is
+usually only partly available: compare with the months that exist and say
+which. Heatmaps cover the last six complete months at the data date, not
+the period, unless the draft is run in July.
 
 ```markdown
 [//]: # (SPDX-License-Identifier: CC-BY-4.0)
@@ -209,13 +214,15 @@ period covered {January to June YEAR}; provenance and data notes in the appendix
 
 ## Project Health
 Two paragraphs: people active per month over the six months against the
-six months before (range, not a sum), releases in the period, repositories
-added. The TAC's mid-year criteria "consistent or increasing activity" and
-"deliverables being produced" are answered here. Optional figure: active
-contributors by role, monthly, twelve months.
-> [MAINTAINER INPUT] Community calls and Discord responsiveness in the period
-> (the TAC asks whether questions are answered promptly; the API has no
+months before that the series holds (range, not a sum), releases in the
+period, repositories added. The TAC's mid-year criteria "consistent or
+increasing activity" and "deliverables being produced" are answered here.
+One figure at most: active contributors by role, monthly, twelve months.
+> [MAINTAINER INPUT] Community calls, Discord responsiveness and GitHub
+> PR and issue responsiveness in the period (the TAC asks whether questions
+> are answered and PRs and issues resolved promptly; the API has no
 > response-time data).
+>
 > Evidence in this draft: none.
 
 ## Maintainer Diversity
@@ -253,9 +260,10 @@ maintainer supplies them, the annual's figures. Question 5: changes.
 ## Project Lifecycle Stage Recommendation
 > [MAINTAINER INPUT] Current stage per the {YEAR} annual: {Graduated}.
 
+## Appendix: Supporting tables
+(the prior goals table as filed; otherwise only what a body statement needs)
 ## Appendix: Sources
 ## Appendix: Data notes and gaps
-(no supporting-tables appendix unless a body statement needs one)
 ```
 
 The mid-year has no Deliverables, Security or HIP sections; releases and

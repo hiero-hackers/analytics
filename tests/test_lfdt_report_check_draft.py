@@ -437,3 +437,113 @@ def test_warn_length_flags_thin_and_sparse_bodies(check):
     assert check.warn_length(stats) == []
     stats.words = 3400
     assert any("over 130%" in f.message for f in check.warn_length(stats))
+
+
+MIDYEAR = "# 2026 Mid-Year Review Hiero"
+ANNUAL = "# 2027 Annual Review Hiero"
+
+
+def _titled(title: str, body: str = PARAGRAPH) -> str:
+    """Return the standard draft with its H1 replaced by ``title``."""
+    return _draft(body).replace(ANNUAL, title)
+
+
+@pytest.mark.parametrize(
+    ("title", "expected"),
+    [
+        (MIDYEAR, "mid-year"),
+        ("# 2026 Mid Year Review Hiero", "mid-year"),
+        ("# 2026 MIDYEAR update", "mid-year"),
+        (ANNUAL, "annual"),
+        ("# Something else entirely", "annual"),
+    ],
+)
+def test_report_type_is_inferred_from_the_h1(check, tmp_path: Path, title: str, expected: str):
+    """A Mid-Year title selects the mid-year benchmarks; anything else is annual; the report says it was inferred."""
+    report = _lint(check, tmp_path, _titled(title))
+    assert report.report_type == expected
+    assert report.type_source == "inferred from the title"
+
+
+def test_report_type_defaults_to_annual_without_a_title(check, tmp_path: Path):
+    """A draft with no H1 falls back to annual."""
+    assert _lint(check, tmp_path, f"{SPDX}\n\nNo title here. Just text.\n").report_type == "annual"
+
+
+def test_type_flag_overrides_inference_and_is_printed(check, tmp_path: Path, capsys):
+    """--type wins over the H1, and the report names the type and where it came from."""
+    path = tmp_path / "draft.md"
+    path.write_text(_titled(ANNUAL))
+    check.main([str(path)])
+    assert "Report type: annual (inferred from the title)" in capsys.readouterr().out
+    check.main([str(path), "--type", "mid-year"])
+    out = capsys.readouterr().out
+    assert "Report type: mid-year (from --type)" in out
+    assert "Mid-year shape (about 1,050 words, about 10 paragraphs, \u22641 figure)" in out
+    path.write_text(_titled(MIDYEAR))
+    check.main([str(path), "--type", "annual"])
+    out = capsys.readouterr().out
+    assert "Report type: annual (from --type)" in out
+    assert "Filed-review shape (about 2,500 words, about 30 paragraphs, 2 tables)" in out
+
+
+def test_type_flag_rejects_unknown_values(check, tmp_path: Path):
+    """An unknown --type is an argparse error (exit 2), not a silent fallback."""
+    path = tmp_path / "draft.md"
+    path.write_text(_titled(ANNUAL))
+    with pytest.raises(SystemExit) as exc:
+        check.main([str(path), "--type", "quarterly"])
+    assert exc.value.code == 2
+
+
+def test_mid_year_figure_and_table_thresholds(check, tmp_path: Path):
+    """Mid-year allows 0 or 1 figure and 2 tables; annual still wants 2 to 3 figures and allows 3 tables."""
+    _figures(tmp_path, "a.svg")
+    fig = "![a](figures/a.svg)\n\n*Figure 1. A.*"
+    table = "| a |\n|---|\n| 1 |"
+
+    def run(n_fig: int, n_tab: int, **kw):
+        body = "\n\n".join([PARAGRAPH] + [fig] * n_fig + [table] * n_tab)
+        return _lint(check, tmp_path, _draft(body), **kw)
+
+    for figures in (0, 1):
+        assert not _has(run(figures, 2, report_type="mid-year"), "WARN", "figures in the body")
+    two = run(2, 2, report_type="mid-year")
+    assert _has(two, "WARN", "2 figures in the body (at most 1; mid-year report)")
+    assert not two.failures()
+    assert _has(run(1, 3, report_type="mid-year"), "WARN", "3 tables in the body (at most 2; mid-year report)")
+    assert not _has(run(1, 2, report_type="mid-year"), "WARN", "tables in the body")
+    # the same counts under annual rules
+    assert _has(run(0, 3, report_type="annual"), "WARN", "0 figures in the body (aim for 2 to 3; annual report)")
+    assert not _has(run(2, 3, report_type="annual"), "WARN", "tables in the body")
+
+
+def test_mid_year_length_thresholds(check):
+    """Mid-year warns under 735 or over 1,365 words and under 6 paragraphs; the same figures differ for annual."""
+    stats = check.Stats()
+
+    def messages(words: int, paragraphs: int, report_type: str) -> list[str]:
+        stats.words, stats.paragraphs = words, paragraphs
+        return [f.message for f in check.warn_length(stats, report_type)]
+
+    assert messages(1050, 10, "mid-year") == []
+    assert messages(735, 6, "mid-year") == []
+    assert messages(1365, 6, "mid-year") == []
+    low = messages(734, 10, "mid-year")
+    assert len(low) == 1 and "under 70% of the mid-year target of 1,050" in low[0]
+    high = messages(1366, 10, "mid-year")
+    assert len(high) == 1 and "over 130% of the mid-year target of 1,050" in high[0]
+    few = messages(1050, 5, "mid-year")
+    assert len(few) == 1 and "5 body paragraphs against about 10 in the mid-year target" in few[0]
+    # a mid-year-sized body is thin for an annual report
+    annual = messages(1050, 10, "annual")
+    assert any("under 70%" in m for m in annual) and any("body paragraphs" in m for m in annual)
+
+
+def test_inferred_type_drives_the_length_warnings(check, tmp_path: Path):
+    """The same short draft is thin as an annual report and, in range of the target, only less so as mid-year."""
+    annual = _lint(check, tmp_path, _titled(ANNUAL))
+    mid = _lint(check, tmp_path, _titled(MIDYEAR))
+    assert _has(annual, "WARN", "filed review's 2,500")
+    assert _has(mid, "WARN", "mid-year target of 1,050")
+    assert not _has(mid, "WARN", "filed review")

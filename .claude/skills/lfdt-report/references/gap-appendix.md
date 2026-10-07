@@ -31,8 +31,9 @@ One bullet per thing a careful reader would otherwise trip on, with ids:
   and any automation accounts seen in the tables.
 - Every `Derived:` line from `derive.py`, and any derivation done by hand
   (what was computed, from which documents).
-- Data defects noticed this run (stale absent-macro notes, unnormalised
-  employer names, methodology text wrong about its document). These are
+- Data defects noticed this run (stale absent-macro notes, role words as
+  employers, methodology text wrong about its document; the separate
+  Hashgraph-related employers are policy, not a defect). These are
   the seeds of analytics issues; keep them terse and factual.
 
 ## 3. Gaps
@@ -78,7 +79,8 @@ expectations to check, not facts to copy:
   merge. `issue-difficulty` describes the open queue only.
 - **CI health:** job failure rate and queue time, which Hiero's 2026 annual
   report cited from GitHub Actions metrics. Only runner types are published
-  (`ownership` card, Runners variant).
+  (`ownership` card, Runners variant); the open CI-health issues cover
+  static workflow checks, not run metrics.
 - **TSC review counts:** how many improvement proposals the TSC reviewed in
   the period. The HIPs macro reports spec status and implementation evidence,
   not dated review events. Check `hip-board` and cite the Governance section
@@ -93,9 +95,10 @@ expectations to check, not facts to copy:
   data/snapshots` and read `api/v1/` at an older commit for a dated tile
   value. History starts 2026-08-07, so it gives short deltas, not a
   prior-year baseline, until it has run for a year.
-- **File hygiene checks:** whether MAINTAINERS and ADOPTERS files and the
-  roadmap are current and public. The affiliation pipeline reads MAINTAINERS
-  files but does not validate them.
+- **File hygiene checks:** whether MAINTAINERS.md and ADOPTERS.md are
+  current and the roadmap (a repository in hiero-ledger) is public and
+  active. Nothing in the API validates them; the MAINTAINERS parser is a
+  maintenance tool, not a published pipeline.
 - **Governance requirement checklist:** whether the project met every TAC
   governing-document requirement. Not measurable from GitHub activity.
 - **Contributor counts from other tools** (for example LFX Insights authors):

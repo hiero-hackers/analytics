@@ -7,7 +7,11 @@ not linted (they are where identifiers, ``Source:`` lines and method remarks
 belong).
 
 Usage:
-    check_draft.py DRAFT.md [--manifest PATH] [--max-numbers 6]
+    check_draft.py DRAFT.md [--manifest PATH] [--max-numbers 6] [--type annual|mid-year]
+
+``--type`` selects the shape benchmarks; by default it is inferred from the H1
+("Mid-Year" gives mid-year, anything else annual) and the report says which
+was used.
 
 Hard failures (exit 1), each printed with its line number and the text:
 
@@ -26,9 +30,14 @@ Hard failures (exit 1), each printed with its line number and the text:
   card or view id of the org in its ``org=`` parameter.
 
 Warnings (printed, exit code unaffected): method-remark phrases, paragraphs
-under two or over seven sentences, fewer than two or more than three
-figures, more than three tables, a header longer than two lines, a header
-without "Data as of".
+under two or over seven sentences, a header longer than two lines, a header
+without "Data as of", and the shape of the whole body against the benchmarks
+for the report type:
+
+- annual: 2 to 3 figures, at most 3 tables, about 2,500 words (warn under 70%
+  or over 130%), about 30 paragraphs (warn under 60%);
+- mid-year: at most 1 figure, at most 2 tables, about 1,050 words, about 10
+  paragraphs.
 
 Exit codes: 0 no hard failure, 1 at least one, 2 unreadable input.
 """
@@ -46,7 +55,30 @@ from urllib.parse import parse_qs, unquote
 SPDX_LINE = "[//]: # (SPDX-License-Identifier: CC-BY-4.0)"
 SLOT = "[MAINTAINER INPUT]"
 DASHBOARD = "hiero-hackers.github.io/analytics/#"
-FILED_REVIEW = {"words": 2500, "paragraphs": 30, "tables": 2}
+BENCHMARKS = {
+    "annual": {
+        "words": 2500,
+        "paragraphs": 30,
+        "tables": 2,
+        "min_figures": 2,
+        "max_figures": 3,
+        "max_tables": 3,
+        "words_ref": "the filed review's",
+        "paragraphs_ref": "the filed review",
+    },
+    "mid-year": {
+        "words": 1050,
+        "paragraphs": 10,
+        "tables": 2,
+        "min_figures": 0,
+        "max_figures": 1,
+        "max_tables": 2,
+        "words_ref": "the mid-year target of",
+        "paragraphs_ref": "the mid-year target",
+    },
+}
+WORDS_LOW, WORDS_HIGH, PARAGRAPHS_LOW = 0.7, 1.3, 0.6  # fractions of the target
+MID_YEAR_RE = re.compile(r"mid[\s-]?year", re.IGNORECASE)
 METHOD_PHRASES = (
     "derived by this draft",
     "row_count",
@@ -57,8 +89,6 @@ METHOD_PHRASES = (
     "population statement",
 )
 MIN_SENTENCES, MAX_SENTENCES = 2, 7
-MIN_FIGURES, MAX_FIGURES = 2, 3
-MAX_TABLES = 3
 MAX_HEADER_LINES = 2
 EXCERPT_WIDTH = 110
 
@@ -152,10 +182,12 @@ class Stats:
 
 @dataclass
 class Report:
-    """Everything one lint run produced."""
+    """Everything one lint run produced, with the report type the benchmarks came from."""
 
     findings: list[Finding]
     stats: Stats
+    report_type: str = "annual"
+    type_source: str = "inferred from the title"
 
     def failures(self) -> list[Finding]:
         """Return the hard failures."""
@@ -223,6 +255,12 @@ def parse_draft(text: str) -> Draft:
         body_start,  # no section heading: there is no header region to exempt
     )
     return Draft(lines, kinds, h1, body_start, body_end, header_end)
+
+
+def infer_report_type(draft: Draft) -> str:
+    """Return "mid-year" when the H1 says Mid-Year, else "annual"."""
+    title = draft.lines[draft.h1] if draft.h1 is not None else ""
+    return "mid-year" if MID_YEAR_RE.search(title) else "annual"
 
 
 def build_blocks(draft: Draft) -> list[Block]:
@@ -525,13 +563,18 @@ def count_tables(draft: Draft) -> int:
     return tables
 
 
-def warn_shape(draft: Draft, figures: int, tables: int) -> list[Finding]:
-    """Warn on figure and table counts and on a header that is long or lacks 'Data as of'."""
+def warn_shape(draft: Draft, figures: int, tables: int, report_type: str = "annual") -> list[Finding]:
+    """Warn on figure and table counts for the report type, and on a header that is long or lacks 'Data as of'."""
     out = []
-    if not MIN_FIGURES <= figures <= MAX_FIGURES:
-        out.append(Finding("WARN", None, f"{figures} figures in the body (aim for {MIN_FIGURES} to {MAX_FIGURES})"))
-    if tables > MAX_TABLES:
-        out.append(Finding("WARN", None, f"{tables} tables in the body (at most {MAX_TABLES})"))
+    bench = BENCHMARKS[report_type]
+    low, high = bench["min_figures"], bench["max_figures"]
+    if not low <= figures <= high:
+        aim = f"at most {high}" if low == 0 else f"aim for {low} to {high}"
+        out.append(Finding("WARN", None, f"{figures} figures in the body ({aim}; {report_type} report)"))
+    if tables > bench["max_tables"]:
+        out.append(
+            Finding("WARN", None, f"{tables} tables in the body (at most {bench['max_tables']}; {report_type} report)")
+        )
     if draft.h1 is None:
         out.append(Finding("WARN", None, "no '# ' title found; the body is taken from line 2"))
     header = [i for i in range(draft.body_start, draft.header_end) if draft.lines[i].strip()]
@@ -574,9 +617,17 @@ def collect_slots(draft: Draft) -> tuple[list[tuple[int, str, str]], int]:
     return slots, cells
 
 
-def lint(text: str, draft_dir: Path, max_numbers: int = 6, manifest: dict | None = None) -> Report:
-    """Run every check over one draft and gather the findings and summary statistics."""
+def lint(
+    text: str,
+    draft_dir: Path,
+    max_numbers: int = 6,
+    manifest: dict | None = None,
+    report_type: str | None = None,
+) -> Report:
+    """Run every check over one draft; ``report_type`` None infers annual or mid-year from the H1."""
     draft = parse_draft(text)
+    type_source = "from --type" if report_type else "inferred from the title"
+    report_type = report_type or infer_report_type(draft)
     blocks = build_blocks(draft)
     stats = Stats()
     findings: list[Finding] = []
@@ -596,54 +647,68 @@ def lint(text: str, draft_dir: Path, max_numbers: int = 6, manifest: dict | None
     sentence_warnings, stats.paragraphs, stats.sentences = warn_sentences(draft, blocks)
     findings += sentence_warnings
     stats.tables = count_tables(draft)
-    findings += warn_shape(draft, stats.figures, stats.tables)
+    findings += warn_shape(draft, stats.figures, stats.tables, report_type)
 
     body_lines = [i for i in draft.body() if draft.kinds[i] not in ("code", "figure", "blank")]
     stats.words = sum(count_words(draft.lines[i]) for i in body_lines)
     stats.links = sum(len(urls_in(draft.lines[i])) for i in body_lines)
     stats.sources = None if entries is None else len(entries)
     stats.slots, stats.goals_cells = collect_slots(draft)
-    findings += warn_length(stats)
-    return Report(findings, stats)
+    findings += warn_length(stats, report_type)
+    return Report(findings, stats, report_type, type_source)
 
 
-def warn_length(stats: Stats) -> list[Finding]:
-    """Warn when the body is far shorter or longer than the filed review's shape."""
+def warn_length(stats: Stats, report_type: str = "annual") -> list[Finding]:
+    """Warn when the body is far shorter or longer than the benchmark for the report type."""
     out = []
-    ref = FILED_REVIEW
-    if stats.words < ref["words"] * 0.7:
+    bench = BENCHMARKS[report_type]
+    target_words, target_paragraphs = bench["words"], bench["paragraphs"]
+    if stats.words < target_words * WORDS_LOW:
         out.append(
             Finding(
                 "WARN",
                 None,
-                f"body is {stats.words:,} words, under 70% of the filed review's {ref['words']:,}; "
+                f"body is {stats.words:,} words, under {WORDS_LOW:.0%} of {bench['words_ref']} {target_words:,}; "
                 "the data sections are probably too thin, not the rules too strict",
             )
         )
-    elif stats.words > ref["words"] * 1.3:
-        out.append(
-            Finding("WARN", None, f"body is {stats.words:,} words, over 130% of the filed review's {ref['words']:,}")
-        )
-    if stats.paragraphs < ref["paragraphs"] * 0.6:
+    elif stats.words > target_words * WORDS_HIGH:
         out.append(
             Finding(
                 "WARN",
                 None,
-                f"{stats.paragraphs} body paragraphs against about {ref['paragraphs']} in the filed review; "
+                f"body is {stats.words:,} words, over {WORDS_HIGH:.0%} of {bench['words_ref']} {target_words:,}",
+            )
+        )
+    if stats.paragraphs < target_paragraphs * PARAGRAPHS_LOW:
+        out.append(
+            Finding(
+                "WARN",
+                None,
+                f"{stats.paragraphs} body paragraphs against about {target_paragraphs} in {bench['paragraphs_ref']}; "
                 "split long paragraphs and give each data section two or three",
             )
         )
     return out
 
 
-def shape_line(stats: Stats) -> str:
-    """Compare the draft with the filed-review shape in one line."""
-    ref = FILED_REVIEW
+def shape_line(stats: Stats, report_type: str = "annual") -> str:
+    """Compare the draft with the benchmark shape for the report type in one line."""
+    bench = BENCHMARKS[report_type]
+    words = f"{stats.words:,} words ({stats.words - bench['words']:+,})"
+    paragraphs = f"{stats.paragraphs} paragraphs ({stats.paragraphs - bench['paragraphs']:+d})"
+    if report_type == "mid-year":
+        top = bench["max_figures"]
+        return (
+            f"Mid-year shape (about {bench['words']:,} words, about {bench['paragraphs']} paragraphs, "
+            f"\u2264{top} figure{'s' if top != 1 else ''}): this draft has {words}, {paragraphs}, "
+            f"{stats.figures} figure{'s' if stats.figures != 1 else ''}, "
+            f"{stats.tables} table{'s' if stats.tables != 1 else ''} (limit {bench['max_tables']})."
+        )
     return (
-        f"Filed-review shape (about {ref['words']:,} words, about {ref['paragraphs']} paragraphs, {ref['tables']} tables): "
-        f"this draft has {stats.words:,} words ({stats.words - ref['words']:+,}), "
-        f"{stats.paragraphs} paragraphs ({stats.paragraphs - ref['paragraphs']:+d}), "
-        f"{stats.tables} tables ({stats.tables - ref['tables']:+d})."
+        f"Filed-review shape (about {bench['words']:,} words, about {bench['paragraphs']} paragraphs, "
+        f"{bench['tables']} tables): this draft has {words}, {paragraphs}, "
+        f"{stats.tables} tables ({stats.tables - bench['tables']:+d})."
     )
 
 
@@ -661,7 +726,7 @@ def format_findings(findings: list[Finding]) -> list[str]:
 def format_report(path: Path, report: Report) -> str:
     """Render the findings, the summary block and the result line."""
     s = report.stats
-    out = [f"check_draft: {path}", ""]
+    out = [f"check_draft: {path}", f"Report type: {report.report_type} ({report.type_source})", ""]
     for title, items in (("Failures", report.failures()), ("Warnings", report.warnings())):
         out.append(f"{title} ({len(items)})")
         out += format_findings(items) or ["  none"]
@@ -680,7 +745,7 @@ def format_report(path: Path, report: Report) -> str:
     ]
     out += [f"    L{line:<5} {heading} ({form})" for line, heading, form in s.slots]
     out.append(f"  goals-table cells:        {s.goals_cells}")
-    out += ["  " + shape_line(s), ""]
+    out += ["  " + shape_line(s, report.report_type), ""]
     nf, nw = len(report.failures()), len(report.warnings())
     out.append(
         f"Result: {'FAIL' if nf else 'pass'} ({nf} failure{'s' if nf != 1 else ''}, {nw} warning{'s' if nw != 1 else ''})"
@@ -694,6 +759,12 @@ def main(argv: list[str]) -> int:
     ap.add_argument("draft", help="the markdown draft to lint")
     ap.add_argument("--manifest", help="manifest.json: check dashboard widget ids against it")
     ap.add_argument("--max-numbers", type=int, default=6, help="numeric tokens allowed per body paragraph (default 6)")
+    ap.add_argument(
+        "--type",
+        choices=sorted(BENCHMARKS),
+        dest="report_type",
+        help="report type for the shape benchmarks (default: inferred from the H1)",
+    )
     a = ap.parse_args(argv)
     path = Path(a.draft)
     try:
@@ -702,7 +773,7 @@ def main(argv: list[str]) -> int:
     except (OSError, ValueError) as exc:
         print(f"cannot read input: {exc}", file=sys.stderr)
         return 2
-    report = lint(text, path.resolve().parent, a.max_numbers, manifest)
+    report = lint(text, path.resolve().parent, a.max_numbers, manifest, a.report_type)
     print(format_report(path, report))
     return 1 if report.failures() else 0
 

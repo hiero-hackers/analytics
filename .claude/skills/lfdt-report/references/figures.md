@@ -17,7 +17,8 @@ for the org.
 | Maintainers by employer | `org-diversity`, "Role-holders by organisation", Maintainers variant (`affiliation_donut`) | Annual Q5 / mid-year Q5. Caption must carry the known-share tile |
 | Committers by employer | same card, Committers variant | Only if it tells a different story from the maintainers one |
 | Cumulative repository count | `repo-growth`, "Cumulative repo count" | Org size over time; the only trend an ungoverned org has. Monthly since the org began, so the renderer thins the axis to years automatically; pass `--every 12` to force it |
-| Repos created per month | `repo-growth`, "New repos per month" | Mid-year only, if the period had notable growth |
+| Active contributors by role, monthly | `maintainer-pipeline`, `1 year` variant (`maintainer_pipeline_monthly`) | The mid-year's one figure: the six months in context of the twelve the series holds |
+| Repos created per month | `repo-growth`, "New repos per month" | Mid-year only, if the period had notable growth and a second figure is justified |
 
 Heatmaps, networks, the HIP matrix and the release timeline stay on the
 dashboard: they need interaction to read, and a static copy misleads.

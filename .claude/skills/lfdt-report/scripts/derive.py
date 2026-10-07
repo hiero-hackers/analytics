@@ -11,6 +11,7 @@ Usage:
     derive.py months TIMESERIES.json --from YYYY-MM --to YYYY-MM [--compare YYYY-MM,YYYY-MM]
     derive.py period SECTION.json [--period 7d|30d|365d|all] [--where COL=VALUE ...]
     derive.py hips HIP_EVIDENCE.json [--funnel HIP_ADOPTION_FUNNEL.json] [--board HIP_BOARD.json]
+                   [--from YYYY-MM --to YYYY-MM]
     derive.py single-employer REPODIVERSITY_OR_TEAMDIVERSITY.json
 
 Exit status is 0 on success and 2 when the input is unusable (unreadable file,
@@ -34,6 +35,8 @@ COMPARISON_OPS = ("<=", ">=", "<", ">")
 FUNNEL_STATUSES = ("Approved", "Accepted", "Final", "Active")
 FUNNEL_STAGE = "implementation evidence"
 DEFAULT_COHORT = "all specs"
+MERGED_FIELD = "pr_merged_at"  # the only date a hip-evidence row carries
+TOTAL_KEY = "\0total"  # synthetic column key for the per-month sum of the series
 
 
 class DeriveError(Exception):
@@ -250,8 +253,23 @@ def _series_of(doc: dict, cat_key: str) -> list[tuple[str, str]]:
     return [(k, k) for k in keys]
 
 
+def _total_label(doc: dict) -> str:
+    """Label the per-month sum; 'distinct people' only when the document counts each person once per bucket."""
+    if "counted once" in str(doc.get("population", "")).lower():
+        return "Total (distinct people, all roles)"
+    return "Total (sum of series)"
+
+
+def _value(row: dict, key: str, series: list[tuple[str, str]]) -> float | None:
+    """One cell of a month row; the synthetic total is the sum of the series, or None if any is missing."""
+    if key != TOTAL_KEY:
+        return _num(row.get(key))
+    parts = [_num(row.get(k)) for k, _ in series]
+    return None if any(part is None for part in parts) else float(sum(p for p in parts if p is not None))
+
+
 def months_report(doc: dict, path: str, start: str, end: str, compare: list[str] | None) -> list[str]:
-    """Per-month series values over start..end, skipping partial months, with min, max and comparisons."""
+    """Per-month series values and their total over start..end, skipping partial months, with min, max and comparisons."""
     if doc.get("frequency") != "month":
         raise DeriveError(
             f"{path} has frequency {doc.get('frequency')!r}; the months command needs a monthly timeseries"
@@ -259,8 +277,8 @@ def months_report(doc: dict, path: str, start: str, end: str, compare: list[str]
     rows = _rows(doc, path)
     cat_key = (doc.get("category") or {}).get("key", "bucket")
     series = _series_of(doc, cat_key)
+    columns = [*series, (TOTAL_KEY, _total_label(doc))] if len(series) > 1 else series
     by_bucket = {str(r[cat_key]): r for r in rows if cat_key in r}
-    labels = [label for _, label in series]
     shown: list[str] = []
     skipped: list[str] = []
     missing: list[str] = []
@@ -276,15 +294,12 @@ def months_report(doc: dict, path: str, start: str, end: str, compare: list[str]
         covered = f"{min(by_bucket)} to {max(by_bucket)}" if by_bucket else "no buckets"
         raise DeriveError(f"no complete month in {start}..{end} in {path} (document covers {covered})")
 
-    def values(month: str) -> list[object]:
-        """One table row of series values for a month."""
-        return [_fmt(_num(by_bucket[month].get(key))) for key, _ in series]
-
-    out = _table(["Month", *labels], [[m, *values(m)] for m in shown], right=tuple(range(1, len(series) + 1)))
+    table = [[m, *[_value(by_bucket[m], key, series) for key, _ in columns]] for m in shown]
+    out = _table(["Month", *[label for _, label in columns]], table, right=tuple(range(1, len(columns) + 1)))
     out.append("")
     extremes = []
-    for key, label in series:
-        known = [(m, n) for m in shown if (n := _num(by_bucket[m].get(key))) is not None]
+    for key, label in columns:
+        known = [(m, n) for m in shown if (n := _value(by_bucket[m], key, series)) is not None]
         if not known:
             extremes.append([label, "n/a", "n/a", "n/a", "n/a"])
             continue
@@ -307,22 +322,30 @@ def months_report(doc: dict, path: str, start: str, end: str, compare: list[str]
     if compare:
         out.append("")
         out.append("Comparison months (as asked with --compare):")
-        out.extend(_comparison_table(by_bucket, series, compare))
+        out.extend(_comparison_table(by_bucket, columns, series, compare))
     pair = doc.get("comparison")
     out.append("")
     if isinstance(pair, dict) and pair.get("current") and pair.get("previous"):
         out.append("The document's own `comparison` pair, two adjacent buckets (not 'since the last report'):")
-        out.extend(_comparison_table(by_bucket, series, [str(pair["previous"]), str(pair["current"])], tag_pair=pair))
+        out.extend(
+            _comparison_table(by_bucket, columns, series, [str(pair["previous"]), str(pair["current"])], tag_pair=pair)
+        )
     else:
         out.append("The document has no `comparison` pair.")
     out.extend(_stale_notes(doc, path))
     keys = ", ".join(k for k, _ in series)
     compared = f"; comparison months {', '.join(compare)} read from the same document" if compare else ""
     skipped_text = f"skipped partial month(s) {', '.join(skipped)}" if skipped else "no partial month fell in the range"
+    total_text = (
+        f"; {columns[-1][1]} is the sum of the series within a single month"
+        + (", valid because the document counts each person once per bucket" if "distinct" in columns[-1][1] else "")
+        if len(columns) > len(series)
+        else ""
+    )
     out.append(
         f"Derived: per-month values of series {keys} (unit: {doc.get('unit', 'as published')}; one value per month, "
         f"never summed across months) read from {_source(doc, path)} for {start} to {end}; {skipped_text}; "
-        f"min and max are over the {len(shown)} complete months shown{compared}."
+        f"min and max are over the {len(shown)} complete months shown{total_text}{compared}."
     )
     return out
 
@@ -333,9 +356,13 @@ def _tied(months: list[str]) -> str:
 
 
 def _comparison_table(
-    by_bucket: dict[str, dict], series: list[tuple[str, str]], months: list[str], tag_pair: dict | None = None
+    by_bucket: dict[str, dict],
+    columns: list[tuple[str, str]],
+    series: list[tuple[str, str]],
+    months: list[str],
+    tag_pair: dict | None = None,
 ) -> list[str]:
-    """Series values for chosen months; a partial or absent bucket is named and not used."""
+    """Column values for chosen months; a partial or absent bucket is named and not used."""
     table = []
     for month in months:
         row = by_bucket.get(month)
@@ -348,8 +375,8 @@ def _comparison_table(
             tags.append("partial, not used")
         name = month + (f" ({', '.join(tags)})" if tags else "")
         usable = row is not None and not row.get("partial")
-        table.append([name, *[_num(row.get(k)) if usable else None for k, _ in series]])
-    return _table(["Month", *[label for _, label in series]], table, right=tuple(range(1, len(series) + 1)))
+        table.append([name, *[_value(row, k, series) if usable else None for k, _ in columns]])
+    return _table(["Month", *[label for _, label in columns]], table, right=tuple(range(1, len(columns) + 1)))
 
 
 # ---------------------------------------------------------------------------
@@ -472,6 +499,9 @@ def period_report(doc: dict, path: str, period: str, where: list[str]) -> list[s
             f"Derived: {len(chosen)} rows in the {name} table of {_source(doc, path)}, counted as the length of that "
             f"rows list (counts by table: {counts})."
         )
+        keys = [c["key"] for c in doc.get("columns", []) if isinstance(c, dict) and "key" in c]
+        keys = keys or list(dict.fromkeys(k for r in chosen or all_rows for k in r))
+        out.append(f"add --where COL=VALUE to count matching rows; columns: {', '.join(keys)}")
     return out
 
 
@@ -508,6 +538,17 @@ def _board_statuses(board: dict, path: str) -> dict[int, str]:
     return out
 
 
+def _merge_month(row: dict) -> str | None:
+    """The YYYY-MM of a row's pr_merged_at (ISO date or timestamp), or None when it is missing or unreadable."""
+    month = str(row.get(MERGED_FIELD) or "")[:7]
+    return month if MONTH_RE.match(month) else None
+
+
+def _hip_numbers(rows: list[dict]) -> set[int]:
+    """Distinct HIP numbers among evidence rows."""
+    return {int(r["hip"]) for r in rows if _num(r.get("hip")) is not None}
+
+
 def hips_report(
     doc: dict,
     path: str,
@@ -516,33 +557,85 @@ def hips_report(
     cohort: str = DEFAULT_COHORT,
     board: dict | None = None,
     board_path: str = "board",
+    start: str | None = None,
+    end: str | None = None,
 ) -> list[str]:
-    """Distinct HIPs with a counted, merged citing PR, optionally compared with the adoption funnel."""
+    """Distinct HIPs with a counted, merged citing PR (optionally merged within start..end), versus the funnel."""
     rows = _rows(doc, path)
-    for needed in ("hip", "counted", "pr_state"):
+    for needed in ("hip", "counted", "pr_state", *([MERGED_FIELD] if start else [])):
         if rows and needed not in rows[0]:
             raise DeriveError(f"{path} rows have no {needed!r} column; is it the hip-evidence section?")
     odd = {type(r.get("counted")).__name__ for r in rows if not isinstance(r.get("counted"), bool | type(None))}
     if odd:
         raise DeriveError(f"{path}: `counted` holds {', '.join(sorted(odd))} values, expected booleans")
     merged = [r for r in rows if r.get("counted") is True and str(r.get("pr_state", "")).upper() == "MERGED"]
-    hips = {int(r["hip"]) for r in merged if _num(r.get("hip")) is not None}
+    hips = _hip_numbers(merged)
     table: list[list[object]] = [
         ["hip-evidence rows", len(rows)],
         ["Rows with counted = true and pr_state = MERGED", len(merged)],
-        ["Distinct HIP numbers among those rows", len(hips)],
     ]
-    derived = (
-        f"{len(hips)} distinct HIP numbers have at least one row with counted = true and pr_state = MERGED "
-        f"({len(merged)} such rows of {len(rows)}) in {_source(doc, path)}"
-    )
     notes: list[str] = []
+    if start is not None and end is not None:
+        dated = [(r, _merge_month(r)) for r in merged]
+        scoped = [r for r, month in dated if month is not None and start <= month <= end]
+        undated = sum(1 for _, month in dated if month is None)
+        scoped_hips = _hip_numbers(scoped)
+        table.append([f"...of those, rows whose {MERGED_FIELD} month is {start} to {end}", len(scoped)])
+        table.append([f"Distinct HIP numbers among the {start} to {end} rows", len(scoped_hips)])
+        derived = (
+            f"{len(scoped_hips)} distinct HIP numbers have at least one row with counted = true and "
+            f"pr_state = MERGED whose {MERGED_FIELD} month is {start} to {end} inclusive "
+            f"({len(scoped)} such rows of {len(merged)} counted merged rows, {len(rows)} rows in all) "
+            f"in {_source(doc, path)}"
+        )
+        notes.append(
+            f"Note: a HIP is counted if any counted merged PR citing it was merged in {start} to {end}, including HIPs "
+            "that already had earlier evidence; this is not 'first implemented in the range'."
+        )
+        if undated:
+            derived += (
+                f"; {undated} counted merged rows have no readable {MERGED_FIELD} and are excluded from the range"
+            )
+            notes.append(
+                f"Warning: {undated} counted merged rows have no readable {MERGED_FIELD}; the rows carry no other "
+                "date field, so they are excluded from the range."
+            )
+        generated = _parse_dt(doc.get("generated_at"))
+        if generated is not None and f"{generated:%Y-%m}" <= end:
+            notes.append(
+                f"Warning: --to {end} is the month the document was generated ({generated:%Y-%m-%d}), so it is a "
+                "partial month; end at the last complete month."
+            )
+    else:
+        table.append(["Distinct HIP numbers among those rows", len(hips)])
+        derived = (
+            f"{len(hips)} distinct HIP numbers have at least one row with counted = true and pr_state = MERGED "
+            f"({len(merged)} such rows of {len(rows)}) in {_source(doc, path)}"
+        )
     if funnel is not None:
         value = _funnel_value(funnel, funnel_path, cohort)
         diff = len(hips) - value
+        scoped_run = start is not None
+        if scoped_run:
+            table.append(["Distinct HIP numbers among all counted merged rows, any merge date", len(hips)])
         table.append([f"Funnel stage '{FUNNEL_STAGE}', cohort '{cohort}'", value])
-        table.append(["Difference (evidence minus funnel)", diff])
-        derived += f"; the funnel's '{FUNNEL_STAGE}' stage for cohort '{cohort}' in {_source(funnel, funnel_path)} is {value}, difference {diff}"
+        table.append(["Difference (evidence minus funnel)" + (", any merge date" if scoped_run else ""), diff])
+        if scoped_run:
+            notes.append(
+                f"Note: the funnel comparison is unscoped. The funnel is cohort-based, not period-based, so the "
+                f"funnel's {value} is compared with the {len(hips)} HIPs counted across all merge dates, not with the "
+                f"{start} to {end} count."
+            )
+            derived += (
+                f"; the funnel comparison is unscoped because the funnel is cohort-based, not period-based: "
+                f"{len(hips)} HIPs across all merge dates against"
+            )
+        else:
+            derived += "; against"
+        derived += (
+            f" the funnel's '{FUNNEL_STAGE}' stage for cohort '{cohort}' in {_source(funnel, funnel_path)}, "
+            f"which is {value}, difference {diff}"
+        )
         notes.extend(_funnel_reason(funnel, funnel_path, board is not None))
         if _funnel_stage2(funnel):
             derived += (
@@ -681,6 +774,14 @@ def _build_parser() -> argparse.ArgumentParser:
         "--cohort", default=DEFAULT_COHORT, help=f"funnel cohort to compare with (default: {DEFAULT_COHORT!r})"
     )
     p.add_argument("--board", metavar="HIP_BOARD.json", help="name the counted HIPs whose status the funnel excludes")
+    p.add_argument(
+        "--from",
+        dest="start",
+        type=_month_arg,
+        metavar="YYYY-MM",
+        help=f"scope the evidence to PRs whose {MERGED_FIELD} month is in --from..--to (the funnel stays unscoped)",
+    )
+    p.add_argument("--to", dest="end", type=_month_arg, metavar="YYYY-MM")
 
     p = sub.add_parser("single-employer", help="single-employer rows of repodiversity or teamdiversity")
     p.add_argument("doc")
@@ -700,8 +801,14 @@ def _run(a: argparse.Namespace) -> list[str]:
         funnel = _load(a.funnel) if a.funnel else None
         if a.board and funnel is None:
             raise DeriveError("--board explains the gap to the funnel, so it needs --funnel")
+        if (a.start is None) != (a.end is None):
+            raise DeriveError("--from and --to go together")
+        if a.start is not None and a.start > a.end:
+            raise DeriveError(f"--from {a.start} is after --to {a.end}")
         board = _load(a.board) if a.board else None
-        return hips_report(doc, a.doc, funnel, a.funnel or "funnel", a.cohort, board, a.board or "board")
+        return hips_report(
+            doc, a.doc, funnel, a.funnel or "funnel", a.cohort, board, a.board or "board", a.start, a.end
+        )
     return single_employer_report(doc, a.doc)
 
 

@@ -33,10 +33,12 @@ being told. Check each one every run; the dates say when they were last seen.
   `hip-evidence` table is the PR-level backing for every HIP figure; the
   `hip-unknown` table lists PRs citing a HIP number that is not in the spec
   list, which is a data-quality caveat worth one line.
-- **Two issue-queue documents disagree, by a lot.** `issue-difficulty` "By
-  repo" is a snapshot of open issues per repo; "Over time (weekly)" is
-  event-based. On 2026-10-06 they gave 4,336 and 1,714 open issues for
-  hiero-ledger on the same day. Report both with
+- **Neither issue-queue document is the open backlog.** `issue-difficulty`
+  "By repo" over-counts open issues (its incremental store never sees
+  closures; 4,336 published against roughly 3,500 on GitHub on 2026-10-06);
+  "Over time (weekly)" counts only issues created in the last 365 days
+  (1,714). Describe the queue without a count and put both figures, with
+  this explanation, in the Data notes. Report both with
   their variant titles (SKILL.md step 5, rule 5).
 - **Roles held and roles active are not the same population.** The
   Governance tiles count people at their current highest role; the yearly
@@ -57,6 +59,12 @@ being told. Check each one every run; the dates say when they were last seen.
 - **The API is `v1`, additive-only, and flagged `wip`.** Say so in the
   provenance block.
 
+- **Governance "all time" is not all time.** The role-coverage base tables
+  (`repoactivity`, `understaffed`, `loadshare`, `gonedark` all-time rows)
+  use a 90-day activity window (hiero-hackers/analytics#413), which is why
+  all-time `understaffed` (16) can be smaller than its `7d` table (26).
+  Cite the `365d` period table and say so.
+
 ## Known disagreements between documents
 
 Both sides go in the Data notes with their ids. When the gap is more than
@@ -70,7 +78,10 @@ dashboard's figure.
   table count as the org size and the entity count as "repos with
   activity". On 2026-10-06 hiero-ledger was 42 vs 44 and hiero-hackers 24
   vs 28; name the missing repos from the documents in front of you, they
-  change between runs.
+  change between runs. The repo-level tables are not all the same set
+  either (governance-based ones include `roadmap` and lack
+  `hiero-identity-standards`; CODEOWNERS and release tables the reverse),
+  so "org size" is the count of the table you cite, named.
 - Single-employer repos: not a disagreement but two definitions. The
   `repodiversity` table's `distinct_orgs == 1` (14 on 2026-10-06) counts
   repos with one named employer even when other seats are independents;
@@ -80,10 +91,12 @@ dashboard's figure.
 - HIPs with merged evidence: the funnel and by-status charts exclude
   Deferred specs; filtering `hip-evidence` by `counted` (bool) and
   `pr_state == "MERGED"` (upper case) includes them (51 vs 53).
-- Employer names are not normalised: Hashgraph, Hedera, The Hashgraph
-  Association and Hashgraph Online are separate rows, and a mapping error
-  can surface as an employer literally named "contributor". Do not merge
-  them; list them as a data defect in the appendix.
+- Hashgraph, Hedera, The Hashgraph Association and Hashgraph Online are
+  separate employers by policy (`docs/affiliations.md`; only Swirlds Labs
+  folds into Hashgraph). Do not merge them, and do not call the split a
+  defect; say in the Data notes that related entities are listed
+  separately. A row whose employer is a role word ("contributor") is a
+  mapping defect; note it.
 - Single-employer teams: `teamdiversity` rows with `distinct_orgs == 1`
   (40 on 2026-10-06) vs the `org-diversity` "Single-employer teams by org"
   chart (27). The table carries a `single_employer` flag that matches the
