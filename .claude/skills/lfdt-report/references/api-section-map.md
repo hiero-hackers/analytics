@@ -44,6 +44,74 @@ Variant labels are period words, not shapes; the document path and its `frequenc
 | `release-timeline` | `Last 18 months` / `1 year` / `1 month` / `Week` | varies | `events`, trailing window of 548 / 365 / 30 / 7 days |
 | `activity-heatmap` | one per dimension | varies | `matrix`, last six complete months, top 25 rows |
 
+## Reading rules
+
+The inventory (`scripts/inventory.py show`) applies these for you; they are
+spelled out so you can check it and so the appendix can explain a figure.
+
+- **Provenance first.** `generated_at`, `provenance.git_sha`,
+  `provenance.data_as_of` and `wip` go in the appendix. `data_as_of` is the
+  oldest dataset watermark, so it is the honest "data as of" date for the
+  whole report.
+- **Ids live at three levels, and tiles have none.** `chart_sections[].id`
+  names a *card* and is what the dashboard deep link's `widget=` takes (so
+  do section ids and view ids; an absorbed section's id also resolves). The
+  charts on a card have a `title` but no id; each variant has a `label`, an
+  `interactive.path`, and the document at that path has its own `id`, equal
+  to its file stem. Cite a chart as "card id, chart title, variant label
+  (document id)". Tiles are `orgs[org].metrics[macro]`, a list per macro
+  with `label` and `value`; cite them as "<Macro> tile '<label>'".
+- **Variants are matched by shape, not label.** Labels are period words or
+  descriptive titles. Read `frequency` (`year`, `month`, `week`, `day`, or
+  `snapshot` for a series re-measured each run, which has no `comparison`)
+  or `window`. For a young org several variants are identical; say so once
+  and cite one.
+- **`row_count` is the all-time table.** Sections with `periods` carry
+  `7d`, `30d` and `365d` row lists with the same columns; their counts are
+  the list lengths and they differ (on 2026-10-06 `understaffed` had 16
+  all-time rows, 4 in `365d`, 26 in `7d`; `gonedark` 14 and 81). An annual
+  cites the `365d` table; a mid-year cites `365d` and says there is no
+  six-month table. Name the period beside every count.
+- **Zero rows means one of two things.** Read the section's `description`.
+  Where each row is an exception or finding (understaffed repos, gone-dark
+  holders, HIPs with no activity or an unknown number, single-employer
+  repos) zero rows is a measured "none"; where each row is a member of a
+  population (contributors, repos, teams, affiliations, releases) zero rows
+  is a gap. Say which reading you took when in doubt.
+- **`absorbed_by`** marks a role variant that another card renders as a
+  tab; read its rows as variants of the absorbing section, not as a
+  separate section.
+- **Absent-macro notes are global strings.** Quote
+  `macro_absent_notes[macro]` for a macro the org truly lacks, then state
+  the org's actual state in one sentence: a note can say "nothing generated
+  for this org yet" for a macro the org has (use the data, record the note
+  as a defect), and the Community note says Discord is published under
+  hiero-ledger while hiero-ledger itself has no Community macro. An
+  ungoverned org has no role data: write "role data is not available for
+  this org", never "no maintainers".
+- **No `maintainer-pipeline` (no governance config):** the activity trend
+  falls back to `repo-growth`, the `profiles` period rows and the heatmap's
+  monthly columns (a weighted score, not a count; counting non-zero cells
+  per month is a derivation and must be called one).
+- **Notes live in two places.** A variant's `note` and `methodology` may be
+  on the manifest card, in the document, or both; the release-timeline
+  `Last 18 months` document carries them, its sibling variants do not.
+  When a note and the document's `population` or `window` disagree about
+  the period, `window` and `population` win and the mismatch is a data note.
+- **Two repo counts.** `entities.repositories.count` lists repos with
+  tracked activity; the repo-level tables and `repo-growth` list every
+  repo. Report the table count as the org size and the entity count as
+  "repos with activity".
+- **Heatmaps** hold every row (`top_n: 25` is the dashboard's display cut)
+  and cover the last six complete calendar months; a `role` of "General
+  User" on every row means the org has no role data.
+- **Table periods** are `7d`, `30d`, `365d` plus the default rows
+  (all-time). There is no 180-day or six-month table. For an org younger
+  than a year the `365d` rows equal the default rows; say so once.
+- **Chart documents** live at `charts[].variants[].interactive.path`; their
+  `kind` (`timeseries`, `categories`, `matrix`, `network`, `events`) decides
+  how to read them. `web/src/api.ts` documents every shape.
+
 ## Which macro answers which question
 
 The sections below existed for `hiero-ledger` on 2026-10-06. Resolve ids from

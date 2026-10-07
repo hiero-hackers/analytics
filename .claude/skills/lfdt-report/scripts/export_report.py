@@ -49,7 +49,9 @@ h2 { font-size: 15pt; margin: 18pt 0 6pt; border-bottom: 1px solid #999; }
 h3 { font-size: 12.5pt; margin: 14pt 0 4pt; }
 p, li { orphans: 3; widows: 3; }
 blockquote { border-left: 3px solid #c60; background: #fff7ee; margin: 8pt 0; padding: 4pt 10pt; }
-table { border-collapse: collapse; font-size: 9.5pt; margin: 6pt 0; page-break-inside: avoid; }
+table { border-collapse: collapse; font-size: 9.5pt; margin: 6pt 0; }
+tr { page-break-inside: avoid; }
+h2, h3 { page-break-after: avoid; }
 th, td { border: 1px solid #bbb; padding: 3pt 6pt; vertical-align: top; }
 th { background: #eee; }
 img { max-width: 100%; page-break-inside: avoid; }

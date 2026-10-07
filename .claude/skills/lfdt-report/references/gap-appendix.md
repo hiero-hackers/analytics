@@ -1,10 +1,14 @@
-# The Data Gaps appendix
+# Appendix: Data notes and gaps
 
-The appendix has three parts, always in this order.
+The last appendix has four parts, always in this order. It is where every
+identifier, field name and method remark that the body is not allowed to
+carry ends up.
 
 ## 1. Provenance
 
 ```
+BASE: https://hiero-hackers.github.io/analytics/data/api/v1 (manifest at BASE/manifest.json)
+Draft status: <"complete period" or "data to <date>; re-run after <period end> before filing">
 API version: v1 (work in progress: <wip value>)
 Manifest generated: <generated_at>
 Analytics revision: <provenance.git_sha>
@@ -12,11 +16,26 @@ Data as of (oldest dataset watermark): <provenance.data_as_of>
 TAC instructions read: <date, and "matched snapshot" or what differed>
 Prior report read: <URL, or "not available: <reason>">
 Stale documents cited: <ids, or none>
-Data defects noticed: <stale absent-notes, unnormalised employers, note/window mismatches, or none>
 Partial buckets excluded: <ids and bucket names, or none>
 ```
 
-## 2. Gaps
+## 2. Data notes
+
+One bullet per thing a careful reader would otherwise trip on, with ids:
+
+- Both sides of every disagreement the body mentions qualitatively (the
+  two open-issue views, the two single-employer counts, funnel versus
+  evidence table, the two repository counts), with a one-line reason.
+- Counting rules that matter: GitHub accounts not people; highest-role
+  counting and where it does and does not allow sums; the bot name rule
+  and any automation accounts seen in the tables.
+- Every `Derived:` line from `derive.py`, and any derivation done by hand
+  (what was computed, from which documents).
+- Data defects noticed this run (stale absent-macro notes, unnormalised
+  employer names, methodology text wrong about its document). These are
+  the seeds of analytics issues; keep them terse and factual.
+
+## 3. Gaps
 
 One entry per item the TAC asks for that the API could not supply. Use this
 shape, short and concrete:
@@ -31,8 +50,9 @@ shape, short and concrete:
   or a manual maintainer input>
 ```
 
-For missing macros, quote `macro_absent_notes[macro]` verbatim and add
-nothing to it.
+For missing macros, quote `macro_absent_notes[macro]` verbatim, then add
+one sentence stating this org's actual state (the notes are global and can
+contradict the org's own manifest).
 
 **A gap is only a gap after checking.** Search the manifest's sections, chart
 documents and metric tiles before declaring one. Chart documents especially:
@@ -49,6 +69,9 @@ expectations to check, not facts to copy:
 - **Adopters:** the ADOPTERS file, how many organisations use the project and
   how that changed. (The HIP funnel is not a substitute.)
 - **Community calls:** cadence, attendance, new call series.
+- **Projects adopted or proposed:** the API publishes repository counts per
+  month but not the new repositories' names or creation dates, and does not
+  collect the "project proposal" issues in hiero-ledger/tsc.
 - **Discord:** the Community macro was absent from the hiero-ledger manifest,
   and even when present it counts messages, not response times.
 - **Issue and PR resolution speed:** time to first response, time to close or
@@ -78,7 +101,7 @@ expectations to check, not facts to copy:
 - **Contributor counts from other tools** (for example LFX Insights authors):
   different definitions, never mix.
 
-## 3. Coverage checklist
+## 4. Coverage checklist
 
 Close with one line per TAC question, so a reviewer sees at a glance what is
 done:

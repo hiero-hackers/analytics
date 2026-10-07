@@ -34,14 +34,18 @@ python3 .claude/skills/lfdt-report/scripts/render_figure.py \
   "$WORK/hiero-ledger/charts/maintainer_pipeline_yearly.json" \
   "$OUT/figures/active-by-role-yearly.svg" \
   --title "Unique active contributors by role, per year" \
-  --subtitle "Each person counted once at their highest role anywhere; bots excluded. Data as of 2026-10-06."
+  --subtitle "Each person counted once at their highest role anywhere; bots excluded. Data as of 6 October 2026."
 ```
+
+Partial buckets are outlined with a dashed border, starred, and carry no
+total label; the footer says "outlined, not final".
 
 Open every figure before embedding it (the PNG, or the SVG in a browser).
 The axis must be readable and the legend must match the series you kept.
 Put the figures in a `figures/` directory beside the draft. Keep the
-subtitle to what the document's `population` and `window` say; the caption
-and `Source:` line in the report carry everything else.
+subtitle to what the document's `population` and `window` say, with a human
+date ("Data as of 6 October 2026"); the caption and the source number in
+the report carry everything else.
 
 If the maintainer wants the picture to match the dashboard exactly, the
 dashboard's print button on any chart card exports a PNG, JPG or PDF of
@@ -52,16 +56,15 @@ that chart. Say which card and variant to export.
 In the body, directly under the paragraph the figure illustrates:
 
 ```markdown
-![Unique active contributors by role, 2018 to 2026 (2026 partial)](figures/active-by-role-yearly.svg)
+![Active contributors by role, 2018 to 2026](figures/active-by-role-yearly.svg)
 
-*Figure 1. Distinct people active per calendar year, each counted once at
-their highest role. 2026 is partial (to 6 October) and drawn hollow.*
-Source: chart `maintainer-pipeline`, All time variant
-(`maintainer_pipeline_yearly`); data as of 2026-10-06.
+*Figure 1. People active each year, counted once at their highest role. The
+2026 bar is outlined because the year is not complete.* [3]
 ```
 
-The alt text states what the picture shows, the italic caption states how
-to read it, and the `Source:` line is the same as for any number.
+The alt text says what the picture shows, the caption says how to read it
+in one plain sentence, and the bracketed number points to the Sources
+appendix like any other figure. No `Source:` line under a figure.
 
 ## PNG and PDF companions
 

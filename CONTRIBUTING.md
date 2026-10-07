@@ -100,6 +100,13 @@ Fully automated PRs — bot-authored submissions with no human who did the above
 are closed regardless of quality. If a review walkthrough shows the work wasn't
 verified, we'll suggest a lower-level issue rather than merge it.
 
+Repo-specific Claude Code skills live under `.claude/skills/<name>/` (a
+`SKILL.md` plus references and, where useful, small standard-library scripts).
+They are documentation for an assistant, not part of the pipeline, but their
+scripts are tested under `tests/` and linted like any other code. Treat a
+change to a skill like a change to docs: check its claims against the code
+and the published data before you commit them.
+
 ## Code quality
 
 Formatting and linting are enforced in CI (the

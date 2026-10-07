@@ -5,7 +5,7 @@ Standard library only, so it runs anywhere the draft is written. Handles the
 two document kinds a report figure needs:
 
 - ``timeseries`` (bar, stacked or not; line): one group per bucket, partial
-  buckets drawn hollow and labelled "(partial)".
+  buckets outlined with a dashed border, starred, and given no total label.
 - ``categories`` (horizontal bars): one bar per row, ``top_n`` rows kept,
   the rest folded into "Other (n)".
 
@@ -130,7 +130,7 @@ def render_timeseries(
                     else f"fill='{colors[s['key']]}'"
                 )
                 parts.append(f"<rect x='{x:.1f}' y='{y:.1f}' width='{bw:.1f}' height='{hgt:.1f}' {style}/>")
-            if stacked:
+            if stacked and not partial:
                 total = sum(float(r.get(s["key"]) or 0) for s in series)
                 parts.append(
                     f"<text x='{x0 + slot * (i + 0.5):.1f}' y='{base - 5:.1f}' text-anchor='middle' font-size='11' fill='#111827' {FONT}>{total:g}</text>"
@@ -155,7 +155,7 @@ def render_timeseries(
         )
     if any(r.get("partial") for r in rows):
         parts.append(
-            f"<text x='{x0}' y='{h - 14}' font-size='11' fill='#6b7280' {FONT}>* partial bucket (period not complete at data-as-of date); drawn hollow, not comparable</text>"
+            f"<text x='{x0}' y='{h - 14}' font-size='11' fill='#6b7280' {FONT}>* period not complete at the data-as-of date: outlined, not final, not comparable</text>"
         )
     _legend(parts, series, colors, x0, PAD_T + 2)
     parts.append("</svg>")
@@ -168,11 +168,11 @@ def render_categories(doc: dict, title: str, subtitle: str, keys: list[str] | No
     cat = doc["category"]["key"]
     rows = list(doc["rows"])
     key0 = series[0]["key"]
-    rows.sort(key=lambda r: -float(r.get(key0) or 0))
+    rows.sort(key=lambda r: (-float(r.get(key0) or 0), str(r.get(cat, ""))))
     top = top or doc.get("top_n") or len(rows)
     if len(rows) > top:
         rest = rows[top:]
-        folded = {cat: f"Other ({len(rest)})"}
+        folded = {cat: f"Other ({len(rest)} more)"}
         for s in series:
             folded[s["key"]] = sum(float(r.get(s["key"]) or 0) for r in rest)
         rows = rows[:top] + [folded]
