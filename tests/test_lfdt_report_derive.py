@@ -654,9 +654,9 @@ def test_hips_range_needs_the_merge_date_column(derive):
 # --- single-employer ------------------------------------------------------
 
 
-def test_single_employer_repos_reading_versus_chart_approximation(derive):
+def test_sole_org_repos_reading_versus_chart_approximation(derive):
     """Repos give the table reading (distinct_orgs == 1) and the independent/unknown-free reading."""
-    out = derive.single_employer_report(_repo_diversity_doc(), "repodiversity.json")
+    out = derive.sole_org_report(_repo_diversity_doc(), "repodiversity.json")
     assert "| distinct_orgs == 1 (the table's reading) | 4 |" in out
     assert "| distinct_orgs == 1 and independent == 0 and unknown == 0 (approximates the dashboard chart) | 2 |" in out
     assert "Columns used for the second reading: distinct_orgs, independent, unknown." in out
@@ -664,26 +664,26 @@ def test_single_employer_repos_reading_versus_chart_approximation(derive):
     assert "2 of them also satisfy distinct_orgs == 1 and independent == 0 and unknown == 0" in _last(out)
 
 
-def test_single_employer_teams_use_the_single_employer_flag(derive):
+def test_sole_org_teams_use_the_single_employer_flag(derive):
     """Teams have no independent column, so the document's own single_employer flag is the second reading."""
-    out = derive.single_employer_report(_team_diversity_doc(), "teamdiversity.json")
+    out = derive.sole_org_report(_team_diversity_doc(), "teamdiversity.json")
     assert "| distinct_orgs == 1 (the table's reading) | 3 |" in out
     assert "| distinct_orgs == 1 and single_employer is true (approximates the dashboard chart) | 2 |" in out
     assert any("no independent column" in line for line in out)
 
 
-def test_single_employer_without_either_reading_warns(derive):
+def test_sole_org_without_either_reading_warns(derive):
     """A document with neither the independent/unknown columns nor a flag gets only the table reading and a warning."""
     doc = {"id": "x", "rows": [{"distinct_orgs": 1}, {"distinct_orgs": 2}]}
-    out = derive.single_employer_report(doc, "x.json")
+    out = derive.sole_org_report(doc, "x.json")
     assert any(line.startswith("Warning: no independent/unknown columns") for line in out)
     assert _last(out) == "Derived: 1 rows have distinct_orgs == 1 in x."
 
 
-def test_single_employer_rejects_other_documents(derive):
+def test_sole_org_rejects_other_documents(derive):
     """A document without distinct_orgs is refused."""
     with pytest.raises(derive.DeriveError, match="no 'distinct_orgs' column"):
-        derive.single_employer_report({"rows": [{"repo": "a"}]}, "x.json")
+        derive.sole_org_report({"rows": [{"repo": "a"}]}, "x.json")
 
 
 # --- shared behaviour and the command line --------------------------------

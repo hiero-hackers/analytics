@@ -697,7 +697,7 @@ def _funnel_reason(funnel: dict, path: str, board_given: bool = False) -> list[s
 # ---------------------------------------------------------------------------
 
 
-def single_employer_report(doc: dict, path: str) -> list[str]:
+def sole_org_report(doc: dict, path: str) -> list[str]:
     """Single-employer rows by the table's reading and by the reading that approximates the dashboard chart."""
     rows = _rows(doc, path)
     if rows and "distinct_orgs" not in rows[0]:
@@ -809,7 +809,7 @@ def _run(a: argparse.Namespace) -> list[str]:
         return hips_report(
             doc, a.doc, funnel, a.funnel or "funnel", a.cohort, board, a.board or "board", a.start, a.end
         )
-    return single_employer_report(doc, a.doc)
+    return sole_org_report(doc, a.doc)
 
 
 def main(argv: list[str]) -> int:
