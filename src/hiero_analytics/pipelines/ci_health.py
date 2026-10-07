@@ -20,7 +20,7 @@ from hiero_analytics.pipelines.scorecard import fetch_org_repos
 
 def main(org: str = ORG) -> None:
     """Check organization repositories for CI health issues."""
-    client, org_data_dir, _ = org_context(org)
+    client, org_data_dir = org_context(org)
 
     repos = fetch_org_repos(client, org)
 

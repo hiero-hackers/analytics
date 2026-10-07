@@ -28,9 +28,11 @@ import { CIHealthMatrix } from './CIHealthMatrix';
 /** Per-cell evidence keyed "<entity>|<repo>", newest merged first. */
 function evidenceByCell(rows: Row[]): Map<string, EvidenceItem[]> {
   const cells = new Map<string, EvidenceItem[]>();
+
   for (const row of rows) {
     const key = `${row.hip}|${row.repo}`;
     const items = cells.get(key) ?? [];
+
     items.push({
       n: Number(row.pr_number),
       t: String(row.pr_title ?? '').slice(0, 100),
@@ -40,17 +42,21 @@ function evidenceByCell(rows: Row[]): Map<string, EvidenceItem[]> {
       q: row.qualifier ? String(row.qualifier) : '',
       x: row.snippet ? String(row.snippet).slice(0, 90) : '',
     });
+
     cells.set(key, items);
   }
+
   for (const items of cells.values()) {
     items.sort((a, b) => b.d.localeCompare(a.d));
   }
+
   return cells;
 }
 
 /** The matrix as the reader sees it — wide format, one column per component. */
 function matrixExport(view: MatrixView): CsvExportSource {
   const sdkColumns = view.columns.filter((column) => column.band === 'SDKs');
+
   return {
     name: 'hip_coverage_matrix',
     title: view.title,
@@ -58,14 +64,23 @@ function matrixExport(view: MatrixView): CsvExportSource {
       { key: 'hip', label: 'hip' },
       { key: 'title', label: 'title' },
       { key: 'status', label: 'status' },
-      ...view.columns.map((column) => ({ key: column.key, label: column.label })),
+      ...view.columns.map((column) => ({
+        key: column.key,
+        label: column.label,
+      })),
       { key: 'gaps', label: 'no_merged_sdk_prs_in' },
     ],
     rows: view.rows.map((row) => {
       const byKey = new Map(row.cells.map((cell) => [cell.key, cell]));
-      const record: Row = { hip: row.key, title: row.sublabel, status: row.status };
+      const record: Row = {
+        hip: row.key,
+        title: row.sublabel,
+        status: row.status,
+      };
+
       for (const column of view.columns) {
         const cell = byKey.get(column.key);
+
         record[column.key] =
           !cell || cell.merged === 0
             ? cell && cell.open > 0
@@ -73,15 +88,18 @@ function matrixExport(view: MatrixView): CsvExportSource {
               : 0
             : cell.merged;
       }
+
       record.gaps = sdkColumns
         .filter((column) => (byKey.get(column.key)?.merged ?? 0) === 0)
         .map((column) => column.label)
         .join(' | ');
+
       return record;
     }),
   };
 }
 
+/** Export the CI-health matrix, optionally restricted to filtered rows. */
 function ciHealthMatrixExport(
   view: CIHealthMatrixView,
   rows: CIHealthMatrixView['rows'] = view.rows,
@@ -141,7 +159,9 @@ export function ViewCards({
   provenance: Manifest['provenance'];
 }) {
   const [jump, setJump] = useState<JumpRequest | null>(null);
+
   const [ciHealthRows, setCiHealthRows] = useState<Record<string, CIHealthMatrixView['rows']>>({});
+
   const jumpCounter = useRef(0);
 
   const onCiHealthRows = useCallback((viewId: string, rows: CIHealthMatrixView['rows']) => {
@@ -151,8 +171,10 @@ export function ViewCards({
   }, []);
 
   const matrix = views.find((view): view is MatrixView => view.kind === 'matrix');
+
   const evidence = useMemo(() => {
     const evidenceDoc = matrix && sectionDocs.find((doc) => doc.id === matrix.evidence_section);
+
     return evidenceByCell(evidenceDoc?.rows ?? []);
   }, [matrix, sectionDocs]);
 
@@ -167,46 +189,6 @@ export function ViewCards({
               : ciHealthMatrixExport(view, ciHealthRows[view.id]);
 
         return (
-          <SectionCard
-            key={view.id}
-            id={view.id}
-            title={view.title}
-            badge={view.badge}
-            description={view.description}
-            generatedAt={view.generated_at}
-            stale={view.stale}
-            actions={
-              <>
-                <CopyLinkButton sectionId={view.id} />
-                <CsvDownloadButton
-                  provenance={provenance}
-                  payload={() => ({
-                    ...exportSource,
-                    total:
-                      view.kind === 'ci_health_matrix'
-                        ? view.rows.length
-                        : exportSource.rows.length,
-                    dataAsOf: view.generated_at,
-                  })}
-                />
-              </>
-            }
-          >
-            {view.kind === 'board' ? (
-              // The board names the view its chips jump to, so a future board
-              // could target something other than the coverage matrix.
-              <StatusBoard
-                view={view}
-                onJump={(hip) =>
-                  view.target_view === matrix?.id && setJump({ hip, nonce: ++jumpCounter.current })
-                }
-              />
-            ) : view.kind === 'matrix' ? (
-              <CoverageMatrix view={view} evidence={evidence} jump={jump} />
-            ) : (
-              <CIHealthMatrix view={view} onFilteredRows={onCiHealthRows} />
-            )}
-          </SectionCard>
           <SectionBoundary key={view.id} id={view.id} title={view.title}>
             <SectionCard
               id={view.id}
@@ -218,11 +200,15 @@ export function ViewCards({
               actions={
                 <>
                   <CopyLinkButton sectionId={view.id} />
+
                   <CsvDownloadButton
                     provenance={provenance}
                     payload={() => ({
                       ...exportSource,
-                      total: exportSource.rows.length,
+                      total:
+                        view.kind === 'ci_health_matrix'
+                          ? view.rows.length
+                          : exportSource.rows.length,
                       dataAsOf: view.generated_at,
                     })}
                   />
@@ -236,11 +222,16 @@ export function ViewCards({
                   view={view}
                   onJump={(hip) =>
                     view.target_view === matrix?.id &&
-                    setJump({ hip, nonce: ++jumpCounter.current })
+                    setJump({
+                      hip,
+                      nonce: ++jumpCounter.current,
+                    })
                   }
                 />
-              ) : (
+              ) : view.kind === 'matrix' ? (
                 <CoverageMatrix view={view} evidence={evidence} jump={jump} />
+              ) : (
+                <CIHealthMatrix view={view} onFilteredRows={onCiHealthRows} />
               )}
             </SectionCard>
           </SectionBoundary>

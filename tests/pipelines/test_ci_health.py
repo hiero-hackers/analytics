@@ -47,7 +47,7 @@ jobs:
     monkeypatch.setattr(
         ci_health,
         "org_context",
-        lambda _: (client, data_dir, Mock()),
+        lambda _: (client, data_dir),
     )
     monkeypatch.setattr(
         ci_health,
@@ -189,7 +189,7 @@ jobs:
     monkeypatch.setattr(
         ci_health,
         "org_context",
-        lambda _: (client, data_dir, Mock()),
+        lambda _: (client, data_dir),
     )
     monkeypatch.setattr(
         ci_health,

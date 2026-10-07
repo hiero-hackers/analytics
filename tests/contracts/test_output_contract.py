@@ -44,8 +44,8 @@ import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
-from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.dashboard_spec import entities as entity_spec
+from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -82,23 +82,7 @@ CLI_ONLY_CHART_CARDS = {"discord"}
 # chart source or a tile loader rather than a table section) and
 # non-dashboard reports.
 CHART_COMPANION_CSVS = {
-    "affiliation_distribution.csv",
-    "affiliation_distribution_committers.csv",
-    "repo_affiliation_composition.csv",
-    "repo_affiliation_composition_committers.csv",
-    "team_affiliation_composition.csv",
-    "repo_affiliation_diversity.csv",  # base for spec section; keep for safety
-    "ci_health_checks.csv",
-    "contributor_activity_heatmap.csv",
-    "org_activity_heatmap.csv",
-    "team_activity_heatmap.csv",
-    "repo_activity_heatmap.csv",
-    # Bases; the shared-period variants (_7d/_30d/_365d) are derived below.
-    "difficulty_distribution.csv",
-    "difficulty_by_repo.csv",
-    "difficulty_over_time_event_based_weekly.csv",
-    "difficulty_over_time_all_event_based_weekly.csv",
-    "maintainer_activity_events.csv",
+    "ci_health_checks.csv",  # long-format CI health findings behind the CI health matrix
     "difficulty_distribution.csv",  # base of the shared-period variants (_7d/_30d/_365d) derived below
     "maintainer_activity_events.csv",  # event-level source behind the maintainer pipeline tables
     "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
