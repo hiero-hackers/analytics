@@ -10,7 +10,9 @@ from hiero_analytics.dashboard_spec import (
     CHART_NOTES,
     COLUMN_FORMATS,
     CUSTOM_VIEW_MODULES,
+    FULL_ROW_CHARTS,
     MACRO_GLOSSARIES,
+    MACRO_SUMMARIES,
     TABLE_FAMILIES,
     WIDE_CHARTS,
     table_variants,
@@ -18,28 +20,31 @@ from hiero_analytics.dashboard_spec import (
 from hiero_analytics.export.data_api import variant_annotations
 
 
-def _referenced_files() -> set[str]:
-    """Every chart filename any macro actually lists."""
-    files: set[str] = set()
+def _referenced_ids() -> set[str]:
+    """Every chart id any macro actually lists."""
+    ids: set[str] = set()
     for macro in CHART_MACROS:
         for specs in macro["charts"].values():
             for spec in specs:
-                for _caption, variants in spec["files"]:
-                    files.update(filename for _label, filename in variants)
-    return files
+                for _caption, variants in spec["variants"]:
+                    ids.update(chart_id for _label, chart_id in variants)
+    return ids
 
 
 def test_chart_annotations_reference_existing_charts():
-    """Notes, methodology, and wide flags may only point at charts a macro lists.
+    """Notes, methodology, and layout flags may only point at charts a macro lists.
 
     An entry keyed by a chart no macro references is dead weight — usually a
     leftover from a removed chart — and fails here instead of drifting silently.
     """
-    referenced = _referenced_files()
+    referenced = _referenced_ids()
 
     assert set(CHART_NOTES) <= referenced, sorted(set(CHART_NOTES) - referenced)
     assert set(CHART_METHODOLOGY) <= referenced, sorted(set(CHART_METHODOLOGY) - referenced)
     assert referenced >= WIDE_CHARTS, sorted(WIDE_CHARTS - referenced)
+    assert referenced >= FULL_ROW_CHARTS, sorted(FULL_ROW_CHARTS - referenced)
+    # A chart is either scrolled wide or spanned full-row, never both.
+    assert not WIDE_CHARTS & FULL_ROW_CHARTS, sorted(WIDE_CHARTS & FULL_ROW_CHARTS)
 
 
 def test_every_chart_annotation_reaches_a_variant():
@@ -56,13 +61,13 @@ def test_every_chart_annotation_reaches_a_variant():
     for macro in CHART_MACROS:
         for specs in macro["charts"].values():
             for spec in specs:
-                for _caption, variants in spec["files"]:
-                    for _label, filename in variants:
-                        annotations = variant_annotations(filename)
+                for _caption, variants in spec["variants"]:
+                    for _label, chart_id in variants:
+                        annotations = variant_annotations(chart_id)
                         if "note" in annotations:
-                            reached_notes.add(filename)
+                            reached_notes.add(chart_id)
                         if "methodology" in annotations:
-                            reached_methods.add(filename)
+                            reached_methods.add(chart_id)
 
     assert set(CHART_NOTES) == reached_notes, sorted(set(CHART_NOTES) ^ reached_notes)
     assert set(CHART_METHODOLOGY) == reached_methods, sorted(set(CHART_METHODOLOGY) ^ reached_methods)
@@ -81,14 +86,53 @@ def test_section_groups_match_section_specs():
         assert sorted(grouped_ids) == sorted(spec_ids), macro_name
 
 
-def test_chart_files_are_canonical():
-    """After assembly, every files entry is ``(caption, [(label, filename), ...])``."""
+def test_chart_variants_are_canonical():
+    """After assembly, every variants entry is ``(caption, [(label, chart_id), ...])``.
+
+    A chart id doubles as the chart document's filename stem and the key of the
+    dashboard's URL state for that view, so it is a plain slug: no extension,
+    no path separators.
+    """
     for macro in CHART_MACROS:
         for specs in macro["charts"].values():
             for spec in specs:
-                for _caption, variants in spec["files"]:
+                for _caption, variants in spec["variants"]:
                     assert isinstance(variants, list) and variants
-                    assert all(isinstance(label, str) and filename.endswith(".png") for label, filename in variants)
+                    for label, chart_id in variants:
+                        assert isinstance(label, str) and label
+                        assert isinstance(chart_id, str) and chart_id
+                        assert "." not in chart_id and "/" not in chart_id, chart_id
+
+
+def test_every_chart_variant_has_exactly_one_source():
+    """A card's variant ids and its ``sources`` keys are the same set.
+
+    Every listed variant is drawn from its source dataset — there is no other
+    way to render one — so a variant without a source would be a tab that can
+    never appear, and a source without a variant is dead configuration.
+    """
+    for macro in CHART_MACROS:
+        for specs in macro["charts"].values():
+            for spec in specs:
+                listed = {chart_id for _caption, variants in spec["variants"] for _label, chart_id in variants}
+                assert listed == set(spec["sources"]), (macro["name"], spec["id"], listed ^ set(spec["sources"]))
+
+
+def test_chart_ids_are_unique_within_an_org():
+    """Two cards in one org may not share a chart id.
+
+    The data API writes one ``<org>/charts/<id>.json`` per id and the dashboard
+    keys the view's URL state by it, so a collision would make one chart
+    silently overwrite the other's document and state.
+    """
+    for macro in CHART_MACROS:
+        for org, specs in macro["charts"].items():
+            seen: dict[str, str] = {}
+            for spec in specs:
+                for _caption, variants in spec["variants"]:
+                    for _label, chart_id in variants:
+                        assert chart_id not in seen, (org, chart_id, seen[chart_id], spec["id"])
+                        seen[chart_id] = spec["id"]
 
 
 def _macro_names() -> set[str]:
@@ -117,6 +161,15 @@ def test_macro_glossaries_belong_to_real_macros():
         assert glossary["terms"], f"{macro_name}: glossary needs terms"
         # Data, not markup — the frontend owns the rendering.
         assert "<" not in str(glossary), f"{macro_name}: glossary must not carry HTML"
+
+
+def test_every_macro_has_a_plain_one_line_summary():
+    """Each tab states its purpose under its title: one line of text, no markup."""
+    assert set(MACRO_SUMMARIES) == _macro_names()
+    for macro_name, summary in MACRO_SUMMARIES.items():
+        assert summary.strip(), f"{macro_name}: summary is empty"
+        assert "\n" not in summary, f"{macro_name}: summary must be one line"
+        assert "<" not in summary, f"{macro_name}: summary must not carry HTML"
 
 
 def test_activity_specs_use_the_shared_period_set():
@@ -200,18 +253,18 @@ def test_every_chart_has_a_note_and_a_methodology():
     The reverse check (annotations referencing real charts) already exists; this
     is the coverage direction — without it, annotations accrue ad-hoc and a new
     chart ships with an empty lightbox. Variants share their chart's entry, so a
-    chart counts as annotated if any of its files is keyed.
+    chart counts as annotated if any of its variant ids is keyed.
     """
     missing_note, missing_method = [], []
     for macro in CHART_MACROS:
         for specs in macro["charts"].values():
             for spec in specs:
-                for caption, variants in spec["files"]:
-                    files = [filename for _label, filename in variants]
+                for caption, variants in spec["variants"]:
+                    ids = [chart_id for _label, chart_id in variants]
                     where = f"{macro['name']} / {caption}"
-                    if not any(f in CHART_NOTES for f in files):
+                    if not any(i in CHART_NOTES for i in ids):
                         missing_note.append(where)
-                    if not any(f in CHART_METHODOLOGY for f in files):
+                    if not any(i in CHART_METHODOLOGY for i in ids):
                         missing_method.append(where)
 
     assert not missing_note, f"charts with no 'how to read this' note: {sorted(set(missing_note))}"

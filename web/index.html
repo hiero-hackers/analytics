@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <!--
       The dashboard is self-contained: its bundle, JSON, and chart PNGs are all
-      same-origin, so nothing legitimate needs an outside origin. 'unsafe-inline'
+      same-origin; only GitHub avatars come from outside. 'unsafe-inline'
       is granted to styles only (React writes inline style attributes); scripts
       get no such exemption. Note frame-ancestors cannot be set from a meta tag —
       clickjacking protection would need a response header, which GitHub Pages
@@ -12,9 +12,12 @@
     -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/brand/hiero-mark.svg" />
+    <!-- Render-blocking on purpose: the CSP allows no inline script, and a
+         deferred one would flash the OS theme before the stored choice. -->
+    <script src="/theme-init.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hiero — analytics dashboard</title>
   </head>

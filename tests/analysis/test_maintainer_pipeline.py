@@ -12,10 +12,6 @@ from hiero_analytics.analysis.maintainer_pipeline import (
     build_maintainer_repo_pipeline,
     build_maintainer_weekly_pipeline,
     build_maintainer_yearly_pipeline,
-    calendar_recent_buckets,
-    humanize_day_label,
-    humanize_month_label,
-    humanize_week_label,
     last_calendar_buckets,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord
@@ -321,17 +317,8 @@ def test_weekly_pipeline_counts_each_week_separately():
 
 
 # ---------------------------------------------------------------------------
-# last_calendar_buckets / calendar_recent_buckets
+# last_calendar_buckets
 # ---------------------------------------------------------------------------
-
-
-def _month_pipeline(n: int) -> pd.DataFrame:
-    """Build a chronologically-sorted monthly pipeline table with ``n`` rows."""
-    rows = [
-        {"month": f"2024-{m:02d}", "general_user": m, "triage": 0, "committer": 0, "maintainer": 0}
-        for m in range(1, n + 1)
-    ]
-    return pd.DataFrame(rows)
 
 
 def test_last_calendar_buckets_daily_weekly_monthly():
@@ -349,34 +336,6 @@ def test_last_calendar_buckets_cross_boundaries():
 
     assert last_calendar_buckets(now, 3, "month") == ["2024-11", "2024-12", "2025-01"]
     assert last_calendar_buckets(now, 2, "week") == ["2024-W52", "2025-W01"]
-
-
-def test_calendar_recent_buckets_windows_by_calendar_not_by_populated_rows():
-    """A sparse table must not stretch older activity into the window (#coderabbit).
-
-    Only 2024-03 and 2024-12 have activity; a 3-month window ending December
-    contains October and November as zero rows and excludes March entirely.
-    """
-    pipeline = pd.DataFrame(
-        [
-            {"month": "2024-03", "general_user": 7, "triage": 0, "committer": 0, "maintainer": 1},
-            {"month": "2024-12", "general_user": 2, "triage": 0, "committer": 0, "maintainer": 0},
-        ]
-    )
-
-    windowed = calendar_recent_buckets(pipeline, ["2024-10", "2024-11", "2024-12"])
-
-    assert list(windowed["month"]) == ["2024-10", "2024-11", "2024-12"]
-    assert list(windowed["general_user"]) == [0, 0, 2]
-    assert "2024-03" not in set(windowed["month"])
-    assert windowed["maintainer"].dtype.kind == "i"  # zero-fill keeps integer counts
-
-
-def test_calendar_recent_buckets_empty_input_stays_empty():
-    """An empty pipeline stays empty so the plotting layer still skips the chart."""
-    pipeline = pd.DataFrame(columns=["month", "general_user", "triage", "committer", "maintainer"])
-
-    assert calendar_recent_buckets(pipeline, ["2024-11", "2024-12"]).empty
 
 
 # ---------------------------------------------------------------------------
@@ -469,11 +428,3 @@ def test_every_time_view_agrees_on_one_day_of_activity():
     }
 
     assert set(counts.values()) == {2}, counts
-
-
-def test_bucket_labels_humanize_for_charts_and_degrade_raw():
-    """Charts speak human ('w/c 3 Aug'), CSVs keep sortable keys; junk passes through."""
-    assert humanize_month_label("2026-07") == "Jul 2026"
-    assert humanize_week_label("2026-W32") == "w/c 3 Aug 2026"
-    assert humanize_day_label("2026-08-05") == "Wed 5 Aug 2026"
-    assert humanize_week_label("not-a-week") == "not-a-week"

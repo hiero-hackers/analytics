@@ -27,13 +27,9 @@ OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 INPUTS_DIR = PROJECT_ROOT / "inputs"
 
 DATA_DIR = OUTPUTS_DIR / "data"
-CHARTS_DIR = OUTPUTS_DIR / "charts"
 
 REPO_DATA_DIR = DATA_DIR / "repo"
 ORG_DATA_DIR = DATA_DIR / "org"
-
-REPO_CHARTS_DIR = CHARTS_DIR / "repo"
-ORG_CHARTS_DIR = CHARTS_DIR / "org"
 
 # Persistent "system of record" datasets for incremental fetching (see
 # data_sources/dataset_store.py). Gitignored locally; CI persists them across
@@ -51,62 +47,15 @@ def dataset_path(resource: str, scope: str, fingerprint: str = "all") -> Path:
     return DATASETS_DIR / f"{resource}_{scope_slug}_{fingerprint}.json"
 
 
-def ensure_output_dirs() -> None:
-    """
-    Ensure the above directories exist.
-
-    Should be called by runner scripts before writing files to ensure they can be
-    saved to that location.
-    """
-    for path in [
-        OUTPUTS_DIR,
-        DATA_DIR,
-        CHARTS_DIR,
-        REPO_DATA_DIR,
-        ORG_DATA_DIR,
-        REPO_CHARTS_DIR,
-        ORG_CHARTS_DIR,
-        DATASETS_DIR,
-    ]:
-        path.mkdir(parents=True, exist_ok=True)
-
-
-def ensure_org_dirs(org: str) -> tuple[Path, Path]:
-    """
-    Create org-specific output directories.
-
-    Args:
-        org: Organization identifier, such as a GitHub organization name or slug.
-
-    Returns:
-        A tuple containing:
-            org_data_dir: Directory for organization-level data outputs.
-            org_charts_dir: Directory for organization-level chart outputs.
-    """
-    org_name = org.replace("/", "_")
-
-    org_data_dir = ORG_DATA_DIR / org_name
-    org_charts_dir = ORG_CHARTS_DIR / org_name
-
+def ensure_org_dirs(org: str) -> Path:
+    """Create and return the org's data output directory (``outputs/data/org/<org>``)."""
+    org_data_dir = ORG_DATA_DIR / org.replace("/", "_")
     org_data_dir.mkdir(parents=True, exist_ok=True)
-    org_charts_dir.mkdir(parents=True, exist_ok=True)
-
-    return org_data_dir, org_charts_dir
+    return org_data_dir
 
 
-def ensure_repo_dirs(repo: str) -> tuple[Path, Path]:
-    """
-    Create repo-specific output directories.
-
-    Returns:
-        repo_data_dir, repo_charts_dir
-    """
-    repo_name = repo.replace("/", "_")
-
-    repo_data_dir = REPO_DATA_DIR / repo_name
-    repo_charts_dir = REPO_CHARTS_DIR / repo_name
-
+def ensure_repo_dirs(repo: str) -> Path:
+    """Create and return the repo's data output directory (``outputs/data/repo/<owner_repo>``)."""
+    repo_data_dir = REPO_DATA_DIR / repo.replace("/", "_")
     repo_data_dir.mkdir(parents=True, exist_ok=True)
-    repo_charts_dir.mkdir(parents=True, exist_ok=True)
-
-    return repo_data_dir, repo_charts_dir
+    return repo_data_dir

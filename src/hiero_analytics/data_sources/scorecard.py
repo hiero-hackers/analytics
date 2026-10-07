@@ -15,15 +15,27 @@ from .serialization import parse_github_datetime
 
 logger = logging.getLogger(__name__)
 
-SCORECARD_API = os.getenv("SCORECARD_API", "https://api.scorecard.dev/projects/github.com/hiero-ledger")
+# Override for a mirror or test server. The value must carry an ``{org}``
+# placeholder: an older org-less value (``…/github.com/hiero-ledger``) would
+# query that one org's scorecards for every org, so it is rejected, not reused.
+SCORECARD_API = os.getenv("SCORECARD_API", "https://api.scorecard.dev/projects/github.com/{org}")
 
 
-def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
+def scorecard_url(repo: str, org: str, template: str | None = None) -> str:
+    """The Scorecard API URL for ``org/repo``; raises when the template has no ``{org}``."""
+    template = SCORECARD_API if template is None else template
+    if "{org}" not in template:
+        raise ValueError(f"SCORECARD_API must contain an {{org}} placeholder, got {template!r}")
+    return f"{template.replace('{org}', org)}/{repo}"
+
+
+def fetch_repo_scorecard(repo: str, *, org: str = "hiero-ledger") -> ScorecardRecord | None:
     """
     Fetch latest OpenSSF Scorecard for a repository.
 
     Args:
         repo: Repository in format `eg: hiero-python-sdk`
+        org: GitHub organisation that owns the repository.
 
     Returns:
         ScorecardRecord, or None when the repository has no scorecard (404).
@@ -32,7 +44,7 @@ def fetch_repo_scorecard(repo: str) -> ScorecardRecord | None:
         requests.RequestException: On network failures or non-404 HTTP errors,
             so a transient outage is never silently recorded as a missing scorecard.
     """
-    url = f"{SCORECARD_API}/{repo}"
+    url = scorecard_url(repo, org)
 
     try:
         response = requests.get(url, timeout=HTTP_TIMEOUT_SECONDS)

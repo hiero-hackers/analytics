@@ -1,12 +1,12 @@
 /**
  * A miniature but structurally complete data API: two orgs, one macro with
  * charts + tables + metrics (only for the primary org) and one macro both
- * orgs share, so org-tab behaviour is exercised. `stubApi` serves it through
- * a fetch stub keyed by URL suffix — the same contract the real API honours.
+ * orgs share, so org-tab behaviour is exercised. The component suite serves these
+ * routes through `stubApi`; the browser suite writes them to a static API tree.
+ * Keep this module plain data so both runners can use the same typed contract.
  */
 
-import { vi } from 'vitest';
-import type { BoardView, Manifest, MatrixView, SectionDoc } from '../api';
+import type { BoardView, Manifest, MatrixView, SectionDoc, TimeseriesDocument } from '../api';
 
 export const GOV_DOC: SectionDoc = {
   id: 'roles',
@@ -171,6 +171,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
     { key: 'flag', label: 'flag', format: 'flag' },
     { key: 'presence', label: 'presence', format: 'presence' },
     { key: 'number', label: 'number', format: 'number' },
+    { key: 'percent', label: 'share %', format: 'percent' },
     { key: 'staleness', label: 'staleness', format: 'staleness' },
   ],
   rows: [
@@ -183,6 +184,7 @@ export const ALL_FORMATS_DOC: SectionDoc = {
       flag: 'true',
       presence: 'true',
       number: 2490,
+      percent: 62,
       staleness: 'overdue',
     },
   ],
@@ -279,6 +281,79 @@ export const BOARD_DOC: BoardView = {
   target_view: 'hip-matrix',
 };
 
+/** A chart variant's dataset: the API path is `hiero-ledger/charts/<id>.json`. */
+const timeseries = (id: string) => ({
+  kind: 'timeseries' as const,
+  path: `hiero-ledger/charts/${id}.json`,
+});
+
+/** The smallest valid timeseries document; `note` and `methodology` follow its tab. */
+const chartDocument = (
+  id: string,
+  extra: Partial<TimeseriesDocument> = {},
+): TimeseriesDocument => ({
+  schema_version: 1,
+  id,
+  org: 'hiero-ledger',
+  kind: 'timeseries',
+  source: 'roles.csv',
+  metric: id,
+  unit: 'People',
+  population: 'Everyone counted.',
+  dimensions: ['period', 'series'],
+  generated_at: '2026-07-25T10:00:00+00:00',
+  mark: 'bar',
+  stacked: false,
+  normalize: false,
+  orientation: 'vertical',
+  value_format: 'integer',
+  rank: false,
+  top_n: null,
+  reference: null,
+  category: { key: 'bucket', label: 'Period (UTC)' },
+  series: [{ key: 'count', label: 'People', color: 'var(--chart-1)' }],
+  details: [],
+  frequency: 'year',
+  timezone: 'UTC',
+  comparison: null,
+  group: null,
+  window: { kind: 'calendar', first: '2025', last: '2026' },
+  rows: [
+    { bucket: '2025', count: 4, partial: false },
+    { bucket: '2026', count: 6, partial: true },
+  ],
+  ...extra,
+});
+
+const CHART_ROUTES: Record<string, unknown> = {
+  'hiero-ledger/charts/pipeline_yearly.json': chartDocument('pipeline_yearly', {
+    note: 'How to read this chart.',
+    methodology: ['Step one.', 'Step two.'],
+  }),
+  'hiero-ledger/charts/pipeline_monthly.json': chartDocument('pipeline_monthly', {
+    frequency: 'month',
+    note: 'How to read this chart.',
+    methodology: ['Step one.', 'Step two.'],
+  }),
+  'hiero-ledger/charts/affiliation_donut.json': chartDocument('affiliation_donut', {
+    note: 'The maintainer bench by employer.',
+    methodology: ['Count maintainers.'],
+  }),
+  'hiero-ledger/charts/affiliation_donut_committers.json': chartDocument(
+    'affiliation_donut_committers',
+    { note: 'The committer bench by employer.', methodology: ['Count committers.'] },
+  ),
+  'hiero-ledger/charts/single_employer_repos_by_org.json': chartDocument(
+    'single_employer_repos_by_org',
+  ),
+  'hiero-ledger/charts/single_employer_repos_by_org_committers.json': chartDocument(
+    'single_employer_repos_by_org_committers',
+  ),
+  'hiero-ledger/charts/single_employer_teams_by_org.json': chartDocument(
+    'single_employer_teams_by_org',
+  ),
+};
+
 export const MANIFEST: Manifest = {
   version: 'v1',
   generated_at: '2026-07-25T22:00:00+00:00',
@@ -299,6 +374,7 @@ export const MANIFEST: Manifest = {
   },
   period_labels: { '30d': '1 month' },
   issues_url: 'https://example.test/issues',
+  macro_summaries: { Governance: 'Who holds which role, and where.' },
   macro_absent_notes: {
     Governance:
       "Governance analytics need a published governance config; this org doesn't have one.",
@@ -373,8 +449,8 @@ export const MANIFEST: Manifest = {
             {
               title: 'Unique active contributors by role',
               variants: [
-                { label: 'By year', file: 'charts/org/hiero-ledger/pipeline_yearly.png' },
-                { label: 'By month', file: 'charts/org/hiero-ledger/pipeline_monthly.png' },
+                { label: 'By year', interactive: timeseries('pipeline_yearly') },
+                { label: 'By month', interactive: timeseries('pipeline_monthly') },
               ],
               note: 'How to read this chart.',
               methodology: ['Step one.', 'Step two.'],
@@ -405,13 +481,13 @@ export const MANIFEST: Manifest = {
               variants: [
                 {
                   label: 'Maintainers',
-                  file: 'charts/org/hiero-ledger/affiliation_donut.png',
+                  interactive: timeseries('affiliation_donut'),
                   note: 'The maintainer bench by employer.',
                   methodology: ['Count maintainers.'],
                 },
                 {
                   label: 'Committers',
-                  file: 'charts/org/hiero-ledger/affiliation_donut_committers.png',
+                  interactive: timeseries('affiliation_donut_committers'),
                   note: 'The committer bench by employer.',
                   methodology: ['Count committers.'],
                 },
@@ -424,11 +500,11 @@ export const MANIFEST: Manifest = {
               variants: [
                 {
                   label: 'Maintainers',
-                  file: 'charts/org/hiero-ledger/single_employer_repos_by_org.png',
+                  interactive: timeseries('single_employer_repos_by_org'),
                 },
                 {
                   label: 'Committers',
-                  file: 'charts/org/hiero-ledger/single_employer_repos_by_org_committers.png',
+                  interactive: timeseries('single_employer_repos_by_org_committers'),
                 },
               ],
             },
@@ -437,7 +513,7 @@ export const MANIFEST: Manifest = {
               variants: [
                 {
                   label: 'Single-employer teams by org',
-                  file: 'charts/org/hiero-ledger/single_employer_teams_by_org.png',
+                  interactive: timeseries('single_employer_teams_by_org'),
                 },
               ],
               note: 'Teams are membership-based, so they have no role tabs.',
@@ -477,7 +553,7 @@ export const MANIFEST: Manifest = {
   },
 };
 
-const ROUTES: Record<string, unknown> = {
+export const ROUTES: Record<string, unknown> = {
   'manifest.json': MANIFEST,
   'hiero-ledger/roles.json': GOV_DOC,
   'hiero-ledger/hip-evidence.json': HIP_EVIDENCE_DOC,
@@ -487,32 +563,8 @@ const ROUTES: Record<string, unknown> = {
   'hiero-ledger/affiliations.json': AFFILIATIONS_DOC,
   'hiero-ledger/committeraffiliations.json': AFFILIATIONS_DOC.variants?.[1],
   'hiero-hackers/profiles.json': HACKERS_DOC,
+  ...CHART_ROUTES,
   // Chart companion CSVs travel inside the API tree as raw text.
   'hiero-ledger/maintainer_affiliations.csv': 'login,organisation\nalice,Hashgraph\n',
   'hiero-ledger/committer_affiliations.csv': 'login,organisation\ndave,BlockyDevs\n',
 };
-
-/**
- * Stub global fetch to serve the fixture API; returns the spy for assertions.
- * `overrides` lets a test intercept specific routes (e.g. to delay or fail a
- * request) while every other route still serves its normal fixture — so a
- * test controlling one request doesn't have to also know every other request
- * the page happens to make.
- */
-export function stubApi(overrides: Record<string, () => Response | Promise<Response>> = {}) {
-  return vi.stubGlobal(
-    'fetch',
-    vi.fn(async (url: string) => {
-      const key = String(url);
-      const override = Object.entries(overrides).find(([suffix]) => key.endsWith(suffix));
-      if (override) return override[1]();
-      const match = Object.entries(ROUTES).find(([suffix]) => key.endsWith(suffix));
-      if (!match) {
-        return new Response('not found', { status: 404 });
-      }
-      // CSV companions are served verbatim; everything else is a JSON document.
-      const body = typeof match[1] === 'string' ? match[1] : JSON.stringify(match[1]);
-      return new Response(body, { status: 200 });
-    }),
-  );
-}

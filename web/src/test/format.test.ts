@@ -1,7 +1,7 @@
 /** Timestamps are labelled UTC wherever they appear, so they must be in UTC. */
 
 import { describe, expect, it } from 'vitest';
-import { dateStamp, stamp } from '../format';
+import { chartViewName, dateStamp, stamp } from '../format';
 
 describe('stamp', () => {
   it('keeps a UTC timestamp as-is', () => {
@@ -40,5 +40,30 @@ describe('dateStamp', () => {
   it('assumes UTC for a naive timestamp and degrades raw when unparseable', () => {
     expect(dateStamp('2026-07-25T10:00:00')).toBe('2026-07-25');
     expect(dateStamp('not-a-date')).toBe('not-a-date');
+  });
+});
+
+describe('chartViewName', () => {
+  it('names the variant after the title', () => {
+    expect(chartViewName('Contributors', 'By month')).toBe('Contributors — By month');
+  });
+
+  it('does not repeat a single-view chart’s title', () => {
+    // A chart with one view is labelled with its own title.
+    expect(chartViewName('Activity heatmap', 'Activity heatmap')).toBe('Activity heatmap');
+  });
+});
+
+describe('readFigure', () => {
+  it('draws shares and parts of a whole as meters, and counts with separators', async () => {
+    const { readFigure } = await import('../metricFigure');
+    expect(readFigure(1457)).toEqual({ kind: 'count', value: '1,457' });
+    expect(readFigure('72%')).toEqual({ kind: 'share', value: '72', percent: 72 });
+    expect(readFigure('26 of 44')).toMatchObject({ kind: 'part', value: '26', of: '44' });
+    expect((readFigure('26 of 44') as { percent: number }).percent).toBeCloseTo(59.09, 1);
+    // A share never overflows its meter; anything unrecognised is shown as written.
+    expect(readFigure('120%')).toMatchObject({ percent: 100 });
+    expect(readFigure('0 of 0')).toEqual({ kind: 'text', value: '0 of 0' });
+    expect(readFigure('>3x')).toEqual({ kind: 'text', value: '>3x' });
   });
 });

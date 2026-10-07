@@ -10,7 +10,10 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { MatrixRow, MatrixView } from '../api';
+import { PRINT_ROW_LIMIT, usePrintMode } from '../printContext';
 import type { EvidenceItem } from './EvidencePanel';
 import { EvidencePanel } from './EvidencePanel';
 
@@ -47,6 +50,7 @@ export function CoverageMatrix({
   evidence: Map<string, EvidenceItem[]>;
   jump: JumpRequest | null;
 }) {
+  const printing = usePrintMode();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [selected, setSelected] = useState<{ hip: number; repo: string } | null>(null);
@@ -77,6 +81,7 @@ export function CoverageMatrix({
   }, [view.rows, query, status]);
 
   const selectedItems = selected ? evidence.get(`${selected.hip}|${selected.repo}`) : undefined;
+  const printRows = rows.slice(0, PRINT_ROW_LIMIT);
 
   const toggleCell = (hip: number, repo: string) => {
     setSelected((current) =>
@@ -86,28 +91,89 @@ export function CoverageMatrix({
 
   return (
     <>
-      <div className="hipmx-filters">
-        <input
-          className="search"
+      {printing && (
+        <p className="print-selection">
+          Showing {printRows.length} of {view.rows.length} rows. Governance: {status || 'All'}.
+          Filter: {query.trim() ? `“${query.trim()}”` : 'None'}.
+        </p>
+      )}
+      {printing && rows.length > PRINT_ROW_LIMIT && (
+        <p className="print-selection" data-print-truncated>
+          Showing {PRINT_ROW_LIMIT} of {rows.length} matching rows in the current order.{' '}
+          {rows.length - PRINT_ROW_LIMIT} matching rows are not printed. Download CSV from this
+          matrix on the dashboard for the complete data.
+        </p>
+      )}
+      {/* Paper can't fit the 14 heat columns, so it gets a four-column table that
+          states each component's merged/open counts. The screen matrix stays
+          mounted (hidden) so its scroll offsets and selection survive. */}
+      {printing && (
+        <table className="print-matrix" data-print-matrix>
+          <caption>Component PR counts are merged/open; 0/0 means no reference found.</caption>
+          <thead>
+            <tr>
+              <th scope="col">HIP</th>
+              <th scope="col">{view.row_header}</th>
+              <th scope="col">Component PRs (merged/open)</th>
+              <th scope="col">{view.note_header}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {printRows.map((row) => (
+              <tr key={row.key}>
+                <th scope="row">
+                  {row.label}
+                  <br />
+                  {row.sublabel}
+                </th>
+                <td>{row.status}</td>
+                <td>
+                  {view.bands.map((band) => (
+                    <div className="print-matrix-band" key={band.label}>
+                      <strong>{band.label}: </strong>
+                      {view.columns
+                        .filter((column) => column.band === band.label)
+                        .map((column) => {
+                          const cell = row.cells.find((cell) => cell.key === column.key);
+                          return `${column.label} ${cell ? `${cell.merged}/${cell.open}` : 'unavailable'}`;
+                        })
+                        .join(' · ')}
+                    </div>
+                  ))}
+                </td>
+                <td>{row.note.text}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <div className="mb-3 flex flex-col gap-2" hidden={printing} data-print-hide>
+        <Input
           placeholder="Filter by HIP number or title…"
+          aria-label="Filter HIPs"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <div className="hipmx-fbar">
-          <span>Governance:</span>
-          {view.filters.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={option === status ? 'hipmx-fbtn active' : 'hipmx-fbtn'}
-              onClick={() => setStatus((current) => (current === option ? '' : option))}
-            >
-              {option}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span id="hipmx-status-label">Governance:</span>
+          {/* Clicking the active status again reports "", clearing the filter. */}
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            aria-labelledby="hipmx-status-label"
+            value={status}
+            onValueChange={setStatus}
+            className="flex-wrap"
+          >
+            {view.filters.map((option) => (
+              <ToggleGroupItem key={option} value={option}>
+                {option}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       </div>
-      <div className="hipmx-wrap">
+      <div className="hipmx-wrap" hidden={printing} data-print-hide data-scroll-restore>
         <table className="hipmx" ref={tableRef}>
           <thead>
             <tr className="hipmx-grp">
@@ -191,16 +257,18 @@ export function CoverageMatrix({
           </tbody>
         </table>
       </div>
-      <div className="hipmx-legend">
-        fewer
-        {/* Keyed off the ramp's *length*, not its colours: the swatches wear the
-            same m1–m5 classes as the cells, so both follow the theme together.
-            Painting the shipped hex here left the legend light in dark mode. */}
-        {view.ramp.map((_shade, index) => (
-          <i key={index} className={`m${index + 1}`} />
-        ))}
-        more merged PRs&nbsp;&nbsp;·&nbsp;&nbsp;○ open PRs only&nbsp;&nbsp;·&nbsp;&nbsp;— no
-        reference found
+      <div className="hipmx-legend gap-x-5" hidden={printing} data-print-hide>
+        <span className="inline-flex items-center gap-1.5">
+          fewer
+          {/* Keyed off the ramp's *length*, not its colours: the swatches share
+              the cells' m1–m5 classes, so both follow the theme. */}
+          {view.ramp.map((_shade, index) => (
+            <i key={index} className={`m${index + 1}`} />
+          ))}
+          more merged PRs
+        </span>
+        <span>○ open PRs only</span>
+        <span>— no reference found</span>
       </div>
       {selected && selectedItems && (
         <EvidencePanel
@@ -210,7 +278,7 @@ export function CoverageMatrix({
           onClose={() => setSelected(null)}
         />
       )}
-      <p className="count">{rows.length} rows</p>
+      {!printing && <p className="mt-2 text-xs text-soft tabular-nums">{rows.length} rows</p>}
     </>
   );
 }

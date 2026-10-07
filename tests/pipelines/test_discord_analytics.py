@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import patch
 
-import matplotlib
 import pandas as pd
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.discord_analytics as runner
 
@@ -23,8 +19,8 @@ CHANNELS_CSV_TEXT = (
     "hiero-general,2026-05-10,95,124,160,200\n"
     "hiero-sdk-cpp,2026-05-10,27,29,55,56\n"
     "hiero-website,2026-04-28,15,56,155,155\n"
-    "hiero-sdk-java,2026-02-02,0,0,4,8\n"  # excluded by d30>0 filter
-    "hiero-hips,2026-02-09,0,0,4,9\n"  # excluded by d30>0 filter
+    "hiero-sdk-java,2026-02-02,0,0,4,8\n"  # zero d30 stays in the CSV
+    "hiero-hips,2026-02-09,0,0,4,9\n"  # zero d30 stays in the CSV
 )
 
 # Intentionally unsorted to verify load_monthly_df sorts ascending.
@@ -115,9 +111,9 @@ def test_load_monthly_df_parses_and_sorts(monthly_csv: Path) -> None:
     """Test that load_monthly_df parses datetimes and returns rows sorted ascending."""
     df = runner.load_monthly_df()
 
-    # Datetime conversion lets the chart use date-aware locators.
+    # Datetime conversion gives the exported series a date dtype.
     assert pd.api.types.is_datetime64_any_dtype(df["month"])
-    # Loader must sort ascending so the line chart reads chronologically.
+    # Loader must sort ascending so the series reads chronologically.
     assert df["month"].is_monotonic_increasing
     assert df["month"].iloc[0] == pd.Timestamp("2024-09-01")
     assert df["month"].iloc[-1] == pd.Timestamp("2026-02-01")
@@ -142,48 +138,25 @@ def test_resolve_path_falls_back_to_default(tmp_path: Path, monkeypatch: pytest.
 
 
 # --------------------------------------------------------------------------- #
-# Chart-writer smoke tests
+# Table builders
 # --------------------------------------------------------------------------- #
 
 
-def test_plot_recent_activity_30d_writes_png(tmp_path: Path, channels_csv: Path) -> None:
-    """Test that plot_recent_activity_30d writes a PNG file."""
-    output = tmp_path / "recent.png"
-    runner.plot_recent_activity_30d(runner.load_channels_df(), output)
-
-    assert output.exists() and output.stat().st_size > 0
-
-
-def test_plot_recent_activity_30d_filters_zero_d30_and_caps_top_n(channels_csv: Path) -> None:
-    """The chart must drop zero-message channels and respect ``top_n``."""
-    with patch.object(runner, "plot_bar") as mock_plot_bar:
-        runner.plot_recent_activity_30d(runner.load_channels_df(), Path("/unused.png"), top_n=2)
-
-    assert mock_plot_bar.call_count == 1
-    passed_df = mock_plot_bar.call_args.kwargs.get("df") or mock_plot_bar.call_args.args[0]
-
-    # Only top_n rows, sorted descending, no zero-d30 channels.
-    assert len(passed_df) == 2
-    counts = passed_df["messages (last 30d)"].tolist()
-    assert counts == sorted(counts, reverse=True)
-    assert "#hiero-sdk-java" not in passed_df["channel_label"].tolist()
-    assert "#hiero-hips" not in passed_df["channel_label"].tolist()
-
-
-def test_plot_category_breakdown_writes_png(tmp_path: Path, channels_csv: Path) -> None:
-    """Test that plot_category_breakdown writes a PNG file."""
-    output = tmp_path / "categories.png"
-    runner.plot_category_breakdown(runner.load_channels_df(), output)
-
-    assert output.exists() and output.stat().st_size > 0
-
-
-def test_plot_monthly_traffic_writes_png(tmp_path: Path, monthly_csv: Path) -> None:
-    """Test that plot_monthly_traffic writes a PNG file."""
-    output = tmp_path / "monthly.png"
-    runner.plot_monthly_traffic(runner.load_monthly_df(), output)
-
-    assert output.exists() and output.stat().st_size > 0
+def test_category_breakdown_ranks_categories_and_splits_recent_from_earlier() -> None:
+    """The exported CSV is this one frame: busiest category first, earlier = total - last 90 days."""
+    channels = pd.DataFrame(
+        {
+            "category": ["Dev", "General", "Dev", "Events"],
+            "total": [100, 300, 50, 10],
+            "d90": [40, 20, 10, 10],
+        }
+    )
+    categories = runner.category_breakdown(channels)
+    assert categories.to_dict("records") == [
+        {"category": "General", "total": 300, "last_90d": 20, "earlier": 280},
+        {"category": "Dev", "total": 150, "last_90d": 50, "earlier": 100},
+        {"category": "Events", "total": 10, "last_90d": 10, "earlier": 0},
+    ]
 
 
 # --------------------------------------------------------------------------- #
@@ -191,25 +164,69 @@ def test_plot_monthly_traffic_writes_png(tmp_path: Path, monthly_csv: Path) -> N
 # --------------------------------------------------------------------------- #
 
 
-def test_main_writes_three_charts(
+def test_main_writes_three_csvs_with_meta(
     tmp_path: Path,
     channels_csv: Path,
     monthly_csv: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """``main()`` must produce all three expected PNGs in the org charts dir."""
-    charts_dir = tmp_path / "charts"
-    charts_dir.mkdir()
-    monkeypatch.setattr(runner, "ensure_org_dirs", lambda _org: (tmp_path / "data", charts_dir))
+    """``main()`` writes the three CSVs (unfiltered recent activity) plus their meta sidecars."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    monkeypatch.setattr(runner, "ensure_org_dirs", lambda _org: data_dir)
 
     runner.main()
 
-    expected = {
-        "hiero_discord_monthly_traffic.png",
-        "hiero_discord_recent_activity_30d.png",
-        "hiero_discord_channel_categories.png",
+    assert {p.name for p in data_dir.glob("*.csv")} == {
+        "hiero_discord_monthly_traffic.csv",
+        "hiero_discord_recent_activity_30d.csv",
+        "hiero_discord_channel_categories.csv",
     }
-    actual = {p.name for p in charts_dir.glob("*.png")}
-    assert expected == actual
-    for png in charts_dir.glob("*.png"):
-        assert png.stat().st_size > 0
+    recent = pd.read_csv(data_dir / "hiero_discord_recent_activity_30d.csv")
+    assert list(recent.columns) == ["channel_label", "d30"]
+    assert len(recent) == 6  # zero-d30 channels are kept
+    for csv in data_dir.glob("*.csv"):
+        assert Path(f"{csv}.meta.json").exists()
+
+
+def test_main_exports_chart_data_at_manual_snapshot_date(channels_csv, monthly_csv, tmp_path, monkeypatch):
+    """Rerendering a manual archive must not extend its calendar series to today."""
+    import json
+
+    from hiero_analytics.dashboard_spec.interactive import DISCORD_SOURCES
+    from hiero_analytics.export.chart_data import chart_document
+
+    data_dir = tmp_path / "data"
+    monkeypatch.setattr(runner, "ensure_org_dirs", lambda _org: data_dir)
+    runner.main()
+    documents = {}
+    for name, source in DISCORD_SOURCES.items():
+        path = data_dir / source["file"]
+        stamp = json.loads(Path(f"{path}.meta.json").read_text())["generated_at"]
+        documents[name] = chart_document(source, path, "hiero-ledger", stamp)
+        assert stamp.startswith("2026-05-12")
+    assert documents["hiero_discord_monthly_traffic"]["rows"][-1]["bucket"] == "2026-05"
+    categories = documents["hiero_discord_channel_categories"]["rows"]
+    assert sum(row["earlier"] + row["last_90d"] for row in categories) == 911
+    assert len(documents["hiero_discord_recent_activity_30d"]["rows"]) == 6
+
+
+# --------------------------------------------------------------------------- #
+# Invariant Validation tests
+# --------------------------------------------------------------------------- #
+
+
+def test_load_channels_df_valid_invariants(channels_csv: Path) -> None:
+    """Test that load_channels_df succeeds when d30 <= d90 <= d365 <= total."""
+    df = runner.load_channels_df()
+    assert len(df) == 6
+
+
+def test_load_channels_df_violates_invariant(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that load_channels_df raises ValueError when d30 <= d90 <= d365 <= total is violated."""
+    invalid_csv = tmp_path / "invalid_channels.csv"
+    invalid_csv.write_text("channel,last_message,d30,d90,d365,total\ndev-chat,2026-05-01,100,50,200,300\n")
+    monkeypatch.setenv("HIERO_DISCORD_CHANNELS_CSV", str(invalid_csv))
+
+    with pytest.raises(ValueError, match="violates d30<=d90<=d365<=total"):
+        runner.load_channels_df()

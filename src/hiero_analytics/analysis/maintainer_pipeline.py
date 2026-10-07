@@ -14,7 +14,7 @@ question from "how has this moved".
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -30,15 +30,6 @@ _STAGE_RANK = {stage: rank for rank, stage in enumerate(STAGE_COLUMNS)}
 
 # Window of days used to determine "active" contributors.
 ACTIVE_WINDOW_DAYS = 183
-
-# Chart readability: how many recent buckets the fine-grained charts render.
-# Full history is still written to CSV; only the rendered charts are trimmed,
-# so the "By week"/"By month" views stay legible instead of becoming a wall of
-# hundreds of bars.
-RECENT_MONTHLY_BUCKETS = 12  # the "1 year" tab
-RECENT_WEEKLY_BUCKETS = 5  # the "1 month" tab
-RECENT_DAILY_BUCKETS = 7  # the "week" tab
-
 
 _MAINTAINER_ACTIVITY_TYPES = {
     "authored_issue",
@@ -244,60 +235,3 @@ def last_calendar_buckets(now: datetime, count: int, freq: str) -> list[str]:
             year, month = (year - 1, 12) if month == 1 else (year, month - 1)
         return list(reversed(labels))
     raise ValueError(f"unknown bucket frequency: {freq!r}")
-
-
-def calendar_recent_buckets(pipeline_df: pd.DataFrame, labels: list[str]) -> pd.DataFrame:
-    """The chart window as complete calendar buckets: exactly ``labels``, zero-filled.
-
-    Unlike taking the tail of the *populated* buckets, a span with no activity
-    stays in the window as a zero bar — so a chart labelled "1 month" covers
-    exactly the last month's calendar weeks and never stretches back to older
-    activity to fill its bar budget. Full history stays in the CSV; only the
-    rendered chart is windowed. An empty input stays empty so the plotting
-    layer's skip-empty behaviour is preserved.
-    """
-    if pipeline_df.empty:
-        return pipeline_df.copy()
-
-    bucket_col = pipeline_df.columns[0]
-    count_cols = [column for column in pipeline_df.columns if column != bucket_col]
-    return (
-        pipeline_df.set_index(bucket_col)
-        .reindex(labels, fill_value=0)
-        .reset_index(names=bucket_col)
-        .astype({column: int for column in count_cols})
-    )
-
-
-def humanize_month_label(bucket: str) -> str:
-    """``2026-07`` -> ``Jul 2026``. Chart display only; CSVs keep sortable keys."""
-    try:
-        return datetime.strptime(bucket, "%Y-%m").replace(tzinfo=UTC).strftime("%b %Y")
-    except ValueError:
-        return bucket
-
-
-def humanize_week_label(bucket: str) -> str:
-    """``2026-W32`` -> ``w/c 3 Aug 2026``, the week's Monday.
-
-    A date a human can place, unlike an ISO week number. Chart display only.
-    """
-    try:
-        year, week = bucket.split("-W")
-        monday = date.fromisocalendar(int(year), int(week), 1)
-    except (ValueError, AttributeError):
-        return bucket
-    return f"w/c {monday.day} {monday.strftime('%b %Y')}"
-
-
-def humanize_day_label(bucket: str) -> str:
-    """``2026-08-05`` -> ``Wed 5 Aug 2026``.
-
-    The weekday is what makes a weekend dip readable at a glance. Chart
-    display only.
-    """
-    try:
-        day = datetime.strptime(bucket, "%Y-%m-%d").replace(tzinfo=UTC)
-    except ValueError:
-        return bucket
-    return f"{day.strftime('%a')} {day.day} {day.strftime('%b %Y')}"

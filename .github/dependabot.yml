@@ -18,6 +18,12 @@ updates:
       interval: "weekly"
     reviewers:
       - exploreriii
+    groups:
+      # init, analyze and upload-sarif must run the same release: CodeQL
+      # refuses a config written by a different version, so bump them together.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
 
   - package-ecosystem: docker
     directory: /.clusterfuzzlite

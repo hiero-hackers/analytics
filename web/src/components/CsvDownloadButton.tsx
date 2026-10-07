@@ -1,28 +1,42 @@
-/** The "Download CSV" button — builds its payload lazily on click. */
+/** The "Download CSV" button — builds (or fetches) its payload lazily on click. */
 
+import { DownloadIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { Manifest } from '../api';
 import { downloadCsv, type CsvExport } from '../csv';
+
+/** The button itself, for callers whose download is not a CsvExport (a chart's companion file). */
+export function DownloadButton({
+  onClick,
+  compact = false,
+}: {
+  onClick: () => void;
+  /** Icon-only below the enclosing `@container`'s `lg` width (a narrow chart card). */
+  compact?: boolean;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={onClick}
+      aria-label={compact ? 'Download CSV' : undefined}
+      title={compact ? 'Download CSV' : undefined}
+    >
+      <DownloadIcon data-icon="inline-start" />
+      {compact ? <span className="hidden @lg:inline">Download CSV</span> : 'Download CSV'}
+    </Button>
+  );
+}
 
 export function CsvDownloadButton({
   payload,
   provenance,
+  compact,
 }: {
   payload: () => CsvExport;
   provenance: Manifest['provenance'];
+  compact?: boolean;
 }) {
-  return (
-    <button className="dl" onClick={() => downloadCsv(payload(), provenance)}>
-      <svg
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden="true"
-      >
-        <path d="M8 2v8m0 0 3-3m-3 3L5 7" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M2.5 11v1.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11" strokeLinecap="round" />
-      </svg>
-      Download CSV
-    </button>
-  );
+  return <DownloadButton compact={compact} onClick={() => downloadCsv(payload(), provenance)} />;
 }

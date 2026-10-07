@@ -31,7 +31,6 @@ import logging
 import os
 import re
 import subprocess
-from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -100,36 +99,6 @@ class Provenance:
     data_as_of: datetime | None
     git_sha: str | None
     run_id: str | None = None
-
-    def footer(self, record_count: int | Mapping[str, int] | None = None) -> str:
-        """Render the one-line stamp for a figure footer or dashboard header.
-
-        Unresolvable parts are omitted rather than rendered as "unknown", so a
-        local run without git history still gets a useful data stamp.
-
-        ``record_count`` takes a mapping for a figure that plots more than one
-        series (``{"GFIs": 120, "contributors": 85}`` → ``n=GFIs 120,
-        contributors 85``). A single total would let one series collapse while
-        the sum held steady, which is the failure the count exists to catch.
-
-        The run id is included when present because the watermark, revision, and
-        count can all repeat across runs whose archived datasets differ — a
-        dataset edited in place moves no watermark. The run id resolves the
-        figure to exactly one ``dataset-snapshot-<run>-<sha>`` artifact.
-        """
-        parts: list[str] = []
-        if self.data_as_of is not None:
-            parts.append(f"data {self.data_as_of.strftime(_STAMP_FORMAT)}")
-        if self.git_sha:
-            parts.append(f"code {self.git_sha}")
-        if self.run_id:
-            parts.append(f"run {self.run_id}")
-        if isinstance(record_count, Mapping):
-            if record_count:
-                parts.append("n=" + ", ".join(f"{label} {count:,}" for label, count in record_count.items()))
-        elif record_count is not None:
-            parts.append(f"n={record_count:,}")
-        return " · ".join(parts)
 
 
 @lru_cache(maxsize=1)

@@ -7,10 +7,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.difficulty_over_time as runner
 from hiero_analytics.data_sources.models import IssueRecord, IssueTimelineEventRecord
@@ -72,7 +69,7 @@ def _patch_pipeline(
     """Redirect the pipeline preamble to tmp_path and stub the GitHub fetches."""
     monkeypatch.setattr(
         "hiero_analytics.pipelines.difficulty_over_time.org_context",
-        lambda _org: (mock_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_client, tmp_path / "data"),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.difficulty_over_time.fetch_org_issues_graphql",
@@ -92,7 +89,7 @@ def test_main_creates_output_files(
     monkeypatch: pytest.MonkeyPatch,
     mock_github_client,
 ):
-    """Running main() should create the weekly difficulty-over-time CSV and chart."""
+    """Running main() should create the weekly difficulty-over-time CSVs."""
     issues = [
         # Open issues created within the 365-day window whose current difficulty
         # label has a matching recorded ``labeled`` event.
@@ -114,12 +111,9 @@ def test_main_creates_output_files(
         "difficulty_over_time_all_event_based_weekly",
     ):
         csv_path = tmp_path / "data" / f"{stem}.csv"
-        chart_path = tmp_path / "charts" / f"{stem}.png"
 
         assert csv_path.exists(), f"CSV {stem}.csv not created"
         assert os.path.getsize(csv_path) > 0, f"CSV {stem}.csv is empty"
-        assert chart_path.exists(), f"Chart {stem}.png not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart {stem}.png is empty"
 
     # Only the "all" variant carries the unknown bucket.
     labelled_header = (tmp_path / "data" / "difficulty_over_time_event_based_weekly.csv").read_text().splitlines()[0]
@@ -141,6 +135,4 @@ def test_main_handles_empty_inputs(
 
     # No series data -> the pipeline exits before writing any outputs.
     assert not (tmp_path / "data" / "difficulty_over_time_event_based_weekly.csv").exists()
-    assert not (tmp_path / "charts" / "difficulty_over_time_event_based_weekly.png").exists()
     assert not (tmp_path / "data" / "difficulty_over_time_all_event_based_weekly.csv").exists()
-    assert not (tmp_path / "charts" / "difficulty_over_time_all_event_based_weekly.png").exists()

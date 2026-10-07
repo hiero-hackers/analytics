@@ -28,3 +28,13 @@ export function stamp(iso: string): string {
 export function dateStamp(iso: string): string {
   return stamp(iso).slice(0, 10);
 }
+
+/**
+ * A chart view's name: its title, then the variant label when that adds something.
+ *
+ * A single-view chart's only label is its own title, so joining the two would
+ * have a screen reader announce "Activity heatmap — Activity heatmap".
+ */
+export function chartViewName(title: string, label: string): string {
+  return label === title ? title : `${title} — ${label}`;
+}

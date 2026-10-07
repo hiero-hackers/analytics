@@ -10,6 +10,11 @@ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import HIP_STATUS_SOURCE
+
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Follow improvement proposals from discussion to implementation."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "The HIP process — specs in the hiero-ledger governance repo and the PRs that "
@@ -31,11 +36,39 @@ CHART_MACRO = {
                     "citation-based stages undercount older specs; the CSV download also carries the "
                     "all-time cohort."
                 ),
-                "files": [("Funnel", "hip_adoption_funnel.png")],
+                "variants": [("Funnel", "hip_adoption_funnel")],
                 "csv": "hip_adoption_funnel.csv",
+                "sources": {
+                    "hip_adoption_funnel": {
+                        "kind": "categories",
+                        "file": "hip_adoption_funnel.csv",
+                        "category": "stage",
+                        "category_label": "Stage",
+                        "group": {"key": "cohort", "label": "Cohort", "default": "created since 2024-09"},
+                        "series": [{"key": "hips", "label": "HIPs", "color": "var(--heat-4)"}],
+                        "details": [{"key": "pct_of_proposed", "label": "Share of proposed", "format": "percent"}],
+                        # Each stage is a subset of the one before, so it draws as a funnel.
+                        "mark": "funnel",
+                        "orientation": "horizontal",
+                        "window": "snapshot",
+                        "metric": "hip_adoption_funnel",
+                        "unit": "HIP specs",
+                        "population": (
+                            "Each HIP spec in the cohort is counted at every stage it has reached, so each "
+                            "stage is a subset of the one before. Shares are of the cohort's proposed specs. "
+                            "Citation-based stages undercount specs created before September 2024."
+                        ),
+                        "note": (
+                            "Stages run top to bottom: proposed, approved by the TSC, merged implementation "
+                            "evidence found, and merged citing PRs in five or more repositories. Switch the "
+                            "cohort to compare recent specs with all specs; the two are never combined."
+                        ),
+                    }
+                },
             },
             {
                 "id": "hip-activity-by-status",
+                "sources": {"hip_activity_by_status": HIP_STATUS_SOURCE},
                 "group": "Adoption",
                 "title": "Implementation evidence — approved & final specs",
                 "description": (
@@ -45,7 +78,7 @@ CHART_MACRO = {
                     "absence — older Final HIPs implemented before the hiero-ledger migration are "
                     "invisible to PR matching."
                 ),
-                "files": [("By spec status", "hip_activity_by_status.png")],
+                "variants": [("By spec status", "hip_activity_by_status")],
             },
             {
                 "id": "hip-repo-engagement",
@@ -57,8 +90,35 @@ CHART_MACRO = {
                     "deliberately: many are tooling or docs where HIPs may not apply — relevance "
                     "is a human call. The full data downloads as CSV."
                 ),
-                "files": [("Repositories by distinct HIPs", "hip_repo_engagement.png")],
+                "variants": [("Repositories by distinct HIPs", "hip_repo_engagement")],
                 "csv": "hip_repo_engagement.csv",
+                "sources": {
+                    "hip_repo_engagement": {
+                        "kind": "categories",
+                        "file": "hip_repo_engagement.csv",
+                        "category": "repo",
+                        "category_label": "Repository",
+                        "strip_org_prefix": True,
+                        "series": [{"key": "distinct_hips_merged", "label": "Distinct HIPs", "color": "var(--heat-4)"}],
+                        "details": [
+                            {"key": "matched_prs", "label": "Merged PRs citing a HIP"},
+                            {"key": "total_prs", "label": "All merged PRs"},
+                        ],
+                        "orientation": "horizontal",
+                        "rank": True,
+                        "top_n": 15,
+                        "window": "all",
+                        # Zero rows are kept (see population), but until some repository has
+                        # merged HIP work the chart would be all zeros, so it stays hidden.
+                        "hide_when_all_zero": True,
+                        "metric": "hip_repo_engagement",
+                        "unit": "Distinct HIPs",
+                        "population": (
+                            "Distinct HIP specs cited by merged pull requests in each repository, over all "
+                            "recorded history. Repositories with no citing PRs keep their zero rows."
+                        ),
+                    }
+                },
             },
         ],
     },
@@ -258,21 +318,28 @@ SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}
 
 WIDE_CHARTS: set[str] = set()
 
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS = {
+    "hip_adoption_funnel",
+    "hip_activity_by_status",
+}
+
 CHART_NOTES = {
-    "hip_adoption_funnel.png": "Each band is a funnel stage for specs created since September 2024; its width and label are "
+    "hip_adoption_funnel": "Each band is a funnel stage for specs created since September 2024; its width and label are "
     "the share of proposed specs. Each stage is a subset of the one above; broad = merged citing PRs "
     "in five or more repositories. Counts and the all-time cohort are in the CSV download.",
-    "hip_activity_by_status.png": "Each bar is a spec-status bucket where implementation is expected. \u201cNo evidence\u201d is "
+    "hip_activity_by_status": "Each bar is a spec-status bucket where implementation is expected. \u201cNo evidence\u201d is "
     "split by what HIP-1 implies: for approved specs it means awaiting implementation (actionable); for "
     "Final/Active specs the implementation merged by definition, so it is a citation gap instead. "
     "Derived from hip_summary.csv.",
-    "hip_repo_engagement.png": "Repositories ranked by how many distinct HIPs they have merged referencing PRs for. Breadth, "
+    "hip_repo_engagement": "Repositories ranked by how many distinct HIPs they have merged referencing PRs for. Breadth, "
     "not volume — one PR per HIP counts the same as fifty. Derived from hip_repo_engagement.csv.",
 }
 
 # Methodology entries are ordered lists of steps (rendered as <li> items).
 CHART_METHODOLOGY = {
-    "hip_adoption_funnel.png": [
+    "hip_adoption_funnel": [
         (
             "Take every spec in the inventory created since September 2024 (the Hiero era) — older specs "
             "are excluded because citation-based stages undercount them."
@@ -288,7 +355,7 @@ CHART_METHODOLOGY = {
             "Each band's label is its share of stage 1; counts and the all-time cohort are in the CSV."
         ),
     ],
-    "hip_repo_engagement.png": [
+    "hip_repo_engagement": [
         (
             "Take every counted (HIP, PR) reference — merged PRs only, proposals-repo and "
             "distancing-cue references already excluded."
@@ -302,7 +369,7 @@ CHART_METHODOLOGY = {
             "tooling or docs where HIPs may not apply, and relevance is a human call."
         ),
     ],
-    "hip_activity_by_status.png": [
+    "hip_activity_by_status": [
         (
             "Sweep every merged and open PR in the organisation and match HIP references locally from "
             "titles, branch names, and descriptions, across the naming variants seen in the wild "

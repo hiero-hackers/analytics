@@ -1,0 +1,488 @@
+/* The dashboard is the screen view; this file defines paper. Selectors are
+   data attributes and shadcn `data-slot`s, never utility classes, so a styling
+   change on screen cannot silently break the printed document. */
+[data-print-only],
+[data-print-layout] > tfoot {
+  display: none;
+}
+
+/* A persistent presentation wrapper preserves React state in browsers that
+   need a repeating table footer instead of @page margin boxes. */
+[data-print-layout],
+[data-print-layout] > tbody,
+[data-print-layout] > tbody > tr,
+[data-print-layout] > tbody > tr > td {
+  display: contents;
+  font: inherit;
+  text-align: inherit;
+  white-space: normal;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm 17mm;
+  @bottom-left {
+    content: var(--print-provenance, 'Data provenance unavailable');
+    font:
+      8pt system-ui,
+      sans-serif;
+    color: #333;
+  }
+  @bottom-right {
+    content: 'Page ' counter(page) ' of ' counter(pages);
+    font:
+      8pt system-ui,
+      sans-serif;
+    color: #333;
+  }
+}
+
+@media print {
+  /* The light palette (app.css scopes dark mode to screen), with paper-strength ink. */
+  :root {
+    color-scheme: light;
+    --page: #fff;
+    --surface: #fff;
+    --ink: #1b1b1b;
+    --muted: #444;
+    --soft: #555;
+    --row-line: #ccc;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  [hidden] {
+    display: none !important;
+  }
+  html,
+  body,
+  #root,
+  [data-slot='sidebar-wrapper'],
+  [data-slot='sidebar-inset'] {
+    display: block;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    background: #fff;
+    color: var(--ink);
+  }
+  [data-slot='sidebar-inset'] > div {
+    max-width: none;
+    padding: 0;
+  }
+  body {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+  /* The whole tab on paper (Print tab, or the browser's own print command).
+     :where() adds no specificity, so these rules cascade as they always have. */
+  :where(html:not([data-print-scope='chart'])) {
+    [data-print-only] {
+      display: block;
+    }
+
+    /* Chrome, controls and overlays: none of them work on paper. */
+    [data-print-hide],
+    [data-slot='sidebar'],
+    [data-slot='sidebar-gap'],
+    [data-slot='sidebar-container'],
+    [data-slot^='dialog-'],
+    [data-slot^='sheet-'],
+    [data-radix-popper-content-wrapper],
+    .recharts-tooltip-wrapper,
+    button:not([data-print-keep]),
+    input,
+    select {
+      display: none !important;
+    }
+    /* A kept button carries data (a chart legend, a row's name): print it as text. */
+    button[data-print-keep] {
+      color: var(--ink);
+      background: transparent;
+      border-color: transparent;
+      cursor: auto;
+    }
+
+    h1 {
+      font-size: 21pt;
+    }
+    h2 {
+      font-size: 13pt;
+    }
+    h3 {
+      font-size: 11pt;
+    }
+    h1,
+    h2,
+    h3,
+    summary,
+    .print-title,
+    .print-group,
+    .print-selection,
+    [data-slot='card-header'] {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+    .print-title {
+      font-size: 15pt;
+      font-weight: 600;
+      margin: 4mm 0;
+    }
+    .print-group {
+      font-size: 12pt;
+      font-weight: 600;
+      border-bottom: 1px solid var(--edge-strong);
+      padding: 2mm 0;
+      margin: 5mm 0 3mm;
+    }
+    p {
+      orphans: 3;
+      widows: 3;
+    }
+
+    /* Cards become plain page flow: no frame, no clipping. */
+    [data-slot='card'] {
+      display: block;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      margin: 0 0 6mm;
+      background: transparent;
+      overflow: visible;
+    }
+    [data-slot='card-header'],
+    [data-slot='card-content'],
+    [data-slot='card-footer'] {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    details::details-content {
+      content-visibility: visible;
+    }
+    summary {
+      list-style: none;
+      font-weight: 600;
+    }
+    summary::marker,
+    summary::-webkit-details-marker {
+      content: '';
+      display: none;
+    }
+    .print-selection,
+    .print-chart-status {
+      font-size: 9pt;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      margin: 2mm 0;
+    }
+    [data-print-truncated],
+    [data-print-incomplete],
+    .print-chart-status {
+      border-left: 2pt solid var(--warn-ink);
+      padding-left: 3mm;
+    }
+
+    /* Tables: every row in normal flow, headers repeated on each page. */
+    [data-slot='table-container'],
+    .hipmx-wrap {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      max-height: none;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+    }
+    table {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+      font-size: 8.5pt;
+      border-collapse: collapse;
+    }
+    /* Give repository names and long employer lists room without squeezing
+       short values into vertical strings. The printed HIP matrix keeps its fixed
+       four-column layout below. */
+    [data-slot='table'] {
+      table-layout: auto;
+    }
+    [data-slot='table'] th,
+    [data-slot='table'] td {
+      min-width: 8mm;
+      max-width: 40mm;
+    }
+    thead {
+      display: table-header-group;
+      position: static;
+    }
+    tbody {
+      display: table-row-group;
+    }
+    tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    th,
+    td {
+      position: static;
+      width: auto;
+      height: auto;
+      min-width: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      text-overflow: clip;
+      overflow: visible;
+      letter-spacing: normal;
+      text-transform: none;
+      text-align: left;
+      vertical-align: top;
+      padding: 1.5mm 1mm;
+      border-bottom: 0.25mm solid var(--row-line);
+      background: transparent;
+      backdrop-filter: none;
+    }
+    th {
+      color: var(--ink);
+      background: var(--raise);
+    }
+    [data-numeric] {
+      text-align: right;
+      white-space: nowrap;
+    }
+    a {
+      color: var(--link-ink);
+      text-decoration: underline;
+    }
+
+    /* Chart galleries print one figure per row, whole. */
+    figure {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin: 4mm 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    figure:has(figure) {
+      break-inside: auto;
+    }
+    [data-slot='card-content'] > .grid {
+      display: block;
+    }
+    [data-slot='chart'] {
+      width: 100%;
+      max-width: 100%;
+      max-height: 220mm;
+    }
+    [data-slot='chart'] svg {
+      max-width: 100%;
+      overflow: visible;
+    }
+
+    /* Headline tiles: three to a row, never split. */
+    section[aria-label='Headline figures'] > div {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3mm;
+    }
+    section[aria-label='Headline figures'] > div > * {
+      break-inside: avoid;
+      padding: 3mm;
+      border: 1px solid var(--edge-strong);
+    }
+    .glossary {
+      border: 0;
+    }
+
+    [data-print-board] {
+      display: block;
+    }
+    .print-board-list {
+      padding-left: 5mm;
+      list-style: disc;
+    }
+    .print-board-list li {
+      break-inside: avoid;
+      margin: 1mm 0;
+    }
+    [data-print-matrix] {
+      table-layout: fixed;
+    }
+    [data-print-matrix] caption {
+      caption-side: top;
+      text-align: left;
+      font-size: 9pt;
+      margin-bottom: 2mm;
+    }
+    [data-print-matrix] th:first-child {
+      width: 20%;
+    }
+    [data-print-matrix] th:nth-child(2) {
+      width: 12%;
+    }
+    [data-print-matrix] th:nth-child(3) {
+      width: 48%;
+    }
+    [data-print-matrix] th:nth-child(4) {
+      width: 20%;
+    }
+    [data-print-matrix] tbody th {
+      font-weight: 400;
+      background: transparent;
+    }
+    .print-matrix-band {
+      margin-bottom: 2mm;
+    }
+
+    /* Native repeating tfoot fallback: reserve footer space, never overlay data. */
+    [data-print-layout] {
+      display: table;
+      table-layout: auto;
+    }
+    [data-print-layout] > tbody {
+      display: table-row-group;
+    }
+    [data-print-layout] > tbody > tr {
+      display: table-row;
+      break-inside: auto;
+    }
+    [data-print-layout] > tbody > tr > td {
+      display: table-cell;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    [data-print-layout] > tfoot {
+      display: table-footer-group;
+    }
+    [data-print-layout] > tfoot > tr > td {
+      font-size: 8pt;
+      padding: 3mm 0 0;
+      border: 0;
+      background: transparent;
+    }
+  }
+}
+
+/* ---- One chart on paper ------------------------------------------------ */
+
+/* The sheet a chart's print preview draws (ChartPrintDialog): the same page on
+   screen, scaled into the dialog, and on paper. Its switches already render as
+   stated filters; here the controls that remain go, and kept buttons read as text. */
+article[data-print-sheet] {
+  color-scheme: light;
+  --page: #fff;
+  --surface: #fff;
+  --ink: #1b1b1b;
+  --muted: #444;
+  --soft: #555;
+  --row-line: #ccc;
+  /* The base border colour resolves on :root; resolve it here, on paper's palette. */
+  --color-border: var(--edge);
+  box-sizing: border-box;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+[data-print-sheet]
+  :is(
+    [data-print-hide],
+    [data-sheet-hide],
+    button:not([data-print-keep]),
+    input,
+    select,
+    .recharts-tooltip-wrapper
+  ) {
+  display: none !important;
+}
+[data-print-sheet] button[data-print-keep] {
+  height: auto;
+  padding: 0 0.5rem 0 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink);
+  opacity: 1;
+}
+/* A legend lists what is drawn; series switched off are named among the filters. */
+[data-print-sheet] [data-print-legend] > [aria-pressed='false'] {
+  display: none;
+}
+[data-print-sheet] a {
+  color: inherit;
+  text-decoration: none;
+}
+[data-print-sheet] [data-slot='chart'] svg {
+  overflow: visible;
+}
+
+@media print {
+  /* While a chart's preview is open the page prints that sheet alone: the
+     dashboard, other layers and the dialog's own controls are left out, and the
+     scaled page it sits in unwinds to the real one (@page from the dialog). */
+  html[data-print-scope='chart'] {
+    #root,
+    [data-slot='dialog-overlay'],
+    [data-slot='dialog-close'],
+    [data-slot='dialog-content']:not([data-print-preview]),
+    [data-slot^='sheet-'],
+    [data-radix-popper-content-wrapper],
+    [data-print-chrome] {
+      display: none !important;
+    }
+    [data-print-path] {
+      display: block !important;
+      position: static !important;
+      inset: auto !important;
+      width: auto !important;
+      height: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: none !important;
+      outline: 0 !important;
+      transform: none !important;
+      /* Tailwind's centring (-translate-1/2) sets the translate property through
+         these; resetting `translate` itself would be folded into the transform
+         shorthand by the CSS minifier, and lost. */
+      --tw-translate-x: 0 !important;
+      --tw-translate-y: 0 !important;
+    }
+    /* The page margin, on the sheet rather than the page (see pageRule): each
+       printed page of it gets the same 12mm, and the browser's own header and
+       footer have no margin to print in. */
+    [data-print-sheet] {
+      box-sizing: content-box;
+      padding: 12mm;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      break-inside: auto;
+    }
+    [data-print-sheet] tr {
+      break-inside: avoid;
+    }
+  }
+}

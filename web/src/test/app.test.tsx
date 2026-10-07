@@ -4,16 +4,20 @@
  * (sorting, filtering, period tabs, the action link).
  */
 
+import type { ReactNode } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
-import { stubApi } from './fixtures';
+import { stubApi } from './stubApi';
 
 beforeEach(() => {
   vi.unstubAllGlobals();
   stubApi();
 });
+
+const chooseOrg = (org: string) =>
+  userEvent.selectOptions(screen.getByRole('combobox', { name: 'Organisation' }), org);
 
 const openGovernance = async () => {
   render(<App />);
@@ -23,6 +27,16 @@ const openGovernance = async () => {
 };
 
 describe('App shell', () => {
+  it('heads each tab with its manifest summary, or a generic line when it has none', async () => {
+    await openGovernance();
+    expect(screen.getByText('Who holds which role, and where.')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Contributors' }));
+    expect(
+      await screen.findByText('Explore activity and insights across the Hiero ecosystem.'),
+    ).toBeInTheDocument();
+  });
+
   it('renders a macro tab per manifest macro and switches between them', async () => {
     render(<App />);
 
@@ -39,18 +53,19 @@ describe('App shell', () => {
 
     // The org filter is present on every tab.
     await userEvent.click(await screen.findByRole('button', { name: 'Contributors' }));
-    expect(await screen.findByRole('button', { name: 'hiero-hackers' })).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'hiero-hackers' })).toBeInTheDocument();
 
     // Select hiero-hackers, then open Governance: the selection sticks, and
     // the tab explains why this org has no governance content.
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-hackers' }));
+    await chooseOrg('hiero-hackers');
     await screen.findByText('erin');
     await userEvent.click(screen.getByRole('button', { name: 'Governance' }));
     expect(await screen.findByText(/need a published governance config/)).toBeInTheDocument();
     expect(screen.queryByText('Role holders')).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Organisation' })).toHaveValue('hiero-hackers');
 
     // Switching back to hiero-ledger restores the tab's content.
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-ledger' }));
+    await chooseOrg('hiero-ledger');
     expect(await screen.findByText('Role holders')).toBeInTheDocument();
   });
 
@@ -59,7 +74,7 @@ describe('App shell', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Contributors' }));
     expect(await screen.findByText('alice')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'hiero-hackers' }));
+    await chooseOrg('hiero-hackers');
     expect(await screen.findByText('erin')).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
   });
@@ -70,11 +85,10 @@ describe('App shell', () => {
     expect(screen.getByText('maintainers')).toBeInTheDocument();
     expect(screen.getByText('103')).toBeInTheDocument();
     expect(screen.getByText('How to read this — what each column means')).toBeInTheDocument();
-    // Each group appears twice: once in the jump bar (a button — deliberately
-    // not a fragment link, which would clobber the tab/org hash state), once
-    // as its header. The chart card renders under its own named group — there
-    // is no generic "Charts" section any more.
-    expect(screen.getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
+    // Each group appears in the sidebar and as its header; the sidebar entry is a button because a
+    // fragment link would clobber the tab/org hash state.
+    const toc = screen.getByRole('navigation', { name: 'Dashboard' });
+    expect(within(toc).getByRole('button', { name: 'Pipeline charts' })).toBeInTheDocument();
     expect(screen.getAllByText('Pipeline charts')).toHaveLength(2);
     expect(screen.queryByText('Charts')).not.toBeInTheDocument();
     expect(screen.getAllByText('Roles & teams')).toHaveLength(2);
@@ -86,7 +100,10 @@ describe('App shell', () => {
       'href',
       'https://example.test/issues',
     );
-    expect(screen.getByText(/data 2026-07-25 21:00 UTC · code abc1234/)).toBeInTheDocument();
+    expect(screen.getByText('2026-07-25 21:00 UTC').closest('p')).toHaveTextContent(
+      'Data as of 2026-07-25 21:00 UTC',
+    );
+    expect(screen.getByText('Code abc1234')).toBeInTheDocument();
   });
 });
 
@@ -100,21 +117,25 @@ describe('Section tables', () => {
     let users = within(table)
       .getAllByRole('row')
       .slice(1)
-      .map((row) => within(row).getAllByRole('cell')[0].textContent);
-    expect(users).toEqual(['alice', 'bob', 'carol']);
+      .map((row) => within(row).getByRole('link'));
+    ['alice', 'bob', 'carol'].forEach((name, index) =>
+      expect(users[index]).toHaveAccessibleName(name),
+    );
 
     await userEvent.click(within(table).getByText(/count/));
     users = within(table)
       .getAllByRole('row')
       .slice(1)
-      .map((row) => within(row).getAllByRole('cell')[0].textContent);
-    expect(users).toEqual(['carol', 'bob', 'alice']);
+      .map((row) => within(row).getByRole('link'));
+    ['carol', 'bob', 'alice'].forEach((name, index) =>
+      expect(users[index]).toHaveAccessibleName(name),
+    );
   });
 
   it('filters rows and shows the shown-of-total badge', async () => {
     await openGovernance();
 
-    await userEvent.type(screen.getByPlaceholderText('Filter…'), 'ali');
+    await userEvent.type(screen.getByRole('textbox', { name: 'Filter rows' }), 'ali');
     expect(screen.getByText('1 of 3')).toBeInTheDocument();
     expect(screen.queryByText('bob')).not.toBeInTheDocument();
   });
@@ -123,11 +144,11 @@ describe('Section tables', () => {
     await openGovernance();
     expect(screen.getByText('bob')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: '1 month' }));
+    await userEvent.click(screen.getByRole('radio', { name: '1 month' }));
     expect(screen.queryByText('bob')).not.toBeInTheDocument();
     expect(screen.getByText('alice')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'All time' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'All time' }));
     expect(screen.getByText('bob')).toBeInTheDocument();
   });
 
@@ -135,16 +156,18 @@ describe('Section tables', () => {
     await openGovernance();
 
     const cell = screen.getByText('2,490'); // 2490 renders with a separator
-    // Cells centre by default; `num` is what earns a column tabular digits.
-    expect(cell.closest('td')).toHaveClass('num');
+    // `data-numeric` is what earns a column right alignment and tabular digits.
+    expect(cell.closest('td')).toHaveAttribute('data-numeric');
     const table = screen.getByRole('table');
-    expect(within(table).getByText('count').closest('th')).toHaveClass('num');
+    expect(within(table).getByText('count').closest('th')).toHaveAttribute('data-numeric');
   });
 
   it('offers the period windows shortest-first, with all time last', async () => {
     await openGovernance();
 
-    const tabs = within(screen.getByRole('group', { name: 'Time range' })).getAllByRole('button');
+    const tabs = within(screen.getByRole('radiogroup', { name: 'Time range' })).getAllByRole(
+      'radio',
+    );
 
     expect(tabs.map((tab) => tab.textContent)).toEqual(['1 month', 'All time']);
   });
@@ -153,27 +176,30 @@ describe('Section tables', () => {
     await openGovernance();
 
     expect(screen.getByText('2026-07-20')).toBeInTheDocument(); // date format trims time
-    expect(screen.getByText(/data as of 2026-07-25 10:00/)).toBeInTheDocument();
+    expect(screen.getByText(/Data as of 2026-07-25 10:00/)).toBeInTheDocument();
     const action = screen.getByRole('link', { name: 'Suggest a correction' });
     expect(action).toHaveAttribute('href', 'https://example.test/correct');
   });
 });
 
 describe('Charts', () => {
-  it('renders variant tabs and opens the lightbox with note and methodology', async () => {
+  it('keeps variant tabs and loads each tab’s own chart data', async () => {
     await openGovernance();
-
-    expect(screen.getByRole('button', { name: 'By year' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'By month' })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByAltText('Unique active contributors by role'));
-    const lightbox = await screen.findByRole('dialog');
-    expect(within(lightbox).getByText('How to read this chart.')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Step-by-step methodology')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Step two.')).toBeInTheDocument();
-
-    await userEvent.keyboard('{Escape}');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'By year' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('radio', { name: 'By month' }));
+    const figure = screen.getByRole('figure', {
+      name: 'Unique active contributors by role — By month',
+    });
+    expect(within(figure).getByRole('radio', { name: 'By month' })).toBeChecked();
+    expect(
+      await within(figure).findByText('How to read this and how it is measured'),
+    ).toBeVisible();
+    expect(
+      vi.mocked(fetch).mock.calls.some(([url]) => String(url).endsWith('pipeline_monthly.json')),
+    ).toBe(true);
+    await userEvent.click(within(figure).getByText('How to read this and how it is measured'));
+    expect(within(figure).getByText('How to read this chart.')).toBeVisible();
+    expect(within(figure).getByText('Step two.')).toBeVisible();
   });
 });
 
@@ -185,26 +211,50 @@ describe('Organisation diversity card (#435)', () => {
     return await screen.findByText('Organisation diversity');
   };
 
-  const chartSrc = (title: string) => screen.getByAltText(title).getAttribute('src');
+  // A figure is named "<title> — <variant>", or just its title when it has one view.
+  const figureNamed = (title: string) =>
+    screen.getByRole('figure', { name: new RegExp(`^${title}( —|$)`) });
+  const chartVariant = (title: string) => figureNamed(title).getAttribute('aria-label');
 
   it('gives the card one role axis, so every role-tabbed chart switches together', async () => {
     await openDiversity();
 
     // One tab row for the card, not one per chart: three charts, two of which
     // share the axis, must not be able to disagree about the active role.
-    const axes = screen.getAllByRole('group', { name: 'Organisation diversity view' });
+    const axes = screen.getAllByRole('radiogroup', { name: 'Organisation diversity view' });
     expect(axes).toHaveLength(1);
-    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut.png');
-    expect(chartSrc('Single-employer repos by org')).toContain('single_employer_repos_by_org.png');
+    expect(chartVariant('Role-holders by organisation')).toContain('Maintainers');
+    expect(chartVariant('Single-employer repos by org')).toContain('Maintainers');
 
-    await userEvent.click(within(axes[0]).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(axes[0]).getByRole('radio', { name: 'Committers' }));
 
-    expect(chartSrc('Role-holders by organisation')).toContain('affiliation_donut_committers.png');
-    expect(chartSrc('Single-employer repos by org')).toContain(
-      'single_employer_repos_by_org_committers.png',
-    );
-    // The chart with no role axis is untouched by the card's tabs.
-    expect(chartSrc('Single-employer teams by org')).toContain('single_employer_teams_by_org.png');
+    expect(chartVariant('Role-holders by organisation')).toContain('Committers');
+    expect(chartVariant('Single-employer repos by org')).toContain('Committers');
+    // The chart with no role axis is untouched by the card's tabs, and its one
+    // view is named once rather than "<title> — <title>".
+    expect(chartVariant('Single-employer teams by org')).toBe('Single-employer teams by org');
+  });
+
+  // Out-of-range tabs clamp to the last one; anything else falls back to the first.
+  it.each([
+    ['-1', 'Maintainers'],
+    ['x', 'Maintainers'],
+    ['99', 'Committers'],
+    ['1,-4', 'Committers'],
+  ])('opens a hand-edited link with card tab %s on %s', async (tab, expected) => {
+    window.location.hash = `org-diversity.tab=${tab}`;
+    await openDiversity();
+
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
+    expect(within(axis).getByRole('radio', { name: expected })).toBeChecked();
+    expect(chartVariant('Role-holders by organisation')).toContain(expected);
+  });
+
+  it('leads an odd run of half-width charts with a two-row chart', async () => {
+    await openDiversity();
+    // Three half-width charts: the first spans two rows, the others stack beside it.
+    expect(figureNamed('Role-holders by organisation')).toHaveClass('lg:row-span-2');
+    expect(figureNamed('Single-employer teams by org')).not.toHaveClass('lg:row-span-2');
   });
 
   it('leaves a chart with its own variant set on its own tabs', async () => {
@@ -213,30 +263,27 @@ describe('Organisation diversity card (#435)', () => {
     await openGovernance();
 
     expect(
-      screen.queryByRole('group', { name: 'Maintainer pipeline view' }),
+      screen.queryByRole('radiogroup', { name: 'Maintainer pipeline view' }),
     ).not.toBeInTheDocument();
-    const own = screen.getByRole('group', { name: 'Unique active contributors by role view' });
-    expect(within(own).getByRole('button', { name: 'By year' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const own = screen.getByRole('radiogroup', {
+      name: 'Unique active contributors by role view',
+    });
+    expect(within(own).getByRole('radio', { name: 'By year' })).toBeChecked();
   });
 
-  it('shows the active tab’s note and methodology in the lightbox', async () => {
+  it('shows the active tab’s note and methodology', async () => {
     await openDiversity();
-    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
-
-    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
-    await userEvent.click(screen.getByAltText('Role-holders by organisation'));
-
-    // The committer tab must describe committers — it used to show the
-    // maintainer note, which misdescribed its own population.
-    const lightbox = await screen.findByRole('dialog');
-    expect(within(lightbox).getByText('The committer bench by employer.')).toBeInTheDocument();
-    expect(within(lightbox).getByText('Count committers.')).toBeInTheDocument();
-    expect(
-      within(lightbox).queryByText('The maintainer bench by employer.'),
-    ).not.toBeInTheDocument();
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
+    await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
+    const figure = screen.getByRole('figure', {
+      name: 'Role-holders by organisation — Committers',
+    });
+    await userEvent.click(
+      await within(figure).findByText('How to read this and how it is measured'),
+    );
+    expect(within(figure).getByText('The committer bench by employer.')).toBeVisible();
+    expect(within(figure).getByText('Count committers.')).toBeVisible();
+    expect(within(figure).queryByText('The maintainer bench by employer.')).not.toBeInTheDocument();
   });
 
   it('downloads the active tab’s companion CSV', async () => {
@@ -249,11 +296,12 @@ describe('Organisation diversity card (#435)', () => {
       }),
     );
     await openDiversity();
-    const axis = screen.getByRole('group', { name: 'Organisation diversity view' });
-    const card = screen.getByText('Organisation diversity').closest('section') as HTMLElement;
+    const axis = screen.getByRole('radiogroup', { name: 'Organisation diversity view' });
+    const card = screen.getByRole('region', { name: 'Organisation diversity' });
 
-    await userEvent.click(within(axis).getByRole('button', { name: 'Committers' }));
-    await userEvent.click(within(card).getByRole('button', { name: 'Download CSV' }));
+    await userEvent.click(within(axis).getByRole('radio', { name: 'Committers' }));
+    // The card's own button leads its header; each loaded chart adds its own after it.
+    await userEvent.click(within(card).getAllByRole('button', { name: 'Download CSV' })[0]);
 
     await vi.waitFor(() =>
       expect(
@@ -290,23 +338,20 @@ describe('Role-tabbed tables (#435)', () => {
         .mock.calls.some(([url]) => String(url).endsWith('committeraffiliations.json')),
     ).toBe(false);
 
-    const roles = screen.getByRole('group', { name: 'Role' });
-    expect(within(roles).getByRole('button', { name: 'Maintainers' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const roles = screen.getByRole('radiogroup', { name: 'Role' });
+    expect(within(roles).getByRole('radio', { name: 'Maintainers' })).toBeChecked();
     expect(screen.getByText('alice')).toBeInTheDocument();
     expect(screen.queryByText('dave')).not.toBeInTheDocument();
   });
 
   it('swaps rows, columns and the freshness stamp with the tab', async () => {
     await openDiversity();
-    const roles = screen.getByRole('group', { name: 'Role' });
+    const roles = screen.getByRole('radiogroup', { name: 'Role' });
     const table = screen.getByRole('table');
 
     expect(within(table).getByText('maintainer')).toBeInTheDocument();
 
-    await userEvent.click(within(roles).getByRole('button', { name: 'Committers' }));
+    await userEvent.click(within(roles).getByRole('radio', { name: 'Committers' }));
 
     // The count column is named for the role it counts, so the tabs differ in
     // shape and not only in their rows.
@@ -314,7 +359,7 @@ describe('Role-tabbed tables (#435)', () => {
     expect(within(screen.getByRole('table')).queryByText('maintainer')).not.toBeInTheDocument();
     expect(screen.getByText('dave')).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
-    expect(screen.getByText(/data as of 2026-07-26 10:00/)).toBeInTheDocument();
+    expect(screen.getByText(/Data as of 2026-07-26 10:00/)).toBeInTheDocument();
     expect(screen.getByText(/whose highest role anywhere is committer/)).toBeInTheDocument();
   });
 
@@ -323,10 +368,10 @@ describe('Role-tabbed tables (#435)', () => {
     // the two axes have to stay tellable apart on a table that has both.
     await openDiversity();
 
-    expect(within(screen.getByRole('group', { name: 'Role' })).getAllByRole('button')).toHaveLength(
-      2,
-    );
-    expect(screen.queryByRole('group', { name: 'Time range' })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('radiogroup', { name: 'Role' })).getAllByRole('radio'),
+    ).toHaveLength(2);
+    expect(screen.queryByRole('radiogroup', { name: 'Time range' })).not.toBeInTheDocument();
   });
 
   it('resolves a deep link to an absorbed section, with its tab active', async () => {
@@ -344,10 +389,10 @@ describe('Role-tabbed tables (#435)', () => {
     await screen.findByText('dave');
     await vi.waitFor(() => expect(scrolled.map((el) => el.id)).toContain('affiliations'));
     expect(
-      within(screen.getByRole('group', { name: 'Role' })).getByRole('button', {
+      within(screen.getByRole('radiogroup', { name: 'Role' })).getByRole('radio', {
         name: 'Committers',
       }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    ).toBeChecked();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
   });
 });
@@ -382,8 +427,9 @@ describe('Cell formats', () => {
     );
 
     expect(container.textContent).toBe('presentmissing');
-    expect(container.querySelector('.chip-merged')).toBeInTheDocument();
-    expect(container.querySelector('.chip-none')).toBeInTheDocument();
+    // The tone (not only the word) distinguishes the two states.
+    expect(container.querySelector('[data-variant="ok"]')).toHaveTextContent('present');
+    expect(container.querySelector('[data-variant="neutral"]')).toHaveTextContent('missing');
   });
 });
 
@@ -438,29 +484,30 @@ describe('Resilience', () => {
 
 describe('Section groups', () => {
   it('gives colliding group names distinct keys and anchors', async () => {
-    const { SectionGroups } = await import('../components/SectionGroups');
+    const { SectionGroups, GroupStrip } = await import('../components/SectionGroups');
+    const { tocEntries } = await import('../toc');
     // Distinct names that slug identically, plus an outright repeat.
-    const { container } = render(
-      <SectionGroups
-        groups={[
-          ['Roles & teams', <p key="a">a</p>],
-          ['Roles  teams', <p key="b">b</p>],
-          ['Roles & teams', <p key="c">c</p>],
-        ]}
-      />,
-    );
+    const groups: [string, ReactNode][] = [
+      ['Roles & teams', <p key="a">a</p>],
+      ['Roles  teams', <p key="b">b</p>],
+      ['Roles & teams', <p key="c">c</p>],
+    ];
+    const { container } = render(<SectionGroups groups={groups} />);
 
-    const ids = [...container.querySelectorAll('details.group')].map((el) => el.id);
+    const ids = [...container.querySelectorAll('[id^="grp-"]')].map((el) => el.id);
     expect(new Set(ids).size).toBe(3); // no duplicate DOM ids
+    expect(tocEntries(groups).map((entry) => entry.id)).toEqual(ids);
 
-    // Every jump button scrolls its own group, even under name collisions.
+    // Every entry scrolls its own group, even under name collisions.
+    render(<GroupStrip entries={tocEntries(groups)} />);
     const scrolled: Element[] = [];
     const spy = vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(function (
       this: Element,
     ) {
       scrolled.push(this);
     });
-    for (const button of container.querySelectorAll('button.jbtn')) {
+    const strip = screen.getByRole('navigation', { name: 'Jump to' });
+    for (const button of within(strip).getAllByRole('button')) {
       await userEvent.click(button);
     }
     spy.mockRestore();
@@ -471,7 +518,8 @@ describe('Section groups', () => {
     await openGovernance();
     expect(window.location.hash).toContain('tab=Governance');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Roles & teams' }));
+    const toc = screen.getByRole('navigation', { name: 'Dashboard' });
+    await userEvent.click(within(toc).getByRole('button', { name: 'Roles & teams' }));
 
     // The jump must not clobber the hash the app stores its state in: the
     // Governance content is still on screen and the hash still names the tab.
@@ -493,9 +541,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Hiero — analytics dashboard' }),
-    ).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Loading dashboard' })).toBeInTheDocument();
 
     resolveManifest(new Response(JSON.stringify(MANIFEST)));
@@ -526,7 +572,10 @@ describe('Loading, empty-filter, and error states (#343)', () => {
   it('shows a no-matches message when a filter excludes every row, and clears it', async () => {
     await openGovernance();
 
-    await userEvent.type(screen.getByPlaceholderText('Filter…'), 'nobody-has-this-name');
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Filter rows' }),
+      'nobody-has-this-name',
+    );
     expect(await screen.findByText(/No rows match/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'clear the filter?' })).toBeInTheDocument();
     expect(screen.queryByText('alice')).not.toBeInTheDocument();
@@ -551,9 +600,7 @@ describe('Loading, empty-filter, and error states (#343)', () => {
 
     render(<App />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Hiero — analytics dashboard' }),
-    ).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
     expect(await screen.findByText(/Failed to load the dashboard data/)).toBeInTheDocument();
     expect(screen.getByText('Error details')).toBeInTheDocument();
 

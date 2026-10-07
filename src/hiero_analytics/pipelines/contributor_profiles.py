@@ -1,9 +1,9 @@
 """
-Plot average contribution mix by contributor type.
+Average contribution mix and max-difficulty distribution by contributor.
 
 Output:
 - avg_contribution_mix_by_type.csv
-- avg_contribution_mix.png
+- max_difficulty_distribution.csv
 """
 
 from __future__ import annotations
@@ -20,7 +20,6 @@ from hiero_analytics.data_sources.github_ingest import (
 )
 from hiero_analytics.export.save import save_dataframe
 from hiero_analytics.pipelines._shared import repo_context
-from hiero_analytics.plotting.bars import plot_bar, plot_stacked_bar
 
 PLOT_DIFFICULTY_ORDER = [
     "Good First Issue",
@@ -103,68 +102,13 @@ def build_avg_contribution_mix(pr_df: pd.DataFrame) -> pd.DataFrame:
 
 
 # =========================================================
-# Plot
-# =========================================================
-def plot_max_difficulty(df: pd.DataFrame, output_path, repo: str):
-    """Render a bar chart of contributors grouped by maximum difficulty reached."""
-    plot_bar(
-        df=df,
-        x_col="difficulty",
-        y_col="count",
-        title=f"{repo}: Max Difficulty Reached by Contributors",
-        output_path=output_path,
-        rotate_x=30,
-    )
-
-
-def plot_avg_mix(df: pd.DataFrame, output_path, repo: str):
-    """Render a stacked bar chart showing the average difficulty mix per contributor type."""
-    if "total" in df.columns:
-        df = df.drop(columns=["total"])
-
-    CONTRIBUTOR_ORDER = [
-        "GFI contributor",
-        "Beginner contributor",
-        "Intermediate contributor",
-        "Advanced contributor",
-    ]
-
-    df["contributor_type"] = pd.Categorical(
-        df["contributor_type"],
-        categories=CONTRIBUTOR_ORDER,
-        ordered=True,
-    )
-
-    df = df.sort_values("contributor_type")
-
-    # enforce stack order
-    stack_cols = [
-        "Good First Issue",
-        "Beginner",
-        "Intermediate",
-        "Advanced",
-    ]
-    stack_cols = [c for c in stack_cols if c in df.columns]
-
-    plot_stacked_bar(
-        df=df,
-        x_col="contributor_type",
-        stack_cols=stack_cols,
-        labels=stack_cols,
-        title=f"{repo}: Average Contribution",
-        output_path=output_path,
-        rotate_x=30,
-    )
-
-
-# =========================================================
 # Main
 # =========================================================
 
 
 def main(org: str = ORG, repo: str = REPO):
-    """Fetch PR difficulty data and generate contributor profile charts for a repository."""
-    client, repo_data_dir, repo_charts_dir = repo_context(org, repo)
+    """Fetch PR difficulty data and write contributor profile tables for a repository."""
+    client, repo_data_dir = repo_context(org, repo)
 
     prs = fetch_repo_merged_pr_difficulty_graphql(
         client,
@@ -185,17 +129,9 @@ def main(org: str = ORG, repo: str = REPO):
         repo_data_dir / "avg_contribution_mix_by_type.csv",
     )
 
-    # plot
-    plot_avg_mix(
-        avg_mix,
-        repo_charts_dir / "avg_contribution_mix.png",
-        repo,
-    )
-
-    plot_max_difficulty(
+    save_dataframe(
         build_max_difficulty_distribution(pr_df),
-        repo_charts_dir / "max_difficulty_distribution.png",
-        repo,
+        repo_data_dir / "max_difficulty_distribution.csv",
     )
 
     logger.info("Done.")

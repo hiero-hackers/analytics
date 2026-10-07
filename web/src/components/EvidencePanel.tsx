@@ -5,6 +5,10 @@
  */
 
 import { useEffect } from 'react';
+import { XIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { usePrintMode } from '../printContext';
 import { safeUrl } from '../safety';
 
 /** One evidence line, in the legacy panel's field order. */
@@ -29,48 +33,62 @@ export function EvidencePanel({
   items: EvidenceItem[];
   onClose: () => void;
 }) {
+  const printing = usePrintMode();
+  // Stays mounted but hidden while printing, and ignores Escape meanwhile, so
+  // an open panel is still open after print/cancel.
   useEffect(() => {
+    if (printing) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, printing]);
 
   return (
-    <div className="hipev">
-      <div className="hipev-head">
-        <h3>
+    <div className="mt-3 rounded-lg border p-3" hidden={printing} data-print-hide>
+      <div className="mb-1.5 flex flex-wrap items-baseline gap-x-2.5">
+        <h3 className="text-sm font-semibold">
           HIP-{hip} · {repo}
         </h3>
-        <span className="n">
+        <span className="text-xs text-soft">
           {items.length} referencing PR{items.length > 1 ? 's' : ''}
         </span>
-        <button type="button" className="dl" onClick={onClose}>
+        <Button type="button" variant="outline" size="sm" className="ml-auto" onClick={onClose}>
+          <XIcon data-icon="inline-start" />
           Close
-        </button>
+        </Button>
       </div>
-      <ol>
+      <ol className="max-h-[300px] overflow-y-auto" data-scroll-restore>
         {items.map((item) => {
           const href = safeUrl(`https://github.com/${repo}/pull/${item.n}`);
           return (
-            <li key={item.n}>
-              <div className="l1">
+            <li key={item.n} className="border-b border-row-line py-1.5 text-xs last:border-b-0">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                 {href ? (
-                  <a href={href} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-link tabular-nums underline-offset-4 hover:underline"
+                  >
                     #{item.n}
                   </a>
                 ) : (
-                  <span>#{item.n}</span>
+                  <span className="font-semibold tabular-nums">#{item.n}</span>
                 )}
-                <span className="t">{item.t}</span>
-                <span className="meta">
+                <span className="text-muted-foreground">{item.t}</span>
+                <span className="whitespace-nowrap text-soft">
                   {item.st === 'MERGED' ? `merged ${item.d}` : item.st.toLowerCase()}
                 </span>
-                <span className="meta">matched in: {item.m.split('|').join(', ')}</span>
-                {item.q && <span className="cue">not counted — “{item.q}”</span>}
+                <span className="whitespace-nowrap text-soft">
+                  matched in: {item.m.split('|').join(', ')}
+                </span>
+                {item.q && <Badge variant="warn">not counted — “{item.q}”</Badge>}
               </div>
-              {item.x && <div className="snip">{item.x}</div>}
+              {item.x && (
+                <div className="mt-0.5 truncate font-mono text-[11px] text-soft">{item.x}</div>
+              )}
             </li>
           );
         })}

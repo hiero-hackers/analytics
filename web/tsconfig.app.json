@@ -15,6 +15,9 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    /* `@/` = src/, the import alias shadcn components are generated with.
+       Paths-only: TypeScript 7 no longer supports `baseUrl`. */
+    "paths": { "@/*": ["./src/*"] },
 
     /* Linting */
     "noUnusedLocals": true,

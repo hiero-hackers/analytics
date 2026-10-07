@@ -22,7 +22,10 @@ import {
   type ReactTable,
 } from '@tanstack/react-table';
 import type { ColumnSpec, Row } from './api';
+import { ContributorCell } from './components/ContributorCell';
 import { FormattedCell } from './components/FormattedCell';
+import { RepoCell } from './components/RepoCell';
+import { RoleCell } from './components/RoleCell';
 
 /**
  * v9 bundles nothing by default: every feature, row model, and sort/filter
@@ -86,6 +89,9 @@ function sortableValue(row: Row, key: string, format?: ColumnSpec['format']): nu
   return value === null || value === undefined ? '' : String(value);
 }
 
+/** Columns whose values are GitHub logins: shown with the person's avatar, linking to them. */
+const PERSON_KEYS = new Set(['login', 'user', 'contributor', 'account', 'top_carrier']);
+
 export function useDataTable(
   columns: ColumnSpec[],
   rows: Row[],
@@ -99,10 +105,17 @@ export function useDataTable(
         helper.accessor((row): unknown => sortableValue(row, spec.key, spec.format), {
           id: spec.key,
           header: spec.label,
-          cell: (context) => (
-            <FormattedCell value={context.row.original[spec.key]} format={spec.format} />
-          ),
-          meta: { numeric: spec.format === 'number' },
+          cell: (context) => {
+            const value = context.row.original[spec.key];
+            if (typeof value === 'string' && !spec.format) {
+              if (PERSON_KEYS.has(spec.key)) return <ContributorCell key={value} login={value} />;
+              if (/(^|_)role$/.test(spec.key)) return <RoleCell role={value} />;
+            }
+            if (['repo', 'repository'].includes(spec.key) && typeof value === 'string')
+              return <RepoCell name={value} />;
+            return <FormattedCell value={value} format={spec.format} />;
+          },
+          meta: { numeric: spec.format === 'number' || spec.format === 'percent' },
         }),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- columns derive from the key

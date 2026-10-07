@@ -21,10 +21,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.config.paths as paths
 import hiero_analytics.pipelines.affiliation as affiliation_mod
@@ -35,6 +32,7 @@ import hiero_analytics.pipelines.contributor_heatmap as heatmap_mod
 import hiero_analytics.pipelines.contributor_profiles as profiles_mod
 import hiero_analytics.pipelines.difficulty as difficulty_mod
 import hiero_analytics.pipelines.difficulty_over_time as difficulty_time_mod
+import hiero_analytics.pipelines.entity_activity as entity_mod
 import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
@@ -47,6 +45,7 @@ import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
+from hiero_analytics.dashboard_spec import entities as entity_spec
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
     ContributorActivityRecord,
@@ -74,17 +73,14 @@ PRIMARY = "hiero-ledger"
 HACKERS = "hiero-hackers"
 _NOW = datetime.now(UTC)
 
-# Charts listed by the spec but owned by CLI-only pipelines: the default run
-# legitimately does not produce them, so existence is not asserted here.
-CLI_ONLY_CHARTS = {
-    "hiero_discord_channel_categories.png",
-    "hiero_discord_monthly_traffic.png",
-    "hiero_discord_recent_activity_30d.png",
-}
+# Chart cards owned by CLI-only pipelines: the default run legitimately does
+# not produce their datasets, so existence is not asserted here.
+CLI_ONLY_CHART_CARDS = {"discord"}
 
 # Org-level artifacts pipelines produce that the dashboard spec deliberately
-# does not list: chart-companion data tables (the PNG is the dashboard-facing
-# artifact; the CSV is its exportable source) and non-dashboard reports.
+# does not list: companion tables behind a chart or KPI tile (read through a
+# chart source or a tile loader rather than a table section) and
+# non-dashboard reports.
 CHART_COMPANION_CSVS = {
     "affiliation_distribution.csv",
     "affiliation_distribution_committers.csv",
@@ -103,26 +99,13 @@ CHART_COMPANION_CSVS = {
     "difficulty_over_time_event_based_weekly.csv",
     "difficulty_over_time_all_event_based_weekly.csv",
     "maintainer_activity_events.csv",
+    "difficulty_distribution.csv",  # base of the shared-period variants (_7d/_30d/_365d) derived below
+    "maintainer_activity_events.csv",  # event-level source behind the maintainer pipeline tables
     "gfi_completers.csv",  # Contributors-tab KPI tile source (completed-a-GFI %)
-    "maintainer_pipeline_yearly.csv",
-    "maintainer_pipeline_daily.csv",
-    "maintainer_pipeline_monthly.csv",
-    "maintainer_pipeline_weekly.csv",
-    "maintainer_pipeline_by_repo.csv",
-    "maintainer_pipeline_by_repo_365d.csv",
-    "maintainer_pipeline_by_repo_30d.csv",
-    "maintainer_pipeline_by_repo_7d.csv",
-    "org_runner_status.csv",
-    "language_distribution.csv",
-    "push_activity.csv",
-    "contributor_counts.csv",
-    "hip_repo_engagement.csv",  # HIPs-tab engagement chart companion (embedded as its CSV download)
+    "org_runner_status.csv",  # per-repo runner detail behind the org runner summary
     "hip_repo_activity.csv",  # long-format source of the coverage matrix (wide CSV embeds in the page)
     "hip_summary.csv",  # per-HIP ledger data behind the funnel, process checks, and matrix (no table dup)
-    "hip_adoption_funnel.csv",  # funnel chart companion (embedded as its CSV download)
     "hip_process_checks.csv",  # HIP-1 conformance findings; data artifact only, no dashboard table
-    "repo_growth_timeline.csv",  # Repo-growth timeline chart companion
-    "release_timeline.csv",  # Release-timeline chart companion (release_repo_summary.csv has its own table section)
 }
 
 
@@ -358,11 +341,8 @@ def outputs_root(tmp_path_factory) -> Path:
         # Redirect the whole output tree; ensure_* helpers read these at call time.
         mp.setattr(paths, "OUTPUTS_DIR", root)
         mp.setattr(paths, "DATA_DIR", root / "data")
-        mp.setattr(paths, "CHARTS_DIR", root / "charts")
         mp.setattr(paths, "ORG_DATA_DIR", root / "data" / "org")
         mp.setattr(paths, "REPO_DATA_DIR", root / "data" / "repo")
-        mp.setattr(paths, "ORG_CHARTS_DIR", root / "charts" / "org")
-        mp.setattr(paths, "REPO_CHARTS_DIR", root / "charts" / "repo")
         mp.setattr(paths, "DATASETS_DIR", root / "data" / "datasets")
 
         # Fetch-layer stubs, per pipeline namespace.
@@ -375,9 +355,9 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(activity_mod, "fetch_org_merged_pr_difficulty_graphql", lambda _c, _org, **_k: REPO_PRS)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod):
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
-        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod):
+        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod, entity_mod):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
-        for mod in (role_coverage_mod, activity_mod):
+        for mod in (role_coverage_mod, activity_mod, entity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)
         mp.setattr(affiliation_mod, "load_affiliations", lambda: AFFILIATIONS)
         mp.setattr(affiliation_mod, "load_manual_logins", set)
@@ -387,7 +367,9 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(
             scorecard_mod,
             "fetch_repo_scorecard",
-            lambda name: ScorecardRecord(repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW),
+            lambda name, **_kwargs: ScorecardRecord(
+                repo=name, score=7.5, checks={"Maintained": 10, "Code-Review": 8}, date=_NOW
+            ),
         )
         mp.setattr(
             ci_health_mod,
@@ -489,22 +471,6 @@ def outputs_root(tmp_path_factory) -> Path:
 # ---------------------------------------------------------------------------
 
 
-def _spec_chart_files() -> dict[str, set[str]]:
-    """Org -> set of chart filenames the spec lists.
-
-    "*" cards are org-independent and best-effort per org, but the primary org
-    runs every pipeline, so they are pinned against it.
-    """
-    per_org: dict[str, set[str]] = {}
-    for macro in CHART_MACROS:
-        for org, specs in macro["charts"].items():
-            files = per_org.setdefault(PRIMARY if org == "*" else org, set())
-            for spec in specs:
-                for _caption, variants in spec["files"]:
-                    files.update(filename for _label, filename in variants)
-    return per_org
-
-
 def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
     """The JSON API lists a document for each spec section whose CSV exists.
 
@@ -591,6 +557,47 @@ def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
     assert any("download" in section for section in hip_charts)
 
 
+def test_data_api_ships_every_interactive_chart(outputs_root: Path):
+    """Every interactive reference resolves, and every source whose CSV was produced publishes."""
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+
+    published, missing = set(), []
+    for entry in manifest["orgs"].values():
+        for section in entry["chart_sections"]:
+            for chart in section["charts"]:
+                for variant in chart["variants"]:
+                    if reference := variant.get("interactive"):
+                        path = api_dir / reference["path"]
+                        if not path.exists():
+                            missing.append(reference["path"])
+                            continue
+                        document = json.loads(path.read_text())
+                        assert document["kind"] == reference["kind"]
+                        content = {"network": "nodes"}.get(document["kind"], "rows")
+                        assert document["population"] and content in document
+                        published.add(Path(reference["path"]).name)
+    assert not missing, f"interactive charts referenced but not written: {missing}"
+
+    org_data = outputs_root / "data" / "org" / PRIMARY
+    expected = {
+        f"{chart_id}.json"
+        for macro in CHART_MACROS
+        for spec in macro["charts"].get(PRIMARY) or macro["charts"].get("*", [])
+        for chart_id, source in spec["sources"].items()
+        if _rows_recorded(org_data / source["file"])
+    }
+    assert expected <= published, f"sources with data but no interactive chart: {sorted(expected - published)}"
+
+
+def _rows_recorded(csv_path: Path) -> bool:
+    """Whether the CSV exists and its sidecar counts at least one row (the data API's listing rule)."""
+    meta = Path(f"{csv_path}.meta.json")
+    if not csv_path.exists():
+        return False
+    return not meta.exists() or json.loads(meta.read_text()).get("record_count", 1) > 0
+
+
 def test_every_spec_table_csv_is_produced(outputs_root: Path):
     """Each section's CSV (and every derived period variant) exists for the primary org."""
     org_data = outputs_root / "data" / "org" / PRIMARY
@@ -607,23 +614,61 @@ def test_every_spec_table_csv_is_produced(outputs_root: Path):
     assert not missing, f"spec lists CSVs no pipeline produced: {sorted(missing)}"
 
 
-def test_every_spec_chart_png_is_produced(outputs_root: Path):
-    """Each macro-listed PNG exists for its org (CLI-only pipelines excepted)."""
+def test_every_spec_chart_source_is_produced(outputs_root: Path):
+    """Each chart variant's dataset exists for its org (CLI-only pipelines excepted).
+
+    "*" cards are org-independent and best-effort per org, but the primary org
+    runs every pipeline, so they are pinned against it.
+    """
     missing = []
-    for org, files in _spec_chart_files().items():
-        chart_dir = outputs_root / "charts" / "org" / org
-        missing += [f"{org}/{name}" for name in files - CLI_ONLY_CHARTS if not (chart_dir / name).exists()]
-    assert not missing, f"spec lists charts no pipeline produced: {sorted(missing)}"
+    for macro in CHART_MACROS:
+        for org, specs in macro["charts"].items():
+            org_data = outputs_root / "data" / "org" / (PRIMARY if org == "*" else org)
+            for spec in specs:
+                if spec["id"] in CLI_ONLY_CHART_CARDS:
+                    continue
+                names = [
+                    n for source in spec["sources"].values() for n in (source["file"], source.get("edges_file")) if n
+                ]
+                missing += [f"{org_data.name}/{name}" for name in names if not (org_data / name).exists()]
+    assert not missing, f"spec lists chart datasets no pipeline produced: {sorted(set(missing))}"
+
+
+def _spec_listed_csvs() -> set[str]:
+    """Every CSV the spec reaches: table sections (with period variants), chart sources, entity tables."""
+    listed = set()
+    for spec in ALL_SECTION_SPECS:
+        listed.add(spec["file"])
+        if spec.get("periods"):
+            stem = Path(spec["file"]).stem
+            listed.update(period.filename(stem) for period in ACTIVITY_PERIODS)
+    listed.update(
+        name
+        for macro in CHART_MACROS
+        for specs in macro["charts"].values()
+        for spec in specs
+        for source in spec["sources"].values()
+        for name in (source["file"], source.get("edges_file"))
+        if name
+    )
+    listed.update(entity_spec.ENTITY_FILES)
+    return listed
+
+
+def test_companion_list_names_only_unlisted_outputs():
+    """The companion allow-list may only name outputs the spec does not already reach.
+
+    Anything the spec lists through a section, a chart source or an entity table
+    is already accounted for; keeping it here too would let the orphan check
+    silently cover an output after the spec stops reading it.
+    """
+    redundant = CHART_COMPANION_CSVS & _spec_listed_csvs()
+    assert not redundant, f"companion entries the spec already lists: {sorted(redundant)}"
 
 
 def test_no_orphan_org_level_outputs(outputs_root: Path):
     """Everything produced at org level is spec-listed or explicitly accounted for."""
-    spec_csvs = set()
-    for spec in ALL_SECTION_SPECS:
-        spec_csvs.add(spec["file"])
-        if spec.get("periods"):
-            stem = Path(spec["file"]).stem
-            spec_csvs.update(period.filename(stem) for period in ACTIVITY_PERIODS)
+    spec_csvs = _spec_listed_csvs()
     period_suffixes = tuple(f"_{period.key}.csv" for period in ACTIVITY_PERIODS)
 
     orphans = []
@@ -641,10 +686,6 @@ def test_no_orphan_org_level_outputs(outputs_root: Path):
             known = base in CHART_COMPANION_CSVS
         if not known:
             orphans.append(name)
-
-    spec_charts = _spec_chart_files().get(PRIMARY, set())
-    org_charts = outputs_root / "charts" / "org" / PRIMARY
-    orphans += [p.name for p in org_charts.glob("*.png") if p.name not in spec_charts]
 
     assert not orphans, f"outputs the dashboard spec doesn't know about: {sorted(orphans)}"
 
@@ -666,3 +707,57 @@ def test_every_emitted_kpi_tile_explains_itself(outputs_root: Path):
         if not tile.get("note") or not tile.get("methodology")
     ]
     assert not unexplained, f"KPI tiles with no explanation: {unexplained}"
+
+
+def test_every_produced_chart_has_interactive_data(outputs_root: Path):
+    """Every published chart variant carries an interactive document that exists on disk.
+
+    ``interactive`` is the only way a variant renders, so a listed variant
+    without one (or pointing at a document that was not written) is a blank
+    tab. The legacy ``file`` field must not come back: the PNG it named is no
+    longer produced.
+    """
+    manifest = json.loads((outputs_root / "data/api/v1/manifest.json").read_text())
+    for org in manifest["orgs"].values():
+        for section in org["chart_sections"]:
+            for chart in section["charts"]:
+                for variant in chart["variants"]:
+                    assert "file" not in variant, variant
+                    assert variant.get("interactive"), variant
+                    target = outputs_root / "data/api/v1" / variant["interactive"]["path"]
+                    assert target.exists(), variant["interactive"]["path"]
+
+
+def test_data_api_publishes_entity_indexes_and_their_documents(outputs_root: Path):
+    """Every org's entity indexes resolve, row by row, to a detail document of their kind."""
+    api_dir = outputs_root / "data" / "api" / "v1"
+    manifest = json.loads((api_dir / "manifest.json").read_text())
+    for org in (PRIMARY, HACKERS):
+        entry = manifest["orgs"][org]["entities"]
+        for kind, detail_kind in (("repositories", "repository"), ("contributors", "contributor")):
+            index = json.loads((api_dir / entry[kind]["path"]).read_text())
+            assert index["rows"], f"{org} publishes no {kind}"
+            assert entry[kind]["count"] == len(index["rows"])
+            for row in index["rows"]:
+                document = json.loads((api_dir / index["detail_path"].format(id=row["id"])).read_text())
+                assert (document["schema_version"], document["kind"], document["id"]) == (1, detail_kind, row["id"])
+                assert set(document["summary"]) == {"all", "7d", "30d", "365d"}
+                assert document["scope"] and document["methodology"] and document["population"]
+                assert "generated_at" in document
+
+
+def test_repository_views_join_tables_the_pipelines_produce(outputs_root: Path):
+    """Each optional table a repository view joins is one the run actually writes.
+
+    A renamed release, governance, onboarding or security table would otherwise
+    quietly turn into "unavailable" on every repository.
+    """
+    org_data = outputs_root / "data" / "org" / PRIMARY
+    declared = set()
+    for section in entity_spec.REPO_RELATED.values():
+        declared.add(section["file"])
+        declared.update(part["file"] for part in section.get("extra", []))
+        if listing := section.get("list"):
+            declared.add(listing["file"])
+    missing = sorted(name for name in declared if not (org_data / name).exists())
+    assert not missing, f"repository views join tables no pipeline produced: {missing}"

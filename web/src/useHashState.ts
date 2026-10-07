@@ -1,21 +1,13 @@
 /**
- * One `key=value` pair of state held in the URL hash — the app's only router.
- * Hash state survives reloads, makes every view linkable, and needs no server
- * routing on static Pages hosting. Future URL-held state (filters, search)
- * goes through this same hook.
+ * One `key=value` pair of navigation state in the URL hash (tab, org, `widget`).
+ * Writes add a history entry; view state uses urlState's `useUrlParam` instead.
  */
 
-import { useEffect, useState } from 'react';
+import { useUrlParam } from './urlState';
 
 export function useHashState(key: string, fallback: string): [string, (value: string) => void] {
-  const read = () => new URLSearchParams(window.location.hash.slice(1)).get(key) ?? fallback;
-  const [value, setValue] = useState(read);
-  useEffect(() => {
-    const onHash = () => setValue(read());
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- read is stable per key/fallback
-  }, [key, fallback]);
+  const [value] = useUrlParam(key, fallback, { push: true });
+  // Keeps an explicit value even when it equals the fallback: `#tab=Governance` stays once chosen.
   const update = (next: string) => {
     const params = new URLSearchParams(window.location.hash.slice(1));
     params.set(key, next);

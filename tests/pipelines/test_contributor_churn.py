@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-import os
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
+import pandas as pd
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.contributor_churn as runner
 from hiero_analytics.data_sources.models import PullRequestDifficultyRecord
@@ -62,16 +59,14 @@ def _patch_pipeline(
     tmp_path: Path,
     prs: list[PullRequestDifficultyRecord],
 ) -> None:
-    """Redirect output dirs to tmp_path and stub the token, client, and PR fetch."""
+    """Redirect the output dir to tmp_path and stub the token, client, and PR fetch."""
     data_dir = tmp_path / "data"
-    charts_dir = tmp_path / "charts"
     data_dir.mkdir(parents=True, exist_ok=True)
-    charts_dir.mkdir(parents=True, exist_ok=True)
 
     monkeypatch.setattr("hiero_analytics.pipelines.contributor_churn.GITHUB_TOKEN", "test-token")
     monkeypatch.setattr(
         "hiero_analytics.pipelines.contributor_churn.repo_context",
-        lambda _org, _repo: (MagicMock(), data_dir, charts_dir),
+        lambda _org, _repo: (MagicMock(), data_dir),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.contributor_churn.fetch_repo_merged_pr_difficulty_graphql",
@@ -82,33 +77,67 @@ def _patch_pipeline(
 # Tests
 
 
-def test_main_creates_output_files(
+def test_main_writes_progression_and_churn_tables(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     synthetic_prs,
 ):
-    """Running main() should create the progression CSV and churn charts."""
+    """Running main() should write the progression CSV and every churn table."""
     _patch_pipeline(monkeypatch, tmp_path, synthetic_prs)
 
     runner.main()
 
     data_dir = tmp_path / "data"
-    charts_dir = tmp_path / "charts"
 
-    csv_path = data_dir / "contributor_progression.csv"
-    assert csv_path.exists(), "CSV contributor_progression.csv not created"
-    assert os.path.getsize(csv_path) > 0, "CSV contributor_progression.csv is empty"
+    # The author is a real column (not a dropped index) and only GFI starters remain.
+    progression = pd.read_csv(data_dir / "contributor_progression.csv").set_index("author")
+    assert set(progression.index) == {"alice", "bob"}
+    assert progression.loc["alice", "max_level"] == "Advanced"
+    assert progression.loc["alice", "pr_count"] == 4
+    assert progression.loc["alice", "tenure_days"] == 60
+    assert progression.loc["bob", "max_level"] == "Good First Issue"
 
-    expected_charts = [
-        "contributor_churn_funnel.png",
-        "contributor_retention.png",
-        "contributor_transitions.png",
-        "avg_tenure_by_level.png",
-    ]
-    for chart_file in expected_charts:
-        chart_path = charts_dir / chart_file
-        assert chart_path.exists(), f"Chart {chart_file} not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart {chart_file} is empty"
+    funnel = pd.read_csv(data_dir / "contributor_churn_funnel.csv")
+    assert list(funnel.columns) == ["stage", "count"]
+    assert dict(zip(funnel["stage"], funnel["count"], strict=True)) == {
+        "GFI Starters": 2,
+        "Progressed to Beginner+": 1,
+        "Progressed to Intermediate+": 1,
+        "Progressed to Advanced": 1,
+    }
+
+    # alice has 4 PRs, bob 1: both clear 1 PR, only alice clears 2..4.
+    retention = pd.read_csv(data_dir / "contributor_retention.csv")
+    assert list(retention.columns) == ["min_prs", "contributors"]
+    assert retention["min_prs"].tolist() == [1, 2, 3, 4]
+    assert retention["contributors"].tolist() == [2, 1, 1, 1]
+
+    transitions = pd.read_csv(data_dir / "contributor_transitions.csv")
+    assert list(transitions.columns) == ["from", "to", "count"]
+    assert {(row["from"], row["to"]): row["count"] for _, row in transitions.iterrows()} == {
+        ("Good First Issue", "Beginner"): 1,
+        ("Beginner", "Intermediate"): 1,
+        ("Intermediate", "Advanced"): 1,
+    }
+
+    # Sorted by difficulty order, not alphabetically.
+    tenure = pd.read_csv(data_dir / "avg_tenure_by_level.csv")
+    assert list(tenure.columns) == ["max_level", "avg_tenure_days"]
+    assert tenure["max_level"].tolist() == ["Good First Issue", "Advanced"]
+    assert tenure["avg_tenure_days"].tolist() == [0, 60]
+
+
+def test_main_skips_transitions_csv_without_transitions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """A GFI starter who never progresses yields no transitions, so no transitions CSV."""
+    _patch_pipeline(monkeypatch, tmp_path, [_test_pr(1, "bob", ["good first issue"], merged_days_ago=90)])
+
+    runner.main()
+
+    assert (tmp_path / "data" / "contributor_churn_funnel.csv").exists()
+    assert not (tmp_path / "data" / "contributor_transitions.csv").exists()
 
 
 def test_main_handles_no_gfi_starters(
@@ -124,7 +153,7 @@ def test_main_handles_no_gfi_starters(
 
     # No GFI starters -> the pipeline exits before writing any outputs.
     assert not (tmp_path / "data" / "contributor_progression.csv").exists()
-    assert not (tmp_path / "charts" / "contributor_churn_funnel.png").exists()
+    assert not (tmp_path / "data" / "contributor_churn_funnel.csv").exists()
 
 
 def test_main_raises_on_empty_pr_data(

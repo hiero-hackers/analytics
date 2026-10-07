@@ -40,7 +40,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
 
@@ -98,7 +98,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       # Same layout the Pages deploy publishes: the app at the root with its
-      # data API and charts nested beneath it. Reviewers unzip the artifact and
+      # data API nested beneath it. Reviewers unzip the artifact and
       # serve it (python3 -m http.server -d <dir>) — the app fetches JSON over
       # HTTP, so file:// won't load data. Treat the preview from unfamiliar
       # contributors with the same care as any other contributor-authored code.
@@ -112,18 +112,13 @@ jobs:
           npm run build --prefix web
           mkdir -p preview/data
           cp -R web/dist/. preview/
-          # A failed or rate-limited data step may leave no API or charts;
+          # A failed or rate-limited data step may leave no API;
           # ship whatever exists — reviewers get the partial site (the job is
           # still red from the earlier step), not a missing artifact.
           if [ -d outputs/data/api ]; then
             cp -R outputs/data/api preview/data/api
           else
             echo "::warning::no data API produced; preview carries the app shell only"
-          fi
-          if [ -d outputs/charts ]; then
-            cp -R outputs/charts preview/charts
-          else
-            echo "::warning::no charts produced"
           fi
           # The app loads its data over HTTP, so the artifact can't be opened
           # straight from the filesystem. README.txt names the one command that

@@ -5,6 +5,11 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import DISCORD_SOURCES
+
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Discover how the Hiero community connects and grows."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "Discord serves the whole Hiero ecosystem, so community activity is published "
@@ -17,13 +22,14 @@ CHART_MACRO = {
         "hiero-ledger": [
             {
                 "id": "discord",
+                "sources": DISCORD_SOURCES,
                 "group": "Discord",
                 "title": "Discord activity",
                 "description": "Discord channel categories, monthly traffic, and recent activity.",
-                "files": [
-                    ("Channel categories", "hiero_discord_channel_categories.png"),
-                    ("Monthly traffic", "hiero_discord_monthly_traffic.png"),
-                    ("Recent activity (30d)", "hiero_discord_recent_activity_30d.png"),
+                "variants": [
+                    ("Channel categories", "hiero_discord_channel_categories"),
+                    ("Monthly traffic", "hiero_discord_monthly_traffic"),
+                    ("Recent activity (30d)", "hiero_discord_recent_activity_30d"),
                 ],
             },
         ],
@@ -31,14 +37,14 @@ CHART_MACRO = {
 }
 
 CHART_NOTES = {
-    "hiero_discord_channel_categories.png": "Discord message volume grouped by topic area, split into the last 90 days versus earlier history. "
+    "hiero_discord_channel_categories": "Discord message volume grouped by topic area, split into the last 90 days versus earlier history. "
     "From a manual Discord export (counts are as of the export date).",
-    "hiero_discord_monthly_traffic.png": "Total Discord messages per month across the export's date range.",
-    "hiero_discord_recent_activity_30d.png": "The five Discord channels with the most messages in the last 30 days (relative to the export snapshot date).",
+    "hiero_discord_monthly_traffic": "Total Discord messages per month across the export's date range.",
+    "hiero_discord_recent_activity_30d": "The five Discord channels with the most messages in the last 30 days (relative to the export snapshot date).",
 }
 
 CHART_METHODOLOGY = {
-    "hiero_discord_channel_categories.png": [
+    "hiero_discord_channel_categories": [
         "Read the manually exported Discord message archive from the gitignored inputs directory.",
         "Group channels into topic areas and count messages in each.",
         (
@@ -46,12 +52,12 @@ CHART_METHODOLOGY = {
             "not to today — so a formerly busy area reads differently from a currently busy one."
         ),
     ],
-    "hiero_discord_monthly_traffic.png": [
+    "hiero_discord_monthly_traffic": [
         "Read the manually exported Discord message archive.",
         "Bucket every message by calendar month across the export's date range.",
         "Plot the monthly totals; the series ends at the export date, not at today.",
     ],
-    "hiero_discord_recent_activity_30d.png": [
+    "hiero_discord_recent_activity_30d": [
         "Read the manually exported Discord message archive.",
         "Count messages per channel in the 30 days before the export's snapshot date.",
         "Keep the five busiest channels.",
@@ -59,6 +65,10 @@ CHART_METHODOLOGY = {
 }
 
 WIDE_CHARTS: set[str] = set()
+
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS: set[str] = set()
 
 # This tab's "how to read this". Prose only; *asterisks* mark emphasis.
 GLOSSARY = {

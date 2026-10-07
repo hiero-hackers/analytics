@@ -23,11 +23,22 @@ PIPELINES: tuple[Pipeline, ...] = (
     # onboarding/contributor_profiles are repo-scoped rather than org-scoped.
     Pipeline("difficulty", "Run repo difficulty analysis", args=("org",), offline=True, extra_orgs=True),
     Pipeline("difficulty_over_time", "Run difficulty over time analysis", args=("org",), offline=True, extra_orgs=True),
-    Pipeline("onboarding", "Analyze repo onboarding signals", args=("org", "repo")),
+    Pipeline(
+        "onboarding",
+        "Analyze repo onboarding signals (writes onboarding_signal and onboarding_efficiency CSVs)",
+        args=("org", "repo"),
+    ),
     Pipeline("contributor_profiles", "Analyze contributor profiles", args=("org", "repo")),
     Pipeline("maintainer_pipeline", "Run maintainer analytics pipeline", args=("org",), offline=True),
     Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True, extra_orgs=True),
-    Pipeline("contributor_heatmap", "Generate contributor activity heatmaps", args=("org",), offline=True),
+    Pipeline(
+        "entity_activity",
+        "Build per-repository and per-contributor activity for the detail views",
+        args=("org",),
+        offline=True,
+        extra_orgs=True,
+    ),
+    Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),
     Pipeline("role_coverage", "Analyze role coverage for organization", args=("org",), offline=True),
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
     Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
@@ -48,7 +59,7 @@ PIPELINES: tuple[Pipeline, ...] = (
     # (the dashboard omits sections whose CSVs are absent), so it stays
     # offline-capable for PR previews.
     Pipeline("hip_implementation", "Map HIPs to the PRs that reference them", args=("org",), offline=True),
-    Pipeline("repo_growth", "Generate repos-over-time timeline charts", args=("org",), offline=True, extra_orgs=True),
+    Pipeline("repo_growth", "Generate repos-over-time timeline tables", args=("org",), offline=True, extra_orgs=True),
     # CLI-only pipelines, excluded from the default run:
     # - data_api: the full run invokes it explicitly, last and once, after all
     #   orgs — it is a re-render over every org's outputs, and its column
@@ -62,7 +73,12 @@ PIPELINES: tuple[Pipeline, ...] = (
     #   and the gpg CLI), which the analytics pipelines then read offline.
     Pipeline("data_api", "Emit the versioned JSON data API from existing outputs", in_default_run=False, offline=True),
     Pipeline("discord_analytics", "Run discord analysis", in_default_run=False),
-    Pipeline("contributor_churn", "Analyze contributor churn", args=("org", "repo"), in_default_run=False),
+    Pipeline(
+        "contributor_churn",
+        "Analyze contributor churn (writes funnel, retention, transitions and tenure CSVs)",
+        args=("org", "repo"),
+        in_default_run=False,
+    ),
     Pipeline("build_affiliations", "Regenerate the curated affiliations map from public signals", in_default_run=False),
 )
 

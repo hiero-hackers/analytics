@@ -4,6 +4,8 @@
  * so the click always shows feedback whether successful or not.
  */
 import { useEffect, useRef, useState } from 'react';
+import { CheckIcon, LinkIcon, XIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { copyText, shareUrl } from '../share';
 
 const TRANSIENT_MS = 1600;
@@ -16,7 +18,16 @@ const LABELS: Record<CopyStatus, string> = {
   failed: "Couldn't copy",
 };
 
-export function CopyLinkButton({ sectionId }: { sectionId: string }) {
+const ICONS = { idle: LinkIcon, copied: CheckIcon, failed: XIcon } as const;
+
+export function CopyLinkButton({
+  sectionId,
+  quiet = false,
+}: {
+  sectionId: string;
+  /** A ghost button for a card header, where an outlined one competes with the title. */
+  quiet?: boolean;
+}) {
   const [status, setStatus] = useState<CopyStatus>('idle');
   const timer = useRef<number | undefined>(undefined);
   const clickId = useRef(0);
@@ -34,27 +45,21 @@ export function CopyLinkButton({ sectionId }: { sectionId: string }) {
     timer.current = window.setTimeout(() => setStatus('idle'), TRANSIENT_MS);
   };
 
+  const Icon = ICONS[status];
   return (
-    <button type="button" className="dl" onClick={onCopy}>
-      <svg
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        aria-hidden="true"
-      >
-        <path
-          d="M6.2 9.8 4.5 11.5a2.1 2.1 0 0 1-3-3L4.2 5.8a2.1 2.1 0 0 1 3 0"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9.8 6.2 11.5 4.5a2.1 2.1 0 0 1 3 3L11.8 10.2a2.1 2.1 0 0 1-3 0"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      {LABELS[status]}
-    </button>
+    <Button
+      type="button"
+      variant={quiet ? 'ghost' : 'outline'}
+      size="sm"
+      className={quiet ? 'text-muted-foreground hover:text-foreground' : undefined}
+      onClick={onCopy}
+    >
+      <Icon data-icon="inline-start" />
+      {/* Live so the result is announced; visually hidden in a phone card header,
+          where it would wrap the title, but still the accessible name. */}
+      <span aria-live="polite" className={quiet ? 'max-sm:sr-only' : undefined}>
+        {LABELS[status]}
+      </span>
+    </Button>
   );
 }

@@ -6,10 +6,7 @@ import os
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.hiero_hackers as runner
 from hiero_analytics.data_sources.models import (
@@ -93,11 +90,11 @@ def test_main_creates_output_files(
     synthetic_repos,
     synthetic_activity,
 ):
-    """Running main() should create expected chart and data files."""
+    """Running main() should create the expected data files."""
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
         "hiero_analytics.pipelines.hiero_hackers.org_context",
-        lambda _org: (mock_github_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls
@@ -114,24 +111,13 @@ def test_main_creates_output_files(
     runner.main()
 
     # Assert expected output files exist
-    charts_dir = tmp_path / "charts"
     data_dir = tmp_path / "data"
 
-    expected_charts = [
-        "language_distribution.png",
-        "push_activity.png",
-        "contributor_counts.png",
-    ]
     expected_csvs = [
         "language_distribution.csv",
         "push_activity.csv",
         "contributor_counts.csv",
     ]
-
-    for chart_file in expected_charts:
-        chart_path = charts_dir / chart_file
-        assert chart_path.exists(), f"Chart {chart_file} not created"
-        assert os.path.getsize(chart_path) > 0, f"Chart {chart_file} is empty"
 
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file
@@ -149,7 +135,7 @@ def test_main_handles_empty_activity(
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
         "hiero_analytics.pipelines.hiero_hackers.org_context",
-        lambda _org: (mock_github_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls
@@ -165,10 +151,11 @@ def test_main_handles_empty_activity(
     # Should not raise an exception
     runner.main()
 
-    # Core charts should still exist
-    charts_dir = tmp_path / "charts"
-    assert (charts_dir / "language_distribution.png").exists()
-    assert (charts_dir / "push_activity.png").exists()
+    # Core CSVs should still exist; the empty contributor table is skipped.
+    data_dir = tmp_path / "data"
+    assert (data_dir / "language_distribution.csv").exists()
+    assert (data_dir / "push_activity.csv").exists()
+    assert not (data_dir / "contributor_counts.csv").exists()
 
 
 def test_main_with_empty_repos(
@@ -180,7 +167,7 @@ def test_main_with_empty_repos(
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
         "hiero_analytics.pipelines.hiero_hackers.org_context",
-        lambda _org: (mock_github_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls

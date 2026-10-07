@@ -1,7 +1,7 @@
 """Declarative spec for the dashboard — one module per dashboard family.
 
 Pure data consumed by the dashboard pipeline. Each family module declares its
-chart macro plus the notes/methodology/wide-chart sets for its charts; a
+chart macro plus the notes/methodology/layout sets for its charts; a
 family with table sections (contributors, governance) also declares
 ``SECTION_SPECS``/``SECTION_GROUPS``. This package assembles the families in
 display order (helpers in ``_assembly``) and exposes the table-bearing
@@ -36,10 +36,12 @@ __all__ = [
     "CHART_NOTES",
     "COLUMN_FORMATS",
     "CUSTOM_VIEW_MODULES",
+    "FULL_ROW_CHARTS",
     "MACRO_ABSENT_NOTES",
     "MACRO_GLOSSARIES",
     "MACRO_GROUP_ORDER",
     "MACRO_PARENTS",
+    "MACRO_SUMMARIES",
     "METRIC_ANNOTATIONS",
     "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
@@ -54,7 +56,9 @@ PROJECT_ISSUES_URL = constants.PROJECT_ISSUES_URL
 # The frontend implements exactly these (web/src/components/FormattedCell.tsx);
 # an unlisted value would fall through to plain text, so a typo is caught by
 # tests/dashboard_spec instead of shipping as a silently unformatted column.
-COLUMN_FORMATS = frozenset({"hip", "date", "link", "evidence", "status", "flag", "presence", "number", "staleness"})
+COLUMN_FORMATS = frozenset(
+    {"hip", "date", "link", "evidence", "status", "flag", "presence", "number", "percent", "staleness"}
+)
 
 # The families that carry table sections, keyed by their macro name — the
 # dashboard pipeline reads SECTION_SPECS / SECTION_ORDER / SECTION_GROUP_OF
@@ -89,6 +93,11 @@ MACRO_ABSENT_NOTES = {
 }
 
 
+# The one-line purpose shown under each tab's title. Every family declares one,
+# so a new tab cannot ship with the frontend's generic fallback by accident.
+MACRO_SUMMARIES = {family.CHART_MACRO["name"]: family.SUMMARY for family in _FAMILIES}
+
+
 def _group_order(family) -> list[str]:
     """The family's section-group display order, chart-only groups included.
 
@@ -117,3 +126,4 @@ CHART_METHODOLOGY = merged(_FAMILIES, "CHART_METHODOLOGY")
 # Unlike the merged() dicts above, WIDE_CHARTS is a plain union: it holds flags,
 # so two families marking the same chart wide is redundant, not conflicting.
 WIDE_CHARTS = set().union(*(family.WIDE_CHARTS for family in _FAMILIES))
+FULL_ROW_CHARTS = set().union(*(family.FULL_ROW_CHARTS for family in _FAMILIES))

@@ -9,6 +9,11 @@ the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import RELEASE_TIMELINE_SOURCES
+
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Follow release activity and delivery across the ecosystem."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = "No releases pipeline data for this org yet."
 
@@ -30,17 +35,18 @@ CHART_MACRO = {
                     "1 year / Last 18 months) — busiest repos at top. Click the chart for the "
                     "full methodology."
                 ),
-                "files": [
+                "variants": [
                     (
                         "Release timeline",
                         [
-                            ("Last 18 months", "release_timeline.png"),
-                            ("1 year", "release_timeline_365d.png"),
-                            ("1 month", "release_timeline_30d.png"),
-                            ("Week", "release_timeline_7d.png"),
+                            ("Last 18 months", "release_timeline"),
+                            ("1 year", "release_timeline_365d"),
+                            ("1 month", "release_timeline_30d"),
+                            ("Week", "release_timeline_7d"),
                         ],
                     ),
                 ],
+                "sources": RELEASE_TIMELINE_SOURCES,
             },
         ],
     },
@@ -48,15 +54,22 @@ CHART_MACRO = {
 
 WIDE_CHARTS: set[str] = set()
 
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS = {
+    "release_timeline",
+    "release_timeline_365d",
+}
+
 CHART_NOTES = {
-    "release_timeline.png": (
+    "release_timeline": (
         "One dot per release, diamonds for prereleases. Repos with zero releases in the "
         "selected span aren't shown on the chart (see the table for those)."
     ),
 }
 
 CHART_METHODOLOGY = {
-    "release_timeline.png": [
+    "release_timeline": [
         "Fetch every published, non-draft release for each repo in the org (GitHub Releases only, no git-tag fallback).",
         "Filter to the selected span (Week / 1 month / 1 year / Last 18 months).",
         "Plot one point per release, sorted top-to-bottom by release count within that span.",

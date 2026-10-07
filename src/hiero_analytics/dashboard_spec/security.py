@@ -5,6 +5,11 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.interactive import OWNERSHIP_SOURCES, SCORECARD_CHECKS
+
+# One line under the tab's title saying what the tab is for.
+SUMMARY = "Explore repository health, security practices, and scorecard results."
+
 # Shown when the selected org has no content for this tab.
 ABSENT_NOTE = (
     "Nothing generated for this org yet: the scorecard and repo-compliance "
@@ -24,13 +29,41 @@ CHART_MACRO = {
                 "group": "Scorecards",
                 "title": "OpenSSF scorecard",
                 "description": "Org-level OpenSSF scorecard and its per-check breakdown.",
-                "files": [
-                    ("Org scorecard", "org_scorecard.png"),
-                    ("Score breakdown", "org_scorecard_breakdown.png"),
+                "variants": [
+                    ("Org scorecard", "org_scorecard"),
+                    ("Score breakdown", "org_scorecard_breakdown"),
                 ],
+                # The breakdown is a checks matrix, not stacked bars: stacking
+                # per-check scores implies they add up to the aggregate, which
+                # Scorecard weights instead.
+                "sources": {
+                    "org_scorecard_breakdown": SCORECARD_CHECKS,
+                    "org_scorecard": {
+                        "kind": "categories",
+                        "file": "org_scorecard.csv",
+                        "category": "repo",
+                        "category_label": "Repository",
+                        "strip_org_prefix": True,
+                        "series": [{"key": "score", "label": "Score", "color": "var(--chart-committer)"}],
+                        "values": "number",
+                        "orientation": "horizontal",
+                        "rank": True,
+                        "top_n": 15,
+                        "reference": {"stat": "median", "label": "Org median"},
+                        "value_max": 10,
+                        "window": "snapshot",
+                        "metric": "openssf_scorecard",
+                        "unit": "OpenSSF Scorecard score (0–10)",
+                        "population": (
+                            "Each repository's aggregate OpenSSF Scorecard score, as published by the "
+                            "Scorecard API. Repositories without a published scorecard are absent."
+                        ),
+                    },
+                },
             },
             {
                 "id": "ownership",
+                "sources": OWNERSHIP_SOURCES,
                 "group": "Ownership",
                 "title": "Code owners & CI runners",
                 "description": (
@@ -38,9 +71,9 @@ CHART_MACRO = {
                     "organisation's workflows use. The per-repository CODEOWNERS answer is a yes/no, so it "
                     "reads as the table below rather than a chart."
                 ),
-                "files": [
-                    ("Code-owner coverage", "org_codeowner_summary.png"),
-                    ("Runners", "org_runner_chart.png"),
+                "variants": [
+                    ("Code-owner coverage", "org_codeowner_summary"),
+                    ("Runners", "org_runner_chart"),
                 ],
             },
         ],
@@ -128,18 +161,18 @@ GLOSSARY = {
 }
 
 CHART_NOTES = {
-    "org_scorecard.png": "Each repository's overall OpenSSF Scorecard score (0–10), a measure of security practices. "
+    "org_scorecard": "Each repository's overall OpenSSF Scorecard score (0–10), a measure of security practices. "
     "Repositories without a published scorecard are omitted.",
-    "org_scorecard_breakdown.png": "Each repository's OpenSSF score split into its individual checks (one colour per check, e.g. "
+    "org_scorecard_breakdown": "Each repository's OpenSSF score split into its individual checks (one colour per check, e.g. "
     "Code-Review, Branch-Protection), so you can see which practices contribute.",
-    "org_codeowner_summary.png": "How many repositories have a CODEOWNERS file (Present) versus none (Missing). "
+    "org_codeowner_summary": "How many repositories have a CODEOWNERS file (Present) versus none (Missing). "
     "Which repositories are missing one is in the table below.",
-    "org_runner_chart.png": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard "
+    "org_runner_chart": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard "
     "(GitHub-hosted), or indeterminate (could not be classified).",
 }
 
 CHART_METHODOLOGY = {
-    "org_scorecard.png": [
+    "org_scorecard": [
         "List the organisation's public repositories.",
         (
             "Request each repository's published score from the public OpenSSF Scorecard API — the score "
@@ -151,7 +184,7 @@ CHART_METHODOLOGY = {
         ),
         "Plot the remaining repositories by overall score (0–10).",
     ],
-    "org_scorecard_breakdown.png": [
+    "org_scorecard_breakdown": [
         "Take the same published scorecards as the overall-score chart.",
         (
             "Split each repository's result into the individual checks that produced it (Code-Review, "
@@ -159,7 +192,7 @@ CHART_METHODOLOGY = {
         ),
         "Stack the per-check scores per repository, one colour per check, so a low total traces to a practice.",
     ],
-    "org_runner_chart.png": [
+    "org_runner_chart": [
         "Read every GitHub Actions workflow file in each repository.",
         (
             "Classify each job's `runs-on` label as self-hosted, standard (a GitHub-hosted image), or "
@@ -170,7 +203,7 @@ CHART_METHODOLOGY = {
             "contributes proportionally more."
         ),
     ],
-    "org_codeowner_summary.png": [
+    "org_codeowner_summary": [
         "Check each repository for a CODEOWNERS file in the standard locations (root, .github/, or docs/).",
         (
             "Resolve duplicates presence-wins: if any check for a repository found a file, the repository "
@@ -181,3 +214,9 @@ CHART_METHODOLOGY = {
 }
 
 WIDE_CHARTS: set[str] = set()
+
+# Full-row charts: few categories but a long legend, or a panoramic timeline —
+# they span the row scaled to fit rather than scrolling like WIDE_CHARTS.
+FULL_ROW_CHARTS = {
+    "org_scorecard_breakdown",
+}

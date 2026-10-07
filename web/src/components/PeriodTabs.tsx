@@ -1,9 +1,13 @@
-/** Rolling-period selector for tables and future charts. */
+/** Rolling-period selector for tables; "All time" is the null period. */
 
-const TAB =
-  'cursor-pointer whitespace-nowrap rounded-md border-0 px-3 py-1.5 text-[13px] [font:inherit]';
-const IDLE = `${TAB} bg-transparent text-muted hover:bg-raise hover:text-ink`;
-const ACTIVE = `${TAB} bg-accent font-semibold text-on-accent shadow-sm`;
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { usePrintMode } from '../printContext';
+
+const SEGMENT =
+  'h-7 rounded-md border-0 bg-transparent px-2.5 text-xs font-medium text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-xs';
+
+/** ToggleGroup value for the null "All time" period. */
+const ALL_TIME = '__all__';
 
 export function PeriodTabs({
   periods,
@@ -17,37 +21,39 @@ export function PeriodTabs({
   /** Display labels per period key ("30d" -> "30 days"). */
   labels?: Record<string, string>;
 }) {
+  const printing = usePrintMode();
   if (periods.length === 0) {
     return null;
   }
+  const label =
+    active !== null && periods.includes(active) ? (labels?.[active] ?? active) : 'All time';
   return (
-    <div
-      className="mb-3 flex w-fit max-w-full gap-1 overflow-x-auto rounded-lg border border-solid border-edge bg-page p-1"
-      role="group"
-      aria-label="Time range"
-    >
-      {periods.map((key) => (
-        <button
-          key={key}
-          type="button"
-          className={active === key ? ACTIVE : IDLE}
-          aria-pressed={active === key}
-          onClick={() => onChange(key)}
-        >
-          {labels?.[key] ?? key}
-        </button>
-      ))}
-      {/* Last, not first: the windows read shortest to longest (30 days →
+    <>
+      {printing && <p className="print-selection">Time range: {label}</p>}
+      <ToggleGroup
+        hidden={printing}
+        data-print-hide
+        data-scroll-restore
+        type="single"
+        spacing={0}
+        aria-label="Time range"
+        value={active ?? ALL_TIME}
+        // "" means the active option was clicked again: keep the window.
+        onValueChange={(value) => value && onChange(value === ALL_TIME ? null : value)}
+        className="max-w-full overflow-x-auto rounded-lg bg-muted p-0.5"
+      >
+        {periods.map((key) => (
+          <ToggleGroupItem key={key} value={key} className={SEGMENT}>
+            {labels?.[key] ?? key}
+          </ToggleGroupItem>
+        ))}
+        {/* Last, not first: the windows read shortest to longest (30 days →
           1 year), and all-time is the end of that scale rather than a
           separate mode sitting before it. */}
-      <button
-        type="button"
-        className={active === null ? ACTIVE : IDLE}
-        aria-pressed={active === null}
-        onClick={() => onChange(null)}
-      >
-        All time
-      </button>
-    </div>
+        <ToggleGroupItem value={ALL_TIME} className={SEGMENT}>
+          All time
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </>
   );
 }

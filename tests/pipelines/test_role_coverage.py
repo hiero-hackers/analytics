@@ -7,10 +7,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import matplotlib
+import pandas as pd
 import pytest
-
-matplotlib.use("Agg")
 
 import hiero_analytics.pipelines.role_coverage as runner
 from hiero_analytics.data_sources.models import (
@@ -99,7 +97,7 @@ def _patch_pipeline(monkeypatch, tmp_path, config, activity, label_events):
     mock_client = MagicMock()
     monkeypatch.setattr(
         "hiero_analytics.pipelines.role_coverage.org_context",
-        lambda _org: (mock_client, tmp_path / "data", tmp_path / "charts"),
+        lambda _org: (mock_client, tmp_path / "data"),
     )
     monkeypatch.setattr(
         "hiero_analytics.pipelines.role_coverage.fetch_governance_config",
@@ -114,13 +112,11 @@ def _patch_pipeline(monkeypatch, tmp_path, config, activity, label_events):
         lambda _client, _org: label_events,
     )
 
-    def _fake_repo_dirs(repo_full: str) -> tuple[Path, Path]:
+    def _fake_repo_dirs(repo_full: str) -> Path:
         slug = repo_full.replace("/", "_")
         repo_data_dir = tmp_path / "repo_data" / slug
-        repo_charts_dir = tmp_path / "repo_charts" / slug
         repo_data_dir.mkdir(parents=True, exist_ok=True)
-        repo_charts_dir.mkdir(parents=True, exist_ok=True)
-        return repo_data_dir, repo_charts_dir
+        return repo_data_dir
 
     monkeypatch.setattr("hiero_analytics.pipelines.role_coverage.ensure_repo_dirs", _fake_repo_dirs)
 
@@ -151,6 +147,8 @@ def test_main_creates_output_files(
         "role_coverage_globally_quiet_7d.csv",
         "repo_activity_overview.csv",
         "tsc_activity_by_repo.csv",
+        "maintainer_network_nodes.csv",
+        "maintainer_network_edges.csv",
     ]
     for csv_file in expected_csvs:
         csv_path = data_dir / csv_file
@@ -161,6 +159,11 @@ def test_main_creates_output_files(
     coverage = (data_dir / "role_coverage_all.csv").read_text(encoding="utf-8")
     assert "alice" in coverage
     assert f"{TEST_ORG}/sdk-python" in coverage
+
+    # The maintainer network links the two repos alice and bob both maintain, with laid-out positions.
+    nodes = pd.read_csv(data_dir / "maintainer_network_nodes.csv")
+    assert {"repo", "x", "y"} <= set(nodes.columns)
+    assert len(nodes) == 2
 
     # Legacy per-repo files are written through the patched ensure_repo_dirs.
     repo_data_dir = tmp_path / "repo_data" / f"{TEST_ORG}_sdk-python"
