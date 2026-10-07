@@ -10,7 +10,10 @@ Manifest generated: <generated_at>
 Analytics revision: <provenance.git_sha>
 Data as of (oldest dataset watermark): <provenance.data_as_of>
 TAC instructions read: <date, and "matched snapshot" or what differed>
+Prior report read: <URL, or "not available: <reason>">
 Stale documents cited: <ids, or none>
+Data defects noticed: <stale absent-notes, unnormalised employers, note/window mismatches, or none>
+Partial buckets excluded: <ids and bucket names, or none>
 ```
 
 ## 2. Gaps
@@ -34,7 +37,8 @@ nothing to it.
 **A gap is only a gap after checking.** Search the manifest's sections, chart
 documents and metric tiles before declaring one. Chart documents especially:
 data once published only as PNGs is now JSON, so the older gap lists may be
-out of date.
+out of date. And a finding-type section with zero rows (no gone-dark
+holders, no understaffed repos) is a result, not a gap; see SKILL.md step 3.
 
 ### Expected gaps to verify each run
 
@@ -50,14 +54,22 @@ expectations to check, not facts to copy:
 - **Issue and PR resolution speed:** time to first response, time to close or
   merge. `issue-difficulty` describes the open queue only.
 - **CI health:** job failure rate and queue time, which Hiero's 2026 annual
-  report cited from GitHub Actions metrics. Only runner types are published.
+  report cited from GitHub Actions metrics. Only runner types are published
+  (`ownership` card, Runners variant).
 - **TSC review counts:** how many improvement proposals the TSC reviewed in
   the period. The HIPs macro reports spec status and implementation evidence,
-  not dated review events; check `hip-board` before declaring it a gap.
+  not dated review events. Check `hip-board` and cite the Governance section
+  `tscrepo` (TSC activity by repo) as the closest signal before declaring it
+  a gap.
 - **Since-last-report deltas:** the API publishes the current state plus
   time series, not the previous report's figures. Deltas are possible only
-  where a time series covers the interval, or where the maintainer supplies
-  the prior numbers. Check `docs/snapshots.md` for what history exists.
+  where a time series covers the interval (the monthly `maintainer-pipeline`
+  buckets do), or where the maintainer supplies the prior numbers. The
+  snapshot archive (`docs/snapshots.md`) is the orphan branch
+  `data/snapshots` of hiero-hackers/analytics; `git fetch origin
+  data/snapshots` and read `api/v1/` at an older commit for a dated tile
+  value. History starts 2026-08-07, so it gives short deltas, not a
+  prior-year baseline, until it has run for a year.
 - **File hygiene checks:** whether MAINTAINERS and ADOPTERS files and the
   roadmap are current and public. The affiliation pipeline reads MAINTAINERS
   files but does not validate them.
@@ -72,7 +84,7 @@ Close with one line per TAC question, so a reviewer sees at a glance what is
 done:
 
 ```
-Q1 Progress against goals     : maintainer input
+Q1 Progress against goals     : maintainer input (prior goals pre-filled)
 Q2 Deliverables               : data (Releases, HIPs) + gaps (...)
 Q3 Goals                      : maintainer input
 Q4 Help                       : maintainer input
