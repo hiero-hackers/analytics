@@ -1,0 +1,20 @@
+# sdk-automations.yml — the SDK automations App reads this file from the default branch.
+# Observe only: it reads and decides, and writes nothing.
+# inactivity runs only from the hourly sweep; until the installation arms one, the App logs it as idle.
+
+schemaVersion: 2
+mode: observe
+
+capabilities:
+  triageQueue:
+    enabled: true
+    welcome: false
+  prDashboard:
+    enabled: true
+  configReport:
+    enabled: true
+  inactivity:
+    enabled: true
+
+principals:
+  maintainerTeam: analytics-maintainers
