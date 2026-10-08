@@ -1,20 +1,69 @@
 # sdk-automations.yml — the SDK automations App reads this file from the default branch.
-# Observe only: it reads and decides, and writes nothing.
+# Observe only: it reads and decides, and writes nothing. Every line below is a decision
+# the App would record, never an act.
 # inactivity runs only from the hourly sweep; until the installation arms one, the App logs it as idle.
 
-schemaVersion: 2
 mode: observe
 
 capabilities:
   triageQueue:
     enabled: true
     welcome: false
+
   prDashboard:
     enabled: true
+    checks:
+      dcoSignoff:
+        enabled: true
+        guide: "https://github.com/hiero-ledger/sdk-collaboration-hub/tree/main/guides/issue-progression/for-developers/signing.md"
+      gpgSignature:
+        enabled: true
+        guide: "https://github.com/hiero-ledger/sdk-collaboration-hub/tree/main/guides/issue-progression/for-developers/signing.md"
+      mergeConflicts:
+        enabled: true
+      linkedIssues:
+        enabled: true
+        assignedIssues:
+          enabled: true
+          guide: "https://github.com/hiero-hackers/analytics/blob/main/CONTRIBUTING.md#workflow"
+
   configReport:
     enabled: true
+
+  assignment:
+    enabled: true
+    autoAssign:
+      enabled: true
+      notClaimableWhen: [blocked]
+      capIgnores: [blocked]
+    unassign:
+      enabled: true
+
   inactivity:
     enabled: true
+    issues:
+      enabled: true
+      reap:
+        enabled: true
+    pullRequests:
+      enabled: true
+      reapWhen:
+        draft:
+          enabled: true
+        changesRequested:
+          enabled: true
+
+mappings:
+  labels:
+    blocked: blocked
+  commands:
+    assign: "/assign"
+    unassign: "/unassign"
+  skills:
+    goodFirstIssue: "good first issue"
+    beginner: beginner
+    intermediate: intermediate
+    advanced: advanced
 
 principals:
   maintainerTeam: analytics-maintainers
