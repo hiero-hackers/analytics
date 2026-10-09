@@ -15,6 +15,7 @@ from urllib.parse import unquote
 import requests
 import yaml
 
+from .cache import load_records_cache, save_records_cache
 from .dataset_store import PartialOrgFetchError
 from .github_client import GitHubClient
 from .github_ingest._common import fetch_all_with_retry
@@ -88,10 +89,84 @@ def _parse_purl(purl: str) -> tuple[str, str, str | None] | None:
     return ecosystem.lower(), unquote(name_and_version), unquote(version) if version else None
 
 
+_SBOM_COVERAGE_CACHE_KIND = "sbom_coverage"
+_SBOM_PACKAGES_CACHE_KIND = "sbom_packages"
+
+
+def _sbom_cache_scope_and_parameters(org: str, repo: str) -> tuple[str, dict[str, object]]:
+    """Build the cache scope/parameters that uniquely identify one repo's SBOM."""
+    return f"{org}/{repo}", {"org": org, "repo": repo, "endpoint": "dependency-graph/sbom"}
+
+
+def _load_cached_repo_sbom(
+    org: str,
+    repo: str,
+    *,
+    use_cache: bool | None,
+    cache_ttl_seconds: int | None,
+    refresh: bool,
+) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]] | None:
+    """Return a cached ``(coverage, packages)`` pair, or ``None`` on any miss.
+
+    Coverage and packages are cached as separate record lists (the cache stores
+    one record type per entry). The coverage entry is the commit marker: both
+    entries must be present, fresh, and consistent, otherwise this is a miss.
+    """
+    scope, parameters = _sbom_cache_scope_and_parameters(org, repo)
+    options = {"use_cache": use_cache, "ttl_seconds": cache_ttl_seconds, "refresh": refresh}
+
+    coverage = load_records_cache(_SBOM_COVERAGE_CACHE_KIND, scope, parameters, SbomCoverageRecord, **options)
+    if coverage is None or len(coverage) != 1 or coverage[0].status != "ok" or coverage[0].repo != repo:
+        return None
+
+    packages = load_records_cache(_SBOM_PACKAGES_CACHE_KIND, scope, parameters, DependencyManifestRecord, **options)
+    if packages is None or len(packages) != coverage[0].package_count:
+        return None
+
+    return coverage[0], packages
+
+
 def fetch_repo_sbom(
+    client: GitHubClient,
+    org: str,
+    repo: str,
+    *,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    refresh: bool = False,
+) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+    """Fetch one repository's SBOM, served from the TTL cache when still fresh.
+
+    Only successful (``"ok"``) results are cached. ``"disabled"`` (404) and
+    ``"error"`` (malformed) outcomes, and propagated HTTP/network failures, are
+    never written, so they are re-fetched on the next run and a repo that later
+    enables the dependency graph is picked up immediately.
+    """
+    cached = _load_cached_repo_sbom(
+        org, repo, use_cache=use_cache, cache_ttl_seconds=cache_ttl_seconds, refresh=refresh
+    )
+    if cached is not None:
+        return cached
+
+    coverage, packages = _fetch_repo_sbom_uncached(client, org, repo)
+
+    if coverage.status == "ok":
+        scope, parameters = _sbom_cache_scope_and_parameters(org, repo)
+        # Packages first, coverage last: coverage is the marker readers require.
+        save_records_cache(
+            _SBOM_PACKAGES_CACHE_KIND, scope, parameters, DependencyManifestRecord, packages, use_cache=use_cache
+        )
+        save_records_cache(
+            _SBOM_COVERAGE_CACHE_KIND, scope, parameters, SbomCoverageRecord, [coverage], use_cache=use_cache
+        )
+
+    return coverage, packages
+
+
+def _fetch_repo_sbom_uncached(
     client: GitHubClient, org: str, repo: str
 ) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
-    """Fetch and parse one repository's dependency-graph SBOM.
+    """Fetch and parse one repository's dependency-graph SBOM from GitHub.
 
     Only a 404 counts as ``"disabled"`` (dependency graph off for this repo) —
     the same 404-vs-error contract ``has_codeowners_file``/``fetch_repo_workflows``
@@ -298,6 +373,10 @@ def fetch_org_sbom_data(
     org: str,
     repo_names: list[str],
     max_workers: int = _SBOM_FETCH_WORKERS,
+    *,
+    use_cache: bool | None = None,
+    cache_ttl_seconds: int | None = None,
+    refresh: bool = False,
 ) -> tuple[list[SbomCoverageRecord], list[DependencyManifestRecord]]:
     """Fetch and parse dependency-graph SBOMs for every repo in ``repo_names``.
 
@@ -306,10 +385,16 @@ def fetch_org_sbom_data(
     network failures propagate through the fan-out so transient failures can
     be retried. Repositories that still fail after the retry are represented
     as ``"error"`` coverage rows rather than being silently dropped.
+
+    Each repository is cached independently (see ``fetch_repo_sbom``), so the
+    concurrent fan-out touches one cache file pair per repo and a retry or
+    re-run only re-fetches repos that are not already cached.
     """
 
     def per_repo(repo: str) -> list[SbomCoverageRecord | DependencyManifestRecord]:
-        coverage, packages = fetch_repo_sbom(client, org, repo)
+        coverage, packages = fetch_repo_sbom(
+            client, org, repo, use_cache=use_cache, cache_ttl_seconds=cache_ttl_seconds, refresh=refresh
+        )
         return [coverage, *packages]
 
     try:
