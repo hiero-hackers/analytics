@@ -23,6 +23,7 @@ query CONTRIBUTOR_ACTIVITY_QUERY($owner:String!, $repo:String!, $cursor:String) 
         reviews(first:100) {
           pageInfo {
             hasNextPage
+            endCursor
           }
           nodes {
             state
