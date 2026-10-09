@@ -10,10 +10,13 @@ from __future__ import annotations
 import base64
 import logging
 import re
+import time
 from urllib.parse import unquote
 
 import requests
 import yaml
+
+from hiero_analytics.config.github import BASE_URL, SBOM_POLL_INTERVAL_SECONDS, SBOM_POLL_MAX_ATTEMPTS
 
 from .dataset_store import PartialOrgFetchError
 from .github_client import GitHubClient
@@ -88,66 +91,34 @@ def _parse_purl(purl: str) -> tuple[str, str, str | None] | None:
     return ecosystem.lower(), unquote(name_and_version), unquote(version) if version else None
 
 
-def fetch_repo_sbom(
-    client: GitHubClient, org: str, repo: str
-) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
-    """Fetch and parse one repository's dependency-graph SBOM.
+def _sbom_error(repo: str) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+    """Coverage row for an SBOM that could not be retrieved or understood."""
+    return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
 
-    Only a 404 counts as ``"disabled"`` (dependency graph off for this repo) —
-    the same 404-vs-error contract ``has_codeowners_file``/``fetch_repo_workflows``
-    use. A 403 is ambiguous (rate limiting, an insufficiently-scoped token, a
-    private repo) rather than an unambiguous disabled-state signal, so it is
-    reported as ``"error"`` like any other HTTP failure, so the org-wide
-    fan-out in ``fetch_org_sbom_data`` can retry it instead of a transient or
-    permission failure being silently misclassified as "no dependency graph".
-    Non-HTTP request failures (timeouts, connection errors) still propagate
-    so ``fetch_org_sbom_data`` can retry them too.
+
+def _parse_sbom_document(repo: str, payload: object) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+    """Parse a downloaded SPDX document into a coverage row and dependency records.
+
+    Accepts the document either enveloped (``{"sbom": {...}}``, the shape the
+    synchronous endpoint returned) or raw (the SPDX JSON itself), since the
+    asynchronous download is the bare document. Anything that is not an SPDX
+    object with a list of packages is reported as ``"error"``, never as an
+    available SBOM with zero packages.
     """
-    url = f"https://api.github.com/repos/{org}/{repo}/dependency-graph/sbom"
-    logger.info("Fetching SBOM for %s/%s", org, repo)
-
-    try:
-        payload = client.get(url)
-    except requests.HTTPError as exc:
-        status_code = exc.response.status_code if exc.response is not None else None
-
-        if status_code == 404:
-            logger.info(
-                "SBOM unavailable for %s/%s (404)",
-                org,
-                repo,
-            )
-            return SbomCoverageRecord(
-                repo=repo,
-                status="disabled",
-                package_count=0,
-            ), []
-
-        logger.warning(
-            "SBOM request failed for %s/%s with HTTP %s; propagating for retry",
-            org,
-            repo,
-            status_code,
-        )
-        raise
-
-    sbom = payload.get("sbom") if isinstance(payload, dict) else None
+    sbom: object = None
+    if isinstance(payload, dict):
+        if "sbom" in payload:
+            sbom = payload["sbom"]
+        elif "packages" in payload or "spdxVersion" in payload:
+            sbom = payload
     if not isinstance(sbom, dict):
-        logger.error("Malformed SBOM response for %s/%s", org, repo)
-        return SbomCoverageRecord(
-            repo=repo,
-            status="error",
-            package_count=0,
-        ), []
+        logger.error("Malformed SBOM response for %s", repo)
+        return _sbom_error(repo)
 
     raw_packages = sbom.get("packages")
     if raw_packages is not None and not isinstance(raw_packages, list):
-        logger.error("Malformed SBOM package list for %s/%s", org, repo)
-        return SbomCoverageRecord(
-            repo=repo,
-            status="error",
-            package_count=0,
-        ), []
+        logger.error("Malformed SBOM package list for %s", repo)
+        return _sbom_error(repo)
     packages = raw_packages or []
     described_ids = set(sbom.get("documentDescribes") or [])
 
@@ -168,17 +139,88 @@ def fetch_repo_sbom(
             DependencyManifestRecord(repo=repo, package_name=package_name, ecosystem=ecosystem, version=version)
         )
 
-    logger.info(
-        "SBOM fetched for %s/%s: %d dependency packages",
-        org,
-        repo,
-        len(records),
-    )
-    return SbomCoverageRecord(
-        repo=repo,
-        status="ok",
-        package_count=len(records),
-    ), records
+    return SbomCoverageRecord(repo=repo, status="ok", package_count=len(records)), records
+
+
+def fetch_repo_sbom(
+    client: GitHubClient,
+    org: str,
+    repo: str,
+    *,
+    max_poll_attempts: int = SBOM_POLL_MAX_ATTEMPTS,
+    poll_interval_seconds: float = SBOM_POLL_INTERVAL_SECONDS,
+) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+    """Generate, poll for, and parse one repository's dependency-graph SBOM.
+
+    Uses GitHub's asynchronous SBOM flow: ``generate-report`` returns the URL of
+    a ``fetch-report`` endpoint, which answers ``202`` while the report is still
+    being built and redirects to the SPDX download once it is ready (``requests``
+    follows the redirect). Polling is bounded by ``max_poll_attempts`` with
+    ``poll_interval_seconds`` between attempts; a report that is still pending
+    after the last attempt is reported as ``"error"``.
+
+    Only a 404 on generation counts as ``"disabled"`` (dependency graph off for
+    this repo) -- the same 404-vs-error contract ``has_codeowners_file``/
+    ``fetch_repo_workflows`` use. A 403 is ambiguous (rate limiting, an
+    insufficiently-scoped token, a private repo), so it propagates like any
+    other HTTP failure, as do timeouts and connection errors, so the org-wide
+    fan-out in ``fetch_org_sbom_data`` can retry them instead of a transient or
+    permission failure being silently misclassified as "no dependency graph".
+    """
+    generate_url = f"{BASE_URL}/repos/{org}/{repo}/dependency-graph/sbom/generate-report"
+    logger.info("Requesting SBOM generation for %s/%s", org, repo)
+
+    try:
+        generated = client.get(generate_url)
+    except requests.HTTPError as exc:
+        status_code = exc.response.status_code if exc.response is not None else None
+
+        if status_code == 404:
+            logger.info("SBOM unavailable for %s/%s (404)", org, repo)
+            return SbomCoverageRecord(repo=repo, status="disabled", package_count=0), []
+
+        logger.warning(
+            "SBOM generation failed for %s/%s with HTTP %s; propagating for retry",
+            org,
+            repo,
+            status_code,
+        )
+        raise
+
+    report_url = generated.get("sbom_url") if isinstance(generated, dict) else None
+    # The token is attached to this request, so only follow URLs on the API host.
+    if not isinstance(report_url, str) or not report_url.startswith(f"{BASE_URL}/"):
+        logger.error("Malformed SBOM generation response for %s/%s", org, repo)
+        return _sbom_error(repo)
+
+    for attempt in range(1, max_poll_attempts + 1):
+        response = client.get_response(report_url)
+
+        if response.status_code == 202:
+            logger.info(
+                "SBOM for %s/%s still generating (attempt %d/%d)",
+                org,
+                repo,
+                attempt,
+                max_poll_attempts,
+            )
+            if attempt < max_poll_attempts:
+                time.sleep(poll_interval_seconds)
+            continue
+
+        try:
+            payload = response.json()
+        except ValueError:
+            logger.error("SBOM response for %s/%s is not valid JSON", org, repo)
+            return _sbom_error(repo)
+
+        coverage, records = _parse_sbom_document(repo, payload)
+        if coverage.status == "ok":
+            logger.info("SBOM fetched for %s/%s: %d dependency packages", org, repo, len(records))
+        return coverage, records
+
+    logger.error("SBOM for %s/%s not ready after %d attempts", org, repo, max_poll_attempts)
+    return _sbom_error(repo)
 
 
 def _is_self_hosted(label: str) -> bool | None:

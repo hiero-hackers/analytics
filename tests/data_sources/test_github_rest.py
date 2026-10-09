@@ -173,13 +173,68 @@ def test_parse_purl_returns_none_for_malformed_input(malformed):
     assert _parse_purl(malformed) is None
 
 
-# -- fetch_repo_sbom: the 404-vs-error contract, and SBOM parsing ------------
+# -- fetch_repo_sbom: async generate -> poll -> parse -------------------------
+
+REPORT_URL = "https://api.github.com/repos/org/repo/dependency-graph/sbom/fetch-report/abc"
 
 
-def test_fetch_repo_sbom_parses_packages_and_excludes_the_described_root():
-    """Packages parse to DependencyManifestRecord; the repo's own root package is excluded."""
+def _report_response(payload=None, status_code=200, *, invalid_json=False):
+    """A fake fetch-report response with the given status and JSON body."""
+    response = Mock()
+    response.status_code = status_code
+    if invalid_json:
+        response.json.side_effect = ValueError("no json")
+    else:
+        response.json.return_value = payload
+    return response
+
+
+def _sbom_client(*responses, report_url=REPORT_URL):
+    """A client whose generate-report call succeeds and whose fetch-report yields ``responses`` in order."""
     client = Mock()
-    client.get.return_value = {
+    client.get.return_value = {"sbom_url": report_url}
+    client.get_response.side_effect = list(responses)
+    return client
+
+
+def _spdx(*purls, described=()):
+    """A minimal SPDX document with one package per purl."""
+    return {
+        "documentDescribes": list(described),
+        "packages": [
+            {
+                "SPDXID": f"SPDXRef-{i}",
+                "externalRefs": [{"referenceType": "purl", "referenceLocator": purl}],
+            }
+            for i, purl in enumerate(purls)
+        ],
+    }
+
+
+@pytest.fixture
+def no_sleep(monkeypatch):
+    """Patch the module-level sleep so polling tests run instantly and can assert on waits."""
+    sleep = Mock()
+    monkeypatch.setattr("hiero_analytics.data_sources.github_rest.time.sleep", sleep)
+    return sleep
+
+
+def test_fetch_repo_sbom_generates_then_fetches_the_report(no_sleep):
+    """The report is requested via generate-report, then read from the returned fetch-report URL."""
+    client = _sbom_client(_report_response(_spdx("pkg:npm/lodash@4.17.21")))
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    client.get.assert_called_once_with("https://api.github.com/repos/org/repo/dependency-graph/sbom/generate-report")
+    client.get_response.assert_called_once_with(REPORT_URL)
+    assert coverage == SbomCoverageRecord(repo="repo", status="ok", package_count=1)
+    assert records == [DependencyManifestRecord(repo="repo", package_name="lodash", ecosystem="npm", version="4.17.21")]
+    no_sleep.assert_not_called()
+
+
+def test_fetch_repo_sbom_parses_enveloped_documents_and_excludes_the_described_root(no_sleep):
+    """Packages parse to DependencyManifestRecord; the repo's own root package is excluded."""
+    document = {
         "sbom": {
             "documentDescribes": ["SPDXRef-root"],
             "packages": [
@@ -192,22 +247,46 @@ def test_fetch_repo_sbom_parses_packages_and_excludes_the_described_root():
             ],
         }
     }
+    client = _sbom_client(_report_response(document))
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
     assert coverage == SbomCoverageRecord(repo="repo", status="ok", package_count=1)
-    assert records == [DependencyManifestRecord(repo="repo", package_name="lodash", ecosystem="npm", version="4.17.21")]
+    assert [r.package_name for r in records] == ["lodash"]
 
 
-def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl():
+def test_fetch_repo_sbom_polls_while_202_then_succeeds(no_sleep):
+    """A 202 means 'still generating': wait and ask again until the report is ready."""
+    client = _sbom_client(
+        _report_response(status_code=202),
+        _report_response(status_code=202),
+        _report_response(_spdx("pkg:pypi/requests@2.32.0")),
+    )
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=5, poll_interval_seconds=0.5)
+
+    assert client.get_response.call_count == 3
+    assert [c.args for c in no_sleep.call_args_list] == [(0.5,), (0.5,)]
+    assert coverage == SbomCoverageRecord(repo="repo", status="ok", package_count=1)
+    assert records[0].ecosystem == "pypi"
+
+
+def test_fetch_repo_sbom_reports_error_when_polling_is_exhausted(no_sleep):
+    """A report that never becomes ready ends as 'error' after a bounded number of requests."""
+    client = _sbom_client(*[_report_response(status_code=202) for _ in range(3)])
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=3, poll_interval_seconds=1.0)
+
+    assert client.get_response.call_count == 3
+    assert no_sleep.call_count == 2  # no pointless wait after the final attempt
+    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
+    assert records == []
+
+
+def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl(no_sleep):
     """A package with no purl external ref is skipped, not fabricated from the raw name."""
-    client = Mock()
-    client.get.return_value = {
-        "sbom": {
-            "documentDescribes": [],
-            "packages": [{"SPDXID": "SPDXRef-1", "name": "mystery-pkg", "externalRefs": []}],
-        }
-    }
+    document = {"documentDescribes": [], "packages": [{"SPDXID": "SPDXRef-1", "name": "mystery", "externalRefs": []}]}
+    client = _sbom_client(_report_response(document))
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
@@ -216,7 +295,7 @@ def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl():
     assert coverage.package_count == 0
 
 
-def test_fetch_repo_sbom_treats_404_as_disabled():
+def test_fetch_repo_sbom_treats_404_on_generation_as_disabled(no_sleep):
     """404 is the only unambiguous 'dependency graph off for this repo' signal."""
     client = Mock()
     client.get.side_effect = _http_error(404)
@@ -225,10 +304,11 @@ def test_fetch_repo_sbom_treats_404_as_disabled():
 
     assert coverage == SbomCoverageRecord(repo="repo", status="disabled", package_count=0)
     assert records == []
+    client.get_response.assert_not_called()
 
 
 @pytest.mark.parametrize("status_code", [403, 500])
-def test_fetch_repo_sbom_propagates_http_errors(status_code):
+def test_fetch_repo_sbom_propagates_generation_http_errors(status_code, no_sleep):
     """HTTP failures must propagate so the org-level retry can handle them."""
     client = Mock()
     client.get.side_effect = _http_error(status_code)
@@ -237,11 +317,52 @@ def test_fetch_repo_sbom_propagates_http_errors(status_code):
         fetch_repo_sbom(client, "org", "repo")
 
 
-@pytest.mark.parametrize("malformed_sbom", [{"sbom": "not-an-object"}, {"sbom": None}, "not-an-object", None])
-def test_fetch_repo_sbom_reports_error_when_sbom_is_not_an_object(malformed_sbom):
-    """A malformed payload/sbom must not be reported as an available SBOM with zero packages."""
+def test_fetch_repo_sbom_propagates_fetch_http_errors(no_sleep):
+    """A failure while fetching the generated report also propagates for retry."""
+    client = _sbom_client()
+    client.get_response.side_effect = _http_error(500)
+
+    with pytest.raises(requests.HTTPError):
+        fetch_repo_sbom(client, "org", "repo")
+
+
+@pytest.mark.parametrize(
+    "generated",
+    [
+        {},
+        {"sbom_url": None},
+        {"sbom_url": 5},
+        {"sbom_url": "https://evil.example.com/fetch-report/abc"},
+        "not-an-object",
+        None,
+    ],
+)
+def test_fetch_repo_sbom_reports_error_for_unusable_generation_response(generated, no_sleep):
+    """No usable report URL (or one off the API host) is an error, and is never requested."""
     client = Mock()
-    client.get.return_value = malformed_sbom
+    client.get.return_value = generated
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
+    assert records == []
+    client.get_response.assert_not_called()
+
+
+@pytest.mark.parametrize("malformed_sbom", [{"sbom": "not-an-object"}, {"sbom": None}, {}, [], "not-an-object", None])
+def test_fetch_repo_sbom_reports_error_when_sbom_is_not_an_object(malformed_sbom, no_sleep):
+    """A malformed payload must not be reported as an available SBOM with zero packages."""
+    client = _sbom_client(_report_response(malformed_sbom))
+
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
+    assert records == []
+
+
+def test_fetch_repo_sbom_reports_error_when_report_body_is_not_json(no_sleep):
+    """A non-JSON download is an error row, not an exception."""
+    client = _sbom_client(_report_response(invalid_json=True))
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
@@ -250,10 +371,9 @@ def test_fetch_repo_sbom_reports_error_when_sbom_is_not_an_object(malformed_sbom
 
 
 @pytest.mark.parametrize("malformed_packages", [{"not": "a list"}, "not-a-list", 5])
-def test_fetch_repo_sbom_reports_error_when_packages_is_not_a_list(malformed_packages):
+def test_fetch_repo_sbom_reports_error_when_packages_is_not_a_list(malformed_packages, no_sleep):
     """'packages' present but the wrong type must not silently resolve to an empty manifest."""
-    client = Mock()
-    client.get.return_value = {"sbom": {"documentDescribes": [], "packages": malformed_packages}}
+    client = _sbom_client(_report_response({"documentDescribes": [], "packages": malformed_packages}))
 
     coverage, records = fetch_repo_sbom(client, "org", "repo")
 
@@ -264,77 +384,40 @@ def test_fetch_repo_sbom_reports_error_when_packages_is_not_a_list(malformed_pac
 # -- fetch_org_sbom_data: the org-wide fan-out --------------------------------
 
 
-def test_fetch_org_sbom_data_returns_one_coverage_row_per_repo():
-    """Every input repo gets exactly one coverage row, regardless of outcome."""
+def _org_client(*, flaky_repo=None):
+    """A client serving per-repo reports; repo-b has the dependency graph off, ``flaky_repo`` fails once."""
+    failures = {flaky_repo: 1} if flaky_repo else {}
 
     def fake_get(url):
-        if "repo-a" in url:
-            return {
-                "sbom": {
-                    "documentDescribes": [],
-                    "packages": [
-                        {
-                            "SPDXID": "x",
-                            "externalRefs": [{"referenceType": "purl", "referenceLocator": "pkg:npm/left-pad@1.0.0"}],
-                        }
-                    ],
-                }
-            }
-        raise _http_error(404)
+        repo = url.split("/")[5]
+        if repo == "repo-b":
+            raise _http_error(404)
+        if failures.get(repo):
+            failures[repo] -= 1
+            raise _http_error(500)
+        return {"sbom_url": f"https://api.github.com/repos/org/{repo}/dependency-graph/sbom/fetch-report/x"}
 
     client = Mock()
     client.get.side_effect = fake_get
+    client.get_response.return_value = _report_response(_spdx("pkg:npm/left-pad@1.0.0"))
+    return client
+
+
+def test_fetch_org_sbom_data_returns_one_coverage_row_per_repo(no_sleep):
+    """Every input repo gets exactly one coverage row, regardless of outcome."""
+    client = _org_client()
 
     coverage, packages = fetch_org_sbom_data(client, "org", ["repo-a", "repo-b"], max_workers=2)
 
-    assert {c.repo for c in coverage} == {"repo-a", "repo-b"}
     assert {c.repo: c.status for c in coverage} == {"repo-a": "ok", "repo-b": "disabled"}
     assert [p.repo for p in packages] == ["repo-a"]
 
 
-def test_fetch_org_sbom_data_retries_http_failures():
+def test_fetch_org_sbom_data_retries_http_failures(no_sleep):
     """HTTP failures from a repo fetch reach the org-level retry mechanism."""
-    calls = {"repo-a": 0}
+    client = _org_client(flaky_repo="repo-a")
 
-    def fake_get(url):
-        if "repo-a" in url:
-            calls["repo-a"] += 1
+    coverage, packages = fetch_org_sbom_data(client, "org", ["repo-a", "repo-b"], max_workers=1)
 
-            if calls["repo-a"] == 1:
-                raise _http_error(500)
-
-            return {
-                "sbom": {
-                    "documentDescribes": [],
-                    "packages": [
-                        {
-                            "SPDXID": "x",
-                            "externalRefs": [
-                                {
-                                    "referenceType": "purl",
-                                    "referenceLocator": "pkg:npm/left-pad@1.0.0",
-                                }
-                            ],
-                        }
-                    ],
-                }
-            }
-
-        raise _http_error(404)
-
-    client = Mock()
-    client.get.side_effect = fake_get
-
-    coverage, packages = fetch_org_sbom_data(
-        client,
-        "org",
-        ["repo-a", "repo-b"],
-        max_workers=1,
-    )
-
-    assert calls["repo-a"] == 2
-    assert {c.repo: c.status for c in coverage} == {
-        "repo-a": "ok",
-        "repo-b": "disabled",
-    }
+    assert {c.repo: c.status for c in coverage} == {"repo-a": "ok", "repo-b": "disabled"}
     assert len(packages) == 1
