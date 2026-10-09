@@ -47,91 +47,103 @@ resets and carries on. Budget therefore shows up as **wall time**, not errors,
 which is why the workflow's job timeout is generous. Concurrency is capped by
 `GITHUB_MAX_WORKERS` (3 in CI, 6 by default) to avoid secondary rate limits.
 
-How much of that budget a run spends depends on what it has to fetch. A dataset
-file on disk moves through three regimes:
+How much of that budget a run spends depends on how each dataset is fetched.
+Datasets follow one of two paths:
 
-| Watermark age | What happens | Relative cost |
+| Path | Datasets (examples) | Behaviour on an existing dataset |
 | --- | --- | --- |
-| under 5 days (`DEFAULT_REUSE_MAX_AGE`) | reused as-is, no fetch | none |
-| 5 – 30 days | incremental: only records updated since the watermark | small |
-| over 30 days (`full_refresh_after`), or no dataset | full fetch / rebuild | large |
+| Reused (`load_or_fetch`) | `contributor_activity`, `ci_health`, `onboarding`, the REST `codeowner_and_runner` data | Reused with **no fetch** while the watermark is under 5 days old (`DEFAULT_REUSE_MAX_AGE`); refetched once older. |
+| Incremental (`fetch_incremental`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since the watermark **on every run**, regardless of age; a full refetch once the watermark is over 30 days old (`full_refresh_after`). |
 
-The incremental cache is restored between runs by `actions/cache`. If it is
-evicted, the next run does one full fetch and then resumes incrementally.
+So a run's floor is not zero: the incremental datasets are always queried. The
+reuse window only saves the datasets on the first path.
+
+The dataset cache is restored between runs by `actions/cache`. If it is evicted,
+the next run does one full fetch and then resumes incrementally.
 
 This is why the cost of an organisation has two very different parts, and why
 they are reported separately below.
 
 ## Measured cost
 
-> **Status: not yet measured.** The figures below must come from real runs
-> against the production token, because they depend on the size of the
-> organisations and on rate-limit sleeps that cannot be reproduced offline.
-> Nothing in this section is an estimate; empty cells are empty on purpose.
+Measured on 2026-10-09 against `hiero-hackers` with a personal classic PAT
+(5,000 points/hour), `GITHUB_MAX_WORKERS=3`, from a developer machine.
+`GITHUB_REPO=analytics` was set: repo-level pipelines (`onboarding`,
+`contributor_profiles`) default to `hiero-sdk-python` and fail on an org that has
+no repository of that name, so set `GITHUB_REPO` when measuring another org.
 
-How to fill it in: run the *Refresh Analytics Data* workflow (or
-`uv run hiero-analytics` with a token) and read the **GitHub API usage** table
-in the job summary, or `api_usage` in the run's `SNAPSHOT.json`.
+How to reproduce: `uv run hiero-analytics` with a token, then read the **GitHub
+API usage** table in the job summary (`GITHUB_STEP_SUMMARY`), or `api_usage` in
+`SNAPSHOT.json`. Measure cold start from an empty `outputs/` directory.
 
-**Steady state** (a normal scheduled run on a warm cache):
+| Run | REST requests | GraphQL requests | GraphQL points | % of one hour (PAT) | Wall time |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Cold start (empty `outputs/`) | 165 | 217 | 525 | 10.5% | 12m 12s |
+| Warm, run straight after (nothing cleared) | 0 | 42 | 292 | 5.8% | 6m 19s |
 
-| Organisation | REST requests | GraphQL requests | GraphQL points | Wall time |
-| --- | --- | --- | --- | --- |
-| _(primary org)_ |  |  |  |  |
-| _(each extra org)_ |  |  |  |  |
+Where the points go (GraphQL points, cold / warm):
 
-Record several consecutive runs rather than one, and note the date and the
-token used.
+| Dataset | Cold | Warm |
+| --- | ---: | ---: |
+| `merged_pr_difficulty` | 192 | 168 |
+| `issue_label_events` | 86 | 56 |
+| `contributor_activity` | 62 | reused |
+| `hiero_hackers` | 62 | reused |
+| `issues` | 58 | 56 |
+| `ci_health` | 28 | reused |
+| `onboarding` | 20 | reused |
+| `pr_hip_references` | 10 | 6 |
+| `releases` | 6 | 5 |
+| `hip_implementation` | 1 | 1 |
+| `codeowner_and_runner` (REST) | 165 requests | reused |
 
-**Cold start** (first fetch of an org, or a run after cache eviction), recorded
-separately because it is a one-off cost and is the part that decides whether the
-Actions token can run it at all:
+Reading the table:
 
-| Organisation | GraphQL points | Hours of budget (points ÷ token limit) | Wall time |
-| --- | --- | --- | --- |
-| _(measured on an org added to an empty cache)_ |  |  |  |
+- The incremental datasets are most of the steady-state cost. Their warm cost
+  (e.g. 168 of 192 points for `merged_pr_difficulty`) is close to their cold cost,
+  so a delta fetch at this size is far from free. Why is not yet investigated.
+- **Limits of this data.** The warm run came minutes after the cold run, so its
+  deltas were as small as they get; a run after 5 days has more to fetch and may
+  cost somewhat more. It is a lower bound for steady state, not an average. It is
+  also a single org and a single run of each kind, from a developer machine.
 
 ## Forecast: adding one more organisation
 
 Adding an org to `GITHUB_EXTRA_ORGS` adds two costs, and they must not be
 summed into one number:
 
-1. **A one-off cold fetch** — the full-fetch GraphQL points for that org, taken
-   from the cold-start table. Divide by the token's hourly limit to get the
-   hours of budget it consumes; with the Actions token this can exceed the job
-   timeout, which is the case for configuring `ANALYTICS_PAT` first.
-2. **A recurring steady-state cost per run** — the incremental points for that
-   org, taken from the steady-state table, multiplied by the runs per month
-   (about 6 at the current 5-day cadence).
+1. **A one-off cold fetch**, for `hiero-hackers`-sized orgs about 525 GraphQL
+   points plus about 165 REST requests and roughly 12 minutes. Divide by the
+   token's hourly limit to get the hours of budget it consumes. Scale by
+   repository and activity volume for other orgs; `hiero-ledger` is much larger
+   and has **not** been measured.
+2. **A recurring cost per run**, at least the warm figure (about 290 points for
+   `hiero-hackers`), times runs per month (about 6 at the 5-day cadence), so
+   about 1,750 points per month per org of this size.
 
-Only the second cost is relevant to the question "does the schedule still fit?".
-The first is relevant to "can this token and timeout survive onboarding?".
-
-A rough size guide is to scale the nearest measured org by its repository count,
-but the measured numbers above supersede it as soon as they exist.
+Only the second matters for "does the schedule still fit?". The first matters
+for "can this token and timeout survive onboarding?". The Actions
+`GITHUB_TOKEN` has a lower hourly budget than a PAT (see above), so the cold
+fetch of a large org is the case that needs `ANALYTICS_PAT` configured first.
 
 ## Cadence decision
 
 **Current: refresh every 5 days (`cron: '0 9 */5 * *'`) with a 5-day reuse
 window (`DEFAULT_REUSE_MAX_AGE`).** These two values are one decision and must
-change together: the reuse window should not be shorter than the interval
-between runs (every run would then refetch), nor so much longer that data is
-served stale.
+change together.
 
-**Recommendation: no change until the measurements above exist.** The cadence
-was chosen to keep gaps under the 7-day cache-eviction window; nothing in the
-usage data collected so far argues for moving it, and changing it without
-measurements would be guessing. When the tables are filled in, revisit as
-follows:
+**Recommendation: keep it as is.** For an org of `hiero-hackers`' size a cold
+run uses about a tenth of one hour's budget and a steady run about 6%, so the
+schedule has ample headroom and there is no cost reason to change it. Two
+points for anyone revisiting it:
 
-- If steady-state points per run are a small fraction of one hour's budget for
-  the token in use, the schedule has headroom and the cadence can stay or
-  shorten.
-- If steady-state points approach the hourly budget (so runs are dominated by
-  rate-limit sleeps), lengthen the cron interval and `DEFAULT_REUSE_MAX_AGE`
-  together, keeping gaps under the cache-eviction window.
-- If cold-start hours exceed the job timeout for the token in use, fix the token
-  (PAT) rather than the cadence.
+- Because incremental datasets are fetched on every run, total monthly cost
+  scales roughly with the number of runs; lengthening the interval cuts cost
+  proportionally, shortening it raises cost proportionally. The reuse window
+  only affects the datasets on the reused path.
+- This is based on one small org. The decision should be revisited with
+  measurements for `hiero-ledger` and for the Actions token before the schedule
+  is tightened or onboarding a large org; the follow-up issues are the place
+  to track that.
 
-Record the decision and the measured figures that support it here, with the
-date, whenever it changes.
+Record any change here with its supporting figures and the date.
