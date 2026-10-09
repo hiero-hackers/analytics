@@ -380,3 +380,22 @@ def test_the_legacy_dataset_notice_is_logged_once_per_run(tmp_path, caplog):
             dataset_watermark(tmp_path)
 
     assert sum("predates the fetched_at stamp" in record.message for record in caplog.records) == 1
+
+
+def test_manifest_records_api_usage_when_given(tmp_path):
+    """The run's API spend is archived beside the data it bought."""
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-20T09:00:00+00:00")
+    usage = {"total": {"rest_requests": 1, "graphql_requests": 2, "graphql_points": 3}, "orgs": {}}
+
+    path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path, api_usage=usage)
+
+    assert json.loads(path.read_text(encoding="utf-8"))["api_usage"] == usage
+
+
+def test_manifest_omits_api_usage_when_not_tracked(tmp_path):
+    """Callers that do not track usage get the manifest they always got."""
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-20T09:00:00+00:00")
+
+    path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path)
+
+    assert "api_usage" not in json.loads(path.read_text(encoding="utf-8"))

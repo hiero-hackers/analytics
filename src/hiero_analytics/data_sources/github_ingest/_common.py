@@ -8,6 +8,7 @@ on one shared core without importing one another.
 
 from __future__ import annotations
 
+import contextvars
 import logging
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -192,7 +193,10 @@ def _run_item_fetches(
     records: list = []
     failed: list = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(per_item, item): item for item in items}
+        # Worker threads start with an empty context, so hand each task a copy of
+        # the caller's: that carries the usage scope (org / dataset) into the
+        # worker. One copy per task — a Context cannot be entered twice at once.
+        futures = {executor.submit(contextvars.copy_context().run, per_item, item): item for item in items}
         for future in as_completed(futures):
             item = futures[future]
             try:

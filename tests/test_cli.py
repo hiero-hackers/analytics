@@ -87,3 +87,49 @@ def test_cli_all_forwards_fail_fast(monkeypatch):
 
     assert cli.main(["all", "--fail-fast"]) == 0
     assert seen == [True]
+
+
+def test_cli_single_pipeline_attributes_its_requests_to_the_org_and_pipeline(monkeypatch):
+    """A one-pipeline run is attributed like a full run: (its --org, its name)."""
+    from hiero_analytics.data_sources.usage import current_scope
+
+    seen = []
+    monkeypatch.setitem(
+        cli.PIPELINES_BY_NAME, "scorecard", _fake_pipeline(lambda **_kw: seen.append(current_scope()), ("org",))
+    )
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["scorecard", "--org", "my-org"]) == 0
+
+    assert (seen[0].org, seen[0].dataset) == ("my-org", "scorecard")
+
+
+def test_cli_single_pipeline_defaults_to_the_configured_org(monkeypatch):
+    """Without --org the pipeline uses the configured org, and so does attribution."""
+    from hiero_analytics.data_sources.usage import current_scope
+
+    seen = []
+    monkeypatch.setitem(
+        cli.PIPELINES_BY_NAME, "scorecard", _fake_pipeline(lambda **_kw: seen.append(current_scope()), ("org",))
+    )
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    cli.main(["scorecard"])
+
+    assert seen[0].org == cli.ORG
+
+
+def test_cli_single_pipeline_logs_its_usage_even_when_it_fails(monkeypatch, caplog):
+    """A failed one-pipeline run still reports what it spent."""
+    import logging
+
+    def boom():
+        raise RuntimeError("kaboom")
+
+    monkeypatch.setitem(cli.PIPELINES_BY_NAME, "scorecard", _fake_pipeline(boom))
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    with caplog.at_level(logging.INFO, logger="hiero_analytics.cli"):
+        assert cli.main(["scorecard"]) == 1
+
+    assert any("GitHub API usage" in record.getMessage() for record in caplog.records)

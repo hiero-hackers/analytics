@@ -33,6 +33,7 @@ from .rate_limit import (
     RateLimitPolicy,
     RateLimitSnapshot,
 )
+from .usage import UsageLedger
 
 logger = logging.getLogger(__name__)
 
@@ -87,21 +88,26 @@ class _RestTransport:
     policy loop above it never has to reason about HTTP.
     """
 
-    def __init__(self, session: requests.Session, policy: RateLimitPolicy) -> None:
-        """Wrap a shared session and rate-limit policy."""
+    def __init__(self, session: requests.Session, policy: RateLimitPolicy, usage: UsageLedger) -> None:
+        """Wrap a shared session and rate-limit policy, recording usage to ``usage``."""
         self.session = session
         self._policy = policy
+        self._usage = usage
 
     def request(
         self,
         method: str,
         url: str,
+        *,
+        graphql: bool = False,
         **kwargs: Any,
     ) -> requests.Response:
         """
         Handle low-level network retries and REST header-based rate limiting.
 
-        Returns a successful HTTP response or raises.
+        ``graphql`` only labels the request for usage accounting; it does not
+        change how the request is sent. Returns a successful HTTP response or
+        raises.
         """
         for attempt in range(1, MAX_RETRIES + 1):
             logger.debug(
@@ -136,6 +142,9 @@ class _RestTransport:
                 continue
 
             logger.debug("GitHub response <- %.2fs", time.time() - start)
+            # Every response that reached us spent budget, retries included, so
+            # this counts per attempt rather than per logical call.
+            self._usage.record_request(graphql=graphql)
 
             # Check REST headers for all endpoints, including GraphQL.
             if response.status_code in RETRY_STATUS_CODES:
@@ -223,7 +232,9 @@ class GitHubClient:
 
         # Rate-limit policy: reads signals, returns decisions.
         self._policy = RateLimitPolicy()
-        self._transport = _RestTransport(self.session, self._policy)
+        # Per-org / per-dataset attribution of every request (see usage.py).
+        self.usage = UsageLedger()
+        self._transport = _RestTransport(self.session, self._policy, self.usage)
         # Thread lock to protect usage counters during concurrent execution.
         self._lock = threading.Lock()
 
@@ -246,7 +257,12 @@ class GitHubClient:
             snapshot = RateLimitSnapshot.from_graphql_payload(data)
             if snapshot and snapshot.cost is not None:
                 self.cost_used += snapshot.cost
-            return snapshot
+
+        # Outside the client lock: the ledger has its own, and nesting them
+        # would only add an ordering to get wrong.
+        if snapshot:
+            self.usage.record_graphql_rate_limit(cost=snapshot.cost, remaining=snapshot.remaining)
+        return snapshot
 
     @staticmethod
     def _pace() -> None:
@@ -297,7 +313,7 @@ class GitHubClient:
         # Retry-After, 5xx backoff), and the loop itself is attempt-bounded. A time
         # budget would only convert heavy throttling into spurious timeouts.
         for attempt in range(1, MAX_GRAPHQL_FRESH_RETRIES + 2):
-            response = self._transport.request("POST", url, json=payload)
+            response = self._transport.request("POST", url, graphql=True, json=payload)
             data: JSON = response.json()
             snapshot = self._record_usage(data, is_graphql=True)
 

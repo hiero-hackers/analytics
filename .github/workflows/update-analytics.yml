@@ -3,7 +3,9 @@ name: Refresh Analytics Data
 on:
   schedule:
     # Every 5 days at 9 AM UTC. Keeps gaps under the 7-day cache-eviction
-    # window so the incremental dataset cache stays warm.
+    # window so the incremental dataset cache stays warm. This interval and
+    # DEFAULT_REUSE_MAX_AGE (data_sources/dataset_store.py) are one decision:
+    # change them together or not at all. See docs/api-budget.md.
     - cron: '0 9 */5 * *'
   workflow_dispatch:
 

@@ -28,6 +28,7 @@ from hiero_analytics.data_sources.queries import load_query
 
 from ..dataset_store import PartialOrgFetchError, fetch_incremental
 from ..github_client import GitHubClient
+from ..usage import usage_scope
 from .batched import fetch_org_records_batched
 
 logger = logging.getLogger(__name__)
@@ -76,16 +77,17 @@ def fetch_org_incremental(
             logger.exception("Incremental %s fetch failed; falling back to full fetch", resource.task_desc)
             return full_fetch()
 
-    return fetch_incremental(
-        path=dataset_path(resource.name, org, fingerprint),
-        model_class=resource.model_class,
-        key_of=resource.key_of,
-        updated_at_of=resource.updated_at_of,
-        full_fetch=full_fetch,
-        since_fetch=guarded_since,
-        force_full=refresh,
-        full_refresh_after=resource.full_refresh_after,
-    )
+    with usage_scope(org=org, dataset=resource.name):
+        return fetch_incremental(
+            path=dataset_path(resource.name, org, fingerprint),
+            model_class=resource.model_class,
+            key_of=resource.key_of,
+            updated_at_of=resource.updated_at_of,
+            full_fetch=full_fetch,
+            since_fetch=guarded_since,
+            force_full=refresh,
+            full_refresh_after=resource.full_refresh_after,
+        )
 
 
 def fetch_org_batched_incremental(

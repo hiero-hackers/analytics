@@ -41,6 +41,9 @@ pipelines, cli          orchestration — wire a fetch → analysis → output r
   `adaptive_limiter` an AIMD concurrency limiter), ingestion (`github_ingest/`),
   persistence (`dataset_store`, `cache`, `serialization`), `models`, and
   `governance_config`, and `affiliations` (the curated login -> organisation map).
+  `usage` attributes every request to the org and dataset it was made for
+  (a context-scoped ledger; the numbers feed `SNAPSHOT.json` and the Actions job
+  summary — see [api-budget.md](api-budget.md)).
 - **`analysis`** — pure transforms from record lists / DataFrames to output
   DataFrames. No network, no file I/O beyond what it is handed. This is the most
   heavily unit-tested layer and the safest to refactor.

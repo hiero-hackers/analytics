@@ -8,7 +8,7 @@ helpers keep that boilerplate (and the dataset names) in one place.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from hiero_analytics.config.paths import ensure_org_dirs, ensure_repo_dirs
 from hiero_analytics.data_sources.dataset_store import load_or_fetch
@@ -18,6 +18,7 @@ from hiero_analytics.data_sources.github_ingest import (
     fetch_org_issue_label_events_graphql,
 )
 from hiero_analytics.data_sources.models import ContributorActivityRecord, IssueTimelineEventRecord
+from hiero_analytics.data_sources.usage import UsageLedger
 
 
 class PipelineContext(NamedTuple):
@@ -41,6 +42,23 @@ def shared_client() -> GitHubClient:
     if _client is None:
         _client = GitHubClient()
     return _client
+
+
+def api_usage_summary() -> dict[str, Any]:
+    """The run's GitHub API usage so far, as a JSON-ready dict.
+
+    All zeros when no client was ever created (an offline run, say) — asking
+    must not construct a client, which would log a missing-token warning for a
+    run that never needed one.
+    """
+    ledger = _client.usage if _client is not None else UsageLedger()
+    return ledger.summary()
+
+
+def reset_api_usage() -> None:
+    """Start a fresh usage count; a no-op until a client exists."""
+    if _client is not None:
+        _client.usage.reset()
 
 
 def org_context(org: str) -> PipelineContext:

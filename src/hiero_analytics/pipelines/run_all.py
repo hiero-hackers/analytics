@@ -25,12 +25,16 @@ entry for every org with data, which the web dashboard renders.
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import Callable
+from pathlib import Path
 
 from hiero_analytics.config.logging_config import setup_logging
-from hiero_analytics.config.paths import DATASETS_DIR, EXTRA_ORGS
+from hiero_analytics.config.paths import DATASETS_DIR, EXTRA_ORGS, ORG
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets
+from hiero_analytics.data_sources.usage import render_usage_markdown, usage_scope
 from hiero_analytics.pipelines import PIPELINES, PIPELINES_BY_NAME, default_run_pipelines
+from hiero_analytics.pipelines._shared import api_usage_summary, reset_api_usage
 from hiero_analytics.provenance import SNAPSHOT_MANIFEST_NAME, write_snapshot_manifest
 
 logger = logging.getLogger(__name__)
@@ -64,7 +68,10 @@ def run_pipelines(
     for name, pipeline in pipelines:
         logger.info("=== Running pipeline: %s ===", name)
         try:
-            pipeline()
+            # Requests a pipeline makes outside a persisted dataset fetch are
+            # attributed to the pipeline itself; dataset fetches narrow this.
+            with usage_scope(org=ORG, dataset=name):
+                pipeline()
         except Exception:
             if fail_fast:
                 logger.exception("Pipeline %s failed; stopping due to --fail-fast", name)
@@ -112,11 +119,29 @@ def _run_extra_org(org: str) -> list[str]:
             continue
         logger.info("=== Extra org %s: %s ===", org, pipeline.name)
         try:
-            pipeline.resolve()(org=org)
+            with usage_scope(org=org, dataset=pipeline.name):
+                pipeline.resolve()(org=org)
         except Exception:
             logger.exception("Extra-org pipeline %s failed for %s", pipeline.name, org)
             failures.append(f"{pipeline.name}[{org}]")
     return failures
+
+
+def _write_usage_step_summary(api_usage: dict) -> None:
+    """Append the usage table to the Actions job summary, when running in Actions.
+
+    ``GITHUB_STEP_SUMMARY`` names a file Actions renders on the run page; outside
+    Actions it is unset and this does nothing. A summary is a convenience, so a
+    failure to write it is logged rather than failing a run that otherwise worked.
+    """
+    target = os.getenv("GITHUB_STEP_SUMMARY", "").strip()
+    if not target:
+        return
+    try:
+        with Path(target).open("a", encoding="utf-8") as handle:
+            handle.write(render_usage_markdown(api_usage))
+    except OSError:
+        logger.warning("Could not write the job summary to %s", target, exc_info=True)
 
 
 def main(*, fail_fast: bool = False) -> None:
@@ -127,9 +152,12 @@ def main(*, fail_fast: bool = False) -> None:
     skip the remaining work (extra orgs, snapshot manifest, data API).
     """
     setup_logging()
+    reset_api_usage()  # each run reports only its own spend
 
     failures = run_pipelines(pipelines_for_current_mode(), fail_fast=fail_fast)
     if fail_fast and failures:
+        # The manifest is skipped on this path, but the budget was still spent.
+        _write_usage_step_summary(api_usage_summary())
         logger.error("%d pipeline(s) failed: %s", len(failures), ", ".join(failures))
         raise SystemExit(1)
 
@@ -164,8 +192,12 @@ def main(*, fail_fast: bool = False) -> None:
     # rather than raised so the API is still emitted for inspection — the
     # non-zero exit then keeps the Pages deploy (which needs this job) from
     # publishing untraceable output.
+    #
+    # The run's API spend rides in the same manifest, and the job summary renders
+    # that same dict, so the two cannot disagree.
+    api_usage = api_usage_summary()
     try:
-        write_snapshot_manifest(DATASETS_DIR / SNAPSHOT_MANIFEST_NAME, failures=failures)
+        write_snapshot_manifest(DATASETS_DIR / SNAPSHOT_MANIFEST_NAME, failures=failures, api_usage=api_usage)
     except Exception:
         logger.exception("Could not write the snapshot manifest")
         failures.append("snapshot_manifest")
@@ -175,10 +207,16 @@ def main(*, fail_fast: bool = False) -> None:
     # run loudly if any pipeline drifted from its dashboard spec.
     logger.info("=== Running pipeline: data_api ===")
     try:
-        _resolve("data_api")()
+        with usage_scope(dataset="data_api"):
+            _resolve("data_api")()
     except Exception:
         logger.exception("Pipeline data_api failed")
         failures.append("data_api")
+
+    # The very dict the manifest recorded, so the job summary and the archived
+    # SNAPSHOT.json report identical figures. (The data API re-renders local
+    # datasets and makes no GitHub requests of its own.)
+    _write_usage_step_summary(api_usage)
 
     if failures:
         logger.error("%d pipeline(s) failed: %s", len(failures), ", ".join(failures))
