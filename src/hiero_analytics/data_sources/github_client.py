@@ -285,11 +285,31 @@ class GitHubClient:
         Returns:
             Parsed JSON response.
         """
-        response = self._transport.request("GET", url, **kwargs)
+        response = self.get_response(url, **kwargs)
         data: JSON = response.json()
-        self._record_usage(data, is_graphql=False)
-        self._pace()
         return data
+
+    def get_response(self, url: str, **kwargs: Any) -> requests.Response:
+        """
+        Execute a GET request and return the raw, status-aware response.
+
+        Goes through the same transport as :meth:`get` (retries, rate-limit
+        handling, concurrency limiter, usage accounting), but leaves the body
+        unparsed so callers can inspect the status code, e.g. a ``202`` that
+        means "still being generated" and carries no JSON to decode. Non-2xx
+        responses still raise ``requests.HTTPError``.
+
+        Args:
+            url: Full GitHub API URL.
+            **kwargs: Additional keyword arguments forwarded to the underlying request.
+
+        Returns:
+            The successful ``requests.Response``.
+        """
+        response = self._transport.request("GET", url, **kwargs)
+        self._record_usage({}, is_graphql=False)
+        self._pace()
+        return response
 
     def graphql(self, query: str, variables: Mapping[str, Any]) -> JSON:
         """
