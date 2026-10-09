@@ -13,7 +13,8 @@ api/v1/                    the emitted JSON API, exactly as published
   manifest.json
   <org>/<section>.json
 SNAPSHOT.json              the run's provenance: git sha, run id, per-dataset
-                           watermarks and SHA-256s, failed pipelines
+                           watermarks and SHA-256s, failed pipelines, and the
+                           run's GitHub API spend (`api_usage`, see api-budget.md)
 ```
 
 History lives in the commits, not in dated directories. Each commit message

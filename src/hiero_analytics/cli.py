@@ -14,7 +14,10 @@ import sys
 from collections.abc import Sequence
 
 from hiero_analytics.config.logging_config import setup_logging
+from hiero_analytics.config.paths import ORG
+from hiero_analytics.data_sources.usage import usage_scope
 from hiero_analytics.pipelines import PIPELINES, PIPELINES_BY_NAME, run_all
+from hiero_analytics.pipelines._shared import api_usage_summary
 
 logger = logging.getLogger(__name__)
 
@@ -76,10 +79,21 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     setup_logging()
     try:
-        pipeline.resolve()(**kwargs)
+        # Same attribution as a full run: the org the pipeline will use (its
+        # --org, else the configured one) and the pipeline's own name.
+        with usage_scope(org=kwargs.get("org") or ORG, dataset=command):
+            pipeline.resolve()(**kwargs)
     except Exception:
         logger.exception("Pipeline %s failed", command)
         return 1
+    finally:
+        total = api_usage_summary()["total"]
+        logger.info(
+            "GitHub API usage: %d REST request(s), %d GraphQL request(s), %d GraphQL point(s)",
+            total["rest_requests"],
+            total["graphql_requests"],
+            total["graphql_points"],
+        )
     return 0
 
 

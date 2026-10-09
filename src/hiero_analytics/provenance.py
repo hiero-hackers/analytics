@@ -35,6 +35,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 from hiero_analytics.config.paths import DATASETS_DIR, PROJECT_ROOT
 
@@ -281,6 +282,7 @@ def write_snapshot_manifest(
     datasets_dir: Path | None = None,
     failures: list[str] | None = None,
     run_id: str | None = None,
+    api_usage: dict[str, Any] | None = None,
 ) -> Path:
     """Write the run manifest that makes an archived dataset snapshot self-describing.
 
@@ -290,6 +292,11 @@ def write_snapshot_manifest(
     the reader needs to know the snapshot is partial). Each dataset is recorded
     by SHA-256, so a chart can be tied to byte-identical inputs rather than to a
     filename that gets overwritten every five days.
+
+    ``api_usage`` is the run's GitHub API spend (see ``data_sources.usage``);
+    when given it is recorded under the same key, so the cost of a run is
+    archived beside the data it bought. Omitted when not supplied, which keeps
+    the manifest unchanged for callers that do not track usage.
     """
     provenance = resolve_provenance(datasets_dir)
     datasets = [_manifest_entry(dataset) for dataset in _dataset_files(datasets_dir)]
@@ -301,6 +308,8 @@ def write_snapshot_manifest(
         "failed_pipelines": failures or [],
         "datasets": datasets,
     }
+    if api_usage is not None:
+        manifest["api_usage"] = api_usage
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     logger.info("Wrote snapshot manifest %s (%d dataset(s))", path, len(datasets))

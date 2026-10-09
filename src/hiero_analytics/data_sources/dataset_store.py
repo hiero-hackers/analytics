@@ -30,6 +30,7 @@ from hiero_analytics.config import paths
 from hiero_analytics.config.paths import dataset_path
 
 from .serialization import deserialize_record, serialize_record
+from .usage import usage_scope
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,8 @@ DATASET_VERSION = 2
 DEFAULT_OVERLAP = timedelta(minutes=10)
 
 # How old a persisted dataset's watermark may be before load_or_fetch refreshes it
-# instead of reusing it. Matches the update-analytics CI cadence.
+# instead of reusing it. Matches the update-analytics CI cadence: change the
+# workflow's cron and this value together (docs/api-budget.md).
 #
 # Two staleness windows layer on the same dataset file, split across two levels:
 # this 5-day *reuse* gate decides whether load_or_fetch calls its fetch_fn at
@@ -358,11 +360,13 @@ def load_or_fetch(  # noqa: UP047
             resource,
             fetched_through.isoformat(),
         )
-        return fetch_fn()
+        with usage_scope(org=org, dataset=resource):
+            return fetch_fn()
     if offline_mode_enabled():
         raise OfflineDatasetMissingError(f"Offline mode requires a cached {resource}/{org} dataset")
     logger.info("No persisted %s/%s dataset; fetching from GitHub", org, resource)
-    return fetch_fn()
+    with usage_scope(org=org, dataset=resource):
+        return fetch_fn()
 
 
 def fetch_incremental(  # noqa: UP047
