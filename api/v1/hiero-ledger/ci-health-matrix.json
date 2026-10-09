@@ -1,0 +1,1223 @@
+{
+ "id": "ci-health-matrix",
+ "kind": "ci_health_matrix",
+ "group": "CI health",
+ "title": "CI health matrix",
+ "description": "Repository-level CI health checks covering GitHub Actions SHA pinning, explicit workflow permissions, and repository security configuration. Click a fail or review cell to inspect the supporting evidence.",
+ "badge": "44 repositories",
+ "source": "ci_health_checks.csv",
+ "row_header": "Repository",
+ "columns": [
+  {
+   "key": "actions_sha_pinned",
+   "label": "Actions SHA Pinned"
+  },
+  {
+   "key": "explicit_permissions",
+   "label": "Explicit Permissions"
+  },
+  {
+   "key": "repository_security_configuration",
+   "label": "Security Config"
+  }
+ ],
+ "rows": [
+  {
+   "key": "hiero-ledger/.github",
+   "label": "hiero-ledger/.github",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/template-sync.yml:11; .github/workflows/template-sync.yml:18"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/awesome-contributions",
+   "label": "hiero-ledger/awesome-contributions",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/governance",
+   "label": "hiero-ledger/governance",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/configure-custom-properties.yaml:11; .github/workflows/pr-formatting.yaml:14; .github/workflows/read-all-custom-properties.yaml:27; .github/workflows/update-custom-properties.yaml:14"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/heka-identity-platform",
+   "label": "hiero-ledger/heka-identity-platform",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 12 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/codeql-analysis.yml:29; .github/workflows/codeql-analysis.yml:36; .github/workflows/gradle-wrapper-validation.yml:16; .github/workflows/heka-auth-service-publish.yml:25; .github/workflows/heka-auth-service-publish.yml:34; .github/workflows/heka-auth-service-verify.yml:16; .github/workflows/heka-identity-service-publish.yml:25; .github/workflows/heka-identity-service-publish.yml:34; .github/workflows/heka-identity-service-verify.yml:16; .github/workflows/heka-identity-service-verify.yml:26; .github/workflows/heka-identity-service-web-ui-verify.yml:16; .github/workflows/heka-sso-service-publish.yml:25; .github/workflows/heka-sso-service-publish.yml:34; .github/workflows/heka-sso-service-verify.yml:16; .github/workflows/heka-sso-web-ui-verify.yml:15; .github/workflows/heka-wallet-build-android.yml:11; .github/workflows/heka-wallet-verify.yml:16"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: codeql-analysis.yml.",
+     "location": ".github/workflows/codeql-analysis.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero",
+   "label": "hiero-ledger/hiero",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/scorecard.yml:19; .github/workflows/scorecard.yml:27"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: scorecard.yml.",
+     "location": ".github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-block-node",
+   "label": "hiero-ledger/hiero-block-node",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 3 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/release-notes-generator.yaml, ./.github/workflows/milestone-rollover.yaml, ./.github/workflows/solo-e2e-test.yml",
+     "location": ".github/workflows/release-automation.yaml:310; .github/workflows/release-automation.yaml:321; .github/workflows/solo-e2e-scheduler.yml:375"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 15 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/e2e-node-operator.yaml:57; .github/workflows/e2e-tests.yaml:18; .github/workflows/helm-charts.yaml:6; .github/workflows/k6-tests.yml:18; .github/workflows/link-check.yml:17; .github/workflows/milestone-rollover.yaml:33; .github/workflows/pr-checks.yaml:21; .github/workflows/pr-formatting.yaml:25; .github/workflows/release-automation.yaml:30; .github/workflows/release-notes-generator.yaml:38; .github/workflows/release-push-image.yaml:29; .github/workflows/solo-e2e-scheduler.yml:79; .github/workflows/solo-e2e-test.yml:213; .github/workflows/sync-docs-to-gitbook.yaml:16; .github/workflows/zxc-verify-gradle-build-determinism.yaml:48"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-cli",
+   "label": "hiero-ledger/hiero-cli",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 12 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-code-analysis.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-compile-code.yaml, ./.github/workflows/zxc-code-analysis.yaml, ./.github/workflows/zxc-code-analysis.yaml",
+     "location": ".github/workflows/flow-build-application.yaml:56; .github/workflows/flow-build-application.yaml:60; .github/workflows/flow-build-application.yaml:69; .github/workflows/flow-build-application.yaml:77; .github/workflows/flow-build-application.yaml:89; .github/workflows/flow-deploy-release-artifact.yaml:135; .github/workflows/flow-pull-request-checks.yaml:37; .github/workflows/flow-pull-request-checks.yaml:41; .github/workflows/flow-pull-request-checks.yaml:50; .github/workflows/flow-pull-request-checks.yaml:59; .github/workflows/flow-pull-request-checks.yaml:72; .github/workflows/flow-pull-request-checks.yaml:86"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: flow-pull-request-checks.yaml",
+     "location": ".github/workflows/flow-build-application.yaml:45; .github/workflows/flow-deploy-release-artifact.yaml:31; .github/workflows/flow-pull-request-checks.yaml; .github/workflows/flow-pull-request-formatting.yaml:31; .github/workflows/zxc-code-analysis.yaml:73; .github/workflows/zxc-compile-code.yaml:66"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-consensus-node",
+   "label": "hiero-ledger/hiero-consensus-node",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 142 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/800-call-mats-tests.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/856-call-solo-ge044.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/816-call-build-publish-state-validator.yaml, ./.github/workflows/815-call-xts-tests.yaml, ./.github/workflows/824-call-xts-optional-tests.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/850-call-build-release-artifact.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/851-call-deploy-preview.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/823-call-verify-gradle-determinism.yaml, ./.github/workflows/822-call-verify-docker-determinism.yaml, ./.github/workflows/853-call-create-github-release.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/856-call-solo-ge044.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/824-call-xts-optional-tests.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/861-call-get-test-config.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/859-call-create-chewie-request.yaml, ./.github/workflows/831-call-single-day-performance-test.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/861-call-get-test-config.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/859-call-create-chewie-request.yaml, ./.github/workflows/833-call-single-day-longevity-test.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/835-call-multi-day-longevity-test.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/861-call-get-test-config.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/859-call-create-chewie-request.yaml, ./.github/workflows/831-call-single-day-performance-test.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/861-call-get-test-config.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/859-call-create-chewie-request.yaml, ./.github/workflows/833-call-single-day-longevity-test.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/862-call-get-chewie-properties.yaml, ./.github/workflows/835-call-multi-day-longevity-test.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/800-call-mats-tests.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/850-call-build-release-artifact.yaml, ./.github/workflows/850-call-build-release-artifact.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/853-call-create-github-release.yaml, ./.github/workflows/853-call-create-github-release.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/800-call-mats-tests.yaml, ./.github/workflows/857-call-workflow-unit-tests.yaml, ./.github/workflows/802-call-compile-and-spotless-check.yaml, ./.github/workflows/809-call-dependency-module-check.yaml, ./.github/workflows/803-call-execute-unit-tests.yaml, ./.github/workflows/804-call-execute-integration-tests.yaml, ./.github/workflows/810-call-execute-mats-hapi.yaml, ./.github/workflows/811-call-execute-mats-otter.yaml, ./.github/workflows/801-call-snyk-scan.yaml, ./.github/workflows/812-call-benchmark-smoke.yaml, ./.github/workflows/823-call-verify-gradle-determinism.yaml, ./.github/workflows/822-call-verify-docker-determinism.yaml, ./.github/workflows/836-call-execute-hapi-misc.yaml, ./.github/workflows/837-call-execute-hapi-misc-records-crypto.yaml, ./.github/workflows/838-call-execute-hapi-token-time-consuming.yaml, ./.github/workflows/839-call-execute-hapi-simple-fees-nd-reconnect.yaml, ./.github/workflows/840-call-execute-hapi-smart-contract-iss.yaml, ./.github/workflows/841-call-execute-hapi-restart.yaml, ./.github/workflows/842-call-execute-hapi-atomic-batch.yaml, ./.github/workflows/843-call-execute-hapi-state-throttling.yaml, ./.github/workflows/847-call-execute-otter-fast.yaml, ./.github/workflows/802-call-compile-and-spotless-check.yaml, ./.github/workflows/806-call-execute-timing-sensitive-tests.yaml, ./.github/workflows/807-call-execute-hammer-tests.yaml, ./.github/workflows/827-call-execute-xts-hapi.yaml, ./.github/workflows/828-call-execute-xts-otter.yaml, ./.github/workflows/817-call-jrs-regression.yaml, ./.github/workflows/819-call-tck-regression.yaml, ./.github/workflows/820-call-mirror-node-regression.yaml, ./.github/workflows/818-call-json-rpc-relay-regression.yaml, ./.github/workflows/821-call-block-node-regression.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/825-call-migration-testing.yaml, ./.github/workflows/826-call-solo-078-to-079-cutover.yaml, ./.github/workflows/844-call-execute-hapi-bn-communication.yaml, ./.github/workflows/845-call-execute-hapi-wraps.yaml, ./.github/workflows/846-call-execute-hapi-cutover.yaml, ./.github/workflows/848-call-execute-otter-full.yaml, ./.github/workflows/849-call-execute-otter-chaos.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/863-call-get-chewie-allocation.yaml, ./.github/workflows/832-call-execute-performance-test.yaml, ./.github/workflows/832-call-execute-performance-test.yaml, ./.github/workflows/832-call-execute-performance-test.yaml, ./.github/workflows/832-call-execute-performance-test.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/863-call-get-chewie-allocation.yaml, ./.github/workflows/858-call-get-chewie-jwt.yaml, ./.github/workflows/861-call-get-test-config.yaml, ./.github/workflows/860-call-validate-chewie-jwt.yaml, ./.github/workflows/859-call-create-chewie-request.yaml, ./.github/workflows/852-call-publish-production-image.yaml, ./.github/workflows/852-call-publish-production-image.yaml, ./.github/workflows/853-call-create-github-release.yaml, ./.github/workflows/855-call-extract-citr-vars.yaml, ./.github/workflows/856-call-solo-ge044.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/816-call-build-publish-state-validator.yaml, ./.github/workflows/815-call-xts-tests.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml, ./.github/workflows/854-call-extract-jdk-version.yaml",
+     "location": ".github/workflows/000-user-dry-run-mats-suite.yaml:72; .github/workflows/000-user-dry-run-mats-suite.yaml:82; .github/workflows/001-user-dry-run-extended-test-suite.yaml:98; .github/workflows/001-user-dry-run-extended-test-suite.yaml:138; .github/workflows/001-user-dry-run-extended-test-suite.yaml:194; .github/workflows/001-user-dry-run-extended-test-suite.yaml:203; .github/workflows/001-user-dry-run-extended-test-suite.yaml:215; .github/workflows/001-user-dry-run-extended-test-suite.yaml:263; .github/workflows/002-user-deploy-adhoc-artifact.yaml:44; .github/workflows/002-user-deploy-adhoc-artifact.yaml:55; .github/workflows/003-user-increment-next-main-release.yaml:26; .github/workflows/004-user-deploy-preview.yaml:60; .github/workflows/005-user-artifact-determinism.yaml:32; .github/workflows/005-user-artifact-determinism.yaml:64; .github/workflows/005-user-artifact-determinism.yaml:78; .github/workflows/101-user-trigger-release.yaml:291; .github/workflows/102-user-memory-profile-ctrl.yaml:51; .github/workflows/103-user-solo-tests-adhoc.yaml:100; .github/workflows/103-user-solo-tests-adhoc.yaml:112; .github/workflows/106-disp-xts-optional-tests.yaml:34; .github/workflows/106-disp-xts-optional-tests.yaml:70; .github/workflows/106-disp-xts-optional-tests.yaml:101; .github/workflows/106-disp-xts-optional-tests.yaml:171; .github/workflows/201-user-sdpt-controller-adhoc.yaml:111; .github/workflows/201-user-sdpt-controller-adhoc.yaml:119; .github/workflows/201-user-sdpt-controller-adhoc.yaml:127; .github/workflows/201-user-sdpt-controller-adhoc.yaml:186; .github/workflows/201-user-sdpt-controller-adhoc.yaml:193; .github/workflows/201-user-sdpt-controller-adhoc.yaml:203; .github/workflows/201-user-sdpt-controller-adhoc.yaml:218; .github/workflows/201-user-sdpt-controller-adhoc.yaml:241; .github/workflows/202-user-sdlt-controller-adhoc.yaml:118; .github/workflows/202-user-sdlt-controller-adhoc.yaml:126; .github/workflows/202-user-sdlt-controller-adhoc.yaml:134; .github/workflows/202-user-sdlt-controller-adhoc.yaml:193; .github/workflows/202-user-sdlt-controller-adhoc.yaml:200; .github/workflows/202-user-sdlt-controller-adhoc.yaml:210; .github/workflows/202-user-sdlt-controller-adhoc.yaml:225; .github/workflows/202-user-sdlt-controller-adhoc.yaml:248; .github/workflows/203-user-mdlt-controller-adhoc.yaml:118; .github/workflows/203-user-mdlt-controller-adhoc.yaml:126; .github/workflows/203-user-mdlt-controller-adhoc.yaml:137; .github/workflows/203-user-mdlt-controller-adhoc.yaml:253; .github/workflows/204-disp-mdlt-monitor.yaml:46; .github/workflows/204-disp-mdlt-monitor.yaml:54; .github/workflows/205-disp-mdlt-publish-results.yaml:41; .github/workflows/205-disp-mdlt-publish-results.yaml:49; .github/workflows/221-disp-sdpt-controller.yaml:58; .github/workflows/221-disp-sdpt-controller.yaml:66; .github/workflows/221-disp-sdpt-controller.yaml:74; .github/workflows/221-disp-sdpt-controller.yaml:119; .github/workflows/221-disp-sdpt-controller.yaml:126; .github/workflows/221-disp-sdpt-controller.yaml:136; .github/workflows/221-disp-sdpt-controller.yaml:151; .github/workflows/221-disp-sdpt-controller.yaml:174; .github/workflows/222-disp-sdlt-controller.yaml:58; .github/workflows/222-disp-sdlt-controller.yaml:66; .github/workflows/222-disp-sdlt-controller.yaml:74; .github/workflows/222-disp-sdlt-controller.yaml:119; .github/workflows/222-disp-sdlt-controller.yaml:126; .github/workflows/222-disp-sdlt-controller.yaml:136; .github/workflows/222-disp-sdlt-controller.yaml:151; .github/workflows/222-disp-sdlt-controller.yaml:175; .github/workflows/224-disp-mdlt-controller.yaml:63; .github/workflows/224-disp-mdlt-controller.yaml:71; .github/workflows/224-disp-mdlt-controller.yaml:82; .github/workflows/224-disp-mdlt-controller.yaml:191; .github/workflows/225-disp-release-chewie-allocation.yaml:21; .github/workflows/225-disp-release-chewie-allocation.yaml:29; .github/workflows/300-flow-build-application.yaml:25; .github/workflows/300-flow-build-application.yaml:33; .github/workflows/301-flow-deploy-release-artifact.yaml:33; .github/workflows/301-flow-deploy-release-artifact.yaml:68; .github/workflows/301-flow-deploy-release-artifact.yaml:158; .github/workflows/304-flow-publish-yahcli-image.yaml:55; .github/workflows/305-flow-generate-release-notes.yaml:35; .github/workflows/305-flow-generate-release-notes.yaml:47; .github/workflows/306-flow-snyk-monitor.yaml:17; .github/workflows/600-flow-pull-request-checks.yaml:55; .github/workflows/600-flow-pull-request-checks.yaml:66; .github/workflows/600-flow-pull-request-checks.yaml:92; .github/workflows/800-call-mats-tests.yaml:132; .github/workflows/800-call-mats-tests.yaml:147; .github/workflows/800-call-mats-tests.yaml:162; .github/workflows/800-call-mats-tests.yaml:180; .github/workflows/800-call-mats-tests.yaml:197; .github/workflows/800-call-mats-tests.yaml:217; .github/workflows/800-call-mats-tests.yaml:234; .github/workflows/800-call-mats-tests.yaml:251; .github/workflows/800-call-mats-tests.yaml:267; .github/workflows/800-call-mats-tests.yaml:283; .github/workflows/810-call-execute-mats-hapi.yaml:59; .github/workflows/810-call-execute-mats-hapi.yaml:72; .github/workflows/810-call-execute-mats-hapi.yaml:85; .github/workflows/810-call-execute-mats-hapi.yaml:98; .github/workflows/810-call-execute-mats-hapi.yaml:111; .github/workflows/810-call-execute-mats-hapi.yaml:124; .github/workflows/810-call-execute-mats-hapi.yaml:137; .github/workflows/810-call-execute-mats-hapi.yaml:150; .github/workflows/811-call-execute-mats-otter.yaml:58; .github/workflows/815-call-xts-tests.yaml:182; .github/workflows/815-call-xts-tests.yaml:200; .github/workflows/815-call-xts-tests.yaml:215; .github/workflows/815-call-xts-tests.yaml:230; .github/workflows/815-call-xts-tests.yaml:248; .github/workflows/815-call-xts-tests.yaml:266; .github/workflows/815-call-xts-tests.yaml:291; .github/workflows/815-call-xts-tests.yaml:310; .github/workflows/815-call-xts-tests.yaml:328; .github/workflows/815-call-xts-tests.yaml:346; .github/workflows/816-call-build-publish-state-validator.yaml:43; .github/workflows/824-call-xts-optional-tests.yaml:132; .github/workflows/824-call-xts-optional-tests.yaml:188; .github/workflows/827-call-execute-xts-hapi.yaml:69; .github/workflows/827-call-execute-xts-hapi.yaml:83; .github/workflows/827-call-execute-xts-hapi.yaml:97; .github/workflows/828-call-execute-xts-otter.yaml:69; .github/workflows/828-call-execute-xts-otter.yaml:83; .github/workflows/831-call-single-day-performance-test.yaml:110; .github/workflows/831-call-single-day-performance-test.yaml:117; .github/workflows/831-call-single-day-performance-test.yaml:129; .github/workflows/831-call-single-day-performance-test.yaml:1415; .github/workflows/831-call-single-day-performance-test.yaml:1434; .github/workflows/831-call-single-day-performance-test.yaml:1453; .github/workflows/831-call-single-day-performance-test.yaml:1472; .github/workflows/833-call-single-day-longevity-test.yaml:107; .github/workflows/833-call-single-day-longevity-test.yaml:115; .github/workflows/833-call-single-day-longevity-test.yaml:127; .github/workflows/835-call-multi-day-longevity-test.yaml:107; .github/workflows/835-call-multi-day-longevity-test.yaml:113; .github/workflows/835-call-multi-day-longevity-test.yaml:125; .github/workflows/835-call-multi-day-longevity-test.yaml:140; .github/workflows/850-call-build-release-artifact.yaml:539; .github/workflows/850-call-build-release-artifact.yaml:559; .github/workflows/850-call-build-release-artifact.yaml:908; .github/workflows/900-cron-extended-test-suite.yaml:55; .github/workflows/900-cron-extended-test-suite.yaml:95; .github/workflows/900-cron-extended-test-suite.yaml:347; .github/workflows/900-cron-extended-test-suite.yaml:358; .github/workflows/900-cron-extended-test-suite.yaml:372; .github/workflows/904-cron-release-branching.yaml:203; .github/workflows/905-cron-nightly-benchmarks.yaml:37"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 3 workflow(s) without complete explicit permissions coverage: 860-call-validate-chewie-jwt.yaml, 861-call-get-test-config.yaml, 862-call-get-chewie-properties.yaml",
+     "location": ".github/workflows/000-user-dry-run-mats-suite.yaml:56; .github/workflows/001-user-dry-run-extended-test-suite.yaml:82; .github/workflows/002-user-deploy-adhoc-artifact.yaml:36; .github/workflows/003-user-increment-next-main-release.yaml:20; .github/workflows/004-user-deploy-preview.yaml:25; .github/workflows/005-user-artifact-determinism.yaml:25; .github/workflows/006-user-update-gs-state-variable.yaml:14; .github/workflows/050-user-memory-profile-ctrl.yaml:10; .github/workflows/080-flow-auto-unapprove.yaml:10; .github/workflows/100-user-collect-workflow-logs.yaml:14; .github/workflows/101-user-trigger-release.yaml:25; .github/workflows/102-user-memory-profile-ctrl.yaml:38; .github/workflows/103-user-solo-tests-adhoc.yaml:76; .github/workflows/104-user-wraps-smoke-test.yaml:21; .github/workflows/105-user-publish-wraps-key.yaml:25; .github/workflows/106-disp-xts-optional-tests.yaml:19; .github/workflows/200-user-adhoc-solo-tests.yaml:10; .github/workflows/201-user-sdpt-controller-adhoc.yaml:63; .github/workflows/202-user-sdlt-controller-adhoc.yaml:70; .github/workflows/203-user-mdlt-controller-adhoc.yaml:70; .github/workflows/204-disp-mdlt-monitor.yaml:39; .github/workflows/205-disp-mdlt-publish-results.yaml:30; .github/workflows/206-disp-mdlt-tag-result.yaml:29; .github/workflows/221-disp-sdpt-controller.yaml:10; .github/workflows/222-disp-sdlt-controller.yaml:10; .github/workflows/223-disp-sdct-controller.yaml:21; .github/workflows/224-disp-mdlt-controller.yaml:15; .github/workflows/225-disp-release-chewie-allocation.yaml:15; .github/workflows/300-flow-build-application.yaml:13; .github/workflows/301-flow-deploy-release-artifact.yaml:25; .github/workflows/302-disp-prepare-extended-test-suite.yaml:19; .github/workflows/303-disp-deploy-integration.yaml:6; .github/workflows/304-flow-publish-yahcli-image.yaml:48; .github/workflows/305-flow-generate-release-notes.yaml:27; .github/workflows/306-flow-snyk-monitor.yaml:10; .github/workflows/600-flow-pull-request-checks.yaml:15; .github/workflows/601-flow-pull-request-formatting.yaml:25; .github/workflows/701-flow-auto-unapprove.yaml:15; .github/workflows/702-flow-codeowners.yaml:15; .github/workflows/703-flow-codeowners-rerun.yaml:14; .github/workflows/800-call-mats-tests.yaml:96; .github/workflows/801-call-snyk-scan.yaml:47; .github/workflows/802-call-compile-and-spotless-check.yaml:44; .github/workflows/802-extract-jdk-version.yaml:10; .github/workflows/803-call-execute-unit-tests.yaml:50; .github/workflows/804-call-execute-integration-tests.yaml:49; .github/workflows/805-call-execute-hapi-tests.yaml:10; .github/workflows/806-call-execute-timing-sensitive-tests.yaml:44; .github/workflows/807-call-execute-hammer-tests.yaml:44; .github/workflows/808-call-execute-otter-tests.yaml:10; .github/workflows/809-call-dependency-module-check.yaml:43; .github/workflows/810-call-execute-mats-hapi.yaml:49; .github/workflows/811-call-execute-mats-otter.yaml:48; .github/workflows/812-call-benchmark-smoke.yaml:39; .github/workflows/815-call-xts-tests.yaml:146; .github/workflows/816-call-build-publish-state-validator.yaml:32; .github/workflows/817-call-jrs-regression.yaml:157; .github/workflows/818-call-json-rpc-relay-regression.yaml:51; .github/workflows/819-call-tck-regression.yaml:55; .github/workflows/820-call-mirror-node-regression.yaml:51; .github/workflows/820-call-mirror-node-regression.yaml:221; .github/workflows/821-call-block-node-regression.yaml:61; .github/workflows/822-call-verify-docker-determinism.yaml:40; .github/workflows/823-call-verify-gradle-determinism.yaml:40; .github/workflows/824-call-xts-optional-tests.yaml:55; .github/workflows/825-call-migration-testing.yaml:38; .github/workflows/826-call-solo-078-to-079-cutover.yaml:35; .github/workflows/827-call-execute-xts-hapi.yaml:59; .github/workflows/828-call-execute-xts-otter.yaml:58; .github/workflows/831-call-single-day-performance-test.yaml:82; .github/workflows/832-call-execute-performance-test.yaml:74; .github/workflows/833-call-single-day-longevity-test.yaml:92; .github/workflows/835-call-multi-day-longevity-test.yaml:92; .github/workflows/836-call-execute-hapi-misc.yaml:49; .github/workflows/837-call-execute-hapi-misc-records-crypto.yaml:49; .github/workflows/838-call-execute-hapi-token-time-consuming.yaml:49; .github/workflows/839-call-execute-hapi-simple-fees-nd-reconnect.yaml:49; .github/workflows/840-call-execute-hapi-smart-contract-iss.yaml:49; .github/workflows/841-call-execute-hapi-restart.yaml:49; .github/workflows/842-call-execute-hapi-atomic-batch.yaml:49; .github/workflows/843-call-execute-hapi-state-throttling.yaml:49; .github/workflows/844-call-execute-hapi-bn-communication.yaml:49; .github/workflows/845-call-execute-hapi-wraps.yaml:49; .github/workflows/846-call-execute-hapi-cutover.yaml:49; .github/workflows/847-call-execute-otter-fast.yaml:48; .github/workflows/848-call-execute-otter-full.yaml:48; .github/workflows/849-call-execute-otter-chaos.yaml:48; .github/workflows/850-call-build-release-artifact.yaml:107; .github/workflows/851-call-deploy-preview.yaml:43; .github/workflows/852-call-publish-production-image.yaml:67; .github/workflows/853-call-create-github-release.yaml:38; .github/workflows/854-call-extract-jdk-version.yaml:19; .github/workflows/855-call-extract-citr-vars.yaml:40; .github/workflows/855-extract-citr-vars.yaml:10; .github/workflows/856-call-solo-ge044.yaml:19; .github/workflows/857-call-solo-ge044.yaml:10; .github/workflows/857-call-workflow-unit-tests.yaml:11; .github/workflows/858-call-get-chewie-jwt.yaml:21; .github/workflows/859-call-create-chewie-request.yaml:90; .github/workflows/860-call-validate-chewie-jwt.yaml; .github/workflows/861-call-get-test-config.yaml; .github/workflows/862-call-get-chewie-properties.yaml; .github/workflows/863-call-get-chewie-allocation.yaml:59; .github/workflows/900-cron-extended-test-suite.yaml:20; .github/workflows/901-cron-promote-build-candidate.yaml:10; .github/workflows/902-cron-auto-namespace-delete.yaml:3; .github/workflows/903-cron-clean.yaml:3; .github/workflows/904-cron-release-branching.yaml:12; .github/workflows/905-cron-nightly-benchmarks.yaml:23; .github/workflows/flow-artifact-determinism.yaml:10; .github/workflows/flow-dry-run-extended-test-suite.yaml:10; .github/workflows/flow-dry-run-mats-suite.yaml:10; .github/workflows/flow-generate-release-notes.yaml:10; .github/workflows/flow-increment-next-main-release.yaml:10; .github/workflows/flow-pull-request-formatting.yaml:10; .github/workflows/flow-trigger-release.yaml:10; .github/workflows/node-flow-build-application.yaml:10; .github/workflows/node-flow-deploy-adhoc-artifact.yaml:10; .github/workflows/node-flow-deploy-preview.yaml:10; .github/workflows/node-flow-deploy-release-artifact.yaml:10; .github/workflows/node-flow-pull-request-checks.yaml:10; .github/workflows/node-zxc-build-release-artifact.yaml:10; .github/workflows/node-zxc-deploy-preview.yaml:10; .github/workflows/node-zxcron-release-branching.yaml:10; .github/workflows/node-zxf-deploy-integration.yaml:10; .github/workflows/node-zxf-snyk-monitor.yaml:10; .github/workflows/zxc-block-node-regression.yaml:10; .github/workflows/zxc-build-publish-state-validator.yaml:10; .github/workflows/zxc-compile-and-spotless-check.yaml:10; .github/workflows/zxc-create-github-release.yaml:10; .github/workflows/zxc-dependency-module-check.yaml:10; .github/workflows/zxc-execute-hammer-tests.yaml:10; .github/workflows/zxc-execute-hapi-tests.yaml:10; .github/workflows/zxc-execute-integration-tests.yaml:10; .github/workflows/zxc-execute-otter-tests.yaml:10; .github/workflows/zxc-execute-performance-test.yaml:10; .github/workflows/zxc-execute-timing-sensitive-tests.yaml:10; .github/workflows/zxc-execute-unit-tests.yaml:10; .github/workflows/zxc-jrs-regression.yaml:10; .github/workflows/zxc-json-rpc-relay-regression.yaml:10; .github/workflows/zxc-mats-tests.yaml:10; .github/workflows/zxc-mirror-node-regression.yaml:10; .github/workflows/zxc-publish-production-image.yaml:10; .github/workflows/zxc-single-day-longevity-test.yaml:10; .github/workflows/zxc-single-day-performance-test.yaml:10; .github/workflows/zxc-snyk-scan.yaml:10; .github/workflows/zxc-tck-regression.yaml:10; .github/workflows/zxc-verify-docker-build-determinism.yaml:10; .github/workflows/zxc-verify-gradle-build-determinism.yaml:10; .github/workflows/zxc-xts-tests.yaml:10; .github/workflows/zxcron-auto-namespaces-delete.yaml:10; .github/workflows/zxcron-clean.yaml:10; .github/workflows/zxcron-extended-test-suite.yaml:10; .github/workflows/zxcron-promote-build-candidate.yaml:10; .github/workflows/zxf-collect-workflow-logs.yaml:10; .github/workflows/zxf-prepare-extended-test-suite.yaml:10; .github/workflows/zxf-publish-yahcli-image.yaml:10; .github/workflows/zxf-single-day-canonical-test.yaml:10; .github/workflows/zxf-single-day-longevity-test-controller-adhoc.yaml:10; .github/workflows/zxf-single-day-longevity-test-controller.yaml:10; .github/workflows/zxf-single-day-performance-test-controller-adhoc.yaml:10; .github/workflows/zxf-single-day-performance-test-controller.yaml:10; .github/workflows/zxf-update-gs-state-variable.yaml:10"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: 822-call-verify-docker-determinism.yaml, 823-call-verify-gradle-determinism.yaml, 850-call-build-release-artifact.yaml; CodeQL workflow not detected.",
+     "location": ".github/workflows/822-call-verify-docker-determinism.yaml; .github/workflows/823-call-verify-gradle-determinism.yaml; .github/workflows/850-call-build-release-artifact.yaml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-consensus-specifications",
+   "label": "hiero-ledger/hiero-consensus-specifications",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/codeql.yml:15; .github/workflows/codeql.yml:22; .github/workflows/labels.yml:10; .github/workflows/labels.yml:16"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml.",
+     "location": ".github/workflows/codeql.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-contracts",
+   "label": "hiero-ledger/hiero-contracts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 28 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml, ./.github/workflows/test-workflow.yml",
+     "location": ".github/workflows/manual-testing.yml:31; .github/workflows/manual-testing.yml:40; .github/workflows/manual-testing.yml:49; .github/workflows/manual-testing.yml:58; .github/workflows/manual-testing.yml:67; .github/workflows/manual-testing.yml:76; .github/workflows/manual-testing.yml:85; .github/workflows/manual-testing.yml:94; .github/workflows/manual-testing.yml:103; .github/workflows/manual-testing.yml:112; .github/workflows/manual-testing.yml:121; .github/workflows/manual-testing.yml:130; .github/workflows/manual-testing.yml:139; .github/workflows/manual-testing.yml:148; .github/workflows/tests.yml:26; .github/workflows/tests.yml:32; .github/workflows/tests.yml:38; .github/workflows/tests.yml:44; .github/workflows/tests.yml:50; .github/workflows/tests.yml:56; .github/workflows/tests.yml:62; .github/workflows/tests.yml:68; .github/workflows/tests.yml:74; .github/workflows/tests.yml:80; .github/workflows/tests.yml:86; .github/workflows/tests.yml:92; .github/workflows/tests.yml:98; .github/workflows/tests.yml:104"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: pr-label-milestone-check.yml",
+     "location": ".github/workflows/code-quality-check.yml:15; .github/workflows/flow-pr-title-check.yml:31; .github/workflows/flow-pr-title-check.yml:43; .github/workflows/manual-testing.yml:19; .github/workflows/pr-label-milestone-check.yml; .github/workflows/release.yml:28; .github/workflows/test-workflow.yml:26; .github/workflows/test-workflow.yml:36; .github/workflows/tests.yml:14"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-cryptography",
+   "label": "hiero-ledger/hiero-cryptography",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 4 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/855-call-extract-targets-and-libs.yaml, ./.github/workflows/zxc-code-analysis.yaml, ./.github/workflows/855-call-extract-targets-and-libs.yaml, ./.github/workflows/855-call-extract-targets-and-libs.yaml",
+     "location": ".github/workflows/build.yml:37; .github/workflows/build.yml:225; .github/workflows/publish_release.yml:44; .github/workflows/publish_snapshot_release.yml:29"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 7 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/855-call-extract-targets-and-libs.yaml:19; .github/workflows/build.yml:19; .github/workflows/flow-pull-request-formatting.yaml:25; .github/workflows/publish_release.yml:32; .github/workflows/publish_snapshot_release.yml:14; .github/workflows/zxc-code-analysis.yaml:37; .github/workflows/zxf-snyk-monitor.yaml:13"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-did-sdk-js",
+   "label": "hiero-ledger/hiero-did-sdk-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 4 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/actions/setup-npm-env, ./.github/actions/setup-npm-env, ./.github/actions/setup-npm-env, ./.github/actions/setup-npm-env",
+     "location": ".github/workflows/docs.yml:27; .github/workflows/lint.yml:25; .github/workflows/release.yml:29; .github/workflows/test.yml:30"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/docs.yml:9; .github/workflows/lint.yml:7; .github/workflows/release.yml:10; .github/workflows/test.yml:7"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-did-sdk-python",
+   "label": "hiero-ledger/hiero-did-sdk-python",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 6 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/actions/setup-poetry-env, ./.github/actions/setup-poetry-env, ./.github/actions/setup-poetry-env, ./.github/actions/setup-poetry-env, ./.github/actions/setup-poetry-env, ./.github/actions/setup-poetry-env",
+     "location": ".github/workflows/deploy-docs.yml:21; .github/workflows/main.yml:32; .github/workflows/main.yml:56; .github/workflows/main.yml:92; .github/workflows/on-release-main.yml:24; .github/workflows/on-release-main.yml:51"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/deploy-docs.yml:5; .github/workflows/main.yml:10; .github/workflows/on-release-main.yml:8; .github/workflows/validate-codecov-config.yml:9"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-docs",
+   "label": "hiero-ledger/hiero-docs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/gitbook-auto-signoff.yml:8; .github/workflows/gitbook-auto-signoff.yml:13; .github/workflows/link-check.yml:14"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-enterprise-java",
+   "label": "hiero-ledger/hiero-enterprise-java",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 11 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/bot-coderabbit-plan-trigger.yml:16; .github/workflows/bot-pr-linked-issue-enforcer.yml:16; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:34; .github/workflows/docs.yml:17; .github/workflows/docs.yml:28; .github/workflows/docs.yml:77; .github/workflows/maven.yml:18; .github/workflows/moderate-new-issues.yml:14; .github/workflows/on-pr-update.yml:13; .github/workflows/on-pr.yml:15; .github/workflows/release.yml:10; .github/workflows/release.yml:17; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": ".github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-ethereum-execution-spec-tests",
+   "label": "hiero-ledger/hiero-ethereum-execution-spec-tests",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 40 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/actions/setup-uv, ./.github/actions/build-evm-base, ./.github/actions/build-fixtures, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/rebase-eip-branch, ./.github/actions/setup-uv, ./.github/actions/cache-docker-images, ./execution-specs/.github/actions/setup-uv, ./execution-specs/.github/actions/load-docker-images, ./execution-specs/.github/actions/start-hive-dev, ./.github/actions/cache-docker-images, ./execution-specs/.github/actions/setup-uv, ./execution-specs/.github/actions/load-docker-images, ./execution-specs/.github/actions/start-hive-dev, ./.github/actions/setup-uv, ./.github/actions/build-fixtures, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-env-pypy, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/build-evmone, ./.github/actions/build-evm-base, ./.github/actions/setup-uv, ./.github/actions/setup-env-pypy, ./.github/actions/build-evmone, ./.github/actions/setup-uv, ./.github/actions/setup-uv, ./.github/actions/merge-eip-branches",
+     "location": ".github/workflows/benchmark.yaml:44; .github/workflows/benchmark.yaml:53; .github/workflows/benchmark.yaml:77; .github/workflows/docs-build.yaml:224; .github/workflows/docs-build.yaml:256; .github/workflows/eip-rebase.yaml:33; .github/workflows/eip-rebase.yaml:36; .github/workflows/gh-pages.yaml:33; .github/workflows/hive-consume.yaml:85; .github/workflows/hive-consume.yaml:167; .github/workflows/hive-consume.yaml:172; .github/workflows/hive-consume.yaml:206; .github/workflows/hive-execute.yaml:37; .github/workflows/hive-execute.yaml:74; .github/workflows/hive-execute.yaml:79; .github/workflows/hive-execute.yaml:88; .github/workflows/release_fixtures.yaml:96; .github/workflows/release_fixtures.yaml:158; .github/workflows/release_fixtures.yaml:181; .github/workflows/test-checklist.yaml:29; .github/workflows/test.yaml:40; .github/workflows/test.yaml:76; .github/workflows/test.yaml:107; .github/workflows/test.yaml:132; .github/workflows/test.yaml:145; .github/workflows/test.yaml:148; .github/workflows/test.yaml:160; .github/workflows/test.yaml:179; .github/workflows/test.yaml:190; .github/workflows/test.yaml:201; .github/workflows/test.yaml:214; .github/workflows/test.yaml:227; .github/workflows/test.yaml:228; .github/workflows/test.yaml:233; .github/workflows/test.yaml:249; .github/workflows/test.yaml:252; .github/workflows/test.yaml:253; .github/workflows/test.yaml:265; .github/workflows/update-devnet-branch.yaml:39; .github/workflows/update-devnet-branch.yaml:42"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 8 workflow(s) without complete explicit permissions coverage: benchmark.yaml, gh-pages.yaml, hive-consume.yaml, hive-execute.yaml, release_fixtures.yaml, stale.yml, test-checklist.yaml, test.yaml",
+     "location": ".github/workflows/backport.yaml:20; .github/workflows/benchmark.yaml; .github/workflows/docs-build.yaml:63; .github/workflows/eip-rebase.yaml:20; .github/workflows/gh-pages.yaml:54; .github/workflows/hive-consume.yaml; .github/workflows/hive-execute.yaml; .github/workflows/release_fixtures.yaml:252; .github/workflows/stale.yml; .github/workflows/test-checklist.yaml; .github/workflows/test.yaml; .github/workflows/update-devnet-branch.yaml:26"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=False, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-gradle-conventions",
+   "label": "hiero-ledger/hiero-gradle-conventions",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/zxc-build-plugins.yaml",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:32"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-deploy-release-artifact.yaml:13; .github/workflows/flow-deploy-snapshot-release-artifact.yaml:13; .github/workflows/flow-pull-request-checks.yaml:18; .github/workflows/flow-pull-request-checks.yaml:28; .github/workflows/flow-pull-request-formatting.yaml:15; .github/workflows/flow-pull-request-formatting.yaml:26; .github/workflows/zxc-build-plugins.yaml:17; .github/workflows/zxc-build-plugins.yaml:29"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-hederium",
+   "label": "hiero-ledger/hiero-hederium",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/dev-tool-workflow.yml",
+     "location": ".github/workflows/dev-tool-test.yml:19"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/deploy-release.yml:9; .github/workflows/dev-tool-test.yml:13; .github/workflows/dev-tool-workflow.yml:13; .github/workflows/dev-tool-workflow.yml:19; .github/workflows/pr-title-check.yml:14; .github/workflows/pr-title-check.yml:26; .github/workflows/release-image.yml:7; .github/workflows/unit-test.yml:13"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-identity-standards",
+   "label": "hiero-ledger/hiero-identity-standards",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-improvement-proposals",
+   "label": "hiero-ledger/hiero-improvement-proposals",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 9 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/add-hip-number.yml:11; .github/workflows/deploy-site.yml:12; .github/workflows/notifications.yml:2; .github/workflows/notifications.yml:15; .github/workflows/schedule-last-call-date-end.yml:3; .github/workflows/schedule-last-call-date-end.yml:20; .github/workflows/send-discord-message.yml:14; .github/workflows/send-email.yml:13; .github/workflows/site-tests.yml:18; .github/workflows/stale-hip-management.yml:3; .github/workflows/validateHeaders.yml:6"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=False, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-json-rpc-relay",
+   "label": "hiero-ledger/hiero-json-rpc-relay",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 28 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/dev-tool-workflow.yml, ./.github/workflows/dev-tool-workflow.yml, ./.github/workflows/dev-tool-workflow.yml, ./.github/workflows/dev-tool-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml, ./.github/workflows/acceptance-workflow.yml",
+     "location": ".github/workflows/acceptance-public.yml:29; .github/workflows/acceptance.yml:62; .github/workflows/dev-tool-test.yml:17; .github/workflows/dev-tool-test.yml:24; .github/workflows/dev-tool-test.yml:32; .github/workflows/dev-tool-test.yml:39; .github/workflows/manual-testing.yml:24; .github/workflows/manual-testing.yml:34; .github/workflows/manual-testing.yml:44; .github/workflows/manual-testing.yml:54; .github/workflows/manual-testing.yml:64; .github/workflows/manual-testing.yml:76; .github/workflows/manual-testing.yml:86; .github/workflows/manual-testing.yml:96; .github/workflows/manual-testing.yml:106; .github/workflows/manual-testing.yml:116; .github/workflows/manual-testing.yml:126; .github/workflows/manual-testing.yml:137; .github/workflows/manual-testing.yml:148; .github/workflows/manual-testing.yml:159; .github/workflows/manual-testing.yml:169; .github/workflows/manual-testing.yml:179; .github/workflows/manual-testing.yml:190; .github/workflows/manual-testing.yml:201; .github/workflows/manual-testing.yml:212; .github/workflows/manual-testing.yml:223; .github/workflows/manual-testing.yml:234; .github/workflows/manual-testing.yml:245"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 4 workflow(s) without complete explicit permissions coverage: dev-tool-test.yml, pr-label-milestone-check.yml, release-automation.yml, test.yml",
+     "location": ".github/workflows/acceptance-public.yml:23; .github/workflows/acceptance-public.yml:44; .github/workflows/acceptance-workflow.yml:48; .github/workflows/acceptance-workflow.yml:55; .github/workflows/acceptance.yml:10; .github/workflows/bump-network-versions.yml:15; .github/workflows/charts.yml:14; .github/workflows/conformity-workflow.yml:24; .github/workflows/dapp.yml:14; .github/workflows/dapp.yml:22; .github/workflows/dev-tool-test.yml; .github/workflows/dev-tool-workflow.yml:22; .github/workflows/dev-tool-workflow.yml:28; .github/workflows/flow-pr-title-check.yml:31; .github/workflows/flow-pr-title-check.yml:43; .github/workflows/foundry.yml:8; .github/workflows/gh-pages-sync.yaml:13; .github/workflows/hoppscotch.yml:33; .github/workflows/hoppscotch.yml:40; .github/workflows/image-build.yml:7; .github/workflows/lint.yml:13; .github/workflows/manual-testing.yml:15; .github/workflows/openrpc-updater.yml:8; .github/workflows/pr-label-milestone-check.yml; .github/workflows/publish-npm-package.yml:19; .github/workflows/redis-version-tests.yml:17; .github/workflows/release-acceptance.yml:27; .github/workflows/release-acceptance.yml:33; .github/workflows/release-automation.yml; .github/workflows/release-integration.yml:11; .github/workflows/release-production.yml:11; .github/workflows/release-production.yml:95; .github/workflows/subgraph.yml:14; .github/workflows/subgraph.yml:20; .github/workflows/test.yml"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-local-node",
+   "label": "hiero-ledger/hiero-local-node",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-pr-title-check.yaml:18; .github/workflows/flow-pull-request-checks.yaml:19; .github/workflows/flow-pull-request-smoke-tests-on-macos.yaml:19; .github/workflows/flow-semantic-release.yml:8; .github/workflows/flow-semantic-release.yml:13; .github/workflows/publish-npm-package.yaml:14"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-mirror-node",
+   "label": "hiero-ledger/hiero-mirror-node",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 6 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/actions/run-e2e, ./.github/actions/k6, ./.github/actions/build-native-image, ./.github/actions/build-native-image, ./.github/actions/run-e2e, ./.github/actions/wait-for-images",
+     "location": ".github/workflows/acceptance.yaml:67; .github/workflows/acceptance.yaml:81; .github/workflows/release-ghcr.yml:53; .github/workflows/test-native-images.yml:60; .github/workflows/test-native-images.yml:125; .github/workflows/wrb-differential.yaml:100"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 22 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/acceptance.yaml:25; .github/workflows/charts.yml:13; .github/workflows/cleanup.yml:9; .github/workflows/cleanup.yml:38; .github/workflows/copy-stackgres-cluster.yml:152; .github/workflows/deploy-preprod.yaml:17; .github/workflows/deploy-preprod.yaml:34; .github/workflows/deploy.yaml:10; .github/workflows/deploy.yaml:24; .github/workflows/gas-estimate-accuracy.yml:40; .github/workflows/gh-pages-sync.yaml:16; .github/workflows/gh-pages-sync.yaml:23; .github/workflows/gradle-wrapper-validation.yml:15; .github/workflows/gradle.yml:20; .github/workflows/non-zero-realm-pr.yml:14; .github/workflows/non-zero-realm.yml:18; .github/workflows/release-automation.yml:12; .github/workflows/release-automation.yml:26; .github/workflows/release-automation.yml:150; .github/workflows/release-ghcr.yml:17; .github/workflows/release-ghcr.yml:39; .github/workflows/release-ghcr.yml:82; .github/workflows/release-integration.yml:10; .github/workflows/release-integration.yml:40; .github/workflows/release-integration.yml:118; .github/workflows/release-production.yml:10; .github/workflows/release-production.yml:41; .github/workflows/release-production.yml:121; .github/workflows/release-production.yml:142; .github/workflows/releases-comparator.yml:14; .github/workflows/rosetta.yml:18; .github/workflows/security.yml:20; .github/workflows/snyk-monitor.yml:16; .github/workflows/test-native-images.yml:18; .github/workflows/wrb-differential.yaml:15; .github/workflows/wrb-differential.yaml:40"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: gradle.yml; CodeQL workflow not detected.",
+     "location": ".github/workflows/gradle.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-mirror-node-explorer",
+   "label": "hiero-ledger/hiero-mirror-node-explorer",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 5 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/zxc-compile-explorer-code.yaml, ./.github/workflows/zxc-compile-explorer-code.yaml, ./.github/workflows/zxc-compile-explorer-code.yaml, ./.github/workflows/zxc-release-explorer-docker-container.yaml, ./.github/workflows/zxc-release-explorer-helm-chart.yaml",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:24; .github/workflows/flow-pull-request-checks.yaml:35; .github/workflows/flow-pull-request-checks.yaml:49; .github/workflows/flow-release-explorer.yaml:76; .github/workflows/flow-release-explorer.yaml:89"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:14; .github/workflows/flow-pull-request-checks.yaml:25; .github/workflows/flow-pull-request-checks.yaml:36; .github/workflows/flow-pull-request-checks.yaml:50; .github/workflows/flow-pull-request-formatting.yaml:15; .github/workflows/flow-pull-request-formatting.yaml:26; .github/workflows/flow-release-explorer.yaml:15; .github/workflows/flow-release-explorer.yaml:77; .github/workflows/flow-release-explorer.yaml:90; .github/workflows/zxc-compile-explorer-code.yaml:30; .github/workflows/zxc-compile-explorer-code.yaml:40; .github/workflows/zxc-release-explorer-docker-container.yaml:18; .github/workflows/zxc-release-explorer-docker-container.yaml:28; .github/workflows/zxc-release-explorer-helm-chart.yaml:15; .github/workflows/zxc-release-explorer-helm-chart.yaml:29"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-cpp",
+   "label": "hiero-ledger/hiero-sdk-cpp",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 2 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/zxc-build-library.yaml, ./.github/workflows/zxc-build-library.yaml",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:27; .github/workflows/on-schedule-builds.yaml:13"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 12 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:19; .github/workflows/on-comment.yaml:38; .github/workflows/on-pr-close.yaml:10; .github/workflows/on-pr-review-labels.yaml:9; .github/workflows/on-pr-review.yaml:8; .github/workflows/on-pr-update.yaml:13; .github/workflows/on-pr.yaml:15; .github/workflows/on-schedule-builds.yaml:8; .github/workflows/on-schedule-inactivity.yaml:36; .github/workflows/zxc-build-library.yaml:47; .github/workflows/zxc-lint-workflows.yaml:22; .github/workflows/zxc-test-bot-scripts.yaml:22"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-go",
+   "label": "hiero-ledger/hiero-sdk-go",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/build.yml:7"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-java",
+   "label": "hiero-ledger/hiero-sdk-java",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/build.yml:20; .github/workflows/gradle-wrapper-validation.yml:16; .github/workflows/pages.yml:13; .github/workflows/pages.yml:23; .github/workflows/pr-formatting.yml:15; .github/workflows/pr-formatting.yml:26; .github/workflows/release-artifacts.yml:19; .github/workflows/release-artifacts.yml:76; .github/workflows/snyk-monitor.yml:10; .github/workflows/snyk-monitor.yml:17"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-js",
+   "label": "hiero-ledger/hiero-sdk-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 15 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/broken-links.yaml:7; .github/workflows/build.yml:19; .github/workflows/common_js.yml:18; .github/workflows/pages.yml:11; .github/workflows/pr_check.yml:15; .github/workflows/publish_release.yaml:22; .github/workflows/react_native.yml:20; .github/workflows/renovate.yml:13; .github/workflows/retry-failed-runs.yml:21; .github/workflows/retry-failed-runs.yml:35; .github/workflows/slack-issue-comment-notify.yml:14; .github/workflows/slack-issue-notify.yml:14; .github/workflows/slack-merge-notify.yml:14; .github/workflows/slack-pr-comment-notify.yml:14; .github/workflows/slack-pr-notify.yml:14; .github/workflows/slack-release-notify.yml:14"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-python",
+   "label": "hiero-ledger/hiero-sdk-python",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 37 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/bot-contributor-lifecycle.yml:50; .github/workflows/bot-gfi-candidate-notification.yaml:10; .github/workflows/bot-issue-assign-on-comment.yaml:7; .github/workflows/bot-next-issue-recommendation.yml:8; .github/workflows/bot-p0-issues-notify-team.yml:8; .github/workflows/bot-pr-missing-linked-issue.yml:21; .github/workflows/capture-pr-review.yml:8; .github/workflows/clusterfuzzlite.yml:19; .github/workflows/cron-admin-update-spam-list.yml:13; .github/workflows/cron-calls-community.yml:17; .github/workflows/cron-calls-office-hours.yml:17; .github/workflows/cron-enforcer-pr-linked-issue.yml:15; .github/workflows/cron-pr-check-broken-links.yml:18; .github/workflows/draft-label-cleanup.yml:32; .github/workflows/moderate-new-issues.yml:14; .github/workflows/on-review.yml:19; .github/workflows/on-review.yml:65; .github/workflows/pr-check-feedback-all.yml:15; .github/workflows/pr-check-primary-broken-links.yml:12; .github/workflows/pr-check-primary-codecov.yml:16; .github/workflows/pr-check-primary-codeql.yml:13; .github/workflows/pr-check-primary-codeql.yml:20; .github/workflows/pr-check-primary-test-files.yml:14; .github/workflows/pr-check-secondary-deps-test.yml:12; .github/workflows/pr-check-secondary-examples.yml:2; .github/workflows/pr-check-secondary-tck-test.yml:18; .github/workflows/pr-check-secondary-unit-integration-test.yml:25; .github/workflows/pr-review-status-evaluator.yml:34; .github/workflows/pre-commit.yml:7; .github/workflows/publish.yml:8; .github/workflows/publish.yml:15; .github/workflows/publish.yml:73; .github/workflows/release-pr-coderabbit-gate.yml:7; .github/workflows/request-triage-review.yml:11; .github/workflows/review-sync.yml:25; .github/workflows/sync-issue-labels-add.yml:12; .github/workflows/sync-issue-labels-add.yml:19; .github/workflows/sync-issue-labels-compute.yml:7; .github/workflows/test-scripts.yml:14; .github/workflows/test-scripts.yml:21; .github/workflows/unassign-on-comment.yml:8; .github/workflows/working-on-comment.yml:14; .github/workflows/working-on-comment.yml:21"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "pass",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: pr-check-feedback-all.yml; CodeQL workflow detected: pr-check-primary-codeql.yml.",
+     "location": ".github/workflows/pr-check-feedback-all.yml; .github/workflows/pr-check-primary-codeql.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-rust",
+   "label": "hiero-ledger/hiero-sdk-rust",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 3 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-pull-request-formatting.yaml:25; .github/workflows/flow-rust-ci.yaml:11; .github/workflows/zxf-publish-release.yaml:22"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-swift",
+   "label": "hiero-ledger/hiero-sdk-swift",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/swift-ci.yml:11"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-sdk-tck",
+   "label": "hiero-ledger/hiero-sdk-tck",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 13 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/js_compatibility.yml, ./.github/workflows/go_compatibility.yml, ./.github/workflows/cpp_compatibility.yml, ./.github/workflows/java_compatibility.yml, ./.github/workflows/js_compatibility.yml, ./.github/workflows/js_compatibility.yml, ./.github/workflows/js_compatibility.yml, ./.github/workflows/go_compatibility.yml, ./.github/workflows/go_compatibility.yml, ./.github/workflows/go_compatibility.yml, ./.github/workflows/java_compatibility.yml, ./.github/workflows/java_compatibility.yml, ./.github/workflows/java_compatibility.yml",
+     "location": ".github/workflows/compatibility.yml:60; .github/workflows/compatibility.yml:71; .github/workflows/compatibility.yml:82; .github/workflows/compatibility.yml:93; .github/workflows/daily_compatibility.yml:57; .github/workflows/daily_compatibility.yml:66; .github/workflows/daily_compatibility.yml:75; .github/workflows/daily_compatibility.yml:84; .github/workflows/daily_compatibility.yml:93; .github/workflows/daily_compatibility.yml:102; .github/workflows/daily_compatibility.yml:111; .github/workflows/daily_compatibility.yml:120; .github/workflows/daily_compatibility.yml:129"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 8 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/compatibility.yml:4; .github/workflows/cpp_compatibility.yml:4; .github/workflows/daily_compatibility.yml:4; .github/workflows/go_compatibility.yml:4; .github/workflows/java_compatibility.yml:4; .github/workflows/js_compatibility.yml:4; .github/workflows/pr_check.yml:24; .github/workflows/pr_check.yml:35; .github/workflows/test-count.yml:23"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-solo-action",
+   "label": "hiero-ledger/hiero-solo-action",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 7 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./, ./, ./, ./, ./, ./, ./",
+     "location": ".github/workflows/validation.yml:42; .github/workflows/validation.yml:71; .github/workflows/validation.yml:101; .github/workflows/validation.yml:142; .github/workflows/validation.yml:220; .github/workflows/validation.yml:312; .github/workflows/validation.yml:341"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/fuzzing.yml:14; .github/workflows/fuzzing.yml:32; .github/workflows/validation.yml:2"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: fuzzing.yml.",
+     "location": ".github/workflows/fuzzing.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/hiero-website",
+   "label": "hiero-ledger/hiero-website",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 9 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approve-issues.yml:17; .github/workflows/bot-coderabbit-plan-trigger.yml:16; .github/workflows/check-broken-links.yml:14; .github/workflows/ci.yml:19; .github/workflows/codeql.yml:19; .github/workflows/moderate-new-issues.yml:18; .github/workflows/on-pr-update.yml:13; .github/workflows/on-pr.yml:15; .github/workflows/pr-formatting.yaml:16"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml.",
+     "location": ".github/workflows/codeql.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/homebrew-tools",
+   "label": "hiero-ledger/homebrew-tools",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/test-brew-install-retry.yml:10; .github/workflows/test-brew-install-version.yml:17; .github/workflows/test-brew-install.yml:21; .github/workflows/update-solo-formula.yml:17"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/identity-collaboration-hub",
+   "label": "hiero-ledger/identity-collaboration-hub",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/deploy-specs.yml:12; .github/workflows/deploy-specs.yml:21; .github/workflows/universal-resolver-driver-publish.yml:25"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: deploy-specs.yml, universal-resolver-driver-publish.yml; CodeQL workflow not detected.",
+     "location": ".github/workflows/deploy-specs.yml; .github/workflows/universal-resolver-driver-publish.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/sdk-collaboration-hub",
+   "label": "hiero-ledger/sdk-collaboration-hub",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/solo",
+   "label": "hiero-ledger/solo",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 35 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-build-application.yaml:49; .github/workflows/flow-build-application.yaml:94; .github/workflows/flow-build-application.yaml:139; .github/workflows/flow-build-sea.yaml:51; .github/workflows/flow-codeql-analysis.yaml:29; .github/workflows/flow-codeql-analysis.yaml:41; .github/workflows/flow-deploy-release-artifact.yaml:35; .github/workflows/flow-deploy-release-artifact.yaml:194; .github/workflows/flow-deploy-release-artifact.yaml:477; .github/workflows/flow-deploy-release-artifact.yaml:584; .github/workflows/flow-deploy-release-artifact.yaml:699; .github/workflows/flow-examples-test.yaml:109; .github/workflows/flow-gcs-bucket-reaper.yaml:23; .github/workflows/flow-gcs-bucket-reaper.yaml:33; .github/workflows/flow-gcs-test.yaml:36; .github/workflows/flow-gcs-test.yaml:45; .github/workflows/flow-hugo-publish.yaml:39; .github/workflows/flow-hugo-publish.yaml:182; .github/workflows/flow-hugo-publish.yaml:216; .github/workflows/flow-image-cache-cluster-images.yaml:42; .github/workflows/flow-install-validation-runtime.yaml:37; .github/workflows/flow-install-validation.yaml:34; .github/workflows/flow-ledger-reset-warm-start-timing.yaml:53; .github/workflows/flow-linux-install-script.yaml:37; .github/workflows/flow-migration-test.yaml:55; .github/workflows/flow-nightly-extended-tests.yaml:38; .github/workflows/flow-nightly-extended-tests.yaml:280; .github/workflows/flow-one-shot-interrupt-destroy.yaml:49; .github/workflows/flow-one-shot-timing.yaml:113; .github/workflows/flow-performance-test.yaml:73; .github/workflows/flow-pull-request-checks.yaml:38; .github/workflows/flow-pull-request-checks.yaml:100; .github/workflows/flow-pull-request-checks.yaml:147; .github/workflows/flow-pull-request-checks.yaml:167; .github/workflows/flow-pull-request-formatting.yaml:37; .github/workflows/flow-pull-request-formatting.yaml:48; .github/workflows/flow-sign-release-assets.yaml:62; .github/workflows/flow-sign-release-assets.yaml:79; .github/workflows/flow-sign-release-assets.yaml:233; .github/workflows/flow-standard-runner-one-shot-windows.yaml:48; .github/workflows/flow-standard-runner-one-shot.yaml:59; .github/workflows/flow-trigger-solo-docs-update.yaml:38; .github/workflows/zxc-check-production-overrides.yaml:35; .github/workflows/zxc-code-analysis.yaml:74; .github/workflows/zxc-code-analysis.yaml:82; .github/workflows/zxc-code-style.yaml:46; .github/workflows/zxc-docs-automation.yaml:26; .github/workflows/zxc-e2e-test.yaml:223; .github/workflows/zxc-hugo-build.yaml:45; .github/workflows/zxc-hugo-publish.yaml:39; .github/workflows/zxc-hugo-publish.yaml:51; .github/workflows/zxc-unit-test.yaml:41; .github/workflows/zxc-unit-test.yaml:47; .github/workflows/zxf-prs-automation.yaml:36; .github/workflows/zxf-prs-automation.yaml:50; .github/workflows/zxf-prs-automation.yaml:81; .github/workflows/zxf-prs-automation.yaml:126; .github/workflows/zxf-stale-issue-pr-closer.yaml:13; .github/workflows/zxf-stale-issue-pr-closer.yaml:20; .github/workflows/zxf-transient-failure-retry.yaml:56; .github/workflows/zxf-transient-failure-retry.yaml:79"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "pass",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: flow-standard-runner-one-shot-windows.yaml; CodeQL workflow detected: flow-codeql-analysis.yaml, zxf-transient-failure-retry.yaml.",
+     "location": ".github/workflows/flow-standard-runner-one-shot-windows.yaml; .github/workflows/flow-codeql-analysis.yaml; .github/workflows/zxf-transient-failure-retry.yaml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/solo-build-actions",
+   "label": "hiero-ledger/solo-build-actions",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/solo-charts",
+   "label": "hiero-ledger/solo-charts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 1 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.github/workflows/solo-e2e-validation.yaml",
+     "location": ".github/workflows/flow-pull-request-checks.yaml:38"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: flow-pull-request-checks.yaml",
+     "location": ".github/workflows/flow-deploy-release-artifact.yaml:31; .github/workflows/flow-pull-request-checks.yaml; .github/workflows/flow-pull-request-formatting.yaml:31; .github/workflows/solo-e2e-validation.yaml:48"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/solo-containers",
+   "label": "hiero-ledger/solo-containers",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-deploy-release-artifact.yaml:34; .github/workflows/flow-pr-formatting.yaml:17"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/solo-docs",
+   "label": "hiero-ledger/solo-docs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/flow-pr-link-check.yaml:34; .github/workflows/flow-update-docs.yaml:75"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/tsc",
+   "label": "hiero-ledger/tsc",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/check-links.yml:8"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "hiero-ledger/tsc-eligibility-check",
+   "label": "hiero-ledger/tsc-eligibility-check",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  }
+ ],
+ "filters": [
+  "pass",
+  "fail",
+  "review",
+  "na"
+ ],
+ "macro": "Security & scorecards",
+ "generated_at": "2026-10-09T20:17:15.611432+00:00",
+ "stale": false
+}

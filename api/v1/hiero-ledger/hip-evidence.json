@@ -59,6 +59,20 @@
  ],
  "rows": [
   {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/sdk-collaboration-hub",
+   "pr_number": 287,
+   "pr_title": "Add HIP-1535 SDK design doc: CLPR",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|branch|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "Add HIP-1535 SDK design doc: CLPR",
+   "url": "https://github.com/hiero-ledger/sdk-collaboration-hub/pull/287"
+  },
+  {
    "hip": 1522,
    "hip_title": "Account Staking Configuration via the Hedera Account Service",
    "repo": "hiero-ledger/hiero-consensus-node",
@@ -169,6 +183,48 @@
    "counted": true,
    "snippet": "HIP-1427 Skip historical migrations when startin",
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/13821"
+  },
+  {
+   "hip": 1424,
+   "hip_title": "Block and State Merkle Tree Hashing Scheme",
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 3299,
+   "pr_title": "feat: Proto Ordinal Streaming Hasher Mapping in BlockHasher",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-08-07 07:47:24+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "sh with the extension subtree roots per HIP-1424 * Exclude absent extension leaves wi",
+   "url": "https://github.com/hiero-ledger/hiero-block-node/pull/3299"
+  },
+  {
+   "hip": 1424,
+   "hip_title": "Block and State Merkle Tree Hashing Scheme",
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 3378,
+   "pr_title": "feat(hasher): always feed 16 leaves to the Merkle Mountain Top hasher",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-08-12 20:07:11+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "lockHasher signature review, ongoing) - HIP-1424, HIP-1056",
+   "url": "https://github.com/hiero-ledger/hiero-block-node/pull/3378"
+  },
+  {
+   "hip": 1424,
+   "hip_title": "Block and State Merkle Tree Hashing Scheme",
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 3619,
+   "pr_title": "docs: add Block Node version compatibility matrix (#3464)",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-09-29 20:08:16+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "(Merkle Mountain Top hasher change per HIP-1424), CN streaming config properties that a",
+   "url": "https://github.com/hiero-ledger/hiero-block-node/pull/3619"
   },
   {
    "hip": 1357,
@@ -1450,8 +1506,8 @@
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 4447,
    "pr_title": "ci: fail hung Solo test jobs fast and retry infrastructure failures",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-06 17:06:40+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -8839,6 +8895,20 @@
   {
    "hip": 869,
    "hip_title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27491,
+   "pr_title": "fix: reject system updates in atomic batches and keep in-memory system state consistent with committed state",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "he top-level originals remain: - `hip869/batch/AtomicNodeUpdateTest`, `AtomicNod",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27491"
+  },
+  {
+   "hip": 869,
+   "hip_title": "Dynamic Address Book - Stage 1 - HAPI Endpoints",
    "repo": "hiero-ledger/hiero-json-rpc-relay",
    "pr_number": 3069,
    "pr_title": "build(deps): [Snyk] Upgrade @hashgraph/sdk from 2.50.0 to 2.51.0",
@@ -9535,6 +9605,20 @@
    "counted": true,
    "snippet": "refactor: HIP-756 Rename Schedule Get Info Smart Contract",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/17429"
+  },
+  {
+   "hip": 756,
+   "hip_title": "Contract Scheduled Token Create",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27486,
+   "pr_title": "fix: Refactor the GetSchedule*Info response",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-08 10:20:53+00:00",
+   "match_sources": "branch",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "fix/hip-756-refactor-get-call",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27486"
   },
   {
    "hip": 755,
@@ -10883,6 +10967,20 @@
   {
    "hip": 551,
    "hip_title": "Batch transactions",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27491,
+   "pr_title": "fix: reject system updates in atomic batches and keep in-memory system state consistent with committed state",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": ", `AtomicNodeUpdateTestEmbedded`; - `hip551/AtomicFileCreateSuite`; - single tes",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27491"
+  },
+  {
+   "hip": 551,
+   "hip_title": "Batch transactions",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 10481,
    "pr_title": "HIP-551: Add batch transaction design",
@@ -11877,6 +11975,34 @@
   {
    "hip": 367,
    "hip_title": "Unlimited Token Associations Per Account",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5851,
+   "pr_title": "build(deps): bump @hiero-ledger/sdk from 2.88.0 to 2.89.1 in /docs/examples",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-08 07:44:33+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "elationships</code> is deprecated as of HIP-367 and truncated at 1000 relationships. Re",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/5851"
+  },
+  {
+   "hip": 367,
+   "hip_title": "Unlimited Token Associations Per Account",
+   "repo": "hiero-ledger/hiero-mirror-node-explorer",
+   "pr_number": 2794,
+   "pr_title": "chore: bump @hiero-ledger/sdk from 2.88.0 to 2.89.1 in /_frontend",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-09 09:28:54+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "elationships</code> is deprecated as of HIP-367 and truncated at 1000 relationships. Re",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node-explorer/pull/2794"
+  },
+  {
+   "hip": 367,
+   "hip_title": "Unlimited Token Associations Per Account",
    "repo": "hiero-ledger/hiero-sdk-go",
    "pr_number": 930,
    "pr_title": "feat(HIP-367) Mirror Node Queries",
@@ -12001,8 +12127,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 853,
- "generated_at": "2026-10-06T09:14:32.509584+00:00",
+ "row_count": 862,
+ "generated_at": "2026-10-09T20:17:45.542799+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

@@ -1,0 +1,22 @@
+{
+ "id": "bot-suspects",
+ "title": "Bot suspects (review)",
+ "description": "Contributor logins is_bot_login() does not exclude, but that trip a weaker automation signal \u2014 one of 'automation', 'actions', 'service', 'auto', 'svc', 'ci', or 'bot' appearing as a whole segment of the login (e.g. 'hiero-automation'), never glued onto a longer word. These stay counted as people everywhere else on this dashboard; a maintainer confirming one is automation adds it to BOT_LOGINS, confirming one is a real person adds it to bot_suspect_dismissals.yaml so it stops reappearing. False positives can still happen (a login segment that just happens to be 'ci', say) but should be rare.",
+ "source": "bot_suspects.csv",
+ "columns": [
+  {
+   "key": "login",
+   "label": "login"
+  },
+  {
+   "key": "signal",
+   "label": "signal matched"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "generated_at": "2026-10-09T20:17:55.862767+00:00",
+ "stale": false,
+ "group": "Bot suspects (review)",
+ "macro": "Contributors"
+}

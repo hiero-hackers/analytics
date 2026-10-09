@@ -43,6 +43,14 @@
     {
      "term": "period tabs",
      "definition": "activity counts and active / quiet status use the selected rolling period; All time includes every tracked event."
+    },
+    {
+     "term": "login",
+     "definition": "the GitHub login flagged for review."
+    },
+    {
+     "term": "signal matched",
+     "definition": "the weak automation signal that fired \u2014 one of *automation*, *actions*, *ci*, *svc*, *service*, *auto*, or *bot* appearing as a whole segment of the login, never glued onto a longer word \u2014 the reason it's here, not proof it's a bot. Confirmed bots move to BOT_LOGINS by hand; confirmed people move to bot_suspect_dismissals.yaml."
     }
    ],
    "note": "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked activities are opening PRs/issues, reviewing, merging, and labeling \u2014 comments and reactions are not counted."
@@ -335,7 +343,8 @@
   "Contributors": [
    "Org overview",
    "Activity & networks",
-   "All contributors"
+   "All contributors",
+   "Bot suspects (review)"
   ],
   "Governance": [
    "Maintainer pipeline",
@@ -352,7 +361,8 @@
   ],
   "Security & scorecards": [
    "Scorecards",
-   "Ownership"
+   "Ownership",
+   "CI health"
   ],
   "Issues & onboarding": [
    "Issue difficulty"
@@ -381,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-06T09:15:42.470465+00:00",
+ "generated_at": "2026-10-09T20:18:58.558120+00:00",
  "provenance": {
-  "git_sha": "62a5652",
-  "data_as_of": "2026-10-06T09:06:07.310814+00:00"
+  "git_sha": "792429b",
+  "data_as_of": "2026-10-06T09:07:56.061881+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,6 +407,13 @@
      "path": "hiero-ledger/profiles.json"
     },
     {
+     "id": "bot-suspects",
+     "macro": "Contributors",
+     "title": "Bot suspects (review)",
+     "row_count": 0,
+     "path": "hiero-ledger/bot-suspects.json"
+    },
+    {
      "id": "repoactivity",
      "macro": "Governance",
      "title": "Repository activity \u2014 permission-holders by role",
@@ -407,7 +424,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 16,
+     "row_count": 15,
      "path": "hiero-ledger/understaffed.json"
     },
     {
@@ -442,7 +459,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2859,
+     "row_count": 2860,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -493,21 +510,21 @@
      "id": "hip-no-activity",
      "macro": "HIPs",
      "title": "Approved, no implementation PRs found",
-     "row_count": 4,
+     "row_count": 3,
      "path": "hiero-ledger/hip-no-activity.json"
     },
     {
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 853,
+     "row_count": 862,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
      "id": "hip-unknown",
      "macro": "HIPs",
      "title": "Unknown HIP numbers (review)",
-     "row_count": 11,
+     "row_count": 8,
      "path": "hiero-ledger/hip-unknown.json"
     },
     {
@@ -1167,7 +1184,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-06T09:14:32.519583+00:00"
+      "generated_at": "2026-10-09T20:17:45.553113+00:00"
      }
     },
     {
@@ -1243,7 +1260,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-06T09:14:32.515108+00:00"
+      "generated_at": "2026-10-09T20:17:45.548476+00:00"
      }
     },
     {
@@ -1524,6 +1541,13 @@
      "kind": "matrix",
      "title": "Implementation coverage matrix",
      "path": "hiero-ledger/hip-matrix.json"
+    },
+    {
+     "id": "ci-health-matrix",
+     "macro": "Security & scorecards",
+     "kind": "ci_health_matrix",
+     "title": "CI health matrix",
+     "path": "hiero-ledger/ci-health-matrix.json"
     }
    ],
    "metrics": {
@@ -1540,7 +1564,7 @@
      },
      {
       "label": "active last month %",
-      "value": "10%",
+      "value": "9%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1717,6 +1741,13 @@
      "title": "All contributors",
      "row_count": 48,
      "path": "hiero-hackers/profiles.json"
+    },
+    {
+     "id": "bot-suspects",
+     "macro": "Contributors",
+     "title": "Bot suspects (review)",
+     "row_count": 0,
+     "path": "hiero-hackers/bot-suspects.json"
     },
     {
      "id": "codeowners",
@@ -2194,7 +2225,15 @@
      "group": "Release cadence & staleness"
     }
    ],
-   "views": [],
+   "views": [
+    {
+     "id": "ci-health-matrix",
+     "macro": "Security & scorecards",
+     "kind": "ci_health_matrix",
+     "title": "CI health matrix",
+     "path": "hiero-hackers/ci-health-matrix.json"
+    }
+   ],
    "metrics": {
     "Contributors": [
      {
@@ -2254,7 +2293,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "27%",
+      "value": "29%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",

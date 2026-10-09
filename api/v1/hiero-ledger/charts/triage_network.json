@@ -54,7 +54,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-06T09:12:55.279758+00:00"
+  "end": "2026-10-09T20:15:29.388819+00:00"
  },
  "nodes": [
   {
@@ -126,7 +126,7 @@
    "active": 2,
    "total": 3,
    "category": "Core network",
-   "x": 2.4221,
+   "x": 2.4398,
    "y": -3.5107
   },
   {
@@ -142,8 +142,8 @@
    "active": 1,
    "total": 2,
    "category": "Core network",
-   "x": 3.7374,
-   "y": 0.2806
+   "x": 4.8202,
+   "y": -1.0777
   },
   {
    "id": "hiero-enterprise-java",
@@ -166,32 +166,32 @@
    "active": 0,
    "total": 3,
    "category": "Tooling / DevEx",
-   "x": 4.9796,
-   "y": 1.718
+   "x": 5.297,
+   "y": 1.3368
   },
   {
    "id": "hiero-contracts",
    "active": 0,
    "total": 1,
    "category": "EVM / smart contracts",
-   "x": 7.1025,
-   "y": 1.0151
+   "x": 7.138,
+   "y": 0.8604
   },
   {
    "id": "hiero-json-rpc-relay",
    "active": 0,
    "total": 1,
    "category": "EVM / smart contracts",
-   "x": 6.9036,
-   "y": -1.2002
+   "x": 6.7041,
+   "y": -1.3368
   },
   {
    "id": "solo",
    "active": 0,
    "total": 1,
    "category": "Tooling / DevEx",
-   "x": 4.7405,
-   "y": -1.718
+   "x": 3.7019,
+   "y": 0.3975
   }
  ],
  "edges": [
@@ -511,6 +511,6 @@
    "shared": 1
   }
  ],
- "generated_at": "2026-10-06T09:12:55.279758+00:00",
+ "generated_at": "2026-10-09T20:15:29.388819+00:00",
  "stale": false
 }

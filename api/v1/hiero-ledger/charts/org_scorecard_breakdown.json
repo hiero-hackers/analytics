@@ -97,7 +97,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-06T09:13:08.172553+00:00"
+  "end": "2026-10-09T20:15:43.563974+00:00"
  },
  "rows": [
   {
@@ -174,8 +174,8 @@
   },
   {
    "repo": "hiero-cli",
-   "score": 6.6,
-   "Maintained": 5.0,
+   "score": 6.2,
+   "Maintained": 1.0,
    "Code-Review": 9.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
@@ -372,21 +372,21 @@
   },
   {
    "repo": "solo",
-   "score": 7.3,
+   "score": 8.1,
    "Maintained": 10.0,
    "Code-Review": 9.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
    "Token-Permissions": 10.0,
-   "Pinned-Dependencies": 6.0,
-   "Fuzzing": 0.0,
+   "Pinned-Dependencies": 9.0,
+   "Fuzzing": 10.0,
    "License": 10.0,
-   "Signed-Releases": 0.0,
+   "Signed-Releases": 1.0,
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 8.0
+   "SAST": 7.0
   },
   {
    "repo": "hiero-block-node",
@@ -408,21 +408,21 @@
   },
   {
    "repo": "hiero-solo-action",
-   "score": 7.2,
-   "Maintained": 4.0,
+   "score": 7.6,
+   "Maintained": 6.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 0.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
    "Token-Permissions": 10.0,
-   "Pinned-Dependencies": 7.0,
+   "Pinned-Dependencies": 9.0,
    "Fuzzing": 0.0,
    "License": 10.0,
    "Signed-Releases": null,
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 5.0
+   "SAST": 6.0
   },
   {
    "repo": "hiero-website",
@@ -458,7 +458,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 5.0
+   "SAST": 4.0
   },
   {
    "repo": "hiero-sdk-python",
@@ -656,9 +656,9 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 7.0
+   "SAST": 8.0
   }
  ],
- "generated_at": "2026-10-06T09:13:08.172553+00:00",
+ "generated_at": "2026-10-09T20:15:43.563974+00:00",
  "stale": false
 }

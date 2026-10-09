@@ -66,7 +66,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-06T09:13:05.443509+00:00"
+  "end": "2026-10-09T20:15:39.263243+00:00"
  },
  "rows": [
   {
@@ -830,6 +830,16 @@
    "2026-09": 187
   },
   {
+   "team": "hiero-solo-action-maintainers",
+   "activity score": 1462,
+   "2026-04": 404,
+   "2026-05": 335,
+   "2026-06": 172,
+   "2026-07": 84,
+   "2026-08": 244,
+   "2026-09": 223
+  },
+  {
    "team": "hiero-sdk-java-maintainers",
    "activity score": 1393,
    "2026-04": 213,
@@ -850,7 +860,7 @@
    "2026-09": 201
   },
   {
-   "team": "hiero-docs-maintainers",
+   "team": "hiero-docs-committers",
    "activity score": 1307,
    "2026-04": 238,
    "2026-05": 232,
@@ -860,7 +870,7 @@
    "2026-09": 135
   },
   {
-   "team": "hiero-docs-committers",
+   "team": "hiero-docs-maintainers",
    "activity score": 1307,
    "2026-04": 238,
    "2026-05": 232,
@@ -920,16 +930,6 @@
    "2026-09": 102
   },
   {
-   "team": "hiero-did-sdk-js-maintainers",
-   "activity score": 1160,
-   "2026-04": 193,
-   "2026-05": 269,
-   "2026-06": 238,
-   "2026-07": 222,
-   "2026-08": 136,
-   "2026-09": 102
-  },
-  {
    "team": "hiero-did-sdk-maintainers",
    "activity score": 1160,
    "2026-04": 193,
@@ -940,7 +940,17 @@
    "2026-09": 102
   },
   {
-   "team": "tsc-eligibility-check-committers",
+   "team": "hiero-did-sdk-js-maintainers",
+   "activity score": 1160,
+   "2026-04": 193,
+   "2026-05": 269,
+   "2026-06": 238,
+   "2026-07": 222,
+   "2026-08": 136,
+   "2026-09": 102
+  },
+  {
+   "team": "tsc-eligibility-check-maintainers",
    "activity score": 1146,
    "2026-04": 176,
    "2026-05": 198,
@@ -950,7 +960,7 @@
    "2026-09": 233
   },
   {
-   "team": "tsc-eligibility-check-maintainers",
+   "team": "tsc-eligibility-check-committers",
    "activity score": 1146,
    "2026-04": 176,
    "2026-05": 198,
@@ -988,16 +998,6 @@
    "2026-07": 196,
    "2026-08": 45,
    "2026-09": 77
-  },
-  {
-   "team": "hiero-solo-action-maintainers",
-   "activity score": 817,
-   "2026-04": 274,
-   "2026-05": 204,
-   "2026-06": 65,
-   "2026-07": 54,
-   "2026-08": 119,
-   "2026-09": 101
   },
   {
    "team": "hiero-hederium-maintainers",
@@ -1200,6 +1200,6 @@
    "2026-09": 13
   }
  ],
- "generated_at": "2026-10-06T09:13:05.443509+00:00",
+ "generated_at": "2026-10-09T20:15:39.263243+00:00",
  "stale": false
 }

@@ -64,7 +64,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-06T09:15:15.926329+00:00"
+  "end": "2026-10-09T20:18:18.048759+00:00"
  },
  "nodes": [
   {
@@ -72,16 +72,16 @@
    "active": 20,
    "total": 28,
    "category": "Tooling / DevEx",
-   "x": -0.1276,
-   "y": -0.2947
+   "x": -0.331,
+   "y": 0.0962
   },
   {
    "id": "hiero-enterprise-js",
    "active": 6,
    "total": 7,
    "category": "Apps / Integrations",
-   "x": 1.5611,
-   "y": -0.8346
+   "x": -0.9374,
+   "y": -1.5926
   },
   {
    "id": "sdk-automations",
@@ -89,23 +89,23 @@
    "total": 6,
    "category": "Tooling / DevEx",
    "x": -3.15,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "hiero-streams-rs",
    "active": 5,
    "total": 5,
    "category": "Other",
-   "x": -1.5611,
-   "y": -1.6
+   "x": -1.6,
+   "y": 1.5926
   },
   {
    "id": "governance",
    "active": 4,
    "total": 15,
    "category": "Governance",
-   "x": -0.5381,
-   "y": 1.6
+   "x": 1.6,
+   "y": 0.4436
   },
   {
    "id": "hiero-x402",
@@ -113,7 +113,7 @@
    "total": 4,
    "category": "Other",
    "x": -2.25,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "agentic-support-hiero",
@@ -121,7 +121,7 @@
    "total": 3,
    "category": "Other",
    "x": -1.35,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "clpr-smart-contracts",
@@ -129,7 +129,7 @@
    "total": 3,
    "category": "EVM / smart contracts",
    "x": -0.45,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "hiero-checkout",
@@ -137,7 +137,7 @@
    "total": 3,
    "category": "Other",
    "x": 0.45,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -145,7 +145,7 @@
    "total": 3,
    "category": "SDKs",
    "x": 1.35,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "clpr-evm-endpoint",
@@ -153,7 +153,7 @@
    "total": 2,
    "category": "EVM / smart contracts",
    "x": 2.25,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "hiero-block-verifier-js",
@@ -161,7 +161,7 @@
    "total": 2,
    "category": "Other",
    "x": 3.15,
-   "y": -3.22
+   "y": -3.2126
   },
   {
    "id": "hiero-journal-rs",
@@ -169,7 +169,7 @@
    "total": 2,
    "category": "Other",
    "x": -3.15,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-payment-requests",
@@ -177,7 +177,7 @@
    "total": 2,
    "category": "Other",
    "x": -2.25,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-tck-action",
@@ -185,7 +185,7 @@
    "total": 2,
    "category": "Other",
    "x": -1.35,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-verify-fn",
@@ -193,7 +193,7 @@
    "total": 2,
    "category": "Other",
    "x": -0.45,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-enterprise-proxy",
@@ -201,7 +201,7 @@
    "total": 1,
    "category": "Apps / Integrations",
    "x": 0.45,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-notifications",
@@ -209,7 +209,7 @@
    "total": 1,
    "category": "Other",
    "x": 1.35,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-receipts",
@@ -217,7 +217,7 @@
    "total": 1,
    "category": "Other",
    "x": 2.25,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "vscode-hedera-transaction-viewer",
@@ -225,7 +225,7 @@
    "total": 1,
    "category": "Other",
    "x": 3.15,
-   "y": -4.12
+   "y": -4.1126
   },
   {
    "id": "hiero-did-sdk-rs",
@@ -233,7 +233,7 @@
    "total": 2,
    "category": "Identity / DID",
    "x": -3.15,
-   "y": -5.02
+   "y": -5.0126
   },
   {
    "id": "hiero-maintainer-automation-prototype",
@@ -241,7 +241,7 @@
    "total": 1,
    "category": "Tooling / DevEx",
    "x": -2.25,
-   "y": -5.02
+   "y": -5.0126
   },
   {
    "id": "hiero-sdk-csharp",
@@ -249,7 +249,7 @@
    "total": 1,
    "category": "SDKs",
    "x": -1.35,
-   "y": -5.02
+   "y": -5.0126
   },
   {
    "id": "rs-hiero-mirror-node",
@@ -257,7 +257,7 @@
    "total": 1,
    "category": "Core network",
    "x": -0.45,
-   "y": -5.02
+   "y": -5.0126
   }
  ],
  "edges": [
@@ -277,6 +277,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-10-06T09:15:15.926329+00:00",
+ "generated_at": "2026-10-09T20:18:18.048759+00:00",
  "stale": false
 }

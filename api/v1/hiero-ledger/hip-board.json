@@ -4,7 +4,7 @@
  "group": "Status & coverage",
  "title": "Where specs sit in governance",
  "description": "Every HIP spec, placed by its current lifecycle status \u2014 the columns read left to right as the pipeline, and the Approved / Accepted column is the implementation triage queue. Statuses come from each spec's frontmatter; click a chip to see the spec's title, and jump from there to its row in the coverage matrix below.",
- "badge": "159 specs",
+ "badge": "163 specs",
  "source": "hip_summary.csv",
  "columns": [
   {
@@ -22,6 +22,12 @@
    "title": "Approved (incl. legacy Accepted)",
    "items": [
     {
+     "key": 1535,
+     "label": "HIP-1535",
+     "title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+     "status": "Approved"
+    },
+    {
      "key": 1522,
      "label": "HIP-1522",
      "title": "Account Staking Configuration via the Hedera Account Service",
@@ -34,15 +40,15 @@
      "status": "Approved"
     },
     {
-     "key": 1446,
-     "label": "HIP-1446",
-     "title": "Multiple Other-Parents in Hashgraph Events",
-     "status": "Approved"
-    },
-    {
      "key": 1427,
      "label": "HIP-1427",
      "title": "Historical Record File Wrapping for Block Stream Cutover",
+     "status": "Approved"
+    },
+    {
+     "key": 1424,
+     "label": "HIP-1424",
+     "title": "Block and State Merkle Tree Hashing Scheme",
      "status": "Approved"
     },
     {
@@ -170,6 +176,12 @@
   {
    "title": "Final",
    "items": [
+    {
+     "key": 1446,
+     "label": "HIP-1446",
+     "title": "Multiple Other-Parents in Hashgraph Events",
+     "status": "Final"
+    },
     {
      "key": 1357,
      "label": "HIP-1357",
@@ -722,6 +734,18 @@
    "title": "Active",
    "items": [
     {
+     "key": 1497,
+     "label": "HIP-1497",
+     "title": "Consensus Node Migration to Kubernetes-Native Deployment",
+     "status": "Active"
+    },
+    {
+     "key": 1496,
+     "label": "HIP-1496",
+     "title": "Globally Synchronized Network Upgrade Process",
+     "status": "Active"
+    },
+    {
      "key": 1398,
      "label": "HIP-1398",
      "title": "TSS Ceremony",
@@ -989,6 +1013,6 @@
  ],
  "target_view": "hip-matrix",
  "macro": "HIPs",
- "generated_at": "2026-10-06T09:14:32.517066+00:00",
+ "generated_at": "2026-10-09T20:17:45.550341+00:00",
  "stale": false
 }

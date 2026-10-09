@@ -48,27 +48,6 @@
    "snippet": "HIP-1485 Add POST /api/v1/contracts/simulate to"
   },
   {
-   "hip": 1424,
-   "repo": "hiero-ledger/hiero-block-node",
-   "pr_number": 3299,
-   "pr_title": "feat: Proto Ordinal Streaming Hasher Mapping in BlockHasher",
-   "snippet": "sh with the extension subtree roots per HIP-1424 * Exclude absent extension leaves wi"
-  },
-  {
-   "hip": 1424,
-   "repo": "hiero-ledger/hiero-block-node",
-   "pr_number": 3378,
-   "pr_title": "feat(hasher): always feed 16 leaves to the Merkle Mountain Top hasher",
-   "snippet": "lockHasher signature review, ongoing) - HIP-1424, HIP-1056"
-  },
-  {
-   "hip": 1424,
-   "repo": "hiero-ledger/hiero-block-node",
-   "pr_number": 3619,
-   "pr_title": "docs: add Block Node version compatibility matrix (#3464)",
-   "snippet": "(Merkle Mountain Top hasher change per HIP-1424), CN streaming config properties that a"
-  },
-  {
    "hip": 1183,
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 135,
@@ -104,8 +83,8 @@
    "snippet": "`HIP-432`: Long Term Scheduled Transaction"
   }
  ],
- "row_count": 11,
- "generated_at": "2026-10-06T09:14:32.511019+00:00",
+ "row_count": 8,
+ "generated_at": "2026-10-09T20:17:45.544246+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

@@ -1,0 +1,791 @@
+{
+ "id": "ci-health-matrix",
+ "kind": "ci_health_matrix",
+ "group": "CI health",
+ "title": "CI health matrix",
+ "description": "Repository-level CI health checks covering GitHub Actions SHA pinning, explicit workflow permissions, and repository security configuration. Click a fail or review cell to inspect the supporting evidence.",
+ "badge": "28 repositories",
+ "source": "ci_health_checks.csv",
+ "row_header": "Repository",
+ "columns": [
+  {
+   "key": "actions_sha_pinned",
+   "label": "Actions SHA Pinned"
+  },
+  {
+   "key": "explicit_permissions",
+   "label": "Explicit Permissions"
+  },
+  {
+   "key": "repository_security_configuration",
+   "label": "Security Config"
+  }
+ ],
+ "rows": [
+  {
+   "key": "hiero-hackers/.github",
+   "label": "hiero-hackers/.github",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/agentic-support-hiero",
+   "label": "hiero-hackers/agentic-support-hiero",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/analytics",
+   "label": "hiero-hackers/analytics",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 8 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/cflite_pr.yml:3; .github/workflows/cflite_pr.yml:17; .github/workflows/codeql.yml:3; .github/workflows/codeql.yml:20; .github/workflows/dashboard-preview-comment.yml:20; .github/workflows/dashboard-preview.yml:12; .github/workflows/lint.yml:11; .github/workflows/scorecard.yml:15; .github/workflows/scorecard.yml:21; .github/workflows/test.yml:11; .github/workflows/update-analytics.yml:12; .github/workflows/update-analytics.yml:181; .github/workflows/update-analytics.yml:252"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/governance",
+   "label": "hiero-hackers/governance",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=False, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-block-verifier-js",
+   "label": "hiero-hackers/hiero-block-verifier-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/release.yml:17; .github/workflows/release.yml:24; .github/workflows/release.yml:96"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-checkout",
+   "label": "hiero-hackers/hiero-checkout",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:13; .github/workflows/ci.yml:20; .github/workflows/pages.yml:10; .github/workflows/pages.yml:20; .github/workflows/pages.yml:52"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-did-sdk-rs",
+   "label": "hiero-hackers/hiero-did-sdk-rs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 11 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4, dtolnay/rust-toolchain@nightly, actions/checkout@v4, dtolnay/rust-toolchain@nightly, Swatinem/rust-cache@v2, actions/checkout@v4, dtolnay/rust-toolchain@nightly, Swatinem/rust-cache@v2, actions/checkout@v4, dtolnay/rust-toolchain@nightly, Swatinem/rust-cache@v2",
+     "location": ".github/workflows/ci.yml:21; .github/workflows/ci.yml:24; .github/workflows/ci.yml:36; .github/workflows/ci.yml:39; .github/workflows/ci.yml:44; .github/workflows/ci.yml:54; .github/workflows/ci.yml:57; .github/workflows/ci.yml:60; .github/workflows/ci.yml:70; .github/workflows/ci.yml:73; .github/workflows/ci.yml:76"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: ci.yml",
+     "location": ".github/workflows/ci.yml"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-differential-fuzz",
+   "label": "hiero-hackers/hiero-differential-fuzz",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-enterprise-js",
+   "label": "hiero-hackers/hiero-enterprise-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 8 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/release.yml:36; .github/workflows/release.yml:43; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-enterprise-proxy",
+   "label": "hiero-hackers/hiero-enterprise-proxy",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 11 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4, docker/setup-qemu-action@v3, docker/setup-buildx-action@v3, docker/login-action@v3, docker/metadata-action@v5, docker/build-push-action@v6, actions/checkout@v4, actions/setup-node@v4, actions/checkout@v4, actions/setup-python@v5, actions/checkout@v4",
+     "location": ".github/workflows/docker-publish.yml:28; .github/workflows/docker-publish.yml:33; .github/workflows/docker-publish.yml:37; .github/workflows/docker-publish.yml:43; .github/workflows/docker-publish.yml:55; .github/workflows/docker-publish.yml:72; .github/workflows/publish-js-sdk.yml:19; .github/workflows/publish-js-sdk.yml:21; .github/workflows/python-sdk-ci.yml:22; .github/workflows/python-sdk-ci.yml:24; .github/workflows/validate-openapi.yml:19"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 2 workflow(s) without complete explicit permissions coverage: python-sdk-ci.yml, validate-openapi.yml",
+     "location": ".github/workflows/docker-publish.yml:15; .github/workflows/publish-js-sdk.yml:15; .github/workflows/python-sdk-ci.yml; .github/workflows/validate-openapi.yml"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-hybrid-workflow-app",
+   "label": "hiero-hackers/hiero-hybrid-workflow-app",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/read-only-tracker.yml:8"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-journal-rs",
+   "label": "hiero-hackers/hiero-journal-rs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-maintainer-automation-prototype",
+   "label": "hiero-hackers/hiero-maintainer-automation-prototype",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-notifications",
+   "label": "hiero-hackers/hiero-notifications",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/ci.yml:16; .github/workflows/ci.yml:59; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:11; .github/workflows/docs.yml:22; .github/workflows/docs.yml:49; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:59; .github/workflows/release.yml:87; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-payment-requests",
+   "label": "hiero-hackers/hiero-payment-requests",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:13; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:49; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:97; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-receipts",
+   "label": "hiero-hackers/hiero-receipts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/ci.yml:49; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:44; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:57; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-sdk-csharp",
+   "label": "hiero-hackers/hiero-sdk-csharp",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-sdk-dart",
+   "label": "hiero-hackers/hiero-sdk-dart",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 3 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4, hiero-ledger/hiero-solo-action@v0.8, dart-lang/setup-dart@v1",
+     "location": ".github/workflows/dart-ci.yaml:15; .github/workflows/dart-ci.yaml:18; .github/workflows/dart-ci.yaml:32"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: dart-ci.yaml",
+     "location": ".github/workflows/dart-ci.yaml"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-sdk-v3-prototyping",
+   "label": "hiero-hackers/hiero-sdk-v3-prototyping",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-streams-rs",
+   "label": "hiero-hackers/hiero-streams-rs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:20; .github/workflows/codeql.yml:27; .github/workflows/fuzz.yml:11; .github/workflows/release.yml:26; .github/workflows/release.yml:137; .github/workflows/release.yml:202; .github/workflows/sentinel.yml:33; .github/workflows/watch-cutover.yml:27"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-tck-action",
+   "label": "hiero-hackers/hiero-tck-action",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 2 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.action, ./.action",
+     "location": ".github/workflows/self-test.yml:42; .github/workflows/weekly.yml:85"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/docs.yml:17; .github/workflows/docs.yml:28; .github/workflows/docs.yml:72; .github/workflows/lint.yml:9; .github/workflows/self-test.yml:7; .github/workflows/weekly.yml:9"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: self-test.yml, weekly.yml; CodeQL workflow not detected.",
+     "location": "repository settings; .github/workflows/self-test.yml; .github/workflows/weekly.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-verify-fn",
+   "label": "hiero-hackers/hiero-verify-fn",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:14; .github/workflows/codeql.yml:21; .github/workflows/release.yml:18; .github/workflows/scorecard.yml:12; .github/workflows/scorecard.yml:18"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-workflow-orchestrator",
+   "label": "hiero-hackers/hiero-workflow-orchestrator",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 2 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v3, actions/setup-node@v3",
+     "location": ".github/workflows/linting.yml:15; .github/workflows/linting.yml:16"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: manual_trigger.yaml",
+     "location": ".github/workflows/linting.yml:12; .github/workflows/manual_trigger.yaml"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-x402",
+   "label": "hiero-hackers/hiero-x402",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:13; .github/workflows/ci.yml:20; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/release.yml:13; .github/workflows/release.yml:20; .github/workflows/release.yml:61; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/noobisoft",
+   "label": "hiero-hackers/noobisoft",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/rs-hiero-mirror-node",
+   "label": "hiero-hackers/rs-hiero-mirror-node",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/sdk-automations",
+   "label": "hiero-hackers/sdk-automations",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:14; .github/workflows/codeql.yml:24; .github/workflows/codeql.yml:35; .github/workflows/conformance.yml:22; .github/workflows/conformance.yml:33; .github/workflows/conformance.yml:104; .github/workflows/scorecard.yml:10; .github/workflows/scorecard.yml:17"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/vscode-hedera-transaction-viewer",
+   "label": "hiero-hackers/vscode-hedera-transaction-viewer",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 5 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4, actions/checkout@v4, actions/setup-node@v4",
+     "location": ".github/workflows/build.yml:14; .github/workflows/build.yml:16; .github/workflows/build.yml:31; .github/workflows/release.yml:15; .github/workflows/release.yml:28"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "fail",
+     "evidence": "Found 1 workflow(s) without complete explicit permissions coverage: build.yml",
+     "location": ".github/workflows/build.yml; .github/workflows/release.yml:8"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    }
+   ]
+  }
+ ],
+ "filters": [
+  "pass",
+  "fail",
+  "review",
+  "na"
+ ],
+ "macro": "Security & scorecards",
+ "generated_at": "2026-10-09T20:18:58.439271+00:00",
+ "stale": false
+}

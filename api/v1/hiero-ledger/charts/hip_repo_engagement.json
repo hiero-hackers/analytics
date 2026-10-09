@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-10-06T09:14:32.515108+00:00"
+  "end": "2026-10-09T20:17:45.548476+00:00"
  },
  "series": [
   {
@@ -58,62 +58,62 @@
   {
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
-   "matched_prs": 228,
-   "total_prs": 5195
+   "matched_prs": 229,
+   "total_prs": 5232
   },
   {
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 35,
    "matched_prs": 194,
-   "total_prs": 3644
+   "total_prs": 3656
   },
   {
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 14,
-   "matched_prs": 38,
-   "total_prs": 1111
+   "matched_prs": 39,
+   "total_prs": 1133
   },
   {
    "repo": "hiero-sdk-go",
    "distinct_hips_merged": 14,
    "matched_prs": 24,
-   "total_prs": 478
+   "total_prs": 482
   },
   {
    "repo": "solo",
    "distinct_hips_merged": 13,
    "matched_prs": 13,
-   "total_prs": 2424
+   "total_prs": 2452
   },
   {
    "repo": "hiero-sdk-java",
    "distinct_hips_merged": 13,
    "matched_prs": 27,
-   "total_prs": 611
+   "total_prs": 613
   },
   {
    "repo": "hiero-sdk-cpp",
    "distinct_hips_merged": 13,
    "matched_prs": 15,
-   "total_prs": 504
+   "total_prs": 505
   },
   {
    "repo": "hiero-json-rpc-relay",
    "distinct_hips_merged": 12,
-   "matched_prs": 13,
-   "total_prs": 1376
+   "matched_prs": 14,
+   "total_prs": 1395
+  },
+  {
+   "repo": "hiero-mirror-node-explorer",
+   "distinct_hips_merged": 12,
+   "matched_prs": 17,
+   "total_prs": 1052
   },
   {
    "repo": "hiero-sdk-swift",
    "distinct_hips_merged": 12,
    "matched_prs": 14,
    "total_prs": 138
-  },
-  {
-   "repo": "hiero-mirror-node-explorer",
-   "distinct_hips_merged": 11,
-   "matched_prs": 16,
-   "total_prs": 1033
   },
   {
    "repo": "hiero-sdk-rust",
@@ -125,43 +125,43 @@
    "repo": "sdk-collaboration-hub",
    "distinct_hips_merged": 9,
    "matched_prs": 26,
-   "total_prs": 176
+   "total_prs": 177
+  },
+  {
+   "repo": "hiero-block-node",
+   "distinct_hips_merged": 5,
+   "matched_prs": 11,
+   "total_prs": 1622
   },
   {
    "repo": "hiero-sdk-python",
    "distinct_hips_merged": 5,
    "matched_prs": 5,
-   "total_prs": 1058
-  },
-  {
-   "repo": "hiero-block-node",
-   "distinct_hips_merged": 4,
-   "matched_prs": 9,
-   "total_prs": 1608
+   "total_prs": 1061
   },
   {
    "repo": "hiero-website",
    "distinct_hips_merged": 4,
    "matched_prs": 4,
-   "total_prs": 381
+   "total_prs": 392
   },
   {
    "repo": "hiero-contracts",
    "distinct_hips_merged": 4,
    "matched_prs": 4,
-   "total_prs": 96
+   "total_prs": 98
   },
   {
    "repo": "governance",
    "distinct_hips_merged": 3,
    "matched_prs": 4,
-   "total_prs": 553
+   "total_prs": 555
   },
   {
    "repo": "hiero-sdk-tck",
    "distinct_hips_merged": 3,
    "matched_prs": 2,
-   "total_prs": 274
+   "total_prs": 286
   },
   {
    "repo": "hiero-cli",
@@ -185,37 +185,37 @@
    "repo": "hiero-docs",
    "distinct_hips_merged": 1,
    "matched_prs": 1,
-   "total_prs": 58
+   "total_prs": 61
   },
   {
    "repo": "hiero-gradle-conventions",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 411
+   "total_prs": 413
   },
   {
    "repo": "hiero-cryptography",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 382
+   "total_prs": 389
   },
   {
    "repo": "hiero-enterprise-java",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 220
+   "total_prs": 225
   },
   {
    "repo": "solo-docs",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 176
+   "total_prs": 182
   },
   {
    "repo": "heka-identity-platform",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 121
+   "total_prs": 128
   },
   {
    "repo": "hiero-hederium",
@@ -227,19 +227,19 @@
    "repo": "solo-containers",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 103
+   "total_prs": 106
   },
   {
    "repo": "solo-charts",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 100
+   "total_prs": 102
   },
   {
    "repo": "hiero-solo-action",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 80
+   "total_prs": 85
   },
   {
    "repo": "homebrew-tools",
@@ -257,7 +257,7 @@
    "repo": ".github",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 55
+   "total_prs": 57
   },
   {
    "repo": "hiero-did-sdk-js",
@@ -302,6 +302,6 @@
    "total_prs": 4
   }
  ],
- "generated_at": "2026-10-06T09:14:32.515108+00:00",
+ "generated_at": "2026-10-09T20:17:45.548476+00:00",
  "stale": false
 }
