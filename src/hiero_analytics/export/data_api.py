@@ -89,10 +89,10 @@ API_VERSION = "v1"
 API_PERIODS = tuple(period for period in ACTIVITY_PERIODS if period.days is not None)
 
 # A section counts as stale when its data is older than the scheduled refresh
-# cadence plus slack for a slow run. The analytics refresh runs every 5 days,
-# and we add 12 hours of slack for slow or delayed runs. The legacy dashboard
-# imports this value so the two cannot drift.
-STALE_AFTER = timedelta(hours=132)
+# cadence plus slack for a slow run. The analytics refresh runs daily, and we
+# add 12 hours of slack for slow or delayed runs, so one missed night shows.
+# The legacy dashboard imports this value so the two cannot drift.
+STALE_AFTER = timedelta(hours=36)
 
 
 class DataApiContractError(RuntimeError):

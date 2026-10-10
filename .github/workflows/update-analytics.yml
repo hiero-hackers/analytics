@@ -2,11 +2,14 @@ name: Refresh Analytics Data
 
 on:
   schedule:
-    # Every 5 days at 9 AM UTC. Keeps gaps under the 7-day cache-eviction
-    # window so the incremental dataset cache stays warm. This interval and
-    # DEFAULT_REUSE_MAX_AGE (data_sources/dataset_store.py) are one decision:
-    # change them together or not at all. See docs/api-budget.md.
-    - cron: '0 9 */5 * *'
+    # Daily at 04:00 EAT (01:00 UTC), outside working hours for the
+    # maintainers (02:00-03:00 in Central Europe, evening in the Americas), so
+    # the GraphQL budget is free during the day for manual runs. GitHub may
+    # start a scheduled run some minutes late at busy times. Every run fetches
+    # fresh deltas (DEFAULT_REUSE_MAX_AGE in data_sources/dataset_store.py only
+    # spans one run), and STALE_AFTER (export/data_api.py) assumes this daily
+    # cadence. See docs/api-budget.md.
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 permissions:
@@ -102,10 +105,10 @@ jobs:
         with:
           name: dataset-snapshot-${{ github.run_id }}-${{ github.sha }}
           path: outputs/data/datasets
-          # Long enough to cover several refresh cycles when tracing a chart back,
-          # short enough that 50+ MB snapshots every 5 days do not accumulate
-          # indefinitely against the repository's storage quota.
-          retention-days: 90
+          # Long enough to trace a month of charts back, short enough that a
+          # 50+ MB snapshot every night does not accumulate against the
+          # repository's storage quota.
+          retention-days: 30
           if-no-files-found: warn
 
       # Hand-off for the archive-snapshot job: the emitted JSON API plus the

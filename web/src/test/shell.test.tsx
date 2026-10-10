@@ -231,15 +231,17 @@ describe('Navigation search', () => {
 });
 
 describe('Header status', () => {
-  it('states the data age in words and flags it past the weekly refresh', async () => {
+  it('states the data age in words and flags it past the daily refresh', async () => {
     const { FreshnessStatus } = await import('../components/AppHeader');
     const asOf = '2026-07-19T00:00:00Z';
     const at = (hours: number) => Date.parse(asOf) + hours * 3_600_000;
     const { rerender } = render(<FreshnessStatus dataAsOf={asOf} now={at(5)} />);
     expect(screen.getByText('Updated 5 hours ago')).toBeInTheDocument();
-    rerender(<FreshnessStatus dataAsOf={asOf} now={at(100)} />);
-    expect(screen.getByText('Updated 4 days ago')).toBeInTheDocument();
-    // 132 h mirrors the exporter's STALE_AFTER.
+    rerender(<FreshnessStatus dataAsOf={asOf} now={at(30)} />);
+    expect(screen.getByText('Updated 30 hours ago')).toBeInTheDocument();
+    // 36 h mirrors the exporter's STALE_AFTER.
+    rerender(<FreshnessStatus dataAsOf={asOf} now={at(37)} />);
+    expect(screen.getByText('2 days old, refresh overdue')).toHaveClass('text-warn-ink');
     rerender(<FreshnessStatus dataAsOf={asOf} now={at(24 * 71)} />);
     expect(screen.getByText('71 days old, refresh overdue')).toHaveClass('text-warn-ink');
     expect(screen.getByText('2026-07-19 00:00 UTC').closest('p')).toHaveTextContent(

@@ -291,7 +291,7 @@ def write_snapshot_manifest(
     failed during the run that produced it (a partial run still archives, and
     the reader needs to know the snapshot is partial). Each dataset is recorded
     by SHA-256, so a chart can be tied to byte-identical inputs rather than to a
-    filename that gets overwritten every five days.
+    filename that gets overwritten every night.
 
     ``api_usage`` is the run's GitHub API spend (see ``data_sources.usage``);
     when given it is recorded under the same key, so the cost of a run is

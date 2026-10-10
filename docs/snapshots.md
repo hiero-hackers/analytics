@@ -74,7 +74,7 @@ version before parsing anything older than the current release.
   snapshots. Before them, one snapshot was ~3.5 MB of JSON across ~20 files,
   but consecutive snapshots are near-identical and git packs the deltas: a
   rehearsal of two snapshots (3.2 MB each on disk) packed to 632 KB of history
-  in total. At the 5-day cadence that is a few MB a year, so there is nothing to
+  in total. At the daily cadence that is likely tens of MB a year, so there is nothing to
   manage yet. Revisit if the branch gets large; it can be pruned or rewritten
   later without touching `main`.
 

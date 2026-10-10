@@ -52,11 +52,11 @@ Datasets follow one of two paths:
 
 | Path | Datasets (examples) | Behaviour on an existing dataset |
 | --- | --- | --- |
-| Reused (`load_or_fetch`) | `contributor_activity`, `ci_health`, `onboarding`, the REST `codeowner_and_runner` data | Reused with **no fetch** while the watermark is under 5 days old (`DEFAULT_REUSE_MAX_AGE`); refetched once older. |
+| Reused (`load_or_fetch`) | `contributor_activity`, `ci_health`, `onboarding`, the REST `codeowner_and_runner` data | Reused with **no fetch** by a run's later pipelines while the last fetch is under 6 hours old (`DEFAULT_REUSE_MAX_AGE`, measured from `fetched_at`); every new run refetches. |
 | Incremental (`fetch_incremental`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since the watermark **on every run**, regardless of age; a full refetch once the watermark is over 30 days old (`full_refresh_after`). |
 
 So a run's floor is not zero: the incremental datasets are always queried. The
-reuse window only saves the datasets on the first path.
+reuse window only saves the datasets on the first path, and only within one run.
 
 The dataset cache is restored between runs by `actions/cache`. If it is evicted,
 the next run does one full fetch and then resumes incrementally.
@@ -103,7 +103,7 @@ Reading the table:
   (e.g. 168 of 192 points for `merged_pr_difficulty`) is close to their cold cost,
   so a delta fetch at this size is far from free. Why is not yet investigated.
 - **Limits of this data.** The warm run came minutes after the cold run, so its
-  deltas were as small as they get; a run after 5 days has more to fetch and may
+  deltas were as small as they get; a nightly run has a day to fetch and may
   cost somewhat more. It is a lower bound for steady state, not an average. It is
   also a single org and a single run of each kind, from a developer machine.
 
@@ -118,8 +118,8 @@ summed into one number:
    repository and activity volume for other orgs; `hiero-ledger` is much larger
    and has **not** been measured.
 2. **A recurring cost per run**, at least the warm figure (about 290 points for
-   `hiero-hackers`), times runs per month (about 6 at the 5-day cadence), so
-   about 1,750 points per month per org of this size.
+   `hiero-hackers`), times runs per month (about 30 at the daily cadence), so
+   about 8,700 points per month per org of this size.
 
 Only the second matters for "does the schedule still fit?". The first matters
 for "can this token and timeout survive onboarding?". The Actions
@@ -128,22 +128,44 @@ fetch of a large org is the case that needs `ANALYTICS_PAT` configured first.
 
 ## Cadence decision
 
-**Current: refresh every 5 days (`cron: '0 9 */5 * *'`) with a 5-day reuse
-window (`DEFAULT_REUSE_MAX_AGE`).** These two values are one decision and must
-change together.
+**Current: refresh daily at 04:00 EAT, 01:00 UTC (`cron: '0 1 * * *'`), since
+2026-10-10.** That is outside working hours for the maintainers (02:00-03:00 in
+Central Europe, evening in the Americas), so a manual run
+during the day has the hour's budget to itself. The reuse window
+(`DEFAULT_REUSE_MAX_AGE`, 6 hours) only spans one run, so it does not have to
+match the cron. `STALE_AFTER` (36 hours, `export/data_api.py`, mirrored in
+`web/src/components/AppHeader.tsx`) does: it is one day plus 12 hours of slack,
+so one missed night shows as stale.
 
-**Recommendation: keep it as is.** For an org of `hiero-hackers`' size a cold
-run uses about a tenth of one hour's budget and a steady run about 6%, so the
-schedule has ample headroom and there is no cost reason to change it. Two
-points for anyone revisiting it:
+Before that the refresh ran every 5 days (`cron: '0 9 */5 * *'`), so the
+recent-activity windows were up to 5 days behind between runs.
+
+Until 2026-10-10 the reuse window was 5 days, measured from the newest event
+rather than the last fetch, and was meant to match the cron. It made runs skip
+fetching: the dispatched run of 2026-10-09 reused the activity data of
+2026-10-06, and `*/5` restarts each month, so runs 1 to 3 days apart (the 31st
+then the 1st, or 26 February then 1 March) skip too. Each such run still ended
+its Week, 1 month and 1 year windows at its own clock, so `hiero-ledger`'s
+repository and contributor views showed days of missing activity as a quiet
+week (for example, 0 issues opened in `hiero-sdk-python`'s Week against 9 on
+GitHub). The change makes every run pull the contributor-activity delta, which
+is cheap next to the incremental datasets.
+
+**Budget for the daily run.** The dispatched run of 2026-10-09 (run
+`37984987230`, `api_usage` in its `SNAPSHOT.json`) spent 970 GraphQL points and
+760 REST requests across both orgs: 656 points and 595 requests for
+`hiero-ledger`, 314 points and 165 requests for `hiero-hackers`. It reused
+`contributor_activity`, which every run now fetches as a delta: about two
+requests per repository, so on the order of 100 to 200 more points for
+`hiero-ledger`'s 44 repositories (an estimate, not yet measured). That is about a
+quarter of one hour's PAT budget, once a day, so the daily schedule has ample
+headroom. Points for anyone revisiting it:
 
 - Because incremental datasets are fetched on every run, total monthly cost
-  scales roughly with the number of runs; lengthening the interval cuts cost
-  proportionally, shortening it raises cost proportionally. The reuse window
-  only affects the datasets on the reused path.
-- This is based on one small org. The decision should be revisited with
-  measurements for `hiero-ledger` and for the Actions token before the schedule
-  is tightened or onboarding a large org; the follow-up issues are the place
-  to track that.
+  scales roughly with the number of runs: about 30 runs a month now, against
+  about 6 at the old cadence.
+- Re-measure from the first nightly runs' `api_usage` and record the figures
+  here; the Actions `GITHUB_TOKEN` fallback (1,000 points / hour) would not fit
+  a cold fetch of `hiero-ledger` in one hour either way.
 
 Record any change here with its supporting figures and the date.

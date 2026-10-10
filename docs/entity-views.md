@@ -103,7 +103,7 @@ them from names.
 `schema_version: 1`) is fetched only when a reader opens it. It carries:
 
 - **Provenance:** `source` (the CSVs it was built from), `generated_at` and
-  `stale` (from the CSV sidecar, with the same 132-hour rule as sections);
+  `stale` (from the CSV sidecar, with the same 36-hour rule as sections);
 - **Explanation:** `scope`, `population`, `methodology` and `limits`;
 - **Dates:** `window` (end, `data_through`, and each window's start),
   `first_active` and `last_active`;

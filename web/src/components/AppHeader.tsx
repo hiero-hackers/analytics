@@ -24,8 +24,8 @@ function Freshness({ dataAsOf, className }: { dataAsOf: string; className?: stri
   );
 }
 
-/** Mirrors STALE_AFTER in export/data_api.py: the weekly refresh plus 1.5 days of slack. */
-const STALE_AFTER_HOURS = 132;
+/** Mirrors STALE_AFTER in export/data_api.py: the daily refresh plus 12 hours of slack. */
+const STALE_AFTER_HOURS = 36;
 const relative = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
 /** How old the data is, in words: the words carry the stale state, never the dot alone. */
@@ -43,8 +43,8 @@ export function FreshnessStatus({ dataAsOf, now }: { dataAsOf: string; now?: num
       className="flex items-start gap-2"
       title={
         stale
-          ? 'Older than the weekly analytics refresh: the next scheduled run has not published yet.'
-          : 'Within the weekly analytics refresh.'
+          ? 'Older than the daily analytics refresh: the next scheduled run has not published yet.'
+          : 'Within the daily analytics refresh.'
       }
     >
       <span
