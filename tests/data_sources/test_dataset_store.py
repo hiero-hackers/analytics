@@ -407,7 +407,7 @@ def test_partial_full_refresh_with_baseline_merges_and_holds_watermark(tmp_path)
 def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
     """When a fresh-enough dataset exists on disk, its records are returned without fetching."""
     persisted = ["rec-a", "rec-b"]
-    recent = datetime.now(UTC) - timedelta(days=1)
+    recent = datetime.now(UTC) - timedelta(hours=1)
     monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (persisted, recent))
 
     fetched = []
@@ -430,6 +430,33 @@ def test_load_or_fetch_refreshes_stale_dataset(monkeypatch):
     result = load_or_fetch("contributor_activity", "an-org", object, lambda: ["fresh"])
 
     assert result == ["fresh"]
+
+
+def test_load_or_fetch_refreshes_when_last_fetch_is_old_though_events_are_recent(tmp_path, monkeypatch):
+    """The regression: a dispatch 3 days after a run must fetch, not reuse.
+
+    The newest event (the watermark) was 3 days old, under the old 5-day gate, so
+    the run served that data as the current week. Age is the last fetch's.
+    """
+    path = tmp_path / "widgets_org_all.json"
+    monkeypatch.setattr(dataset_store, "dataset_path", lambda *_args, **_kwargs: path)
+    three_days_ago = datetime.now(UTC) - timedelta(days=3)
+    save_dataset(path, [_rec("a", 1, 1)], three_days_ago, fetched_at=three_days_ago)
+
+    result = load_or_fetch("widgets", "org", _Record, lambda: ["fresh"])
+
+    assert result == ["fresh"]
+
+
+def test_load_or_fetch_reuses_a_fresh_fetch_of_a_quiet_dataset(tmp_path, monkeypatch):
+    """Within a run, a dataset fetched minutes ago is reused even if its newest event is old."""
+    path = tmp_path / "widgets_org_all.json"
+    monkeypatch.setattr(dataset_store, "dataset_path", lambda *_args, **_kwargs: path)
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))  # fetched_at = now
+
+    records = load_or_fetch("widgets", "org", _Record, lambda: pytest.fail("should have reused"))
+
+    assert len(records) == 1
 
 
 def test_load_or_fetch_max_age_none_disables_staleness_bound(monkeypatch):
@@ -491,8 +518,8 @@ def test_prune_keeps_a_dataset_reused_without_rewriting(tmp_path, monkeypatch):
     """Reuse must count as live — the reason mtimes cannot be the signal.
 
     ``load_or_fetch`` serves a dataset straight from disk for up to
-    DEFAULT_REUSE_MAX_AGE, which is the refresh cadence itself, so a live
-    dataset routinely survives a whole run without being written.
+    DEFAULT_REUSE_MAX_AGE, so a live dataset can be read by a run's later
+    pipelines without being written.
     """
     # Redirect the store's path builder into the sandbox: the real one resolves
     # under outputs/, and a prune test must never be able to reach it.
