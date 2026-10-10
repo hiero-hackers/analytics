@@ -338,3 +338,171 @@ def test_fetch_org_sbom_data_retries_http_failures():
         "repo-b": "disabled",
     }
     assert len(packages) == 1
+
+
+# -- SBOM TTL caching ----------------------------------------------------------
+
+
+def _sbom_payload(*purls: str) -> dict:
+    return {
+        "sbom": {
+            "documentDescribes": [],
+            "packages": [
+                {"SPDXID": f"p{i}", "externalRefs": [{"referenceType": "purl", "referenceLocator": purl}]}
+                for i, purl in enumerate(purls)
+            ],
+        }
+    }
+
+
+def test_fetch_repo_sbom_cache_hit_skips_the_request():
+    """A second call within the TTL is served from cache with identical output."""
+    client = Mock()
+    client.get.return_value = _sbom_payload("pkg:npm/left-pad@1.0.0")
+
+    first = fetch_repo_sbom(client, "org", "repo")
+    second = fetch_repo_sbom(client, "org", "repo")
+
+    assert client.get.call_count == 1
+    assert second == first
+    assert second[0] == SbomCoverageRecord(repo="repo", status="ok", package_count=1)
+
+
+def test_fetch_repo_sbom_cache_hit_preserves_empty_manifest():
+    """An ok SBOM with zero packages is a valid cached result, not a miss."""
+    client = Mock()
+    client.get.return_value = _sbom_payload()
+
+    fetch_repo_sbom(client, "org", "repo")
+    coverage, records = fetch_repo_sbom(client, "org", "repo")
+
+    assert client.get.call_count == 1
+    assert coverage == SbomCoverageRecord(repo="repo", status="ok", package_count=0)
+    assert records == []
+
+
+def test_fetch_repo_sbom_cache_miss_fetches_and_scopes_by_org_and_repo():
+    """Different repos/orgs never share a cache entry."""
+    client = Mock()
+    client.get.return_value = _sbom_payload("pkg:npm/left-pad@1.0.0")
+
+    fetch_repo_sbom(client, "org", "repo-a")
+    fetch_repo_sbom(client, "org", "repo-b")
+    fetch_repo_sbom(client, "other-org", "repo-a")
+
+    assert client.get.call_count == 3
+
+
+def test_fetch_repo_sbom_expired_entry_is_refetched(monkeypatch):
+    """An entry older than the TTL is treated as a miss and replaced with fresh data."""
+    from datetime import UTC, datetime, timedelta
+
+    import hiero_analytics.data_sources.cache as cache
+
+    client = Mock()
+    client.get.side_effect = [
+        _sbom_payload("pkg:npm/left-pad@1.0.0"),
+        _sbom_payload("pkg:npm/left-pad@2.0.0"),
+    ]
+
+    fetch_repo_sbom(client, "org", "repo", cache_ttl_seconds=60)
+
+    real_datetime = datetime
+
+    class _Later(real_datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return real_datetime.now(tz) + timedelta(seconds=120)
+
+    monkeypatch.setattr(cache, "datetime", _Later)
+    assert UTC  # keep import used
+    _, records = fetch_repo_sbom(client, "org", "repo", cache_ttl_seconds=60)
+
+    assert client.get.call_count == 2
+    assert [r.version for r in records] == ["2.0.0"]
+
+
+def test_fetch_repo_sbom_refresh_bypasses_cache():
+    """refresh=True forces a re-fetch even when a fresh entry exists."""
+    client = Mock()
+    client.get.return_value = _sbom_payload("pkg:npm/left-pad@1.0.0")
+
+    fetch_repo_sbom(client, "org", "repo")
+    fetch_repo_sbom(client, "org", "repo", refresh=True)
+
+    assert client.get.call_count == 2
+
+
+def test_fetch_repo_sbom_use_cache_false_never_reads_or_writes():
+    """Disabling the cache always hits GitHub and leaves nothing behind."""
+    client = Mock()
+    client.get.return_value = _sbom_payload("pkg:npm/left-pad@1.0.0")
+
+    fetch_repo_sbom(client, "org", "repo", use_cache=False)
+    fetch_repo_sbom(client, "org", "repo", use_cache=False)
+    fetch_repo_sbom(client, "org", "repo")  # default cache on: nothing was written above
+
+    assert client.get.call_count == 3
+
+
+def test_fetch_repo_sbom_does_not_cache_disabled_results():
+    """A 404 is not cached, so enabling the dependency graph is noticed on the next run."""
+    client = Mock()
+    client.get.side_effect = [_http_error(404), _sbom_payload("pkg:npm/left-pad@1.0.0")]
+
+    first_coverage, _ = fetch_repo_sbom(client, "org", "repo")
+    second_coverage, _ = fetch_repo_sbom(client, "org", "repo")
+
+    assert first_coverage.status == "disabled"
+    assert second_coverage.status == "ok"
+    assert client.get.call_count == 2
+
+
+@pytest.mark.parametrize("malformed", [{"sbom": None}, {"sbom": {"packages": "nope"}}, None])
+def test_fetch_repo_sbom_does_not_cache_malformed_responses(malformed):
+    """Malformed payloads are reported as errors and never stored as valid SBOM data."""
+    client = Mock()
+    client.get.side_effect = [malformed, _sbom_payload("pkg:npm/left-pad@1.0.0")]
+
+    first_coverage, _ = fetch_repo_sbom(client, "org", "repo")
+    second_coverage, _ = fetch_repo_sbom(client, "org", "repo")
+
+    assert first_coverage.status == "error"
+    assert second_coverage.status == "ok"
+    assert client.get.call_count == 2
+
+
+def test_fetch_repo_sbom_does_not_cache_propagated_http_errors():
+    """A failed request writes nothing; the next call fetches again."""
+    client = Mock()
+    client.get.side_effect = [_http_error(500), _sbom_payload("pkg:npm/left-pad@1.0.0")]
+
+    with pytest.raises(requests.HTTPError):
+        fetch_repo_sbom(client, "org", "repo")
+    coverage, _ = fetch_repo_sbom(client, "org", "repo")
+
+    assert coverage.status == "ok"
+    assert client.get.call_count == 2
+
+
+def test_fetch_org_sbom_data_only_refetches_uncached_repos():
+    """On a re-run, cached repos are served locally and only the rest hit GitHub."""
+    calls: list[str] = []
+
+    def fake_get(url):
+        calls.append(url)
+        if "repo-a" in url:
+            return _sbom_payload("pkg:npm/left-pad@1.0.0")
+        raise _http_error(404)
+
+    client = Mock()
+    client.get.side_effect = fake_get
+
+    first = fetch_org_sbom_data(client, "org", ["repo-a", "repo-b"], max_workers=2)
+    calls.clear()
+    second = fetch_org_sbom_data(client, "org", ["repo-a", "repo-b"], max_workers=2)
+
+    assert [u for u in calls if "repo-a" in u] == []  # repo-a served from cache
+    assert len([u for u in calls if "repo-b" in u]) == 1  # 404s are not cached
+    assert sorted(second[0], key=lambda c: c.repo) == sorted(first[0], key=lambda c: c.repo)
+    assert second[1] == first[1]
