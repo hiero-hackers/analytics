@@ -1,4 +1,4 @@
-FROM gcr.io/oss-fuzz-base/base-builder-python:v1@sha256:7c97d379ceb773b0bd345f0ced72b037d26e9bb6c4a0c9a176525e65975c5694
+FROM gcr.io/oss-fuzz-base/base-builder-python:v1@sha256:690445a4d5f14cb2019f221fecf7bec45f62179dcc56314f2e1731c4082823a4
 
 
 COPY . $SRC/analytics
