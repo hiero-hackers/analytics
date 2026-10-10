@@ -43,22 +43,25 @@ DATASET_VERSION = 2
 # mid-fetch (or under minor clock skew) are not missed. Re-merges are idempotent.
 DEFAULT_OVERLAP = timedelta(minutes=10)
 
-# How old a persisted dataset's watermark may be before load_or_fetch refreshes it
-# instead of reusing it. Matches the update-analytics CI cadence: change the
-# workflow's cron and this value together (docs/api-budget.md).
+# How long ago a persisted dataset may have been *fetched* (its ``fetched_at``
+# stamp) before load_or_fetch refreshes it instead of reusing it. It only has to
+# span one run, so the pipelines of a run share the first one's fetch; every
+# later run, scheduled or dispatched, pulls the delta. It once gated on the
+# content watermark with the then 5-day CI cadence, so a run within 5 days of the
+# newest event fetched nothing yet ended its activity windows at its own clock,
+# publishing days-old data as the current week (docs/api-budget.md).
 #
 # Two staleness windows layer on the same dataset file, split across two levels:
-# this 5-day *reuse* gate decides whether load_or_fetch calls its fetch_fn at
-# all, and fetch_incremental's ~30-day *full_refresh_after* decides whether that
-# fetch is a cheap since-delta or a full self-healing re-fetch. A normal run
-# therefore reuses (<5d), refreshes incrementally (5-30d), or rebuilds (>30d).
-DEFAULT_REUSE_MAX_AGE = timedelta(days=5)
+# this *reuse* gate decides whether load_or_fetch calls its fetch_fn at all, and
+# fetch_incremental's ~30-day *full_refresh_after* decides whether that fetch is
+# a cheap since-delta or a full self-healing re-fetch.
+DEFAULT_REUSE_MAX_AGE = timedelta(hours=6)
 
 
 # Dataset paths this process read or wrote — what "still live" means for
 # pruning. Deliberately not file mtimes: `load_or_fetch` reuses a dataset
-# without rewriting it for up to DEFAULT_REUSE_MAX_AGE, which is the refresh
-# cadence itself, so a perfectly live dataset can go a whole run untouched on
+# without rewriting it for up to DEFAULT_REUSE_MAX_AGE, and offline runs never
+# rewrite one, so a perfectly live dataset can go a whole run untouched on
 # disk. Reading it still registers here.
 _touched_datasets: set[Path] = set()
 
@@ -334,30 +337,38 @@ def load_or_fetch(  # noqa: UP047
     Wraps :func:`load_dataset` with a fetch fallback and consistent logging, so the
     runners don't each re-implement the reuse-or-fetch dance. ``fetch_fn`` produces
     the full record list when there is no usable dataset on disk, and is also called
-    when the stored watermark is older than ``max_age`` — a standalone run therefore
-    never silently serves arbitrarily old data. ``fetch_fn`` is normally an
+    when the dataset was last fetched more than ``max_age`` ago — a standalone run
+    therefore never silently serves arbitrarily old data. ``fetch_fn`` is normally an
     incremental fetcher, so a stale-triggered refresh only pulls the delta (and
     re-persists the dataset). ``max_age=None`` disables the staleness bound.
+
+    Age is measured from ``fetched_at``, not the ``fetched_through`` content
+    watermark: the watermark is the newest event, which says nothing about when
+    the events after it were last looked for. A legacy file without
+    ``fetched_at`` falls back to the watermark.
 
     ``fingerprint`` must match what ``fetch_fn`` writes (the incremental
     fetchers derive it from their query variables, e.g. issue states) — a
     mismatch would read one dataset while writing another.
     """
-    state = load_dataset(dataset_path(resource, org, fingerprint), model_class)
+    path = dataset_path(resource, org, fingerprint)
+    state = load_dataset(path, model_class)
     if state is not None:
         records, fetched_through = state
         if offline_mode_enabled():
             logger.info("Reusing offline %s/%s dataset (%d records)", org, resource, len(records))
             return records
-        if fetched_through.tzinfo is None:
-            fetched_through = fetched_through.replace(tzinfo=UTC)
-        if max_age is None or fetched_through >= datetime.now(UTC) - max_age:
+        last_fetched = _read_prior_fetched_at(path) or fetched_through
+        if last_fetched.tzinfo is None:
+            last_fetched = last_fetched.replace(tzinfo=UTC)
+        if max_age is None or last_fetched >= datetime.now(UTC) - max_age:
             logger.info("Reusing persisted %s/%s dataset (%d records)", org, resource, len(records))
             return records
         logger.info(
-            "Persisted %s/%s dataset is stale (fetched through %s); refreshing",
+            "Persisted %s/%s dataset is stale (fetched at %s, through %s); refreshing",
             org,
             resource,
+            last_fetched.isoformat(),
             fetched_through.isoformat(),
         )
         with usage_scope(org=org, dataset=resource):
