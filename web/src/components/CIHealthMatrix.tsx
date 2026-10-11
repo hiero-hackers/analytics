@@ -61,7 +61,8 @@ export function CIHealthMatrix({
     );
   };
 
-  const bandHeader = view.bands && view.bands.length > 0;
+  const bands = view.bands ?? [];
+  const bandHeader = bands.length > 0;
 
   return (
     <>
@@ -92,12 +93,12 @@ export function CIHealthMatrix({
       </div>
 
       <div className="cimx-wrap">
-        <table className="cimx">
+        <table className={bandHeader ? 'cimx cimx-banded' : 'cimx'}>
           <thead>
             {bandHeader && (
               <tr className="cimx-band">
                 <th scope="col" aria-label="Blank header cell" />
-                {view.bands!.map((band) => (
+                {bands.map((band) => (
                   <th key={band.label} scope="col" colSpan={band.span}>
                     {band.label}
                   </th>

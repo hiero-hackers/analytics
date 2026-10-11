@@ -47,7 +47,11 @@ def _bands(columns: list[dict]) -> list[dict]:
 
 def _repo_sort_key(row: dict) -> tuple[int, int, str]:
     """Sort by the most severe findings first, then repository name."""
-    return (-sum(cell["status"] == "fail" for cell in row["cells"]), -sum(cell["status"] == "review" for cell in row["cells"]), row["label"])
+    return (
+        -sum(cell["status"] == "fail" for cell in row["cells"]),
+        -sum(cell["status"] == "review" for cell in row["cells"]),
+        row["label"],
+    )
 
 
 def _clean_cell_value(value: object) -> str:
@@ -59,7 +63,10 @@ def _clean_cell_value(value: object) -> str:
 
 def ci_health_matrix(_org: str, org_data_dir: Path) -> dict | None:
     """Build the CI health repository x check matrix."""
-    frame = load_csv(org_data_dir / "ci_health_checks.csv")
+    try:
+        frame = load_csv(org_data_dir / "ci_health_checks.csv")
+    except pd.errors.EmptyDataError:
+        return None
 
     if frame.empty:
         return None
@@ -106,15 +113,7 @@ def ci_health_matrix(_org: str, org_data_dir: Path) -> dict | None:
             }
         )
 
-    for row in rows:
-        row["fail_count"] = sum(cell["status"] == "fail" for cell in row["cells"])
-        row["review_count"] = sum(cell["status"] == "review" for cell in row["cells"])
-
     rows.sort(key=_repo_sort_key)
-
-    for row in rows:
-        row.pop("fail_count", None)
-        row.pop("review_count", None)
 
     columns = [{"key": key, "label": label, "band": band} for key, label, band in CHECK_COLUMNS]
 

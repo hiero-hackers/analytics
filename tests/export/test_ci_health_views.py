@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from hiero_analytics.export.ci_health_views import ci_health_matrix
+from hiero_analytics.export.ci_health_views import build_views, ci_health_matrix
 
 ORG = "test-org"
 
@@ -127,13 +127,34 @@ def test_rows_are_sorted_worst_first_and_tie_broken_by_repo_name(ci_health_data:
 
 
 def test_na_rows_rank_with_pass_rows_below_fail_and_review(ci_health_data: Path):
-    """na and pass do not contribute to repo severity; they fall behind fail/review rows."""
+    """Na and pass do not contribute to repo severity; they fall behind fail/review rows."""
     matrix = ci_health_matrix(ORG, ci_health_data)
 
     assert matrix is not None
     ranking = [row["label"] for row in matrix["rows"]]
     assert ranking.index("repo-delta") < ranking.index("repo-gamma")
     assert ranking.index("repo-alpha") < ranking.index("repo-beta")
+
+
+def test_sort_uses_review_count_then_repository_name_for_fail_ties(ci_health_data: Path):
+    """Rows with equal fail counts are ranked by reviews, then repository name."""
+    path = ci_health_data / "ci_health_checks.csv"
+    frame = pd.read_csv(path)
+    statuses = {
+        "repo-alpha": ["fail", "review", "pass"],
+        "repo-beta": ["fail", "pass", "pass"],
+        "repo-gamma": ["pass", "review", "review"],
+        "repo-delta": ["fail", "review", "pass"],
+    }
+    for repo, repo_statuses in statuses.items():
+        repo_rows = frame["repo"] == repo
+        frame.loc[repo_rows, "status"] = repo_statuses
+
+    frame.to_csv(path, index=False)
+    matrix = ci_health_matrix(ORG, ci_health_data)
+
+    assert matrix is not None
+    assert [row["label"] for row in matrix["rows"]] == ["repo-alpha", "repo-delta", "repo-beta", "repo-gamma"]
 
 
 def test_matrix_adds_band_metadata_and_column_band_values(ci_health_data: Path):
@@ -181,17 +202,41 @@ def test_unknown_status_and_band_mismatch_raise_value_error(ci_health_data: Path
         ci_health_matrix(ORG, ci_health_data)
 
 
-def test_missing_and_empty_csv_inputs_return_none(ci_health_data: Path, tmp_path: Path):
-    """Missing or empty CSV inputs do not build a matrix."""
+def test_unknown_checks_are_ignored(ci_health_data: Path):
+    """New checks do not affect the fixed matrix until they are declared."""
+    path = ci_health_data / "ci_health_checks.csv"
+    frame = pd.read_csv(path)
+    unknown = frame.iloc[[0]].copy()
+    unknown.loc[:, "check"] = "future_check"
+    unknown.loc[:, "band"] = "future_band"
+    frame = pd.concat([frame, unknown], ignore_index=True)
+    frame.to_csv(path, index=False)
+
+    matrix = ci_health_matrix(ORG, ci_health_data)
+
+    assert matrix is not None
+    assert all(cell["key"] != "future_check" for row in matrix["rows"] for cell in row["cells"])
+
+
+def test_missing_and_empty_csv_inputs_return_no_views(tmp_path: Path):
+    """Missing, zero-byte, and header-only CSV inputs do not build a matrix."""
     missing_dir = tmp_path / "missing"
     missing_dir.mkdir()
     assert ci_health_matrix(ORG, missing_dir) is None
+    assert build_views(ORG, missing_dir) == []
 
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir()
-    empty = pd.DataFrame(columns=["repo", "check", "band", "status", "evidence", "location"])
-    empty.to_csv(empty_dir / "ci_health_checks.csv", index=False)
+    (empty_dir / "ci_health_checks.csv").write_text("")
     assert ci_health_matrix(ORG, empty_dir) is None
+    assert build_views(ORG, empty_dir) == []
+
+    header_only_dir = tmp_path / "header-only"
+    header_only_dir.mkdir()
+    empty = pd.DataFrame(columns=["repo", "check", "band", "status", "evidence", "location"])
+    empty.to_csv(header_only_dir / "ci_health_checks.csv", index=False)
+    assert ci_health_matrix(ORG, header_only_dir) is None
+    assert build_views(ORG, header_only_dir) == []
 
 
 def test_evidence_and_location_are_passthrough_and_file_only_locations_stay_valid(ci_health_data: Path):
