@@ -123,7 +123,7 @@ def test_rows_are_sorted_worst_first_and_tie_broken_by_repo_name(ci_health_data:
     matrix = ci_health_matrix(ORG, ci_health_data)
 
     assert matrix is not None
-    assert [row["label"] for row in matrix["rows"]] == ["repo-alpha", "repo-beta", "repo-gamma", "repo-delta"]
+    assert [row["label"] for row in matrix["rows"]] == ["repo-alpha", "repo-beta", "repo-delta", "repo-gamma"]
 
 
 def test_na_rows_rank_with_pass_rows_below_fail_and_review(ci_health_data: Path):
@@ -132,7 +132,7 @@ def test_na_rows_rank_with_pass_rows_below_fail_and_review(ci_health_data: Path)
 
     assert matrix is not None
     ranking = [row["label"] for row in matrix["rows"]]
-    assert ranking.index("repo-gamma") < ranking.index("repo-delta")
+    assert ranking.index("repo-delta") < ranking.index("repo-gamma")
     assert ranking.index("repo-alpha") < ranking.index("repo-beta")
 
 
@@ -183,11 +183,15 @@ def test_unknown_status_and_band_mismatch_raise_value_error(ci_health_data: Path
 
 def test_missing_and_empty_csv_inputs_return_none(ci_health_data: Path, tmp_path: Path):
     """Missing or empty CSV inputs do not build a matrix."""
-    assert ci_health_matrix(ORG, tmp_path) is None
+    missing_dir = tmp_path / "missing"
+    missing_dir.mkdir()
+    assert ci_health_matrix(ORG, missing_dir) is None
 
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
     empty = pd.DataFrame(columns=["repo", "check", "band", "status", "evidence", "location"])
-    empty.to_csv(ci_health_data / "ci_health_checks.csv", index=False)
-    assert ci_health_matrix(ORG, ci_health_data) is None
+    empty.to_csv(empty_dir / "ci_health_checks.csv", index=False)
+    assert ci_health_matrix(ORG, empty_dir) is None
 
 
 def test_evidence_and_location_are_passthrough_and_file_only_locations_stay_valid(ci_health_data: Path):

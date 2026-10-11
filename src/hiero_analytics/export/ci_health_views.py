@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
+
 from hiero_analytics.export.artifacts import load_csv
 
 MATRIX_ID = "ci-health-matrix"
@@ -46,6 +48,13 @@ def _bands(columns: list[dict]) -> list[dict]:
 def _repo_sort_key(row: dict) -> tuple[int, int, str]:
     """Sort by the most severe findings first, then repository name."""
     return (-sum(cell["status"] == "fail" for cell in row["cells"]), -sum(cell["status"] == "review" for cell in row["cells"]), row["label"])
+
+
+def _clean_cell_value(value: object) -> str:
+    """Coerce pandas missing values to empty strings without mutating valid values."""
+    if pd.isna(value):
+        return ""
+    return str(value)
 
 
 def ci_health_matrix(_org: str, org_data_dir: Path) -> dict | None:
@@ -84,8 +93,8 @@ def ci_health_matrix(_org: str, org_data_dir: Path) -> dict | None:
                     "key": check_key,
                     "label": label,
                     "status": status,
-                    "evidence": str(result["evidence"]),
-                    "location": str(result["location"]),
+                    "evidence": _clean_cell_value(result["evidence"]),
+                    "location": _clean_cell_value(result["location"]),
                 }
             )
 
