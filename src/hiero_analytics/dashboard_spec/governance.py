@@ -274,7 +274,7 @@ SECTION_SPECS = [
             "For each repo, the share of review+merge work in the selected period done by the single busiest "
             "person who can merge — committer or maintainer. 'top role' is whether the busiest is a "
             "committer or maintainer; 'top %' is their share, 'top-2 %' the top two combined. Highest "
-            "concentration first; repos with under 20 recent review+merge actions are omitted."
+            "concentration first; repos with under 20 review+merge actions in the selected period are omitted."
         ),
         "columns": [
             ("repo", "repo"),

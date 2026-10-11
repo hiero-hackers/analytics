@@ -73,6 +73,13 @@ way a shared section link does. While charts above the target load, the jump
 holds the target in place for a few seconds, and stops as soon as the reader
 scrolls. Shared section links benefit too.
 
+The joined Governance activity fields and role-holder status use the source
+tables' **all-time** base, independently of the detail view's activity period
+selector. Their labels state that scope. A role holder is active there if they
+have any recorded activity in the repository; someone never active remains quiet.
+The role network charts and legacy per-repository coverage files separately retain
+the `ROLE_ACTIVE_DAYS` recency window (90 days by default).
+
 Repositories match by bare or `owner/repo` name. A table this run did not
 produce is listed as unavailable, for example when an offline run skips the
 network-only pipelines. A table that was produced but has no row for the

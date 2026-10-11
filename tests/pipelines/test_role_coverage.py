@@ -11,10 +11,12 @@ import pandas as pd
 import pytest
 
 import hiero_analytics.pipelines.role_coverage as runner
+from hiero_analytics.dashboard_spec.governance import SECTION_SPECS
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueTimelineEventRecord,
 )
+from hiero_analytics.export.data_api import _section_document
 
 TEST_ORG = "test-org"
 
@@ -190,3 +192,171 @@ def test_main_handles_empty_activity(
     assert (data_dir / "team_activity_summary.csv").exists()
     quiet = (data_dir / "role_coverage_globally_quiet.csv").read_text(encoding="utf-8")
     assert "alice" in quiet
+
+    coverage = pd.read_csv(data_dir / "role_coverage_all.csv")
+    assert set(coverage["status"]) == {"quiet"}
+    assert (coverage.filter(regex="_recent$") == 0).all().all()
+
+
+@pytest.fixture
+def historical_outputs(tmp_path, monkeypatch, governance_config):
+    """A fixed history spanning every window, including never-active role holders."""
+    now = datetime(2026, 10, 11, 12, tzinfo=UTC)
+
+    class FixedClock:
+        @staticmethod
+        def now(_tz):
+            return now
+
+    monkeypatch.setattr(runner, "datetime", FixedClock)
+    repo = f"{TEST_ORG}/sdk-python"
+    records, labels = [], []
+    for days in (5, 20, 150, 500):
+        when = now - timedelta(days=days)
+        for activity_type in (
+            "authored_pull_request",
+            "reviewed_pull_request",
+            "merged_pull_request",
+            "authored_issue",
+        ):
+            records.append(
+                ContributorActivityRecord(
+                    repo=repo,
+                    actor="alice",
+                    activity_type=activity_type,
+                    occurred_at=when,
+                    target_type="pull_request",
+                    target_number=len(records) + 1,
+                )
+            )
+        labels.append(
+            IssueTimelineEventRecord(
+                repo=repo,
+                actor="alice",
+                issue_number=len(labels) + 1,
+                event_type="labeled",
+                label="bug",
+                occurred_at=when,
+            )
+        )
+    # Enough reviews to exercise the load-share table's 20-action minimum.
+    for actor, days in [("alice", 5)] * 25 + [("bob", 150), ("carol", 500)]:
+        records.append(
+            ContributorActivityRecord(
+                repo=repo,
+                actor=actor,
+                activity_type="reviewed_pull_request",
+                occurred_at=now - timedelta(days=days),
+                target_type="pull_request",
+                target_number=len(records) + 1,
+            )
+        )
+    governance_config["teams"][0]["members"].append("never-active")
+    _patch_pipeline(monkeypatch, tmp_path, governance_config, records, labels)
+    runner.main(TEST_ORG)
+    return tmp_path
+
+
+def test_all_time_counts_include_history_beyond_a_year(historical_outputs):
+    """All five counts use the full history; bounded windows remain independently counted."""
+    data = historical_outputs / "data"
+    count_columns = ["prs_recent", "reviews_recent", "merges_recent", "issues_recent", "labels_recent"]
+    expected = {"": [4, 29, 4, 4, 4], "_7d": [1, 26, 1, 1, 1], "_30d": [2, 27, 2, 2, 2], "_365d": [3, 28, 3, 3, 3]}
+    base = pd.read_csv(data / "role_coverage_all.csv").set_index(["repo", "user"])
+    for suffix, counts in expected.items():
+        frame = pd.read_csv(data / f"role_coverage_all{suffix}.csv").set_index(["repo", "user"])
+        assert frame.loc[(f"{TEST_ORG}/sdk-python", "alice"), count_columns].tolist() == counts
+        assert (base[count_columns].sort_index() >= frame[count_columns].sort_index()).all().all()
+    for user in ("bob", "carol"):
+        assert base.loc[(f"{TEST_ORG}/sdk-python", user), "status"] == "active"
+    assert base.loc[(f"{TEST_ORG}/sdk-python", "never-active"), "status"] == "quiet"
+    # Activity in one repo must not make its holder active in another.
+    assert (base.loc[f"{TEST_ORG}/sdk-java", count_columns] == 0).all().all()
+    assert set(base.loc[f"{TEST_ORG}/sdk-java", "status"]) == {"quiet"}
+    assert base.loc[(f"{TEST_ORG}/sdk-python", "carol"), "days_since_active"] == 500
+
+
+def test_all_time_repo_summaries_use_full_history(historical_outputs):
+    """Activity, staffing and review-load summaries inherit the all-time counts and status."""
+    data = historical_outputs / "data"
+    overview = pd.read_csv(data / "repo_activity_overview.csv").set_index("repo")
+    assert overview.loc["sdk-python", "actions_recent"] == 47
+    assert overview.loc["sdk-python", "actions_all_time"] == 47
+    assert overview.loc["sdk-python", "active_recent"] == 3
+    assert overview.loc["sdk-python", "maintainer_actions_recent"] == 46
+    assert overview.loc["sdk-python", "committer_actions_recent"] == 1
+    risk = pd.read_csv(data / "maintainer_coverage_risk.csv").set_index("repo")
+    assert "sdk-python" not in risk.index  # Both maintainers have recorded activity.
+    assert risk.loc["sdk-java", "active_maintainers"] == 0
+    load = pd.read_csv(data / "review_load_share.csv").set_index("repo")
+    assert load.loc["sdk-python", "load_recent"] == 35
+    assert load.loc["sdk-python", "mergers"] == 3
+    assert load.loc["sdk-python", "top_carrier"] == "alice"
+    assert load.loc["sdk-python", "top_pct"] == 94  # 33 of 35 reviews + merges.
+
+
+def test_networks_and_legacy_coverage_keep_their_recent_window(historical_outputs):
+    """The dashboard's all-time fix must not redefine the existing 90-day outputs."""
+    data = historical_outputs / "data"
+    legacy = pd.read_csv(historical_outputs / "repo_data" / f"{TEST_ORG}_sdk-python" / "role_coverage.csv").set_index(
+        "user"
+    )
+    assert legacy.loc["alice", "prs_recent"] == 2
+    assert legacy.loc["alice", "reviews_recent"] == 27
+    assert legacy.loc["alice", "reviews_given"] == 29
+    assert legacy.loc["bob", "status"] == legacy.loc["carol", "status"] == "quiet"
+    for role, active in [("maintainer", 1), ("committer", 0)]:
+        nodes = pd.read_csv(data / f"{role}_network_nodes.csv").set_index("repo")
+        assert nodes.loc["sdk-python", "active_members"] == active
+
+
+def test_api_publishes_corrected_base_and_bounded_periods(historical_outputs):
+    """The same public columns carry all-time values and the independent period variants."""
+    data = historical_outputs / "data"
+    documents = {
+        spec["id"]: _section_document(spec, {}, TEST_ORG, data)
+        for spec in SECTION_SPECS
+        if spec["id"] in {"repo", "repoactivity", "understaffed", "loadshare"}
+    }
+    repo = documents["repo"]
+    alice = next(row for row in repo["rows"] if row["user"] == "alice" and row["repo"].endswith("/sdk-python"))
+    assert alice["reviews_recent"] == 29
+    year = next(
+        row for row in repo["periods"]["365d"] if row["user"] == "alice" and row["repo"].endswith("/sdk-python")
+    )
+    assert year["reviews_recent"] == 28
+    for document in documents.values():
+        assert set(document["periods"]) == {"7d", "30d", "365d"}
+        columns = {column["key"] for column in document["columns"]}
+        for rows in [document["rows"], *document["periods"].values()]:
+            assert all(set(row) == columns for row in rows)
+
+
+@pytest.mark.parametrize("days", [7, 30, 365])
+def test_period_count_boundary_is_inclusive(tmp_path, monkeypatch, governance_config, days):
+    """An event at the cutoff counts; one just before it belongs only to wider windows."""
+    now = datetime(2026, 10, 11, 12, tzinfo=UTC)
+
+    class FixedClock:
+        @staticmethod
+        def now(_tz):
+            return now
+
+    monkeypatch.setattr(runner, "datetime", FixedClock)
+    records = [
+        ContributorActivityRecord(
+            repo=f"{TEST_ORG}/sdk-python",
+            actor="alice",
+            activity_type="reviewed_pull_request",
+            occurred_at=now - timedelta(days=days, seconds=offset),
+            target_type="pull_request",
+            target_number=offset + 1,
+        )
+        for offset in (0, 1)
+    ]
+    _patch_pipeline(monkeypatch, tmp_path, governance_config, records, [])
+    runner.main(TEST_ORG)
+    for suffix, expected in [("", 2), (f"_{days}d", 1)]:
+        frame = pd.read_csv(tmp_path / "data" / f"role_coverage_all{suffix}.csv")
+        alice = frame[(frame["user"] == "alice") & frame["repo"].str.endswith("/sdk-python")]
+        assert alice["reviews_recent"].item() == expected

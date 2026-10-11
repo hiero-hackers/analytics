@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 import hiero_analytics.pipelines.entity_activity as runner
+import hiero_analytics.pipelines.role_coverage as role_runner
 from hiero_analytics.dashboard_spec import entities as spec
 from hiero_analytics.data_sources.models import ContributorActivityRecord, IssueTimelineEventRecord
 from hiero_analytics.export import data_api
@@ -242,6 +243,42 @@ def test_related_sections_join_available_tables_and_name_the_missing(org_data):
 def test_no_entity_tables_means_no_documents(tmp_path):
     """Without the pipeline's tables there is nothing to publish."""
     assert build_entity_documents(ORG, tmp_path, data_api._freshness) is None
+
+
+def test_governance_details_label_all_time_counts_and_status(org_data, monkeypatch):
+    """Joined governance fields include old activity and describe the same all-time scope."""
+    records = RECORDS + [_act("hiero-sdk-js", "dana", "reviewed_pull_request", 500) for _ in range(25)]
+    monkeypatch.setattr(runner, "load_contributor_activity", lambda *_args: records)
+    runner.main(ORG)
+    config = {
+        "teams": [{"name": "sdk-maintainers", "maintainers": ["bob"], "members": ["dana", "never-active"]}],
+        "repositories": [{"name": "hiero-sdk-js", "teams": {"sdk-maintainers": "maintain"}}],
+    }
+    monkeypatch.setattr(role_runner, "org_context", lambda _org: (None, org_data))
+    monkeypatch.setattr(role_runner, "fetch_governance_config", lambda _org: config)
+    monkeypatch.setattr(role_runner, "load_contributor_activity", lambda *_args: records)
+    monkeypatch.setattr(role_runner, "load_issue_label_events", lambda *_args: LABELS)
+    monkeypatch.setattr(role_runner, "ensure_repo_dirs", lambda _repo: org_data / "legacy")
+    role_runner.main(ORG)
+
+    document = _build(org_data).documents[f"{ORG}/entities/repositories/hiero-sdk-js.json"]
+    governance = next(section for section in document["related"] if section["id"] == "governance")
+    fields = {field["key"]: field for field in governance["fields"]}
+    assert fields["active_recent"]["value"] == 2
+    assert fields["mergers"]["value"] == 2
+    assert fields["top_carrier"]["value"] == "dana"
+    assert fields["top_pct"]["value"] == 93  # 25 of 27 reviews + merges.
+    for key in ("active_recent", "mergers", "top_carrier", "top_pct"):
+        assert "all time" in fields[key]["label"].replace("-", " ").lower()
+    assert "reviews + merges" in fields["top_pct"]["label"]
+    holders = governance["list"]
+    assert {row["user"]: row["status"] for row in holders["rows"]} == {
+        "bob": "active",
+        "dana": "active",
+        "never-active": "quiet",
+    }
+    status_column = next(column for column in holders["columns"] if column["key"] == "status")
+    assert status_column["label"] == "Status (all time)"
 
 
 def test_emit_publishes_entity_documents_and_lists_them_in_the_manifest(

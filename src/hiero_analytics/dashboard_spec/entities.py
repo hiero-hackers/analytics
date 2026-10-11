@@ -14,8 +14,6 @@ the optional per-repository tables below and publishes, per org:
 
 from __future__ import annotations
 
-from hiero_analytics.config.analysis import ROLE_ACTIVE_DAYS
-
 # Tables the entity_activity pipeline writes into each org's data directory.
 REPO_ACTIVITY_FILE = "entity_repo_activity.csv"
 CONTRIBUTOR_ACTIVITY_FILE = "entity_contributor_activity.csv"
@@ -128,7 +126,7 @@ REPO_RELATED = {
             ("maintainers", "Maintainers", "number"),
             ("committers", "Committers", "number"),
             ("triage", "Triage", "number"),
-            ("active_recent", f"Permission-holders active in the last {ROLE_ACTIVE_DAYS} days", "number"),
+            ("active_recent", "Permission-holders with activity (all time)", "number"),
         ],
         "extra": [
             {
@@ -142,9 +140,9 @@ REPO_RELATED = {
             {
                 "file": "review_load_share.csv",
                 "columns": [
-                    ("mergers", "People merging recently", "number"),
-                    ("top_carrier", "Largest review load"),
-                    ("top_pct", "Their share of recent merges", "percent"),
+                    ("mergers", "People reviewing or merging (all time)", "number"),
+                    ("top_carrier", "Largest review + merge load (all time)"),
+                    ("top_pct", "Share of all-time reviews + merges", "percent"),
                 ],
             },
             {
@@ -159,7 +157,7 @@ REPO_RELATED = {
             "columns": [
                 ("user", "Person"),
                 ("granted_role", "Role"),
-                ("status", "Status", "status"),
+                ("status", "Status (all time)", "status"),
                 ("last_active", "Last active (UTC)", "date"),
             ],
         },

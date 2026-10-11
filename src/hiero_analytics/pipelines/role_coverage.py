@@ -1,11 +1,12 @@
 """Build per-repository role-coverage tables: governance roles vs. real activity.
 
 For each repo with governance-assigned roles, writes who holds triage / committer
-/ maintainer permissions, their contribution counts in that repo (both all-time and
-over the last ``ROLE_ACTIVE_DAYS`` days, as ``*_recent`` columns), and whether they
-are currently active or **quiet in that repo** (no activity in that window) — plus a
-combined ``role_coverage_all`` table (filter by repo) and the inverse
-promotion-candidate list. Status and days-since-active reflect all-time recency.
+/ maintainer permissions and their activity. The dashboard's combined
+``role_coverage_all`` base and its summaries count all recorded history; their
+period variants scope ``*_recent`` counts and active/quiet status to that period.
+Days-since-active always reflects the latest recorded activity in the repo.
+Legacy per-repo coverage, promotion candidates and role networks keep the fixed
+``ROLE_ACTIVE_DAYS`` recency window independently of the dashboard period tabs.
 Because roles are granted per repo, the only org-wide quiet list is
 ``role_coverage_globally_quiet``: holders with no activity in *any* repo within
 the shared activity periods (the base file lists holders never active at all).
@@ -74,7 +75,7 @@ def _build_profile_sets(records, label_events, now):
 
     Returns ``(all_time_by_repo, all_time_org_profiles, recent_by_repo,
     repo_last_seen, global_last_seen)``. Counts are all-time except ``recent_by_repo``
-    (the last ``ROLE_ACTIVE_DAYS`` days, for role coverage's ``*_recent`` columns).
+    (the last ``ROLE_ACTIVE_DAYS`` days, for legacy per-repo coverage and networks).
     """
     all_time_by_repo = build_contributor_profiles_by_repo(records, label_events)
     all_time_org_profiles = build_contributor_profiles(records, label_events)
@@ -100,8 +101,10 @@ def _build_role_coverage(
 ):
     """Build combined coverage, optionally writing legacy per-repo tables.
 
-    Counts are all-time with period-scoped ``*_recent`` columns; status/recency is all-time.
-    Every repo with role-holders is covered, even quiet ones.
+    ``recent_by_repo`` supplies the selected window's ``*_recent`` counts;
+    ``active_within_days`` scopes status. Use all-time profiles and ``None`` for
+    the dashboard base. Last-active dates always use the full history. Every repo
+    with role-holders is covered, even quiet ones.
     """
     # Cover every governance repo that has role-holders — including quiet ones with
     # no recorded activity (often the highest-risk repos) — not just repos seen in
@@ -250,16 +253,31 @@ def main(org: str = ORG) -> None:
     profiles = _build_profile_sets(records, label_events, now)
     all_time_by_repo, all_time_org_profiles, recent_by_repo, repo_last_seen, global_last_seen = profiles
     logger.info(
-        "All-time profiles across %d repos; role coverage also reports last %d days",
+        "All-time profiles across %d repos; legacy coverage and networks use last %d days",
         len(all_time_by_repo),
         ROLE_ACTIVE_DAYS,
     )
 
-    combined = _build_role_coverage(roles_by_repo, all_time_by_repo, recent_by_repo, repo_last_seen, now=now, org=org)
+    # Preserve the fixed recency window for the legacy per-repo files and networks.
+    recent_coverage = _build_role_coverage(
+        roles_by_repo, all_time_by_repo, recent_by_repo, repo_last_seen, now=now, org=org
+    )
+    # The dashboard's no-period base means all recorded time, including status.
+    # Do not overwrite the legacy per-repo files with this different window.
+    combined = _build_role_coverage(
+        roles_by_repo,
+        all_time_by_repo,
+        all_time_by_repo,
+        repo_last_seen,
+        now=now,
+        active_within_days=None,
+        write_repo_files=False,
+        org=org,
+    )
     if not combined.empty:
         save_dataframe(combined, org_data_dir / "role_coverage_all.csv")
         _write_repo_summaries(combined, org_data_dir)
-        _write_role_networks(combined, org_data_dir)
+        _write_role_networks(recent_coverage, org_data_dir)
 
     for period in ACTIVITY_PERIODS:
         # Every ACTIVITY_PERIODS entry is a bounded window (all-time is the
