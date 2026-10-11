@@ -48,6 +48,54 @@ _CONTRIBUTOR_ACTIVITY_TYPES = [
 ]
 
 
+# Safety cap on follow-up review pages per PR (100 reviews each).
+_MAX_REVIEW_PAGES = 50
+
+
+def _fetch_remaining_reviews(
+    client: GitHubClient,
+    owner: str,
+    repo: str,
+    pr_number: int,
+    cursor: str | None,
+) -> list[dict]:
+    """Fetch review pages after ``cursor`` for a single pull request."""
+    reviews_query = load_query("pr_reviews")
+
+    def page(page_cursor: str | None) -> tuple[list[dict], str | None, bool]:
+        """Fetch one page of reviews for the pull request."""
+        data = client.graphql(
+            reviews_query,
+            {"owner": owner, "repo": repo, "number": pr_number, "cursor": page_cursor},
+        )
+        return extract_graphql_cursor_page(data, ["repository", "pullRequest", "reviews"])
+
+    # paginate_cursor always starts from a None cursor, so seed the first
+    # call with the cursor where the main query left off.
+    def seeded(page_cursor: str | None) -> tuple[list[dict], str | None, bool]:
+        return page(page_cursor if page_cursor is not None else cursor)
+
+    return paginate_cursor(seeded, max_pages=_MAX_REVIEW_PAGES)
+
+
+def _merge_remaining_reviews(
+    client: GitHubClient,
+    owner: str,
+    repo: str,
+    node: dict,
+) -> None:
+    """Fold extra review pages into ``node["reviews"]`` when a PR has >100 reviews."""
+    reviews = node.get("reviews") or {}
+    page_info = reviews.get("pageInfo") or {}
+    if not page_info.get("hasNextPage") or not page_info.get("endCursor"):
+        return
+
+    extra = _fetch_remaining_reviews(client, owner, repo, node["number"], page_info["endCursor"])
+    reviews["nodes"] = [*(reviews.get("nodes") or []), *extra]
+    # All pages are merged now, so the truncation warning must not fire.
+    reviews["pageInfo"] = {"hasNextPage": False, "endCursor": None}
+
+
 def _fetch_repo_pull_request_activity_graphql(
     client: GitHubClient,
     owner: str,
@@ -77,6 +125,8 @@ def _fetch_repo_pull_request_activity_graphql(
             updated_at = _parse_graphql_datetime(node.get("updatedAt"))
             if cutoff is not None and updated_at is not None and updated_at < cutoff:
                 page_has_older_prs = True
+
+            _merge_remaining_reviews(client, owner, repo, node)
 
             records.extend(
                 ContributorActivityRecord.from_github_node(

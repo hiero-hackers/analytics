@@ -303,3 +303,89 @@ def test_fetch_org_contributor_activity_graphql(monkeypatch, mock_client):
 
     assert len(records) == 2
     assert {record.repo for record in records} == {"org/repo1", "org/repo2"}
+
+
+def _review(login: str, submitted_at: str, state: str = "APPROVED") -> dict:
+    """Build a GraphQL review node."""
+    return {"state": state, "submittedAt": submitted_at, "author": {"login": login}}
+
+
+def _pr_page(reviews: dict) -> dict:
+    """Wrap one PR node with the given reviews connection in a PR-list response."""
+    now = _to_iso(datetime.now(UTC) - timedelta(days=1))
+    return {
+        "data": {
+            "repository": {
+                "pullRequests": {
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                    "nodes": [
+                        {
+                            "number": 7,
+                            "createdAt": now,
+                            "updatedAt": now,
+                            "mergedAt": None,
+                            "author": {"login": "alice"},
+                            "mergedBy": None,
+                            "reviews": reviews,
+                        }
+                    ],
+                }
+            }
+        }
+    }
+
+
+def _reviews_page(nodes: list[dict], has_next: bool, end_cursor: str | None) -> dict:
+    """Build a per-PR reviews response."""
+    return {
+        "data": {
+            "repository": {
+                "pullRequest": {
+                    "reviews": {
+                        "pageInfo": {"hasNextPage": has_next, "endCursor": end_cursor},
+                        "nodes": nodes,
+                    }
+                }
+            }
+        }
+    }
+
+
+def test_pull_request_reviews_paginate_across_pages(mock_client, caplog):
+    """Reviews beyond the first 100 are fetched and included without duplicates."""
+    ts = _to_iso(datetime.now(UTC) - timedelta(hours=5))
+    mock_client.graphql.side_effect = [
+        _pr_page(
+            {
+                "pageInfo": {"hasNextPage": True, "endCursor": "c1"},
+                "nodes": [_review("r1", ts)],
+            }
+        ),
+        _reviews_page([_review("r2", ts)], True, "c2"),
+        _reviews_page([_review("r3", ts)], False, None),
+    ]
+
+    with caplog.at_level("WARNING"):
+        records = ingest.contributors._fetch_repo_pull_request_activity_graphql(mock_client, "org", "repo", None)
+
+    reviewers = sorted(r.actor for r in records if r.activity_type == "reviewed_pull_request")
+    assert reviewers == ["r1", "r2", "r3"]
+    assert mock_client.graphql.call_count == 3
+    # Follow-up calls resume from the cursor the main query returned.
+    assert mock_client.graphql.call_args_list[1].args[1]["cursor"] == "c1"
+    assert mock_client.graphql.call_args_list[1].args[1]["number"] == 7
+    assert mock_client.graphql.call_args_list[2].args[1]["cursor"] == "c2"
+    assert "review history truncated" not in caplog.text
+
+
+def test_pull_request_reviews_single_page_makes_no_follow_up(mock_client):
+    """PRs with 100 or fewer reviews trigger no extra requests."""
+    ts = _to_iso(datetime.now(UTC) - timedelta(hours=5))
+    mock_client.graphql.side_effect = [
+        _pr_page({"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": [_review("r1", ts)]}),
+    ]
+
+    records = ingest.contributors._fetch_repo_pull_request_activity_graphql(mock_client, "org", "repo", None)
+
+    assert [r.actor for r in records if r.activity_type == "reviewed_pull_request"] == ["r1"]
+    assert mock_client.graphql.call_count == 1

@@ -1,0 +1,25 @@
+query PR_REVIEWS_QUERY($owner:String!, $repo:String!, $number:Int!, $cursor:String) {
+  repository(owner:$owner, name:$repo) {
+    pullRequest(number:$number) {
+      reviews(first:100, after:$cursor) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          state
+          submittedAt
+          author {
+            login
+          }
+        }
+      }
+    }
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}
