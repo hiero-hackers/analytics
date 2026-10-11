@@ -27,7 +27,18 @@ PIPELINES: tuple[Pipeline, ...] = (
     Pipeline("contributor_profiles", "Analyze contributor profiles", args=("org", "repo")),
     Pipeline("maintainer_pipeline", "Run maintainer analytics pipeline", args=("org",), offline=True),
     Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True, extra_orgs=True),
-    Pipeline("contributor_heatmap", "Generate contributor activity heatmaps", args=("org",), offline=True),
+    # No dashboard section consumes these tables yet, so it is CLI-only until one
+    # does (the same convention as contributor_churn below). Flip in_default_run
+    # then — and only then add extra_orgs: the full run repeats every extra_orgs
+    # pipeline for the extra orgs even when it is not in the default run.
+    Pipeline(
+        "pr_responsiveness",
+        "Measure time-to-first-review and time-to-merge for merged PRs (writes pr_responsiveness CSVs)",
+        args=("org",),
+        in_default_run=False,
+        offline=True,
+    ),
+    Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),
     Pipeline("role_coverage", "Analyze role coverage for organization", args=("org",), offline=True),
     Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
     Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
