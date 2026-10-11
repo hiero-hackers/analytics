@@ -3,6 +3,13 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CIHealthMatrixView, CIHealthCell } from '../api';
 import { CIHealthEvidencePanel } from './CIHealthEvidencePanel';
 
+const STATUS_LABELS: Record<CIHealthCell['status'], string> = {
+  pass: 'pass',
+  fail: 'fail',
+  review: 'review',
+  na: 'not applicable',
+};
+
 function cellClass(status: CIHealthCell['status']): string {
   return `cimx-cell cimx-${status}`;
 }
@@ -54,11 +61,14 @@ export function CIHealthMatrix({
     );
   };
 
+  const bandHeader = view.bands && view.bands.length > 0;
+
   return (
     <>
       <div className="cimx-filters">
         <input
           className="search"
+          aria-label="Filter CI health by repository or check"
           placeholder="Filter by repository or check…"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -71,6 +81,7 @@ export function CIHealthMatrix({
             <button
               key={option}
               type="button"
+              aria-pressed={status === option}
               className={option === status ? 'cimx-fbtn active' : 'cimx-fbtn'}
               onClick={() => setStatus((current) => (current === option ? '' : option))}
             >
@@ -83,10 +94,23 @@ export function CIHealthMatrix({
       <div className="cimx-wrap">
         <table className="cimx">
           <thead>
+            {bandHeader && (
+              <tr className="cimx-band">
+                <th scope="col" aria-label="Blank header cell" />
+                {view.bands!.map((band) => (
+                  <th key={band.label} scope="col" colSpan={band.span}>
+                    {band.label}
+                  </th>
+                ))}
+              </tr>
+            )}
+
             <tr>
-              <th>{view.row_header}</th>
+              <th scope="col">{view.row_header}</th>
               {view.columns.map((column) => (
-                <th key={column.key}>{column.label}</th>
+                <th key={column.key} scope="col">
+                  {column.label}
+                </th>
               ))}
             </tr>
           </thead>
@@ -94,11 +118,11 @@ export function CIHealthMatrix({
           <tbody>
             {rows.map((row) => (
               <tr key={row.key}>
-                <th>{row.label}</th>
+                <th scope="row">{row.label}</th>
 
                 {row.cells.map((cell) => {
                   const clickable = cell.status === 'fail' || cell.status === 'review';
-
+                  const ariaLabel = `${row.label} — ${cell.label}: ${STATUS_LABELS[cell.status]}`;
                   const isSelected = selected?.repo === row.key && selected.cell.key === cell.key;
 
                   return (
@@ -106,6 +130,7 @@ export function CIHealthMatrix({
                       key={cell.key}
                       className={`${cellClass(cell.status)}${isSelected ? ' selected' : ''}`}
                       title={clickable ? `${cell.status}: click for evidence` : cell.status}
+                      aria-label={ariaLabel}
                       {...(clickable && {
                         onClick: () => toggleCell(row.key, cell),
                         onKeyDown: (event: React.KeyboardEvent) => {

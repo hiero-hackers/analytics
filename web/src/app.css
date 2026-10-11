@@ -599,6 +599,15 @@
     font-size: 11px;
   }
 
+  .cimx thead .cimx-band th {
+    background: var(--surface-strong);
+    color: var(--soft);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--edge-faint);
+    text-transform: uppercase;
+  }
+
   .cimx th {
     border-bottom: none;
     cursor: default;
