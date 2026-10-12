@@ -68,6 +68,7 @@ from hiero_analytics.dashboard_spec import (
     PROJECT_ISSUES_URL,
     TABLE_FAMILIES,
     WIDE_CHARTS,
+    chart_specs_for_org,
     table_variants,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
@@ -328,10 +329,11 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
     """
     sections = []
     for macro in CHART_MACROS:
-        # "*" declares org-independent cards: they apply to any org, and the
-        # per-variant existence filter below drops whatever an org's pipelines
-        # didn't produce. An explicit org key overrides the wildcard.
-        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
+        # Cards compose from every key the org matches: "*" (org-independent),
+        # a capability key like "@governed" / "@org_overview" (from the org
+        # registry), then the org's own key. The per-variant existence filter
+        # below drops whatever an org's pipelines didn't produce.
+        for spec in chart_specs_for_org(macro["charts"], org):
             charts = []
             for caption, variant_specs in spec["variants"]:
                 variants = [
@@ -483,7 +485,7 @@ def _source_sections(
         add(name, {"macro": ref["macro"], "id": ref["id"], "title": ref["title"]})
     emitted = {section["id"]: section for section in chart_sections}
     for macro in CHART_MACROS:
-        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
+        for spec in chart_specs_for_org(macro["charts"], org):
             section = emitted.get(spec["id"])
             if section is None:
                 continue

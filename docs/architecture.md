@@ -178,12 +178,36 @@ are applied in three places:
 
 ## Multi-org
 
-Output dirs are per-org, so multiple orgs coexist. `config.paths.EXTRA_ORGS` is the
-single "also render this org" concept (consumed by both `run_all`'s contributor pass
-and the heatmap). Governance is per-org: `fetch_governance_config(org)` resolves each
-org's source from `GOVERNANCE_CONFIG_URLS` and snapshots it under an org-scoped path;
-an org with no configured source is *ungoverned* (empty config — it never inherits
-another org's roles).
+`config/orgs.py` is the single source of truth: an `OrgProfile` per org declaring
+whether it is `governed` (publishes a `config.yaml`), gets the org-overview cards
+(`org_overview`), and is rendered by the full run (`extra`). **Onboarding an org
+is adding one `OrgProfile`** — every org-shaped consumer reads the registry rather
+than hardcoding a name:
+
+- `GOVERNANCE_CONFIG_URLS` is derived from the registry, so `fetch_governance_config(org)`
+  resolves each governed org's source and snapshots it under an org-scoped path.
+  An unregistered or ungoverned org has no source, so it is *ungoverned* (empty
+  config — it never inherits another org's roles).
+- `extra_orgs()` derives the "also render this org" set from `extra`, filtered by
+  `GITHUB_EXTRA_ORGS` when set; both `run_all`'s contributor pass and the
+  contributor heatmap read it, so the concept has one home.
+- The `org_overview` pipeline iterates the registry's `org_overview` orgs.
+
+`GITHUB_ORG` still selects the primary org and `GITHUB_EXTRA_ORGS` still filters
+the extras, so the env is a *view* over the registry, not a replacement.
+
+### Dashboard chart spec composition
+
+A family's `charts` dict composes per org instead of one key overriding another
+(`chart_specs_for_org` in `dashboard_spec/_assembly.py`). Three key kinds, applied
+in order:
+
+| Key | Applies to |
+| --- | --- |
+| `"*"` | every org (org-independent cards) |
+| `"@governed"`, `"@org_overview"` | orgs whose registry profile has that capability |
+| `"hiero-hackers"` | that org alone |
+
 
 ## The dashboard contract
 

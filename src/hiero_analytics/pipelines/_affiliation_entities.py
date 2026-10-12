@@ -10,6 +10,8 @@ stay separate entities.
 
 from __future__ import annotations
 
+from hiero_analytics.config.orgs import org_names
+
 NOREPLY = "users.noreply.github.com"
 
 # --- entity maps (each a distinct entity; Swirlds Labs folded into Hashgraph) ---
@@ -154,4 +156,4 @@ COMPANY_JUNK = {
     "web3",
     "blockchain",
 }
-COMPANY_NOT_EMPLOYER = {"hiero-ledger", "hiero-hackers", "hiero", "lf-decentralized-trust"}
+COMPANY_NOT_EMPLOYER = {*org_names(), "hiero", "lf-decentralized-trust"}

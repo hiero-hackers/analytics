@@ -88,7 +88,7 @@ Where the points go (GraphQL points, cold / warm):
 | `merged_pr_difficulty` | 192 | 168 |
 | `issue_label_events` | 86 | 56 |
 | `contributor_activity` | 62 | reused |
-| `hiero_hackers` | 62 | reused |
+| `org_overview` | 62 | reused |
 | `issues` | 58 | 56 |
 | `ci_health` | 28 | reused |
 | `onboarding` | 20 | reused |

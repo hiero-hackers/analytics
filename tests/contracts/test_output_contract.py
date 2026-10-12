@@ -33,10 +33,10 @@ import hiero_analytics.pipelines.contributor_profiles as profiles_mod
 import hiero_analytics.pipelines.difficulty as difficulty_mod
 import hiero_analytics.pipelines.difficulty_over_time as difficulty_time_mod
 import hiero_analytics.pipelines.entity_activity as entity_mod
-import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
+import hiero_analytics.pipelines.org_overview as overview_mod
 import hiero_analytics.pipelines.releases as releases_mod
 import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
@@ -45,6 +45,7 @@ import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.analysis.ci_health_types import CheckResult
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.dashboard_spec import entities as entity_spec
+from hiero_analytics.dashboard_spec._assembly import chart_specs_for_org
 from hiero_analytics.data_sources.github_ingest.ci_health import CIHealthRecord
 from hiero_analytics.data_sources.models import (
     CodeOwnersRecord,
@@ -421,7 +422,7 @@ def outputs_root(tmp_path_factory) -> Path:
             ],
         )
         mp.setattr(
-            hackers_mod,
+            overview_mod,
             "fetch_org_repos_graphql",
             lambda _c, org: [_repo(org, "analytics"), _repo(org, "hips", "Markdown")],
         )
@@ -436,7 +437,7 @@ def outputs_root(tmp_path_factory) -> Path:
             lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
         )
         mp.setattr(releases_mod, "fetch_org_releases_graphql", lambda _c, _org, **_kwargs: RELEASES)
-        mp.setattr(hackers_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
+        mp.setattr(overview_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
         mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)
         mp.setattr(hip_mod, "fetch_org_pr_hip_refs_graphql", lambda _c, _org, **_k: HIP_REFS)
 
@@ -601,20 +602,23 @@ def test_every_spec_table_csv_is_produced(outputs_root: Path):
 def test_every_spec_chart_source_is_produced(outputs_root: Path):
     """Each chart variant's dataset exists for its org (CLI-only pipelines excepted).
 
-    "*" cards are org-independent and best-effort per org, but the primary org
-    runs every pipeline, so they are pinned against it.
+    Card keys are resolved per org — ``"*"`` is org-independent and best-effort,
+    but every org the run renders must have the datasets its own cards declare.
+    The primary org runs every pipeline, so a capability key's cards are pinned
+    against whichever orgs actually have that capability.
     """
+    rendered = [profile.name for profile in paths.ORGS]
     missing = []
     for macro in CHART_MACROS:
-        for org, specs in macro["charts"].items():
-            org_data = outputs_root / "data" / "org" / (PRIMARY if org == "*" else org)
-            for spec in specs:
+        for org in rendered:
+            for spec in chart_specs_for_org(macro["charts"], org):
                 if spec["id"] in CLI_ONLY_CHART_CARDS:
                     continue
+                org_data = outputs_root / "data" / "org" / org
                 names = [
                     n for source in spec["sources"].values() for n in (source["file"], source.get("edges_file")) if n
                 ]
-                missing += [f"{org_data.name}/{name}" for name in names if not (org_data / name).exists()]
+                missing += [f"{org}/{name}" for name in names if not (org_data / name).exists()]
     assert not missing, f"spec lists chart datasets no pipeline produced: {sorted(set(missing))}"
 
 

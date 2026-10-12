@@ -19,7 +19,7 @@ ABSENT_NOTE = (
 CHART_MACRO = {
     "name": "Community",
     "charts": {
-        "hiero-ledger": [
+        "@primary": [
             {
                 "id": "discord",
                 "sources": DISCORD_SOURCES,

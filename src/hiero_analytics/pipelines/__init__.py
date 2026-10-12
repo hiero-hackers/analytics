@@ -54,7 +54,11 @@ PIPELINES: tuple[Pipeline, ...] = (
         args=("org",),
         extra_orgs=True,
     ),
-    Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
+    Pipeline(
+        "org_overview",
+        "Build org-overview cards (repos by contributors, language mix, recent pushes)",
+        args=("org",),
+    ),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays
     # offline-capable for PR previews.

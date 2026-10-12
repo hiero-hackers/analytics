@@ -24,7 +24,7 @@ ABSENT_NOTE = (
 CHART_MACRO = {
     "name": "HIPs",
     "charts": {
-        "hiero-ledger": [
+        "@primary": [
             {
                 "id": "hip-adoption-funnel",
                 "group": "Adoption",

@@ -21,7 +21,12 @@ from hiero_analytics.dashboard_spec import (
     releases,
     security,
 )
-from hiero_analytics.dashboard_spec._assembly import canonical_macro, merged, table_variants
+from hiero_analytics.dashboard_spec._assembly import (
+    canonical_macro,
+    chart_specs_for_org,
+    merged,
+    table_variants,
+)
 from hiero_analytics.dashboard_spec.metrics import METRIC_ANNOTATIONS
 
 # Macro (family) display order — the tab order the dashboard shows.
@@ -46,6 +51,7 @@ __all__ = [
     "PROJECT_ISSUES_URL",
     "TABLE_FAMILIES",
     "WIDE_CHARTS",
+    "chart_specs_for_org",
     "table_variants",
 ]
 

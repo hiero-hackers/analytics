@@ -10,6 +10,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from types import ModuleType
 
+from hiero_analytics.config.orgs import has_org_overview, is_governed, is_primary
+
 
 def canonical_macro(family_macro: dict) -> dict:
     """Canonicalize a family's chart macro for consumers.
@@ -62,3 +64,45 @@ def table_variants(section: dict) -> list[dict]:
     if not declared:
         return [section]
     return [{**{key: value for key, value in section.items() if key != "variants"}, **variant} for variant in declared]
+
+
+# Chart keys, applied in this order. ``"*"`` renders for every org; a capability
+# key (``@``-prefixed) renders for orgs the registry says have that capability; a
+# bare org name renders for that org alone.
+WILDCARD_KEY = "*"
+GOVERNED_KEY = "@governed"
+ORG_OVERVIEW_KEY = "@org_overview"
+PRIMARY_KEY = "@primary"
+
+
+def capability_keys(org: str) -> tuple[str, ...]:
+    """The capability keys ``org`` matches, in application order.
+
+    Keyed off the org registry (:mod:`hiero_analytics.config.orgs`) rather than
+    hardcoded org names, so a newly registered governed org picks up the
+    governance tab's cards without a spec change.
+    """
+    keys = []
+    if is_primary(org):
+        keys.append(PRIMARY_KEY)
+    if is_governed(org):
+        keys.append(GOVERNED_KEY)
+    if has_org_overview(org):
+        keys.append(ORG_OVERVIEW_KEY)
+    return tuple(keys)
+
+
+def chart_specs_for_org(charts: dict, org: str) -> list[dict]:
+    """A family's chart cards for ``org``, composed from every key it matches.
+
+    Composition, not replacement: wildcard cards apply to all orgs, capability
+    keys add what the org's profile entitles it to, and an explicit org key adds
+    its own cards — so an org key declares only its extras, never the wildcard
+    list. Redeclaring a card id still replaces its content in place, keeping
+    card order stable across orgs.
+    """
+    ordered: dict[str, dict] = {}
+    for key in (WILDCARD_KEY, *capability_keys(org), org):
+        for spec in charts.get(key, []):
+            ordered[spec["id"]] = spec
+    return list(ordered.values())

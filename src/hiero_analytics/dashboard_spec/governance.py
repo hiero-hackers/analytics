@@ -43,7 +43,7 @@ ABSENT_NOTE = (
 CHART_MACRO = {
     "name": "Governance",
     "charts": {
-        "hiero-ledger": [
+        "@governed": [
             {
                 "id": "maintainer-pipeline",
                 # Same windows as the span tabs: all years, 12 months, 5 ISO weeks, 7 days.

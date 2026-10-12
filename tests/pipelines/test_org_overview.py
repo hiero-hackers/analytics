@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-import hiero_analytics.pipelines.hiero_hackers as runner
+import hiero_analytics.pipelines.org_overview as runner
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     RepositoryRecord,
@@ -93,17 +93,17 @@ def test_main_creates_output_files(
     """Running main() should create the expected data files."""
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.org_context",
+        "hiero_analytics.pipelines.org_overview.org_context",
         lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_repos_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_repos_graphql",
         lambda _client, _org: synthetic_repos,
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
         lambda _client, _org: synthetic_activity,
     )
 
@@ -134,17 +134,17 @@ def test_main_handles_empty_activity(
     """Running main() with empty activity should not crash."""
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.org_context",
+        "hiero_analytics.pipelines.org_overview.org_context",
         lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_repos_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_repos_graphql",
         lambda _client, _org: synthetic_repos,
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
         lambda _client, _org: [],  # Empty activity
     )
 
@@ -166,17 +166,17 @@ def test_main_with_empty_repos(
     """Running main() with empty repos should not crash."""
     # Redirect paths to tmp_path and stub the GitHub client
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.org_context",
+        "hiero_analytics.pipelines.org_overview.org_context",
         lambda _org: (mock_github_client, tmp_path / "data"),
     )
 
     # Mock GitHub API calls
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_repos_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_repos_graphql",
         lambda _client, _org: [],  # Empty repos
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.hiero_hackers.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
         lambda _client, _org: [],
     )
 

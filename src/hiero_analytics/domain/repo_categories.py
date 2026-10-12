@@ -7,6 +7,7 @@ to colour the maintainer network and reusable for any other per-repo grouping.
 
 from __future__ import annotations
 
+from hiero_analytics.config.orgs import repo_category_overrides
 from hiero_analytics.domain.repos import bare_repo
 
 # Curated map. Keys are bare repo names (the part after the last '/'), lowercased.
@@ -67,6 +68,10 @@ REPO_CATEGORIES = {
     "hiero-sdk-csharp": "SDKs",
 }
 
+# Per-org registry entries (config/orgs.py) override the map above, so an org can
+# fix a keyword rule that mis-buckets one of its own repos.
+REPO_CATEGORIES.update(repo_category_overrides())
+
 # Stable display / colour order; "Other" is the fallback bucket, shown last.
 CATEGORY_ORDER = [
     "SDKs",
@@ -112,7 +117,8 @@ _KEYWORD_RULES = [
 def categorize_repo(repo: str) -> str:
     """Map a repository (``owner/name`` or bare name) to a semantic category.
 
-    Checks the curated map first, then ordered keyword rules, else ``"Other"``.
+    Checks the curated map first (the per-org registry entries merged into the
+    primary map), then the ordered keyword rules, else ``"Other"``.
     """
     name = bare_repo(str(repo)).lower()
     if name in REPO_CATEGORIES:

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -12,22 +11,18 @@ import requests
 import yaml
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
-from hiero_analytics.config.paths import DATASETS_DIR, ORG, dataset_path
+from hiero_analytics.config.orgs import PRIMARY_ORG, governance_urls
+from hiero_analytics.config.paths import DATASETS_DIR, dataset_path
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled
 from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.roles import ROLE_PRIORITY, permission_to_role
 
 logger = logging.getLogger(__name__)
 
-# Per-org governance config sources. Only governed orgs appear here; an org
-# without an entry (e.g. the composition org) has no governance roles and
-# fetches an empty config rather than inheriting another org's. The
-# GOVERNANCE_CONFIG_URL env var overrides the configured primary org's source.
-GOVERNANCE_CONFIG_URLS: dict[str, str] = {
-    "hiero-ledger": "https://raw.githubusercontent.com/hiero-ledger/governance/main/config.yaml",
-}
-if _url_override := os.getenv("GOVERNANCE_CONFIG_URL"):
-    GOVERNANCE_CONFIG_URLS[ORG] = _url_override
+# Per-org governance config sources, derived from the org registry — an org
+# is governed because its profile says so, not because it appears here. An org
+# with no source fetches an empty config rather than inheriting another org's.
+GOVERNANCE_CONFIG_URLS: dict[str, str] = governance_urls()
 
 # Org-wide "blanket" teams: assigned to (nearly) every repo, so counting them as a
 # repo's role-holders would stamp the same handful of people onto all repos and
@@ -81,7 +76,7 @@ def _validate_governance_config(data: Any) -> dict[str, Any]:
 
 
 def fetch_governance_config(
-    org: str = ORG,
+    org: str = PRIMARY_ORG,
     *,
     url: str | None = None,
     snapshot_path: Path | None = None,

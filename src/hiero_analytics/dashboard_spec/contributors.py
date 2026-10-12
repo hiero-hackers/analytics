@@ -41,68 +41,6 @@ CHART_MACRO = {
             },
             {
                 "id": "activity-heatmap",
-                "title": "Activity heatmaps",
-                "group": "Activity & networks",
-                "slideshow": True,
-                "description": (
-                    "Weighted monthly activity over the last six months (stronger colour = more active). Slide "
-                    "through the same activity zooming steadily out — from each individual contributor, "
-                    "to their governance team, to their employer, and finally to the repositories the "
-                    "work lands in. For employer concentration and authority risk, see the Governance tab."
-                ),
-                "variants": [
-                    ("By contributor", "contributor_activity_heatmap"),
-                    ("By team", "team_activity_heatmap"),
-                    ("By organisation", "org_activity_heatmap"),
-                    ("By repository", "repo_activity_heatmap"),
-                ],
-                "sources": ACTIVITY_HEATMAP_SOURCES,
-            },
-            {
-                "id": "repo-growth",
-                "title": "Repository growth",
-                "group": "Activity & networks",
-                "description": (
-                    "How quickly the organisation is creating new repositories. The monthly view shows "
-                    "new repos per month; the cumulative view shows the total repo count over time. Data "
-                    "comes from each repository's createdAt timestamp."
-                ),
-                "variants": [
-                    ("New repos per month", "repos_created_per_month"),
-                    ("Cumulative repo count", "cumulative_repo_count"),
-                ],
-                "sources": REPO_GROWTH_SOURCES,
-            },
-        ],
-        "hiero-hackers": [
-            {
-                "id": "org-overview",
-                "sources": OVERVIEW_SOURCES,
-                "title": "Organization overview (org-wide)",
-                "group": "Org overview",
-                "description": (
-                    "Org-wide view of hiero-hackers: repositories ranked by contributor count, "
-                    "the language mix across repos, and how many repos pushed in the last 30 days."
-                ),
-                "variants": [
-                    ("Top repositories by contributors", "contributor_counts"),
-                    ("Programming languages", "language_distribution"),
-                    ("Repository push activity (30d)", "push_activity"),
-                ],
-            },
-            {
-                "id": "contributor-network",
-                "title": "Contributor network",
-                "group": "Activity & networks",
-                "description": (
-                    "Each bubble is a repository, sized by its active contributors; two repos are "
-                    "linked when they share contributors. Colour = repository type. Click to enlarge."
-                ),
-                "variants": [("Repositories linked by shared contributors", "all_network")],
-                "sources": {"all_network": CONTRIBUTOR_NETWORK},
-            },
-            {
-                "id": "activity-heatmap",
                 "title": "Contributor activity heatmap",
                 "group": "Activity & networks",
                 "description": (
@@ -126,6 +64,46 @@ CHART_MACRO = {
                     ("Cumulative repo count", "cumulative_repo_count"),
                 ],
                 "sources": REPO_GROWTH_SOURCES,
+            },
+        ],
+        # "@governed": governed orgs run the affiliation pipeline.
+        "@governed": [
+            {
+                "id": "activity-heatmap",
+                "title": "Activity heatmaps",
+                "group": "Activity & networks",
+                "slideshow": True,
+                "description": (
+                    "Weighted monthly activity over the last six months (stronger colour = more active). Slide "
+                    "through the same activity zooming steadily out — from each individual contributor, "
+                    "to their governance team, to their employer, and finally to the repositories the "
+                    "work lands in. For employer concentration and authority risk, see the Governance tab."
+                ),
+                "variants": [
+                    ("By contributor", "contributor_activity_heatmap"),
+                    ("By team", "team_activity_heatmap"),
+                    ("By organisation", "org_activity_heatmap"),
+                    ("By repository", "repo_activity_heatmap"),
+                ],
+                "sources": ACTIVITY_HEATMAP_SOURCES,
+            },
+        ],
+        # "@org_overview": the orgs whose composition is worth a card of its own.
+        "@org_overview": [
+            {
+                "id": "org-overview",
+                "sources": OVERVIEW_SOURCES,
+                "title": "Organization overview (org-wide)",
+                "group": "Org overview",
+                "description": (
+                    "Org-wide view: repositories ranked by contributor count, "
+                    "the language mix across repos, and how many repos pushed in the last 30 days."
+                ),
+                "variants": [
+                    ("Top repositories by contributors", "contributor_counts"),
+                    ("Programming languages", "language_distribution"),
+                    ("Repository push activity (30d)", "push_activity"),
+                ],
             },
         ],
     },

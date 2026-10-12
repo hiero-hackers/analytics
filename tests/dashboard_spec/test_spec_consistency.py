@@ -17,6 +17,7 @@ from hiero_analytics.dashboard_spec import (
     WIDE_CHARTS,
     table_variants,
 )
+from hiero_analytics.dashboard_spec._assembly import chart_specs_for_org
 from hiero_analytics.export.data_api import variant_annotations
 
 
@@ -285,3 +286,72 @@ def test_column_formats_are_ones_the_frontend_implements():
         if len(column) > 2 and column[2] not in COLUMN_FORMATS
     }
     assert not unknown, f"columns declaring an unknown format: {sorted(unknown)}"
+
+
+# org-key composition
+
+
+def _cards(macro, org):
+    """The chart cards ``org`` gets from one macro, as a list of ids in order."""
+    from hiero_analytics.dashboard_spec import chart_specs_for_org
+
+    return [spec["id"] for spec in chart_specs_for_org(macro["charts"], org)]
+
+
+def test_chart_specs_compose_wildcard_capability_and_org_keys():
+    """A family's cards for an org compose from wildcard + capability + org keys.
+
+    Composition, not replacement: the wildcard cards always apply, a capability
+    key adds what the org's profile entitles it to, and an explicit org key adds
+    that org's own extras. This is what lets a third org add one bespoke card
+    without restating the whole wildcard list.
+    """
+    macro = {
+        "charts": {
+            "*": [{"id": "base"}],
+            "@governed": [{"id": "gov"}],
+            "@org_overview": [{"id": "overview"}],
+            "special": [{"id": "special-card"}],
+        }
+    }
+
+    # Governed primary: wildcard + governed cards.
+    assert _cards(macro, "hiero-ledger") == ["base", "gov"]
+    # Composition org: wildcard + overview cards.
+    assert _cards(macro, "hiero-hackers") == ["base", "overview"]
+    # An explicit org key adds only its own extras on top of the wildcard.
+    assert _cards(macro, "special") == ["base", "special-card"]
+
+
+def test_chart_specs_org_key_redeclares_in_place():
+    """Re-declaring a card id for an org replaces its content but keeps position.
+
+    So an org can override a wildcard card's variants without the card jumping
+    to the end of the list — order stays stable across orgs.
+    """
+    macro = {
+        "charts": {
+            "*": [{"id": "a", "variants": ["wildcard"]}, {"id": "b", "variants": ["wildcard"]}],
+            "special": [{"id": "b", "variants": ["override"]}],
+        }
+    }
+
+    cards = chart_specs_for_org(macro["charts"], "special")
+
+    assert [spec["id"] for spec in cards] == ["a", "b"]  # position kept
+    assert cards[1]["variants"] == ["override"]  # content replaced
+
+
+def test_every_registered_org_gets_its_capability_cards():
+    """Each real family renders at least the wildcard cards for every registered org.
+
+    The wildcard floor holds for any org, governed or not — so registering an org
+    never yields an empty tab by omission.
+    """
+    from hiero_analytics.config import orgs as orgs_mod
+
+    for macro in CHART_MACROS:
+        wildcard_ids = {spec["id"] for spec in macro["charts"].get("*", [])}
+        for org in orgs_mod.org_names():
+            got = {spec["id"] for spec in chart_specs_for_org(macro["charts"], org)}
+            assert wildcard_ids <= got, f"{macro['name']}: {org} missing wildcard cards"

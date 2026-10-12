@@ -152,7 +152,7 @@ Available pipelines:
 | `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
 | `releases` | GitHub Releases cadence and per-repo staleness (`latest_release`, `days_since_last_release`) |
 | `ci_health` | Audit CI/CD workflows and repository configuration for security, reliability, and compliance |
-| `hiero_hackers` | Hiero Hackers org composition and activity |
+| `org_overview` | Org-wide composition (contributor counts, languages, pushes) |
 | `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
 | `repo_growth` | Generate repository-growth timeline tables |
 | `data_api` | Emits the versioned JSON data API (`outputs/data/api/v1/`) the web dashboard renders — the full run does this last |
