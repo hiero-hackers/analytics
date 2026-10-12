@@ -99,6 +99,26 @@ def test_no_retry_on_401(monkeypatch, mock_sleep):
 # ---------------------------------------------------------
 
 
+def test_get_response_returns_the_raw_response_without_parsing(monkeypatch, mock_sleep):
+    """get_response hands back the status-aware response, so a bodyless 202 never hits .json()."""
+    mock_response = Mock()
+    mock_response.headers = {"X-RateLimit-Remaining": "10", "X-RateLimit-Reset": "0"}
+    mock_response.json.side_effect = ValueError("202 has no body")
+    mock_response.raise_for_status = Mock()
+    mock_response.status_code = 202
+    mock_response.ok = True
+
+    client = github_client.GitHubClient()
+    monkeypatch.setattr(client.session, "request", Mock(return_value=mock_response))
+
+    result = client.get_response("https://api.github.com/test")
+
+    assert result is mock_response
+    assert result.status_code == 202
+    assert client.requests_made == 1
+    mock_response.json.assert_not_called()
+
+
 def test_get_rate_limit_retry(monkeypatch, mock_sleep):
     """Verify the client retries after a 403 rate-limit response."""
     first = Mock()
