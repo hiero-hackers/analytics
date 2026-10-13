@@ -128,6 +128,19 @@ TERMS: dict[str, str] = {
         "a longer word — the reason it's here, not proof it's a bot. Confirmed bots move to "
         "BOT_LOGINS by hand; confirmed people move to bot_suspect_dismissals.yaml."
     ),
+    # --- PR responsiveness columns ---------------------------------------
+    "cohort": (
+        "the population grouping used by the analysis. Interpret the label as defined by the PR responsiveness pipeline."
+    ),
+    "merged PRs": "number of merged pull requests in the selected reporting window.",
+    "reviewed PRs": "number of merged pull requests with at least one qualifying review.",
+    "reviewed share": "percentage of merged pull requests with at least one qualifying review.",
+    "median hours to first review": "median elapsed hours from pull-request creation to its first qualifying review.",
+    "P90 hours to first review": "90th percentile of elapsed hours from pull-request creation to its first qualifying review.",
+    "median hours to merge": "median elapsed hours from pull-request creation to merge.",
+    "P90 hours to merge": "90th percentile of elapsed hours from pull-request creation to merge.",
+    "month": "calendar month in which the pull request was merged.",
+
 }
 
 GLOSSARY_NOTE = (

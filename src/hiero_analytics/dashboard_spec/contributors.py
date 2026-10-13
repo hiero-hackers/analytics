@@ -111,6 +111,7 @@ CHART_MACRO = {
 
 # Each section: which CSV it reads and how to render it. Sections appear only when
 # their CSV exists and is non-empty.
+
 SECTION_SPECS = [
     {
         "id": "profiles",
@@ -148,6 +149,64 @@ SECTION_SPECS = [
             ("signal", "signal matched"),
         ],
     },
+    {
+        "id": "prwaits",
+        "file": "pr_responsiveness.csv",
+        "periods": True,
+        "title": "PR review responsiveness",
+        "description": (
+            "Review and merge timing for merged pull requests in the selected period."
+        ),
+        "columns": [
+            ("cohort", "cohort"),
+            ("merged_prs", "merged PRs", "number"),
+            ("reviewed_prs", "reviewed PRs", "number"),
+            ("reviewed_share", "reviewed share", "number"),
+            ("median_hours_to_first_review", "median hours to first review", "number"),
+            ("p90_hours_to_first_review", "P90 hours to first review", "number"),
+            ("median_hours_to_merge", "median hours to merge", "number"),
+            ("p90_hours_to_merge", "P90 hours to merge", "number"),
+        ],
+    },
+    {
+        "id": "prwaitsrepo",
+        "file": "pr_responsiveness_by_repo.csv",
+        "periods": True,
+        "title": "PR responsiveness by repository",
+        "description": (
+            "Compare review and merge timing across repositories. Interpret results "
+            "alongside the number of merged pull requests."
+        ),
+        "columns": [
+            ("repo", "repo"),
+            ("cohort", "cohort"),
+            ("merged_prs", "merged PRs", "number"),
+            ("reviewed_prs", "reviewed PRs", "number"),
+            ("reviewed_share", "reviewed share", "number"),
+            ("median_hours_to_first_review", "median hours to first review", "number"),
+            ("p90_hours_to_first_review", "P90 hours to first review", "number"),
+            ("median_hours_to_merge", "median hours to merge", "number"),
+            ("p90_hours_to_merge", "P90 hours to merge", "number"),
+        ],
+    },
+    {
+        "id": "prwaitsmonthly",
+        "file": "pr_responsiveness_monthly.csv",
+        "periods": False,
+        "title": "Monthly PR responsiveness",
+        "description": (
+            "Monthly review and merge timing trends. Interpret timing estimates "
+            "alongside the sample count."
+        ),
+        "columns": [
+            ("month", "month"),
+            ("cohort", "cohort"),
+            ("merged_prs", "merged PRs", "number"),
+            ("reviewed_prs", "reviewed PRs", "number"),
+            ("median_hours_to_first_review", "median hours to first review", "number"),
+            ("median_hours_to_merge", "median hours to merge", "number"),
+        ],
+    },
 ]
 
 # This tab's "how to read this": only the columns the contributor tables show.
@@ -165,11 +224,22 @@ GLOSSARY = glossary_of(
         "period tabs",
         "login",
         "signal matched",
+        "cohort",
+        "merged PRs",
+        "reviewed PRs",
+        "reviewed share",
+        "median hours to first review",
+        "P90 hours to first review",
+        "median hours to merge",
+        "P90 hours to merge",
+        "month",
     ),
     note=(
         "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked "
         "activities are opening PRs/issues, reviewing, merging, and labeling — comments and reactions "
-        "are not counted."
+        "are not counted. PR responsiveness measures elapsed hours from PR creation to first review "
+        "and to merge. Reviewed share is a percentage of merged PRs with a qualifying review; P90 is "
+        "the 90th percentile."
     ),
 )
 
@@ -181,6 +251,7 @@ SECTION_GROUPS = [
     # The full per-person list.
     ("All contributors", ["profiles"]),
     ("Bot suspects (review)", ["bot-suspects"]),
+    ("PR review responsiveness", ["prwaits", "prwaitsrepo", "prwaitsmonthly"]),
 ]
 SECTION_ORDER = [sid for _name, ids in SECTION_GROUPS for sid in ids]
 SECTION_GROUP_OF = {sid: name for name, ids in SECTION_GROUPS for sid in ids}

@@ -25,7 +25,7 @@ def _act(repo: str, actor: str, activity_type: str, hours_ago: float, number: in
 
 
 def _patch(monkeypatch, stub_pipeline_context, records):
-    _, data_dir, _ = stub_pipeline_context(runner)
+    _, data_dir = stub_pipeline_context(runner)
     monkeypatch.setattr(runner, "load_contributor_activity", lambda _client, _org: records)
     return data_dir
 

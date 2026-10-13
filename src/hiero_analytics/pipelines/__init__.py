@@ -43,6 +43,12 @@ PIPELINES: tuple[Pipeline, ...] = (
         args=("org",),
         offline=True,
     ),
+    Pipeline(
+        "pr_responsiveness",
+        "Measure time-to-first-review and time-to-merge for merged PRs (writes pr_responsiveness CSVs)",
+        args=("org",),
+        offline=True,
+    ),
     # Org-independent: labels contributors by role where the org is governed.
     Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),
     Pipeline(
@@ -66,25 +72,6 @@ PIPELINES: tuple[Pipeline, ...] = (
         args=("org",),
         requires=frozenset({ORG_OVERVIEW}),
     ),
-    Pipeline("maintainer_pipeline", "Run maintainer analytics pipeline", args=("org",), offline=True),
-    Pipeline("contributor_activity", "Run contributor activity analysis", args=("org",), offline=True, extra_orgs=True),
-    # No dashboard section consumes these tables yet, so it is CLI-only until one
-    # does (the same convention as contributor_churn below). Flip in_default_run
-    # then — and only then add extra_orgs: the full run repeats every extra_orgs
-    # pipeline for the extra orgs even when it is not in the default run.
-    Pipeline(
-        "pr_responsiveness",
-        "Measure time-to-first-review and time-to-merge for merged PRs (writes pr_responsiveness CSVs)",
-        args=("org",),
-        in_default_run=False,
-        offline=True,
-    ),
-    Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),
-    Pipeline("role_coverage", "Analyze role coverage for organization", args=("org",), offline=True),
-    Pipeline("affiliation", "Map contributor affiliations", args=("org",), offline=True),
-    Pipeline("scorecard", "Generate scorecard metrics for an organization", args=("org",), extra_orgs=True),
-    Pipeline("codeowner_and_runner", "Analyze CODEOWNERS and workflow runners", args=("org",), extra_orgs=True),
-    Pipeline("hiero_hackers", "Run Hiero Hackers org analytics", args=("org",)),
     # Offline runs without cached HIP datasets skip cleanly inside the pipeline
     # (the dashboard omits sections whose CSVs are absent), so it stays
     # offline-capable for PR previews.
