@@ -38,6 +38,7 @@ import hiero_analytics.pipelines.hiero_hackers as hackers_mod
 import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
+import hiero_analytics.pipelines.pr_responsiveness as pr_responsiveness_mod
 import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
@@ -340,7 +341,7 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(activity_mod, "fetch_org_merged_pr_difficulty_graphql", lambda _c, _org, **_k: REPO_PRS)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod):
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
-        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod):
+        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod, pr_responsiveness_mod):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
         for mod in (role_coverage_mod, activity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)

@@ -35,7 +35,6 @@ PIPELINES: tuple[Pipeline, ...] = (
         "pr_responsiveness",
         "Measure time-to-first-review and time-to-merge for merged PRs (writes pr_responsiveness CSVs)",
         args=("org",),
-        in_default_run=False,
         offline=True,
     ),
     Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),

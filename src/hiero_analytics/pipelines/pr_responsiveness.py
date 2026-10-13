@@ -53,9 +53,20 @@ def main(org: str = ORG) -> None:
     latest = events["occurred_at"].max() if not events.empty else None
     stamps = {"window_end": now.isoformat(), "data_through": latest.isoformat() if latest is not None else None}
 
-    save_dataframe(responsiveness_summary(prs, windows).assign(**stamps), org_data_dir / PR_RESPONSIVENESS_FILE)
-    save_dataframe(
-        responsiveness_summary(prs, windows, by_repo=True).assign(**stamps),
-        org_data_dir / PR_RESPONSIVENESS_BY_REPO_FILE,
-    )
+    overall = responsiveness_summary(prs, windows).assign(**stamps)
+    by_repo = responsiveness_summary(prs, windows, by_repo=True).assign(**stamps)
+
+    # Keep complete tables for consumers that need every reporting window.
+    save_dataframe(overall, org_data_dir / PR_RESPONSIVENESS_FILE)
+    save_dataframe(by_repo, org_data_dir / PR_RESPONSIVENESS_BY_REPO_FILE)
     save_dataframe(monthly_responsiveness(prs), org_data_dir / PR_RESPONSIVENESS_MONTHLY_FILE)
+
+    # Period tabs use one file per period; the filename carries the selection.
+    for period in ACTIVITY_PERIODS:
+        for frame, filename in (
+            (overall, PR_RESPONSIVENESS_FILE),
+            (by_repo, PR_RESPONSIVENESS_BY_REPO_FILE),
+        ):
+            selected = frame.loc[frame["period"] == period.key].drop(columns=["period"])
+            stem = filename.removesuffix(".csv")
+            save_dataframe(selected, org_data_dir / period.filename(stem))
