@@ -64,7 +64,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-13T01:34:53.682829+00:00"
+  "end": "2026-10-13T14:52:14.239773+00:00"
  },
  "nodes": [
   {
@@ -96,14 +96,6 @@
    "active": 5,
    "total": 5,
    "category": "Other",
-   "x": -1.6,
-   "y": 1.5926
-  },
-  {
-   "id": "governance",
-   "active": 4,
-   "total": 15,
-   "category": "Governance",
    "x": 1.6,
    "y": 0.4436
   },
@@ -114,6 +106,14 @@
    "category": "Other",
    "x": -2.25,
    "y": -3.2126
+  },
+  {
+   "id": "governance",
+   "active": 3,
+   "total": 15,
+   "category": "Governance",
+   "x": -1.6,
+   "y": 1.5926
   },
   {
    "id": "clpr-smart-contracts",
@@ -277,6 +277,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-10-13T01:34:53.682829+00:00",
+ "generated_at": "2026-10-13T14:52:14.239773+00:00",
  "stale": false
 }

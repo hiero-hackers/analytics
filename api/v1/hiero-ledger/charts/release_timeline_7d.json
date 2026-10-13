@@ -35,14 +35,16 @@
   "hiero-cryptography",
   "hiero-consensus-node",
   "solo-charts",
+  "solo",
+  "hiero-mirror-node",
   "hiero-sdk-python",
   "hiero-sdk-tck",
-  "solo"
+  "hiero-solo-action"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-13T01:33:40.004755+00:00"
+  "end": "2026-10-13T14:50:36.082585+00:00"
  },
  "rows": [
   {
@@ -128,8 +130,26 @@
    "time": "2026-10-12T23:04:37Z",
    "tag_name": "v3.20.1",
    "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-13T03:28:15Z",
+   "tag_name": "v0.164.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-solo-action",
+   "time": "2026-10-13T06:46:32Z",
+   "tag_name": "v0.26.0",
+   "type": "release"
+  },
+  {
+   "repo": "solo",
+   "time": "2026-10-13T14:21:25Z",
+   "tag_name": "v0.93.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-13T01:33:40.004755+00:00",
+ "generated_at": "2026-10-13T14:50:36.082585+00:00",
  "stale": false
 }

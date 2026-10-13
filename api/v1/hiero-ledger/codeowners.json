@@ -32,10 +32,6 @@
    "status": false
   },
   {
-   "repo": "hiero-consensus-node",
-   "status": false
-  },
-  {
    "repo": "hiero-did-sdk-js",
    "status": false
   },
@@ -89,6 +85,10 @@
   },
   {
    "repo": "hiero-cli",
+   "status": true
+  },
+  {
+   "repo": "hiero-consensus-node",
    "status": true
   },
   {
@@ -193,7 +193,7 @@
   }
  ],
  "row_count": 44,
- "generated_at": "2026-10-13T01:33:03.918143+00:00",
+ "generated_at": "2026-10-13T14:49:36.827724+00:00",
  "stale": false,
  "group": "Ownership",
  "macro": "Security & scorecards"
