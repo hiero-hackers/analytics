@@ -1,0 +1,52 @@
+{
+ "schema_version": 1,
+ "id": "release_timeline_7d",
+ "kind": "events",
+ "org": "hiero-hackers",
+ "source": "release_timeline.csv",
+ "metric": "releases",
+ "unit": "Published releases",
+ "population": "Each published GitHub release, by repository and publication time (UTC). Drafts are excluded; prereleases are marked. Repositories with no release in the window are not shown.",
+ "dimensions": [
+  "repo",
+  "type"
+ ],
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "label": {
+  "key": "tag_name",
+  "label": "Tag"
+ },
+ "types": [
+  {
+   "key": "release",
+   "label": "Release",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "prerelease",
+   "label": "Prerelease",
+   "color": "var(--chart-1)"
+  }
+ ],
+ "categories": [
+  "hiero-tck-action"
+ ],
+ "window": {
+  "kind": "trailing",
+  "days": 7,
+  "end": "2026-10-13T01:35:14.994564+00:00"
+ },
+ "rows": [
+  {
+   "repo": "hiero-tck-action",
+   "time": "2026-10-12T17:13:27Z",
+   "tag_name": "v0.0.1",
+   "type": "release"
+  }
+ ],
+ "generated_at": "2026-10-13T01:35:14.994564+00:00",
+ "stale": false
+}

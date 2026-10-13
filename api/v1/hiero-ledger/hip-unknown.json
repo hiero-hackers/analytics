@@ -48,6 +48,13 @@
    "snippet": "HIP-1485 Add POST /api/v1/contracts/simulate to"
   },
   {
+   "hip": 1485,
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14415,
+   "pr_title": "Add child indicator to contract results and logs",
+   "snippet": "feature/HIP-1485-add-child-column"
+  },
+  {
    "hip": 1183,
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 135,
@@ -83,8 +90,8 @@
    "snippet": "`HIP-432`: Long Term Scheduled Transaction"
   }
  ],
- "row_count": 8,
- "generated_at": "2026-10-12T01:38:19.181271+00:00",
+ "row_count": 9,
+ "generated_at": "2026-10-13T01:34:25.685963+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

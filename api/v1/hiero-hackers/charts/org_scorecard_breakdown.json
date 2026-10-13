@@ -97,12 +97,12 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-12T01:38:55.219295+00:00"
+  "end": "2026-10-13T01:34:56.092288+00:00"
  },
  "rows": [
   {
    "repo": "hiero-enterprise-js",
-   "score": 7.3,
+   "score": 7.6,
    "Maintained": 10.0,
    "Code-Review": 2.0,
    "CII-Best-Practices": 0.0,
@@ -138,7 +138,7 @@
   },
   {
    "repo": "sdk-automations",
-   "score": 8.8,
+   "score": 8.7,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 0.0,
@@ -152,7 +152,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 10.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-verify-fn",
@@ -245,6 +245,6 @@
    "SAST": 10.0
   }
  ],
- "generated_at": "2026-10-12T01:38:55.219295+00:00",
+ "generated_at": "2026-10-13T01:34:56.092288+00:00",
  "stale": false
 }

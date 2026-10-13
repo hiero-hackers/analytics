@@ -47,8 +47,8 @@
   "hiero-sdk-java",
   "hiero-solo-action",
   "hiero-sdk-cpp",
-  "hiero-sdk-swift",
   "hiero-sdk-tck",
+  "hiero-sdk-swift",
   "hiero-cli",
   "hiero-did-sdk-python",
   "hiero-local-node",
@@ -62,7 +62,7 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-12T01:37:28.069215+00:00"
+  "end": "2026-10-13T01:33:40.004755+00:00"
  },
  "rows": [
   {
@@ -3454,8 +3454,50 @@
    "time": "2026-10-11T17:00:18Z",
    "tag_name": "v0.3.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "time": "2026-10-12T13:01:37Z",
+   "tag_name": "v0.14.0",
+   "type": "release"
+  },
+  {
+   "repo": "solo-charts",
+   "time": "2026-10-12T15:48:07Z",
+   "tag_name": "v0.67.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-10-12T18:47:08Z",
+   "tag_name": "v0.77.3",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-10-12T18:48:56Z",
+   "tag_name": "v0.77.4",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-10-12T18:51:52Z",
+   "tag_name": "v0.77.5",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-12T18:55:10Z",
+   "tag_name": "v3.20.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-12T23:04:37Z",
+   "tag_name": "v3.20.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-12T01:37:28.069215+00:00",
+ "generated_at": "2026-10-13T01:33:40.004755+00:00",
  "stale": false
 }
