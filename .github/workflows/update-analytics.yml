@@ -101,7 +101,7 @@ jobs:
       # records which pipelines failed.
       - name: Archive dataset snapshot
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dataset-snapshot-${{ github.run_id }}-${{ github.sha }}
           path: outputs/data/datasets
@@ -126,7 +126,7 @@ jobs:
           cp outputs/data/datasets/SNAPSHOT.json snapshot/SNAPSHOT.json
 
       - name: Hand off API snapshot
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-snapshot-${{ github.run_id }}
           path: snapshot
