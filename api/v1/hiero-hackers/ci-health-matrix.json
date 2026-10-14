@@ -739,8 +739,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:14; .github/workflows/codeql.yml:24; .github/workflows/codeql.yml:35; .github/workflows/conformance.yml:22; .github/workflows/conformance.yml:33; .github/workflows/conformance.yml:104; .github/workflows/scorecard.yml:10; .github/workflows/scorecard.yml:17"
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:14; .github/workflows/codeql.yml:24; .github/workflows/codeql.yml:35; .github/workflows/conformance.yml:22; .github/workflows/conformance.yml:33; .github/workflows/conformance.yml:104; .github/workflows/release.yml:9; .github/workflows/release.yml:22; .github/workflows/scorecard.yml:10; .github/workflows/scorecard.yml:17"
     },
     {
      "key": "repository_security_configuration",
@@ -786,6 +786,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-10-13T14:52:57.485162+00:00",
+ "generated_at": "2026-10-14T01:24:28.822051+00:00",
  "stale": false
 }
