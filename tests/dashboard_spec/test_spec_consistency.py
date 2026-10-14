@@ -323,23 +323,19 @@ def test_chart_specs_compose_wildcard_capability_and_org_keys():
     assert _cards(macro, "special") == ["base", "special-card"]
 
 
-def test_chart_specs_org_key_redeclares_in_place():
-    """Re-declaring a card id for an org replaces its content but keeps position.
+def test_new_capability_cards_land_after_the_wildcards():
+    """A card first seen under a capability or org key trails the wildcards.
 
-    So an org can override a wildcard card's variants without the card jumping
-    to the end of the list — order stays stable across orgs.
+    org-overview only appears under @org_overview, so for hiero-hackers it lands
+    after the wildcard cards rather than leading them (on main the old hiero-hackers
+    key listed it first, so the order shifted).
     """
-    macro = {
-        "charts": {
-            "*": [{"id": "a", "variants": ["wildcard"]}, {"id": "b", "variants": ["wildcard"]}],
-            "special": [{"id": "b", "variants": ["override"]}],
-        }
-    }
+    from hiero_analytics.dashboard_spec import contributors
 
-    cards = chart_specs_for_org(macro["charts"], "special")
+    cards = [spec["id"] for spec in chart_specs_for_org(contributors.CHART_MACRO["charts"], "hiero-hackers")]
 
-    assert [spec["id"] for spec in cards] == ["a", "b"]  # position kept
-    assert cards[1]["variants"] == ["override"]  # content replaced
+    assert cards[-1] == "org-overview"
+    assert set(cards[:-1]) == {"contributor-network", "activity-heatmap", "repo-growth"}
 
 
 def test_every_registered_org_gets_its_capability_cards():

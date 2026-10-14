@@ -95,11 +95,11 @@ def capability_keys(org: str) -> tuple[str, ...]:
 def chart_specs_for_org(charts: dict, org: str) -> list[dict]:
     """A family's chart cards for ``org``, composed from every key it matches.
 
-    Composition, not replacement: wildcard cards apply to all orgs, capability
-    keys add what the org's profile entitles it to, and an explicit org key adds
-    its own cards — so an org key declares only its extras, never the wildcard
-    list. Redeclaring a card id still replaces its content in place, keeping
-    card order stable across orgs.
+    Wildcard cards apply to all orgs; capability keys and the org key add extras
+    on top, so an org key declares only its extras, never the wildcard list. Keys
+    apply in order and an id appears once: redeclaring an id swaps its content in
+    place, while a new id lands after the wildcards — so hiero-hackers' org-overview
+    trails its wildcard cards rather than leading them.
     """
     ordered: dict[str, dict] = {}
     for key in (WILDCARD_KEY, *capability_keys(org), org):

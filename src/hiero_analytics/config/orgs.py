@@ -12,8 +12,11 @@ extra set, so existing workflows keep working: env is a view over this registry.
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass, field
+
+logger = logging.getLogger(__name__)
 
 # The org the full run treats as primary: governance pipelines, governance
 # config lookup, and the primary-org dashboards all resolve against it.
@@ -135,6 +138,13 @@ def extra_orgs() -> list[str]:
     if "GITHUB_EXTRA_ORGS" not in os.environ:
         return registry
     requested = [org.strip() for org in os.getenv("GITHUB_EXTRA_ORGS", "").split(",") if org.strip()]
+    dropped = [org for org in requested if org not in registry]
+    if dropped:
+        logger.warning(
+            "GITHUB_EXTRA_ORGS names org(s) not in the registry's extra set, ignoring them: %s "
+            "(register the org in config/orgs.py with extra=True to include it)",
+            ", ".join(dropped),
+        )
     return [org for org in registry if org in requested]
 
 

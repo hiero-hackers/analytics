@@ -44,7 +44,7 @@ def _build_org_overview(org: str) -> None:
     if not language_df.empty:
         save_dataframe(language_df, data_dir / "language_distribution.csv")
 
-    # Push activity, only when the values are non-zero (an org with no recent
+    # Push activity, only when the values are non-zero
     activity_df = calculate_push_activity_summary(repos_df, days=30)
     if not activity_df.empty and activity_df["count"].sum() > 0:
         save_dataframe(activity_df, data_dir / "push_activity.csv")

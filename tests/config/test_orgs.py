@@ -8,6 +8,8 @@ system reads, so the composition can change without silently breaking the
 
 from __future__ import annotations
 
+import logging
+
 from hiero_analytics.config import orgs
 from hiero_analytics.config.orgs import (
     DEFAULT_PRIMARY_ORG,
@@ -131,6 +133,20 @@ def test_extra_orgs_env_filters_to_known_orgs(monkeypatch):
     monkeypatch.setenv("GITHUB_EXTRA_ORGS", "hiero-hackers,unregistered-org")
 
     assert extra_orgs() == ["hiero-hackers"]
+
+
+def test_extra_orgs_warns_about_dropped_orgs(monkeypatch, caplog):
+    """Requesting an org outside the registry logs what gets ignored.
+
+    So ``GITHUB_EXTRA_ORGS`` never quietly does nothing: an unregistered name is
+    dropped (only registry ``extra`` orgs render), and the warning names it.
+    """
+    monkeypatch.setenv("GITHUB_EXTRA_ORGS", "hiero-hackers,some-new-org")
+
+    with caplog.at_level(logging.WARNING, logger=orgs.logger.name):
+        assert extra_orgs() == ["hiero-hackers"]
+
+    assert any("some-new-org" in record.getMessage() for record in caplog.records)
 
 
 # repo category overrides

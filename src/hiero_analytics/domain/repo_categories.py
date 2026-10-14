@@ -60,12 +60,6 @@ REPO_CATEGORIES = {
     "hiero-enterprise-java": "Apps / Integrations",
     "hiero-enterprise-js": "Apps / Integrations",
     "hiero-enterprise-proxy": "Apps / Integrations",
-    # hiero-hackers org repos
-    "analytics": "Tooling / DevEx",
-    "sdk-automations": "Tooling / DevEx",
-    "hiero-maintainer-automation-prototype": "Tooling / DevEx",
-    "hiero-did-sdk-rs": "Identity / DID",
-    "hiero-sdk-csharp": "SDKs",
 }
 
 # Per-org registry entries (config/orgs.py) override the map above, so an org can
