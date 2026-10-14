@@ -39,3 +39,9 @@ GITHUB_MAX_WORKERS = env_int("GITHUB_MAX_WORKERS", 6, minimum=1)
 # validated against.
 HIP_PROPOSALS_REPO = os.getenv("HIP_PROPOSALS_REPO", "hiero-ledger/hiero-improvement-proposals")
 HIP_PROPOSALS_DIR = os.getenv("HIP_PROPOSALS_DIR", "HIP")
+
+# Asynchronous SBOM generation: GitHub builds the report in the background, so
+# the fetch is polled. Both limits are explicit so a report that never becomes
+# ready ends as an "error" row instead of an unbounded request loop.
+SBOM_POLL_MAX_ATTEMPTS = env_int("SBOM_POLL_MAX_ATTEMPTS", 10, minimum=1)
+SBOM_POLL_INTERVAL_SECONDS = env_float("SBOM_POLL_INTERVAL_SECONDS", 3.0, minimum=0.0)
