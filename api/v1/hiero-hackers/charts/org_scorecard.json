@@ -25,8 +25,8 @@
  "rank": true,
  "top_n": 15,
  "reference": {
-  "value": 6.55,
-  "label": "Org median 6.55"
+  "value": 6.65,
+  "label": "Org median 6.65"
  },
  "value_max": 10,
  "group": null,
@@ -37,7 +37,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-14T01:23:52.628576+00:00"
+  "end": "2026-10-15T01:21:26.459268+00:00"
  },
  "series": [
   {
@@ -62,7 +62,7 @@
   },
   {
    "repo": "hiero-verify-fn",
-   "score": 6.8
+   "score": 7.0
   },
   {
    "repo": "hiero-notifications",
@@ -81,6 +81,6 @@
    "score": 6.2
   }
  ],
- "generated_at": "2026-10-14T01:23:52.628576+00:00",
+ "generated_at": "2026-10-15T01:21:26.459268+00:00",
  "stale": false
 }

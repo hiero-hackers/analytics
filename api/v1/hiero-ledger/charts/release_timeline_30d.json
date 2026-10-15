@@ -38,21 +38,21 @@
   "solo",
   "hiero-consensus-node",
   "solo-charts",
-  "hiero-sdk-go",
   "hiero-sdk-js",
+  "hiero-json-rpc-relay",
+  "hiero-sdk-go",
+  "hiero-sdk-java",
   "hiero-sdk-tck",
   "hiero-solo-action",
   "hiero-enterprise-java",
   "hiero-gradle-conventions",
-  "hiero-json-rpc-relay",
-  "hiero-sdk-java",
   "hiero-sdk-python",
   "solo-containers"
  ],
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-14T01:22:06.348995+00:00"
+  "end": "2026-10-15T01:19:57.543844+00:00"
  },
  "rows": [
   {
@@ -342,8 +342,32 @@
    "time": "2026-10-13T21:46:02Z",
    "tag_name": "v0.164.2",
    "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "time": "2026-10-14T10:40:55Z",
+   "tag_name": "v2.79.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "time": "2026-10-14T11:05:07Z",
+   "tag_name": "v2.90.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-10-14T12:11:25Z",
+   "tag_name": "v0.80.0-rc1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-14T21:42:45Z",
+   "tag_name": "v0.45.0-rc1",
+   "type": "prerelease"
   }
  ],
- "generated_at": "2026-10-14T01:22:06.348995+00:00",
+ "generated_at": "2026-10-15T01:19:57.543844+00:00",
  "stale": false
 }

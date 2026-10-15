@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-14T01:20:49.451321+00:00"
+  "end": "2026-10-15T01:19:02.123808+00:00"
  },
  "series": [
   {
@@ -223,18 +223,6 @@
    "Unknown": 0
   },
   {
-   "repo": "solo-docs",
-   "Hashgraph": 8,
-   "LimeChain": 0,
-   "DSR Corporation": 0,
-   "Linux Foundation": 0,
-   "Hedera": 0,
-   "Hashgraph Online": 0,
-   "Other orgs": 1,
-   "Independent": 1,
-   "Unknown": 0
-  },
-  {
    "repo": "homebrew-tools",
    "Hashgraph": 4,
    "LimeChain": 0,
@@ -259,6 +247,18 @@
    "Unknown": 0
   },
   {
+   "repo": "solo-docs",
+   "Hashgraph": 6,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 1,
+   "Unknown": 0
+  },
+  {
    "repo": "hiero-gradle-conventions",
    "Hashgraph": 3,
    "LimeChain": 0,
@@ -267,18 +267,6 @@
    "Hedera": 0,
    "Hashgraph Online": 0,
    "Other orgs": 1,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
-   "repo": "sdk-collaboration-hub",
-   "Hashgraph": 3,
-   "LimeChain": 1,
-   "DSR Corporation": 0,
-   "Linux Foundation": 0,
-   "Hedera": 0,
-   "Hashgraph Online": 0,
-   "Other orgs": 0,
    "Independent": 0,
    "Unknown": 0
   },
@@ -332,6 +320,18 @@
   },
   {
    "repo": "hiero-sdk-swift",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "sdk-collaboration-hub",
    "Hashgraph": 2,
    "LimeChain": 1,
    "DSR Corporation": 0,
@@ -499,18 +499,6 @@
    "Unknown": 1
   },
   {
-   "repo": "hiero-local-node",
-   "Hashgraph": 1,
-   "LimeChain": 2,
-   "DSR Corporation": 0,
-   "Linux Foundation": 0,
-   "Hedera": 0,
-   "Hashgraph Online": 0,
-   "Other orgs": 1,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
    "repo": "identity-collaboration-hub",
    "Hashgraph": 1,
    "LimeChain": 0,
@@ -571,6 +559,18 @@
    "Unknown": 0
   },
   {
+   "repo": "hiero-local-node",
+   "Hashgraph": 1,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "Linux Foundation": 0,
+   "Hedera": 0,
+   "Hashgraph Online": 0,
+   "Other orgs": 1,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
    "repo": "hiero-solo-action",
    "Hashgraph": 1,
    "LimeChain": 1,
@@ -619,6 +619,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-14T01:20:49.451321+00:00",
+ "generated_at": "2026-10-15T01:19:02.123808+00:00",
  "stale": false
 }

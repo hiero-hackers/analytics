@@ -300,18 +300,6 @@
    "organisations": "Hashgraph 3"
   },
   {
-   "team": "solo-docs-admins",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 100,
-   "hhi": 10000,
-   "unknown": 0,
-   "single_employer": true,
-   "organisations": "Hashgraph 3"
-  },
-  {
    "team": "hiero-contracts-internal-contributors",
    "members": 2,
    "resolved": 2,
@@ -372,6 +360,18 @@
    "organisations": "Hashgraph 1"
   },
   {
+   "team": "solo-docs-admins",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Hashgraph 2"
+  },
+  {
    "team": "tsc-eligibility-check-admins",
    "members": 2,
    "resolved": 2,
@@ -420,6 +420,18 @@
    "organisations": "LimeChain 6, Hashgraph 1"
   },
   {
+   "team": "hiero-sdk-tck-committers",
+   "members": 8,
+   "resolved": 7,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 86,
+   "hhi": 7551,
+   "unknown": 1,
+   "single_employer": false,
+   "organisations": "LimeChain 6, Hashgraph 1"
+  },
+  {
    "team": "github-maintainers",
    "members": 7,
    "resolved": 7,
@@ -454,18 +466,6 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 6, LimeChain 1"
-  },
-  {
-   "team": "solo-docs-committers",
-   "members": 8,
-   "resolved": 6,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 83,
-   "hhi": 7222,
-   "unknown": 2,
-   "single_employer": false,
-   "organisations": "Hashgraph 5, LimeChain 1"
   },
   {
    "team": "hiero-cryptography-committers",
@@ -516,6 +516,18 @@
    "organisations": "Hashgraph 9, LimeChain 1, Independent 1"
   },
   {
+   "team": "solo-docs-committers",
+   "members": 7,
+   "resolved": 5,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 80,
+   "hhi": 6800,
+   "unknown": 2,
+   "single_employer": false,
+   "organisations": "Hashgraph 4, LimeChain 1"
+  },
+  {
    "team": "hiero-sdk-js-maintainers",
    "members": 6,
    "resolved": 5,
@@ -564,28 +576,16 @@
    "organisations": "Hashgraph 4, Independent 1"
   },
   {
-   "team": "hiero-sdk-tck-committers",
-   "members": 10,
-   "resolved": 9,
-   "distinct_orgs": 3,
+   "team": "sdk-collaboration-hub-committers",
+   "members": 5,
+   "resolved": 5,
+   "distinct_orgs": 1,
    "top_org": "LimeChain",
-   "top_org_pct": 78,
-   "hhi": 6296,
-   "unknown": 1,
-   "single_employer": false,
-   "organisations": "LimeChain 7, Launchbadge 1, Hashgraph 1"
-  },
-  {
-   "team": "solo-docs-maintainers",
-   "members": 9,
-   "resolved": 9,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 78,
-   "hhi": 6296,
+   "top_org_pct": 80,
+   "hhi": 6800,
    "unknown": 0,
    "single_employer": false,
-   "organisations": "Hashgraph 7, DevLabs 1, Independent 1"
+   "organisations": "LimeChain 4, Independent 1"
   },
   {
    "team": "security-maintainers",
@@ -636,18 +636,6 @@
    "organisations": "LimeChain 3, Hashgraph 1"
   },
   {
-   "team": "sdk-collaboration-hub-maintainers",
-   "members": 4,
-   "resolved": 4,
-   "distinct_orgs": 2,
-   "top_org": "Hashgraph",
-   "top_org_pct": 75,
-   "hhi": 6250,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "Hashgraph 3, LimeChain 1"
-  },
-  {
    "team": "solo-maintainers",
    "members": 4,
    "resolved": 4,
@@ -658,6 +646,18 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 3, Independent 1"
+  },
+  {
+   "team": "solo-docs-maintainers",
+   "members": 8,
+   "resolved": 8,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 75,
+   "hhi": 5938,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 6, DevLabs 1, Independent 1"
   },
   {
    "team": "hiero-consensus-node-smart-contract-codeowners",
@@ -769,6 +769,18 @@
   },
   {
    "team": "hiero-sdk-swift-maintainers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 67,
+   "hhi": 5556,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 2, LimeChain 1"
+  },
+  {
+   "team": "sdk-collaboration-hub-maintainers",
    "members": 3,
    "resolved": 3,
    "distinct_orgs": 2,
@@ -1020,28 +1032,16 @@
    "organisations": "Hashgraph 3, DevLabs 1, Independent 1"
   },
   {
-   "team": "sdk-collaboration-hub-committers",
-   "members": 8,
-   "resolved": 8,
-   "distinct_orgs": 3,
-   "top_org": "LimeChain",
-   "top_org_pct": 62,
-   "hhi": 4375,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "LimeChain 5, Hashgraph 1, Launchbadge 1, Independent 1"
-  },
-  {
    "team": "hiero-local-node-committers",
-   "members": 9,
-   "resolved": 9,
+   "members": 6,
+   "resolved": 6,
    "distinct_orgs": 3,
    "top_org": "Hashgraph",
-   "top_org_pct": 44,
-   "hhi": 4074,
+   "top_org_pct": 50,
+   "hhi": 3889,
    "unknown": 0,
    "single_employer": false,
-   "organisations": "Hashgraph 4, LimeChain 4, DevLabs 1"
+   "organisations": "Hashgraph 3, LimeChain 2, DevLabs 1"
   },
   {
    "team": "hiero-sdk-triage",
@@ -1128,18 +1128,6 @@
    "organisations": "Hashgraph 2, LimeChain 1, Independent 1"
   },
   {
-   "team": "hiero-local-node-maintainers",
-   "members": 4,
-   "resolved": 4,
-   "distinct_orgs": 3,
-   "top_org": "LimeChain",
-   "top_org_pct": 50,
-   "hhi": 3750,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "LimeChain 2, DevLabs 1, Hashgraph 1"
-  },
-  {
    "team": "hiero-sdk-rust-maintainers",
    "members": 4,
    "resolved": 4,
@@ -1198,6 +1186,18 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 1, OpenElements 1, Independent 1"
+  },
+  {
+   "team": "hiero-local-node-maintainers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 3,
+   "top_org": "DevLabs",
+   "top_org_pct": 33,
+   "hhi": 3333,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "DevLabs 1, Hashgraph 1, LimeChain 1"
   },
   {
    "team": "hiero-solo-action-maintainers",
@@ -1381,7 +1381,7 @@
   }
  ],
  "row_count": 111,
- "generated_at": "2026-10-14T01:20:49.854325+00:00",
+ "generated_at": "2026-10-15T01:19:02.651376+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

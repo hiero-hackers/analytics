@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-14T01:20:49.502427+00:00"
+  "end": "2026-10-15T01:19:02.186311+00:00"
  },
  "series": [
   {
@@ -148,6 +148,18 @@
    "Unknown": 0
   },
   {
+   "repo": "solo",
+   "Hashgraph": 3,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
    "repo": "governance",
    "Hashgraph": 2,
    "LimeChain": 1,
@@ -160,20 +172,8 @@
    "Unknown": 0
   },
   {
-   "repo": "solo",
-   "Hashgraph": 2,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
-  },
-  {
    "repo": "hiero-consensus-node",
-   "Hashgraph": 26,
+   "Hashgraph": 27,
    "LimeChain": 9,
    "BlockyDevs": 0,
    "DSR Corporation": 0,
@@ -194,30 +194,6 @@
    "Other orgs": 0,
    "Independent": 0,
    "Unknown": 1
-  },
-  {
-   "repo": "hiero-local-node",
-   "Hashgraph": 1,
-   "LimeChain": 1,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
-   "repo": "sdk-collaboration-hub",
-   "Hashgraph": 1,
-   "LimeChain": 1,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 0
   },
   {
    "repo": "heka-identity-platform",
@@ -448,6 +424,6 @@
    "Unknown": 1
   }
  ],
- "generated_at": "2026-10-14T01:20:49.502427+00:00",
+ "generated_at": "2026-10-15T01:19:02.186311+00:00",
  "stale": false
 }

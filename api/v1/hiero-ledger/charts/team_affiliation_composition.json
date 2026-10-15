@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-14T01:20:49.695836+00:00"
+  "end": "2026-10-15T01:19:02.454279+00:00"
  },
  "series": [
   {
@@ -331,11 +331,11 @@
    "Unknown": 0
   },
   {
-   "team": "solo-docs-maintainers",
-   "Hashgraph": 7,
-   "LimeChain": 0,
+   "team": "sdk-collaboration-hub-committers",
+   "Hashgraph": 0,
+   "LimeChain": 4,
    "DSR Corporation": 0,
-   "DevLabs": 1,
+   "DevLabs": 0,
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
@@ -355,6 +355,18 @@
    "Unknown": 1
   },
   {
+   "team": "solo-docs-maintainers",
+   "Hashgraph": 6,
+   "LimeChain": 0,
+   "DSR Corporation": 0,
+   "DevLabs": 1,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 1,
+   "Unknown": 0
+  },
+  {
    "team": "hiero-gradle-conventions-maintainers",
    "Hashgraph": 3,
    "LimeChain": 0,
@@ -363,18 +375,6 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 1,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
-   "team": "sdk-collaboration-hub-maintainers",
-   "Hashgraph": 3,
-   "LimeChain": 1,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
    "Independent": 0,
    "Unknown": 0
   },
@@ -392,6 +392,18 @@
   },
   {
    "team": "hiero-sdk-js-committers",
+   "Hashgraph": 1,
+   "LimeChain": 6,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "team": "hiero-sdk-tck-committers",
    "Hashgraph": 1,
    "LimeChain": 6,
    "DSR Corporation": 0,
@@ -463,18 +475,6 @@
    "Unknown": 1
   },
   {
-   "team": "hiero-sdk-tck-committers",
-   "Hashgraph": 1,
-   "LimeChain": 7,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 1,
-   "Independent": 0,
-   "Unknown": 1
-  },
-  {
    "team": "hiero-sdk-js-maintainers",
    "Hashgraph": 1,
    "LimeChain": 4,
@@ -521,30 +521,6 @@
    "Other orgs": 0,
    "Independent": 0,
    "Unknown": 1
-  },
-  {
-   "team": "solo-docs-committers",
-   "Hashgraph": 5,
-   "LimeChain": 1,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
-  },
-  {
-   "team": "sdk-collaboration-hub-committers",
-   "Hashgraph": 1,
-   "LimeChain": 5,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 1,
-   "Independent": 1,
-   "Unknown": 0
   },
   {
    "team": "solo-committers",
@@ -655,6 +631,18 @@
    "Unknown": 0
   },
   {
+   "team": "solo-docs-committers",
+   "Hashgraph": 4,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 2
+  },
+  {
    "team": "hiero-sdk-triage",
    "Hashgraph": 3,
    "LimeChain": 8,
@@ -739,8 +727,8 @@
    "Unknown": 1
   },
   {
-   "team": "hiero-local-node-maintainers",
-   "Hashgraph": 1,
+   "team": "hiero-local-node-committers",
+   "Hashgraph": 3,
    "LimeChain": 2,
    "DSR Corporation": 0,
    "DevLabs": 1,
@@ -771,18 +759,6 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 1,
-   "Independent": 0,
-   "Unknown": 0
-  },
-  {
-   "team": "hiero-local-node-committers",
-   "Hashgraph": 4,
-   "LimeChain": 4,
-   "DSR Corporation": 0,
-   "DevLabs": 1,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
    "Independent": 0,
    "Unknown": 0
   },
@@ -1003,6 +979,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-14T01:20:49.695836+00:00",
+ "generated_at": "2026-10-15T01:19:02.454279+00:00",
  "stale": false
 }
