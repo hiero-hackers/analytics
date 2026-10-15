@@ -35,9 +35,9 @@ Append one profile to `ORGS` in `src/hiero_analytics/config/orgs.py`:
 
 ```python
 OrgProfile(
-    name="LFDT-EXAMPLE",          # GitHub's exact spelling (checked before every run)
+    name="LFDT-EXAMPLE",  # GitHub's exact spelling (checked before every run)
     display_name="LFDT Example",  # optional: the switcher label; the login otherwise
-    extra=True,                   # rendered by the scheduled run
+    extra=True,  # rendered by the scheduled run
 )
 ```
 

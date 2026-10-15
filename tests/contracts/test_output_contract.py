@@ -44,7 +44,6 @@ import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.analysis.ci_health_types import CheckResult
-from hiero_analytics.config.orgs import OrgProfile
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.dashboard_spec import entities as entity_spec
 from hiero_analytics.dashboard_spec._assembly import chart_specs_for_org
@@ -462,13 +461,13 @@ def outputs_root(tmp_path_factory) -> Path:
             "ORGS",
             (
                 org_registry.profile_for(PRIMARY),
-                OrgProfile(
+                org_registry.OrgProfile(
                     name=GOVERNED_EXTRA,
                     governed=True,
                     governance_url="https://example.test/governance.yaml",
                     extra=True,
                 ),
-                OrgProfile(name=PLAIN_EXTRA, org_overview=True, extra=True, display_name="Plain Org"),
+                org_registry.OrgProfile(name=PLAIN_EXTRA, org_overview=True, extra=True, display_name="Plain Org"),
             ),
         )
         mp.setenv("GITHUB_ORG", PRIMARY)

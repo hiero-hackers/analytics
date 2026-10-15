@@ -208,18 +208,22 @@ def render_failures_markdown(failures: list[str], *, tolerated: bool) -> str:
     lines = ["## Pipeline failures", ""]
     if tolerated:
         lines += [
-            "These failures are confined to extra or trial organisations, so the run still "
-            "published. The sections these pipelines feed are missing for the affected "
-            "organisations until a later run succeeds; their datasets keep their watermarks, "
-            "so that run resumes where this one stopped.",
+            (
+                "These failures are confined to extra or trial organisations, so the run still "
+                "published. The sections these pipelines feed are missing for the affected "
+                "organisations until a later run succeeds; their datasets keep their watermarks, "
+                "so that run resumes where this one stopped."
+            ),
             "",
         ]
     lines += [f"- `{label}`" for label in failures]
     if any(label.startswith("preflight") for label in failures):
         lines += [
             "",
-            "A `preflight` failure means GitHub has no organisation by that exact spelling, so "
-            "the organisation was skipped entirely and is absent from this deploy.",
+            (
+                "A `preflight` failure means GitHub has no organisation by that exact spelling, so "
+                "the organisation was skipped entirely and is absent from this deploy."
+            ),
         ]
     return "\n".join(lines) + "\n\n"
 
