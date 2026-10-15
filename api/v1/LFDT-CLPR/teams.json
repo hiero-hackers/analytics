@@ -1,0 +1,159 @@
+{
+ "id": "teams",
+ "title": "Team activity overview",
+ "description": "Each governance team's size, how many members have activity in the selected period, and its active or quiet status. Teams with no activity in that period are listed first.",
+ "source": "team_activity_summary.csv",
+ "columns": [
+  {
+   "key": "team",
+   "label": "team"
+  },
+  {
+   "key": "members",
+   "label": "members"
+  },
+  {
+   "key": "active_members",
+   "label": "active"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "days_since_active",
+   "label": "days since active"
+  },
+  {
+   "key": "prs_opened",
+   "label": "PRs"
+  },
+  {
+   "key": "reviews_given",
+   "label": "reviews"
+  },
+  {
+   "key": "merges_done",
+   "label": "merges"
+  },
+  {
+   "key": "issues_opened",
+   "label": "issues"
+  },
+  {
+   "key": "labels_applied",
+   "label": "labels"
+  }
+ ],
+ "rows": [
+  {
+   "team": "clpr-maintainers",
+   "members": 2,
+   "active_members": 2,
+   "status": "active",
+   "days_since_active": 1,
+   "prs_opened": 2,
+   "reviews_given": 4,
+   "merges_done": 3,
+   "issues_opened": 5,
+   "labels_applied": 4
+  },
+  {
+   "team": "lfdt-staff",
+   "members": 3,
+   "active_members": 2,
+   "status": "active",
+   "days_since_active": 1,
+   "prs_opened": 10,
+   "reviews_given": 5,
+   "merges_done": 8,
+   "issues_opened": 9,
+   "labels_applied": 13
+  }
+ ],
+ "row_count": 2,
+ "generated_at": "2026-10-15T10:36:12.743108+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [
+   {
+    "team": "clpr-maintainers",
+    "members": 2,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 4
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 4,
+    "reviews_given": 2,
+    "merges_done": 3,
+    "issues_opened": 9,
+    "labels_applied": 13
+   }
+  ],
+  "30d": [
+   {
+    "team": "clpr-maintainers",
+    "members": 2,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 4
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 9,
+    "reviews_given": 5,
+    "merges_done": 8,
+    "issues_opened": 9,
+    "labels_applied": 13
+   }
+  ],
+  "365d": [
+   {
+    "team": "clpr-maintainers",
+    "members": 2,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 2,
+    "reviews_given": 4,
+    "merges_done": 3,
+    "issues_opened": 5,
+    "labels_applied": 4
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 10,
+    "reviews_given": 5,
+    "merges_done": 8,
+    "issues_opened": 9,
+    "labels_applied": 13
+   }
+  ]
+ },
+ "group": "Teams & TSC",
+ "macro": "Governance"
+}

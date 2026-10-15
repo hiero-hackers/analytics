@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-15T01:19:02.454279+00:00"
+  "end": "2026-10-15T10:32:53.662291+00:00"
  },
  "series": [
   {
@@ -319,6 +319,18 @@
    "Unknown": 0
   },
   {
+   "team": "hiero-sdk-go-committers",
+   "Hashgraph": 1,
+   "LimeChain": 4,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
    "team": "hiero-sdk-go-maintainers",
    "Hashgraph": 1,
    "LimeChain": 4,
@@ -341,6 +353,18 @@
    "Other orgs": 0,
    "Independent": 1,
    "Unknown": 0
+  },
+  {
+   "team": "roadmap-viewers",
+   "Hashgraph": 23,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "DevLabs": 1,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 1,
+   "Independent": 1,
+   "Unknown": 3
   },
   {
    "team": "hiero-block-node-committers",
@@ -399,8 +423,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
+   "Independent": 1,
+   "Unknown": 0
   },
   {
    "team": "hiero-sdk-tck-committers",
@@ -411,8 +435,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
+   "Independent": 1,
+   "Unknown": 0
   },
   {
    "team": "hiero-sdk-java-maintainers",
@@ -425,18 +449,6 @@
    "Other orgs": 0,
    "Independent": 0,
    "Unknown": 0
-  },
-  {
-   "team": "roadmap-viewers",
-   "Hashgraph": 22,
-   "LimeChain": 1,
-   "DSR Corporation": 0,
-   "DevLabs": 1,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 1,
-   "Independent": 1,
-   "Unknown": 4
   },
   {
    "team": "hiero-consensus-node-consensus-codeowners",
@@ -483,8 +495,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
+   "Independent": 1,
+   "Unknown": 0
   },
   {
    "team": "hiero-did-sdk-python-maintainers",
@@ -531,8 +543,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 1,
-   "Unknown": 2
+   "Independent": 2,
+   "Unknown": 1
   },
   {
    "team": "solo-charts-maintainers",
@@ -557,18 +569,6 @@
    "Other orgs": 0,
    "Independent": 1,
    "Unknown": 0
-  },
-  {
-   "team": "hiero-sdk-go-committers",
-   "Hashgraph": 1,
-   "LimeChain": 3,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
   },
   {
    "team": "hiero-contracts-maintainers",
@@ -603,8 +603,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 1,
-   "Unknown": 2
+   "Independent": 2,
+   "Unknown": 1
   },
   {
    "team": "governance-write",
@@ -639,8 +639,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 2
+   "Independent": 1,
+   "Unknown": 1
   },
   {
    "team": "hiero-sdk-triage",
@@ -739,6 +739,18 @@
    "Unknown": 0
   },
   {
+   "team": "hiero-sdk-tck-maintainers",
+   "Hashgraph": 2,
+   "LimeChain": 1,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 1,
+   "Unknown": 0
+  },
+  {
    "team": "identity-collaboration-hub-maintainers",
    "Hashgraph": 1,
    "LimeChain": 0,
@@ -765,14 +777,14 @@
   {
    "team": "hiero-contracts-committers",
    "Hashgraph": 12,
-   "LimeChain": 8,
+   "LimeChain": 9,
    "DSR Corporation": 0,
    "DevLabs": 1,
    "BlockyDevs": 1,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 5,
-   "Unknown": 4
+   "Independent": 6,
+   "Unknown": 2
   },
   {
    "team": "security-maintainers",
@@ -795,20 +807,20 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 1,
-   "Unknown": 2
+   "Independent": 2,
+   "Unknown": 1
   },
   {
    "team": "hiero-json-rpc-relay-committers",
    "Hashgraph": 7,
-   "LimeChain": 5,
+   "LimeChain": 6,
    "DSR Corporation": 0,
    "DevLabs": 1,
    "BlockyDevs": 1,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 4,
-   "Unknown": 3
+   "Independent": 5,
+   "Unknown": 1
   },
   {
    "team": "tsc",
@@ -831,8 +843,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 1,
-   "Unknown": 2
+   "Independent": 2,
+   "Unknown": 1
   },
   {
    "team": "solo-containers-committers",
@@ -843,8 +855,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 1,
-   "Unknown": 2
+   "Independent": 2,
+   "Unknown": 1
   },
   {
    "team": "hiero-improvement-proposals-committers",
@@ -855,8 +867,8 @@
    "BlockyDevs": 0,
    "Linux Foundation": 0,
    "Other orgs": 18,
-   "Independent": 12,
-   "Unknown": 20
+   "Independent": 13,
+   "Unknown": 19
   },
   {
    "team": "hiero-sdk-good-first-issue-support",
@@ -897,14 +909,14 @@
   {
    "team": "hiero-ethereum-execution-spec-tests-committers",
    "Hashgraph": 3,
-   "LimeChain": 2,
+   "LimeChain": 3,
    "DSR Corporation": 0,
    "DevLabs": 1,
    "BlockyDevs": 1,
    "Linux Foundation": 0,
    "Other orgs": 0,
-   "Independent": 4,
-   "Unknown": 3
+   "Independent": 5,
+   "Unknown": 1
   },
   {
    "team": "hiero-website-committers",
@@ -979,6 +991,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-15T01:19:02.454279+00:00",
+ "generated_at": "2026-10-15T10:32:53.662291+00:00",
  "stale": false
 }

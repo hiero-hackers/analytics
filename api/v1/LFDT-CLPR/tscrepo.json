@@ -1,0 +1,55 @@
+{
+ "id": "tscrepo",
+ "title": "TSC activity by repo",
+ "description": "For TSC members with activity, which repos they work in and the role they hold there.",
+ "source": "tsc_activity_by_repo.csv",
+ "columns": [
+  {
+   "key": "account",
+   "label": "member"
+  },
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "repo_role",
+   "label": "role here"
+  },
+  {
+   "key": "prs_opened",
+   "label": "PRs"
+  },
+  {
+   "key": "reviews_given",
+   "label": "reviews"
+  },
+  {
+   "key": "merges_done",
+   "label": "merges"
+  },
+  {
+   "key": "issues_opened",
+   "label": "issues"
+  },
+  {
+   "key": "labels_applied",
+   "label": "labels"
+  },
+  {
+   "key": "last_active",
+   "label": "last active"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "generated_at": "2026-10-15T10:36:12.746008+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [],
+  "30d": [],
+  "365d": []
+ },
+ "group": "Teams & TSC",
+ "macro": "Governance"
+}

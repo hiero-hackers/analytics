@@ -1,0 +1,41 @@
+{
+ "id": "loadshare",
+ "title": "Who carries the review load",
+ "description": "For each repo, the share of review+merge work in the selected period done by the single busiest person who can merge \u2014 committer or maintainer. 'top role' is whether the busiest is a committer or maintainer; 'top %' is their share, 'top-2 %' the top two combined. Highest concentration first; repos with under 20 review+merge actions in the selected period are omitted.",
+ "source": "review_load_share.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "top_carrier",
+   "label": "top carrier"
+  },
+  {
+   "key": "top_role",
+   "label": "top role"
+  },
+  {
+   "key": "top_pct",
+   "label": "top %",
+   "format": "percent"
+  },
+  {
+   "key": "top2_pct",
+   "label": "top-2 %",
+   "format": "percent"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "generated_at": "2026-10-15T10:36:12.516677+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [],
+  "30d": [],
+  "365d": []
+ },
+ "group": "Coverage & risk",
+ "macro": "Governance"
+}

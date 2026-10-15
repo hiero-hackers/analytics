@@ -1,0 +1,134 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Take every tracked event in the last six months \u2014 issues opened, PRs opened, reviews, merges \u2014 excluding bots.",
+  "Weight each event (issues \u00d72, reviews \u00d73, PRs opened \u00d73, merges \u00d72) and bucket it by the month it happened.",
+  "Sum the weighted score per contributor per month.",
+  "Rank contributors by their six-month total and keep the top 25.",
+  "Colour each cell by its monthly score (greener = more active)."
+ ],
+ "schema_version": 1,
+ "id": "contributor_activity_heatmap",
+ "kind": "matrix",
+ "org": "LFDT-CLPR",
+ "source": "contributor_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each row is one person.",
+ "dimensions": [
+  "contributor",
+  "column"
+ ],
+ "row": {
+  "key": "contributor name",
+  "label": "Contributor"
+ },
+ "sublabel": {
+  "key": "role",
+  "label": "Highest role"
+ },
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  },
+  {
+   "key": "2026-09",
+   "label": "2026-09"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 25,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": true,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:12.381105+00:00"
+ },
+ "rows": [
+  {
+   "contributor name": "ryjones",
+   "role": "General User",
+   "activity score": 25,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 25
+  },
+  {
+   "contributor name": "jwagantall",
+   "role": "General User",
+   "activity score": 12,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 12
+  },
+  {
+   "contributor name": "edward-swirldslabs",
+   "role": "Maintainer",
+   "activity score": 10,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 10
+  },
+  {
+   "contributor name": "hendrikebbers",
+   "role": "Maintainer",
+   "activity score": 6,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 6
+  },
+  {
+   "contributor name": "shayansal",
+   "role": "General User",
+   "activity score": 3,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 3
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:12.381105+00:00",
+ "stale": false
+}

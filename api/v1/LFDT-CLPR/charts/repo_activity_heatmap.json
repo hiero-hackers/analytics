@@ -1,0 +1,125 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Take every tracked event in the last six months (bots excluded), keyed by the repository it occurred in.",
+  "Weight each event (issues \u00d72, reviews \u00d73, PRs opened \u00d73, merges \u00d72) and bucket by month.",
+  "Sum the weighted score per repository per month \u2014 each event counts once.",
+  "Rank repositories by total, show the busiest 25, and colour each cell by its monthly score."
+ ],
+ "schema_version": 1,
+ "id": "repo_activity_heatmap",
+ "kind": "matrix",
+ "org": "LFDT-CLPR",
+ "source": "repo_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each event counts once, in the repository where it happened.",
+ "dimensions": [
+  "repo",
+  "column"
+ ],
+ "row": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "sublabel": null,
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  },
+  {
+   "key": "2026-09",
+   "label": "2026-09"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 29,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": false,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:12.819434+00:00"
+ },
+ "rows": [
+  {
+   "repo": ".github",
+   "activity score": 29,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 29
+  },
+  {
+   "repo": "clpr-smart-contracts",
+   "activity score": 11,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 11
+  },
+  {
+   "repo": "clpr-endpoint",
+   "activity score": 8,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 8
+  },
+  {
+   "repo": "governance",
+   "activity score": 5,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 5
+  },
+  {
+   "repo": "clpr-spec",
+   "activity score": 3,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 3
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:12.819434+00:00",
+ "stale": false
+}

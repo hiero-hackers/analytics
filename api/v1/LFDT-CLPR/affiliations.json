@@ -1,0 +1,129 @@
+{
+ "id": "affiliations",
+ "title": "Organisation affiliations \u2014 reference",
+ "description": "Reference: each maintainer, the organisation they were mapped to, and how it was decided \u2014 'automated' (the resolver placed them from public signals) or 'manual' (a hand-correction). Status is 'affiliated' (named employer), 'independent' (solo / personal-email only), or 'unknown' (no public signal). To fix a mapping or resolve an unknown, add a row for the login to data/affiliation_overrides.yaml with the reason as a comment (it then survives regeneration and reads 'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo.",
+ "source": "maintainer_affiliations.csv",
+ "columns": [
+  {
+   "key": "login",
+   "label": "maintainer"
+  },
+  {
+   "key": "organisation",
+   "label": "organisation"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "method",
+   "label": "method"
+  }
+ ],
+ "rows": [
+  {
+   "login": "edward-swirldslabs",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "automated"
+  },
+  {
+   "login": "hendrikebbers",
+   "organisation": "Hashgraph",
+   "status": "affiliated",
+   "method": "manual"
+  }
+ ],
+ "row_count": 2,
+ "label": "Maintainers",
+ "action": {
+  "url": "https://github.com/hiero-hackers/analytics/issues",
+  "label": "Suggest a correction"
+ },
+ "generated_at": "2026-10-15T10:36:12.790728+00:00",
+ "stale": false,
+ "group": "Organisation diversity",
+ "variants": [
+  {
+   "id": "affiliations",
+   "title": "Maintainer affiliations \u2014 reference",
+   "description": "Reference: each maintainer, the organisation they were mapped to, and how it was decided \u2014 'automated' (the resolver placed them from public signals) or 'manual' (a hand-correction). Status is 'affiliated' (named employer), 'independent' (solo / personal-email only), or 'unknown' (no public signal). To fix a mapping or resolve an unknown, add a row for the login to data/affiliation_overrides.yaml with the reason as a comment (it then survives regeneration and reads 'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo.",
+   "source": "maintainer_affiliations.csv",
+   "columns": [
+    {
+     "key": "login",
+     "label": "maintainer"
+    },
+    {
+     "key": "organisation",
+     "label": "organisation"
+    },
+    {
+     "key": "status",
+     "label": "status"
+    },
+    {
+     "key": "method",
+     "label": "method"
+    }
+   ],
+   "rows": [
+    {
+     "login": "edward-swirldslabs",
+     "organisation": "Hashgraph",
+     "status": "affiliated",
+     "method": "automated"
+    },
+    {
+     "login": "hendrikebbers",
+     "organisation": "Hashgraph",
+     "status": "affiliated",
+     "method": "manual"
+    }
+   ],
+   "row_count": 2,
+   "label": "Maintainers",
+   "action": {
+    "url": "https://github.com/hiero-hackers/analytics/issues",
+    "label": "Suggest a correction"
+   },
+   "generated_at": "2026-10-15T10:36:12.790728+00:00",
+   "stale": false
+  },
+  {
+   "id": "committeraffiliations",
+   "title": "Committer affiliations \u2014 reference",
+   "description": "The same reference as the Maintainers tab, for people whose highest role anywhere is committer \u2014 write access, but no maintainer seat in any repository. The two populations are disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. To fix a mapping or resolve an unknown, add a row for the login to data/affiliation_overrides.yaml with the reason as a comment, or use 'Suggest a correction' to open an issue on the analytics repo.",
+   "source": "committer_affiliations.csv",
+   "columns": [
+    {
+     "key": "login",
+     "label": "committer"
+    },
+    {
+     "key": "organisation",
+     "label": "organisation"
+    },
+    {
+     "key": "status",
+     "label": "status"
+    },
+    {
+     "key": "method",
+     "label": "method"
+    }
+   ],
+   "rows": [],
+   "row_count": 0,
+   "label": "Committers",
+   "action": {
+    "url": "https://github.com/hiero-hackers/analytics/issues",
+    "label": "Suggest a correction"
+   },
+   "generated_at": "2026-10-15T10:36:12.803101+00:00",
+   "stale": false
+  }
+ ],
+ "macro": "Governance"
+}

@@ -1,0 +1,163 @@
+{
+ "note": "Each bar is a calendar month, counting the distinct people active that month \u2014 once each, under the highest governance role they hold in any repo (general \u2192 triage \u2192 committer \u2192 maintainer). Counts are strictly per-month (not a trailing window), so the current month is month-to-date. Only the most recent 12 months are charted \u2014 the '1 year' span; full history stays in the CSV.",
+ "schema_version": 1,
+ "id": "maintainer_pipeline_monthly",
+ "kind": "timeseries",
+ "org": "LFDT-CLPR",
+ "source": "maintainer_pipeline_monthly.csv",
+ "metric": "active_contributors_by_role",
+ "unit": "Unique active contributors",
+ "population": "Each person is counted once per bucket under the highest governance role they hold in any repository. Bots are excluded. Counts across periods must not be added to obtain unique people.",
+ "dimensions": [
+  "period",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "month",
+ "timezone": "UTC",
+ "comparison": {
+  "current": "2026-09",
+  "previous": "2026-08"
+ },
+ "category": {
+  "key": "bucket",
+  "label": "Period (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2025-11",
+  "last": "2026-10"
+ },
+ "series": [
+  {
+   "key": "general_user",
+   "label": "General contributors",
+   "color": "var(--chart-general)"
+  },
+  {
+   "key": "triage",
+   "label": "Triage",
+   "color": "var(--chart-triage)"
+  },
+  {
+   "key": "committer",
+   "label": "Committers",
+   "color": "var(--chart-committer)"
+  },
+  {
+   "key": "maintainer",
+   "label": "Maintainers",
+   "color": "var(--chart-maintainer)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2025-11",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10",
+   "general_user": 6,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2,
+   "partial": true
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:10.528416+00:00",
+ "stale": false
+}

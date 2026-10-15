@@ -1,0 +1,95 @@
+{
+ "note": "The 25 highest six-month scores are shown first; search or show all to see every row. Stronger colour means a higher score; the scale lists each shade's range, and every cell states its exact value.",
+ "methodology": [
+  "Start from the contributor activity matrix (weighted monthly scores, bots excluded).",
+  "Map each contributor to an organisation via the affiliations file; drop those with no organisation.",
+  "Sum the contributors' monthly scores within each organisation.",
+  "Rank organisations by total and colour each cell by its monthly score."
+ ],
+ "schema_version": 1,
+ "id": "org_activity_heatmap",
+ "kind": "matrix",
+ "org": "LFDT-CLPR",
+ "source": "org_activity_heatmap.csv",
+ "metric": "weighted_activity",
+ "unit": "Weighted monthly activity score",
+ "population": "A weighted score, not a count: issues \u00d72, reviews \u00d73, prs created \u00d73, prs merged \u00d72. Other activity (comments, labels) is not scored. Columns are the last 6 complete calendar months (UTC); the current month is excluded. Bots are excluded. Each person counts toward their curated employer; people with no curated affiliation are excluded.",
+ "dimensions": [
+  "organisation",
+  "column"
+ ],
+ "row": {
+  "key": "organisation",
+  "label": "Organisation"
+ },
+ "sublabel": null,
+ "total": {
+  "key": "activity score",
+  "label": "Six-month score"
+ },
+ "columns": [
+  {
+   "key": "2026-04",
+   "label": "2026-04"
+  },
+  {
+   "key": "2026-05",
+   "label": "2026-05"
+  },
+  {
+   "key": "2026-06",
+   "label": "2026-06"
+  },
+  {
+   "key": "2026-07",
+   "label": "2026-07"
+  },
+  {
+   "key": "2026-08",
+   "label": "2026-08"
+  },
+  {
+   "key": "2026-09",
+   "label": "2026-09"
+  }
+ ],
+ "value_label": "Weighted activity score",
+ "scale": {
+  "min": 0,
+  "max": 37,
+  "steps": 5
+ },
+ "missing": null,
+ "avatars": false,
+ "top_n": 25,
+ "value_format": "integer",
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:12.816767+00:00"
+ },
+ "rows": [
+  {
+   "organisation": "Linux Foundation",
+   "activity score": 37,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 37
+  },
+  {
+   "organisation": "Hashgraph",
+   "activity score": 16,
+   "2026-04": 0,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 16
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:12.816767+00:00",
+ "stale": false
+}

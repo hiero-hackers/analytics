@@ -1,0 +1,549 @@
+{
+ "id": "repo",
+ "title": "Roles and recent activity by repo",
+ "description": "Type a repo to see its permission-holders and their contributions in this repo during the selected period, plus whether each has activity here in that period. Days since active always refers to the latest recorded activity.",
+ "source": "role_coverage_all.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "user",
+   "label": "user"
+  },
+  {
+   "key": "granted_role",
+   "label": "role"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "days_since_active",
+   "label": "days since active",
+   "format": "number"
+  },
+  {
+   "key": "prs_recent",
+   "label": "PRs",
+   "format": "number"
+  },
+  {
+   "key": "reviews_recent",
+   "label": "reviews",
+   "format": "number"
+  },
+  {
+   "key": "merges_recent",
+   "label": "merges",
+   "format": "number"
+  },
+  {
+   "key": "issues_recent",
+   "label": "issues",
+   "format": "number"
+  },
+  {
+   "key": "labels_recent",
+   "label": "labels",
+   "format": "number"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "LFDT-CLPR/.github",
+   "user": "hendrikebbers",
+   "granted_role": "maintainer",
+   "status": "quiet",
+   "days_since_active": null,
+   "prs_recent": 0,
+   "reviews_recent": 0,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/.github",
+   "user": "edward-swirldslabs",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 1.0,
+   "prs_recent": 0,
+   "reviews_recent": 1,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-endpoint",
+   "user": "hendrikebbers",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 43.0,
+   "prs_recent": 0,
+   "reviews_recent": 1,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-endpoint",
+   "user": "edward-swirldslabs",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 43.0,
+   "prs_recent": 1,
+   "reviews_recent": 0,
+   "merges_recent": 1,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-smart-contracts",
+   "user": "hendrikebbers",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 43.0,
+   "prs_recent": 0,
+   "reviews_recent": 1,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-smart-contracts",
+   "user": "edward-swirldslabs",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 43.0,
+   "prs_recent": 1,
+   "reviews_recent": 0,
+   "merges_recent": 1,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-spec",
+   "user": "edward-swirldslabs",
+   "granted_role": "maintainer",
+   "status": "quiet",
+   "days_since_active": null,
+   "prs_recent": 0,
+   "reviews_recent": 0,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-spec",
+   "user": "hendrikebbers",
+   "granted_role": "maintainer",
+   "status": "quiet",
+   "days_since_active": null,
+   "prs_recent": 0,
+   "reviews_recent": 0,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/governance",
+   "user": "edward-swirldslabs",
+   "granted_role": "maintainer",
+   "status": "quiet",
+   "days_since_active": null,
+   "prs_recent": 0,
+   "reviews_recent": 0,
+   "merges_recent": 0,
+   "issues_recent": 0,
+   "labels_recent": 0
+  },
+  {
+   "repo": "LFDT-CLPR/governance",
+   "user": "hendrikebbers",
+   "granted_role": "maintainer",
+   "status": "active",
+   "days_since_active": 5.0,
+   "prs_recent": 0,
+   "reviews_recent": 1,
+   "merges_recent": 1,
+   "issues_recent": 5,
+   "labels_recent": 4
+  }
+ ],
+ "row_count": 10,
+ "generated_at": "2026-10-15T10:36:12.502262+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 1.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 5.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 1,
+    "issues_recent": 5,
+    "labels_recent": 4
+   }
+  ],
+  "30d": [
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 1.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 5.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 1,
+    "issues_recent": 5,
+    "labels_recent": 4
+   }
+  ],
+  "365d": [
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/.github",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 1.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 43.0,
+    "prs_recent": 1,
+    "reviews_recent": 0,
+    "merges_recent": 1,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 43.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 43.0,
+    "prs_recent": 1,
+    "reviews_recent": 0,
+    "merges_recent": 1,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/clpr-spec",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "edward-swirldslabs",
+    "granted_role": "maintainer",
+    "status": "quiet",
+    "days_since_active": null,
+    "prs_recent": 0,
+    "reviews_recent": 0,
+    "merges_recent": 0,
+    "issues_recent": 0,
+    "labels_recent": 0
+   },
+   {
+    "repo": "LFDT-CLPR/governance",
+    "user": "hendrikebbers",
+    "granted_role": "maintainer",
+    "status": "active",
+    "days_since_active": 5.0,
+    "prs_recent": 0,
+    "reviews_recent": 1,
+    "merges_recent": 1,
+    "issues_recent": 5,
+    "labels_recent": 4
+   }
+  ]
+ },
+ "group": "Roles",
+ "macro": "Governance"
+}

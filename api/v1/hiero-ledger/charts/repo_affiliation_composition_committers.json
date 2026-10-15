@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-15T01:19:02.186311+00:00"
+  "end": "2026-10-15T10:32:53.517252+00:00"
  },
  "series": [
   {
@@ -67,7 +67,7 @@
   {
    "key": "Studio Monolith",
    "label": "Studio Monolith",
-   "color": "#BCBD22"
+   "color": "#E377C2"
   },
   {
    "key": "Other orgs",
@@ -91,6 +91,18 @@
    "repo": "roadmap",
    "Hashgraph": 2,
    "LimeChain": 0,
+   "BlockyDevs": 0,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "Hashgraph": 0,
+   "LimeChain": 1,
    "BlockyDevs": 0,
    "DSR Corporation": 0,
    "Launchbadge": 0,
@@ -270,14 +282,38 @@
   {
    "repo": "hiero-contracts",
    "Hashgraph": 7,
-   "LimeChain": 7,
+   "LimeChain": 8,
+   "BlockyDevs": 1,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 6,
+   "Unknown": 2
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "Hashgraph": 1,
+   "LimeChain": 2,
    "BlockyDevs": 1,
    "DSR Corporation": 0,
    "Launchbadge": 0,
    "Studio Monolith": 0,
    "Other orgs": 0,
    "Independent": 5,
-   "Unknown": 4
+   "Unknown": 1
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "Hashgraph": 1,
+   "LimeChain": 2,
+   "BlockyDevs": 1,
+   "DSR Corporation": 0,
+   "Launchbadge": 0,
+   "Studio Monolith": 0,
+   "Other orgs": 0,
+   "Independent": 5,
+   "Unknown": 1
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -288,32 +324,8 @@
    "Launchbadge": 3,
    "Studio Monolith": 0,
    "Other orgs": 12,
-   "Independent": 12,
-   "Unknown": 19
-  },
-  {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "Hashgraph": 1,
-   "LimeChain": 1,
-   "BlockyDevs": 1,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 4,
-   "Unknown": 3
-  },
-  {
-   "repo": "hiero-json-rpc-relay",
-   "Hashgraph": 1,
-   "LimeChain": 1,
-   "BlockyDevs": 1,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 4,
-   "Unknown": 3
+   "Independent": 13,
+   "Unknown": 18
   },
   {
    "repo": "hiero-sdk-python",
@@ -338,18 +350,6 @@
    "Other orgs": 0,
    "Independent": 1,
    "Unknown": 0
-  },
-  {
-   "repo": "hiero-sdk-go",
-   "Hashgraph": 0,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "DSR Corporation": 0,
-   "Launchbadge": 0,
-   "Studio Monolith": 0,
-   "Other orgs": 0,
-   "Independent": 0,
-   "Unknown": 1
   },
   {
    "repo": "hiero-sdk-swift",
@@ -424,6 +424,6 @@
    "Unknown": 1
   }
  ],
- "generated_at": "2026-10-15T01:19:02.186311+00:00",
+ "generated_at": "2026-10-15T10:32:53.517252+00:00",
  "stale": false
 }

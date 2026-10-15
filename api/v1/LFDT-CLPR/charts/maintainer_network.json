@@ -1,0 +1,140 @@
+{
+ "note": "Each bubble is a repository, sized by how many maintainers are active in it; two repos are linked when they share a maintainer (thicker line = more shared). Bubble colour is the repo's category.",
+ "methodology": [
+  "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+  "Make each repository a node, sized by how many holders of that role it has.",
+  "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+  "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+ ],
+ "schema_version": 1,
+ "id": "maintainer_network",
+ "kind": "network",
+ "org": "LFDT-CLPR",
+ "source": "maintainer_network_nodes.csv",
+ "metric": "maintainer_comembership",
+ "unit": "Repositories linked by shared maintainers",
+ "population": "A node is a repository where someone holds the maintainer role (their highest role in that repository); its size is how many of those maintainers were active there in the last 90 days. A link joins two repositories that share at least one maintainer, counted whether active or not.",
+ "dimensions": [
+  "repo",
+  "link"
+ ],
+ "member_label": "maintainers",
+ "categories": [
+  {
+   "key": "EVM / smart contracts",
+   "label": "EVM / smart contracts",
+   "color": "#14B8A6"
+  },
+  {
+   "key": "Governance",
+   "label": "Governance",
+   "color": "#EF4444"
+  },
+  {
+   "key": "Other",
+   "label": "Other",
+   "color": "#94A3B8"
+  }
+ ],
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:12.535004+00:00"
+ },
+ "nodes": [
+  {
+   "id": "clpr-endpoint",
+   "active": 2,
+   "total": 2,
+   "category": "Other",
+   "x": -0.2872,
+   "y": 1.718
+  },
+  {
+   "id": "clpr-smart-contracts",
+   "active": 2,
+   "total": 2,
+   "category": "EVM / smart contracts",
+   "x": 1.5012,
+   "y": -1.2293
+  },
+  {
+   "id": ".github",
+   "active": 1,
+   "total": 2,
+   "category": "Governance",
+   "x": -0.5729,
+   "y": -1.718
+  },
+  {
+   "id": "governance",
+   "active": 1,
+   "total": 2,
+   "category": "Governance",
+   "x": -1.6781,
+   "y": 0.104
+  },
+  {
+   "id": "clpr-spec",
+   "active": 0,
+   "total": 2,
+   "category": "Other",
+   "x": 1.6781,
+   "y": 0.8941
+  }
+ ],
+ "edges": [
+  {
+   "source": ".github",
+   "target": "clpr-endpoint",
+   "shared": 2
+  },
+  {
+   "source": ".github",
+   "target": "clpr-smart-contracts",
+   "shared": 2
+  },
+  {
+   "source": ".github",
+   "target": "clpr-spec",
+   "shared": 2
+  },
+  {
+   "source": ".github",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "clpr-smart-contracts",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "clpr-spec",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-spec",
+   "shared": 2
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-spec",
+   "target": "governance",
+   "shared": 2
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:12.535004+00:00",
+ "stale": false
+}

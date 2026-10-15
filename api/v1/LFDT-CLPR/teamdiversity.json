@@ -1,0 +1,80 @@
+{
+ "id": "teamdiversity",
+ "title": "Team organisation concentration",
+ "description": "Per governance team: how many members resolve to an employer, how many distinct employers they span, the largest employer and its share, and the concentration (HHI, 10000 = one employer). 'single employer' = one employer holds every resolved seat \u2014 a capture / bus-factor risk, most serious for admin, release, security, and maintainer teams; teams with more unmapped than resolved members are never flagged. 'unknown' is how many members aren't in the affiliations map (mostly non-maintainers), so read a flag on a mostly-unknown team with caution. Most concentrated first.",
+ "source": "team_affiliation_diversity.csv",
+ "columns": [
+  {
+   "key": "team",
+   "label": "team"
+  },
+  {
+   "key": "members",
+   "label": "members"
+  },
+  {
+   "key": "resolved",
+   "label": "resolved"
+  },
+  {
+   "key": "distinct_orgs",
+   "label": "distinct orgs"
+  },
+  {
+   "key": "top_org",
+   "label": "largest org"
+  },
+  {
+   "key": "top_org_pct",
+   "label": "largest org %",
+   "format": "percent"
+  },
+  {
+   "key": "hhi",
+   "label": "HHI"
+  },
+  {
+   "key": "unknown",
+   "label": "unknown"
+  },
+  {
+   "key": "single_employer",
+   "label": "single employer"
+  },
+  {
+   "key": "organisations",
+   "label": "organisation mix"
+  }
+ ],
+ "rows": [
+  {
+   "team": "lfdt-staff",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 1,
+   "top_org": "Linux Foundation",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Linux Foundation 3"
+  },
+  {
+   "team": "clpr-maintainers",
+   "members": 2,
+   "resolved": 2,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Hashgraph 2"
+  }
+ ],
+ "row_count": 2,
+ "generated_at": "2026-10-15T10:36:12.812627+00:00",
+ "stale": false,
+ "group": "Organisation diversity",
+ "macro": "Governance"
+}

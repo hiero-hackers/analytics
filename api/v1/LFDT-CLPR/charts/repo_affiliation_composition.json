@@ -1,0 +1,75 @@
+{
+ "note": "Each bar is normalised to 100%, so segments are each employer's share of that row's role-holders; the dashed line marks 50%. Rows are ordered most-concentrated first. The six largest employers get their own colour; smaller ones pool into 'Other orgs'. The data view shows the underlying counts.",
+ "methodology": [
+  "For each repository, take the people holding the selected role there (the tabs pick maintainer or committer).",
+  "Map each to an organisation via the affiliations file.",
+  "Count holders per organisation within the repo; the largest employers across all repos get their own colour, the rest pool into 'Other orgs', and solo/unmapped holders show as 'Independent'/'Unknown'.",
+  "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first (by the largest single employer's share); ties are grouped by the leading organisation's colour.",
+  "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are single-employer repos; multi-colour bars are cross-org."
+ ],
+ "schema_version": 1,
+ "id": "repo_affiliation_composition",
+ "kind": "categories",
+ "org": "LFDT-CLPR",
+ "source": "repo_affiliation_composition.csv",
+ "metric": "employer_composition",
+ "unit": "Maintainers (share of repository)",
+ "population": "People holding the maintainer role in each repository, by curated employer; a person is counted in every repository where they hold it.",
+ "dimensions": [
+  "repo"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": true,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": 15,
+ "reference": {
+  "value": 50,
+  "label": "Majority"
+ },
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:12.796421+00:00"
+ },
+ "series": [
+  {
+   "key": "Hashgraph",
+   "label": "Hashgraph",
+   "color": "#1F77B4"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": ".github",
+   "Hashgraph": 2
+  },
+  {
+   "repo": "clpr-endpoint",
+   "Hashgraph": 2
+  },
+  {
+   "repo": "clpr-smart-contracts",
+   "Hashgraph": 2
+  },
+  {
+   "repo": "clpr-spec",
+   "Hashgraph": 2
+  },
+  {
+   "repo": "governance",
+   "Hashgraph": 2
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:12.796421+00:00",
+ "stale": false
+}

@@ -1,7 +1,7 @@
 {
  "note": "Repositories ranked by distinct contributors over the last six months; bar height is the number of unique contributors. The chart and its CSV hold every repository.",
  "methodology": [
-  "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
+  "Take the organisation's contributor activity records.",
   "Count the distinct contributors active in each repository.",
   "Rank the repositories by that count; the chart and the CSV keep them all."
  ],
@@ -33,7 +33,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-15T01:20:37.063106+00:00"
+  "end": "2026-10-15T10:36:06.582660+00:00"
  },
  "series": [
   {
@@ -46,7 +46,7 @@
  "rows": [
   {
    "repo": "analytics",
-   "contributors": 24
+   "contributors": 23
   },
   {
    "repo": "governance",
@@ -69,7 +69,7 @@
    "contributors": 4
   },
   {
-   "repo": "hiero-sdk-v3-prototyping",
+   "repo": "clpr-smart-contracts",
    "contributors": 3
   },
   {
@@ -77,11 +77,19 @@
    "contributors": 3
   },
   {
+   "repo": "hiero-sdk-v3-prototyping",
+   "contributors": 3
+  },
+  {
+   "repo": "hiero-checkout",
+   "contributors": 2
+  },
+  {
    "repo": "hiero-block-verifier-js",
    "contributors": 2
   },
   {
-   "repo": "hiero-checkout",
+   "repo": "clpr-evm-endpoint",
    "contributors": 2
   },
   {
@@ -133,6 +141,6 @@
    "contributors": 1
   }
  ],
- "generated_at": "2026-10-15T01:20:37.063106+00:00",
+ "generated_at": "2026-10-15T10:36:06.582660+00:00",
  "stale": false
 }

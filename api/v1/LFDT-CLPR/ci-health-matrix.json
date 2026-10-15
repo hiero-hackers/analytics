@@ -1,0 +1,170 @@
+{
+ "id": "ci-health-matrix",
+ "kind": "ci_health_matrix",
+ "group": "CI health",
+ "title": "CI health matrix",
+ "description": "Repository-level CI health checks covering GitHub Actions SHA pinning, explicit workflow permissions, and repository security configuration. Click a fail or review cell to inspect the supporting evidence.",
+ "badge": "5 repositories",
+ "source": "ci_health_checks.csv",
+ "row_header": "Repository",
+ "columns": [
+  {
+   "key": "actions_sha_pinned",
+   "label": "Actions SHA Pinned"
+  },
+  {
+   "key": "explicit_permissions",
+   "label": "Explicit Permissions"
+  },
+  {
+   "key": "repository_security_configuration",
+   "label": "Security Config"
+  }
+ ],
+ "rows": [
+  {
+   "key": "LFDT-CLPR/.github",
+   "label": "LFDT-CLPR/.github",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-endpoint",
+   "label": "LFDT-CLPR/clpr-endpoint",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-smart-contracts",
+   "label": "LFDT-CLPR/clpr-smart-contracts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-spec",
+   "label": "LFDT-CLPR/clpr-spec",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/governance",
+   "label": "LFDT-CLPR/governance",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": "nan"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "nan"
+    }
+   ]
+  }
+ ],
+ "filters": [
+  "pass",
+  "fail",
+  "review",
+  "na"
+ ],
+ "macro": "Security & scorecards",
+ "generated_at": "2026-10-15T10:36:17.822651+00:00",
+ "stale": false
+}

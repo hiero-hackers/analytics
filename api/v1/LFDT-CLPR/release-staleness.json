@@ -1,0 +1,84 @@
+{
+ "id": "release-staleness",
+ "title": "Release staleness by repo",
+ "description": "Every repo in the org, whether or not it has ever released \u2014 a repo with no releases still gets a row, ranked maximally stale, rather than being silently absent. See the glossary below for what 'staleness_ratio' and 'pace' mean.",
+ "source": "release_repo_summary.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "latest_release",
+   "label": "latest release",
+   "format": "date"
+  },
+  {
+   "key": "days_since_last_release",
+   "label": "days since",
+   "format": "number"
+  },
+  {
+   "key": "median_gap_days",
+   "label": "typical gap (days)",
+   "format": "number"
+  },
+  {
+   "key": "staleness_ratio",
+   "label": "\u00d7 overdue vs. own pace",
+   "format": "number"
+  },
+  {
+   "key": "staleness_bucket",
+   "label": "pace",
+   "format": "staleness"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "LFDT-CLPR/clpr-spec",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-smart-contracts",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-endpoint",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "LFDT-CLPR/.github",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "LFDT-CLPR/governance",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
+  }
+ ],
+ "row_count": 5,
+ "generated_at": "2026-10-15T10:36:16.287645+00:00",
+ "stale": false,
+ "group": "Release cadence & staleness",
+ "macro": "Releases"
+}

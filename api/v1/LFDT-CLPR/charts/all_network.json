@@ -1,0 +1,130 @@
+{
+ "note": "Each bubble is a repository, sized by its active contributors; two repos are linked when they share contributors. Bubble colour is the repo's category; the link threshold scales with org size.",
+ "methodology": [
+  "Take every tracked contributor activity (PRs opened, reviews, merges, issues, labels) and reduce it to which people were active in which repositories.",
+  "Make each repository a node, sized by how many contributors it has.",
+  "Link two repositories when they share contributors; the link's thickness is how many they share. Links use all contributors, active or not, so latent structure shows even in a quiet period.",
+  "Thin the links with a minimum-shared threshold that scales with the number of repositories, so a dense organisation stays readable rather than becoming a hairball."
+ ],
+ "schema_version": 1,
+ "id": "all_network",
+ "kind": "network",
+ "org": "LFDT-CLPR",
+ "source": "all_network_nodes.csv",
+ "metric": "contributor_comembership",
+ "unit": "Repositories linked by shared contributors",
+ "population": "A node is a repository with recorded contributors (bots excluded); its size is how many were active there in the last 90 days. A link joins two repositories that share enough contributors: the threshold is one shared contributor per six repositories in the organisation, at least one.",
+ "dimensions": [
+  "repo",
+  "link"
+ ],
+ "member_label": "contributors",
+ "categories": [
+  {
+   "key": "EVM / smart contracts",
+   "label": "EVM / smart contracts",
+   "color": "#14B8A6"
+  },
+  {
+   "key": "Governance",
+   "label": "Governance",
+   "color": "#EF4444"
+  },
+  {
+   "key": "Other",
+   "label": "Other",
+   "color": "#94A3B8"
+  }
+ ],
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-15T10:36:11.369903+00:00"
+ },
+ "nodes": [
+  {
+   "id": "clpr-smart-contracts",
+   "active": 5,
+   "total": 5,
+   "category": "EVM / smart contracts",
+   "x": 0.3688,
+   "y": -0.3601
+  },
+  {
+   "id": "governance",
+   "active": 4,
+   "total": 4,
+   "category": "Governance",
+   "x": 0.0033,
+   "y": -1.718
+  },
+  {
+   "id": ".github",
+   "active": 3,
+   "total": 3,
+   "category": "Governance",
+   "x": -1.1486,
+   "y": -1.1027
+  },
+  {
+   "id": "clpr-endpoint",
+   "active": 3,
+   "total": 3,
+   "category": "Other",
+   "x": -0.3555,
+   "y": 0.4516
+  },
+  {
+   "id": "clpr-spec",
+   "active": 2,
+   "total": 2,
+   "category": "Other",
+   "x": 1.1486,
+   "y": 1.718
+  }
+ ],
+ "edges": [
+  {
+   "source": "clpr-endpoint",
+   "target": "clpr-smart-contracts",
+   "shared": 3
+  },
+  {
+   "source": ".github",
+   "target": "clpr-smart-contracts",
+   "shared": 2
+  },
+  {
+   "source": ".github",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "governance",
+   "shared": 1
+  },
+  {
+   "source": ".github",
+   "target": "clpr-endpoint",
+   "shared": 1
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "clpr-spec",
+   "shared": 1
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-spec",
+   "shared": 1
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:11.369903+00:00",
+ "stale": false
+}

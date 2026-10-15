@@ -246,9 +246,9 @@
    "maintainers": 6,
    "distinct_orgs": 2,
    "top_org": "LimeChain",
-   "top_org_pct": 80,
-   "independent": 0,
-   "unknown": 1,
+   "top_org_pct": 67,
+   "independent": 1,
+   "unknown": 0,
    "organisations": "LimeChain, Hashgraph"
   },
   {
@@ -306,9 +306,9 @@
    "maintainers": 4,
    "distinct_orgs": 2,
    "top_org": "Hashgraph",
-   "top_org_pct": 67,
-   "independent": 0,
-   "unknown": 1,
+   "top_org_pct": 50,
+   "independent": 1,
+   "unknown": 0,
    "organisations": "Hashgraph, LimeChain"
   },
   {
@@ -484,7 +484,7 @@
  ],
  "row_count": 44,
  "label": "Maintainers",
- "generated_at": "2026-10-15T01:19:02.170446+00:00",
+ "generated_at": "2026-10-15T10:32:53.506278+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -736,9 +736,9 @@
      "maintainers": 6,
      "distinct_orgs": 2,
      "top_org": "LimeChain",
-     "top_org_pct": 80,
-     "independent": 0,
-     "unknown": 1,
+     "top_org_pct": 67,
+     "independent": 1,
+     "unknown": 0,
      "organisations": "LimeChain, Hashgraph"
     },
     {
@@ -796,9 +796,9 @@
      "maintainers": 4,
      "distinct_orgs": 2,
      "top_org": "Hashgraph",
-     "top_org_pct": 67,
-     "independent": 0,
-     "unknown": 1,
+     "top_org_pct": 50,
+     "independent": 1,
+     "unknown": 0,
      "organisations": "Hashgraph, LimeChain"
     },
     {
@@ -974,7 +974,7 @@
    ],
    "row_count": 44,
    "label": "Maintainers",
-   "generated_at": "2026-10-15T01:19:02.170446+00:00",
+   "generated_at": "2026-10-15T10:32:53.506278+00:00",
    "stale": false
   },
   {
@@ -1038,16 +1038,6 @@
      "top_org_pct": 0,
      "independent": 1,
      "unknown": 0,
-     "organisations": null
-    },
-    {
-     "repo": "hiero-sdk-go",
-     "committers": 1,
-     "distinct_orgs": 0,
-     "top_org": null,
-     "top_org_pct": 0,
-     "independent": 0,
-     "unknown": 1,
      "organisations": null
     },
     {
@@ -1171,6 +1161,16 @@
      "organisations": "Hashgraph"
     },
     {
+     "repo": "hiero-sdk-go",
+     "committers": 1,
+     "distinct_orgs": 1,
+     "top_org": "LimeChain",
+     "top_org_pct": 100,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "LimeChain"
+    },
+    {
      "repo": "hiero-sdk-js",
      "committers": 1,
      "distinct_orgs": 1,
@@ -1265,30 +1265,30 @@
      "committers": 24,
      "distinct_orgs": 3,
      "top_org": "LimeChain",
-     "top_org_pct": 35,
-     "independent": 5,
-     "unknown": 4,
+     "top_org_pct": 36,
+     "independent": 6,
+     "unknown": 2,
      "organisations": "LimeChain, Hashgraph, BlockyDevs"
     },
     {
      "repo": "hiero-ethereum-execution-spec-tests",
      "committers": 10,
      "distinct_orgs": 3,
-     "top_org": "BlockyDevs",
-     "top_org_pct": 14,
-     "independent": 4,
-     "unknown": 3,
-     "organisations": "BlockyDevs, Hashgraph, LimeChain"
+     "top_org": "LimeChain",
+     "top_org_pct": 22,
+     "independent": 5,
+     "unknown": 1,
+     "organisations": "LimeChain, BlockyDevs, Hashgraph"
     },
     {
      "repo": "hiero-json-rpc-relay",
      "committers": 10,
      "distinct_orgs": 3,
-     "top_org": "BlockyDevs",
-     "top_org_pct": 14,
-     "independent": 4,
-     "unknown": 3,
-     "organisations": "BlockyDevs, Hashgraph, LimeChain"
+     "top_org": "LimeChain",
+     "top_org_pct": 22,
+     "independent": 5,
+     "unknown": 1,
+     "organisations": "LimeChain, BlockyDevs, Hashgraph"
     },
     {
      "repo": "hiero-improvement-proposals",
@@ -1296,14 +1296,14 @@
      "distinct_orgs": 15,
      "top_org": "Hashgraph",
      "top_org_pct": 24,
-     "independent": 12,
-     "unknown": 19,
+     "independent": 13,
+     "unknown": 18,
      "organisations": "Hashgraph, Launchbadge, Hedera, BugBytes, Inc., Envision Blockchain, FundRequest, VSP, dovuofficial, suku.world, LimeChain, contributor, RECDeFi, luthersystems, ScalemaiL, Robinhood"
     }
    ],
    "row_count": 28,
    "label": "Committers",
-   "generated_at": "2026-10-15T01:19:02.219545+00:00",
+   "generated_at": "2026-10-15T10:32:53.537347+00:00",
    "stale": false
   }
  ],

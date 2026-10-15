@@ -1,0 +1,51 @@
+{
+ "id": "committerrepodiversity",
+ "title": "Committer organisation diversity by repo",
+ "description": "The Maintainers tab's table over committers instead of maintainers: per repo, how many committers it has, how many distinct employers they span, the largest employer and its share of resolved committers, and the independent / unknown counts. Read it against the Maintainers tab \u2014 a repo whose maintainers are single-employer but whose committers are not has a bench it could promote from. The 'unknown' count is higher here, so weigh a single-employer reading against it.",
+ "source": "repo_affiliation_diversity_committers.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "committers",
+   "label": "committers",
+   "format": "number"
+  },
+  {
+   "key": "distinct_orgs",
+   "label": "distinct orgs",
+   "format": "number"
+  },
+  {
+   "key": "top_org",
+   "label": "largest org"
+  },
+  {
+   "key": "top_org_pct",
+   "label": "largest org %",
+   "format": "percent"
+  },
+  {
+   "key": "independent",
+   "label": "independent"
+  },
+  {
+   "key": "unknown",
+   "label": "unknown"
+  },
+  {
+   "key": "organisations",
+   "label": "organisations"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "label": "Committers",
+ "generated_at": "2026-10-15T10:36:12.804912+00:00",
+ "stale": false,
+ "group": "Organisation diversity",
+ "macro": "Governance",
+ "absorbed_by": "repodiversity"
+}

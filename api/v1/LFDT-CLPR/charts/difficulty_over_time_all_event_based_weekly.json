@@ -1,0 +1,555 @@
+{
+ "note": "Same series with the 'Unknown' band added: open issues with no difficulty label (or whose label application date isn't recoverable from events), counted from their creation date. Shows how the untriaged backlog moves relative to the triaged one.",
+ "schema_version": 1,
+ "id": "difficulty_over_time_all_event_based_weekly",
+ "kind": "timeseries",
+ "org": "LFDT-CLPR",
+ "source": "difficulty_over_time_all_event_based_weekly.csv",
+ "metric": "open_issues_by_difficulty",
+ "unit": "Open issues",
+ "population": "Open issues on each date, by the difficulty label they carried then, reconstructed from label events. Each point is a count at that moment, not activity during the week.",
+ "dimensions": [
+  "period",
+  "series"
+ ],
+ "mark": "area",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "vertical",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": null,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "frequency": "snapshot",
+ "timezone": "UTC",
+ "comparison": null,
+ "category": {
+  "key": "bucket",
+  "label": "Date (UTC)"
+ },
+ "window": {
+  "kind": "calendar",
+  "first": "2025-10-15",
+  "last": "2026-10-15"
+ },
+ "series": [
+  {
+   "key": "unknown",
+   "label": "Unknown",
+   "color": "#B3B3B3"
+  },
+  {
+   "key": "gfi",
+   "label": "Good First Issue",
+   "color": "#66C2A5"
+  },
+  {
+   "key": "beginner",
+   "label": "Beginner",
+   "color": "#8DA0CB"
+  },
+  {
+   "key": "intermediate",
+   "label": "Intermediate",
+   "color": "#FFD92F"
+  },
+  {
+   "key": "advanced",
+   "label": "Advanced",
+   "color": "#E78AC3"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "bucket": "2025-10-15",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-10-22",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-10-29",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11-05",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11-12",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11-19",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11-26",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12-03",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12-10",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12-17",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12-24",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-12-31",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01-07",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01-14",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01-21",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-01-28",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02-04",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02-11",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02-18",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-02-25",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-04",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-11",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-18",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-25",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-01",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-08",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-15",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-22",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-29",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-06",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-13",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-20",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-27",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06-03",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06-10",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06-17",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-06-24",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-01",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-08",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-15",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-22",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-29",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08-05",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08-12",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08-19",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-08-26",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-02",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-09",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-16",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-23",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-09-30",
+   "unknown": 0,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-07",
+   "unknown": 2,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-14",
+   "unknown": 15,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-15",
+   "unknown": 15,
+   "gfi": 0,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  }
+ ],
+ "generated_at": "2026-10-15T10:36:09.106519+00:00",
+ "stale": false
+}

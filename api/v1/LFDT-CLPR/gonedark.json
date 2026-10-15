@@ -1,0 +1,46 @@
+{
+ "id": "gonedark",
+ "title": "Permission-holders with no recent activity",
+ "description": "Permission-holders with no recorded activity in any repo within the selected period; 'All time' lists those with no recorded activity at all. Useful for keeping access lists current. A blank 'days since active' means no recorded activity yet. The 'quiet permission-holders' KPI tile above stays at a fixed 180-day threshold regardless of the tab.",
+ "source": "role_coverage_globally_quiet.csv",
+ "columns": [
+  {
+   "key": "user",
+   "label": "user"
+  },
+  {
+   "key": "highest_role",
+   "label": "highest role"
+  },
+  {
+   "key": "roles",
+   "label": "roles held"
+  },
+  {
+   "key": "repos_held",
+   "label": "repos",
+   "format": "number"
+  },
+  {
+   "key": "days_since_active",
+   "label": "days since active",
+   "format": "number"
+  },
+  {
+   "key": "last_active",
+   "label": "last active",
+   "format": "date"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "generated_at": "2026-10-15T10:36:12.734759+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [],
+  "30d": [],
+  "365d": []
+ },
+ "group": "Coverage & risk",
+ "macro": "Governance"
+}

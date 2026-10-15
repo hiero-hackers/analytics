@@ -1,0 +1,301 @@
+{
+ "id": "teamrepo",
+ "title": "Team activity by repo",
+ "description": "Which repos each team is active in \u2014 type a team or repo to filter. This is a team-wide rollup (headcount + totals per repo); for a named maintainer's own by-repo activity, see the 'Roles and recent activity by repo' table, and for individual TSC members, see the TSC table.",
+ "source": "team_activity_by_repo.csv",
+ "columns": [
+  {
+   "key": "team",
+   "label": "team"
+  },
+  {
+   "key": "repo",
+   "label": "repo"
+  },
+  {
+   "key": "members_active",
+   "label": "members active"
+  },
+  {
+   "key": "prs_opened",
+   "label": "PRs"
+  },
+  {
+   "key": "reviews_given",
+   "label": "reviews"
+  },
+  {
+   "key": "merges_done",
+   "label": "merges"
+  },
+  {
+   "key": "issues_opened",
+   "label": "issues"
+  },
+  {
+   "key": "labels_applied",
+   "label": "labels"
+  },
+  {
+   "key": "last_active",
+   "label": "last active"
+  }
+ ],
+ "rows": [
+  {
+   "team": "clpr-maintainers",
+   "repo": "LFDT-CLPR/governance",
+   "members_active": 1,
+   "prs_opened": 0,
+   "reviews_given": 1,
+   "merges_done": 1,
+   "issues_opened": 5,
+   "labels_applied": 4,
+   "last_active": "2026-10-09 15:54:40+00:00"
+  },
+  {
+   "team": "clpr-maintainers",
+   "repo": "LFDT-CLPR/clpr-endpoint",
+   "members_active": 2,
+   "prs_opened": 1,
+   "reviews_given": 1,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-09-01 17:53:11+00:00"
+  },
+  {
+   "team": "clpr-maintainers",
+   "repo": "LFDT-CLPR/clpr-smart-contracts",
+   "members_active": 2,
+   "prs_opened": 1,
+   "reviews_given": 1,
+   "merges_done": 1,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-09-01 17:22:37+00:00"
+  },
+  {
+   "team": "clpr-maintainers",
+   "repo": "LFDT-CLPR/.github",
+   "members_active": 1,
+   "prs_opened": 0,
+   "reviews_given": 1,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-10-13 14:01:44+00:00"
+  },
+  {
+   "team": "lfdt-staff",
+   "repo": "LFDT-CLPR/governance",
+   "members_active": 2,
+   "prs_opened": 4,
+   "reviews_given": 2,
+   "merges_done": 3,
+   "issues_opened": 9,
+   "labels_applied": 13,
+   "last_active": "2026-10-09 15:51:57+00:00"
+  },
+  {
+   "team": "lfdt-staff",
+   "repo": "LFDT-CLPR/.github",
+   "members_active": 2,
+   "prs_opened": 5,
+   "reviews_given": 3,
+   "merges_done": 5,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-10-13 14:19:30+00:00"
+  },
+  {
+   "team": "lfdt-staff",
+   "repo": "LFDT-CLPR/clpr-smart-contracts",
+   "members_active": 1,
+   "prs_opened": 1,
+   "reviews_given": 0,
+   "merges_done": 0,
+   "issues_opened": 0,
+   "labels_applied": 0,
+   "last_active": "2026-09-01 15:56:26+00:00"
+  }
+ ],
+ "row_count": 7,
+ "generated_at": "2026-10-15T10:36:12.743731+00:00",
+ "stale": false,
+ "periods": {
+  "7d": [
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 4,
+    "last_active": "2026-10-09 15:54:40+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:01:44+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 2,
+    "prs_opened": 3,
+    "reviews_given": 2,
+    "merges_done": 2,
+    "issues_opened": 9,
+    "labels_applied": 13,
+    "last_active": "2026-10-09 15:51:57+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:19:30+00:00"
+   }
+  ],
+  "30d": [
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 4,
+    "last_active": "2026-10-09 15:54:40+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:01:44+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 2,
+    "prs_opened": 4,
+    "reviews_given": 2,
+    "merges_done": 3,
+    "issues_opened": 9,
+    "labels_applied": 13,
+    "last_active": "2026-10-09 15:51:57+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 2,
+    "prs_opened": 5,
+    "reviews_given": 3,
+    "merges_done": 5,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:19:30+00:00"
+   }
+  ],
+  "365d": [
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 4,
+    "last_active": "2026-10-09 15:54:40+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/clpr-endpoint",
+    "members_active": 2,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-09-01 17:53:11+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 2,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-09-01 17:22:37+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:01:44+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/governance",
+    "members_active": 2,
+    "prs_opened": 4,
+    "reviews_given": 2,
+    "merges_done": 3,
+    "issues_opened": 9,
+    "labels_applied": 13,
+    "last_active": "2026-10-09 15:51:57+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/.github",
+    "members_active": 2,
+    "prs_opened": 5,
+    "reviews_given": 3,
+    "merges_done": 5,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-10-13 14:19:30+00:00"
+   },
+   {
+    "team": "lfdt-staff",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-09-01 15:56:26+00:00"
+   }
+  ]
+ },
+ "group": "Teams & TSC",
+ "macro": "Governance"
+}

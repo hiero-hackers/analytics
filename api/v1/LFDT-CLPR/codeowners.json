@@ -1,0 +1,44 @@
+{
+ "id": "codeowners",
+ "title": "CODEOWNERS by repository",
+ "description": "Whether each repository declares code owners, repositories without a file first \u2014 a yes/no per repository, which is why this is a table and not a chart. A missing file is a lead, not a defect: docs, archive, and meta repositories may have no meaningful owner to name, so relevance is a human call. Checked in the standard locations (root, .github/, docs/).",
+ "source": "repo_wise_codeowner_status.csv",
+ "columns": [
+  {
+   "key": "repo",
+   "label": "repository"
+  },
+  {
+   "key": "status",
+   "label": "CODEOWNERS",
+   "format": "presence"
+  }
+ ],
+ "rows": [
+  {
+   "repo": "clpr-endpoint",
+   "status": false
+  },
+  {
+   "repo": "clpr-smart-contracts",
+   "status": false
+  },
+  {
+   "repo": "clpr-spec",
+   "status": false
+  },
+  {
+   "repo": ".github",
+   "status": true
+  },
+  {
+   "repo": "governance",
+   "status": true
+  }
+ ],
+ "row_count": 5,
+ "generated_at": "2026-10-15T10:36:15.129739+00:00",
+ "stale": false,
+ "group": "Ownership",
+ "macro": "Security & scorecards"
+}

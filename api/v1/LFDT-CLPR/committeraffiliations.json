@@ -1,0 +1,36 @@
+{
+ "id": "committeraffiliations",
+ "title": "Committer affiliations \u2014 reference",
+ "description": "The same reference as the Maintainers tab, for people whose highest role anywhere is committer \u2014 write access, but no maintainer seat in any repository. The two populations are disjoint, so nobody appears in both. Curation coverage is thinner here than for maintainers, so expect more 'unknown' rows; each one resolved makes the committer diversity chart sharper. To fix a mapping or resolve an unknown, add a row for the login to data/affiliation_overrides.yaml with the reason as a comment, or use 'Suggest a correction' to open an issue on the analytics repo.",
+ "source": "committer_affiliations.csv",
+ "columns": [
+  {
+   "key": "login",
+   "label": "committer"
+  },
+  {
+   "key": "organisation",
+   "label": "organisation"
+  },
+  {
+   "key": "status",
+   "label": "status"
+  },
+  {
+   "key": "method",
+   "label": "method"
+  }
+ ],
+ "rows": [],
+ "row_count": 0,
+ "label": "Committers",
+ "action": {
+  "url": "https://github.com/hiero-hackers/analytics/issues",
+  "label": "Suggest a correction"
+ },
+ "generated_at": "2026-10-15T10:36:12.803101+00:00",
+ "stale": false,
+ "group": "Organisation diversity",
+ "macro": "Governance",
+ "absorbed_by": "affiliations"
+}
