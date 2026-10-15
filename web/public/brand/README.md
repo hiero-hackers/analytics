@@ -23,3 +23,17 @@ source here as the Hiero entry does: the URL it came from, the original file
 names, the retrieval date, and the trademark owner. The CSP allows images
 from `'self'` only (plus GitHub avatars), so logos must be bundled here rather
 than linked.
+
+### `clpr/`
+
+Vector trace of the LFDT-CLPR GitHub organisation avatar, the only mark the
+project publishes:
+https://github.com/LFDT-CLPR (avatar `https://avatars.githubusercontent.com/u/328008145`).
+
+- `logo.svg`: the mark in black, for light backgrounds
+- `logo-dark.svg`: the same geometry in white, for dark backgrounds
+
+Traced with potrace 1.16 at a 50% threshold from the 460x460 PNG, trimmed to
+the mark's bounds. Retrieved October 15, 2026. CLPR branding remains the
+property of its respective owners; the files identify the CLPR project in its
+analytics dashboard.

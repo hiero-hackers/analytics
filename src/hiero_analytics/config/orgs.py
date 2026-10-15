@@ -119,6 +119,18 @@ ORGS: tuple[OrgProfile, ...] = (
             "hiero-sdk-csharp": "SDKs",
         },
     ),
+    OrgProfile(
+        name="LFDT-CLPR",
+        display_name="CLPR",
+        governed=True,
+        # CLPR's governance repo publishes the same teams/repositories shape as
+        # hiero-ledger's config.yaml, under a different file name.
+        governance_url="https://raw.githubusercontent.com/LFDT-CLPR/governance/main/teams.yml",
+        # LF staff hold maintain or admin on every CLPR repo.
+        blanket_teams=frozenset({"lfdt-staff"}),
+        extra=True,
+        brand="clpr",
+    ),
 )
 
 
