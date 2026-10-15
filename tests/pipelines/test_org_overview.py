@@ -103,7 +103,7 @@ def test_main_creates_output_files(
         lambda _client, _org: synthetic_repos,
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.load_contributor_activity",
         lambda _client, _org: synthetic_activity,
     )
 
@@ -144,7 +144,7 @@ def test_main_handles_empty_activity(
         lambda _client, _org: synthetic_repos,
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.load_contributor_activity",
         lambda _client, _org: [],  # Empty activity
     )
 
@@ -176,9 +176,56 @@ def test_main_with_empty_repos(
         lambda _client, _org: [],  # Empty repos
     )
     monkeypatch.setattr(
-        "hiero_analytics.pipelines.org_overview.fetch_org_contributor_activity_graphql",
+        "hiero_analytics.pipelines.org_overview.load_contributor_activity",
         lambda _client, _org: [],
     )
 
     # Should not raise an exception
     runner.main()
+
+
+def test_contributor_counts_use_the_persisted_dataset_within_six_months(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_repos,
+):
+    """The card reads the org's persisted activity, keeping only the last ~six months."""
+    import dataclasses
+    from datetime import UTC, datetime, timedelta
+
+    import pandas as pd
+
+    recent = _test_activity("hiero-hackers/sdk-python", "alice")
+    old = dataclasses.replace(
+        _test_activity("hiero-hackers/sdk-java", "bob"),
+        occurred_at=datetime.now(UTC) - timedelta(days=runner.CONTRIBUTOR_WINDOW_DAYS + 1),
+    )
+    loaded = []
+    monkeypatch.setattr(runner, "org_context", lambda _org: (mock_github_client, tmp_path / "data"))
+    monkeypatch.setattr(runner, "fetch_org_repos_graphql", lambda _client, _org: synthetic_repos)
+    monkeypatch.setattr(runner, "load_contributor_activity", lambda _client, org: loaded.append(org) or [recent, old])
+
+    runner.main("hiero-hackers")
+
+    assert loaded == ["hiero-hackers"]
+    counts = pd.read_csv(tmp_path / "data" / "contributor_counts.csv")
+    assert counts.to_dict("records") == [{"repo": "hiero-hackers/sdk-python", "contributors": 1}]
+
+
+def test_main_without_an_org_builds_the_orgs_with_the_capability(monkeypatch):
+    """Run alone, it builds the rendered orgs that have org_overview, not the primary org."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(
+        orgs, "ORGS", (OrgProfile(name="primary-org"), OrgProfile(name="overview-org", org_overview=True, extra=True))
+    )
+    monkeypatch.setenv("GITHUB_ORG", "primary-org")
+    built = []
+    monkeypatch.setattr(runner, "_build_org_overview", built.append)
+
+    runner.main()
+    runner.main("primary-org")
+
+    assert built == ["overview-org", "primary-org"]

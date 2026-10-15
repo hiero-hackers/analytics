@@ -112,6 +112,27 @@ def fetch_github_resource(  # noqa: UP047
     return records
 
 
+def fetch_org_login(client: GitHubClient, org: str) -> str | None:
+    """GitHub's own spelling of organisation ``org``, or None when it does not exist.
+
+    One GraphQL point. Organisation logins match case-insensitively on GitHub,
+    but this codebase keys output paths, dataset files and ``owner/repo`` joins
+    on the exact string, so a caller compares the result with what it was given.
+    A missing organisation surfaces either as a null node or as a GraphQL
+    ``NOT_FOUND`` error, which the client raises; both read as None here, while
+    transport failures propagate.
+    """
+    try:
+        data = client.graphql(load_query("org_login"), {"login": org})
+    except RuntimeError as exc:
+        if "NOT_FOUND" in str(exc) or "Could not resolve" in str(exc):
+            return None
+        raise
+    node = (data.get("data") or {}).get("organization")
+    login = node.get("login") if isinstance(node, dict) else None
+    return login if isinstance(login, str) else None
+
+
 def fetch_org_repos_graphql(
     client: GitHubClient,
     org: str,

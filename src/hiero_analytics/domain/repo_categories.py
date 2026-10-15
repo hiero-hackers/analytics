@@ -7,7 +7,8 @@ to colour the maintainer network and reusable for any other per-repo grouping.
 
 from __future__ import annotations
 
-from hiero_analytics.config.orgs import repo_category_overrides
+from collections.abc import Mapping
+
 from hiero_analytics.domain.repos import bare_repo
 
 # Curated map. Keys are bare repo names (the part after the last '/'), lowercased.
@@ -62,10 +63,6 @@ REPO_CATEGORIES = {
     "hiero-enterprise-proxy": "Apps / Integrations",
 }
 
-# Per-org registry entries (config/orgs.py) override the map above, so an org can
-# fix a keyword rule that mis-buckets one of its own repos.
-REPO_CATEGORIES.update(repo_category_overrides())
-
 # Stable display / colour order; "Other" is the fallback bucket, shown last.
 CATEGORY_ORDER = [
     "SDKs",
@@ -108,13 +105,18 @@ _KEYWORD_RULES = [
 ]
 
 
-def categorize_repo(repo: str) -> str:
+def categorize_repo(repo: str, overrides: Mapping[str, str] | None = None) -> str:
     """Map a repository (``owner/name`` or bare name) to a semantic category.
 
-    Checks the curated map first (the per-org registry entries merged into the
-    primary map), then the ordered keyword rules, else ``"Other"``.
+    Checks ``overrides`` first (bare name -> category; callers pass the org
+    registry's ``repo_category_overrides()``, so per-org knowledge stays with
+    the org), then the curated map, then the ordered keyword rules, else
+    ``"Other"``. Taking the overrides as an argument keeps ``domain`` free of
+    any dependency on ``config``.
     """
     name = bare_repo(str(repo)).lower()
+    if overrides and name in overrides:
+        return overrides[name]
     if name in REPO_CATEGORIES:
         return REPO_CATEGORIES[name]
     for keyword, category in _KEYWORD_RULES:

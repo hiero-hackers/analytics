@@ -112,7 +112,11 @@ def _is_dataset_file(path: Path) -> bool:
     return '"records"' in prefix and ('"version"' in prefix or '"fetched_through"' in prefix)
 
 
-def prune_untouched_datasets(datasets_dir: Path | None = None) -> list[Path]:
+def prune_untouched_datasets(
+    datasets_dir: Path | None = None,
+    *,
+    keep: Callable[[Path], bool] | None = None,
+) -> list[Path]:
     """Delete persisted datasets no resource claimed this run. Returns what went.
 
     An orphan — a dataset whose fetch was renamed, re-scoped, or removed — is
@@ -127,10 +131,15 @@ def prune_untouched_datasets(datasets_dir: Path | None = None) -> list[Path]:
     empty touch record prunes nothing, so a run that fetched nothing at all can
     never mistake every dataset for an orphan.
 
-    Note that "live" is relative to the configuration that ran: with
-    ``GITHUB_EXTRA_ORGS`` unset, that org's datasets are genuinely unclaimed and
-    will be removed, costing a full re-fetch if it is configured again later.
+    Note that "live" is relative to the configuration that ran: an org removed
+    from the registry (``config.orgs``), filtered out by ``GITHUB_EXTRA_ORGS``, or
+    only ever run as a trial org leaves datasets nothing claims, and they will be
+    removed, costing a full re-fetch if it is configured again later.
     Every deletion is logged for exactly this reason.
+
+    ``keep`` exempts files the caller cannot judge, such as the datasets of an
+    org whose pipelines failed this run (they may simply not have got as far as
+    their fetch).
     """
     directory = datasets_dir if datasets_dir is not None else paths.DATASETS_DIR
     if not directory.is_dir():
@@ -150,6 +159,8 @@ def prune_untouched_datasets(datasets_dir: Path | None = None) -> list[Path]:
     removed: list[Path] = []
     for path in sorted(directory.glob("*.json")):
         if path.resolve() in _touched_datasets or not _is_dataset_file(path):
+            continue
+        if keep is not None and keep(path):
             continue
         logger.warning(
             "Pruning orphaned dataset %s: no resource claimed it this run (it would otherwise "

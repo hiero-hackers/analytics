@@ -197,3 +197,62 @@ def test_build_repo_role_lookup_normalizes_usernames():
 
     assert repo_role_lookup["hiero-website"]["leadmaintainer"] == "committer"
     assert repo_role_lookup["hiero-website"]["exploreriii"] == "committer"
+
+
+def test_blanket_teams_come_from_the_orgs_own_profile(monkeypatch):
+    """Each org excludes its own org-wide teams, not the primary org's."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(
+        orgs,
+        "ORGS",
+        (
+            OrgProfile(name="a-org", governed=True, governance_url="u", blanket_teams=frozenset({"a-staff"})),
+            OrgProfile(name="b-org", governed=True, governance_url="u", blanket_teams=frozenset({"b-staff"})),
+        ),
+    )
+    config = {
+        "teams": [
+            {"name": "sdk-maintainers", "maintainers": ["dev"], "members": []},
+            {"name": "a-staff", "maintainers": ["a-admin"], "members": []},
+            {"name": "b-staff", "maintainers": ["b-admin"], "members": []},
+        ],
+        "repositories": [
+            {"name": "sdk", "teams": {"sdk-maintainers": "maintain", "a-staff": "maintain", "b-staff": "maintain"}},
+        ],
+    }
+
+    assert build_repo_role_lookup(config, org="a-org")["sdk"] == {"dev": "maintainer", "b-admin": "maintainer"}
+    assert build_repo_role_lookup(config, org="b-org")["sdk"] == {"dev": "maintainer", "a-admin": "maintainer"}
+    # An unregistered org has no blanket teams, so every grant counts.
+    assert set(build_repo_role_lookup(config, org="other")["sdk"]) == {"dev", "a-admin", "b-admin"}
+
+
+def test_governance_source_is_resolved_from_the_registry_at_call_time(monkeypatch, tmp_path):
+    """A governed org's config URL comes from its profile; an unregistered org is ungoverned."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(
+        orgs,
+        "ORGS",
+        (OrgProfile(name="new-org", governed=True, governance_url="https://example.test/new.yaml"),),
+    )
+    monkeypatch.setattr(governance_config, "offline_mode_enabled", lambda: False)
+    requested = []
+
+    class _Response:
+        text = "teams: []\nrepositories: []\n"
+
+        def raise_for_status(self):
+            return None
+
+    monkeypatch.setattr(governance_config.requests, "get", lambda url, **_kwargs: requested.append(url) or _Response())
+
+    assert governance_config.fetch_governance_config("new-org", snapshot_path=tmp_path / "g.json") == {
+        "teams": [],
+        "repositories": [],
+    }
+    assert requested == ["https://example.test/new.yaml"]
+    assert governance_config.fetch_governance_config("not-registered") == {}

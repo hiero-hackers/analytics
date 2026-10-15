@@ -12,7 +12,7 @@ import { NARROW_HEADER, useMediaQuery } from '../hooks/use-media-query';
 import type { NavModel } from '../nav';
 import type { TocEntry } from '../toc';
 import { ThemeToggle } from './ThemeToggle';
-import { HieroBrand } from './HieroBrand';
+import { Brand } from './Brand';
 import { NavigationSearch } from './NavigationSearch';
 import { OrgAvatar, OrgSwitcher } from './OrgSwitcher';
 
@@ -91,7 +91,7 @@ export function AppHeader({
     >
       <div className="flex shrink-0 items-center gap-2 md:w-(--sidebar-width) md:justify-between md:border-r md:px-5">
         {isMobile && <SidebarTrigger className="size-8" aria-label="Open sections" />}
-        <HieroBrand />
+        <Brand brand={nav?.brand} label={nav?.labelOf(nav.shownOrg)} />
         {!isMobile && (
           <SidebarTrigger
             className="size-8 shrink-0 text-muted-foreground"
@@ -107,12 +107,13 @@ export function AppHeader({
                 orgs={nav.orgs}
                 value={nav.shownOrg}
                 onChange={onOrg}
+                labelOf={nav.labelOf}
                 className="max-w-37.5 md:max-w-none"
               />
             ) : (
               <span className="inline-flex min-w-0 items-center gap-2 pl-1.5 text-sm font-semibold">
                 <OrgAvatar org={nav.shownOrg} />
-                <span className="truncate">{nav.shownOrg}</span>
+                <span className="truncate">{nav.labelOf(nav.shownOrg)}</span>
               </span>
             )}
             {/* Shown once the page title scrolls away, never repeating a visible heading. */}

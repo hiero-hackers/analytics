@@ -68,6 +68,10 @@ jobs:
       # and rate-limit files (github_client, pagination, adaptive_limiter, …)
       # cannot introduce fields a cached dataset lacks, so touching them keeps
       # the fast offline path.
+      #
+      # The org registry (config/orgs.py) triggers it too: an org registered by
+      # the pull request has no datasets in the base branch's cache, so an
+      # offline preview could only skip it.
       - name: Select data mode
         id: data-mode
         run: |
@@ -77,7 +81,8 @@ jobs:
                src/hiero_analytics/data_sources/github_ingest \
                src/hiero_analytics/data_sources/governance_config.py \
                src/hiero_analytics/data_sources/queries.py \
-               src/hiero_analytics/data_sources/queries; then
+               src/hiero_analytics/data_sources/queries \
+               src/hiero_analytics/config/orgs.py; then
             echo "offline=1" >> "$GITHUB_OUTPUT"
           else
             echo "offline=0" >> "$GITHUB_OUTPUT"
@@ -87,7 +92,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           HIERO_ANALYTICS_OFFLINE: ${{ steps.data-mode.outputs.offline }}
-        run: uv run hiero-analytics
+        # --strict: a preview exists to catch regressions, so a pipeline that
+        # breaks for any org fails it (the scheduled refresh tolerates
+        # extra-org failures instead).
+        run: uv run hiero-analytics all --strict
 
       - name: Set up Node
         if: ${{ !cancelled() }}

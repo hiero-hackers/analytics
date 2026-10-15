@@ -52,11 +52,14 @@ export function OrgSwitcher({
   orgs,
   value,
   onChange,
+  labelOf = (org) => org,
   className,
 }: {
   orgs: string[];
   value: string;
   onChange: (org: string) => void;
+  /** An org's label (its display name); the login by default. */
+  labelOf?: (org: string) => string;
   className?: string;
 }) {
   return (
@@ -67,7 +70,7 @@ export function OrgSwitcher({
       )}
     >
       <OrgAvatar org={value} />
-      <span className="truncate text-sm font-semibold">{value}</span>
+      <span className="truncate text-sm font-semibold">{labelOf(value)}</span>
       <ChevronsUpDownIcon aria-hidden="true" className="size-3.5 shrink-0 text-muted-foreground" />
       <select
         aria-label="Organisation"
@@ -77,7 +80,7 @@ export function OrgSwitcher({
       >
         {orgs.map((org) => (
           <option key={org} value={org}>
-            {org}
+            {labelOf(org)}
           </option>
         ))}
       </select>

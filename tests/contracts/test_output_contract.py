@@ -23,6 +23,7 @@ from pathlib import Path
 
 import pytest
 
+import hiero_analytics.config.orgs as org_registry
 import hiero_analytics.config.paths as paths
 import hiero_analytics.pipelines.affiliation as affiliation_mod
 import hiero_analytics.pipelines.ci_health as ci_health_mod
@@ -43,6 +44,7 @@ import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
 import hiero_analytics.pipelines.scorecard as scorecard_mod
 from hiero_analytics.analysis.ci_health_types import CheckResult
+from hiero_analytics.config.orgs import OrgProfile
 from hiero_analytics.dashboard_spec import CHART_MACROS, TABLE_FAMILIES, table_variants
 from hiero_analytics.dashboard_spec import entities as entity_spec
 from hiero_analytics.dashboard_spec._assembly import chart_specs_for_org
@@ -71,7 +73,13 @@ ALL_SECTION_SPECS = [
 ]
 
 PRIMARY = "hiero-ledger"
-HACKERS = "hiero-hackers"
+# A synthetic roster around the real primary org: one governed extra org (so the
+# governance pipelines must run for an org that is not primary) and one plain
+# extra org with the org-overview capability. Nothing here names a real extra
+# org, so registering one in config/orgs.py never edits this test.
+GOVERNED_EXTRA = "governed-org"
+PLAIN_EXTRA = "plain-org"
+EXTRA_ORGS = (GOVERNED_EXTRA, PLAIN_EXTRA)
 _NOW = datetime.now(UTC)
 
 # Chart cards owned by CLI-only pipelines: the default run legitimately does
@@ -340,7 +348,15 @@ def outputs_root(tmp_path_factory) -> Path:
         mp.setattr(activity_mod, "fetch_org_merged_pr_difficulty_graphql", lambda _c, _org, **_k: REPO_PRS)
         for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod):
             mp.setattr(mod, "fetch_governance_config", lambda *_a, **_k: GOVERNANCE)
-        for mod in (maintainer_mod, heatmap_mod, role_coverage_mod, affiliation_mod, activity_mod, entity_mod):
+        for mod in (
+            maintainer_mod,
+            heatmap_mod,
+            role_coverage_mod,
+            affiliation_mod,
+            activity_mod,
+            entity_mod,
+            overview_mod,
+        ):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
         for mod in (role_coverage_mod, activity_mod, entity_mod):
             mp.setattr(mod, "load_issue_label_events", lambda _c, _org: TIMELINE)
@@ -437,13 +453,33 @@ def outputs_root(tmp_path_factory) -> Path:
             lambda _c, org: [_repo(org, "sdk-python"), _repo(org, "sdk-java")],
         )
         mp.setattr(releases_mod, "fetch_org_releases_graphql", lambda _c, _org, **_kwargs: RELEASES)
-        mp.setattr(overview_mod, "fetch_org_contributor_activity_graphql", lambda _c, org: _org_activity(org))
         mp.setattr(hip_mod, "fetch_hip_inventory", lambda _c, **_k: HIP_SPECS)
         mp.setattr(hip_mod, "fetch_org_pr_hip_refs_graphql", lambda _c, _org, **_k: HIP_REFS)
 
         mp.setattr(run_all, "setup_logging", lambda: None)
-        mp.setattr(run_all, "EXTRA_ORGS", [HACKERS])
-        mp.setattr(heatmap_mod, "EXTRA_ORGS", [HACKERS])
+        mp.setattr(
+            org_registry,
+            "ORGS",
+            (
+                org_registry.profile_for(PRIMARY),
+                OrgProfile(
+                    name=GOVERNED_EXTRA,
+                    governed=True,
+                    governance_url="https://example.test/governance.yaml",
+                    extra=True,
+                ),
+                OrgProfile(name=PLAIN_EXTRA, org_overview=True, extra=True, display_name="Plain Org"),
+            ),
+        )
+        mp.setenv("GITHUB_ORG", PRIMARY)
+        mp.setattr(paths, "ORG", PRIMARY)
+        # This module-scoped fixture runs before the suite's per-test isolation,
+        # so it isolates itself: a developer's .env must not narrow the roster,
+        # and the org preflight must not reach GitHub.
+        for name in ("GITHUB_EXTRA_ORGS", "HIERO_ANALYTICS_TRIAL_ORGS", "GOVERNANCE_CONFIG_URL", "HIP_PROPOSALS_REPO"):
+            mp.delenv(name, raising=False)
+        mp.setattr(run_all, "shared_client", lambda: None)
+        mp.setattr(run_all, "fetch_org_login", lambda _client, org: org)
 
         run_all.main()  # raises SystemExit(1) if any pipeline failed
         yield root
@@ -568,7 +604,7 @@ def test_data_api_ships_every_interactive_chart(outputs_root: Path):
     expected = {
         f"{chart_id}.json"
         for macro in CHART_MACROS
-        for spec in macro["charts"].get(PRIMARY) or macro["charts"].get("*", [])
+        for spec in chart_specs_for_org(macro["charts"], PRIMARY)
         for chart_id, source in spec["sources"].items()
         if _rows_recorded(org_data / source["file"])
     }
@@ -607,7 +643,7 @@ def test_every_spec_chart_source_is_produced(outputs_root: Path):
     The primary org runs every pipeline, so a capability key's cards are pinned
     against whichever orgs actually have that capability.
     """
-    rendered = [profile.name for profile in paths.ORGS]
+    rendered = org_registry.rendered_orgs()
     missing = []
     for macro in CHART_MACROS:
         for org in rendered:
@@ -720,7 +756,7 @@ def test_data_api_publishes_entity_indexes_and_their_documents(outputs_root: Pat
     """Every org's entity indexes resolve, row by row, to a detail document of their kind."""
     api_dir = outputs_root / "data" / "api" / "v1"
     manifest = json.loads((api_dir / "manifest.json").read_text())
-    for org in (PRIMARY, HACKERS):
+    for org in (PRIMARY, *EXTRA_ORGS):
         entry = manifest["orgs"][org]["entities"]
         for kind, detail_kind in (("repositories", "repository"), ("contributors", "contributor")):
             index = json.loads((api_dir / entry[kind]["path"]).read_text())
@@ -749,3 +785,69 @@ def test_repository_views_join_tables_the_pipelines_produce(outputs_root: Path):
             declared.add(listing["file"])
     missing = sorted(name for name in declared if not (org_data / name).exists())
     assert not missing, f"repository views join tables no pipeline produced: {missing}"
+
+
+# ---------------------------------------------------------------------------
+# Multi-org: what each kind of org gets
+# ---------------------------------------------------------------------------
+
+
+def _manifest(outputs_root: Path) -> dict:
+    return json.loads((outputs_root / "data" / "api" / "v1" / "manifest.json").read_text())
+
+
+def _macros(entry: dict) -> set[str]:
+    return {item["macro"] for kind in ("sections", "chart_sections", "views") for item in entry.get(kind, [])}
+
+
+def test_every_rendered_org_is_published_in_registry_order(outputs_root: Path):
+    """The manifest lists the primary org first, then the extras in registry order."""
+    assert list(_manifest(outputs_root)["orgs"]) == [PRIMARY, *EXTRA_ORGS]
+
+
+def test_a_governed_extra_org_gets_the_governance_tab(outputs_root: Path):
+    """Registering an extra org as governed is enough for its Governance tab to fill in."""
+    entry = _manifest(outputs_root)["orgs"][GOVERNED_EXTRA]
+
+    assert "Governance" in _macros(entry)
+    governance_cards = {section["id"] for section in entry["chart_sections"] if section["macro"] == "Governance"}
+    assert "maintainer-pipeline" in governance_cards
+    assert (outputs_root / "data" / "org" / GOVERNED_EXTRA / "role_coverage_all.csv").exists()
+
+
+def test_a_plain_extra_org_gets_the_org_independent_tabs_only(outputs_root: Path):
+    """An ungoverned org gets no Governance or HIPs content, but does get its overview card."""
+    entry = _manifest(outputs_root)["orgs"][PLAIN_EXTRA]
+
+    assert {"Governance", "HIPs", "Community"}.isdisjoint(_macros(entry))
+    assert {"Contributors", "Security & scorecards", "Releases"} <= _macros(entry)
+    assert "org-overview" in {section["id"] for section in entry["chart_sections"]}
+    assert not (outputs_root / "data" / "org" / PLAIN_EXTRA / "role_coverage_all.csv").exists()
+
+
+def test_hips_are_published_only_for_the_org_with_the_capability(outputs_root: Path):
+    """HIPs belong to the org whose profile names a proposals repo, not to every governed org."""
+    orgs = _manifest(outputs_root)["orgs"]
+
+    assert "HIPs" in _macros(orgs[PRIMARY])
+    assert "HIPs" not in _macros(orgs[GOVERNED_EXTRA])
+
+
+def test_every_tab_an_org_lacks_has_an_absent_note(outputs_root: Path):
+    """A tab an org has no data for explains itself rather than rendering blank."""
+    manifest = _manifest(outputs_root)
+    notes = manifest["macro_absent_notes"]
+    for org, entry in manifest["orgs"].items():
+        missing = set(manifest["macro_order"]) - _macros(entry)
+        assert missing <= set(notes), f"{org} lacks {sorted(missing - set(notes))} with no absent note"
+
+
+def test_each_org_carries_its_registry_metadata(outputs_root: Path):
+    """Display name and GitHub link come from the registry; brand only when a profile sets one."""
+    orgs = _manifest(outputs_root)["orgs"]
+
+    assert orgs[PLAIN_EXTRA]["display_name"] == "Plain Org"
+    assert orgs[GOVERNED_EXTRA]["display_name"] == GOVERNED_EXTRA
+    for org, entry in orgs.items():
+        assert entry["github_url"] == f"https://github.com/{org}"
+        assert "brand" not in entry or entry["brand"]

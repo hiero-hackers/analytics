@@ -11,24 +11,24 @@ import requests
 import yaml
 
 from hiero_analytics.config.github import HTTP_TIMEOUT_SECONDS
-from hiero_analytics.config.orgs import PRIMARY_ORG, governance_urls
-from hiero_analytics.config.paths import DATASETS_DIR, dataset_path
+from hiero_analytics.config.orgs import blanket_teams, governance_urls, primary_org
+from hiero_analytics.config.paths import DATASETS_DIR, ORG, dataset_path
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled
 from hiero_analytics.domain.bots import is_bot_login
 from hiero_analytics.domain.roles import ROLE_PRIORITY, permission_to_role
 
 logger = logging.getLogger(__name__)
 
-# Per-org governance config sources, derived from the org registry — an org
-# is governed because its profile says so, not because it appears here. An org
-# with no source fetches an empty config rather than inheriting another org's.
-GOVERNANCE_CONFIG_URLS: dict[str, str] = governance_urls()
+# Per-org governance config sources come from the org registry at call time
+# (``config.orgs.governance_urls``): an org is governed because its profile says
+# so. An org with no source fetches an empty config rather than inheriting
+# another org's.
 
-# Org-wide "blanket" teams: assigned to (nearly) every repo, so counting them as a
-# repo's role-holders would stamp the same handful of people onto all repos and
-# drown out domain-specific maintainership. Excluded from domain repos, but used as
-# a maintainer fallback for org/meta repos that have no domain maintainer team.
-BLANKET_TEAMS = frozenset({"github-maintainers", "security-maintainers", "lf-staff", "tsc", "hiero-triage"})
+# Org-wide "blanket" teams live on each org's profile (config.orgs): assigned to
+# (nearly) every repo, so counting them as a repo's role-holders would stamp the
+# same handful of people onto all repos and drown out domain-specific
+# maintainership. Excluded from domain repos, but used as a maintainer fallback
+# for org/meta repos that have no domain maintainer team.
 
 
 def _normalize_username(user: str) -> str:
@@ -76,18 +76,18 @@ def _validate_governance_config(data: Any) -> dict[str, Any]:
 
 
 def fetch_governance_config(
-    org: str = PRIMARY_ORG,
+    org: str = ORG,
     *,
     url: str | None = None,
     snapshot_path: Path | None = None,
 ) -> dict[str, Any]:
     """Fetch ``org``'s governance config live, or load its validated snapshot offline.
 
-    The source resolves from ``GOVERNANCE_CONFIG_URLS`` (or the explicit ``url``);
+    The source resolves from the org registry's ``governance_urls()`` (or the explicit ``url``);
     an org with no configured source is ungoverned and gets an empty config.
     Snapshots are org-scoped so two governed orgs can never collide.
     """
-    source = url or GOVERNANCE_CONFIG_URLS.get(org)
+    source = url or governance_urls().get(org)
     if source is None and snapshot_path is None:
         logger.info("No governance config source for org %s; treating it as ungoverned", org)
         return {}
@@ -138,18 +138,20 @@ def build_team_membership(config: dict[str, Any]) -> dict[str, set[str]]:
     return membership
 
 
-def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
+def build_repo_role_lookup(config: dict[str, Any], *, org: str | None = None) -> dict[str, dict[str, str]]:
     """Build repo -> user -> highest governance role from explicit per-repo teams.
 
     Applies each repo's listed team→permission grants directly (GitHub's real model),
     taking the highest role per user — so a team granted to several repos is counted on
-    all of them. Org-wide *blanket* teams (``BLANKET_TEAMS``) and bot/automation teams
+    all of them. ``org``'s *blanket* teams (its profile's ``blanket_teams``; the
+    primary org's when ``org`` is omitted) and bot/automation teams
     are excluded from domain repos, so they don't stamp the same people onto every repo.
     As a fallback, blanket *maintain* teams are credited on repos that have no domain
     maintainer team (e.g. ``governance``, ``.github``), so org-governed repos aren't
     shown as unmaintained.
     """
     team_members = build_team_membership(config)
+    blanket = blanket_teams(org or primary_org())
 
     repo_roles: dict[str, dict[str, str]] = {}
     for repo in config.get("repositories", []):
@@ -160,11 +162,11 @@ def build_repo_role_lookup(config: dict[str, Any]) -> dict[str, dict[str, str]]:
         if not isinstance(repo_name, str) or not isinstance(assignments, dict):
             continue
 
-        roles = _resolve_roles(assignments, team_members, skip=BLANKET_TEAMS)
+        roles = _resolve_roles(assignments, team_members, skip=blanket)
         # Org/meta repos have no domain maintainer team — credit the blanket maintain
         # teams there so they're not misreported as having zero maintainers.
         if not any(role == "maintainer" for role in roles.values()):
-            for user, role in _resolve_roles(assignments, team_members, only=BLANKET_TEAMS).items():
+            for user, role in _resolve_roles(assignments, team_members, only=blanket).items():
                 if role != "maintainer":
                     continue  # credit blanket *maintainers* only — not triage/write holders
                 current = roles.get(user)

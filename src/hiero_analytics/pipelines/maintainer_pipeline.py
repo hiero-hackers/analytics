@@ -28,7 +28,7 @@ def main(org: str = ORG) -> None:
     logger.info("Running maintainer pipeline analytics for org: %s", org)
 
     gov_config = fetch_governance_config(org)
-    repo_role_lookup = build_repo_role_lookup(gov_config)
+    repo_role_lookup = build_repo_role_lookup(gov_config, org=org)
 
     records = load_contributor_activity(client, org)
 

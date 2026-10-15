@@ -7,6 +7,7 @@ the data-source layer.
 import os
 
 from hiero_analytics.config.env import env_float, env_int
+from hiero_analytics.config.orgs import ORGS
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 BASE_URL = "https://api.github.com"
@@ -37,5 +38,10 @@ GITHUB_MAX_WORKERS = env_int("GITHUB_MAX_WORKERS", 6, minimum=1)
 # merged spec files inside it. The HIP-implementation pipeline parses each
 # file's frontmatter into the canonical inventory that PR references are
 # validated against.
-HIP_PROPOSALS_REPO = os.getenv("HIP_PROPOSALS_REPO", "hiero-ledger/hiero-improvement-proposals")
+# The default comes from the org registry (the profile with a
+# ``hip_proposals_repo``); pipelines resolve it per org through
+# ``config.orgs.hip_proposals_repo``. ``HIP_PROPOSALS_REPO`` overrides both.
+HIP_PROPOSALS_REPO = os.getenv("HIP_PROPOSALS_REPO") or next(
+    (profile.hip_proposals_repo for profile in ORGS if profile.hip_proposals_repo), ""
+)
 HIP_PROPOSALS_DIR = os.getenv("HIP_PROPOSALS_DIR", "HIP")

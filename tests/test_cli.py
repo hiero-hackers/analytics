@@ -10,7 +10,7 @@ from hiero_analytics.pipelines import PIPELINES
 
 
 def _fake_pipeline(entry, args=()):
-    return SimpleNamespace(args=args, resolve=lambda: entry)
+    return SimpleNamespace(args=args, requires=frozenset(), resolve=lambda: entry)
 
 
 def test_every_registered_pipeline_resolves_to_its_declared_signature():
@@ -71,22 +71,33 @@ def test_cli_reports_pipeline_failure_with_exit_code(monkeypatch):
 
 
 def test_cli_defaults_to_full_run(monkeypatch):
-    """No arguments (and the `all` command) run the full suite."""
+    """No arguments (and the `all` command) run the full suite, lenient and continuing."""
     ran = []
-    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: ran.append(fail_fast))
+    monkeypatch.setattr(cli.run_all, "main", lambda **kwargs: ran.append(kwargs))
 
     assert cli.main([]) == 0
     assert cli.main(["all"]) == 0
-    assert ran == [False, False]
+    assert ran == [{"fail_fast": False, "strict": False}] * 2
 
 
-def test_cli_all_forwards_fail_fast(monkeypatch):
-    """The explicit `all --fail-fast` flag is forwarded to run_all.main()."""
+def test_cli_all_forwards_fail_fast_and_strict(monkeypatch):
+    """The explicit `all` flags are forwarded to run_all.main()."""
     seen = []
-    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: seen.append(fail_fast))
+    monkeypatch.setattr(cli.run_all, "main", lambda **kwargs: seen.append(kwargs))
 
     assert cli.main(["all", "--fail-fast"]) == 0
-    assert seen == [True]
+    assert cli.main(["all", "--strict"]) == 0
+    assert seen == [{"fail_fast": True, "strict": False}, {"fail_fast": False, "strict": True}]
+
+
+def test_cli_list_shows_capability_requirements(capsys):
+    """`list` says which pipelines only run for orgs with a capability."""
+    assert cli.main(["list"]) == 0
+
+    lines = {line.split()[0]: line for line in capsys.readouterr().out.splitlines()}
+    assert "[requires: governed]" in lines["role_coverage"]
+    assert "[requires: hips]" in lines["hip_implementation"]
+    assert "requires" not in lines["difficulty"]
 
 
 def test_cli_single_pipeline_attributes_its_requests_to_the_org_and_pipeline(monkeypatch):
@@ -133,3 +144,20 @@ def test_cli_single_pipeline_logs_its_usage_even_when_it_fails(monkeypatch, capl
         assert cli.main(["scorecard"]) == 1
 
     assert any("GitHub API usage" in record.getMessage() for record in caplog.records)
+
+
+def test_cli_warns_when_the_org_lacks_the_pipelines_capability(monkeypatch, caplog):
+    """Running a governance pipeline for an ungoverned org is allowed, but flagged."""
+    import logging
+
+    monkeypatch.setitem(
+        cli.PIPELINES_BY_NAME,
+        "role_coverage",
+        SimpleNamespace(args=("org",), requires=frozenset({"governed"}), resolve=lambda: lambda **_kw: None),
+    )
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.cli"):
+        assert cli.main(["role_coverage", "--org", "some-ungoverned-org"]) == 0
+
+    assert any("governed" in record.getMessage() for record in caplog.records)

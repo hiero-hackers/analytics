@@ -16,6 +16,7 @@ import math
 import networkx as nx
 import pandas as pd
 
+from hiero_analytics.config.orgs import repo_category_overrides
 from hiero_analytics.domain.repo_categories import categorize_repo
 
 
@@ -105,7 +106,8 @@ def network_tables(nodes: pd.DataFrame, edges: pd.DataFrame, seed: int = 42) -> 
     graph = _graph(nodes, edges)
     pos, _isolated, _caption = network_layout(graph, seed)
     node_table = nodes[["repo", "active_members", "total_members"]].copy()
-    node_table["category"] = node_table["repo"].map(categorize_repo)
+    overrides = repo_category_overrides()
+    node_table["category"] = node_table["repo"].map(lambda repo: categorize_repo(repo, overrides))
     node_table["x"] = node_table["repo"].map(lambda repo: round(pos[repo][0], 4))
     node_table["y"] = node_table["repo"].map(lambda repo: round(pos[repo][1], 4))
     edge_table = edges[edges["repo_a"].isin(graph) & edges["repo_b"].isin(graph)][["repo_a", "repo_b", "shared"]]

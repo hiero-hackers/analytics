@@ -19,7 +19,7 @@ ABSENT_NOTE = (
 CHART_MACRO = {
     "name": "Community",
     "charts": {
-        "@primary": [
+        "@discord": [
             {
                 "id": "discord",
                 "sources": DISCORD_SOURCES,

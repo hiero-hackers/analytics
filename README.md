@@ -50,8 +50,9 @@ uv run hiero-analytics
 
 **What this does:**
 - Runs all analytics pipelines in one process (one Python start-up instead of one per pipeline), reusing the on-disk fetch cache between pipelines
+- Runs them for every organisation in the org registry (`src/hiero_analytics/config/orgs.py`), each getting the pipelines its capabilities allow (governance pipelines only for orgs that publish a governance config, for example)
 - Writes data tables to `outputs/data/` and the JSON data API to `outputs/data/api/`
-- Isolates failures — if one pipeline errors it is logged and the rest still run; the command exits non-zero if any failed
+- Isolates failures — if one pipeline errors it is logged and the rest still run. The command exits non-zero if anything failed for the primary organisation or the data API; failures confined to another organisation are reported but do not fail the run (add `--strict` to `all` to fail on those too)
 
 For faster local debugging, run the explicit `all` command with `--fail-fast`:
 
@@ -63,6 +64,13 @@ This stops after the first pipeline failure and exits non-zero immediately, so
 the original traceback is not buried beneath output from later pipelines.
 Without `--fail-fast`, the default behaviour is unchanged: failures are logged,
 the remaining pipelines continue, and all failures are reported at the end.
+
+To try an organisation that is not registered yet, add it to one run (it is
+treated as ungoverned; see [docs/adding-an-organisation.md](docs/adding-an-organisation.md)):
+
+```bash
+HIERO_ANALYTICS_TRIAL_ORGS=<github-org> uv run hiero-analytics
+```
 
 Everything under `outputs/` is generated and gitignored. The scheduled workflow publishes the dashboard to GitHub Pages instead of committing generated data and reports.
 
@@ -122,7 +130,7 @@ Open the URL it prints (`http://localhost:8000/`). A server is needed because th
 
 Most previews restore the latest base-branch datasets and set `HIERO_ANALYTICS_OFFLINE=1`. This keeps the input data fixed so the artifact isolates code changes. Offline mode never falls back to a network fetch: it fails clearly when a required dataset or governance snapshot is missing. Pipelines backed only by live repo or third-party APIs are skipped, so Scorecard, CODEOWNERS/runner, repo-only, and Hiero Hackers sections may be absent from an offline preview.
 
-Changes to the field-bearing ingestion layer (`data_sources/models.py`, `github_ingest/`, the queries, the governance snapshot) automatically use a live fetch, because a cached dataset cannot contain newly introduced fields; transport-only changes (client, rate limiting) keep the fast offline path. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
+Changes to the field-bearing ingestion layer (`data_sources/models.py`, `github_ingest/`, the queries, the governance snapshot) or to the org registry (`config/orgs.py`) automatically use a live fetch, because a cached dataset cannot contain newly introduced fields or newly registered orgs; transport-only changes (client, rate limiting) keep the fast offline path. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
 
 ### Running a single pipeline
 
@@ -181,7 +189,8 @@ To avoid re-downloading all of GitHub history on every run, fetching is **increm
 
 ## Documentation
 
-- [**Architecture**](docs/architecture.md) — the layer map, the two extensibility registries, the fetch/persistence model, and where new features go. Start here to understand the codebase.
+- [**Architecture**](docs/architecture.md) — the layer map, the extensibility registries, the fetch/persistence model, multi-org scheduling, and where new features go. Start here to understand the codebase.
+- [**Adding an organisation**](docs/adding-an-organisation.md) — the one registry entry that adds an org to the dashboard, what each capability gives it, and how to trial-run it first.
 - [**Role-holder affiliations**](docs/affiliations.md) — how each maintainer and committer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
 - [**Snapshot archive**](docs/snapshots.md) — every refresh's data API is archived to the `data/snapshots` branch, so the dashboard's history is queryable and diffable. How to read a past snapshot, and how to build on it.
 

@@ -29,7 +29,7 @@ def scorecard_url(repo: str, org: str, template: str | None = None) -> str:
     return f"{template.replace('{org}', org)}/{repo}"
 
 
-def fetch_repo_scorecard(repo: str, *, org: str = "hiero-ledger") -> ScorecardRecord | None:
+def fetch_repo_scorecard(repo: str, *, org: str) -> ScorecardRecord | None:
     """
     Fetch latest OpenSSF Scorecard for a repository.
 

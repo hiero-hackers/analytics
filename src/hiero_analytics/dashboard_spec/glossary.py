@@ -65,8 +65,9 @@ TERMS: dict[str, str] = {
         "(*read* access isn’t counted). Where someone holds more than one, the highest is shown."
     ),
     "org-wide teams": (
-        "a few teams (github-maintainers, security-maintainers, lf-staff, tsc, hiero-triage) are granted "
-        "on nearly every repo. To keep each repo’s domain maintainers visible, these are not counted "
+        "each organisation names a few teams granted on nearly every repo (for hiero-ledger: "
+        "github-maintainers, security-maintainers, lf-staff, tsc, hiero-triage). To keep each repo’s "
+        "domain maintainers visible, these are not counted "
         "on domain repos; they’re credited only on org/meta repos (e.g. .github, governance) that have "
         "no domain maintainer team of their own. So members of those teams appear on just those few repos."
     ),

@@ -341,7 +341,7 @@ def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
     monkeypatch.setattr(ba, "ORG", "hiero-ledger")
 
     monkeypatch.setattr(ba, "fetch_governance_config", lambda *_a, **_k: {})
-    monkeypatch.setattr(ba, "build_repo_role_lookup", lambda _c: {"repo": {"alice": "maintainer"}})
+    monkeypatch.setattr(ba, "build_repo_role_lookup", lambda _c, **_k: {"repo": {"alice": "maintainer"}})
     monkeypatch.setattr(ba, "build_team_membership", lambda _c: {})
     monkeypatch.setattr(ba, "fetch_maintainers_affiliations", lambda _c: {})
     monkeypatch.setattr(ba, "gpg_uid_emails", lambda _login: [])
@@ -368,3 +368,58 @@ def test_main_requires_a_token(monkeypatch):
     monkeypatch.setattr(ba, "GITHUB_TOKEN", None)
     with pytest.raises(SystemExit, match="GITHUB_TOKEN"):
         ba.main()
+
+
+def test_main_collects_participants_from_every_governed_org(monkeypatch, tmp_path):
+    """affiliations.yaml is one map for all orgs, so every governed org's people are resolved."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(
+        orgs,
+        "ORGS",
+        (
+            OrgProfile(name="hiero-ledger", governed=True, governance_url="https://example.test/a.yaml"),
+            OrgProfile(name="second-org", governed=True, governance_url="https://example.test/b.yaml", extra=True),
+            OrgProfile(name="plain-org", extra=True),
+        ),
+    )
+    monkeypatch.setattr(ba, "PARTICIPANT_ORGS", ("hiero-ledger", "second-org", "plain-org"))
+    monkeypatch.setattr(ba, "GITHUB_TOKEN", "test-token")
+    monkeypatch.setattr(ba, "shared_client", object)
+    monkeypatch.setattr(ba, "SRC", tmp_path)
+    monkeypatch.setattr(ba, "ORG_DATA_DIR", tmp_path / "data")
+    monkeypatch.setattr(ba, "ORG", "hiero-ledger")
+    configs = {
+        "hiero-ledger": {
+            "teams": [{"name": "sdk", "maintainers": ["alice"], "members": []}],
+            "repositories": [{"name": "sdk", "teams": {"sdk": "maintain"}}],
+        },
+        "second-org": {
+            "teams": [{"name": "core", "maintainers": ["bob"], "members": ["carol"]}],
+            "repositories": [{"name": "core", "teams": {"core": "write"}}],
+        },
+    }
+    fetched = []
+    monkeypatch.setattr(ba, "fetch_governance_config", lambda org: fetched.append(org) or configs[org])
+    monkeypatch.setattr(ba, "fetch_maintainers_affiliations", lambda _c: {})
+    monkeypatch.setattr(ba, "gpg_uid_emails", lambda _login: [])
+    monkeypatch.setattr(ba, "commit_author_org", lambda *_a, **_k: None)
+    monkeypatch.setattr(ba, "fetch_linkedin", lambda *_a, **_k: "")
+    profiled = []
+    monkeypatch.setattr(
+        ba,
+        "_fetch_profiles",
+        lambda _client, people: (
+            profiled.extend(people)
+            or [{"login": p, "name": p, "company": "Acme", "email": "", "bio": "", "orgs": []} for p in people]
+        ),
+    )
+    (tmp_path / "data").mkdir()
+
+    ba.main()
+
+    assert fetched == ["hiero-ledger", "second-org"]  # the ungoverned org has no config to read
+    assert sorted(profiled) == ["alice", "bob", "carol"]
+    yaml_text = (tmp_path / "data" / "affiliations.yaml").read_text(encoding="utf-8")
+    assert 'bob: "Acme"  # committer' in yaml_text

@@ -9,6 +9,10 @@ export interface NavModel {
   orgs: string[];
   /** The org actually shown: the hash's org when the manifest knows it, else the first. */
   shownOrg: string;
+  /** How to label an org: its manifest display name, else its login. */
+  labelOf: (org: string) => string;
+  /** The shown org's brand key, if its profile names one. */
+  brand: string | undefined;
   /** Every macro, in the manifest's declared family order. */
   macros: string[];
   /** The macro actually shown: the hash's when known, else the first. */
@@ -55,9 +59,12 @@ export function navModel(manifest: Manifest, macro: string, org: string): NavMod
   ]);
   const orgHasMacro = present.has(activeMacro);
   const hasData = (tab: string) => macros.some((name) => topOf(name) === tab && present.has(name));
+  const labelOf = (name: string) => manifest.orgs[name]?.display_name || name;
   return {
     orgs,
     shownOrg,
+    labelOf,
+    brand: entry.brand,
     macros,
     activeMacro,
     topTabs: [...new Set(macros.map(topOf))],

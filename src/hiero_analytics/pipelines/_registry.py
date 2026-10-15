@@ -22,13 +22,23 @@ class Pipeline:
     # datasets; the rest need live network access and are skipped in offline
     # PR previews rather than silently making requests.
     offline: bool = False
-    # Org-independent pipelines (no governance config needed) also run once per
-    # extra org (config.paths.EXTRA_ORGS) during the full run, so every org's
-    # dashboard fills in wherever the data can exist.
-    extra_orgs: bool = False
+    # Org capabilities (config.orgs.CAPABILITIES) the pipeline needs. The full
+    # run schedules a pipeline for every rendered org whose profile has all of
+    # them, so the default (no requirement) means "runs for every org": a new
+    # pipeline is multi-org unless it says otherwise.
+    requires: frozenset[str] = frozenset()
     # Default-run pipelines execute in registry order during a full run (the
     # order CI used when they were separate steps); the others are CLI-only.
     in_default_run: bool = True
+
+    @property
+    def repo_scoped(self) -> bool:
+        """Whether the pipeline analyses one repository (``GITHUB_REPO``) rather than an org.
+
+        The full run executes these for the primary org only, since the
+        configured repository belongs to it.
+        """
+        return "repo" in self.args
 
     def resolve(self) -> Callable[..., None]:
         """Import the pipeline module and return its ``main`` entry point."""

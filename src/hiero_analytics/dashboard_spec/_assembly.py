@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from types import ModuleType
 
-from hiero_analytics.config.orgs import has_org_overview, is_governed, is_primary
+from hiero_analytics.config.orgs import DISCORD, GOVERNED, HIPS, ORG_OVERVIEW, capabilities_of
 
 
 def canonical_macro(family_macro: dict) -> dict:
@@ -67,29 +67,30 @@ def table_variants(section: dict) -> list[dict]:
 
 
 # Chart keys, applied in this order. ``"*"`` renders for every org; a capability
-# key (``@``-prefixed) renders for orgs the registry says have that capability; a
-# bare org name renders for that org alone.
+# key (``"@<capability>"``, the names in ``config.orgs.CAPABILITIES``) renders
+# for orgs whose registry profile has that capability; a bare org name renders
+# for that org alone (supported, but the shipped spec uses capability keys only,
+# which a spec test enforces, so registering an org never needs a spec edit).
 WILDCARD_KEY = "*"
-GOVERNED_KEY = "@governed"
-ORG_OVERVIEW_KEY = "@org_overview"
-PRIMARY_KEY = "@primary"
+CAPABILITY_PREFIX = "@"
+# Application order of the capability keys, so card order is stable per org.
+CAPABILITY_ORDER = (GOVERNED, ORG_OVERVIEW, HIPS, DISCORD)
+
+
+def capability_key(capability: str) -> str:
+    """The spec key for one capability, e.g. ``"@governed"``."""
+    return f"{CAPABILITY_PREFIX}{capability}"
 
 
 def capability_keys(org: str) -> tuple[str, ...]:
     """The capability keys ``org`` matches, in application order.
 
     Keyed off the org registry (:mod:`hiero_analytics.config.orgs`) rather than
-    hardcoded org names, so a newly registered governed org picks up the
-    governance tab's cards without a spec change.
+    org names, so a newly registered governed org picks up the governance tab's
+    cards without a spec change.
     """
-    keys = []
-    if is_primary(org):
-        keys.append(PRIMARY_KEY)
-    if is_governed(org):
-        keys.append(GOVERNED_KEY)
-    if has_org_overview(org):
-        keys.append(ORG_OVERVIEW_KEY)
-    return tuple(keys)
+    capabilities = capabilities_of(org)
+    return tuple(capability_key(name) for name in CAPABILITY_ORDER if name in capabilities)
 
 
 def chart_specs_for_org(charts: dict, org: str) -> list[dict]:

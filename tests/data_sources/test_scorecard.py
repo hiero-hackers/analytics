@@ -29,7 +29,7 @@ def test_fetch_repo_scorecard_success(mock_get):
     mock_get.return_value = mock_response
 
     repo = "hiero-sdk-python"
-    record = fetch_repo_scorecard(repo)
+    record = fetch_repo_scorecard(repo, org="hiero-ledger")
 
     assert record is not None
     assert isinstance(record, ScorecardRecord)
@@ -55,7 +55,7 @@ def test_fetch_repo_scorecard_not_found(mock_get):
 
     # unknown repo or repo with no open-ssf set
     repo = "unknown-repo"
-    record = fetch_repo_scorecard(repo)
+    record = fetch_repo_scorecard(repo, org="hiero-ledger")
 
     assert record is None
 
@@ -66,7 +66,7 @@ def test_fetch_repo_scorecard_network_error_raises(mock_get):
     mock_get.side_effect = requests.exceptions.RequestException()
 
     with pytest.raises(requests.exceptions.RequestException):
-        fetch_repo_scorecard("hiero-sdk-python")
+        fetch_repo_scorecard("hiero-sdk-python", org="hiero-ledger")
 
 
 @patch("hiero_analytics.data_sources.scorecard.requests.get")
@@ -78,7 +78,7 @@ def test_fetch_repo_scorecard_server_error_raises(mock_get):
     mock_get.side_effect = requests.exceptions.HTTPError(response=mock_response)
 
     with pytest.raises(requests.exceptions.HTTPError):
-        fetch_repo_scorecard("hiero-sdk-python")
+        fetch_repo_scorecard("hiero-sdk-python", org="hiero-ledger")
 
 
 @patch("hiero_analytics.data_sources.scorecard.requests.get")

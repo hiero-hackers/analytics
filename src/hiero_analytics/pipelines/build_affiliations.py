@@ -42,7 +42,8 @@ from urllib.parse import urlparse
 import requests
 
 from hiero_analytics.config.github import GITHUB_TOKEN
-from hiero_analytics.config.paths import EXTRA_ORGS, ORG, ORG_DATA_DIR, SRC
+from hiero_analytics.config.orgs import is_governed, rendered_orgs
+from hiero_analytics.config.paths import ORG, ORG_DATA_DIR, SRC
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
@@ -69,10 +70,10 @@ from hiero_analytics.pipelines._affiliation_entities import (
 )
 from hiero_analytics.pipelines._shared import shared_client
 
-# Governance participants are drawn from the primary org plus the shared
-# extra-orgs concept (config.paths.EXTRA_ORGS), so MAINTAINERS.md scanning and
-# commit mining follow the same org set as the rest of the analytics.
-PARTICIPANT_ORGS = tuple(dict.fromkeys((ORG, *EXTRA_ORGS)))
+# Governance participants are drawn from every org the run renders (the
+# registry's primary and extra orgs), so MAINTAINERS.md scanning and commit
+# mining follow the same org set as the rest of the analytics.
+PARTICIPANT_ORGS = tuple(rendered_orgs())
 EMAIL_RE = re.compile(r"<([^<>@\s]+@[^<>\s]+)>")
 
 logger = logging.getLogger(__name__)
@@ -596,9 +597,16 @@ def main() -> None:
     manual_overrides = load_manual_overrides(yaml_path)
     logger.info("manual overrides found: %d", len(manual_overrides))
 
-    config = fetch_governance_config()
-    role_lookup = build_repo_role_lookup(config)
-    team_membership = build_team_membership(config)
+    # Every governed org's config contributes its role holders and team members:
+    # affiliations.yaml is one login -> employer map shared by all orgs.
+    role_lookup: dict[str, dict[str, str]] = {}
+    team_membership: dict[str, set[str]] = {}
+    for org in [org for org in PARTICIPANT_ORGS if is_governed(org)] or [ORG]:
+        config = fetch_governance_config(org)
+        for repo, holders in build_repo_role_lookup(config, org=org).items():
+            role_lookup[f"{org}/{repo}"] = holders
+        for team, members in build_team_membership(config).items():
+            team_membership.setdefault(f"{org}/{team}", set()).update(members)
 
     # Every governance participant, not just maintainers, so team/repo concentration
     # is measured against the whole population. Bots are excluded.

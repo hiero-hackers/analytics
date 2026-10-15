@@ -53,6 +53,7 @@ import pandas as pd
 # Paths are read through the module at call time (never bound at import), so
 # the contract tests' path redirection applies no matter the import order.
 from hiero_analytics.config import paths
+from hiero_analytics.config.orgs import extra_orgs, profile_or_default, trial_orgs
 from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
     CHART_METHODOLOGY,
@@ -540,11 +541,35 @@ def _metric_tiles(family, org_data_dir: Path) -> list[dict]:
 
 
 def _orgs_with_data() -> list[str]:
-    """Orgs with produced tables, primary org first for stable manifests."""
+    """The orgs to publish: those this configuration renders that produced tables.
+
+    Order is the run's own: the primary org, then the registry's extra orgs in
+    registry order, then trial orgs. An output directory for any other org (one
+    removed from the registry, or a past trial, left behind in a local
+    ``outputs/``) is not published, so the dashboard always matches the roster.
+    CI starts each run with an empty ``outputs/``, so there it never arises.
+    """
     if not paths.ORG_DATA_DIR.exists():
         return []
-    orgs = sorted(path.name for path in paths.ORG_DATA_DIR.iterdir() if path.is_dir())
-    return [paths.ORG, *[org for org in orgs if org != paths.ORG]] if paths.ORG in orgs else orgs
+    present = {path.name for path in paths.ORG_DATA_DIR.iterdir() if path.is_dir()}
+    rendered = list(dict.fromkeys([paths.ORG, *extra_orgs(), *trial_orgs()]))
+    if leftover := sorted(present - set(rendered), key=str.lower):
+        logger.info("Not publishing org output(s) this run does not render: %s", ", ".join(leftover))
+    return [org for org in rendered if org in present]
+
+
+def _org_metadata(org: str) -> dict:
+    """How the dashboard names, links and brands ``org`` (from the org registry).
+
+    Additive manifest fields: ``display_name`` (the login when unset), the org's
+    ``github_url``, and ``brand`` — the logo set under ``web/public/brand/`` —
+    only when the profile names one.
+    """
+    profile = profile_or_default(org)
+    metadata = {"display_name": profile.label, "github_url": f"https://github.com/{org}"}
+    if profile.brand:
+        metadata["brand"] = profile.brand
+    return metadata
 
 
 def emit_data_api() -> Path:
@@ -639,6 +664,7 @@ def emit_data_api() -> Path:
                 if (tiles := _metric_tiles(family, org_data_dir))
             }
             manifest["orgs"][org] = {
+                **_org_metadata(org),
                 "sections": sections,
                 "chart_sections": chart_sections,
                 "views": views,

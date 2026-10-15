@@ -61,18 +61,20 @@ pipelines, cli          orchestration — wire a fetch → analysis → output r
 - **`pipelines` / `cli`** — the orchestration layer. Each pipeline reads a fetch,
   runs analysis, and writes outputs.
 
-## The three registries
+## The registries
 
-Extensibility flows through three declarative registries rather than scattered
+Extensibility flows through four declarative registries rather than scattered
 special-casing. Adding a capability means adding a registry entry, not editing a
 dispatcher.
 
 **Pipeline registry** (`pipelines/__init__.py`). Each `Pipeline` declares its name
 (= module name = CLI subcommand), description, CLI options (`org`/`repo`), whether it
-is `offline`-capable, and whether it is in the default full run. Both the CLI
-(`cli.py`) and the orchestrator (`pipelines/run_all.py`) are driven by this list.
-*To add a pipeline:* create `pipelines/<name>.py` with a `main()`, append one
-`Pipeline(...)` entry.
+is `offline`-capable, whether it is in the default full run, and the org
+capabilities it `requires` (empty by default, meaning it runs for every org). Both
+the CLI (`cli.py`) and the orchestrator (`pipelines/run_all.py`) are driven by this
+list. *To add a pipeline:* create `pipelines/<name>.py` with a `main(org=ORG)`,
+append one `Pipeline(...)` entry, and add `requires=` only if it needs a governance
+config, a proposals repo, or another capability.
 
 **Ingestion resource registry** (`data_sources/github_ingest/`). Each
 `OrgIncrementalResource` declares a fetched dataset's name, model, record identity
@@ -91,6 +93,12 @@ module exposing `build_views(org, org_data_dir)` for views that are neither a
 table nor a chart gallery (`CUSTOM_VIEW_MODULES`) — the HIPs tab's governance
 board and coverage matrix are built that way, in `export/hip_views.py`.
 *To add a family:* create the module, list it in `_FAMILIES`.
+
+**Org registry** (`config/orgs.py`). Each `OrgProfile` names one GitHub
+organisation and the capabilities it has (`governed`, `org_overview`, `hips`,
+`discord`). The orchestrator schedules pipelines by those capabilities and the
+spec assembles cards by them, so nothing else names an org (see
+[Multi-org](#multi-org)). *To add an org:* append one profile.
 
 ## Data flow and persistence
 
@@ -178,36 +186,57 @@ are applied in three places:
 
 ## Multi-org
 
-`config/orgs.py` is the single source of truth: an `OrgProfile` per org declaring
-whether it is `governed` (publishes a `config.yaml`), gets the org-overview cards
-(`org_overview`), and is rendered by the full run (`extra`). **Onboarding an org
-is adding one `OrgProfile`** — every org-shaped consumer reads the registry rather
-than hardcoding a name:
+`config/orgs.py` is the single source of truth: one `OrgProfile` per org, and
+everything org-shaped reads it instead of naming orgs. **Adding an org is adding
+one profile**; [adding-an-organisation.md](adding-an-organisation.md) is the
+checklist.
 
-- `GOVERNANCE_CONFIG_URLS` is derived from the registry, so `fetch_governance_config(org)`
-  resolves each governed org's source and snapshots it under an org-scoped path.
-  An unregistered or ungoverned org has no source, so it is *ungoverned* (empty
-  config — it never inherits another org's roles).
-- `extra_orgs()` derives the "also render this org" set from `extra`, filtered by
-  `GITHUB_EXTRA_ORGS` when set; both `run_all`'s contributor pass and the
-  contributor heatmap read it, so the concept has one home.
-- The `org_overview` pipeline iterates the registry's `org_overview` orgs.
+A profile's fields map to *capabilities* (`config.orgs.CAPABILITIES`), the join
+between the three places that care about an org:
 
-`GITHUB_ORG` still selects the primary org and `GITHUB_EXTRA_ORGS` still filters
-the extras, so the env is a *view* over the registry, not a replacement.
+| Capability | Profile field | Pipelines that `require` it | Spec key |
+|---|---|---|---|
+| `governed` | `governed` + `governance_url` | `maintainer_pipeline`, `role_coverage`, `affiliation` | `"@governed"` |
+| `org_overview` | `org_overview` | `org_overview` | `"@org_overview"` |
+| `hips` | `hip_proposals_repo` | `hip_implementation` | `"@hips"` |
+| `discord` | `discord` | `discord_analytics` (CLI-only) | `"@discord"` |
 
-### Dashboard chart spec composition
+- **Which orgs run.** `config.orgs.rendered_orgs()`: the primary org
+  (`GITHUB_ORG`, default `hiero-ledger`), then the registry's `extra` orgs
+  (narrowed by `GITHUB_EXTRA_ORGS` when set), then any trial orgs
+  (`HIERO_ANALYTICS_TRIAL_ORGS`, unregistered, run once for evaluation). The env
+  is a view over the registry, never a second roster.
+- **Which pipelines run for an org.** `run_all` loops over the rendered orgs and
+  runs each default-run pipeline whose `requires` the org's capabilities cover.
+  Repo-scoped pipelines (`GITHUB_REPO`) run for the primary org only. Each
+  pipeline receives the org explicitly and runs under that org's API usage
+  scope, so `SNAPSHOT.json` attributes spend per org.
+- **Which cards an org gets.** A family's `charts` compose per org
+  (`chart_specs_for_org` in `dashboard_spec/_assembly.py`): `"*"` cards for
+  every org, then the `"@<capability>"` cards the org has. A bare org key is
+  supported for a one-off but a spec test forbids it in the shipped spec. A tab
+  an org has nothing for shows the family's `ABSENT_NOTE`.
+- **Governance is per org.** `fetch_governance_config(org)` resolves the
+  profile's `governance_url` and snapshots it under an org-scoped path; each
+  org's own `blanket_teams` are excluded from its per-repo role holders. An
+  ungoverned org gets an empty config and never inherits another org's roles.
+- **The data API** lists orgs primary first, then in registry order, and gives
+  each its `display_name`, `github_url` and optional `brand`, which the web app
+  uses for the switcher label and the top-left logo.
 
-A family's `charts` dict composes per org instead of one key overriding another
-(`chart_specs_for_org` in `dashboard_spec/_assembly.py`). Three key kinds, applied
-in order:
+**Failure policy.** A failure confined to an extra or trial org is recorded
+(labelled `pipeline[org]`) in `SNAPSHOT.json` and the job summary but does not
+fail the run, so one org's outage cannot hold every org's dashboard back. A
+primary-org failure, a missing snapshot manifest or a data API failure still
+exits non-zero. `hiero-analytics all --strict`, used by PR previews, fails on
+any failure. Before fetching, each org's login is checked against GitHub's
+spelling, since output paths and `owner/repo` joins are case-sensitive; offline
+runs skip an extra org that has no cached datasets yet.
 
-| Key | Applies to |
-| --- | --- |
-| `"*"` | every org (org-independent cards) |
-| `"@governed"`, `"@org_overview"` | orgs whose registry profile has that capability |
-| `"hiero-hackers"` | that org alone |
-
+Two tests keep this true: `tests/test_org_literals.py` fails on an org login
+written anywhere in `src/` outside the registry, and the output contract
+(`tests/contracts/`) runs a synthetic governed extra org and a plain extra org
+alongside the primary and asserts what each one gets.
 
 ## The dashboard contract
 
@@ -245,6 +274,7 @@ namespace and asserting the output files. Coverage floor is enforced in CI.
 | Add a chart *kind* | a document builder in `export/chart_data.py` plus a view in `web/src/components/charts/` |
 | Add a bespoke dashboard view | `CUSTOM_VIEWS_MODULE` on the family + a `build_views()` module returning pure data |
 | Add a pipeline | `pipelines/<name>.py` + one `Pipeline` entry in `pipelines/__init__.py` |
+| Add an organisation | one `OrgProfile` in `config/orgs.py` (see [adding-an-organisation.md](adding-an-organisation.md)) |
 | Add a fetched resource | `models` + `queries/` + `github_ingest/<x>.py` + one `OrgIncrementalResource` |
 | A concept two layers share | `domain/` |
 | Tune a threshold/window | `config/analysis.py` |

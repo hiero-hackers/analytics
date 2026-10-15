@@ -35,9 +35,9 @@ SUMMARY = "Understand project stewardship, role coverage, and the people guiding
 # macro_absent_notes): say *why*, so absence reads as a property of the data,
 # not a bug.
 ABSENT_NOTE = (
-    "Governance analytics are derived from the org's published governance config "
-    "(team → permission grants). This org doesn't publish one, so roles, coverage, "
-    "teams, and organisation diversity can't be inferred."
+    "Governance analytics are derived from an org's governance config (team → permission "
+    "grants). None is configured for this org, so roles, coverage, teams, and organisation "
+    "diversity can't be inferred."
 )
 
 CHART_MACRO = {

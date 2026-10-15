@@ -107,16 +107,56 @@ Reading the table:
   cost somewhat more. It is a lower bound for steady state, not an average. It is
   also a single org and a single run of each kind, from a developer machine.
 
+### Nightly production runs, per organisation
+
+Since #537 every run records its spend per org. The scheduled refresh (Actions,
+`ANALYTICS_PAT`, `GITHUB_MAX_WORKERS=3`) has been almost exactly the same each
+night, read from `api_usage` in the archived `SNAPSHOT.json` files on the
+`data/snapshots` branch:
+
+| Run (UTC) | hiero-ledger points | hiero-ledger REST | hiero-hackers points | hiero-hackers REST | Total points | Wall time |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| 2026-10-12 01:32 | 788 | 595 | 399 | 165 | 1,187 | 8 min |
+| 2026-10-13 01:26 | 787 | 599 | 399 | 165 | 1,186 | 10 min |
+| 2026-10-14 01:13 | 788 | 598 | 399 | 166 | 1,187 | 12 min |
+
+Two notes on reading it:
+
+- About 63 of hiero-ledger's points each night were in fact hiero-hackers'
+  org-overview pipeline, which ran in the primary org's pass and fetched its own
+  six-month activity window. It now runs under hiero-hackers' own scope and reads
+  the persisted `contributor_activity` dataset instead, so those points are no
+  longer spent at all.
+- `graphql_remaining` after these runs was about 8,200 to 8,800, so the token in
+  use has a larger hourly allowance than the 5,000 points listed above. Either
+  way a nightly run uses well under a quarter of one hour's budget.
+
+### A small org's first fetch: LFDT-CLPR
+
+A local trial run on 2026-10-14 (`HIERO_ANALYTICS_TRIAL_ORGS=LFDT-CLPR`, a
+personal PAT, `GITHUB_MAX_WORKERS=3`) fetched LFDT-CLPR, 5 public repositories,
+from nothing:
+
+| Org | GraphQL points | GraphQL requests | REST requests | Wall time |
+| --- | ---: | ---: | ---: | --- |
+| LFDT-CLPR, cold | 73 | 24 | 18 | about 22 seconds |
+
+Its largest dataset was `merged_pr_difficulty` (30 points). Its nightly cost
+will be lower still, so an org of this size is negligible against either token.
+
 ## Forecast: adding one more organisation
 
-Adding an org to `GITHUB_EXTRA_ORGS` adds two costs, and they must not be
-summed into one number:
+Registering an org in `config/orgs.py` (see
+[adding-an-organisation.md](adding-an-organisation.md)) adds two costs, and
+they must not be summed into one number. The cheapest way to measure both for
+a specific org is a trial run (`trial_orgs` on the workflow dispatch), whose job
+summary has a row for the candidate org:
 
 1. **A one-off cold fetch**, for `hiero-hackers`-sized orgs about 525 GraphQL
    points plus about 165 REST requests and roughly 12 minutes. Divide by the
    token's hourly limit to get the hours of budget it consumes. Scale by
-   repository and activity volume for other orgs; `hiero-ledger` is much larger
-   and has **not** been measured.
+   repository and activity volume for other orgs; `hiero-ledger`'s cold fetch
+   has **not** been measured, though its nightly cost has (above).
 2. **A recurring cost per run**, at least the warm figure (about 290 points for
    `hiero-hackers`), times runs per month (about 30 at the daily cadence), so
    about 8,700 points per month per org of this size.

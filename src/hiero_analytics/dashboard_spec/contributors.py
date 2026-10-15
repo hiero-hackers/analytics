@@ -247,7 +247,7 @@ CHART_METHODOLOGY = {
         ),
     ],
     "contributor_counts": [
-        "Take the org-wide contributor activity records for the Hiero Hackers organisation.",
+        "Take the organisation's contributor activity records.",
         "Count the distinct contributors active in each repository.",
         "Rank the repositories by that count; the chart and the CSV keep them all.",
     ],

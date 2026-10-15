@@ -11,6 +11,16 @@ on:
     # cadence. See docs/api-budget.md.
     - cron: '0 1 * * *'
   workflow_dispatch:
+    inputs:
+      trial_orgs:
+        description: >-
+          Comma-separated GitHub orgs to try once, before registering them in
+          config/orgs.py. They run every pipeline that needs no org capability.
+          A trial run builds the dashboard artifact but never deploys it or
+          archives its snapshot.
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -77,13 +87,25 @@ jobs:
           # a watermark against), so gentleness beats speed here — rate-limit
           # sleeps dominate wall time anyway.
           GITHUB_MAX_WORKERS: "3"
+          # Passed through the environment, never interpolated into the script,
+          # so a dispatch input cannot inject shell. Empty on scheduled runs.
+          HIERO_ANALYTICS_TRIAL_ORGS: ${{ inputs.trial_orgs }}
+        # A failure confined to an extra or trial org is reported in the job
+        # summary and SNAPSHOT.json but does not fail this step, so one org's
+        # outage cannot hold every org's dashboard back (see run_all).
         run: uv run hiero-analytics
 
       # Only persist datasets when the run succeeds. Saving after a failed run
       # would let a partial snapshot become the next incremental baseline
       # (restore picks the most recent analytics-datasets- key); on failure we
-      # keep the last good cache and let the next run resume from it.
+      # keep the last good cache and let the next run resume from it. A run that
+      # only tolerated extra-org failures counts as a success here: each dataset
+      # is written atomically, and a partial org fetch holds its watermark, so
+      # the failed org's datasets resume correctly from what was saved. Trial
+      # runs never save: their datasets would ride the cache into the next
+      # scheduled run.
       - name: Save incremental datasets
+        if: ${{ !inputs.trial_orgs }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: outputs/data/datasets
@@ -172,11 +194,13 @@ jobs:
   #   by date       git rev-list -1 --before=2026-08-01 data/snapshots
   #   diff two runs git diff <sha1> <sha2> -- api/v1/
   #
-  # See docs/snapshots.md. Runs only when refresh-data succeeded, so a run with
-  # failed pipelines never enters the archive.
+  # See docs/snapshots.md. Runs only when refresh-data succeeded, so a run whose
+  # primary org failed never enters the archive; failures tolerated for extra
+  # orgs are listed in the archived SNAPSHOT.json. Trial runs never archive.
   archive-snapshot:
     name: Archive API snapshot
     needs: refresh-data
+    if: ${{ !inputs.trial_orgs }}
     runs-on: ubuntu-latest
     # The only job in this workflow that writes to the repository, and it
     # writes to one branch that never holds code. The workflow's top-level
@@ -251,6 +275,9 @@ jobs:
   deploy-pages:
     name: Deploy dashboard to GitHub Pages
     needs: refresh-data
+    # A trial run (dispatch with trial_orgs) is for inspection only: download
+    # its Pages artifact instead of publishing it.
+    if: ${{ !inputs.trial_orgs }}
     runs-on: ubuntu-latest
     permissions:
       pages: write

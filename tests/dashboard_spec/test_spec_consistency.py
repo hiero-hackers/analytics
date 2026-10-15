@@ -351,3 +351,35 @@ def test_every_registered_org_gets_its_capability_cards():
         for org in orgs_mod.org_names():
             got = {spec["id"] for spec in chart_specs_for_org(macro["charts"], org)}
             assert wildcard_ids <= got, f"{macro['name']}: {org} missing wildcard cards"
+
+
+def test_chart_keys_are_capabilities_not_org_names():
+    """The shipped spec keys cards by "*" or "@<capability>" only, never by an org's name.
+
+    The assembler still supports a bare org key for a one-off, but keying the
+    shipped spec by capability is what lets an org be added with one registry
+    entry: its tabs follow from what its profile says it has.
+    """
+    from hiero_analytics.config.orgs import CAPABILITIES
+    from hiero_analytics.dashboard_spec._assembly import WILDCARD_KEY, capability_key
+
+    allowed = {WILDCARD_KEY, *(capability_key(name) for name in CAPABILITIES)}
+    for macro in CHART_MACROS:
+        stray = set(macro["charts"]) - allowed
+        assert not stray, f"{macro['name']} keys cards by {sorted(stray)}; use '*' or a capability key"
+
+
+def test_capability_keys_follow_the_registry(monkeypatch):
+    """An org's capability keys come from its profile, in a fixed application order."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+    from hiero_analytics.dashboard_spec._assembly import capability_keys
+
+    monkeypatch.setattr(
+        orgs,
+        "ORGS",
+        (OrgProfile(name="x", governed=True, governance_url="u", org_overview=True, hip_proposals_repo="x/h"),),
+    )
+
+    assert capability_keys("x") == ("@governed", "@org_overview", "@hips")
+    assert capability_keys("unregistered") == ()

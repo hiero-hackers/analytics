@@ -5,23 +5,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from hiero_analytics.config.orgs import ORGS as KNOWN_ORGS
-from hiero_analytics.config.orgs import extra_orgs
+from hiero_analytics.config.orgs import primary_org
 
-# Import-time *defaults* only — runners that support multiple orgs must accept an
-# explicit org argument (see run_contributor_activity_org.main) rather than lean
-# on these, so one process can serve several orgs without env mutation.
-ORG = os.getenv("GITHUB_ORG", "hiero-ledger")
+# Import-time *defaults* only, for function signatures such as
+# ``main(org: str = ORG)``. Runners that serve several orgs take the org as an
+# explicit argument, and the set of orgs a run renders comes from
+# ``config.orgs.rendered_orgs()`` at call time, never from a constant here.
+ORG = primary_org()
 REPO = os.getenv("GITHUB_REPO", "hiero-sdk-python")
-
-# Registry in display order — primary org first. Just an ordering view of
-# config.orgs, not a copy: everything org-shaped is read from there.
-ORGS = (*(p for p in KNOWN_ORGS if p.name == ORG), *(p for p in KNOWN_ORGS if p.name != ORG))
-
-# Orgs the full run also renders, derived from the registry (filtered by
-# GITHUB_EXTRA_ORGS when set) so the orchestrator and heatmap share one source.
-# Re-exported here since consumers import orgs from ``paths``.
-EXTRA_ORGS = extra_orgs()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SRC = PROJECT_ROOT / "src" / "hiero_analytics"

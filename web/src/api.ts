@@ -362,6 +362,12 @@ export interface MetricTile {
 }
 
 export interface OrgEntry {
+  /** How to label the org (its profile's display name); absent in older manifests: use the login. */
+  display_name?: string;
+  /** The org on GitHub. */
+  github_url?: string;
+  /** The org's logo set under public/brand/<brand>/; the Hiero mark when absent. */
+  brand?: string;
   sections: SectionRef[];
   chart_sections: ChartSection[];
   views?: ViewRef[];

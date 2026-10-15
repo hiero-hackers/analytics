@@ -198,7 +198,7 @@ def main(org: str = ORG) -> None:
     org_data_dir = ensure_org_dirs(org)
 
     config = fetch_governance_config(org)
-    role_lookup = build_repo_role_lookup(config)
+    role_lookup = build_repo_role_lookup(config, org=org)
     team_membership = build_team_membership(config)
     affiliations = load_affiliations()
     manual_logins = load_manual_logins()

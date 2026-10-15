@@ -156,4 +156,6 @@ COMPANY_JUNK = {
     "web3",
     "blockchain",
 }
-COMPANY_NOT_EMPLOYER = {*org_names(), "hiero", "lf-decentralized-trust"}
+# Compared against a lowercased company field, so the registry's logins are
+# lowercased too (``LFDT-CLPR`` must match a company field of ``lfdt-clpr``).
+COMPANY_NOT_EMPLOYER = {*(name.lower() for name in org_names()), "hiero", "lf-decentralized-trust"}
