@@ -86,8 +86,9 @@ PIPELINES: tuple[Pipeline, ...] = (
     # - contributor_churn: repo-scoped deep dive whose output no dashboard section
     #   consumes yet; flip in_default_run once one does.
     # - build_affiliations: a maintenance tool, not an analytics pipeline — it
-    #   regenerates the curated affiliations.yaml source data (needs GITHUB_TOKEN
-    #   and the gpg CLI), which the analytics pipelines then read offline.
+    #   regenerates the generated affiliations.yaml (needs GITHUB_TOKEN and the
+    #   gpg CLI), which the analytics pipelines then read offline, merged with the
+    #   hand-kept affiliation_overrides.yaml.
     Pipeline("data_api", "Emit the versioned JSON data API from existing outputs", in_default_run=False, offline=True),
     Pipeline("discord_analytics", "Run discord analysis", in_default_run=False, requires=frozenset({DISCORD})),
     Pipeline(
@@ -96,7 +97,11 @@ PIPELINES: tuple[Pipeline, ...] = (
         args=("org", "repo"),
         in_default_run=False,
     ),
-    Pipeline("build_affiliations", "Regenerate the curated affiliations map from public signals", in_default_run=False),
+    Pipeline(
+        "build_affiliations",
+        "Regenerate affiliations.yaml from public signals (corrections live in affiliation_overrides.yaml)",
+        in_default_run=False,
+    ),
 )
 
 PIPELINES_BY_NAME: dict[str, Pipeline] = {pipeline.name: pipeline for pipeline in PIPELINES}

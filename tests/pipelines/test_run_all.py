@@ -656,3 +656,45 @@ def test_main_prunes_but_keeps_a_failed_extra_orgs_datasets(monkeypatch, main_en
     assert keep(paths.DATASETS_DIR / f"issues_{PLAIN}_all.json")
     assert not keep(paths.DATASETS_DIR / f"issues_{GOVERNED}_all.json")
     assert not keep(paths.DATASETS_DIR / "issues_old-trial-org_all.json")
+
+
+@pytest.mark.parametrize(
+    ("narrow", "rendered", "kept", "judged"),
+    [
+        pytest.param({"GITHUB_EXTRA_ORGS": GOVERNED}, [PRIMARY, GOVERNED], [PLAIN], [PRIMARY, GOVERNED], id="extras"),
+        pytest.param(
+            {"GITHUB_ORG": PLAIN, "GITHUB_EXTRA_ORGS": ""}, [PLAIN], [PRIMARY, GOVERNED], [PLAIN], id="primary"
+        ),
+    ],
+)
+def test_main_keeps_datasets_of_registered_orgs_the_environment_left_out(
+    monkeypatch, main_env, caplog, narrow, rendered, kept, judged
+):
+    """A narrowed run prunes only what it could judge: registered-but-unrendered orgs keep their cache."""
+    for name, value in narrow.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(run_all, "_rendered_orgs", lambda: list(rendered))
+    seen = []
+    monkeypatch.setattr(run_all, "prune_untouched_datasets", lambda keep: seen.append(keep))
+    _use(monkeypatch, _pipeline("p"))
+
+    with caplog.at_level("INFO", logger="hiero_analytics.pipelines.run_all"):
+        run_all.main()
+
+    (keep,) = seen
+    for org in kept:
+        assert keep(paths.DATASETS_DIR / f"issues_{org}_all.json"), org
+    for org in judged:
+        assert not keep(paths.DATASETS_DIR / f"issues_{org}_all.json"), org
+    assert not keep(paths.DATASETS_DIR / "issues_old-trial-org_all.json")
+    left_out = [r for r in caplog.records if "leaves out registered org" in r.getMessage()]
+    assert len(left_out) == 1
+    assert all(org in left_out[0].getMessage() for org in kept)
+
+
+def test_main_is_silent_about_left_out_orgs_when_the_registry_is_rendered(monkeypatch, main_env, caplog):
+    """The full registry run has nothing to disclose."""
+    _use(monkeypatch, _pipeline("p"))
+    with caplog.at_level("INFO", logger="hiero_analytics.pipelines.run_all"):
+        run_all.main()
+    assert not [r for r in caplog.records if "leaves out registered org" in r.getMessage()]

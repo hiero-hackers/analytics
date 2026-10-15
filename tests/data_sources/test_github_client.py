@@ -363,7 +363,7 @@ def test_request_raises_after_exhausting_transport_retries(monkeypatch, mock_sle
 
 
 def test_request_raises_after_exhausting_5xx_retries(monkeypatch, mock_sleep):
-    """A persistent 5xx eventually raises via raise_for_status rather than looping forever."""
+    """A persistent 5xx eventually raises an HTTPError rather than looping forever."""
     client = github_client.GitHubClient()
 
     server_error = Mock()
@@ -378,6 +378,33 @@ def test_request_raises_after_exhausting_5xx_retries(monkeypatch, mock_sleep):
     with pytest.raises(requests.HTTPError):
         client.get("https://api.github.com/test")
     assert request_mock.call_count == github_client.MAX_RETRIES
+
+
+def test_persistent_5xx_raises_typed_server_error(monkeypatch, mock_sleep):
+    """After exhausting retries on a 502, the transport raises GitHubServerError carrying the response."""
+    client = github_client.GitHubClient()
+
+    server_error = Mock()
+    server_error.status_code = 502
+    server_error.ok = False
+    server_error.headers = {}
+
+    request_mock = Mock(return_value=server_error)
+    monkeypatch.setattr(client.session, "request", request_mock)
+
+    with pytest.raises(github_client.GitHubServerError) as excinfo:
+        client.graphql("query { viewer { login } }", {})
+
+    assert excinfo.value.response is server_error
+    assert "502" in str(excinfo.value)
+    assert request_mock.call_count == github_client.MAX_RETRIES
+
+
+def test_github_server_error_is_an_http_error():
+    """GitHubServerError subclasses requests.HTTPError so existing handlers keep catching it."""
+    assert issubclass(github_client.GitHubServerError, requests.HTTPError)
+    with pytest.raises(requests.HTTPError):
+        raise github_client.GitHubServerError("boom")
 
 
 # ---------------------------------------------------------
@@ -420,3 +447,27 @@ def test_secondary_rate_limit_detected_from_message_body(monkeypatch, mock_sleep
 
     assert client.get("https://api.github.com/test") == {"ok": True}
     assert request_mock.call_count == 2
+
+
+# ---------------------------------------------------------
+# BYTES (artifact downloads)
+# ---------------------------------------------------------
+
+
+def test_get_bytes_returns_content_through_the_transport(monkeypatch, mock_sleep):
+    """get_bytes goes through the shared transport, follows redirects, and returns the raw body."""
+    response = Mock()
+    response.headers = {}
+    response.content = b"PK\x03\x04zip-bytes"
+    response.status_code = 200
+    response.ok = True
+    client = github_client.GitHubClient()
+    request = Mock(return_value=response)
+    monkeypatch.setattr(client.session, "request", request)
+
+    result = client.get_bytes("https://api.github.com/repos/o/r/actions/artifacts/1/zip")
+
+    assert result == b"PK\x03\x04zip-bytes"
+    assert request.call_args.args == ("GET", "https://api.github.com/repos/o/r/actions/artifacts/1/zip")
+    assert request.call_args.kwargs["allow_redirects"] is True
+    assert client.requests_made == 1

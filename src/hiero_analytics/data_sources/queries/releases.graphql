@@ -1,6 +1,6 @@
-query RELEASES_QUERY($owner:String!,$repo:String!,$cursor:String){
+query RELEASES_QUERY($owner:String!,$repo:String!,$cursor:String,$pageSize:Int!){
   repository(owner:$owner, name:$repo){
-    releases(first:100, after:$cursor, orderBy:{field:CREATED_AT, direction:DESC}){
+    releases(first:$pageSize, after:$cursor, orderBy:{field:CREATED_AT, direction:DESC}){
       pageInfo{
         hasNextPage
         endCursor

@@ -161,3 +161,62 @@ def test_cli_warns_when_the_org_lacks_the_pipelines_capability(monkeypatch, capl
         assert cli.main(["role_coverage", "--org", "some-ungoverned-org"]) == 0
 
     assert any("governed" in record.getMessage() for record in caplog.records)
+
+
+def test_seed_datasets_command_is_registered_and_dispatches(monkeypatch, capsys):
+    """seed-datasets forwards its options to the seeder, prints the summary, and returns success."""
+    calls = []
+    result = SimpleNamespace(
+        run_id=5,
+        run_url="https://github.com/o/r/actions/runs/5",
+        git_sha="abc1234",
+        data_as_of="2026-10-15T01:00:00+00:00",
+        dataset_count=3,
+        total_bytes=2048,
+        datasets_dir="outputs/data/datasets",
+    )
+    monkeypatch.setattr(cli, "seed_datasets", lambda client, repo, **kw: calls.append((client, repo, kw)) or result)
+    monkeypatch.setattr(cli, "shared_client", lambda: "client")
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets", "--repo", "o/r", "--run-id", "5", "--force"]) == 0
+
+    assert calls == [("client", "o/r", {"run_id": 5, "force": True})]
+    output = capsys.readouterr().out
+    assert "abc1234" in output
+    assert "2026-10-15T01:00:00+00:00" in output
+
+
+def test_seed_datasets_defaults_to_the_project_repository(monkeypatch):
+    """Without --repo the command targets the default repository, with no run id and no force."""
+    calls = []
+    monkeypatch.setattr(cli, "seed_datasets", lambda _client, repo, **kw: calls.append((repo, kw)) or SimpleNamespace())
+    monkeypatch.setattr(cli, "format_summary", lambda _result: "ok")
+    monkeypatch.setattr(cli, "shared_client", lambda: None)
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets"]) == 0
+
+    assert calls == [(cli.DEFAULT_SEED_REPO, {"run_id": None, "force": False})]
+
+
+def test_seed_datasets_failure_exits_non_zero_with_the_message(monkeypatch, capsys):
+    """A SeedError becomes a one-line error on stderr and a non-zero exit."""
+
+    def fail(client, repo, **kwargs):
+        raise cli.SeedError("GITHUB_TOKEN is not set")
+
+    monkeypatch.setattr(cli, "seed_datasets", fail)
+    monkeypatch.setattr(cli, "shared_client", lambda: None)
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets"]) == 1
+
+    assert "GITHUB_TOKEN is not set" in capsys.readouterr().err
+
+
+def test_seed_datasets_is_not_listed_as_a_pipeline(capsys):
+    """seed-datasets is a command, not a registered pipeline, so `list` does not show it."""
+    assert cli.main(["list"]) == 0
+
+    assert "seed-datasets" not in capsys.readouterr().out

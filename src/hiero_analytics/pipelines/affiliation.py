@@ -1,6 +1,7 @@
 """Build the organisation-diversity tables for the org.
 
-Reads the curated ``data/affiliations.yaml`` map and the org's governance config,
+Reads the affiliation map (generated ``data/affiliations.yaml`` merged with the
+hand-kept ``data/affiliation_overrides.yaml``) and the org's governance config,
 classifies every role-holder by employer (or independent / unknown), and writes a
 set of org-scoped tables per role tab (maintainers, committers) plus the
 role-agnostic team tables. Per role, suffixed ``_committers`` for the second tab:
@@ -40,7 +41,7 @@ from hiero_analytics.analysis.contributor_heatmap import (
 )
 from hiero_analytics.config.analysis import AFFILIATION_MIN_KNOWN_SHARE_PCT
 from hiero_analytics.config.paths import ORG, ensure_org_dirs
-from hiero_analytics.data_sources.affiliations import AFFILIATIONS_PATH, load_affiliations, load_manual_logins
+from hiero_analytics.data_sources.affiliations import OVERRIDES_PATH, load_affiliations, load_manual_logins
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
     build_team_membership,
@@ -148,8 +149,8 @@ def _write_role_views(
     logger.info("Resolved %d distinct %s from governance config", len(holders), plural)
 
     classified = classify_role_holders(holders, affiliations)
-    # Flag how each affiliation was decided: a hand-correction (marked '# manual' in
-    # the YAML) vs the automated resolver.
+    # Flag how each affiliation was decided: a hand correction (a row in
+    # affiliation_overrides.yaml) vs the automated resolver.
     classified["method"] = [
         "manual" if str(login).lower() in manual_logins else "automated" for login in classified["login"]
     ]
@@ -169,12 +170,12 @@ def _write_role_views(
     if holders and known_share < AFFILIATION_MIN_KNOWN_SHARE_PCT:
         logger.warning(
             "Affiliation curation for %s has decayed to %d%% known (floor %d%%): the %s diversity tables "
-            "now describe a minority of the population — resolve unknowns in %s",
+            "now describe a minority of the population — record resolved unknowns in %s",
             role,
             known_share,
             AFFILIATION_MIN_KNOWN_SHARE_PCT,
             role,
-            AFFILIATIONS_PATH,
+            OVERRIDES_PATH,
         )
     logger.info(
         "Concentration (%s): HHI %d across %d employers; largest is %s at %d%%",

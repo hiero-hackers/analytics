@@ -64,6 +64,15 @@ the next run does one full fetch and then resumes incrementally.
 This is why the cost of an organisation has two very different parts, and why
 they are reported separately below.
 
+Page size is not a budget lever. GitHub charges GraphQL points per node
+requested, so a page of 25 costs the same points as a quarter of a page of 100
+and only adds round trips. The client requests 100 nodes per page
+(`GITHUB_GRAPHQL_PAGE_SIZE`) and shrinks only on the failure path: when GitHub
+answers a query that ran too long with a 502 or 504, pagination halves the page
+(never below `GITHUB_GRAPHQL_MIN_PAGE_SIZE`, default 10), retries the same
+cursor, and doubles back up after three clean pages. Batched rounds shrink
+together, since the round's cost is the sum of its repositories.
+
 ## Measured cost
 
 Measured on 2026-10-09 against `hiero-hackers` with a personal classic PAT

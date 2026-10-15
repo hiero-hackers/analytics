@@ -198,10 +198,13 @@ Used by GitHub search endpoints.
 ### Cursor pagination (GraphQL APIs)
 
 ```python
-paginate_cursor(fetch_page)
+paginate_cursor(fetch_page)  # fetch_page(cursor, page_size)
 ```
 
-Used by GraphQL queries for repositories, issues, and pull requests.
+Used by GraphQL queries for repositories, issues, and pull requests. Queries take
+the page size as a `$pageSize` variable; on a `GitHubServerError` (GitHub's 502/504
+for a query that ran too long) the loop halves the page size and retries the same
+cursor, then recovers after a few clean pages.
 
 Both helpers provide:
 

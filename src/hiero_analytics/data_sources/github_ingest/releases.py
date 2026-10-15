@@ -24,7 +24,7 @@ from __future__ import annotations
 from itertools import groupby
 from operator import attrgetter
 
-from hiero_analytics.config.github import GITHUB_MAX_WORKERS
+from hiero_analytics.config.github import GITHUB_GRAPHQL_PAGE_SIZE, GITHUB_MAX_WORKERS
 from hiero_analytics.data_sources.queries import load_query
 
 from ..cache import load_records_cache, save_records_cache
@@ -52,7 +52,12 @@ def _fetch_repo_releases_uncached(client: GitHubClient, owner: str, repo: str) -
 
     def page(cursor: str | None) -> tuple[list[ReleaseRecord], str | None, bool]:
         """Fetch a single page of releases."""
-        data = client.graphql(releases_query, {"owner": owner, "repo": repo, "cursor": cursor})
+        data = client.graphql(
+            releases_query,
+            # Fixed page size: this loop keeps its own page-count guard, so it
+            # does not shrink on server errors the way paginate_cursor does.
+            {"owner": owner, "repo": repo, "cursor": cursor, "pageSize": GITHUB_GRAPHQL_PAGE_SIZE},
+        )
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, ["repository", "releases"])
         records = [
             record for node in nodes for record in ReleaseRecord.from_github_node(node, {"owner": owner, "repo": repo})

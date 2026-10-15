@@ -72,15 +72,17 @@ uv run hiero-analytics build_affiliations
 ```
 
 This regenerates `src/hiero_analytics/data/affiliations.yaml` from every
-governed org's config. Review the new rows and hand-correct the unknowns as
-[affiliations.md](affiliations.md) describes. Until then the run logs an
-affiliation-coverage warning for the org, and its diversity charts describe
-only the people already resolved.
+governed org's config. That file is generated, so never edit it by hand: review
+the new rows and hand-correct the unknowns as rows in
+`src/hiero_analytics/data/affiliation_overrides.yaml`, each with a reason
+comment, as [affiliations.md](affiliations.md) describes. Until then the run
+logs an affiliation-coverage warning for the org, and its diversity charts
+describe only the people already resolved.
 
 ## 5. Open the pull request
 
-The change should touch `config/orgs.py`, and optionally the logo files and
-`affiliations.yaml`, and nothing else. CI checks that:
+The change should touch `config/orgs.py`, and optionally the logo files,
+`affiliations.yaml` and `affiliation_overrides.yaml`, and nothing else. CI checks that:
 
 - no other file names the org (`tests/test_org_literals.py`);
 - dashboard cards are keyed by capability, never by org name

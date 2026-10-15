@@ -247,6 +247,17 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
 
     orgs = _rendered_orgs()
     logger.info("Rendering %d org(s): %s", len(orgs), ", ".join(orgs))
+    # Narrowing the run is a normal development mode, but a silently absent org
+    # reads as a bug (its tab is missing, its outputs are "not published"), so
+    # name what the environment left out, here and once rather than in
+    # extra_orgs(), which several modules call.
+    left_out = sorted(set(org_registry.org_names()) - set(orgs))
+    if left_out:
+        logger.info(
+            "Environment leaves out registered org(s): %s (GITHUB_ORG / GITHUB_EXTRA_ORGS narrow the run; "
+            "unset them to render the registry)",
+            ", ".join(left_out),
+        )
     failures: list[str] = []
     for index, org in enumerate(orgs):
         failures += run_org(org, primary=index == 0, fail_fast=fail_fast)
@@ -269,6 +280,12 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     # orphan. Failures confined to extra orgs no longer skip the prune (that
     # would let orphans, such as a past trial org's datasets, ride the cache and
     # age the published "data as of"); instead those orgs' own datasets are kept.
+    #
+    # Likewise a registered org this run did not render (GITHUB_ORG or
+    # GITHUB_EXTRA_ORGS narrowed the run) has datasets nothing claimed, but they
+    # are not orphans: one quick single-org run must not wipe hours of cache for
+    # the others. Only an org that is neither rendered nor registered — removed
+    # from the registry, or a past trial — is pruned.
     primary_failures = [label for label in failures if not is_org_scoped_failure(label)]
     if primary_failures:
         logger.info(
@@ -278,7 +295,8 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     elif offline_mode_enabled():
         logger.info("Skipping the dataset prune: offline runs do not claim the network-backed datasets")
     else:
-        prune_untouched_datasets(keep=_belongs_to_any(failed_orgs(failures)))
+        unjudged = failed_orgs(failures) | (set(org_registry.org_names()) - set(orgs))
+        prune_untouched_datasets(keep=_belongs_to_any(unjudged))
 
     # Describe the snapshot before the data API emits against it. Written
     # even when pipelines failed — a partial run still produces charts, and the

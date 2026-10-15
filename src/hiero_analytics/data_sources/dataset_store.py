@@ -132,10 +132,12 @@ def prune_untouched_datasets(
     never mistake every dataset for an orphan.
 
     Note that "live" is relative to the configuration that ran: an org removed
-    from the registry (``config.orgs``), filtered out by ``GITHUB_EXTRA_ORGS``, or
-    only ever run as a trial org leaves datasets nothing claims, and they will be
-    removed, costing a full re-fetch if it is configured again later.
-    Every deletion is logged for exactly this reason.
+    from the registry (``config.orgs``) or only ever run as a trial org leaves
+    datasets nothing claims, and they will be removed, costing a full re-fetch
+    if it is configured again later. Every deletion is logged for exactly this
+    reason. A registered org the run merely did not render (``GITHUB_ORG`` or
+    ``GITHUB_EXTRA_ORGS`` narrowed it) is the caller's job to exempt via
+    ``keep``; ``run_all`` does.
 
     ``keep`` exempts files the caller cannot judge, such as the datasets of an
     org whose pipelines failed this run (they may simply not have got as far as

@@ -91,10 +91,11 @@ def fetch_github_resource(  # noqa: UP047
     if cached is not None:
         return cached
 
-    def page(cursor: str | None) -> tuple[list[T], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[T], str | None, bool]:
         """Fetch a single page of GraphQL results."""
         paginated_vars = dict(variables)
         paginated_vars["cursor"] = cursor
+        paginated_vars["pageSize"] = page_size
 
         data = client.graphql(query, paginated_vars)
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, nodes_path)

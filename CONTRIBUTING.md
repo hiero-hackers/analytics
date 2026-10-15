@@ -30,7 +30,9 @@ minutes.
 
 4. *(Only for issues that fetch live GitHub data)* create a `.env` file in the repo
    root containing `GITHUB_TOKEN=<a classic token with public repo read access>`.
-   Most issues, and the whole test suite, work without one.
+   Most issues, and the whole test suite, work without one. With a token, run
+   `uv run hiero-analytics seed-datasets` once to copy the nightly datasets instead
+   of spending ~25 minutes on a cold first fetch.
 5. **Set up commit signing** (required): [GPG signing guide](https://github.com/hiero-ledger/sdk-collaboration-hub/tree/main/guides/issue-progression/for-developers/signing.md).
 6. **Install the pre-commit hooks** (recommended): `uv run pre-commit install`.
    They run automatically on each commit — see [Code quality](#code-quality).

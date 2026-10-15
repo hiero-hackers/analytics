@@ -7,6 +7,7 @@ import pytest
 
 import hiero_analytics.data_sources.github_ingest as ingest
 from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
+from hiero_analytics.data_sources.github_client import GitHubServerError
 from hiero_analytics.data_sources.models import (
     IssueRecord,
     PullRequestDifficultyRecord,
@@ -31,7 +32,7 @@ def bypass_pagination(monkeypatch):
     monkeypatch.setattr(
         ingest._common,
         "paginate_cursor",
-        lambda f: f(None)[0],
+        lambda f: f(None, 100)[0],
     )
 
 
@@ -66,6 +67,35 @@ def test_fetch_org_repos_graphql(mock_client, bypass_pagination):
     assert len(repos) == 2
     assert repos[0].full_name == "org/repo1"
     assert repos[1].name == "repo2"
+
+
+def _repos_page(names, *, has_next=False, cursor=None):
+    """A GraphQL organization.repositories response page."""
+    return {
+        "data": {
+            "organization": {
+                "repositories": {
+                    "nodes": [{"name": name} for name in names],
+                    "pageInfo": {"hasNextPage": has_next, "endCursor": cursor},
+                }
+            }
+        }
+    }
+
+
+def test_fetch_org_repos_sends_page_size_and_shrinks_on_server_error(mock_client):
+    """The resource engine sends pageSize, halves it on a 502, and retries the same cursor."""
+    mock_client.graphql.side_effect = [
+        _repos_page(["a"], has_next=True, cursor="C1"),
+        GitHubServerError("502"),
+        _repos_page(["b"]),
+    ]
+
+    repos = ingest.fetch_org_repos_graphql(mock_client, "org", use_cache=False)
+
+    assert [repo.name for repo in repos] == ["a", "b"]
+    sent = [call.args[1] for call in mock_client.graphql.call_args_list]
+    assert [(v["cursor"], v["pageSize"]) for v in sent] == [(None, 100), ("C1", 100), ("C1", 50)]
 
 
 # ---------------------------------------------------------

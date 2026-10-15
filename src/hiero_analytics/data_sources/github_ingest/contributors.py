@@ -62,18 +62,18 @@ def _fetch_remaining_reviews(
     """Fetch review pages after ``cursor`` for a single pull request."""
     reviews_query = load_query("pr_reviews")
 
-    def page(page_cursor: str | None) -> tuple[list[dict], str | None, bool]:
+    def page(page_cursor: str | None, page_size: int) -> tuple[list[dict], str | None, bool]:
         """Fetch one page of reviews for the pull request."""
         data = client.graphql(
             reviews_query,
-            {"owner": owner, "repo": repo, "number": pr_number, "cursor": page_cursor},
+            {"owner": owner, "repo": repo, "number": pr_number, "cursor": page_cursor, "pageSize": page_size},
         )
         return extract_graphql_cursor_page(data, ["repository", "pullRequest", "reviews"])
 
     # paginate_cursor always starts from a None cursor, so seed the first
     # call with the cursor where the main query left off.
-    def seeded(page_cursor: str | None) -> tuple[list[dict], str | None, bool]:
-        return page(page_cursor if page_cursor is not None else cursor)
+    def seeded(page_cursor: str | None, page_size: int) -> tuple[list[dict], str | None, bool]:
+        return page(page_cursor if page_cursor is not None else cursor, page_size)
 
     return paginate_cursor(seeded, max_pages=_MAX_REVIEW_PAGES)
 
@@ -110,11 +110,11 @@ def _fetch_repo_pull_request_activity_graphql(
     """
     contributor_activity_query = load_query("contributor_activity")
 
-    def page(cursor: str | None) -> tuple[list[ContributorActivityRecord], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[ContributorActivityRecord], str | None, bool]:
         """Fetch a single page of pull requests, stopping past the cutoff."""
         data = client.graphql(
             contributor_activity_query,
-            {"owner": owner, "repo": repo, "cursor": cursor},
+            {"owner": owner, "repo": repo, "cursor": cursor, "pageSize": page_size},
         )
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, ["repository", "pullRequests"])
 
@@ -154,11 +154,11 @@ def _fetch_repo_issue_activity_graphql(
     """Fetch contributor activity signals from recently opened issues."""
     contributor_issue_activity_query = load_query("contributor_issue_activity")
 
-    def page(cursor: str | None) -> tuple[list[ContributorActivityRecord], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[ContributorActivityRecord], str | None, bool]:
         """Fetch a single page of issues."""
         data = client.graphql(
             contributor_issue_activity_query,
-            {"owner": owner, "repo": repo, "cursor": cursor},
+            {"owner": owner, "repo": repo, "cursor": cursor, "pageSize": page_size},
         )
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, ["repository", "issues"])
 

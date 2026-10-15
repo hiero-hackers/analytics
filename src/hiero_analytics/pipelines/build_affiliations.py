@@ -23,8 +23,10 @@ and the ``gpg`` CLI:
 
     uv run hiero-analytics build_affiliations
 
-It writes the curated YAML and a gitignored provenance audit CSV. The YAML is the
-source of truth: hand-edit it afterwards (e.g. for people no signal can place).
+It writes the generated YAML and a gitignored provenance audit CSV. The YAML is
+never edited by hand: a correction (e.g. for people no signal can place) is one
+row in ``data/affiliation_overrides.yaml``, which wins over the generated value
+at run time and survives every regeneration.
 """
 
 from __future__ import annotations
@@ -44,6 +46,12 @@ import requests
 from hiero_analytics.config.github import GITHUB_TOKEN
 from hiero_analytics.config.orgs import is_governed, rendered_orgs
 from hiero_analytics.config.paths import ORG, ORG_DATA_DIR, SRC
+from hiero_analytics.data_sources.affiliations import (
+    LEGACY_MANUAL_MARKER_RE,
+    UNKNOWN_VALUES,
+    load_override_rows,
+    split_row,
+)
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.governance_config import (
     build_repo_role_lookup,
@@ -147,33 +155,6 @@ def external_company(raw: str) -> str | None:
 def orgs_from_membership(orgs: list[str]) -> set[str]:
     """Employer orgs implied by public GitHub org memberships (curated map only)."""
     return {EMPLOYER_ORG[o.lower()] for o in orgs if o.lower() in EMPLOYER_ORG}
-
-
-def load_manual_overrides(path) -> dict[str, tuple[str, str]]:
-    """Read the existing YAML; return ``{login: (value, reason)}`` for hand-corrected rows.
-
-    Manual corrections survive regeneration: edit a row's value and append
-    ``# manual`` (or ``# manual: reason``). On the next run the generator keeps
-    that value verbatim and re-flags it, instead of overwriting it from signals.
-    """
-    overrides: dict[str, tuple[str, str]] = {}
-    if not path.exists():
-        return overrides
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        if raw.lstrip().startswith("#") or ":" not in raw:
-            continue
-        body, sep, comment = raw.partition("#")
-        # 'manual' anywhere in the comment — the generator's '… · MANUAL — …', a fresh
-        # '# manual[: reason]', or one appended after the role tag ('# maintainer # manual').
-        is_manual = bool(re.search(r"\bmanual\b", comment, re.IGNORECASE))
-        if not sep or not is_manual:
-            continue
-        login, _, value = body.partition(":")
-        keyword = re.search(r"(?i)\bmanual\b\s*[:\-—·]?\s*", comment)
-        reason = comment[keyword.end() :] if keyword else ""
-        reason = re.sub(r"\s*\(resolver:.*\)\s*$", "", reason).strip()
-        overrides[login.strip().lower()] = (value.strip().strip('"').strip(), reason)
-    return overrides
 
 
 def org_from_bio(bio: str) -> str | None:
@@ -454,47 +435,66 @@ def resolve_participant(
     }
 
 
-def _write_yaml(rows: list[dict], yaml_path, *, scope_of, maintainer_count: int) -> None:
-    """Write the curated YAML (the source of truth), keyed by login.
+def _refuse_markers_in_generated_file(yaml_path, overrides_path) -> None:
+    """Abort when a row of the generated file still carries a ``# manual`` marker.
 
-    Each row carries a 'governance-role · name' comment; hand-corrected rows are
-    re-flagged MANUAL with the resolver's competing guess and never overwritten.
+    The generator never reads the generated file, so a marker left there would be
+    overwritten and the correction lost. Moving it to the overrides file first is
+    a one-line edit; losing it silently is not acceptable.
+    """
+    if not yaml_path.exists():
+        return
+    marked = []
+    for raw in yaml_path.read_text(encoding="utf-8").splitlines():
+        if raw.lstrip().startswith("#") or ":" not in raw:
+            continue
+        login, _value, comment = split_row(raw)
+        if LEGACY_MANUAL_MARKER_RE.search(comment):
+            marked.append(login)
+    if marked:
+        raise SystemExit(
+            f"{yaml_path.name} has '# manual' markers on {len(marked)} row(s) ({', '.join(marked)}); "
+            f"move each correction to {overrides_path.name} before regenerating, or it will be overwritten"
+        )
+
+
+def _write_yaml(rows: list[dict], yaml_path, *, scope_of, maintainer_count: int) -> None:
+    """Write the generated YAML, keyed by login, as pure resolver output.
+
+    Hand corrections are *not* folded in here: they live in the overrides file and
+    are merged at run time, so this file changes only when public signals do and
+    a diff of it is always a diff of the resolver's view.
     """
     header = (
-        "# Maintainer / governance participant -> organisation, for the diversity charts.\n"
-        "# Regenerate with 'hiero-analytics build_affiliations'. Seeded from public signals\n"
-        "# (GPG-key email, profile email, MAINTAINERS.md, company field, profile bio,\n"
-        "# org membership, solo domain, commit-author email), in that precedence.\n"
-        "# Obfuscated noreply addresses never count. Lineage: Swirlds Labs was renamed\n"
-        "# to Hashgraph; Hedera and Hgraph stay separate.\n#\n"
+        "# GENERATED by 'hiero-analytics build_affiliations' — do not edit by hand.\n"
+        "# To correct a row, add the login to affiliation_overrides.yaml (same folder);\n"
+        "# that file wins over this one at run time and survives regeneration. A value\n"
+        "# changed here is overwritten by the next run.\n#\n"
+        "# Maintainer / governance participant -> organisation, for the diversity charts,\n"
+        "# resolved from public signals (GPG-key email, profile email, MAINTAINERS.md,\n"
+        "# company field, profile bio, org membership, solo domain, commit-author email),\n"
+        "# in that precedence. Obfuscated noreply addresses never count. Lineage: Swirlds\n"
+        "# Labs was renamed to Hashgraph; Hedera and Hgraph stay separate.\n#\n"
         '# Values: an organisation name | "Independent" (solo / personal-email only) |\n'
         '# "?" (unknown — no public signal).\n#\n'
         "# Each row's comment is 'governance-role · name' (maintainer | committer |\n"
         f"# triage | team). Only the {maintainer_count} maintainers feed the maintainer-org charts;\n"
-        "# the rest are here so the team-concentration view is fully covered.\n#\n"
-        "# TO HAND-CORRECT a row so it STANDS OUT and survives regeneration: change the\n"
-        "# value and append '# manual' (or '# manual: your reason'). It is re-flagged\n"
-        "# below as 'MANUAL' with the resolver's competing guess, and never overwritten.\n\n"
+        "# the rest are here so the team-concentration view is fully covered.\n\n"
     )
 
     def yaml_value(r: dict) -> str:
-        if r["status"] == "affiliated":
-            return r["resolved"]
-        return "Independent" if r["status"] == "independent" else "?"
+        if r["auto_status"] == "affiliated":
+            return r["auto_resolved"]
+        return "Independent" if r["auto_status"] == "independent" else "?"
 
-    manual_count = sum(1 for r in rows if r["manual"])
+    overridden = sum(1 for r in rows if r["manual"])
     with yaml_path.open("w", encoding="utf-8") as f:
         f.write(header)
         for r in sorted(rows, key=lambda x: x["login"].lower()):
             scope = scope_of(r["login"])
-            if r["manual"]:
-                auto = r["auto_resolved"] or ("Independent" if r["auto_status"] == "independent" else "?")
-                note = r["manual_reason"] or r["name"] or "corrected by hand"
-                comment = f"  # {scope} · MANUAL — {note} (resolver: {auto})"
-            else:
-                comment = f"  # {scope} · {r['name']}" if r["name"] else f"  # {scope}"
+            comment = f"  # {scope} · {r['name']}" if r["name"] else f"  # {scope}"
             f.write(f"{r['login']}: {json.dumps(yaml_value(r), ensure_ascii=False)}{comment}\n")
-    logger.info("wrote %s (%d manual overrides preserved)", yaml_path, manual_count)
+    logger.info("wrote %s (%d login(s) have an override on file, applied at run time)", yaml_path, overridden)
 
 
 def _write_audit(rows: list[dict], audit_path) -> None:
@@ -594,8 +594,10 @@ def main() -> None:
     client = shared_client()
 
     yaml_path = SRC / "data" / "affiliations.yaml"
-    manual_overrides = load_manual_overrides(yaml_path)
-    logger.info("manual overrides found: %d", len(manual_overrides))
+    overrides_path = SRC / "data" / "affiliation_overrides.yaml"
+    _refuse_markers_in_generated_file(yaml_path, overrides_path)
+    manual_overrides = load_override_rows(overrides_path)
+    logger.info("overrides on file: %d (%s)", len(manual_overrides), overrides_path)
 
     # Every governed org's config contributes its role holders and team members:
     # affiliations.yaml is one login -> employer map shared by all orgs.
@@ -615,6 +617,19 @@ def main() -> None:
     people = sorted(p for p in people if not is_bot_login(p))
     maintainers = {u for holders in role_lookup.values() for u, r in holders.items() if r == "maintainer"}
     logger.info("governance participants: %d (%d maintainers)", len(people), len(maintainers))
+
+    # An override outlives the person's spell on the roster on purpose (they may
+    # come back, or move to another org we track), but it should be a deliberate
+    # keep, so name the strays for the maintainer reviewing the regeneration.
+    on_roster = {login.lower() for login in people}
+    stale = sorted(login for login in manual_overrides if login not in on_roster)
+    if stale:
+        logger.warning(
+            "%d override(s) in %s name logins outside every governance roster; keep or prune them: %s",
+            len(stale),
+            overrides_path.name,
+            ", ".join(stale),
+        )
 
     # Highest governance role per login, annotated on each YAML row for clarity.
     role_of: dict[str, set[str]] = {}
@@ -655,7 +670,7 @@ def main() -> None:
         if override:
             value, reason = override
             r["manual_reason"] = reason
-            if value in ("", "?"):
+            if value.lower() in UNKNOWN_VALUES:
                 r["status"], r["resolved"] = "unknown", None
             elif value.lower() == "independent":
                 r["status"], r["resolved"] = "independent", None

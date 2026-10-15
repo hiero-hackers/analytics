@@ -78,7 +78,7 @@ TERMS: dict[str, str] = {
     ),
     "method": (
         "how the mapping was decided: *automated* (the resolver placed them from public signals) or "
-        "*manual* (a hand-correction in affiliations.yaml, which survives regeneration)."
+        "*manual* (a hand-correction: a row in data/affiliation_overrides.yaml, which survives regeneration)."
     ),
     "resolved": "how many of the group could be mapped to a named employer at all.",
     "distinct orgs": (

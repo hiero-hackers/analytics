@@ -65,9 +65,9 @@ def fetch_repo_pr_hip_refs_since_graphql(
     """
     query = load_query("pr_hip_refs")
 
-    def page(cursor: str | None) -> tuple[list[HipReferenceRecord], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[HipReferenceRecord], str | None, bool]:
         """Fetch a single page of PRs, stopping past the cutoff."""
-        data = client.graphql(query, {"owner": owner, "repo": repo, "cursor": cursor})
+        data = client.graphql(query, {"owner": owner, "repo": repo, "cursor": cursor, "pageSize": page_size})
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, ["repository", "pullRequests"])
 
         records: list[HipReferenceRecord] = []

@@ -8,6 +8,7 @@ subtle ranking that regresses silently — these tests pin it.
 from __future__ import annotations
 
 import csv
+import logging
 
 import pytest
 import requests
@@ -15,13 +16,13 @@ import requests
 import hiero_analytics.pipelines.build_affiliations as ba
 from hiero_analytics.pipelines.build_affiliations import (
     _get_json,
+    _refuse_markers_in_generated_file,
     _write_audit,
     _write_yaml,
     commit_author_org,
     external_company,
     fetch_linkedin,
     fetch_maintainers_affiliations,
-    load_manual_overrides,
     org_from_bio,
     org_from_email,
     parse_maintainers_md,
@@ -163,21 +164,6 @@ def test_parse_maintainers_md_reads_pipe_tables():
     assert list(parse_maintainers_md(md)) == [("alice", "LimeChain"), ("bob", "-")]
 
 
-def test_load_manual_overrides_survive_regeneration(tmp_path):
-    """Rows flagged '# manual' are preserved with their reason."""
-    yaml = tmp_path / "affiliations.yaml"
-    yaml.write_text(
-        'alice: "Hashgraph"  # maintainer · Alice\n'
-        'bob: "Acme"  # manual: confirmed via call\n'
-        'carol: "?"  # team · MANUAL — left the company (resolver: Hashgraph)\n',
-        encoding="utf-8",
-    )
-    overrides = load_manual_overrides(yaml)
-    assert "alice" not in overrides
-    assert overrides["bob"] == ("Acme", "confirmed via call")
-    assert overrides["carol"][0] == "?"
-
-
 # -- I/O: writers round-trip and provenance -----------------------------------
 
 
@@ -195,7 +181,7 @@ def _full_row(login, *, profile=None, gpg_emails=(), md_org=None, commit_org=Non
     if manual:
         value, reason = manual
         row["manual_reason"] = reason
-        if value in ("", "?"):
+        if value.lower() in {"", "?", "unknown", "none"}:
             row["status"], row["resolved"] = "unknown", None
         elif value.lower() == "independent":
             row["status"], row["resolved"] = "independent", None
@@ -205,30 +191,107 @@ def _full_row(login, *, profile=None, gpg_emails=(), md_org=None, commit_org=Non
     return row
 
 
-def test_write_yaml_round_trips_through_load_manual_overrides(tmp_path):
-    """A manual override written by _write_yaml is read back intact by load_manual_overrides.
-
-    This is the regeneration contract: hand-corrected rows must survive a rewrite.
-    The read side is tested elsewhere; this pins that the *writer* emits the exact
-    '# manual: reason' shape the reader recognises.
-    """
+@pytest.mark.parametrize("override", ["Acme", "Independent", "?"], ids=["org", "independent", "unset"])
+def test_write_yaml_writes_the_resolver_value_for_an_overridden_row(tmp_path, override):
+    """An overridden row is written with what the resolver decided; the override never reaches the file."""
     rows = [
         _full_row("alice", profile={"email": "alice@hashgraph.com"}),
-        # bob resolves to Hashgraph automatically, but a human overrode it to Acme.
-        _full_row("bob", profile={"email": "bob@hashgraph.com"}, manual=("Acme", "confirmed via call")),
+        # bob resolves to Hashgraph automatically, but a human overrode it (kept in the overrides file).
+        _full_row("bob", profile={"email": "bob@hashgraph.com"}, manual=(override, "confirmed on a call")),
         _full_row("carol", profile={"email": "carol@gmail.com"}),
     ]
     yaml_path = tmp_path / "affiliations.yaml"
     _write_yaml(rows, yaml_path, scope_of=lambda _login: "maintainer", maintainer_count=1)
 
-    overrides = load_manual_overrides(yaml_path)
-    assert overrides == {"bob": ("Acme", "confirmed via call")}
-
     text = yaml_path.read_text(encoding="utf-8")
+    lines = text.splitlines()
     assert 'alice: "Hashgraph"' in text
-    assert 'bob: "Acme"' in text
-    assert "MANUAL — confirmed via call (resolver: Hashgraph)" in text  # competing guess recorded
+    assert 'bob: "Hashgraph"' in text
     assert 'carol: "Independent"' in text
+    assert 'bob: "Hashgraph"  # maintainer · Bob' in lines  # the whole row: resolver value, plain role comment
+    assert "MANUAL" not in text
+    assert "manual" not in text.lower()
+    assert "confirmed on a call" not in text  # the override's reason is not echoed into the generated file
+
+
+def test_write_yaml_header_marks_the_file_as_generated(tmp_path):
+    """The first line says the file is generated and the header points at the overrides file."""
+    yaml_path = tmp_path / "affiliations.yaml"
+    _write_yaml(
+        [_full_row("alice", profile={"email": "alice@hashgraph.com"})],
+        yaml_path,
+        scope_of=lambda _login: "maintainer",
+        maintainer_count=1,
+    )
+
+    lines = yaml_path.read_text(encoding="utf-8").splitlines()
+
+    assert lines[0].startswith("# GENERATED")
+    assert any("affiliation_overrides.yaml" in line for line in lines if line.startswith("#"))
+    assert 'alice: "Hashgraph"  # maintainer · Alice' in lines
+
+
+def test_written_yaml_passes_the_marker_guard(tmp_path):
+    """The generator's own output never trips its own '# manual' guard, so regenerating twice works."""
+    yaml_path = tmp_path / "affiliations.yaml"
+    rows = [_full_row("bob", profile={"email": "bob@hashgraph.com"}, manual=("Acme", "manual: confirmed by hand"))]
+    _write_yaml(rows, yaml_path, scope_of=lambda _login: "maintainer", maintainer_count=1)
+
+    _refuse_markers_in_generated_file(yaml_path, tmp_path / "affiliation_overrides.yaml")  # must not raise
+
+
+# -- the '# manual' marker guard ----------------------------------------------
+
+
+def test_refuse_markers_names_each_marked_login(tmp_path):
+    """A row carrying a '# manual' marker aborts the run, naming that login and the file to move it to."""
+    yaml_path = tmp_path / "affiliations.yaml"
+    yaml_path.write_text(
+        "# GENERATED\n"
+        "\n"
+        'alice: "Hashgraph"  # maintainer · Alice\n'
+        'bob: "LimeChain"  # manual: confirmed by hand\n'
+        'carol: "Hedera"  # maintainer · MANUAL — moved (resolver: Hashgraph)\n',
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SystemExit) as raised:
+        _refuse_markers_in_generated_file(yaml_path, tmp_path / "affiliation_overrides.yaml")
+
+    message = str(raised.value)
+    assert "bob" in message
+    assert "carol" in message
+    assert "alice" not in message
+    assert "2 row(s)" in message
+    assert "affiliation_overrides.yaml" in message
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        pytest.param('alice: "Hashgraph"  # maintainer · Alice\nbob: "?"  # team\n', id="clean"),
+        pytest.param(
+            "# GENERATED by the tool. Do not edit by hand: a manual edit is overwritten.\n"
+            "# Hand-made (manual) corrections go in the overrides file.\n\n"
+            'alice: "Hashgraph"  # maintainer · Alice\n',
+            id="manual-only-in-header-comments",
+        ),
+        pytest.param('alice: "Hashgraph"  # maintainer · Manuel Garcia, set manually\n', id="near-miss-words"),
+        pytest.param('alice: "Manual Labs"  # maintainer · Alice\n', id="manual-in-the-value"),
+        pytest.param('alice: "Hashgraph"  # maintainer · Manual Rodriguez\n', id="manual-as-a-display-name"),
+    ],
+)
+def test_refuse_markers_passes_files_without_a_marked_row(tmp_path, text):
+    """Header comments, near-miss words, and the value column never count as a marker."""
+    yaml_path = tmp_path / "affiliations.yaml"
+    yaml_path.write_text(text, encoding="utf-8")
+
+    _refuse_markers_in_generated_file(yaml_path, tmp_path / "affiliation_overrides.yaml")  # must not raise
+
+
+def test_refuse_markers_passes_when_the_generated_file_is_missing(tmp_path):
+    """A first-ever run has no generated file yet, so there is nothing to refuse."""
+    _refuse_markers_in_generated_file(tmp_path / "affiliations.yaml", tmp_path / "affiliation_overrides.yaml")
 
 
 def test_write_audit_redacts_emails_and_neutralises_formula_injection(tmp_path):
@@ -332,8 +395,15 @@ def test_fetch_linkedin_returns_url_only_for_linkedin_accounts(monkeypatch):
 # -- main(): end-to-end wiring with every network boundary stubbed ------------
 
 
-def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
-    """main() wires resolution to disk: it writes the curated YAML and the audit CSV."""
+def _stub_main(monkeypatch, tmp_path, *, holders=None):
+    """Point main() at ``tmp_path`` and stub every network boundary; returns the data dir.
+
+    ``holders`` is the one repo's ``login -> role`` lookup (alice, a maintainer, by default).
+    The overrides file main() reads is ``<returned dir>/affiliation_overrides.yaml``; each test
+    creates it where it needs one. Every profile says ``company: Hashgraph``, so the resolver
+    places everyone at Hashgraph.
+    """
+    holders = holders or {"alice": "maintainer"}
     monkeypatch.setattr(ba, "GITHUB_TOKEN", "test-token")
     monkeypatch.setattr(ba, "shared_client", object)
     monkeypatch.setattr(ba, "SRC", tmp_path)
@@ -341,7 +411,7 @@ def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
     monkeypatch.setattr(ba, "ORG", "hiero-ledger")
 
     monkeypatch.setattr(ba, "fetch_governance_config", lambda *_a, **_k: {})
-    monkeypatch.setattr(ba, "build_repo_role_lookup", lambda _c, **_k: {"repo": {"alice": "maintainer"}})
+    monkeypatch.setattr(ba, "build_repo_role_lookup", lambda _c, **_k: {"repo": holders})
     monkeypatch.setattr(ba, "build_team_membership", lambda _c: {})
     monkeypatch.setattr(ba, "fetch_maintainers_affiliations", lambda _c: {})
     monkeypatch.setattr(ba, "gpg_uid_emails", lambda _login: [])
@@ -355,12 +425,104 @@ def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
         ],
     )
 
-    (tmp_path / "data").mkdir()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    return data_dir
+
+
+def _read_audit(tmp_path) -> dict[str, dict[str, str]]:
+    """The audit CSV main() wrote, as ``login -> row``."""
+    audit_path = tmp_path / "data" / "hiero-ledger" / "maintainer_affiliation_audit.csv"
+    with audit_path.open(newline="", encoding="utf-8") as f:
+        return {row["login"]: row for row in csv.DictReader(f)}
+
+
+def test_main_regenerates_yaml_and_audit(monkeypatch, tmp_path):
+    """main() wires resolution to disk: it writes the generated YAML and the audit CSV, overrides file or not."""
+    data_dir = _stub_main(monkeypatch, tmp_path)
+    assert not (data_dir / "affiliation_overrides.yaml").exists()  # a missing overrides file is fine
+
     ba.main()
 
-    yaml_text = (tmp_path / "data" / "affiliations.yaml").read_text(encoding="utf-8")
+    yaml_text = (data_dir / "affiliations.yaml").read_text(encoding="utf-8")
+    assert yaml_text.startswith("# GENERATED")
     assert 'alice: "Hashgraph"' in yaml_text
-    assert (tmp_path / "data" / "hiero-ledger" / "maintainer_affiliation_audit.csv").exists()
+    assert (data_dir / "hiero-ledger" / "maintainer_affiliation_audit.csv").exists()
+    assert not (data_dir / "affiliation_overrides.yaml").exists()  # main() never creates or rewrites it
+
+
+@pytest.mark.parametrize(
+    ("override", "audit_affiliation", "audit_status"),
+    [
+        pytest.param("Acme", "Acme", "affiliated", id="org"),
+        pytest.param("Independent", "Independent", "independent", id="independent"),
+        pytest.param("?", "?", "unknown", id="unset"),
+    ],
+)
+def test_main_applies_an_override_to_the_audit_but_not_to_the_yaml(
+    monkeypatch, tmp_path, caplog, override, audit_affiliation, audit_status
+):
+    """An override shows in the audit CSV as a 'manual override', while the YAML keeps the resolver's value."""
+    data_dir = _stub_main(monkeypatch, tmp_path, holders={"alice": "maintainer", "bob": "committer"})
+    overrides_text = f'alice: "{override}"  # confirmed on a call\n'
+    overrides_path = data_dir / "affiliation_overrides.yaml"
+    overrides_path.write_text(overrides_text, encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING):
+        ba.main()
+
+    audit = _read_audit(tmp_path)
+    assert audit["alice"]["decided_by"] == "manual override"
+    assert audit["alice"]["affiliation"] == audit_affiliation
+    assert audit["alice"]["status"] == audit_status
+    assert audit["bob"]["decided_by"] == "company field"  # an un-overridden row is untouched
+    assert audit["bob"]["affiliation"] == "Hashgraph"
+
+    yaml_text = (data_dir / "affiliations.yaml").read_text(encoding="utf-8")
+    assert 'alice: "Hashgraph"' in yaml_text  # the resolver's view, whatever the override says
+    assert 'bob: "Hashgraph"' in yaml_text
+    assert "manual" not in yaml_text.lower()
+    rows_text = yaml_text.split("\n\n", 1)[1]  # everything after the header, which names the value kinds
+    assert override not in rows_text
+
+    assert overrides_path.read_text(encoding="utf-8") == overrides_text  # never rewritten by a regeneration
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]  # alice is on the roster
+
+
+def test_main_warns_about_override_logins_on_no_roster(monkeypatch, tmp_path, caplog):
+    """An override for a login no governance roster names is kept but flagged for review in a WARNING."""
+    data_dir = _stub_main(monkeypatch, tmp_path)
+    (data_dir / "affiliation_overrides.yaml").write_text(
+        'alice: "Acme"  # on the roster\nghost: "Linux Foundation"  # left the roster in 2025\nzed: "?"  # never was\n',
+        encoding="utf-8",
+    )
+
+    with caplog.at_level(logging.WARNING):
+        ba.main()
+
+    warnings = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
+    assert len(warnings) == 1
+    assert "ghost" in warnings[0]
+    assert "zed" in warnings[0]
+    assert "alice" not in warnings[0]
+    assert "2 override(s)" in warnings[0]
+    # The stray override is only flagged, not dropped: the audit and the YAML still cover the roster.
+    assert _read_audit(tmp_path)["alice"]["decided_by"] == "manual override"
+    assert 'alice: "Hashgraph"' in (data_dir / "affiliations.yaml").read_text(encoding="utf-8")
+
+
+def test_main_refuses_to_overwrite_a_generated_file_with_manual_markers(monkeypatch, tmp_path):
+    """A '# manual' row in the generated file aborts main() before anything is written, leaving the file alone."""
+    data_dir = _stub_main(monkeypatch, tmp_path)
+    marked = '# GENERATED\n\nalice: "Acme"  # maintainer · MANUAL — corrected by hand (resolver: Hashgraph)\n'
+    yaml_path = data_dir / "affiliations.yaml"
+    yaml_path.write_text(marked, encoding="utf-8")
+
+    with pytest.raises(SystemExit, match="alice"):
+        ba.main()
+
+    assert yaml_path.read_text(encoding="utf-8") == marked
+    assert not (data_dir / "hiero-ledger" / "maintainer_affiliation_audit.csv").exists()
 
 
 def test_main_requires_a_token(monkeypatch):

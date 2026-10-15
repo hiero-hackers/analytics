@@ -47,6 +47,15 @@ MAX_GRAPHQL_FRESH_RETRIES = 2
 RETRY_STATUS_CODES = {500, 502, 503, 504}
 
 
+class GitHubServerError(requests.HTTPError):
+    """GitHub kept answering 5xx after every transport retry.
+
+    A subclass of :class:`requests.HTTPError`, so existing ``except HTTPError`` and
+    ``except Exception`` handlers keep working. Callers that can ask for less data
+    (GraphQL pagination) catch it specifically and retry with a smaller page.
+    """
+
+
 def _apply_decision(decision: RateLimitDecision) -> Action:
     """Apply a policy decision's sleep side effect and return the action."""
     if decision.sleep_seconds > 0:
@@ -154,7 +163,10 @@ class _RestTransport:
                         response.status_code,
                         MAX_RETRIES,
                     )
-                    response.raise_for_status()
+                    raise GitHubServerError(
+                        f"{response.status_code} Server Error after {MAX_RETRIES} attempts for url: {url}",
+                        response=response,
+                    )
 
                 sleep_time = (2**attempt) + random.uniform(0, 1)  # noqa: S311 — backoff jitter, not crypto
                 logger.warning(
@@ -290,6 +302,30 @@ class GitHubClient:
         self._record_usage(data, is_graphql=False)
         self._pace()
         return data
+
+    def get_bytes(self, url: str, **kwargs: Any) -> bytes:
+        """
+        Execute a GET request and return the raw response body.
+
+        For endpoints that answer with a file rather than JSON, such as an
+        Actions artifact archive. Goes through the same transport as :meth:`get`
+        (retries, rate-limit handling), and follows redirects: the artifact
+        endpoint answers 302 with a short-lived signed URL, to which ``requests``
+        does not forward the Authorization header.
+
+        Args:
+            url: Full GitHub API URL.
+            **kwargs: Additional keyword arguments forwarded to the underlying request.
+
+        Returns:
+            The response body, undecoded.
+        """
+        kwargs.setdefault("allow_redirects", True)
+        response = self._transport.request("GET", url, **kwargs)
+        content: bytes = response.content
+        self._record_usage({}, is_graphql=False)
+        self._pace()
+        return content
 
     def graphql(self, query: str, variables: Mapping[str, Any]) -> JSON:
         """

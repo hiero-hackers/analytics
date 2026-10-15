@@ -28,8 +28,9 @@ from collections.abc import Callable
 from hiero_analytics.config.github import GITHUB_GRAPHQL_BATCH_SIZE
 
 from ..dataset_store import PartialOrgFetchError
-from ..github_client import GitHubClient
+from ..github_client import GitHubClient, GitHubServerError
 from ..models import RepositoryRecord
+from ..pagination import PageSizePolicy
 from . import _common
 from ._common import fetch_all_with_retry
 
@@ -121,11 +122,18 @@ def _fetch_chunk(
     from a response, or whose pagination misbehaves (repeating cursor), joins
     ``failed_repos`` so the caller retries it individually rather than silently
     treating a partial repo as complete.
+
+    The round's ``$pageSize`` is shared by every alias, so a
+    :class:`GitHubServerError` halves it for all of them (the round's cost is
+    their sum) and the same round is retried; the reduced size persists for later
+    rounds and recovers after a few clean ones. At the floor the error propagates
+    and the caller falls back to per-repo fetching.
     """
     cursors: dict[int, str | None] = dict.fromkeys(range(len(chunk)))
     active = set(cursors)
     records: list = []
     failed: list[RepositoryRecord] = []
+    page_size = PageSizePolicy()
 
     while active:
         batch = [(index, chunk[index]) for index in sorted(active)]
@@ -133,7 +141,16 @@ def _fetch_chunk(
         round_variables = dict(variables or {})
         round_variables.update({f"c{index}": cursors[index] for index in sorted(active)})
 
-        payload = client.graphql(query, round_variables).get("data") or {}
+        while True:
+            try:
+                response = client.graphql(query, {**round_variables, "pageSize": page_size.current})
+            except GitHubServerError:
+                if not page_size.shrink():
+                    raise
+                continue
+            page_size.record_success()
+            break
+        payload = response.get("data") or {}
 
         for index, repo in batch:
             container: object = payload.get(f"r{index}")
