@@ -69,151 +69,151 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-15T10:31:41.519801+00:00"
+  "end": "2026-10-16T01:14:14.676960+00:00"
  },
  "nodes": [
   {
    "id": "hiero-consensus-node",
-   "active": 71,
-   "total": 290,
+   "active": 72,
+   "total": 291,
    "category": "Core network",
-   "x": 1.0086,
-   "y": 0.9067
+   "x": 0.3628,
+   "y": 0.9082
   },
   {
    "id": "hiero-sdk-python",
    "active": 39,
    "total": 280,
    "category": "SDKs",
-   "x": 0.8225,
-   "y": -0.2277
+   "x": 0.4063,
+   "y": -0.2085
   },
   {
    "id": "hiero-sdk-java",
    "active": 39,
    "total": 216,
    "category": "SDKs",
-   "x": 0.7164,
-   "y": 0.3607
+   "x": 0.1872,
+   "y": 0.3831
   },
   {
    "id": "hiero-sdk-js",
-   "active": 35,
+   "active": 34,
    "total": 350,
    "category": "SDKs",
-   "x": 0.7263,
-   "y": 0.6481
+   "x": 0.3233,
+   "y": 0.6386
   },
   {
    "id": "governance",
    "active": 33,
    "total": 141,
    "category": "Governance",
-   "x": 0.9227,
-   "y": 0.6378
+   "x": 0.0521,
+   "y": 0.6357
   },
   {
    "id": "solo",
    "active": 29,
    "total": 98,
    "category": "Tooling / DevEx",
-   "x": 1.2144,
-   "y": 0.6726
+   "x": 0.6222,
+   "y": 0.6595
   },
   {
    "id": "hiero-mirror-node",
    "active": 26,
    "total": 239,
    "category": "Core network",
-   "x": 0.7834,
-   "y": 0.9589
+   "x": 0.1208,
+   "y": 0.9445
   },
   {
    "id": "hiero-sdk-cpp",
    "active": 24,
    "total": 116,
    "category": "SDKs",
-   "x": 0.9763,
-   "y": 0.2917
+   "x": 0.4572,
+   "y": 0.3085
   },
   {
    "id": "hiero-improvement-proposals",
    "active": 21,
    "total": 182,
    "category": "Governance",
-   "x": 0.4203,
-   "y": 0.8375
+   "x": -0.1649,
+   "y": 0.7739
   },
   {
    "id": "hiero-json-rpc-relay",
    "active": 18,
    "total": 156,
    "category": "EVM / smart contracts",
-   "x": 0.8368,
-   "y": 1.1977
+   "x": 0.0993,
+   "y": 1.1849
   },
   {
    "id": "hiero-block-node",
    "active": 18,
    "total": 65,
    "category": "Core network",
-   "x": 1.3915,
-   "y": 0.8728
+   "x": 0.8675,
+   "y": 0.8464
   },
   {
    "id": "hiero-sdk-tck",
    "active": 17,
    "total": 44,
    "category": "SDKs",
-   "x": 1.3346,
-   "y": 0.1546
+   "x": 0.8517,
+   "y": 0.205
   },
   {
    "id": "hiero-sdk-go",
    "active": 15,
    "total": 138,
    "category": "SDKs",
-   "x": 0.4342,
-   "y": 0.5908
+   "x": 0.6406,
+   "y": 0.9603
   },
   {
    "id": "hiero-sdk-swift",
    "active": 12,
    "total": 59,
    "category": "SDKs",
-   "x": 1.1429,
-   "y": 0.0305
+   "x": 0.6786,
+   "y": 0.0708
   },
   {
    "id": "hiero-website",
    "active": 11,
    "total": 83,
    "category": "Docs / Web",
-   "x": 0.0603,
-   "y": 0.1266
+   "x": -0.1963,
+   "y": -0.1363
   },
   {
    "id": "hiero-sdk-rust",
    "active": 11,
    "total": 56,
    "category": "SDKs",
-   "x": 1.3923,
-   "y": 0.425
+   "x": 0.8961,
+   "y": 0.4755
   },
   {
    "id": "hiero-cryptography",
    "active": 11,
    "total": 36,
    "category": "Core network",
-   "x": 0.5183,
-   "y": 1.5816
+   "x": -0.459,
+   "y": 1.2771
   },
   {
    "id": "heka-identity-platform",
    "active": 10,
    "total": 34,
    "category": "Identity / DID",
-   "x": 3.4958,
+   "x": 3.0794,
    "y": -3.7623
   },
   {
@@ -221,127 +221,127 @@
    "active": 9,
    "total": 28,
    "category": "Tooling / DevEx",
-   "x": 0.2907,
-   "y": 0.2505
+   "x": -0.1748,
+   "y": 0.1453
   },
   {
    "id": "solo-docs",
    "active": 9,
    "total": 18,
    "category": "Tooling / DevEx",
-   "x": 2.0393,
-   "y": 0.6838
+   "x": 1.5358,
+   "y": 0.7784
   },
   {
    "id": "hiero-docs",
    "active": 8,
    "total": 135,
    "category": "Docs / Web",
-   "x": 0.2814,
-   "y": 1.1882
+   "x": -0.1876,
+   "y": 1.21
   },
   {
    "id": "hiero-consensus-specifications",
    "active": 8,
    "total": 23,
    "category": "Core network",
-   "x": -1.5669,
-   "y": 2.2004
+   "x": -2.2544,
+   "y": 2.1429
   },
   {
    "id": "hiero-contracts",
    "active": 8,
    "total": 19,
    "category": "EVM / smart contracts",
-   "x": 1.4496,
-   "y": 2.046
+   "x": 0.7765,
+   "y": 2.1208
   },
   {
    "id": "homebrew-tools",
    "active": 8,
    "total": 18,
    "category": "Tooling / DevEx",
-   "x": 1.8762,
-   "y": 1.1883
+   "x": 1.3135,
+   "y": 1.29
   },
   {
    "id": "hiero-mirror-node-explorer",
    "active": 7,
    "total": 98,
    "category": "Core network",
-   "x": 1.1464,
-   "y": 1.1985
+   "x": 0.5815,
+   "y": 1.2926
   },
   {
    "id": "hiero-cli",
    "active": 7,
    "total": 58,
    "category": "Tooling / DevEx",
-   "x": 0.9215,
-   "y": 1.552
+   "x": 0.1376,
+   "y": 1.5938
   },
   {
    "id": "sdk-collaboration-hub",
    "active": 7,
    "total": 41,
    "category": "SDKs",
-   "x": 0.6146,
-   "y": -0.0752
+   "x": 0.1632,
+   "y": -0.0814
   },
   {
    "id": "tsc",
    "active": 6,
    "total": 30,
    "category": "Governance",
-   "x": -0.133,
-   "y": 0.9347
+   "x": -0.6719,
+   "y": 0.8543
   },
   {
    "id": "hiero-enterprise-java",
    "active": 6,
    "total": 20,
    "category": "Apps / Integrations",
-   "x": 1.0948,
-   "y": -0.8728
+   "x": 0.5311,
+   "y": -0.9141
   },
   {
    "id": "hiero-gradle-conventions",
    "active": 6,
    "total": 19,
    "category": "Tooling / DevEx",
-   "x": -0.1472,
-   "y": 0.533
+   "x": -0.7737,
+   "y": 0.3371
   },
   {
    "id": "hiero",
    "active": 5,
    "total": 25,
    "category": "Other",
-   "x": 0.2355,
-   "y": -0.0797
+   "x": -0.4888,
+   "y": 0.2368
   },
   {
    "id": "solo-charts",
    "active": 5,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": 3.3831,
-   "y": 1.3484
+   "x": 2.7456,
+   "y": 1.5703
   },
   {
    "id": ".github",
    "active": 4,
    "total": 15,
    "category": "Governance",
-   "x": -0.4015,
-   "y": 0.5531
+   "x": -0.8908,
+   "y": 0.6174
   },
   {
    "id": "hiero-ethereum-execution-spec-tests",
    "active": 4,
    "total": 7,
    "category": "EVM / smart contracts",
-   "x": 1.051,
+   "x": -0.4029,
    "y": 3.7623
   },
   {
@@ -357,24 +357,24 @@
    "active": 2,
    "total": 95,
    "category": "Tooling / DevEx",
-   "x": 0.5662,
-   "y": 1.104
+   "x": 0.3504,
+   "y": 1.2047
   },
   {
    "id": "hiero-did-sdk-python",
    "active": 2,
    "total": 16,
    "category": "Identity / DID",
-   "x": 0.125,
-   "y": -0.581
+   "x": -0.4773,
+   "y": -0.5576
   },
   {
    "id": "awesome-contributions",
    "active": 2,
    "total": 7,
    "category": "Other",
-   "x": -3.4958,
-   "y": -1.7901
+   "x": -3.0794,
+   "y": -3.0739
   },
   {
    "id": "tsc-eligibility-check",
@@ -389,24 +389,24 @@
    "active": 1,
    "total": 19,
    "category": "Identity / DID",
-   "x": 1.5847,
-   "y": -0.8666
+   "x": 1.0741,
+   "y": -0.8712
   },
   {
    "id": "hiero-hederium",
    "active": 1,
    "total": 9,
    "category": "EVM / smart contracts",
-   "x": 0.3136,
-   "y": 2.3485
+   "x": -0.2327,
+   "y": 2.4003
   },
   {
    "id": "identity-collaboration-hub",
    "active": 1,
    "total": 8,
    "category": "Identity / DID",
-   "x": -0.8381,
-   "y": -2.5646
+   "x": -0.8911,
+   "y": -2.7996
   }
  ],
  "edges": [
@@ -481,13 +481,13 @@
    "shared": 59
   },
   {
-   "source": "hiero-sdk-go",
-   "target": "hiero-sdk-java",
-   "shared": 57
-  },
-  {
    "source": "hiero-consensus-node",
    "target": "solo",
+   "shared": 58
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-java",
    "shared": 57
   },
   {
@@ -543,7 +543,7 @@
   {
    "source": "hiero-block-node",
    "target": "hiero-consensus-node",
-   "shared": 48
+   "shared": 49
   },
   {
    "source": "hiero-docs",
@@ -2871,6 +2871,6 @@
    "shared": 7
   }
  ],
- "generated_at": "2026-10-15T10:31:41.519801+00:00",
+ "generated_at": "2026-10-16T01:14:14.676960+00:00",
  "stale": false
 }

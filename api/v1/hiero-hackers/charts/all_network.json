@@ -64,24 +64,24 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-15T10:35:13.882663+00:00"
+  "end": "2026-10-16T01:19:36.179763+00:00"
  },
  "nodes": [
   {
    "id": "analytics",
-   "active": 22,
+   "active": 21,
    "total": 29,
    "category": "Tooling / DevEx",
-   "x": -0.1276,
-   "y": -0.2947
+   "x": -0.2561,
+   "y": 0.1466
   },
   {
    "id": "hiero-enterprise-js",
    "active": 8,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": 1.5611,
-   "y": -0.8346
+   "x": 1.4327,
+   "y": 0.415
   },
   {
    "id": "sdk-automations",
@@ -96,7 +96,7 @@
    "active": 5,
    "total": 5,
    "category": "Other",
-   "x": -0.5381,
+   "x": -1.4327,
    "y": 1.6
   },
   {
@@ -112,7 +112,7 @@
    "active": 3,
    "total": 15,
    "category": "Governance",
-   "x": -1.5611,
+   "x": -0.9241,
    "y": -1.6
   },
   {
@@ -277,6 +277,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-10-15T10:35:13.882663+00:00",
+ "generated_at": "2026-10-16T01:19:36.179763+00:00",
  "stale": false
 }

@@ -254,7 +254,7 @@
      "label": "Explicit Permissions",
      "status": "pass",
      "evidence": "All 8 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/release.yml:35; .github/workflows/release.yml:42; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/release.yml:36; .github/workflows/release.yml:48; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
     },
     {
      "key": "repository_security_configuration",
@@ -786,6 +786,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-10-15T10:36:06.564266+00:00",
+ "generated_at": "2026-10-16T01:20:47.338714+00:00",
  "stale": false
 }

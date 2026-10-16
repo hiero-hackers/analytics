@@ -1198,6 +1198,91 @@
    }
   },
   {
+   "key": 1300,
+   "label": "HIP-1300",
+   "sublabel": "Increased Transaction Size for Governance Accounts",
+   "status": "Final",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 2,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 3,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 1
+    }
+   ],
+   "note": {
+    "kind": "partial",
+    "text": "python",
+    "items": [
+     "python"
+    ]
+   }
+  },
+  {
    "key": 1046,
    "label": "HIP-1046",
    "sublabel": "Adding support for gRPC-Web proxy endpoints to the Address B",
@@ -1280,91 +1365,6 @@
     "items": [
      "go",
      "rust",
-     "python"
-    ]
-   }
-  },
-  {
-   "key": 1300,
-   "label": "HIP-1300",
-   "sublabel": "Increased Transaction Size for Governance Accounts",
-   "status": "Final",
-   "cells": [
-    {
-     "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 2,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-block-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-go",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-js",
-     "merged": 3,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-cpp",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-rust",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-swift",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-python",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-json-rpc-relay",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node-explorer",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/solo",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-local-node",
-     "merged": 0,
-     "open": 1
-    }
-   ],
-   "note": {
-    "kind": "partial",
-    "text": "python",
-    "items": [
      "python"
     ]
    }
@@ -13563,6 +13563,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-10-15T10:34:52.036024+00:00",
+ "generated_at": "2026-10-16T01:19:17.026933+00:00",
  "stale": false
 }

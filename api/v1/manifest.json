@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-15T10:36:17.926705+00:00",
+ "generated_at": "2026-10-16T01:20:58.619854+00:00",
  "provenance": {
-  "git_sha": "20f33a0",
-  "data_as_of": "2026-10-15T10:29:32.883973+00:00"
+  "git_sha": "735f623",
+  "data_as_of": "2026-10-16T01:11:46.850763+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -519,7 +519,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 862,
+     "row_count": 863,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-15T10:34:52.039828+00:00"
+      "generated_at": "2026-10-16T01:19:17.031766+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-15T10:34:52.036572+00:00"
+      "generated_at": "2026-10-16T01:19:17.027681+00:00"
      }
     },
     {
@@ -2284,7 +2284,7 @@
      },
      {
       "label": "file issues %",
-      "value": "49%",
+      "value": "51%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -2342,7 +2342,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 1,
+      "value": 0,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -2372,7 +2372,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 8,
+     "row_count": 9,
      "path": "LFDT-CLPR/profiles.json"
     },
     {
@@ -3097,7 +3097,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 8,
+      "value": 9,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -3116,7 +3116,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "62%",
+      "value": "56%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -3125,7 +3125,7 @@
      },
      {
       "label": "file issues %",
-      "value": "50%",
+      "value": "44%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3134,7 +3134,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "75%",
+      "value": "67%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -3143,7 +3143,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "38%",
+      "value": "44%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -3242,7 +3242,7 @@
     },
     "contributors": {
      "path": "LFDT-CLPR/entities/contributors.json",
-     "count": 8
+     "count": 9
     }
    }
   }

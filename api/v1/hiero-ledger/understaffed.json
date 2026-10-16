@@ -46,7 +46,7 @@
   }
  ],
  "row_count": 2,
- "generated_at": "2026-10-15T10:32:48.096726+00:00",
+ "generated_at": "2026-10-16T01:17:18.176979+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -170,6 +170,13 @@
     "triage": 1
    },
    {
+    "repo": ".github",
+    "maintainers": 16,
+    "active_maintainers": 0,
+    "committers": 0,
+    "triage": 0
+   },
+   {
     "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -195,6 +202,20 @@
     "maintainers": 3,
     "active_maintainers": 1,
     "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-solo-action",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-improvement-proposals",
+    "maintainers": 4,
+    "active_maintainers": 1,
+    "committers": 77,
     "triage": 0
    },
    {
@@ -224,20 +245,6 @@
     "active_maintainers": 1,
     "committers": 1,
     "triage": 11
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 13,
-    "triage": 0
-   },
-   {
-    "repo": ".github",
-    "maintainers": 16,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
    }
   ],
   "30d": [

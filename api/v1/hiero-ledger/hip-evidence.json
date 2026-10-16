@@ -1517,6 +1517,20 @@
   {
    "hip": 1300,
    "hip_title": "Increased Transaction Size for Governance Accounts",
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "pr_number": 4536,
+   "pr_title": "test: surface the last error on request timeout and fail HIP-1300 tests fast",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|branch|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "last error on request timeout and fail HIP-1300 tests fast",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/4536"
+  },
+  {
+   "hip": 1300,
+   "hip_title": "Increased Transaction Size for Governance Accounts",
    "repo": "hiero-ledger/hiero-sdk-rust",
    "pr_number": 1177,
    "pr_title": "feat: add tests for hip-1300",
@@ -12127,8 +12141,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 862,
- "generated_at": "2026-10-15T10:34:52.032926+00:00",
+ "row_count": 863,
+ "generated_at": "2026-10-16T01:19:17.022967+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

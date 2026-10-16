@@ -766,8 +766,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 15 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/broken-links.yaml:7; .github/workflows/build.yml:19; .github/workflows/common_js.yml:18; .github/workflows/pages.yml:11; .github/workflows/pr_check.yml:15; .github/workflows/publish_release.yaml:22; .github/workflows/react_native.yml:20; .github/workflows/renovate.yml:13; .github/workflows/retry-failed-runs.yml:21; .github/workflows/retry-failed-runs.yml:35; .github/workflows/slack-issue-comment-notify.yml:14; .github/workflows/slack-issue-notify.yml:14; .github/workflows/slack-merge-notify.yml:14; .github/workflows/slack-pr-comment-notify.yml:14; .github/workflows/slack-pr-notify.yml:14; .github/workflows/slack-release-notify.yml:14"
+     "evidence": "All 14 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/broken-links.yaml:7; .github/workflows/build.yml:19; .github/workflows/common_js.yml:18; .github/workflows/pages.yml:11; .github/workflows/pr_check.yml:15; .github/workflows/publish_release.yaml:22; .github/workflows/react_native.yml:20; .github/workflows/retry-failed-runs.yml:21; .github/workflows/retry-failed-runs.yml:35; .github/workflows/slack-issue-comment-notify.yml:14; .github/workflows/slack-issue-notify.yml:14; .github/workflows/slack-merge-notify.yml:14; .github/workflows/slack-pr-comment-notify.yml:14; .github/workflows/slack-pr-notify.yml:14; .github/workflows/slack-release-notify.yml:14"
     },
     {
      "key": "repository_security_configuration",
@@ -1218,6 +1218,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-10-15T10:34:36.434949+00:00",
+ "generated_at": "2026-10-16T01:19:01.279834+00:00",
  "stale": false
 }
