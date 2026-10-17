@@ -1,0 +1,78 @@
+# Inventory: hiero-hackers
+
+Manifest v1, wip=true, generated 2026-10-17T01:21:59.376381+00:00, git_sha 07bbad9, data as of 2026-10-17T01:12:23.752757+00:00.
+
+## Macros
+
+| Macro | Status | Sections | Cards | Views | Tiles | Absence note |
+|---|---|---|---|---|---|---|
+| Contributors | present | 2 | 4 | 0 | 7 | - |
+| Governance | absent | 0 | 0 | 0 | 0 | Governance analytics are derived from an org's governance config (team → permission grants). None is configured for this org, so roles, coverage, teams, and organisation diversity can't be inferred. |
+| HIPs | absent | 0 | 0 | 0 | 0 | The HIP process — specs in the hiero-ledger governance repo and the PRs that cite them — is specific to hiero-ledger, so this tab only ever has data there. |
+| Security & scorecards | present | 1 | 2 | 1 | 0 | - |
+| Issues & onboarding | present | 0 | 1 | 0 | 0 | - |
+| Community | absent | 0 | 0 | 0 | 0 | Discord serves the whole Hiero ecosystem, so community activity is published once, under hiero-ledger, rather than per org. |
+| Releases | present | 1 | 1 | 0 | 3 | - |
+
+## Sections (4)
+
+| Id | Macro | Title | Rows (all time) | Rows by period | Absorbed by | Stale | Generated |
+|---|---|---|---|---|---|---|---|
+| profiles | Contributors | All contributors | 51 | 7d=13 30d=21 365d=51 | - | no | 2026-10-17 01:20Z |
+| bot-suspects | Contributors | Bot suspects (review) | 0 | - | - | no | 2026-10-17 01:20Z |
+| codeowners | Security & scorecards | CODEOWNERS by repository | 28 | - | - | no | 2026-10-17 01:21Z |
+| release-staleness | Releases | Release staleness by repo | 28 | - | - | no | 2026-10-17 01:21Z |
+
+## Chart cards (21 variants)
+
+| Card | Macro | Chart | Variant | Document | Kind | Frequency / window | Rows | Partial | Comparison | top_n | Stale |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| contributor-network | Contributors | Repositories linked by shared contributors | Repositories linked by shared contributors | all_network | network | snapshot at 2026-10-17 | 24 | - | - | - | no |
+| activity-heatmap | Contributors | Activity heatmap | Activity heatmap | contributor_activity_heatmap | matrix | snapshot at 2026-10-17 | 44 | - | - | 25 | no |
+| repo-growth | Contributors | New repos per month | New repos per month | repos_created_per_month | timeseries | month (2025-10..2026-10) | 13 | 2026-10 | 2026-09 vs 2026-08 | - | no |
+| repo-growth | Contributors | Cumulative repo count | Cumulative repo count | cumulative_repo_count | timeseries | month (2025-10..2026-10) | 13 | 2026-10 | 2026-09 vs 2026-08 | - | no |
+| org-overview | Contributors | Top repositories by contributors | Top repositories by contributors | contributor_counts | categories | snapshot at 2026-10-17 | 24 | - | - | 15 | no |
+| org-overview | Contributors | Programming languages | Programming languages | language_distribution | categories | snapshot at 2026-10-17 | 10 | - | - | 15 | no |
+| org-overview | Contributors | Repository push activity (30d) | Repository push activity (30d) | push_activity | categories | snapshot at 2026-10-17 | 2 | - | - | - | no |
+| scorecard | Security & scorecards | Org scorecard | Org scorecard | org_scorecard | categories | snapshot at 2026-10-17 | 8 | - | - | 15 | no |
+| scorecard | Security & scorecards | Score breakdown | Score breakdown | org_scorecard_breakdown | matrix | snapshot at 2026-10-17 | 8 | - | - | - | no |
+| ownership | Security & scorecards | Code-owner coverage | Code-owner coverage | org_codeowner_summary | categories | snapshot at 2026-10-17 | 2 | - | - | - | no |
+| ownership | Security & scorecards | Runners | Runners | org_runner_chart | categories | snapshot at 2026-10-17 | 19 | - | - | 15 | no |
+| issue-difficulty | Issues & onboarding | By repo | All time | difficulty_by_repo | categories | all time to 2026-10-17 | 15 | - | - | 12 | no |
+| issue-difficulty | Issues & onboarding | By repo | 1 year | difficulty_by_repo_365d | categories | trailing 365d to 2026-10-17 | 15 | - | - | 12 | no |
+| issue-difficulty | Issues & onboarding | By repo | 1 month | difficulty_by_repo_30d | categories | trailing 30d to 2026-10-17 | 4 | - | - | 12 | no |
+| issue-difficulty | Issues & onboarding | By repo | Week | difficulty_by_repo_7d | categories | trailing 7d to 2026-10-17 | 2 | - | - | 12 | no |
+| issue-difficulty | Issues & onboarding | Over time (weekly) | All issues | difficulty_over_time_all_event_based_weekly | timeseries | snapshot (2025-10-17..2026-10-17) | 54 | - | - | - | no |
+| issue-difficulty | Issues & onboarding | Over time (weekly) | Labelled | difficulty_over_time_event_based_weekly | timeseries | snapshot (2025-10-17..2026-10-17) | 54 | - | - | - | no |
+| release-timeline | Releases | Release timeline | Last 18 months | release_timeline | events | trailing 548d to 2026-10-17 | 21 | - | - | - | no |
+| release-timeline | Releases | Release timeline | 1 year | release_timeline_365d | events | trailing 365d to 2026-10-17 | 21 | - | - | - | no |
+| release-timeline | Releases | Release timeline | 1 month | release_timeline_30d | events | trailing 30d to 2026-10-17 | 2 | - | - | - | no |
+| release-timeline | Releases | Release timeline | Week | release_timeline_7d | events | trailing 7d to 2026-10-17 | 2 | - | - | - | no |
+
+## Views (1)
+
+| Id | Macro | Kind |
+|---|---|---|
+| ci-health-matrix | Security & scorecards | ci_health_matrix |
+
+## Tiles (10)
+
+| Macro | Label | Value |
+|---|---|---|
+| Contributors | contributors | 51 |
+| Contributors | active last month % | 41% |
+| Contributors | multi-repo % | 33% |
+| Contributors | file issues % | 51% |
+| Contributors | open PRs % | 82% |
+| Contributors | give reviews % | 51% |
+| Contributors | completed a GFI % | 27% |
+| Releases | repos with releases | 8 of 28 |
+| Releases | released last 90d % | 100% |
+| Releases | >3x their own typical gap | 1 |
+
+## Entities
+
+| Index | Count | Path |
+|---|---|---|
+| repositories | 24 | hiero-hackers/entities/repositories.json |
+| contributors | 51 | hiero-hackers/entities/contributors.json |
