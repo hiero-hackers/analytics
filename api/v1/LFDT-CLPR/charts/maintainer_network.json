@@ -39,102 +39,102 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-16T01:20:53.341926+00:00"
+  "end": "2026-10-17T01:21:54.702255+00:00"
  },
  "nodes": [
   {
    "id": "clpr-endpoint",
    "active": 2,
-   "total": 2,
+   "total": 3,
    "category": "Other",
-   "x": -0.2872,
+   "x": -0.2923,
    "y": 1.718
   },
   {
    "id": "clpr-smart-contracts",
    "active": 2,
-   "total": 2,
+   "total": 3,
    "category": "EVM / smart contracts",
-   "x": 1.5012,
-   "y": -1.2293
+   "x": 1.5089,
+   "y": -1.2205
+  },
+  {
+   "id": "governance",
+   "active": 2,
+   "total": 3,
+   "category": "Governance",
+   "x": -0.5624,
+   "y": -1.718
   },
   {
    "id": ".github",
    "active": 1,
-   "total": 2,
+   "total": 3,
    "category": "Governance",
-   "x": -0.5729,
-   "y": -1.718
-  },
-  {
-   "id": "governance",
-   "active": 1,
-   "total": 2,
-   "category": "Governance",
-   "x": -1.6781,
-   "y": 0.104
+   "x": -1.6762,
+   "y": 0.0983
   },
   {
    "id": "clpr-spec",
    "active": 0,
-   "total": 2,
+   "total": 3,
    "category": "Other",
-   "x": 1.6781,
-   "y": 0.8941
+   "x": 1.6762,
+   "y": 0.9036
   }
  ],
  "edges": [
   {
    "source": ".github",
    "target": "clpr-endpoint",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": ".github",
    "target": "clpr-smart-contracts",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": ".github",
    "target": "clpr-spec",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": ".github",
    "target": "governance",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-endpoint",
    "target": "clpr-smart-contracts",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-endpoint",
    "target": "clpr-spec",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-endpoint",
    "target": "governance",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-smart-contracts",
    "target": "clpr-spec",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-smart-contracts",
    "target": "governance",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-spec",
    "target": "governance",
-   "shared": 2
+   "shared": 3
   }
  ],
- "generated_at": "2026-10-16T01:20:53.341926+00:00",
+ "generated_at": "2026-10-17T01:21:54.702255+00:00",
  "stale": false
 }

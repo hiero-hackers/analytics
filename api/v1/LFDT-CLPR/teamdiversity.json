@@ -48,6 +48,42 @@
  ],
  "rows": [
   {
+   "team": "clpr-release-engineers",
+   "members": 5,
+   "resolved": 5,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Hashgraph 5"
+  },
+  {
+   "team": "clpr-endpoint-committers",
+   "members": 5,
+   "resolved": 4,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 1,
+   "single_employer": true,
+   "organisations": "Hashgraph 4"
+  },
+  {
+   "team": "clpr-maintainers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 0,
+   "single_employer": true,
+   "organisations": "Hashgraph 3"
+  },
+  {
    "team": "lfdt-staff",
    "members": 3,
    "resolved": 3,
@@ -60,7 +96,7 @@
    "organisations": "Linux Foundation 3"
   },
   {
-   "team": "clpr-maintainers",
+   "team": "clpr-spec-committers",
    "members": 2,
    "resolved": 2,
    "distinct_orgs": 1,
@@ -70,10 +106,34 @@
    "unknown": 0,
    "single_employer": true,
    "organisations": "Hashgraph 2"
+  },
+  {
+   "team": "security-maintainers",
+   "members": 3,
+   "resolved": 3,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 67,
+   "hhi": 5556,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 2, Independent 1"
+  },
+  {
+   "team": "clpr-smart-contracts-committers",
+   "members": 10,
+   "resolved": 10,
+   "distinct_orgs": 3,
+   "top_org": "Hashgraph",
+   "top_org_pct": 70,
+   "hhi": 5200,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "Hashgraph 7, BlockyDevs 1, LimeChain 1, Independent 1"
   }
  ],
- "row_count": 2,
- "generated_at": "2026-10-16T01:20:53.719671+00:00",
+ "row_count": 7,
+ "generated_at": "2026-10-17T01:21:55.185194+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

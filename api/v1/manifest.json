@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-16T01:20:58.619854+00:00",
+ "generated_at": "2026-10-17T01:21:59.376381+00:00",
  "provenance": {
-  "git_sha": "735f623",
-  "data_as_of": "2026-10-16T01:11:46.850763+00:00"
+  "git_sha": "07bbad9",
+  "data_as_of": "2026-10-17T01:12:23.752757+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -405,7 +405,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1495,
+     "row_count": 1498,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -461,7 +461,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2860,
+     "row_count": 2862,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-16T01:19:17.031766+00:00"
+      "generated_at": "2026-10-17T01:20:35.658904+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-16T01:19:17.027681+00:00"
+      "generated_at": "2026-10-17T01:20:35.654538+00:00"
      }
     },
     {
@@ -1556,7 +1556,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1495,
+      "value": 1498,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1593,7 +1593,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "72%",
+      "value": "73%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -1731,7 +1731,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1495
+     "count": 1498
     }
    }
   },
@@ -2342,7 +2342,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 0,
+      "value": 1,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -2372,7 +2372,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 9,
+     "row_count": 10,
      "path": "LFDT-CLPR/profiles.json"
     },
     {
@@ -2393,7 +2393,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 3,
+     "row_count": 2,
      "path": "LFDT-CLPR/understaffed.json"
     },
     {
@@ -2407,28 +2407,28 @@
      "id": "gonedark",
      "macro": "Governance",
      "title": "Permission-holders with no recent activity",
-     "row_count": 0,
+     "row_count": 1,
      "path": "LFDT-CLPR/gonedark.json"
     },
     {
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 10,
+     "row_count": 15,
      "path": "LFDT-CLPR/repo.json"
     },
     {
      "id": "teams",
      "macro": "Governance",
      "title": "Team activity overview",
-     "row_count": 2,
+     "row_count": 7,
      "path": "LFDT-CLPR/teams.json"
     },
     {
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 7,
+     "row_count": 27,
      "path": "LFDT-CLPR/teamrepo.json"
     },
     {
@@ -2442,7 +2442,7 @@
      "id": "affiliations",
      "macro": "Governance",
      "title": "Organisation affiliations \u2014 reference",
-     "row_count": 2,
+     "row_count": 3,
      "path": "LFDT-CLPR/affiliations.json"
     },
     {
@@ -2472,7 +2472,7 @@
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
-     "row_count": 2,
+     "row_count": 7,
      "path": "LFDT-CLPR/teamdiversity.json"
     },
     {
@@ -2970,6 +2970,35 @@
         "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are single-employer repos; multi-colour bars are cross-org."
        ],
        "wide": true
+      },
+      {
+       "title": "Organisation mix by team",
+       "variants": [
+        {
+         "label": "Organisation mix by team",
+         "interactive": {
+          "kind": "categories",
+          "path": "LFDT-CLPR/charts/team_affiliation_composition.json"
+         },
+         "note": "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the team's members. The dashed line marks 50%: a segment past it means one employer holds the majority (a capture / bus-factor risk). Largest employers get their own colour, smaller ones pool into 'Other orgs', and solo or unmapped members show as 'Independent' and 'Unknown'. Limited to teams with at least four resolved members and ordered most-concentrated first; teams with the same concentration are grouped by their leading organisation (colour). Every team is in the concentration table.",
+         "methodology": [
+          "For each governance team, take its members.",
+          "Map each member to an organisation via the affiliations file.",
+          "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus 'Independent' and 'Unknown').",
+          "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with same-concentration teams grouped by their leading organisation's colour; only teams with at least four resolved members are shown (the full set is in the team-concentration table).",
+          "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are employer-controlled teams; multi-colour bars are cross-org."
+         ]
+        }
+       ],
+       "note": "Each bar is a governance team, normalised to 100% so the segments show each employer's share of the team's members. The dashed line marks 50%: a segment past it means one employer holds the majority (a capture / bus-factor risk). Largest employers get their own colour, smaller ones pool into 'Other orgs', and solo or unmapped members show as 'Independent' and 'Unknown'. Limited to teams with at least four resolved members and ordered most-concentrated first; teams with the same concentration are grouped by their leading organisation (colour). Every team is in the concentration table.",
+       "methodology": [
+        "For each governance team, take its members.",
+        "Map each member to an organisation via the affiliations file.",
+        "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus 'Independent' and 'Unknown').",
+        "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with same-concentration teams grouped by their leading organisation's colour; only teams with at least four resolved members are shown (the full set is in the team-concentration table).",
+        "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are employer-controlled teams; multi-colour bars are cross-org."
+       ],
+       "wide": true
       }
      ],
      "group": "Organisation diversity"
@@ -3097,7 +3126,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 9,
+      "value": 10,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -3116,7 +3145,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "56%",
+      "value": "50%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -3125,7 +3154,7 @@
      },
      {
       "label": "file issues %",
-      "value": "44%",
+      "value": "40%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3134,7 +3163,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "67%",
+      "value": "70%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -3143,7 +3172,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "44%",
+      "value": "50%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -3164,7 +3193,7 @@
     "Governance": [
      {
       "label": "maintainers",
-      "value": 2,
+      "value": 3,
       "note": "People whose *highest* role anywhere in the organisation is maintainer. Counted at the highest role so the role tiles partition the permission-holders without double-counting.",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
@@ -3204,7 +3233,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 0,
+      "value": 1,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -3242,7 +3271,7 @@
     },
     "contributors": {
      "path": "LFDT-CLPR/entities/contributors.json",
-     "count": 9
+     "count": 10
     }
    }
   }

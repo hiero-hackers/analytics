@@ -39,23 +39,23 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-16T01:20:51.928821+00:00"
+  "end": "2026-10-17T01:21:53.230394+00:00"
  },
  "nodes": [
   {
    "id": "clpr-smart-contracts",
-   "active": 6,
-   "total": 6,
+   "active": 7,
+   "total": 7,
    "category": "EVM / smart contracts",
-   "x": 0.3688,
-   "y": -0.3601
+   "x": 0.5291,
+   "y": -0.5564
   },
   {
    "id": "governance",
-   "active": 4,
-   "total": 4,
+   "active": 5,
+   "total": 5,
    "category": "Governance",
-   "x": 0.0033,
+   "x": 0.0699,
    "y": -1.718
   },
   {
@@ -63,23 +63,23 @@
    "active": 3,
    "total": 3,
    "category": "Governance",
-   "x": -1.1486,
-   "y": -1.1027
+   "x": -1.111,
+   "y": -1.5511
   },
   {
    "id": "clpr-endpoint",
    "active": 3,
    "total": 3,
    "category": "Other",
-   "x": -0.3555,
-   "y": 0.4516
+   "x": -0.3794,
+   "y": 0.1163
   },
   {
    "id": "clpr-spec",
    "active": 2,
    "total": 2,
    "category": "Other",
-   "x": 1.1486,
+   "x": 1.111,
    "y": 1.718
   }
  ],
@@ -91,23 +91,23 @@
   },
   {
    "source": ".github",
-   "target": "clpr-smart-contracts",
-   "shared": 2
-  },
-  {
-   "source": ".github",
    "target": "governance",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-smart-contracts",
    "target": "governance",
+   "shared": 3
+  },
+  {
+   "source": ".github",
+   "target": "clpr-smart-contracts",
    "shared": 2
   },
   {
    "source": "clpr-endpoint",
    "target": "governance",
-   "shared": 1
+   "shared": 2
   },
   {
    "source": ".github",
@@ -125,6 +125,6 @@
    "shared": 1
   }
  ],
- "generated_at": "2026-10-16T01:20:51.928821+00:00",
+ "generated_at": "2026-10-17T01:21:53.230394+00:00",
  "stale": false
 }

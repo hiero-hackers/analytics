@@ -57,31 +57,31 @@
  "rows": [
   {
    "repo": "governance",
-   "maintainers": 2,
-   "committers": 0,
-   "triage": 0,
-   "active_recent": 1,
-   "maintainer_actions_recent": 11,
-   "committer_actions_recent": 0,
-   "triage_actions_recent": 0,
-   "actions_recent": 11,
-   "last_active": "2026-10-09 15:54:40+00:00"
-  },
-  {
-   "repo": "clpr-smart-contracts",
-   "maintainers": 2,
+   "maintainers": 3,
    "committers": 0,
    "triage": 0,
    "active_recent": 2,
-   "maintainer_actions_recent": 3,
+   "maintainer_actions_recent": 14,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 3,
-   "last_active": "2026-09-01 17:22:37+00:00"
+   "actions_recent": 14,
+   "last_active": "2026-10-16 16:29:47+00:00"
+  },
+  {
+   "repo": "clpr-smart-contracts",
+   "maintainers": 3,
+   "committers": 0,
+   "triage": 0,
+   "active_recent": 2,
+   "maintainer_actions_recent": 4,
+   "committer_actions_recent": 0,
+   "triage_actions_recent": 0,
+   "actions_recent": 4,
+   "last_active": "2026-10-16 14:18:31+00:00"
   },
   {
    "repo": "clpr-endpoint",
-   "maintainers": 2,
+   "maintainers": 3,
    "committers": 0,
    "triage": 0,
    "active_recent": 2,
@@ -93,7 +93,7 @@
   },
   {
    "repo": ".github",
-   "maintainers": 2,
+   "maintainers": 3,
    "committers": 0,
    "triage": 0,
    "active_recent": 1,
@@ -105,7 +105,7 @@
   },
   {
    "repo": "clpr-spec",
-   "maintainers": 2,
+   "maintainers": 3,
    "committers": 0,
    "triage": 0,
    "active_recent": 0,
@@ -117,25 +117,25 @@
   }
  ],
  "row_count": 5,
- "generated_at": "2026-10-16T01:20:53.311271+00:00",
+ "generated_at": "2026-10-17T01:21:54.661898+00:00",
  "stale": false,
  "periods": {
   "7d": [
    {
     "repo": "governance",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 11,
+    "active_recent": 2,
+    "maintainer_actions_recent": 3,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 11,
-    "last_active": "2026-10-09 15:54:40+00:00"
+    "actions_recent": 3,
+    "last_active": "2026-10-16 16:29:47+00:00"
    },
    {
     "repo": ".github",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 1,
@@ -146,8 +146,20 @@
     "last_active": "2026-10-13 14:01:44+00:00"
    },
    {
+    "repo": "clpr-smart-contracts",
+    "maintainers": 3,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 1,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 1,
+    "last_active": "2026-10-16 14:18:31+00:00"
+   },
+   {
     "repo": "clpr-endpoint",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 0,
@@ -158,20 +170,8 @@
     "last_active": "2026-09-01 17:53:11+00:00"
    },
    {
-    "repo": "clpr-smart-contracts",
-    "maintainers": 2,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 0,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 0,
-    "last_active": "2026-09-01 17:22:37+00:00"
-   },
-   {
     "repo": "clpr-spec",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 0,
@@ -185,19 +185,19 @@
   "30d": [
    {
     "repo": "governance",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 11,
+    "active_recent": 2,
+    "maintainer_actions_recent": 14,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 11,
-    "last_active": "2026-10-09 15:54:40+00:00"
+    "actions_recent": 14,
+    "last_active": "2026-10-16 16:29:47+00:00"
    },
    {
     "repo": ".github",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 1,
@@ -208,8 +208,20 @@
     "last_active": "2026-10-13 14:01:44+00:00"
    },
    {
+    "repo": "clpr-smart-contracts",
+    "maintainers": 3,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 1,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 1,
+    "last_active": "2026-10-16 14:18:31+00:00"
+   },
+   {
     "repo": "clpr-endpoint",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 0,
@@ -220,20 +232,8 @@
     "last_active": "2026-09-01 17:53:11+00:00"
    },
    {
-    "repo": "clpr-smart-contracts",
-    "maintainers": 2,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 0,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 0,
-    "last_active": "2026-09-01 17:22:37+00:00"
-   },
-   {
     "repo": "clpr-spec",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 0,
@@ -247,31 +247,31 @@
   "365d": [
    {
     "repo": "governance",
-    "maintainers": 2,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 11,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 11,
-    "last_active": "2026-10-09 15:54:40+00:00"
-   },
-   {
-    "repo": "clpr-smart-contracts",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 3,
+    "maintainer_actions_recent": 14,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 3,
-    "last_active": "2026-09-01 17:22:37+00:00"
+    "actions_recent": 14,
+    "last_active": "2026-10-16 16:29:47+00:00"
+   },
+   {
+    "repo": "clpr-smart-contracts",
+    "maintainers": 3,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 2,
+    "maintainer_actions_recent": 4,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 4,
+    "last_active": "2026-10-16 14:18:31+00:00"
    },
    {
     "repo": "clpr-endpoint",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
@@ -283,7 +283,7 @@
    },
    {
     "repo": ".github",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 1,
@@ -295,7 +295,7 @@
    },
    {
     "repo": "clpr-spec",
-    "maintainers": 2,
+    "maintainers": 3,
     "committers": 0,
     "triage": 0,
     "active_recent": 0,

@@ -1,0 +1,100 @@
+{
+ "note": "Each bar is normalised to 100%, so segments are each employer's share of that row's role-holders; the dashed line marks 50%. Rows are ordered most-concentrated first. The six largest employers get their own colour; smaller ones pool into 'Other orgs'. The data view shows the underlying counts.",
+ "methodology": [
+  "For each governance team, take its members.",
+  "Map each member to an organisation via the affiliations file.",
+  "Count members per organisation (top employers coloured individually, the rest as 'Other orgs', plus 'Independent' and 'Unknown').",
+  "Normalise each team's counts to 100% and stack into one bar, ordered most-concentrated first with same-concentration teams grouped by their leading organisation's colour; only teams with at least four resolved members are shown (the full set is in the team-concentration table).",
+  "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are employer-controlled teams; multi-colour bars are cross-org."
+ ],
+ "schema_version": 1,
+ "id": "team_affiliation_composition",
+ "kind": "categories",
+ "org": "LFDT-CLPR",
+ "source": "team_affiliation_composition.csv",
+ "metric": "employer_composition",
+ "unit": "Members (share of team)",
+ "population": "Members of each governance team with at least four resolved members, by curated employer; a person is counted in every team they belong to.",
+ "dimensions": [
+  "team",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": true,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": false,
+ "top_n": 15,
+ "reference": {
+  "value": 50,
+  "label": "Majority"
+ },
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "team",
+  "label": "Team"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-10-17T01:21:55.171100+00:00"
+ },
+ "series": [
+  {
+   "key": "Hashgraph",
+   "label": "Hashgraph",
+   "color": "#1F77B4"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
+  },
+  {
+   "key": "BlockyDevs",
+   "label": "BlockyDevs",
+   "color": "#D62728"
+  },
+  {
+   "key": "Independent",
+   "label": "Independent",
+   "color": "#94A3B8"
+  },
+  {
+   "key": "Unknown",
+   "label": "Unknown",
+   "color": "#E5E7EB"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "team": "clpr-release-engineers",
+   "Hashgraph": 5,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
+   "team": "clpr-endpoint-committers",
+   "Hashgraph": 4,
+   "LimeChain": 0,
+   "BlockyDevs": 0,
+   "Independent": 0,
+   "Unknown": 1
+  },
+  {
+   "team": "clpr-smart-contracts-committers",
+   "Hashgraph": 7,
+   "LimeChain": 1,
+   "BlockyDevs": 1,
+   "Independent": 1,
+   "Unknown": 0
+  }
+ ],
+ "generated_at": "2026-10-17T01:21:55.171100+00:00",
+ "stale": false
+}

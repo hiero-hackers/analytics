@@ -32,14 +32,50 @@
    "format": "date"
   }
  ],
- "rows": [],
- "row_count": 0,
- "generated_at": "2026-10-16T01:20:53.600404+00:00",
+ "rows": [
+  {
+   "user": "simihunjan",
+   "highest_role": "maintainer",
+   "roles": "maintainer",
+   "repos_held": 5,
+   "days_since_active": null,
+   "last_active": null
+  }
+ ],
+ "row_count": 1,
+ "generated_at": "2026-10-17T01:21:55.036866+00:00",
  "stale": false,
  "periods": {
-  "7d": [],
-  "30d": [],
-  "365d": []
+  "7d": [
+   {
+    "user": "simihunjan",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 5,
+    "days_since_active": null,
+    "last_active": null
+   }
+  ],
+  "30d": [
+   {
+    "user": "simihunjan",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 5,
+    "days_since_active": null,
+    "last_active": null
+   }
+  ],
+  "365d": [
+   {
+    "user": "simihunjan",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 5,
+    "days_since_active": null,
+    "last_active": null
+   }
+  ]
  },
  "group": "Coverage & risk",
  "macro": "Governance"
