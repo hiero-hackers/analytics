@@ -147,3 +147,18 @@ def test_main_handles_empty_timeline_events(monkeypatch: pytest.MonkeyPatch, stu
     for suffix in SPAN_SUFFIXES:
         assert (data_dir / f"difficulty_distribution{suffix}.csv").exists()
         assert (data_dir / f"difficulty_by_repo{suffix}.csv").exists()
+
+
+def test_main_handles_org_with_no_open_issues(monkeypatch: pytest.MonkeyPatch, stub_pipeline_context):
+    """An org with no open issues should write empty CSVs for every period."""
+    _, data_dir = stub_pipeline_context(runner)
+    _stub_fetches(monkeypatch, [], [])
+
+    runner.main()
+
+    for suffix in SPAN_SUFFIXES:
+        distribution = (data_dir / f"difficulty_distribution{suffix}.csv").read_text().splitlines()
+        by_repo = (data_dir / f"difficulty_by_repo{suffix}.csv").read_text().splitlines()
+        assert distribution == ["difficulty,count"]
+        assert by_repo[0].split(",")[0] == "repo"
+        assert len(by_repo) == 1
