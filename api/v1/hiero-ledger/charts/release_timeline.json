@@ -49,8 +49,8 @@
   "solo-charts",
   "hiero-gradle-conventions",
   "hiero-sdk-java",
-  "hiero-sdk-go",
   "solo-containers",
+  "hiero-sdk-go",
   "hiero-solo-action",
   "hiero-sdk-cpp",
   "hiero-sdk-python",
@@ -69,33 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-17T01:20:00.602874+00:00"
+  "end": "2026-10-18T01:27:36.019621+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-java",
-   "time": "2025-04-17T07:55:53Z",
-   "tag_name": "v2.54.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-go",
-   "time": "2025-04-17T08:44:47Z",
-   "tag_name": "v2.60.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2025-04-17T09:14:29Z",
-   "tag_name": "v2.63.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-gradle-conventions",
-   "time": "2025-04-17T10:33:29Z",
-   "tag_name": "v0.3.10",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-cpp",
    "time": "2025-04-18T09:04:55Z",
@@ -5209,6 +5185,6 @@
    "type": "release"
   }
  ],
- "generated_at": "2026-10-17T01:20:00.602874+00:00",
+ "generated_at": "2026-10-18T01:27:36.019621+00:00",
  "stale": false
 }

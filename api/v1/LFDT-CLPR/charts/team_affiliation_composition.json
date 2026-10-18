@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-17T01:21:55.171100+00:00"
+  "end": "2026-10-18T01:29:18.838266+00:00"
  },
  "series": [
   {
@@ -48,14 +48,14 @@
    "color": "#1F77B4"
   },
   {
-   "key": "LimeChain",
-   "label": "LimeChain",
-   "color": "#FF7F0E"
-  },
-  {
    "key": "BlockyDevs",
    "label": "BlockyDevs",
    "color": "#D62728"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
   },
   {
    "key": "Independent",
@@ -73,28 +73,28 @@
   {
    "team": "clpr-release-engineers",
    "Hashgraph": 5,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "Independent": 0,
    "Unknown": 0
   },
   {
    "team": "clpr-endpoint-committers",
    "Hashgraph": 4,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "Independent": 0,
    "Unknown": 1
   },
   {
    "team": "clpr-smart-contracts-committers",
    "Hashgraph": 7,
-   "LimeChain": 1,
    "BlockyDevs": 1,
+   "LimeChain": 1,
    "Independent": 1,
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-17T01:21:55.171100+00:00",
+ "generated_at": "2026-10-18T01:29:18.838266+00:00",
  "stale": false
 }

@@ -39,10 +39,10 @@
   }
  ],
  "categories": [
+  "hiero-enterprise-js",
   "hiero-payment-requests",
   "hiero-receipts",
   "vscode-hedera-transaction-viewer",
-  "hiero-enterprise-js",
   "hiero-streams-rs",
   "hiero-notifications",
   "hiero-tck-action",
@@ -51,7 +51,7 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-17T01:21:41.304194+00:00"
+  "end": "2026-10-18T01:29:05.265734+00:00"
  },
  "rows": [
   {
@@ -179,8 +179,14 @@
    "time": "2026-10-15T16:15:38Z",
    "tag_name": "v0.4.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-enterprise-js",
+   "time": "2026-10-17T20:28:13Z",
+   "tag_name": "v0.5.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-17T01:21:41.304194+00:00",
+ "generated_at": "2026-10-18T01:29:05.265734+00:00",
  "stale": false
 }

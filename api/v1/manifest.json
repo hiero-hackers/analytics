@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-17T01:21:59.376381+00:00",
+ "generated_at": "2026-10-18T01:29:22.653320+00:00",
  "provenance": {
   "git_sha": "07bbad9",
-  "data_as_of": "2026-10-17T01:12:23.752757+00:00"
+  "data_as_of": "2026-10-18T01:16:23.718047+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -405,7 +405,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1498,
+     "row_count": 1501,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-17T01:20:35.658904+00:00"
+      "generated_at": "2026-10-18T01:28:07.285623+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-17T01:20:35.654538+00:00"
+      "generated_at": "2026-10-18T01:28:07.282332+00:00"
      }
     },
     {
@@ -1556,7 +1556,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1498,
+      "value": 1501,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1566,7 +1566,7 @@
      },
      {
       "label": "active last month %",
-      "value": "10%",
+      "value": "11%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1673,7 +1673,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 97,
+      "value": 98,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1731,7 +1731,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1498
+     "count": 1501
     }
    }
   },
@@ -2302,7 +2302,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "51%",
+      "value": "53%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -2311,7 +2311,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "27%",
+      "value": "29%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -2332,7 +2332,7 @@
      },
      {
       "label": "released last 90d %",
-      "value": "100%",
+      "value": "88%",
       "note": "Of repos that have ever released (not the full repo universe), the share that shipped a release in the last 90 days.",
       "methodology": [
        "Take repos with at least one release ever.",
