@@ -53,16 +53,23 @@ def test_writes_the_three_tables_with_sidecars_and_window_stamps(monkeypatch, st
         assert (data_dir / name).exists(), name
         assert (data_dir / f"{name}.meta.json").exists(), name
 
-    overall = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_FILE).set_index(["period", "cohort"])
-    assert set(overall.index.get_level_values("period")) == {"all", "7d", "30d", "365d"}
-    assert overall.loc[("all", "all"), "merged_prs"] == 2
-    assert overall.loc[("7d", "all"), "merged_prs"] == 1
-    assert overall.loc[("7d", "all"), "median_hours_to_first_review"] == 6
-    assert overall.loc[("7d", "all"), "median_hours_to_merge"] == 24
+    overall = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_FILE).set_index("cohort")
+    assert overall["merged_prs"].eq(2).all()
+    assert overall.loc["all", "median_hours_to_first_review"] == 6
+    assert overall.loc["all", "median_hours_to_merge"] == 17
     assert overall["window_end"].nunique() == 1
+    assert "period" not in overall.columns
+
+    # The period-specific files retain only their selected window.
+    week = pd.read_csv(data_dir / "pr_responsiveness_7d.csv").set_index("cohort")
+    assert week.loc["all", "merged_prs"] == 1
+    assert week.loc["all", "median_hours_to_first_review"] == 6
+    assert week.loc["all", "median_hours_to_merge"] == 24
+    assert "period" not in week.columns
 
     by_repo = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_BY_REPO_FILE)
     assert set(by_repo["repo"]) == {"test-org/sdk", "test-org/docs"}
+    assert "period" not in by_repo.columns
 
 
 def test_an_org_with_no_activity_writes_empty_tables(monkeypatch, stub_pipeline_context):
