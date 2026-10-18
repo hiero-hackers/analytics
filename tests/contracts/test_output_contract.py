@@ -38,8 +38,8 @@ import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
 import hiero_analytics.pipelines.org_overview as overview_mod
-import hiero_analytics.pipelines.releases as releases_mod
 import hiero_analytics.pipelines.pr_responsiveness as pr_responsiveness_mod
+import hiero_analytics.pipelines.releases as releases_mod
 import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
 import hiero_analytics.pipelines.run_all as run_all
