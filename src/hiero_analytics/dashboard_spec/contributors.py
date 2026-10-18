@@ -155,7 +155,12 @@ SECTION_SPECS = [
         "periods": True,
         "title": "PR review responsiveness",
         "description": (
-            "Review and merge timing for merged pull requests in the selected period."
+            "Review and merge timing for merged pull requests in the selected period. "
+            "Only PRs with recorded creation and merge events are included; unmerged "
+            "PRs are excluded. Review time measures elapsed wall-clock hours until the "
+            "first review by someone other than the author. Contributor history cannot "
+            "be verified, so the 'unknown' cohort contains all eligible PRs and "
+            "duplicates the 'all' cohort metrics."
         ),
         "columns": [
             ("cohort", "cohort"),
@@ -174,8 +179,10 @@ SECTION_SPECS = [
         "periods": True,
         "title": "PR responsiveness by repository",
         "description": (
-            "Compare review and merge timing across repositories. Interpret results "
-            "alongside the number of merged pull requests."
+            "Compare review and merge timing across repositories, considering the "
+            "number of merged pull requests. Unmerged PRs are excluded. Contributor "
+            "history cannot be verified, so 'unknown' contains the same eligible PRs "
+            "as 'all'; these are not separate populations."
         ),
         "columns": [
             ("repo", "repo"),
@@ -195,8 +202,10 @@ SECTION_SPECS = [
         "periods": False,
         "title": "Monthly PR responsiveness",
         "description": (
-            "Monthly review and merge timing trends. Interpret timing estimates "
-            "alongside the sample count."
+            "Monthly review and merge timing trends, grouped by merge month. Interpret "
+            "timing estimates alongside sample counts; unmerged PRs are excluded. "
+            "Contributor history cannot be verified, so 'unknown' duplicates the "
+            "'all' cohort metrics rather than representing a separate population."
         ),
         "columns": [
             ("month", "month"),

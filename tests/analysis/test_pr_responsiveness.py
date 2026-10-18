@@ -187,7 +187,7 @@ def test_a_merge_before_its_creation_is_dropped_as_a_data_error():
     assert prs.empty
 
 
-def test_first_prs_follow_each_authors_earliest_prs_merged_or_not():
+def test_cohort_is_unknown_when_contributor_history_is_incomplete():
     """Cohort is by the author's own order, counting PRs that never merged."""
     records = [
         # alice opens #1 (never merged), #2, then #3: only #1 and #2 are her first two.
@@ -200,11 +200,11 @@ def test_first_prs_follow_each_authors_earliest_prs_merged_or_not():
         _opened("sdk", "bob", 4, at=60),
         _merged("sdk", "alice", "bob", 4, at=61),
     ]
-    prs = pr_response_times(_frame(*records), newcomer_max_prs=2)
+    prs = pr_response_times(_frame(*records))
 
-    assert _one(prs, 2)["cohort"] == "first_prs"
-    assert _one(prs, 3)["cohort"] == "later_prs"
-    assert _one(prs, 4)["cohort"] == "first_prs"
+    assert _one(prs, 2)["cohort"] == "unknown"
+    assert _one(prs, 3)["cohort"] == "unknown"
+    assert _one(prs, 4)["cohort"] == "unknown"
 
 
 @pytest.mark.parametrize("records", [[], [_opened("sdk", "alice", 1)], [_merged("sdk", "bob", "alice", 1, at=1)]])
@@ -229,7 +229,7 @@ def _prs_for_summary() -> pd.DataFrame:
         _reviewed("docs", "bob", "eve", 1, at=100),
         _merged("docs", "bob", "eve", 1, at=200),
     ]
-    return pr_response_times(_frame(*records), newcomer_max_prs=1)
+    return pr_response_times(_frame(*records))
 
 
 def _cell(summary: pd.DataFrame, **match) -> pd.Series:
@@ -302,20 +302,27 @@ def test_every_window_and_cohort_has_a_row_even_when_empty():
 
     summary = responsiveness_summary(prs, [("all", None), ("7d", T0 + timedelta(days=400))])
 
-    assert len(summary) == 6
-    empty = _cell(summary, period="7d", cohort="first_prs")
+    assert len(summary) == 4
+    empty = _cell(summary, period="7d", cohort="unknown")
     assert empty["merged_prs"] == 0
     assert empty["reviewed_share"] == 0
     assert pd.isna(empty["median_hours_to_merge"])
 
 
 def test_cohorts_are_reported_separately():
-    """First PRs and later PRs get their own rows alongside the overall one."""
+    """Overall and unknown-cohort rows both include all eligible PRs."""
     summary = responsiveness_summary(_prs_for_summary(), [("all", None)])
 
-    first = _cell(summary, period="all", cohort="first_prs")
-    assert first["merged_prs"] == 6  # every author here has exactly one PR
-    assert _cell(summary, period="all", cohort="later_prs")["merged_prs"] == 0
+    overall = _cell(summary, period="all", cohort="all")
+    unknown = _cell(summary, period="all", cohort="unknown")
+
+    assert overall["merged_prs"] == 6
+    assert unknown["merged_prs"] == 6
+    assert overall["reviewed_prs"] == unknown["reviewed_prs"]
+    assert (
+        overall["median_hours_to_merge"]
+        == unknown["median_hours_to_merge"]
+    )
 
 
 def test_per_repo_summary_carries_the_repo_and_the_same_statistics():

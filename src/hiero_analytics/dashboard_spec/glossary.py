@@ -130,8 +130,12 @@ TERMS: dict[str, str] = {
     ),
     # --- PR responsiveness columns ---------------------------------------
     "cohort": (
-        "the population grouping used by the analysis. Interpret the label as defined by the PR responsiveness pipeline."
-    ),
+    "the PR responsiveness grouping. 'all' reports all eligible pull requests; "
+    "'unknown' indicates that contributor history is incomplete or cannot be "
+    "verified, so first-time versus established-contributor status is not assigned. "
+    "The unknown group may contain the same PRs as the all group; do not interpret "
+    "it as a separate contributor population."
+),
     "merged PRs": "number of merged pull requests in the selected reporting window.",
     "reviewed PRs": "number of merged pull requests with at least one qualifying review.",
     "reviewed share": "percentage of merged pull requests with at least one qualifying review.",
