@@ -108,9 +108,7 @@ def pr_response_times(events: pd.DataFrame) -> pd.DataFrame:
     if events.empty:
         return _empty_pr_frame()
 
-    frame = events[events["occurred_at"].notna()].assign(
-        occurred_at=lambda f: _utc(f["occurred_at"])
-    )
+    frame = events[events["occurred_at"].notna()].assign(occurred_at=lambda f: _utc(f["occurred_at"]))
 
     authored = frame[frame["activity_type"] == "authored_pull_request"]
     merged = frame[frame["activity_type"] == "merged_pull_request"]
@@ -121,18 +119,14 @@ def pr_response_times(events: pd.DataFrame) -> pd.DataFrame:
     created = (
         authored.sort_values("occurred_at")
         .drop_duplicates(_PR_KEY)
-        .rename(columns={"contributor": "author", "occurred_at": "created_at"})[
-            [*_PR_KEY, "author", "created_at"]
-        ]
+        .rename(columns={"contributor": "author", "occurred_at": "created_at"})[[*_PR_KEY, "author", "created_at"]]
     )
     created["cohort"] = UNKNOWN_COHORT
 
     merges = (
         merged.sort_values("occurred_at")
         .drop_duplicates(_PR_KEY)
-        .rename(columns={"occurred_at": "merged_at"})[
-            [*_PR_KEY, "merged_at"]
-        ]
+        .rename(columns={"occurred_at": "merged_at"})[[*_PR_KEY, "merged_at"]]
     )
     prs = created.merge(merges, on=_PR_KEY, how="inner")
     if prs.empty:
@@ -142,48 +136,33 @@ def pr_response_times(events: pd.DataFrame) -> pd.DataFrame:
     prs = prs.merge(first_review, on=_PR_KEY, how="left")
 
     hour = pd.Timedelta(hours=1)
-    prs["hours_to_first_review"] = (
-        prs["first_review_at"] - prs["created_at"]
-    ) / hour
+    prs["hours_to_first_review"] = (prs["first_review_at"] - prs["created_at"]) / hour
     prs["hours_to_merge"] = (prs["merged_at"] - prs["created_at"]) / hour
 
     # A merge recorded before creation is a data error, not a valid wait.
     prs = prs[prs["hours_to_merge"] >= 0]
     prs = prs.rename(columns={"target_number": "pr_number"})
-    return prs[PR_RESPONSE_COLUMNS].sort_values(
-        ["repo", "pr_number"], ignore_index=True
-    )
+    return prs[PR_RESPONSE_COLUMNS].sort_values(["repo", "pr_number"], ignore_index=True)
 
 
-def _first_review_by_others(
-    frame: pd.DataFrame, prs: pd.DataFrame
-) -> pd.DataFrame:
+def _first_review_by_others(frame: pd.DataFrame, prs: pd.DataFrame) -> pd.DataFrame:
     """Find the earliest non-author review per PR, between creation and merge."""
     reviews = frame[frame["activity_type"] == "reviewed_pull_request"]
     reviews = reviews[reviews["contributor"] != reviews["target_author"]]
     bounds = prs[[*_PR_KEY, "created_at", "merged_at"]]
     reviews = reviews.merge(bounds, on=_PR_KEY, how="inner")
     reviews = reviews[
-        (reviews["occurred_at"] >= reviews["created_at"])
-        & (reviews["occurred_at"] <= reviews["merged_at"])
+        (reviews["occurred_at"] >= reviews["created_at"]) & (reviews["occurred_at"] <= reviews["merged_at"])
     ]
     return (
-        reviews.groupby(_PR_KEY, as_index=False)["occurred_at"]
-        .min()
-        .rename(columns={"occurred_at": "first_review_at"})
+        reviews.groupby(_PR_KEY, as_index=False)["occurred_at"].min().rename(columns={"occurred_at": "first_review_at"})
     )
 
 
-def _percentile(
-    values: pd.Series, q: float, *, min_sample: int = 1
-) -> float:
+def _percentile(values: pd.Series, q: float, *, min_sample: int = 1) -> float:
     """Calculate a rounded percentile when enough non-missing values exist."""
     values = values.dropna()
-    return (
-        round(float(values.quantile(q)), 1)
-        if len(values) >= min_sample
-        else float("nan")
-    )
+    return round(float(values.quantile(q)), 1) if len(values) >= min_sample else float("nan")
 
 
 def _stats(prs: pd.DataFrame) -> dict[str, float | int]:
@@ -197,13 +176,9 @@ def _stats(prs: pd.DataFrame) -> dict[str, float | int]:
         "reviewed_prs": reviewed,
         "reviewed_share": round(reviewed / total * 100) if total else 0,
         "median_hours_to_first_review": _percentile(to_review, 0.5),
-        "p90_hours_to_first_review": _percentile(
-            to_review, 0.9, min_sample=P90_MIN_SAMPLE
-        ),
+        "p90_hours_to_first_review": _percentile(to_review, 0.9, min_sample=P90_MIN_SAMPLE),
         "median_hours_to_merge": _percentile(to_merge, 0.5),
-        "p90_hours_to_merge": _percentile(
-            to_merge, 0.9, min_sample=P90_MIN_SAMPLE
-        ),
+        "p90_hours_to_merge": _percentile(to_merge, 0.9, min_sample=P90_MIN_SAMPLE),
     }
 
 
@@ -228,17 +203,11 @@ def responsiveness_summary(
     if by_repo and prs.empty:
         return pd.DataFrame(columns=columns)
 
-    groups = (
-        [(repo, group) for repo, group in prs.groupby("repo")]
-        if by_repo
-        else [(None, prs)]
-    )
+    groups = [(repo, group) for repo, group in prs.groupby("repo")] if by_repo else [(None, prs)]
     rows: list[dict[str, object]] = []
     for repo, group in groups:
         for key, cutoff in windows:
-            in_window = (
-                group if cutoff is None else group[group["merged_at"] >= cutoff]
-            )
+            in_window = group if cutoff is None else group[group["merged_at"] >= cutoff]
             for cohort in COHORTS:
                 row: dict[str, object] = {
                     "period": key,
@@ -269,12 +238,8 @@ def monthly_responsiveness(prs: pd.DataFrame) -> pd.DataFrame:
                     "cohort": cohort,
                     "merged_prs": stats["merged_prs"],
                     "reviewed_prs": stats["reviewed_prs"],
-                    "median_hours_to_first_review": (
-                        stats["median_hours_to_first_review"]
-                    ),
+                    "median_hours_to_first_review": (stats["median_hours_to_first_review"]),
                     "median_hours_to_merge": stats["median_hours_to_merge"],
                 }
             )
-    return pd.DataFrame(rows, columns=MONTHLY_COLUMNS).sort_values(
-        ["month", "cohort"], ignore_index=True
-    )
+    return pd.DataFrame(rows, columns=MONTHLY_COLUMNS).sort_values(["month", "cohort"], ignore_index=True)

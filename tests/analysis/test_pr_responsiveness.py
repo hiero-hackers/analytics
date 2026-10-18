@@ -319,10 +319,7 @@ def test_cohorts_are_reported_separately():
     assert overall["merged_prs"] == 6
     assert unknown["merged_prs"] == 6
     assert overall["reviewed_prs"] == unknown["reviewed_prs"]
-    assert (
-        overall["median_hours_to_merge"]
-        == unknown["median_hours_to_merge"]
-    )
+    assert overall["median_hours_to_merge"] == unknown["median_hours_to_merge"]
 
 
 def test_per_repo_summary_carries_the_repo_and_the_same_statistics():
