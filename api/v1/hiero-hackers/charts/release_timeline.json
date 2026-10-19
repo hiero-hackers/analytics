@@ -46,12 +46,13 @@
   "hiero-streams-rs",
   "hiero-notifications",
   "hiero-tck-action",
-  "hiero-x402"
+  "hiero-x402",
+  "sdk-automations"
  ],
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-18T01:29:05.265734+00:00"
+  "end": "2026-10-19T01:26:59.760109+00:00"
  },
  "rows": [
   {
@@ -185,8 +186,14 @@
    "time": "2026-10-17T20:28:13Z",
    "tag_name": "v0.5.0",
    "type": "release"
+  },
+  {
+   "repo": "sdk-automations",
+   "time": "2026-10-18T15:07:09Z",
+   "tag_name": "v0.1.0",
+   "type": "prerelease"
   }
  ],
- "generated_at": "2026-10-18T01:29:05.265734+00:00",
+ "generated_at": "2026-10-19T01:26:59.760109+00:00",
  "stale": false
 }

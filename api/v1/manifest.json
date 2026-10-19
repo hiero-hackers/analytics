@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-18T01:29:22.653320+00:00",
+ "generated_at": "2026-10-19T01:27:18.616125+00:00",
  "provenance": {
   "git_sha": "07bbad9",
-  "data_as_of": "2026-10-18T01:16:23.718047+00:00"
+  "data_as_of": "2026-10-19T01:17:58.646154+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-18T01:28:07.285623+00:00"
+      "generated_at": "2026-10-19T01:25:54.978879+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-18T01:28:07.282332+00:00"
+      "generated_at": "2026-10-19T01:25:54.976224+00:00"
      }
     },
     {
@@ -1566,7 +1566,7 @@
      },
      {
       "label": "active last month %",
-      "value": "11%",
+      "value": "10%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

@@ -39,7 +39,6 @@
   "hiero-sdk-js",
   "hiero-block-node",
   "hiero-sdk-java",
-  "hiero-sdk-python",
   "hiero-sdk-tck",
   "hiero-solo-action",
   "solo",
@@ -48,15 +47,9 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-18T01:27:36.019621+00:00"
+  "end": "2026-10-19T01:25:16.981965+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-python",
-   "time": "2026-10-11T17:00:18Z",
-   "tag_name": "v0.3.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-tck",
    "time": "2026-10-12T13:01:37Z",
@@ -196,6 +189,6 @@
    "type": "release"
   }
  ],
- "generated_at": "2026-10-18T01:27:36.019621+00:00",
+ "generated_at": "2026-10-19T01:25:16.981965+00:00",
  "stale": false
 }
