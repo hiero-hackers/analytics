@@ -28,9 +28,7 @@ Yours to write (9 slots)
 
 To file
 1. Fill the slots; delete the "> [MAINTAINER INPUT]" lines.
-2. Upload figures/*.png to the governance PR (drag into the description),
-   replace each ![...](figures/...) line with the <img> GitHub inserts.
-3. Add the file under tac/project-updates/2027/ and the mkdocs.yml nav
+2. Add the file under tac/project-updates/2027/ and the mkdocs.yml nav
    entry under 2027 → Annual (or → MidYear; match the live nav). Open the
    PR against lf-decentralized-trust/governance.
 

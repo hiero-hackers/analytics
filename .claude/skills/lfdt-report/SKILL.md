@@ -1,6 +1,6 @@
 ---
 name: lfdt-report
-description: Draft Hiero's LF Decentralized Trust TAC report (annual review or mid-year update) from this repo's published data API. Data-backed sections get real, cited numbers in the register of the filed reviews; judgment sections become marked maintainer slots pre-filled with the evidence and the prior report's goals; a Data notes and gaps appendix lists what the TAC asks for that the API cannot yet supply. Ships scripts to fetch and inventory the API, derive period figures, render figures, lint the draft and export PNG and PDF. Use whenever asked to write, draft, refresh, or prepare the LFDT / TAC annual review or mid-year report for hiero-ledger or any other org in the manifest.
+description: Draft Hiero's LF Decentralized Trust TAC report (annual review or mid-year update) from this repo's published data API. Data-backed sections get real, cited numbers in the register of the filed reviews; judgment sections become marked maintainer slots pre-filled with the evidence and the prior report's goals; a Data notes and gaps appendix lists what the TAC asks for that the API cannot yet supply. Ships scripts to fetch the API, number its sources and derive period figures; the draft is Markdown, checked by hand against a short checklist. Use whenever asked to write, draft, refresh, or prepare the LFDT / TAC annual review or mid-year report for hiero-ledger or any other org in the manifest.
 ---
 
 # Drafting the LFDT TAC report
@@ -76,8 +76,8 @@ scratch directory, never in the repo:
 
 ```bash
 export WORK=${WORK:-$(mktemp -d)}   # downloads and inventory
-export OUT=${OUT:-$WORK/draft}      # the draft, figures/ and PDF, unless the maintainer names a place
-mkdir -p "$OUT/figures"
+export OUT=${OUT:-$WORK/draft}      # the draft, unless the maintainer names a place
+mkdir -p "$OUT"
 S=.claude/skills/lfdt-report/scripts
 python3 $S/inventory.py fetch hiero-ledger            # manifest + every document; fails loudly
 ```
@@ -147,7 +147,7 @@ and the register of the filed reviews (`references/example.md`). Rules:
    question. No section, chart, tile or column identifiers, no field names,
    no "derived by this draft", no remarks about how the API is structured:
    all of that belongs in the appendices. Human dates in prose ("6 October
-   2026"). The linter warns when the body falls under 70% of that length.
+   2026"). A body under about 70% of that length is probably a summary, not a draft.
 2. **Cite with inline links and numbered sources.** Link the number or
    phrase to the dashboard card
    (`https://hiero-hackers.github.io/analytics/#tab=<Macro>&org=<org>&widget=<card or section id>`,
@@ -206,11 +206,13 @@ means the checks were skipped.
 
 Before handing back, check the draft by hand:
 
-- Every number has a `Source:` line or a numbered source.
+- Every number has a numbered source, every [n] in the body has an entry in
+  Appendix: Sources, and no entry goes unused.
 - Every slot is marked and none is filled with invented prose.
 - No empty sections; the gaps appendix is not empty.
 - The re-run warning is the first line if the period is incomplete.
-- Header is one line; the SPDX line is first.
+- Header is one line and says "Data as of <date>"; the SPDX line is first.
+- No paragraph packs more than about six numbers; split it.
 - Numbers from `derive.py` match what you wrote, not a recomputation.
 
 - Then read the body once yourself as the TAC reviewer, and once as the
