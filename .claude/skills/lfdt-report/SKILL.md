@@ -194,9 +194,8 @@ and the register of the filed reviews (`references/example.md`). Rules:
    slot states the current stage as the prior report gave it.
 7. **Describe, don't editorialise.** "The maintainer bench spans fourteen
    employers" is a finding; "diversity is healthy" is the slot's to say.
-8. **Two or three figures for an annual, one at most for a mid-year**,
-   rendered with `render_figure.py` as `references/figures.md` describes, saved in `figures/` beside the draft,
-   each with alt text, a one-sentence plain caption and a source number.
+8. **Prefer small tables to charts.** If a figure helps, one at most, with
+   alt text, a one-sentence plain caption and a source number.
 9. **The header is one line** (data as of, dashboard link, period, the
    re-run clause when the period is incomplete, pointer to the appendix).
    Provenance and `BASE` live in the appendix.
@@ -212,16 +211,17 @@ TAC wants, why the API cannot answer, the closest signal, the smallest
 follow-up), coverage checklist. An empty gaps section almost certainly
 means the checks were skipped.
 
-## 7. Check, export, hand back
+## 7. Check, hand back
 
-```bash
-python3 $S/check_draft.py "$OUT/2027-annual-Hiero.md" --manifest "$WORK/manifest.json"   # infers annual or mid-year from the title
-python3 $S/export_report.py png "$OUT/figures"
-python3 $S/export_report.py pdf "$OUT/2027-annual-Hiero.md"
-```
+Before handing back, check the draft by hand:
 
-- Fix every failure the linter reports and judge each warning; it checks
-  the rules in step 5 and prints the body's shape against the filed review.
+- Every number has a `Source:` line or a numbered source.
+- Every slot is marked and none is filled with invented prose.
+- No empty sections; the gaps appendix is not empty.
+- The re-run warning is the first line if the period is incomplete.
+- Header is one line; the SPDX line is first.
+- Numbers from `derive.py` match what you wrote, not a recomputation.
+
 - Then read the body once yourself as the TAC reviewer, and once as the
   maintainer who must fill each slot from the evidence listed under it.
 - Trace three numbers back to their JSON documents: one tile, one table row,
@@ -230,8 +230,7 @@ python3 $S/export_report.py pdf "$OUT/2027-annual-Hiero.md"
   maintainer asks, else in your scratch directory, and say it is untracked.
   Never under `outputs/`, which is gitignored and regenerated.
 - Hand back in the shape of `references/handback.md`: re-run warning first,
-  files (markdown is what gets filed; PNGs are for GitHub attachments; the
-  PDF is a review copy), slots, filing steps, data defects for
+  files (markdown is what gets filed), slots, filing steps, data defects for
   `/write-analytics-issue`, manifest `generated_at` and `git_sha`.
 - Do not commit, push or open a PR. Maintainers file under
   `tac/project-updates/<year>/` and add the `mkdocs.yml` nav entry under
