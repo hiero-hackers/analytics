@@ -36,8 +36,7 @@ reported, not fixed.
 - **Period:** annual covers the previous calendar year and is filed early in
   the new one; mid-year covers January to June and is due in late summer
   (the year's schedule page, `project-updates/<year>/<year>-schedule/`,
-  gives the project's date; `inventory.py tac` prints it, and the hand-back
-  says whether it is past). Write the period as months in the header. Tiles,
+  gives the project's date; the hand-back says whether it is past). Write the period as months in the header. Tiles,
   shares, bench findings, the HIP funnel and Scorecard are snapshots at the
   data date, which may be after the period: the header says "figures that
   name no month are at <date>" when it is. `YYYY` in the file name is the filing
@@ -58,11 +57,10 @@ reported, not fixed.
 
 ## 2. Read the TAC instructions again, every run
 
-`python3 .claude/skills/lfdt-report/scripts/inventory.py tac --year <filing year> --project Hiero`
-fetches both instruction pages and the schedule and prints the questions,
-the evaluation criteria, the file-naming sentence and the project's due
-dates. They define the questions and they change (mid-year reports became
-mandatory in 2026):
+Open both instruction pages and the year's schedule page, and read the
+questions, the evaluation criteria, the file-naming sentence and the
+project's due date. They define the questions and they change (mid-year
+reports became mandatory in 2026):
 
 - Annual: <https://lf-decentralized-trust.github.io/governance/project-updates/annual-review-instructions/>
 - Mid-year: <https://lf-decentralized-trust.github.io/governance/project-updates/mid-year-update-instructions/>
@@ -82,15 +80,13 @@ export OUT=${OUT:-$WORK/draft}      # the draft, figures/ and PDF, unless the ma
 mkdir -p "$OUT/figures"
 S=.claude/skills/lfdt-report/scripts
 python3 $S/inventory.py fetch hiero-ledger            # manifest + every document; fails loudly
-python3 $S/inventory.py show  hiero-ledger > "$WORK/inventory.md"
 ```
 
-Read the inventory, not the raw manifest. It lists every macro (present or
-absent, with the absence note), every section with its all-time and
-per-period row counts, every chart card with variant → document id → kind,
-frequency, window, partial buckets and comparison pair, the views, the
-tiles and the entity counts. `references/api-section-map.md` says which of
-them answers which TAC question and sets out the reading rules: ids live at
+Then read `$WORK/manifest.json` for the org: every macro (present or
+absent, with the absence note), every section with its row counts, every
+chart card with its variants, the views, the tiles and the entity counts.
+`references/api-section-map.md` says which of them answers which TAC
+question and sets out the reading rules: ids live at
 three levels and tiles have none; `row_count` is the all-time table and the
 `7d`/`30d`/`365d` tables differ; variants are matched by `frequency`, not
 label; zero rows is a measured "none" for finding-type sections and a gap
@@ -103,17 +99,12 @@ If the org is not in the manifest, stop and list the orgs that are. If
 
 ## 4. Read the definitions, then derive with `derive.py`
 
-For every document you cite, read its definitions first:
-
-```bash
-python3 $S/inventory.py doc hiero-ledger maintainer_pipeline_yearly understaffed@365d tile:Governance/maintainers
-```
-
-It prints `note`, `methodology`, `population`, `window`, `frequency`,
-`comparison`, partial buckets, `stale` and `generated_at`, merging the
-document's text with the manifest card's and saying when they differ (a
-variant's note may live only on the card). Those are the only reliable
-statement of who was counted. If `stale` is true, say so beside the
+For every document you cite, open its JSON in `$WORK` and read `note`,
+`methodology`, `population`, `window`, `frequency`, `comparison`, partial
+buckets, `stale` and `generated_at` first, plus the same fields on the
+manifest card (a variant's note may live only on the card). Say when the two
+differ. Those are the only reliable statement of who was counted. Never print
+or paste the rows. If `stale` is true, say so beside the
 number. `references/data-quirks.md` lists the traps (two meanings of
 "adoption", unknown versus independent, the bot name rule) and the documents
 that disagree with each other; check each one every run.

@@ -7,7 +7,7 @@ they can skim it. Nothing in it repeats the draft.
 Draft status: data to 6 October 2026; re-run after 31 December 2026 before filing.
    (or: complete period, ready to fill in)
    (or: complete period; figures that name no month are snapshots at 6 October 2026)
-Due: 3 September 2026 per the 2026 schedule (past due by 5 weeks)   <- from inventory.py tac
+Due: 3 September 2026 per the 2026 schedule (past due by 5 weeks)   <- from the schedule page
 
 Files
 - <path>/2027-annual-Hiero.md          the draft (what gets filed)
