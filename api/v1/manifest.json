@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-20T01:25:33.985371+00:00",
+ "generated_at": "2026-10-21T01:30:38.737352+00:00",
  "provenance": {
   "git_sha": "07bbad9",
-  "data_as_of": "2026-10-20T01:14:30.019266+00:00"
+  "data_as_of": "2026-10-21T01:15:16.296344+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -405,7 +405,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1502,
+     "row_count": 1504,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-20T01:23:47.781100+00:00"
+      "generated_at": "2026-10-21T01:28:54.920362+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-20T01:23:47.777822+00:00"
+      "generated_at": "2026-10-21T01:28:54.916105+00:00"
      }
     },
     {
@@ -1556,7 +1556,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1502,
+      "value": 1504,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1566,7 +1566,7 @@
      },
      {
       "label": "active last month %",
-      "value": "10%",
+      "value": "11%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1714,7 +1714,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 5,
+      "value": 6,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -1731,7 +1731,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1502
+     "count": 1504
     }
    }
   },
@@ -2284,7 +2284,7 @@
      },
      {
       "label": "file issues %",
-      "value": "51%",
+      "value": "53%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -2332,7 +2332,7 @@
      },
      {
       "label": "released last 90d %",
-      "value": "88%",
+      "value": "62%",
       "note": "Of repos that have ever released (not the full repo universe), the share that shipped a release in the last 90 days.",
       "methodology": [
        "Take repos with at least one release ever.",
