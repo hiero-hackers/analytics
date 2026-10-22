@@ -25,8 +25,8 @@
  "rank": true,
  "top_n": 15,
  "reference": {
-  "value": 7.3,
-  "label": "Org median 7.3"
+  "value": 7.4,
+  "label": "Org median 7.4"
  },
  "value_max": 10,
  "group": null,
@@ -37,7 +37,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-21T01:27:31.392029+00:00"
+  "end": "2026-10-22T01:21:24.975265+00:00"
  },
  "series": [
   {
@@ -50,7 +50,7 @@
  "rows": [
   {
    "repo": "hiero-sdk-java",
-   "score": 8.2
+   "score": 8.3
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -58,7 +58,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "score": 8.9
+   "score": 9.1
   },
   {
    "repo": "hiero-sdk-js",
@@ -78,7 +78,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "score": 6.8
+   "score": 7.5
   },
   {
    "repo": "hiero-docs",
@@ -94,7 +94,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "score": 6.8
+   "score": 7.4
   },
   {
    "repo": "hiero-mirror-node-explorer",
@@ -102,15 +102,15 @@
   },
   {
    "repo": "hiero-sdk-tck",
-   "score": 8.2
+   "score": 8.3
   },
   {
    "repo": "hiero-sdk-cpp",
-   "score": 6.5
+   "score": 6.4
   },
   {
    "repo": "solo",
-   "score": 8.1
+   "score": 8.4
   },
   {
    "repo": "hiero-block-node",
@@ -118,7 +118,7 @@
   },
   {
    "repo": "hiero-solo-action",
-   "score": 8.5
+   "score": 8.6
   },
   {
    "repo": "hiero-website",
@@ -138,7 +138,7 @@
   },
   {
    "repo": "hiero-hederium",
-   "score": 4.9
+   "score": 4.7
   },
   {
    "repo": "hiero-did-sdk-python",
@@ -146,7 +146,7 @@
   },
   {
    "repo": "sdk-collaboration-hub",
-   "score": 5.8
+   "score": 5.7
   },
   {
    "repo": "hiero-did-sdk-js",
@@ -173,6 +173,6 @@
    "score": 8.2
   }
  ],
- "generated_at": "2026-10-21T01:27:31.392029+00:00",
+ "generated_at": "2026-10-22T01:21:24.975265+00:00",
  "stale": false
 }

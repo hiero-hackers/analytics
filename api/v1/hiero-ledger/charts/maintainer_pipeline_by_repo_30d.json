@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-21T01:17:35.036184+00:00"
+  "end": "2026-10-22T01:15:16.177583+00:00"
  },
  "series": [
   {
@@ -56,14 +56,14 @@
  "rows": [
   {
    "repo": "hiero-consensus-node",
-   "general_user": 9,
+   "general_user": 7,
    "triage": 1,
    "committer": 31,
    "maintainer": 13
   },
   {
    "repo": "hiero-sdk-js",
-   "general_user": 24,
+   "general_user": 26,
    "triage": 1,
    "committer": 0,
    "maintainer": 2
@@ -84,7 +84,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "general_user": 6,
+   "general_user": 7,
    "triage": 1,
    "committer": 5,
    "maintainer": 3
@@ -118,13 +118,6 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-cryptography",
-   "general_user": 7,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 4
-  },
-  {
    "repo": "hiero-json-rpc-relay",
    "general_user": 7,
    "triage": 0,
@@ -137,6 +130,13 @@
    "triage": 2,
    "committer": 0,
    "maintainer": 2
+  },
+  {
+   "repo": "hiero-cryptography",
+   "general_user": 6,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 4
   },
   {
    "repo": "solo-docs",
@@ -181,6 +181,13 @@
    "maintainer": 2
   },
   {
+   "repo": "solo-containers",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 3
+  },
+  {
    "repo": "sdk-collaboration-hub",
    "general_user": 3,
    "triage": 1,
@@ -191,13 +198,6 @@
    "repo": "hiero-sdk-rust",
    "general_user": 4,
    "triage": 1,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
-   "repo": "heka-identity-platform",
-   "general_user": 4,
-   "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
@@ -216,11 +216,11 @@
    "maintainer": 4
   },
   {
-   "repo": "solo-containers",
-   "general_user": 3,
+   "repo": "heka-identity-platform",
+   "general_user": 4,
    "triage": 0,
    "committer": 0,
-   "maintainer": 2
+   "maintainer": 1
   },
   {
    "repo": "solo-charts",
@@ -315,6 +315,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-21T01:17:35.036184+00:00",
+ "generated_at": "2026-10-22T01:15:16.177583+00:00",
  "stale": false
 }

@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-21T01:15:21.903419+00:00"
+  "end": "2026-10-22T01:13:10.109249+00:00"
  },
  "series": [
   {
@@ -61,7 +61,7 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 35,
+   "Unknown": 33,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -69,23 +69,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 68,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-cryptography",
-   "Unknown": 1,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-enterprise-java",
-   "Unknown": 1,
+   "Unknown": 81,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +85,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 10,
+   "Unknown": 7,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -117,7 +101,7 @@
   },
   {
    "repo": "hiero-sdk-java",
-   "Unknown": 2,
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -126,9 +110,9 @@
   {
    "repo": "hiero-sdk-js",
    "Unknown": 6,
-   "Good First Issue": 5,
-   "Beginner": 4,
-   "Intermediate": 5,
+   "Good First Issue": 4,
+   "Beginner": 3,
+   "Intermediate": 3,
    "Advanced": 0
   },
   {
@@ -149,7 +133,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 20,
+   "Unknown": 21,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -172,6 +156,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-10-21T01:15:21.903419+00:00",
+ "generated_at": "2026-10-22T01:13:10.109249+00:00",
  "stale": false
 }

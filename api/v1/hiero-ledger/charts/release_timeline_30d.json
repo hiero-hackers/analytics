@@ -35,32 +35,26 @@
   "hiero-cryptography",
   "hiero-mirror-node",
   "solo",
-  "hiero-block-node",
+  "hiero-json-rpc-relay",
   "hiero-sdk-js",
   "solo-charts",
+  "hiero-block-node",
   "hiero-consensus-node",
-  "hiero-json-rpc-relay",
   "hiero-enterprise-java",
   "hiero-sdk-go",
   "hiero-sdk-java",
   "hiero-sdk-tck",
   "hiero-solo-action",
+  "solo-containers",
   "hiero-gradle-conventions",
-  "hiero-sdk-python",
-  "solo-containers"
+  "hiero-sdk-python"
  ],
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-21T01:28:18.416632+00:00"
+  "end": "2026-10-22T01:22:44.548308+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-block-node",
-   "time": "2026-09-21T15:34:16Z",
-   "tag_name": "v0.42.0",
-   "type": "release"
-  },
   {
    "repo": "solo",
    "time": "2026-09-23T12:33:31Z",
@@ -402,8 +396,20 @@
    "time": "2026-10-20T20:36:48Z",
    "tag_name": "v0.165.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-10-21T14:14:55Z",
+   "tag_name": "v0.80.2",
+   "type": "release"
+  },
+  {
+   "repo": "solo-containers",
+   "time": "2026-10-21T23:59:47Z",
+   "tag_name": "v0.46.3",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-21T01:28:18.416632+00:00",
+ "generated_at": "2026-10-22T01:22:44.548308+00:00",
  "stale": false
 }
