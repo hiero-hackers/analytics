@@ -22,7 +22,8 @@ The raw counts are not committed. Two CSVs are read from
 Override either path with ``HIERO_DISCORD_CHANNELS_CSV`` /
 ``HIERO_DISCORD_MONTHLY_CSV``.
 
-Tables are written to ``outputs/data/org/hiero-ledger/``.
+Tables are written under the org whose registry profile has the ``discord``
+capability (``outputs/data/org/<org>/``), which the Community tab reads.
 """
 
 from __future__ import annotations
@@ -34,10 +35,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from hiero_analytics.config.paths import INPUTS_DIR, ensure_org_dirs
+from hiero_analytics.config.orgs import discord_org
+from hiero_analytics.config.paths import INPUTS_DIR, ORG, ensure_org_dirs
 from hiero_analytics.export.save import save_dataframe, write_output_meta
-
-ORG = "hiero-ledger"
 
 # Snapshot date for the underlying export; "last 30 days" windows are
 # anchored here so the exported tables stay accurate when re-run later.
@@ -137,7 +137,7 @@ def category_breakdown(channels: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     """Generate the Hiero Discord tables."""
-    data_dir = ensure_org_dirs(ORG)
+    data_dir = ensure_org_dirs(discord_org() or ORG)
 
     channels = load_channels_df()
     monthly = load_monthly_df()

@@ -46,6 +46,7 @@ from hiero_analytics.analysis.hip_implementation import (
 )
 from hiero_analytics.config.analysis import HIERO_ERA_START
 from hiero_analytics.config.github import HIP_PROPOSALS_REPO
+from hiero_analytics.config.orgs import hip_proposals_repo
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.dataset_store import OfflineDatasetMissingError
 from hiero_analytics.data_sources.github_ingest import fetch_hip_inventory, fetch_org_pr_hip_refs_graphql
@@ -114,15 +115,18 @@ def main(org: str = ORG) -> None:
 
     # Offline runs without the cached datasets skip cleanly: the tab's sections
     # simply don't render until a live run (or the CI refresh) populates them.
+    # The org's own proposals repository (its registry profile), falling back
+    # to the configured default for a one-off CLI run against another org.
+    proposals_repo = hip_proposals_repo(org) or HIP_PROPOSALS_REPO
     try:
-        inventory = fetch_hip_inventory(client)
+        inventory = fetch_hip_inventory(client, proposals_repo=proposals_repo)
         references = fetch_org_pr_hip_refs_graphql(client, org)
     except OfflineDatasetMissingError:
         logger.warning("No cached HIP datasets for %s in offline mode; skipping HIP implementation tables", org)
         return
     # Spec-authoring PRs in the proposals repo reference their own HIP numbers
     # constantly; they are the specification, not its implementation.
-    references = [r for r in references if r.repo != HIP_PROPOSALS_REPO]
+    references = [r for r in references if r.repo != proposals_repo]
     swept_prs = len({(r.repo, r.pr_number) for r in references})
     logger.info("Using %d HIP specs and %d swept PRs", len(inventory), swept_prs)
 

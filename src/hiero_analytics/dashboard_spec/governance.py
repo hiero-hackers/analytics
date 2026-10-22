@@ -23,7 +23,7 @@ from hiero_analytics.dashboard_spec.interactive import (
 
 # "Suggest a correction" target for the affiliations reference table. That table
 # earns a contextual link because its data is hand-curated: a correction is either
-# a one-line edit to data/affiliations.yaml (append '# manual') or an issue. Tables
+# a row in data/affiliation_overrides.yaml or an issue. Tables
 # of computed counts get no such link — the footer's general report link covers
 # "this looks wrong" everywhere else.
 AFFILIATION_ISSUE_URL = PROJECT_ISSUES_URL
@@ -35,15 +35,15 @@ SUMMARY = "Understand project stewardship, role coverage, and the people guiding
 # macro_absent_notes): say *why*, so absence reads as a property of the data,
 # not a bug.
 ABSENT_NOTE = (
-    "Governance analytics are derived from the org's published governance config "
-    "(team → permission grants). This org doesn't publish one, so roles, coverage, "
-    "teams, and organisation diversity can't be inferred."
+    "Governance analytics are derived from an org's governance config (team → permission "
+    "grants). None is configured for this org, so roles, coverage, teams, and organisation "
+    "diversity can't be inferred."
 )
 
 CHART_MACRO = {
     "name": "Governance",
     "charts": {
-        "hiero-ledger": [
+        "@governed": [
             {
                 "id": "maintainer-pipeline",
                 # Same windows as the span tabs: all years, 12 months, 5 ISO weeks, 7 days.
@@ -398,9 +398,9 @@ SECTION_SPECS = [
             "Reference: each maintainer, the organisation they were mapped to, and how it was decided — "
             "'automated' (the resolver placed them from public signals) or 'manual' (a hand-correction). "
             "Status is 'affiliated' (named employer), 'independent' (solo / personal-email only), or "
-            "'unknown' (no public signal). To fix a mapping or resolve an unknown, edit its row in "
-            "data/affiliations.yaml and append '# manual: reason' (it then survives regeneration and reads "
-            "'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo."
+            "'unknown' (no public signal). To fix a mapping or resolve an unknown, add a row for the login "
+            "to data/affiliation_overrides.yaml with the reason as a comment (it then survives regeneration "
+            "and reads 'manual' here), or use 'Suggest a correction' to open an issue on the analytics repo."
         ),
         "action_url": AFFILIATION_ISSUE_URL,
         "action_label": "Suggest a correction",
@@ -426,9 +426,9 @@ SECTION_SPECS = [
                     "committer — write access, but no maintainer seat in any repository. The two populations "
                     "are disjoint, so nobody appears in both. Curation coverage is thinner here than for "
                     "maintainers, so expect more 'unknown' rows; each one resolved makes the committer "
-                    "diversity chart sharper. To fix a mapping or resolve an unknown, edit its row in "
-                    "data/affiliations.yaml and append '# manual: reason', or use 'Suggest a correction' to "
-                    "open an issue on the analytics repo."
+                    "diversity chart sharper. To fix a mapping or resolve an unknown, add a row for the login "
+                    "to data/affiliation_overrides.yaml with the reason as a comment, or use 'Suggest a "
+                    "correction' to open an issue on the analytics repo."
                 ),
                 "columns": [
                     ("login", "committer"),

@@ -5,17 +5,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# Import-time *defaults* only — runners that support multiple orgs must accept an
-# explicit org argument (see run_contributor_activity_org.main) rather than lean
-# on these, so one process can serve several orgs without env mutation.
-ORG = os.getenv("GITHUB_ORG", "hiero-ledger")
-REPO = os.getenv("GITHUB_REPO", "hiero-sdk-python")
+from hiero_analytics.config.orgs import primary_org
 
-# Secondary orgs the multi-org pipelines also render (comma-separated) — the
-# single "extra orgs" concept shared by run_all's contributor pass and the
-# contributor heatmap. The default keeps the composition org on every dashboard
-# build; set GITHUB_EXTRA_ORGS="" to disable extras entirely.
-EXTRA_ORGS = [org.strip() for org in os.getenv("GITHUB_EXTRA_ORGS", "hiero-hackers").split(",") if org.strip()]
+# Import-time *defaults* only, for function signatures such as
+# ``main(org: str = ORG)``. Runners that serve several orgs take the org as an
+# explicit argument, and the set of orgs a run renders comes from
+# ``config.orgs.rendered_orgs()`` at call time, never from a constant here.
+ORG = primary_org()
+REPO = os.getenv("GITHUB_REPO", "hiero-sdk-python")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SRC = PROJECT_ROOT / "src" / "hiero_analytics"

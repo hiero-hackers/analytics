@@ -1,4 +1,4 @@
-"""Hiero Hackers GitHub organization analytics functions.
+"""Org overview analytics — composition-level summaries for any organization.
 
 Pure transformations on repository and contributor activity data
 to produce aggregated summaries for charting.

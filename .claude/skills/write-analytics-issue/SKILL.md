@@ -88,7 +88,9 @@ otherwise, and reviewers will send the PR back:
 - **Column formats are a closed set.** `dashboard_spec.COLUMN_FORMATS` is the
   single source; the frontend's `FormattedCell` implements exactly those.
 - **Run shapes.** Anything touching pipelines or the dataset store must survive
-  a single-pipeline CLI run, an offline run, and extra orgs — not just the full
+  a single-pipeline CLI run, an offline run, and extra orgs, governed and
+  ungoverned (a new pipeline runs for every org unless its registry entry
+  declares `requires=`) — not just the full
   scheduled run. This is the most common source of "worked locally, wrong in CI".
 - **Two-layer staleness.** The TTL cache and the durable dataset store have
   deliberately different semantics; read the module docstrings before proposing

@@ -21,7 +21,7 @@ def bypass_pagination(monkeypatch):
     monkeypatch.setattr(
         ingest.contributors,
         "paginate_cursor",
-        lambda f: f(None)[0],
+        lambda f: f(None, 100)[0],
     )
 
 

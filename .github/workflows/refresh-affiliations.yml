@@ -1,0 +1,292 @@
+name: Refresh Affiliations
+
+on:
+  schedule:
+    # Monthly, on the 1st at 06:00 UTC. Affiliations drift slowly (a job
+    # change, a profile edit, a roster change), so a monthly cadence keeps each
+    # refresh a small diff a human can check against the audit CSV, instead of
+    # drift piling up for months or a weekly PR that is mostly noise. 06:00 UTC
+    # lands after the daily 01:00 UTC analytics refresh (update-analytics.yml),
+    # so the two rarely draw on the same GraphQL budget (docs/api-budget.md).
+    # Scheduled runs start from the default branch, and GitHub may start one
+    # some minutes late at busy times.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: Refresh affiliations and open a pull request
+    runs-on: ubuntu-latest
+    # The only job in this workflow, and the only thing here that writes to the
+    # repository: it pushes one branch and opens (or updates) one pull request,
+    # both with GITHUB_TOKEN (see the PR step for why not the PAT). contents:
+    # write is for the push, pull-requests: write for the PR itself. The
+    # workflow's top-level permissions stay contents: read.
+    permissions:
+      contents: write
+      pull-requests: write
+    # Never let a manual dispatch overlap a scheduled run: both would push the
+    # same chore/refresh-affiliations branch and race to update the same PR.
+    concurrency:
+      group: refresh-affiliations
+      cancel-in-progress: false
+    # One pass looks up every governance participant's profile and GPG key and,
+    # for logins still unresolved, their commit-author email; an hour is ample,
+    # and a hang should fail rather than hold the runner for the 6-hour default.
+    timeout-minutes: 60
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+
+      # Full history is not needed: the PR-body step only compares the working
+      # tree against HEAD (`git show HEAD:...`), and the PR action diffs against
+      # the checked-out base branch.
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      # The resolver shells out to `gpg --show-keys` to read the email UIDs of
+      # each person's published GPG key, its highest-precedence signal. If the
+      # binary were missing the resolver would swallow the error and carry on
+      # without that signal, quietly producing a large, wrong diff. ubuntu-latest
+      # ships gpg; this step makes the day it stops doing so fail loudly instead.
+      - name: Check the gpg CLI is available
+        run: gpg --version
+
+      # Regenerates src/hiero_analytics/data/affiliations.yaml in the working
+      # tree and writes the audit CSV (outputs/data/org/<org>/, gitignored; it
+      # holds email domains only, never addresses). Output is tee'd to a log so
+      # the PR-body step can lift the override warnings out of it. pipefail keeps
+      # the step red when the generator fails; without it the pipeline would
+      # report tee's exit status and a failed run would still go on to open a PR.
+      #
+      # Prefer a PAT when one is configured, for the same reason as
+      # update-analytics.yml: the built-in Actions token gets only 1,000 GraphQL
+      # points/hour per repo, a classic PAT (public_repo is enough) gets 5,000.
+      # Falls back to the Actions token when the secret is absent, so forks keep
+      # working.
+      - name: Regenerate affiliations.yaml from live signals
+        env:
+          GITHUB_TOKEN: ${{ secrets.ANALYTICS_PAT || secrets.GITHUB_TOKEN }}
+          # Fewer parallel GraphQL workers = smaller burst load, so fewer 502s
+          # and secondary-rate-limit 403s; gentleness beats speed for a monthly
+          # job nobody is waiting on.
+          GITHUB_MAX_WORKERS: "3"
+          LOG_FILE: ${{ runner.temp }}/build_affiliations.log
+        run: |
+          set -euo pipefail
+          uv run hiero-analytics build_affiliations 2>&1 | tee "$LOG_FILE"
+
+      # Keep the audit CSV: it is the evidence for each resolved value (which
+      # signal decided, and the email domain it came from), and the PR body asks
+      # the reviewer to check value changes against it. Runs even when a later
+      # step fails, so a failed refresh can still be diagnosed from it. Safe to
+      # attach: it carries email domains, never addresses.
+      - name: Archive affiliation audit
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: affiliation-audit-${{ github.run_id }}
+          path: outputs/data/org/*/maintainer_affiliation_audit.csv
+          retention-days: 30
+          if-no-files-found: warn
+
+      # Builds the pull-request body: what the regeneration changed, compared
+      # row by row with the committed file, plus any override warnings from the
+      # generator log. Stdlib only, so it needs nothing beyond setup-python. Run
+      # details arrive through the environment, never interpolated into the
+      # script. The body is also appended to the job summary, so a run that ends
+      # with no diff (and therefore no PR) still shows what it found.
+      - name: Build the pull request body
+        env:
+          LOG_FILE: ${{ runner.temp }}/build_affiliations.log
+          BODY_FILE: ${{ runner.temp }}/pr-body.md
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          AUDIT_ARTIFACT: affiliation-audit-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          DATA = "src/hiero_analytics/data/affiliations.yaml"
+          CAP = 40  # entries listed per section; the Files changed tab has the rest
+
+          # A row reads:  login: "Value"  # role · name
+          # The value is a JSON string; the role tag is the first word of the comment.
+          ROW = re.compile(r'^([^\s:#"]+):\s*("(?:[^"\\]|\\.)*")\s*(?:#\s*(.*))?$')
+
+
+          def parse(text):
+              """Map login -> (value, role tag); also count lines that are not rows."""
+              rows, unparsed = {}, 0
+              for line in text.splitlines():
+                  line = line.strip()
+                  if not line or line.startswith("#"):
+                      continue
+                  match = ROW.match(line)
+                  if not match:
+                      unparsed += 1
+                      continue
+                  login, value, comment = match.groups()
+                  words = (comment or "").split()
+                  rows[login] = (json.loads(value), words[0] if words else "")
+              return rows, unparsed
+
+
+          def section(title, items):
+              """Render a capped bullet list, or nothing when there is nothing to list."""
+              if not items:
+                  return []
+              out = [f"### {title} ({len(items)})", ""]
+              out += [f"- {item}" for item in items[:CAP]]
+              if len(items) > CAP:
+                  out.append(f"- ... and {len(items) - CAP} more (see the Files changed tab)")
+              return out + [""]
+
+
+          committed = subprocess.run(
+              ["git", "show", f"HEAD:{DATA}"],
+              check=True, capture_output=True, text=True, encoding="utf-8",
+          ).stdout
+          old, old_unparsed = parse(committed)
+          new, new_unparsed = parse(Path(DATA).read_text(encoding="utf-8"))
+
+          by_login = lambda logins: sorted(logins, key=str.lower)
+          added = by_login(k for k in new if k not in old)
+          removed = by_login(k for k in old if k not in new)
+          kept = by_login(k for k in new if k in old)
+          value_changed = [k for k in kept if old[k][0] != new[k][0]]
+          role_changed = [k for k in kept if old[k][1] != new[k][1]]
+
+          log = Path(os.environ["LOG_FILE"]).read_text(encoding="utf-8", errors="replace")
+          roster_warnings = [ln for ln in log.splitlines() if "outside every governance roster" in ln]
+
+          body = [
+              f"Automated refresh of `{DATA}` from live GitHub signals "
+              "(`hiero-analytics build_affiliations`).",
+              "",
+              "The diff is resolver output: it is what the public signals say today, "
+              "not a reviewed judgement. Hand corrections live in "
+              "`src/hiero_analytics/data/affiliation_overrides.yaml`, which wins over the "
+              "generated file at run time and survives regeneration; do not edit the "
+              "generated file by hand. **Reviewer:** check each value change against the "
+              "audit CSV before approving.",
+              "",
+              "## Summary",
+              "",
+              f"- Rows added: {len(added)}",
+              f"- Rows removed: {len(removed)}",
+              f"- Value changed: {len(value_changed)}",
+              f"- Role tag changed: {len(role_changed)}",
+              "",
+          ]
+          body += section("Rows added", [f"`{k}`: `{new[k][0]}` ({new[k][1] or 'no role'})" for k in added])
+          body += section("Rows removed", [f"`{k}`: `{old[k][0]}` ({old[k][1] or 'no role'})" for k in removed])
+          body += section("Value changed", [f"`{k}`: `{old[k][0]}` -> `{new[k][0]}`" for k in value_changed])
+          body += section(
+              "Role tag changed",
+              [f"`{k}`: `{old[k][1] or 'none'}` -> `{new[k][1] or 'none'}`" for k in role_changed],
+          )
+          if old_unparsed or new_unparsed:
+              body += [
+                  f"Note: {old_unparsed} committed and {new_unparsed} regenerated line(s) did not "
+                  'match the `login: "Value"  # role · name` row format and were not compared.',
+                  "",
+              ]
+          if roster_warnings:
+              body += [
+                  "## Override warnings",
+                  "",
+                  "From the generator log. Keep or prune these rows in `affiliation_overrides.yaml`.",
+                  "",
+                  "```",
+                  *roster_warnings,
+                  "```",
+                  "",
+              ]
+          body += [
+              "---",
+              f"Run: {os.environ['RUN_URL']}",
+              f"Audit CSV (email domains only): artifact `{os.environ['AUDIT_ARTIFACT']}` on that run, kept 30 days.",
+              "",
+          ]
+          Path(os.environ["BODY_FILE"]).write_text("\n".join(body), encoding="utf-8")
+          PY
+          cat "$BODY_FILE" >> "$GITHUB_STEP_SUMMARY"
+
+      # A pull request opened with the default GITHUB_TOKEN does not trigger the
+      # repo's CI (GitHub suppresses events caused by that token, to prevent
+      # loops). The tests that matter for a data-only change are the offline
+      # guards over the committed files, so run them here, against the file the
+      # PR will carry, before anything is pushed. A generated file that fails
+      # them never becomes a PR.
+      - name: Check the regenerated file passes the file guards
+        run: uv run pytest -q --no-cov tests/data_sources/test_affiliation_files.py
+
+      # Who the commit is from, and why it is the Actions token and not the PAT.
+      #
+      # main's ruleset requires signed commits. With sign-commits the action
+      # makes the commit through the GitHub API, which GitHub signs, but only
+      # for bot tokens: GITHUB_TOKEN (commit and sign-off as github-actions[bot])
+      # or a GitHub App token (as <app>[bot]). With a personal access token the
+      # action still opens the PR but the commit is NOT signed, is authored as
+      # the person who happened to trigger the run (the workflow's last editor,
+      # for a schedule) and signed off by the bot, so it would fail both the
+      # signature rule and the DCO check while looking like that person's work.
+      # Hence GITHUB_TOKEN here even though the generator step prefers the PAT
+      # for its API budget. Everything about the commit is then the bot's:
+      # author, committer, signature and Signed-off-by, like a dependabot PR.
+      #
+      # Two consequences of the Actions token: the repository setting "Allow
+      # GitHub Actions to create and approve pull requests" (Settings > Actions >
+      # General) must be on, and CI does not run on the PR (the guard step above
+      # stands in; close and reopen the PR to run the full suite). A GitHub App
+      # token (actions/create-github-app-token) removes both limits and keeps
+      # the commit signed as <app>[bot]; switch `token:` to it if one is set up.
+      #
+      # The action itself does nothing when the regenerated file matches the base
+      # branch, so a month with no drift opens no PR (the job summary above still
+      # records the run). A dispatch from a non-default branch targets that
+      # branch, which is handy for trying a change before it reaches main.
+      - name: Open or update the pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sign-commits: true
+          # CONTRIBUTING requires a DCO sign-off on every commit; with
+          # sign-commits it is github-actions[bot]'s, matching the author.
+          signoff: true
+          branch: chore/refresh-affiliations
+          # Remove the branch once the PR is merged or closed, so the next
+          # month starts again from a fresh branch off main.
+          delete-branch: true
+          # Only the generated file, never affiliation_overrides.yaml: that file
+          # is hand-curated and this workflow must not be able to rewrite it. It
+          # also keeps anything else the run touched out of the PR.
+          add-paths: src/hiero_analytics/data/affiliations.yaml
+          commit-message: "chore: refresh affiliations.yaml from live signals"
+          title: "chore: refresh affiliations.yaml from live signals"
+          # Written by the "Build the pull request body" step above.
+          body-path: ${{ runner.temp }}/pr-body.md

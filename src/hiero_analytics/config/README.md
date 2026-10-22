@@ -71,6 +71,23 @@ If a `GITHUB_TOKEN` is not provided, the API will operate under GitHub’s unaut
 
 ---
 
+### `orgs.py`
+
+The organisation registry: one `OrgProfile` per GitHub organisation the
+dashboard renders, and the single place an org is named. A profile's fields
+give the org its capabilities (`governed`, `org_overview`, `hips`, `discord`),
+which decide the pipelines that run for it and the dashboard cards it gets.
+
+* `rendered_orgs()` — the orgs a run renders: the primary org, the registry's
+  extra orgs, then any trial orgs
+* `capabilities_of(org)`, `is_governed(org)`, `blanket_teams(org)` and friends —
+  what an org provides; an unregistered org provides nothing
+
+`GITHUB_ORG`, `GITHUB_EXTRA_ORGS` and `HIERO_ANALYTICS_TRIAL_ORGS` are views over
+the registry. See `docs/adding-an-organisation.md`.
+
+---
+
 ### `paths.py`
 
 Defines project directory locations used by the analytics pipeline.

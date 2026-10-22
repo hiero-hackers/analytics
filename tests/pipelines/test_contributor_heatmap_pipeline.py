@@ -67,35 +67,15 @@ def _patch_pipeline(
     tmp_path: Path,
     mock_client,
     activity,
-) -> None:
-    """Stub the GitHub client, governance config and dataset loads; redirect output dirs."""
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.contributor_heatmap.shared_client",
-        lambda: mock_client,
-    )
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.contributor_heatmap.EXTRA_ORGS",
-        ["hiero-hackers"],
-    )
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.contributor_heatmap.fetch_governance_config",
-        lambda *_a, **_k: {},
-    )
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.contributor_heatmap.load_contributor_activity",
-        lambda _client, _org: activity,
-    )
-
-    def _fake_org_dirs(org: str) -> Path:
-        """Create and return the per-org data dir under tmp_path."""
-        org_data_dir = tmp_path / "data" / org
-        org_data_dir.mkdir(parents=True, exist_ok=True)
-        return org_data_dir
-
-    monkeypatch.setattr(
-        "hiero_analytics.pipelines.contributor_heatmap.ensure_org_dirs",
-        _fake_org_dirs,
-    )
+    governance: dict | None = None,
+) -> Path:
+    """Stub the client, governance config and dataset load; return the org's output dir."""
+    org_data_dir = tmp_path / "data" / ORG
+    org_data_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(runner, "org_context", lambda _org: (mock_client, org_data_dir))
+    monkeypatch.setattr(runner, "fetch_governance_config", lambda *_a, **_k: governance or {})
+    monkeypatch.setattr(runner, "load_contributor_activity", lambda _client, _org: activity)
+    return org_data_dir
 
 
 # Tests
@@ -107,20 +87,54 @@ def test_main_creates_output_files(
     mock_github_client,
     synthetic_activity,
 ):
-    """Running main() should build the heatmap CSV for the org and hiero-hackers."""
-    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity)
+    """Running main() builds the heatmap CSV for the given org, and only that org."""
+    org_data_dir = _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity)
 
     runner.main(ORG)
 
-    # main() renders the given org plus the secondary hiero-hackers composition org.
-    for org in (ORG, "hiero-hackers"):
-        csv_path = tmp_path / "data" / org / "contributor_activity_heatmap.csv"
-        assert csv_path.exists(), f"Heatmap CSV for {org} not created"
-        assert os.path.getsize(csv_path) > 0, f"Heatmap CSV for {org} is empty"
+    csv_path = org_data_dir / "contributor_activity_heatmap.csv"
+    assert csv_path.exists()
+    assert os.path.getsize(csv_path) > 0
+    heatmap = pd.read_csv(csv_path)
+    assert set(heatmap["contributor name"]) == {"alice", "bob", "charlie"}
+    assert any(re.fullmatch(r"\d{4}-\d{2}", column) for column in heatmap.columns)
+    # The orchestrator renders other orgs; this pipeline never loops over them itself.
+    assert [path.name for path in (tmp_path / "data").iterdir()] == [ORG]
 
-        heatmap = pd.read_csv(csv_path)
-        assert set(heatmap["contributor name"]) == {"alice", "bob", "charlie"}
-        assert any(re.fullmatch(r"\d{4}-\d{2}", column) for column in heatmap.columns)
+
+def test_ungoverned_org_gets_no_role_labels(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_activity,
+):
+    """An org with no governance config labels everyone a general user."""
+    org_data_dir = _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity)
+
+    runner.main(ORG)
+
+    heatmap = pd.read_csv(org_data_dir / "contributor_activity_heatmap.csv")
+    assert set(heatmap["role"]) == {"General User"}
+
+
+def test_governed_org_labels_contributors_by_role(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_activity,
+):
+    """A governed org's config labels its role holders, resolved against that org's teams."""
+    governance = {
+        "teams": [{"name": "repo-a-maintainers", "maintainers": ["bob"], "members": []}],
+        "repositories": [{"name": "repo-a", "teams": {"repo-a-maintainers": "maintain"}}],
+    }
+    org_data_dir = _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity, governance)
+
+    runner.main(ORG)
+
+    heatmap = pd.read_csv(org_data_dir / "contributor_activity_heatmap.csv").set_index("contributor name")
+    assert heatmap.loc["bob", "role"] == "Maintainer"
+    assert heatmap.loc["alice", "role"] == "General User"
 
 
 def test_main_handles_empty_activity(
@@ -129,12 +143,11 @@ def test_main_handles_empty_activity(
     mock_github_client,
 ):
     """Running main() with no activity records should not crash."""
-    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, [])
+    org_data_dir = _patch_pipeline(monkeypatch, tmp_path, mock_github_client, [])
 
     runner.main(ORG)
 
     # The (empty, headers-only) heatmap table is still written, month columns included.
-    for org in (ORG, "hiero-hackers"):
-        heatmap = pd.read_csv(tmp_path / "data" / org / "contributor_activity_heatmap.csv")
-        assert heatmap.empty
-        assert any(re.fullmatch(r"\d{4}-\d{2}", column) for column in heatmap.columns)
+    heatmap = pd.read_csv(org_data_dir / "contributor_activity_heatmap.csv")
+    assert heatmap.empty
+    assert any(re.fullmatch(r"\d{4}-\d{2}", column) for column in heatmap.columns)

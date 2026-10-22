@@ -72,9 +72,9 @@ def fetch_repo_merged_pr_difficulty_since_graphql(
     """
     query = load_query("merged_pr")
 
-    def page(cursor: str | None) -> tuple[list[PullRequestDifficultyRecord], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[PullRequestDifficultyRecord], str | None, bool]:
         """Fetch a single page of merged PRs, stopping past the cutoff."""
-        data = client.graphql(query, {"owner": owner, "repo": repo, "cursor": cursor})
+        data = client.graphql(query, {"owner": owner, "repo": repo, "cursor": cursor, "pageSize": page_size})
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, ["repository", "pullRequests"])
 
         records: list[PullRequestDifficultyRecord] = []

@@ -91,10 +91,11 @@ def fetch_github_resource(  # noqa: UP047
     if cached is not None:
         return cached
 
-    def page(cursor: str | None) -> tuple[list[T], str | None, bool]:
+    def page(cursor: str | None, page_size: int) -> tuple[list[T], str | None, bool]:
         """Fetch a single page of GraphQL results."""
         paginated_vars = dict(variables)
         paginated_vars["cursor"] = cursor
+        paginated_vars["pageSize"] = page_size
 
         data = client.graphql(query, paginated_vars)
         nodes, next_cursor, has_next = extract_graphql_cursor_page(data, nodes_path)
@@ -110,6 +111,27 @@ def fetch_github_resource(  # noqa: UP047
     records = paginate_cursor(page)
     save_records_cache(cache_key, cache_scope, cache_parameters, model_class, records, use_cache=use_cache)
     return records
+
+
+def fetch_org_login(client: GitHubClient, org: str) -> str | None:
+    """GitHub's own spelling of organisation ``org``, or None when it does not exist.
+
+    One GraphQL point. Organisation logins match case-insensitively on GitHub,
+    but this codebase keys output paths, dataset files and ``owner/repo`` joins
+    on the exact string, so a caller compares the result with what it was given.
+    A missing organisation surfaces either as a null node or as a GraphQL
+    ``NOT_FOUND`` error, which the client raises; both read as None here, while
+    transport failures propagate.
+    """
+    try:
+        data = client.graphql(load_query("org_login"), {"login": org})
+    except RuntimeError as exc:
+        if "NOT_FOUND" in str(exc) or "Could not resolve" in str(exc):
+            return None
+        raise
+    node = (data.get("data") or {}).get("organization")
+    login = node.get("login") if isinstance(node, dict) else None
+    return login if isinstance(login, str) else None
 
 
 def fetch_org_repos_graphql(

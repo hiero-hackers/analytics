@@ -10,7 +10,7 @@ from hiero_analytics.pipelines import PIPELINES
 
 
 def _fake_pipeline(entry, args=()):
-    return SimpleNamespace(args=args, resolve=lambda: entry)
+    return SimpleNamespace(args=args, requires=frozenset(), resolve=lambda: entry)
 
 
 def test_every_registered_pipeline_resolves_to_its_declared_signature():
@@ -71,22 +71,33 @@ def test_cli_reports_pipeline_failure_with_exit_code(monkeypatch):
 
 
 def test_cli_defaults_to_full_run(monkeypatch):
-    """No arguments (and the `all` command) run the full suite."""
+    """No arguments (and the `all` command) run the full suite, lenient and continuing."""
     ran = []
-    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: ran.append(fail_fast))
+    monkeypatch.setattr(cli.run_all, "main", lambda **kwargs: ran.append(kwargs))
 
     assert cli.main([]) == 0
     assert cli.main(["all"]) == 0
-    assert ran == [False, False]
+    assert ran == [{"fail_fast": False, "strict": False}] * 2
 
 
-def test_cli_all_forwards_fail_fast(monkeypatch):
-    """The explicit `all --fail-fast` flag is forwarded to run_all.main()."""
+def test_cli_all_forwards_fail_fast_and_strict(monkeypatch):
+    """The explicit `all` flags are forwarded to run_all.main()."""
     seen = []
-    monkeypatch.setattr(cli.run_all, "main", lambda fail_fast=False: seen.append(fail_fast))
+    monkeypatch.setattr(cli.run_all, "main", lambda **kwargs: seen.append(kwargs))
 
     assert cli.main(["all", "--fail-fast"]) == 0
-    assert seen == [True]
+    assert cli.main(["all", "--strict"]) == 0
+    assert seen == [{"fail_fast": True, "strict": False}, {"fail_fast": False, "strict": True}]
+
+
+def test_cli_list_shows_capability_requirements(capsys):
+    """`list` says which pipelines only run for orgs with a capability."""
+    assert cli.main(["list"]) == 0
+
+    lines = {line.split()[0]: line for line in capsys.readouterr().out.splitlines()}
+    assert "[requires: governed]" in lines["role_coverage"]
+    assert "[requires: hips]" in lines["hip_implementation"]
+    assert "requires" not in lines["difficulty"]
 
 
 def test_cli_single_pipeline_attributes_its_requests_to_the_org_and_pipeline(monkeypatch):
@@ -133,3 +144,79 @@ def test_cli_single_pipeline_logs_its_usage_even_when_it_fails(monkeypatch, capl
         assert cli.main(["scorecard"]) == 1
 
     assert any("GitHub API usage" in record.getMessage() for record in caplog.records)
+
+
+def test_cli_warns_when_the_org_lacks_the_pipelines_capability(monkeypatch, caplog):
+    """Running a governance pipeline for an ungoverned org is allowed, but flagged."""
+    import logging
+
+    monkeypatch.setitem(
+        cli.PIPELINES_BY_NAME,
+        "role_coverage",
+        SimpleNamespace(args=("org",), requires=frozenset({"governed"}), resolve=lambda: lambda **_kw: None),
+    )
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    with caplog.at_level(logging.WARNING, logger="hiero_analytics.cli"):
+        assert cli.main(["role_coverage", "--org", "some-ungoverned-org"]) == 0
+
+    assert any("governed" in record.getMessage() for record in caplog.records)
+
+
+def test_seed_datasets_command_is_registered_and_dispatches(monkeypatch, capsys):
+    """seed-datasets forwards its options to the seeder, prints the summary, and returns success."""
+    calls = []
+    result = SimpleNamespace(
+        run_id=5,
+        run_url="https://github.com/o/r/actions/runs/5",
+        git_sha="abc1234",
+        data_as_of="2026-10-15T01:00:00+00:00",
+        dataset_count=3,
+        total_bytes=2048,
+        datasets_dir="outputs/data/datasets",
+    )
+    monkeypatch.setattr(cli, "seed_datasets", lambda client, repo, **kw: calls.append((client, repo, kw)) or result)
+    monkeypatch.setattr(cli, "shared_client", lambda: "client")
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets", "--repo", "o/r", "--run-id", "5", "--force"]) == 0
+
+    assert calls == [("client", "o/r", {"run_id": 5, "force": True})]
+    output = capsys.readouterr().out
+    assert "abc1234" in output
+    assert "2026-10-15T01:00:00+00:00" in output
+
+
+def test_seed_datasets_defaults_to_the_project_repository(monkeypatch):
+    """Without --repo the command targets the default repository, with no run id and no force."""
+    calls = []
+    monkeypatch.setattr(cli, "seed_datasets", lambda _client, repo, **kw: calls.append((repo, kw)) or SimpleNamespace())
+    monkeypatch.setattr(cli, "format_summary", lambda _result: "ok")
+    monkeypatch.setattr(cli, "shared_client", lambda: None)
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets"]) == 0
+
+    assert calls == [(cli.DEFAULT_SEED_REPO, {"run_id": None, "force": False})]
+
+
+def test_seed_datasets_failure_exits_non_zero_with_the_message(monkeypatch, capsys):
+    """A SeedError becomes a one-line error on stderr and a non-zero exit."""
+
+    def fail(client, repo, **kwargs):
+        raise cli.SeedError("GITHUB_TOKEN is not set")
+
+    monkeypatch.setattr(cli, "seed_datasets", fail)
+    monkeypatch.setattr(cli, "shared_client", lambda: None)
+    monkeypatch.setattr(cli, "setup_logging", lambda: None)
+
+    assert cli.main(["seed-datasets"]) == 1
+
+    assert "GITHUB_TOKEN is not set" in capsys.readouterr().err
+
+
+def test_seed_datasets_is_not_listed_as_a_pipeline(capsys):
+    """seed-datasets is a command, not a registered pipeline, so `list` does not show it."""
+    assert cli.main(["list"]) == 0
+
+    assert "seed-datasets" not in capsys.readouterr().out

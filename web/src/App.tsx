@@ -264,6 +264,7 @@ function Dashboard({
 }) {
   const narrowHeader = useMediaQuery(NARROW_HEADER);
   const { activeMacro, shownOrg, orgHasMacro } = nav;
+  const orgLabel = nav.labelOf(shownOrg);
   const glossary = orgHasMacro ? manifest.macro_glossaries?.[activeMacro] : undefined;
   const dataAsOf = manifest.provenance.data_as_of;
   const directory = useContext(EntityDirectoryContext);
@@ -281,7 +282,7 @@ function Dashboard({
     return (
       <PrintLayout provenance={manifest.provenance}>
         <p data-print-only className="print-title">
-          {entity.kind === 'repo' ? 'Repository' : 'Contributor'} · {shownOrg}
+          {entity.kind === 'repo' ? 'Repository' : 'Contributor'} · {orgLabel}
         </p>
         <OrgContext.Provider value={shownOrg}>
           <Suspense fallback={<Skeleton label="Loading details" rows={6} />}>
@@ -303,7 +304,7 @@ function Dashboard({
   return (
     <PrintLayout provenance={manifest.provenance}>
       <p data-print-only className="print-title">
-        {activeMacro} · {shownOrg}
+        {activeMacro} · {orgLabel}
       </p>
       <p data-print-only>
         Generated {stamp(manifest.generated_at)} UTC. Periods and filters are stated beside each
@@ -312,7 +313,7 @@ function Dashboard({
       <div className="mb-6 border-b pb-6">
         <p className="mb-2.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <OrgAvatar org={shownOrg} className="size-5 rounded" />
-          {shownOrg}
+          {orgLabel}
           {nav.topOf(activeMacro) !== activeMacro && (
             <>
               <span aria-hidden="true">/</span>
@@ -349,7 +350,7 @@ function Dashboard({
           <Empty className="my-12">
             <EmptyHeader>
               <EmptyTitle>
-                No {activeMacro} data for {shownOrg}
+                No {activeMacro} data for {orgLabel}
               </EmptyTitle>
               {manifest.macro_absent_notes?.[activeMacro] && (
                 <EmptyDescription>{manifest.macro_absent_notes[activeMacro]}</EmptyDescription>

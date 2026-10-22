@@ -1,6 +1,6 @@
-query ISSUE_LABEL_EVENTS_QUERY($owner:String!,$repo:String!,$cursor:String,$states:[IssueState!]){
+query ISSUE_LABEL_EVENTS_QUERY($owner:String!,$repo:String!,$cursor:String,$pageSize:Int!,$states:[IssueState!]){
   repository(owner:$owner,name:$repo){
-    issues(first:100, after:$cursor, states:$states){
+    issues(first:$pageSize, after:$cursor, states:$states){
       pageInfo{
         hasNextPage
         endCursor

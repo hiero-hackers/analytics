@@ -53,6 +53,7 @@ import pandas as pd
 # Paths are read through the module at call time (never bound at import), so
 # the contract tests' path redirection applies no matter the import order.
 from hiero_analytics.config import paths
+from hiero_analytics.config.orgs import extra_orgs, profile_or_default, trial_orgs
 from hiero_analytics.dashboard_spec import (
     CHART_MACROS,
     CHART_METHODOLOGY,
@@ -68,6 +69,7 @@ from hiero_analytics.dashboard_spec import (
     PROJECT_ISSUES_URL,
     TABLE_FAMILIES,
     WIDE_CHARTS,
+    chart_specs_for_org,
     table_variants,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
@@ -328,10 +330,11 @@ def _org_chart_sections(org: str, org_data_dir: Path, org_dir: Path) -> list[dic
     """
     sections = []
     for macro in CHART_MACROS:
-        # "*" declares org-independent cards: they apply to any org, and the
-        # per-variant existence filter below drops whatever an org's pipelines
-        # didn't produce. An explicit org key overrides the wildcard.
-        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
+        # Cards compose from every key the org matches: "*" (org-independent),
+        # a capability key like "@governed" / "@org_overview" (from the org
+        # registry), then the org's own key. The per-variant existence filter
+        # below drops whatever an org's pipelines didn't produce.
+        for spec in chart_specs_for_org(macro["charts"], org):
             charts = []
             for caption, variant_specs in spec["variants"]:
                 variants = [
@@ -483,7 +486,7 @@ def _source_sections(
         add(name, {"macro": ref["macro"], "id": ref["id"], "title": ref["title"]})
     emitted = {section["id"]: section for section in chart_sections}
     for macro in CHART_MACROS:
-        for spec in macro["charts"].get(org) or macro["charts"].get("*", []):
+        for spec in chart_specs_for_org(macro["charts"], org):
             section = emitted.get(spec["id"])
             if section is None:
                 continue
@@ -538,11 +541,35 @@ def _metric_tiles(family, org_data_dir: Path) -> list[dict]:
 
 
 def _orgs_with_data() -> list[str]:
-    """Orgs with produced tables, primary org first for stable manifests."""
+    """The orgs to publish: those this configuration renders that produced tables.
+
+    Order is the run's own: the primary org, then the registry's extra orgs in
+    registry order, then trial orgs. An output directory for any other org (one
+    removed from the registry, or a past trial, left behind in a local
+    ``outputs/``) is not published, so the dashboard always matches the roster.
+    CI starts each run with an empty ``outputs/``, so there it never arises.
+    """
     if not paths.ORG_DATA_DIR.exists():
         return []
-    orgs = sorted(path.name for path in paths.ORG_DATA_DIR.iterdir() if path.is_dir())
-    return [paths.ORG, *[org for org in orgs if org != paths.ORG]] if paths.ORG in orgs else orgs
+    present = {path.name for path in paths.ORG_DATA_DIR.iterdir() if path.is_dir()}
+    rendered = list(dict.fromkeys([paths.ORG, *extra_orgs(), *trial_orgs()]))
+    if leftover := sorted(present - set(rendered), key=str.lower):
+        logger.info("Not publishing org output(s) this run does not render: %s", ", ".join(leftover))
+    return [org for org in rendered if org in present]
+
+
+def _org_metadata(org: str) -> dict:
+    """How the dashboard names, links and brands ``org`` (from the org registry).
+
+    Additive manifest fields: ``display_name`` (the login when unset), the org's
+    ``github_url``, and ``brand`` — the logo set under ``web/public/brand/`` —
+    only when the profile names one.
+    """
+    profile = profile_or_default(org)
+    metadata = {"display_name": profile.label, "github_url": f"https://github.com/{org}"}
+    if profile.brand:
+        metadata["brand"] = profile.brand
+    return metadata
 
 
 def emit_data_api() -> Path:
@@ -637,6 +664,7 @@ def emit_data_api() -> Path:
                 if (tiles := _metric_tiles(family, org_data_dir))
             }
             manifest["orgs"][org] = {
+                **_org_metadata(org),
                 "sections": sections,
                 "chart_sections": chart_sections,
                 "views": views,

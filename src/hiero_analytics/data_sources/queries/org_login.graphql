@@ -1,0 +1,11 @@
+query ORG_LOGIN_QUERY($login:String!) {
+  organization(login:$login) {
+    login
+  }
+  rateLimit{
+    limit
+    remaining
+    cost
+    resetAt
+  }
+}

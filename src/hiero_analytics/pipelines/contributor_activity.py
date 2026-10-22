@@ -111,8 +111,6 @@ def main(org: str = ORG) -> None:
     save_dataframe(bot_suspects, org_data_dir / "bot_suspects.csv")
     logger.info("Bot suspects: %d logins flagged for review", len(bot_suspects))
 
-    _write_gfi_completers(client, org, org_data_dir)
-
     # Org-wide: the all-time base table, plus one variant per shared activity
     # period. All-time is no longer a member of ACTIVITY_PERIODS (it is the
     # base every table already is), so it is built explicitly.
@@ -137,5 +135,12 @@ def main(org: str = ORG) -> None:
 
     # All-contributors network (no governance needed, so every org gets it).
     _build_contributor_network(records, label_events, by_repo, org_data_dir)
+
+    # Last on purpose: the GFI-completers tile needs the org's merged-PR dataset,
+    # whose first fetch for a new org (or a cold cache) can fail on one stubborn
+    # repo. That failure still fails this pipeline, but only after the profiles
+    # and network above are written, so an optional tile cannot take the org's
+    # main contributor tables down with it.
+    _write_gfi_completers(client, org, org_data_dir)
 
     logger.info("Contributor activity tables complete")

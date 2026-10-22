@@ -92,6 +92,9 @@ other origin without the same written reasoning here.
   so a chart cannot ship with an empty lightbox.
 - **A new bespoke view** returns pure data from a `build_views()` module and
   renders through `SectionCard`, so it inherits the shared card chrome.
+- **A new organisation** needs no frontend change: the switcher lists every org
+  the manifest carries, labelled by its `display_name`. A logo is optional and
+  is files only (`public/brand/<key>/`, see `public/brand/README.md`).
 
 ## Tests
 

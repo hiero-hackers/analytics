@@ -224,3 +224,31 @@ def test_main_handles_empty_inputs(
     # The org-wide profile table is still written (headers only).
     assert (tmp_path / "data" / "contributor_activity_profiles.csv").exists()
     assert (tmp_path / "data" / "bot_suspects.csv").exists()
+
+
+def test_a_failed_gfi_fetch_still_fails_but_after_the_main_tables(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_github_client,
+    synthetic_activity,
+    synthetic_label_events,
+):
+    """A merged-PR fetch that fails (a new org's cold fetch) cannot cost the org its profiles."""
+    from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
+
+    _patch_pipeline(monkeypatch, tmp_path, mock_github_client, synthetic_activity, synthetic_label_events)
+
+    def _partial(_client, _org, **_k):
+        raise PartialOrgFetchError([], ["org/stubborn-repo"])
+
+    monkeypatch.setattr(
+        "hiero_analytics.pipelines.contributor_activity.fetch_org_merged_pr_difficulty_graphql", _partial
+    )
+
+    with pytest.raises(PartialOrgFetchError):
+        runner.main(ORG)
+
+    data_dir = tmp_path / "data"
+    assert (data_dir / "contributor_activity_profiles.csv").exists()
+    assert (data_dir / "all_network_nodes.csv").exists()
+    assert not (data_dir / "gfi_completers.csv").exists()

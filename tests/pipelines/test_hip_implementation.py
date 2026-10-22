@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -95,3 +96,28 @@ def test_main_handles_empty_inputs(tmp_path: Path, monkeypatch: pytest.MonkeyPat
 
     for csv_name in EXPECTED_CSVS:
         assert (tmp_path / "data" / csv_name).exists(), f"{csv_name} not created"
+
+
+def test_main_reads_the_orgs_own_proposals_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """The inventory comes from the org's registered proposals repo, whose own PRs are not evidence."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(orgs, "ORGS", (OrgProfile(name=ORG, hip_proposals_repo=f"{ORG}/proposals"),))
+    requested = []
+    _patch_pipeline(monkeypatch, tmp_path, [_spec(1)], [])
+    monkeypatch.setattr(
+        "hiero_analytics.pipelines.hip_implementation.fetch_hip_inventory",
+        lambda _client, **kwargs: requested.append(kwargs["proposals_repo"]) or [_spec(1)],
+    )
+    spec_pr = dataclasses.replace(_ref(1, 1), repo=f"{ORG}/proposals")
+    monkeypatch.setattr(
+        "hiero_analytics.pipelines.hip_implementation.fetch_org_pr_hip_refs_graphql",
+        lambda _client, _org, **_k: [spec_pr, _ref(2, 1)],
+    )
+
+    runner.main(ORG)
+
+    assert requested == [f"{ORG}/proposals"]
+    evidence = pd.read_csv(tmp_path / "data" / "hip_pr_evidence.csv")
+    assert set(evidence["repo"]) == {f"{ORG}/sdk"}

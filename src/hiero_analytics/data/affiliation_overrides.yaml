@@ -1,0 +1,33 @@
+# Hand corrections to the generated affiliations map (affiliations.yaml).
+#
+# One row per GitHub login, lowercase, with the reason as the trailing comment:
+#
+#   login: "Organisation"  # evidence — who checked, when
+#
+# A row here wins over the generated value at run time (data_sources.affiliations
+# merges the two files), reads 'manual' in the dashboard's method column, and
+# survives every regeneration: 'hiero-analytics build_affiliations' never
+# rewrites this file. It also outlives the person's spell on the governance
+# roster; the generator warns about rows that no roster names, so prune or keep
+# them deliberately.
+#
+# Values: an organisation name | "Independent" (solo, no employer) | "?" to
+# unset a resolver guess you know to be wrong when the right answer is unknown.
+#
+# The reason is required (a test checks it): say what the evidence was, so the
+# next person can tell whether it still holds.
+
+allison-hashgraph: "Hashgraph"  # hand-set before the overrides file existed; reason not recorded
+cijujohn: "Independent"  # Ciju John · hand-set before the overrides file existed; reason not recorded
+cliffclick: "Independent"  # Cliff Click · hand-set before the overrides file existed; reason not recorded
+cooper-kunz: "?"  # Cooper Kunz · hand-set before the overrides file existed; reason not recorded
+daniela-barbosa: "Linux Foundation"  # Daniela Barbosa · hand-set before the overrides file existed; reason not recorded
+davidwboswell: "Linux Foundation"  # hand-set before the overrides file existed; reason not recorded
+diegoescalonaro: "The Hashgraph Association"  # says so on profile
+exploreriii: "Independent"  # Sophie Bulloch · hand-set before the overrides file existed; reason not recorded
+hartm: "Linux Foundation"  # hand-set before the overrides file existed; reason not recorded
+hendrikebbers: "Hashgraph"  # Hendrik Ebbers · hand-set before the overrides file existed; reason not recorded
+joshmarinacci: "Independent"  # Josh Marinacci · hand-set before the overrides file existed; reason not recorded
+misiek-blocky: "BlockyDevs"  # hand-set before the overrides file existed; reason not recorded
+prajeeta15: "Independent"  # prajeeta · hand-set before the overrides file existed; reason not recorded
+seanbohan: "Linux Foundation"  # Sean Bohan · hand-set before the overrides file existed; reason not recorded

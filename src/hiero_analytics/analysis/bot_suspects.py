@@ -15,7 +15,7 @@ False positives in the output are acceptable (a real name can trip a
 signal); the point is to surface candidates for ``BOT_LOGINS``, not to make
 the exclusion call automatically. A login a maintainer confirms is a real
 person, not a bot, goes in ``data/bot_suspect_dismissals.yaml`` (mirroring
-``affiliations.yaml``'s hand-maintained-file pattern) so it stops reappearing
+``affiliation_overrides.yaml``'s hand-maintained-file pattern) so it stops reappearing
 every run — see ``load_dismissed_suspects``.
 """
 
@@ -41,7 +41,7 @@ def load_dismissed_suspects(path=DISMISSALS_PATH) -> set[str]:
     """Lowercased logins a maintainer has confirmed are real people, not bots.
 
     A YAML mapping of ``login: "reason"`` (see the file itself, and
-    ``affiliations.yaml``, whose format this mirrors) — the reason strings
+    ``affiliation_overrides.yaml``, whose format this mirrors) — the reason strings
     aren't used here, only the keys. An empty mapping (``{}``) or a
     comments-only file both mean nothing's been dismissed yet.
     """

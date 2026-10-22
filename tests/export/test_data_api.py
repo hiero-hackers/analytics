@@ -605,3 +605,61 @@ def test_manifest_carries_the_wip_flag_and_issues_url(api_env: Path, tmp_path: P
 
     assert manifest["wip"] is True
     assert manifest["issues_url"].startswith("https://github.com/")
+
+
+def test_publishes_the_rendered_orgs_in_run_order(api_env: Path, tmp_path: Path, monkeypatch):
+    """Primary first, then registry extras in registry order, then trial orgs."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(
+        orgs, "ORGS", (OrgProfile(name="zeta-org", extra=True), OrgProfile(name="alpha-org", extra=True))
+    )
+    monkeypatch.setenv("HIERO_ANALYTICS_TRIAL_ORGS", "LFDT-X")
+    for org in ("alpha-org", "zeta-org", "LFDT-X"):
+        (tmp_path / "data" / "org" / org).mkdir()
+
+    assert data_api._orgs_with_data() == [ORG, "zeta-org", "alpha-org", "LFDT-X"]
+
+
+def test_leftover_org_outputs_are_not_published(api_env: Path, tmp_path: Path, monkeypatch, caplog):
+    """A local output dir for an org this run does not render (a past trial) stays unpublished."""
+    import logging
+
+    from hiero_analytics.config import orgs
+
+    monkeypatch.setattr(orgs, "ORGS", ())
+    (tmp_path / "data" / "org" / "old-trial-org").mkdir()
+
+    with caplog.at_level(logging.INFO, logger=data_api.logger.name):
+        assert data_api._orgs_with_data() == [ORG]
+
+    assert any("old-trial-org" in record.getMessage() for record in caplog.records)
+
+
+def test_org_metadata_comes_from_the_registry(monkeypatch):
+    """Display name, GitHub link and brand travel with each org; brand only when set."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+
+    monkeypatch.setattr(orgs, "ORGS", (OrgProfile(name="LFDT-X", display_name="LF X", brand="lfdt-x"),))
+
+    assert data_api._org_metadata("LFDT-X") == {
+        "display_name": "LF X",
+        "github_url": "https://github.com/LFDT-X",
+        "brand": "lfdt-x",
+    }
+    assert data_api._org_metadata("unregistered") == {
+        "display_name": "unregistered",
+        "github_url": "https://github.com/unregistered",
+    }
+
+
+def test_manifest_org_entries_carry_the_metadata(api_env: Path):
+    """An emitted org entry includes its display name and GitHub link next to its sections."""
+    _write_widgets(api_env, pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]}))
+
+    manifest = json.loads(emit_data_api().read_text())
+
+    assert manifest["orgs"][ORG]["display_name"] == ORG
+    assert manifest["orgs"][ORG]["github_url"] == f"https://github.com/{ORG}"

@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
-from hiero_analytics.analysis.hiero_hackers_analysis import (
+from hiero_analytics.analysis.org_overview_analysis import (
     build_contributor_counts,
     calculate_language_distribution,
     calculate_push_activity_summary,

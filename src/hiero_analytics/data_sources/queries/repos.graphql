@@ -1,6 +1,6 @@
-query REPOS_QUERY($org:String!,$cursor:String){
+query REPOS_QUERY($org:String!,$cursor:String,$pageSize:Int!){
   organization(login:$org){
-    repositories(first:100, after:$cursor){
+    repositories(first:$pageSize, after:$cursor){
       pageInfo{
         hasNextPage
         endCursor

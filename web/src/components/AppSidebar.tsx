@@ -39,7 +39,7 @@ import type { NavModel } from '../nav';
 import { useActiveSection } from '../useActiveSection';
 import { scrollToGroup, type TocEntry } from '../toc';
 import { Button } from '@/components/ui/button';
-import { HieroBrand } from './HieroBrand';
+import { Brand } from './Brand';
 import { ThemeToggle } from './ThemeToggle';
 
 const navigationIcons: Record<string, typeof UsersIcon> = {
@@ -93,7 +93,9 @@ function TabsGroup({ nav, onTab }: { nav: NavModel | null; onTab: (macro: string
                       )}
                       isActive={active}
                       aria-current={active ? 'page' : undefined}
-                      aria-description={empty ? `No data for ${nav.shownOrg}` : undefined}
+                      aria-description={
+                        empty ? `No data for ${nav.labelOf(nav.shownOrg)}` : undefined
+                      }
                       // An umbrella opens on its first member.
                       onClick={() => select(nav.macros.find((m) => nav.topOf(m) === tab) ?? tab)}
                     >
@@ -214,7 +216,7 @@ export function AppSidebar({
     <Sidebar className="md:top-(--header-h) md:h-[calc(100svh-var(--header-h))]">
       {isMobile && (
         <SidebarHeader className="flex-row items-center justify-between border-b px-5 py-5">
-          <HieroBrand compact />
+          <Brand compact brand={nav?.brand} label={nav?.labelOf(nav.shownOrg)} />
           <Button
             variant="ghost"
             size="icon"

@@ -398,7 +398,7 @@ def test_fetch_repo_issues_graphql_uses_cache(monkeypatch, _temp_cache_dir):
     monkeypatch.setattr(
         ingest._common,
         "paginate_cursor",
-        lambda fetch_page: fetch_page(None)[0],
+        lambda fetch_page: fetch_page(None, 100)[0],
     )
 
     mock_client.graphql.return_value = {

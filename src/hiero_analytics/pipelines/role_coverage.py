@@ -242,7 +242,7 @@ def main(org: str = ORG) -> None:
     now = datetime.now(UTC)
 
     config = fetch_governance_config(org)
-    role_lookup = build_repo_role_lookup(config)
+    role_lookup = build_repo_role_lookup(config, org=org)
     # Governance keys are bare repo names; activity keys are "owner/repo".
     roles_by_repo = {bare_repo(repo): holders for repo, holders in role_lookup.items()}
     logger.info("Loaded governance roles for %d repos", len(roles_by_repo))

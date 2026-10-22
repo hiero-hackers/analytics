@@ -17,6 +17,7 @@ from hiero_analytics.dashboard_spec import (
     WIDE_CHARTS,
     table_variants,
 )
+from hiero_analytics.dashboard_spec._assembly import chart_specs_for_org
 from hiero_analytics.export.data_api import variant_annotations
 
 
@@ -285,3 +286,100 @@ def test_column_formats_are_ones_the_frontend_implements():
         if len(column) > 2 and column[2] not in COLUMN_FORMATS
     }
     assert not unknown, f"columns declaring an unknown format: {sorted(unknown)}"
+
+
+# org-key composition
+
+
+def _cards(macro, org):
+    """The chart cards ``org`` gets from one macro, as a list of ids in order."""
+    from hiero_analytics.dashboard_spec import chart_specs_for_org
+
+    return [spec["id"] for spec in chart_specs_for_org(macro["charts"], org)]
+
+
+def test_chart_specs_compose_wildcard_capability_and_org_keys():
+    """A family's cards for an org compose from wildcard + capability + org keys.
+
+    Composition, not replacement: the wildcard cards always apply, a capability
+    key adds what the org's profile entitles it to, and an explicit org key adds
+    that org's own extras. This is what lets a third org add one bespoke card
+    without restating the whole wildcard list.
+    """
+    macro = {
+        "charts": {
+            "*": [{"id": "base"}],
+            "@governed": [{"id": "gov"}],
+            "@org_overview": [{"id": "overview"}],
+            "special": [{"id": "special-card"}],
+        }
+    }
+
+    # Governed primary: wildcard + governed cards.
+    assert _cards(macro, "hiero-ledger") == ["base", "gov"]
+    # Composition org: wildcard + overview cards.
+    assert _cards(macro, "hiero-hackers") == ["base", "overview"]
+    # An explicit org key adds only its own extras on top of the wildcard.
+    assert _cards(macro, "special") == ["base", "special-card"]
+
+
+def test_new_capability_cards_land_after_the_wildcards():
+    """A card first seen under a capability or org key trails the wildcards.
+
+    org-overview only appears under @org_overview, so for hiero-hackers it lands
+    after the wildcard cards rather than leading them (on main the old hiero-hackers
+    key listed it first, so the order shifted).
+    """
+    from hiero_analytics.dashboard_spec import contributors
+
+    cards = [spec["id"] for spec in chart_specs_for_org(contributors.CHART_MACRO["charts"], "hiero-hackers")]
+
+    assert cards[-1] == "org-overview"
+    assert set(cards[:-1]) == {"contributor-network", "activity-heatmap", "repo-growth"}
+
+
+def test_every_registered_org_gets_its_capability_cards():
+    """Each real family renders at least the wildcard cards for every registered org.
+
+    The wildcard floor holds for any org, governed or not — so registering an org
+    never yields an empty tab by omission.
+    """
+    from hiero_analytics.config import orgs as orgs_mod
+
+    for macro in CHART_MACROS:
+        wildcard_ids = {spec["id"] for spec in macro["charts"].get("*", [])}
+        for org in orgs_mod.org_names():
+            got = {spec["id"] for spec in chart_specs_for_org(macro["charts"], org)}
+            assert wildcard_ids <= got, f"{macro['name']}: {org} missing wildcard cards"
+
+
+def test_chart_keys_are_capabilities_not_org_names():
+    """The shipped spec keys cards by "*" or "@<capability>" only, never by an org's name.
+
+    The assembler still supports a bare org key for a one-off, but keying the
+    shipped spec by capability is what lets an org be added with one registry
+    entry: its tabs follow from what its profile says it has.
+    """
+    from hiero_analytics.config.orgs import CAPABILITIES
+    from hiero_analytics.dashboard_spec._assembly import WILDCARD_KEY, capability_key
+
+    allowed = {WILDCARD_KEY, *(capability_key(name) for name in CAPABILITIES)}
+    for macro in CHART_MACROS:
+        stray = set(macro["charts"]) - allowed
+        assert not stray, f"{macro['name']} keys cards by {sorted(stray)}; use '*' or a capability key"
+
+
+def test_capability_keys_follow_the_registry(monkeypatch):
+    """An org's capability keys come from its profile, in a fixed application order."""
+    from hiero_analytics.config import orgs
+    from hiero_analytics.config.orgs import OrgProfile
+    from hiero_analytics.dashboard_spec._assembly import capability_keys
+
+    monkeypatch.setattr(
+        orgs,
+        "ORGS",
+        (OrgProfile(name="x", governed=True, governance_url="u", org_overview=True, hip_proposals_repo="x/h"),),
+    )
+
+    assert capability_keys("x") == ("@governed", "@org_overview", "@hips")
+    assert capability_keys("unregistered") == ()

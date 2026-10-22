@@ -8,7 +8,7 @@
 # domain/bots.py instead, so it's excluded from people metrics entirely
 # rather than just dropped from this review list.
 #
-# Format mirrors affiliations.yaml: login: "reason"  # who/when reviewed it
+# Format mirrors affiliation_overrides.yaml: login: "reason"  # who/when reviewed it
 #
 # cijujohn: "human login, 'ci' is a coincidence"  # reviewed by <you> on <date>
 {}

@@ -271,3 +271,77 @@ describe('Header status', () => {
     ]);
   });
 });
+
+describe('Organisation names and brands from the manifest', () => {
+  /** The fixture manifest, with hiero-hackers given a display name and a brand key. */
+  const branded = (brand: string) => ({
+    ...MANIFEST,
+    orgs: {
+      ...MANIFEST.orgs,
+      'hiero-hackers': { ...MANIFEST.orgs['hiero-hackers'], display_name: 'Hiero Hackers', brand },
+    },
+  });
+
+  const serve = (manifest: unknown) =>
+    stubApi({ 'manifest.json': () => new Response(JSON.stringify(manifest)) });
+
+  const bannerLogos = () =>
+    [...screen.getByRole('banner').querySelectorAll('img')]
+      .map((img) => img.getAttribute('src'))
+      .filter((src) => src?.includes('brand/'));
+
+  it('labels each organisation by its display name, keeping the login as the value', async () => {
+    serve(branded('hackers'));
+    render(<App />);
+
+    const option = await screen.findByRole('option', { name: 'Hiero Hackers' });
+    expect(option).toHaveValue('hiero-hackers');
+    // An org without a display name is labelled by its login, as before.
+    expect(screen.getByRole('option', { name: 'hiero-ledger' })).toBeInTheDocument();
+  });
+
+  it('shows the selected organisation’s logo and returns to Hiero when switching back', async () => {
+    window.location.hash = 'org=hiero-hackers';
+    serve(branded('hackers'));
+    render(<App />);
+
+    expect(
+      await within(screen.getByRole('banner')).findByText('Hiero Hackers analytics'),
+    ).toBeInTheDocument();
+    expect(bannerLogos()).toEqual(['/brand/hackers/logo.svg', '/brand/hackers/logo-dark.svg']);
+
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Organisation' }),
+      'hiero-ledger',
+    );
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
+    expect(bannerLogos()).toEqual(['/brand/hiero-logo.svg', '/brand/hiero-logo-dark.svg']);
+  });
+
+  it('falls back to the Hiero mark when an organisation’s logo fails to load', async () => {
+    window.location.hash = 'org=hiero-hackers';
+    serve(branded('hackers'));
+    render(<App />);
+    await within(screen.getByRole('banner')).findByText('Hiero Hackers analytics');
+
+    fireEvent.error(
+      screen.getByRole('banner').querySelector('img[src="/brand/hackers/logo.svg"]')!,
+    );
+
+    expect(within(screen.getByRole('banner')).getByText('Hiero analytics')).toBeInTheDocument();
+    expect(bannerLogos()).toEqual(['/brand/hiero-logo.svg', '/brand/hiero-logo-dark.svg']);
+  });
+
+  it('ignores a brand key that is not a plain slug', async () => {
+    const { brandLogo } = await import('../brand');
+
+    expect(brandLogo('../../evil', '/')).toBeNull();
+    expect(brandLogo('Hackers', '/')).toBeNull();
+    expect(brandLogo('hiero', '/')).toBeNull();
+    expect(brandLogo(undefined, '/')).toBeNull();
+    expect(brandLogo('lfdt-clpr', '/base/')).toEqual({
+      light: '/base/brand/lfdt-clpr/logo.svg',
+      dark: '/base/brand/lfdt-clpr/logo-dark.svg',
+    });
+  });
+});

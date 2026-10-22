@@ -50,8 +50,9 @@ uv run hiero-analytics
 
 **What this does:**
 - Runs all analytics pipelines in one process (one Python start-up instead of one per pipeline), reusing the on-disk fetch cache between pipelines
+- Runs them for every organisation in the org registry (`src/hiero_analytics/config/orgs.py`), each getting the pipelines its capabilities allow (governance pipelines only for orgs that publish a governance config, for example)
 - Writes data tables to `outputs/data/` and the JSON data API to `outputs/data/api/`
-- Isolates failures — if one pipeline errors it is logged and the rest still run; the command exits non-zero if any failed
+- Isolates failures — if one pipeline errors it is logged and the rest still run. The command exits non-zero if anything failed for the primary organisation or the data API; failures confined to another organisation are reported but do not fail the run (add `--strict` to `all` to fail on those too)
 
 For faster local debugging, run the explicit `all` command with `--fail-fast`:
 
@@ -64,11 +65,20 @@ the original traceback is not buried beneath output from later pipelines.
 Without `--fail-fast`, the default behaviour is unchanged: failures are logged,
 the remaining pipelines continue, and all failures are reported at the end.
 
+To try an organisation that is not registered yet, add it to one run (it is
+treated as ungoverned; see [docs/adding-an-organisation.md](docs/adding-an-organisation.md)):
+
+```bash
+HIERO_ANALYTICS_TRIAL_ORGS=<github-org> uv run hiero-analytics
+```
+
 Everything under `outputs/` is generated and gitignored. The scheduled workflow publishes the dashboard to GitHub Pages instead of committing generated data and reports.
 
 This is the same command the scheduled **Refresh Analytics Data** workflow runs.
 
-> ⏱️ **The first run is slow.** It fetches org-wide activity from the GitHub API (subject to rate limits), so the initial run can take **several minutes**. Later runs are incremental and much faster (see [Incremental data fetching](#incremental-data-fetching)).
+> ⏱️ **The first run is slow.** It fetches org-wide activity from the GitHub API (subject to rate limits), so a cold first run can take **the better part of half an hour** (and can fail if GitHub is flaky). Later runs are incremental and much faster (see [Incremental data fetching](#incremental-data-fetching)).
+>
+> **Skip the wait:** after creating your `.env`, run `uv run hiero-analytics seed-datasets` first. It downloads the datasets the nightly refresh already built, so your first real run is an incremental one (see [Seeding from CI](#seeding-from-ci)).
 
 ### Viewing the dashboard
 
@@ -122,7 +132,7 @@ Open the URL it prints (`http://localhost:8000/`). A server is needed because th
 
 Most previews restore the latest base-branch datasets and set `HIERO_ANALYTICS_OFFLINE=1`. This keeps the input data fixed so the artifact isolates code changes. Offline mode never falls back to a network fetch: it fails clearly when a required dataset or governance snapshot is missing. Pipelines backed only by live repo or third-party APIs are skipped, so Scorecard, CODEOWNERS/runner, repo-only, and Hiero Hackers sections may be absent from an offline preview.
 
-Changes to the field-bearing ingestion layer (`data_sources/models.py`, `github_ingest/`, the queries, the governance snapshot) automatically use a live fetch, because a cached dataset cannot contain newly introduced fields; transport-only changes (client, rate limiting) keep the fast offline path. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
+Changes to the field-bearing ingestion layer (`data_sources/models.py`, `github_ingest/`, the queries, the governance snapshot) or to the org registry (`config/orgs.py`) automatically use a live fetch, because a cached dataset cannot contain newly introduced fields or newly registered orgs; transport-only changes (client, rate limiting) keep the fast offline path. Those fields are populated only for records fetched during the preview; the scheduled refresh remains responsible for a complete backfill. Preview workflows restore caches but never save them.
 
 ### Running a single pipeline
 
@@ -152,13 +162,13 @@ Available pipelines:
 | `codeowner_and_runner` | CODEOWNERS presence and CI runner usage |
 | `releases` | GitHub Releases cadence and per-repo staleness (`latest_release`, `days_since_last_release`) |
 | `ci_health` | Audit CI/CD workflows and repository configuration for security, reliability, and compliance |
-| `hiero_hackers` | Hiero Hackers org composition and activity |
+| `org_overview` | Org-wide composition (contributor counts, languages, pushes) |
 | `hip_implementation` | Maps HIPs to the PRs that reference them across the org — feeds the HIPs dashboard tab |
 | `repo_growth` | Generate repository-growth timeline tables |
 | `data_api` | Emits the versioned JSON data API (`outputs/data/api/v1/`) the web dashboard renders — the full run does this last |
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
 | `contributor_churn` | Contributor churn analysis (funnel, retention, transitions and tenure CSVs) — on-demand, not part of the full run |
-| `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
+| `build_affiliations` | Regenerates `affiliations.yaml` from public signals (hand corrections go in `affiliation_overrides.yaml`) — maintenance tool, needs `gpg` |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.
 
@@ -177,12 +187,27 @@ To avoid re-downloading all of GitHub history on every run, fetching is **increm
 
 > Local and CI datasets are independent — each maintains its own and stays correct on its own; you never need to sync them.
 
+#### Seeding from CI
+
+To avoid the slow first fetch, copy the nightly refresh's datasets instead of rebuilding them:
+
+```bash
+uv run hiero-analytics seed-datasets
+```
+
+This needs `GITHUB_TOKEN` in your `.env` (GitHub only serves Actions artifact downloads to authenticated requests). It finds the most recent **successful** run of the **Refresh Analytics Data** workflow (failed runs also archive a partial snapshot, which is skipped), downloads its `dataset-snapshot-…` artifact, checks it, and unpacks it into `outputs/data/datasets/`. It then prints the run, code revision and "data as of" time of what you now have; your next `uv run hiero-analytics` only fetches what changed since.
+
+- It only ever downloads from the configured repository's own Actions artifacts, and validates the archive before writing anything: flat `.json` file names only, every file must parse, dataset files must carry the store's `version` key, and the total size is capped.
+- It refuses to write into a datasets directory that already has files; pass `--force` to overwrite files of the same name.
+- **Forks:** the default repository is `hiero-hackers/analytics`; point it at your own with `--repo OWNER/NAME` (your fork needs a completed run of the refresh workflow). `--run-id N` picks a specific run instead of the latest.
+
 ---
 
 ## Documentation
 
-- [**Architecture**](docs/architecture.md) — the layer map, the two extensibility registries, the fetch/persistence model, and where new features go. Start here to understand the codebase.
-- [**Role-holder affiliations**](docs/affiliations.md) — how each maintainer and committer is mapped to an organisation, how to make manual corrections, and how to resolve the unknowns.
+- [**Architecture**](docs/architecture.md) — the layer map, the extensibility registries, the fetch/persistence model, multi-org scheduling, and where new features go. Start here to understand the codebase.
+- [**Adding an organisation**](docs/adding-an-organisation.md) — the one registry entry that adds an org to the dashboard, what each capability gives it, and how to trial-run it first.
+- [**Role-holder affiliations**](docs/affiliations.md) — how each maintainer and committer is mapped to an organisation, how to make manual corrections in `affiliation_overrides.yaml`, and how to resolve the unknowns.
 - [**Snapshot archive**](docs/snapshots.md) — every refresh's data API is archived to the `data/snapshots` branch, so the dashboard's history is queryable and diffable. How to read a past snapshot, and how to build on it.
 
 ---

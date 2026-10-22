@@ -1,0 +1,81 @@
+# sdk-automations.yml — read by the sdk-automations Action from the default branch.
+# Observe only: it reads and decides, and writes nothing. Every row in a run's job summary
+# is a decision it would have recorded, never an act. Every shipped capability is on, and each
+# block states `mode: observe` of its own, which pins it: raising the file's `mode` promotes
+# nothing. A capability is promoted on its own, in its own reviewed diff, by raising its line.
+
+mode: observe
+
+capabilities:
+  triageQueue: # a new issue is labelled awaitingTriage
+    enabled: true
+    mode: observe
+    welcome: false
+
+  prDashboard: # one comment per pull request: what stops it being reviewable
+    enabled: true
+    mode: observe
+    checks:
+      dcoSignoff:
+        enabled: true
+      gpgSignature:
+        enabled: true
+      mergeConflicts:
+        enabled: true
+      linkedIssues:
+        enabled: true
+        assignedIssues:
+          enabled: true
+    applyLabels: [needsRevision, needsReview]
+
+  configReport: # a pull request that changes this file gets one comment saying what it would mean
+    enabled: true
+    mode: observe
+
+  inactivity: # on the hourly schedule: remind about stalled work, then release it
+    enabled: true
+    mode: observe
+    issues:
+      enabled: true
+      reap:
+        enabled: true
+    pullRequests:
+      enabled: true
+      reapWhen:
+        draft:
+          enabled: true
+          reap:
+            enabled: true
+        changesRequested:
+          enabled: true
+          reap:
+            enabled: true
+        needsRevision:
+          enabled: true
+          reap:
+            enabled: true
+
+  assignment: # a contributor claims an issue with a comment, and releases it the same way
+    enabled: true
+    mode: observe
+    autoAssign:
+      enabled: true
+      notClaimableWhen: [blocked]
+    unassign:
+      enabled: true
+
+mappings:
+  labels:
+    blocked: "blocked" # this repository's existing label; the App reads it and never sets it
+  commands:
+    assign: "/assign"
+    unassign: "/unassign"
+    working: "/working"
+  skills: # this repository's existing difficulty labels
+    goodFirstIssue: "good first issue"
+    beginner: "beginner"
+    intermediate: "intermediate"
+    advanced: "advanced"
+
+principals:
+  maintainerTeam: analytics-maintainers

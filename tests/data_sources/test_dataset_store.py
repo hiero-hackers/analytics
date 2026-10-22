@@ -601,3 +601,29 @@ def test_prune_reclaims_a_legacy_orphan_without_a_version_key(tmp_path):
 
     assert [path.name for path in removed] == ["issues_org_all.json"]
     assert (tmp_path / "live_org_all.json").exists()
+
+
+def test_prune_spares_files_the_caller_asks_to_keep(tmp_path):
+    """``keep`` exempts unclaimed files the caller cannot judge (a failed org's datasets)."""
+    from hiero_analytics.data_sources.dataset_store import (
+        forget_touched_datasets,
+        load_dataset,
+        prune_untouched_datasets,
+        save_dataset,
+    )
+    from hiero_analytics.data_sources.models import IssueTimelineEventRecord
+
+    forget_touched_datasets()
+    stamp = datetime(2026, 1, 1, tzinfo=UTC)
+    for name in ("issues_live-org_all.json", "issues_failed-org_all.json", "issues_orphan-org_all.json"):
+        save_dataset(tmp_path / name, [], stamp)
+    forget_touched_datasets()
+    load_dataset(tmp_path / "issues_live-org_all.json", IssueTimelineEventRecord)  # claimed this run
+
+    removed = prune_untouched_datasets(tmp_path, keep=lambda path: "_failed-org_" in path.name)
+
+    assert [path.name for path in removed] == ["issues_orphan-org_all.json"]
+    assert sorted(path.name for path in tmp_path.glob("*.json")) == [
+        "issues_failed-org_all.json",
+        "issues_live-org_all.json",
+    ]

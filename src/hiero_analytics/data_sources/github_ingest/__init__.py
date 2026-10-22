@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from ._common import (
     fetch_github_resource,
+    fetch_org_login,
     fetch_org_repos_graphql,
     fetch_org_resource_parallel,
 )
@@ -89,6 +90,7 @@ __all__ = [
     "fetch_github_resource",
     "fetch_org_resource_parallel",
     "fetch_org_repos_graphql",
+    "fetch_org_login",
     # issues
     "fetch_repo_issues_graphql",
     "fetch_repo_issues_since_graphql",
