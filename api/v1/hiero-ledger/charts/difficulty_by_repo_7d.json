@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-22T01:13:10.109249+00:00"
+  "end": "2026-10-23T01:16:13.058634+00:00"
  },
  "series": [
   {
@@ -61,7 +61,15 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 33,
+   "Unknown": 31,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cli",
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -69,7 +77,15 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 81,
+   "Unknown": 67,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-cryptography",
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -77,7 +93,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 2,
+   "Unknown": 3,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -93,7 +109,7 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "Unknown": 1,
+   "Unknown": 2,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +117,7 @@
   },
   {
    "repo": "hiero-sdk-java",
-   "Unknown": 1,
+   "Unknown": 3,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -109,7 +125,7 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "Unknown": 6,
+   "Unknown": 4,
    "Good First Issue": 4,
    "Beginner": 3,
    "Intermediate": 3,
@@ -118,14 +134,14 @@
   {
    "repo": "hiero-sdk-python",
    "Unknown": 0,
-   "Good First Issue": 3,
+   "Good First Issue": 2,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
    "repo": "hiero-sdk-tck",
-   "Unknown": 1,
+   "Unknown": 2,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -133,7 +149,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 21,
+   "Unknown": 18,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -156,6 +172,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-10-22T01:13:10.109249+00:00",
+ "generated_at": "2026-10-23T01:16:13.058634+00:00",
  "stale": false
 }

@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-10-22T01:15:16.129353+00:00"
+  "end": "2026-10-23T01:18:28.980362+00:00"
  },
  "series": [
   {
@@ -209,7 +209,7 @@
   },
   {
    "repo": "hiero-cryptography",
-   "general_user": 31,
+   "general_user": 32,
    "triage": 0,
    "committer": 2,
    "maintainer": 4
@@ -292,18 +292,18 @@
    "maintainer": 5
   },
   {
+   "repo": ".github",
+   "general_user": 10,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 6
+  },
+  {
    "repo": "hiero-did-sdk-python",
    "general_user": 11,
    "triage": 0,
    "committer": 2,
    "maintainer": 3
-  },
-  {
-   "repo": ".github",
-   "general_user": 10,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 5
   },
   {
    "repo": "hiero-hederium",
@@ -355,6 +355,6 @@
    "maintainer": 2
   }
  ],
- "generated_at": "2026-10-22T01:15:16.129353+00:00",
+ "generated_at": "2026-10-23T01:18:28.980362+00:00",
  "stale": false
 }

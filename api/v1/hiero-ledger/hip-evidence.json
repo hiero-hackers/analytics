@@ -64,8 +64,8 @@
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 287,
    "pr_title": "Add HIP-1535 SDK design doc: CLPR",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-22 15:04:23+00:00",
    "match_sources": "title|branch|body",
    "qualifier": null,
    "counted": true,
@@ -1989,6 +1989,20 @@
    "counted": true,
    "snippet": "/`doWithStartupConfig` flag toggles in `hip1261/*SimpleFeesTest` * Collapse simple-vs-l",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26028"
+  },
+  {
+   "hip": 1261,
+   "hip_title": "Simple Fees",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27590,
+   "pr_title": "fix: scale simple fees for contract id keys, NFT allowance serials and token dissociate",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "follows Keith's decision of 30 Jul in #hip-1261-simpler-fees. - **TokenCreate / TokenU",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27590"
   },
   {
    "hip": 1261,
@@ -12141,8 +12155,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 863,
- "generated_at": "2026-10-22T01:23:33.969646+00:00",
+ "row_count": 864,
+ "generated_at": "2026-10-23T01:24:49.104246+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
