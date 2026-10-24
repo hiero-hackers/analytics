@@ -38,6 +38,7 @@ import hiero_analytics.pipelines.hip_implementation as hip_mod
 import hiero_analytics.pipelines.maintainer_pipeline as maintainer_mod
 import hiero_analytics.pipelines.onboarding as onboarding_mod
 import hiero_analytics.pipelines.org_overview as overview_mod
+import hiero_analytics.pipelines.pr_responsiveness as pr_responsiveness_mod
 import hiero_analytics.pipelines.releases as releases_mod
 import hiero_analytics.pipelines.repo_growth as repo_growth_mod
 import hiero_analytics.pipelines.role_coverage as role_coverage_mod
@@ -355,6 +356,7 @@ def outputs_root(tmp_path_factory) -> Path:
             activity_mod,
             entity_mod,
             overview_mod,
+            pr_responsiveness_mod,
         ):
             mp.setattr(mod, "load_contributor_activity", lambda _c, org: _org_activity(org))
         for mod in (role_coverage_mod, activity_mod, entity_mod):
