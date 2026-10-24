@@ -1,6 +1,6 @@
 ---
 name: lfdt-report
-description: Draft Hiero's LF Decentralized Trust TAC report (annual review or mid-year update) from this repo's published data API. Data-backed sections get real, cited numbers in the register of the filed reviews; judgment sections become marked maintainer slots pre-filled with the evidence and the prior report's goals; a Data notes and gaps appendix lists what the TAC asks for that the API cannot yet supply. Ships scripts to fetch and inventory the API, derive period figures, render figures, lint the draft and export PNG and PDF. Use whenever asked to write, draft, refresh, or prepare the LFDT / TAC annual review or mid-year report for hiero-ledger or any other org in the manifest.
+description: Draft Hiero's LF Decentralized Trust TAC report (annual review or mid-year update) from this repo's published data API. Data-backed sections get real, cited numbers in the register of the filed reviews; judgment sections become marked maintainer slots pre-filled with the evidence and the prior report's goals; a Data notes and gaps appendix lists what the TAC asks for that the API cannot yet supply. Ships scripts to fetch the API, number its sources and derive period figures; the draft is Markdown, checked by hand against a short checklist. Use whenever asked to write, draft, refresh, or prepare the LFDT / TAC annual review or mid-year report for hiero-ledger or any other org in the manifest.
 ---
 
 # Drafting the LFDT TAC report
@@ -36,8 +36,7 @@ reported, not fixed.
 - **Period:** annual covers the previous calendar year and is filed early in
   the new one; mid-year covers January to June and is due in late summer
   (the year's schedule page, `project-updates/<year>/<year>-schedule/`,
-  gives the project's date; `inventory.py tac` prints it, and the hand-back
-  says whether it is past). Write the period as months in the header. Tiles,
+  gives the project's date; the hand-back says whether it is past). Write the period as months in the header. Tiles,
   shares, bench findings, the HIP funnel and Scorecard are snapshots at the
   data date, which may be after the period: the header says "figures that
   name no month are at <date>" when it is. `YYYY` in the file name is the filing
@@ -58,11 +57,10 @@ reported, not fixed.
 
 ## 2. Read the TAC instructions again, every run
 
-`python3 .claude/skills/lfdt-report/scripts/inventory.py tac --year <filing year> --project Hiero`
-fetches both instruction pages and the schedule and prints the questions,
-the evaluation criteria, the file-naming sentence and the project's due
-dates. They define the questions and they change (mid-year reports became
-mandatory in 2026):
+Open both instruction pages and the year's schedule page, and read the
+questions, the evaluation criteria, the file-naming sentence and the
+project's due date. They define the questions and they change (mid-year
+reports became mandatory in 2026):
 
 - Annual: <https://lf-decentralized-trust.github.io/governance/project-updates/annual-review-instructions/>
 - Mid-year: <https://lf-decentralized-trust.github.io/governance/project-updates/mid-year-update-instructions/>
@@ -78,19 +76,17 @@ scratch directory, never in the repo:
 
 ```bash
 export WORK=${WORK:-$(mktemp -d)}   # downloads and inventory
-export OUT=${OUT:-$WORK/draft}      # the draft, figures/ and PDF, unless the maintainer names a place
-mkdir -p "$OUT/figures"
+export OUT=${OUT:-$WORK/draft}      # the draft, unless the maintainer names a place
+mkdir -p "$OUT"
 S=.claude/skills/lfdt-report/scripts
 python3 $S/inventory.py fetch hiero-ledger            # manifest + every document; fails loudly
-python3 $S/inventory.py show  hiero-ledger > "$WORK/inventory.md"
 ```
 
-Read the inventory, not the raw manifest. It lists every macro (present or
-absent, with the absence note), every section with its all-time and
-per-period row counts, every chart card with variant → document id → kind,
-frequency, window, partial buckets and comparison pair, the views, the
-tiles and the entity counts. `references/api-section-map.md` says which of
-them answers which TAC question and sets out the reading rules: ids live at
+Then read `$WORK/manifest.json` for the org: every macro (present or
+absent, with the absence note), every section with its row counts, every
+chart card with its variants, the views, the tiles and the entity counts.
+`references/api-section-map.md` says which of them answers which TAC
+question and sets out the reading rules: ids live at
 three levels and tiles have none; `row_count` is the all-time table and the
 `7d`/`30d`/`365d` tables differ; variants are matched by `frequency`, not
 label; zero rows is a measured "none" for finding-type sections and a gap
@@ -103,17 +99,12 @@ If the org is not in the manifest, stop and list the orgs that are. If
 
 ## 4. Read the definitions, then derive with `derive.py`
 
-For every document you cite, read its definitions first:
-
-```bash
-python3 $S/inventory.py doc hiero-ledger maintainer_pipeline_yearly understaffed@365d tile:Governance/maintainers
-```
-
-It prints `note`, `methodology`, `population`, `window`, `frequency`,
-`comparison`, partial buckets, `stale` and `generated_at`, merging the
-document's text with the manifest card's and saying when they differ (a
-variant's note may live only on the card). Those are the only reliable
-statement of who was counted. If `stale` is true, say so beside the
+For every document you cite, open its JSON in `$WORK` and read `note`,
+`methodology`, `population`, `window`, `frequency`, `comparison`, partial
+buckets, `stale` and `generated_at` first, plus the same fields on the
+manifest card (a variant's note may live only on the card). Say when the two
+differ. Those are the only reliable statement of who was counted. Never print
+or paste the rows. If `stale` is true, say so beside the
 number. `references/data-quirks.md` lists the traps (two meanings of
 "adoption", unknown versus independent, the bot name rule) and the documents
 that disagree with each other; check each one every run.
@@ -156,7 +147,7 @@ and the register of the filed reviews (`references/example.md`). Rules:
    question. No section, chart, tile or column identifiers, no field names,
    no "derived by this draft", no remarks about how the API is structured:
    all of that belongs in the appendices. Human dates in prose ("6 October
-   2026"). The linter warns when the body falls under 70% of that length.
+   2026"). A body under about 70% of that length is probably a summary, not a draft.
 2. **Cite with inline links and numbered sources.** Link the number or
    phrase to the dashboard card
    (`https://hiero-hackers.github.io/analytics/#tab=<Macro>&org=<org>&widget=<card or section id>`,
@@ -194,9 +185,8 @@ and the register of the filed reviews (`references/example.md`). Rules:
    slot states the current stage as the prior report gave it.
 7. **Describe, don't editorialise.** "The maintainer bench spans fourteen
    employers" is a finding; "diversity is healthy" is the slot's to say.
-8. **Two or three figures for an annual, one at most for a mid-year**,
-   rendered with `render_figure.py` as `references/figures.md` describes, saved in `figures/` beside the draft,
-   each with alt text, a one-sentence plain caption and a source number.
+8. **Prefer small tables to charts.** If a figure helps, one at most, with
+   alt text, a one-sentence plain caption and a source number.
 9. **The header is one line** (data as of, dashboard link, period, the
    re-run clause when the period is incomplete, pointer to the appendix).
    Provenance and `BASE` live in the appendix.
@@ -212,16 +202,19 @@ TAC wants, why the API cannot answer, the closest signal, the smallest
 follow-up), coverage checklist. An empty gaps section almost certainly
 means the checks were skipped.
 
-## 7. Check, export, hand back
+## 7. Check, hand back
 
-```bash
-python3 $S/check_draft.py "$OUT/2027-annual-Hiero.md" --manifest "$WORK/manifest.json"   # infers annual or mid-year from the title
-python3 $S/export_report.py png "$OUT/figures"
-python3 $S/export_report.py pdf "$OUT/2027-annual-Hiero.md"
-```
+Before handing back, check the draft by hand:
 
-- Fix every failure the linter reports and judge each warning; it checks
-  the rules in step 5 and prints the body's shape against the filed review.
+- Every number has a numbered source, every [n] in the body has an entry in
+  Appendix: Sources, and no entry goes unused.
+- Every slot is marked and none is filled with invented prose.
+- No empty sections; the gaps appendix is not empty.
+- The re-run warning is the first line if the period is incomplete.
+- Header is one line and says "Data as of <date>"; the SPDX line is first.
+- No paragraph packs more than about six numbers; split it.
+- Numbers from `derive.py` match what you wrote, not a recomputation.
+
 - Then read the body once yourself as the TAC reviewer, and once as the
   maintainer who must fill each slot from the evidence listed under it.
 - Trace three numbers back to their JSON documents: one tile, one table row,
@@ -230,8 +223,7 @@ python3 $S/export_report.py pdf "$OUT/2027-annual-Hiero.md"
   maintainer asks, else in your scratch directory, and say it is untracked.
   Never under `outputs/`, which is gitignored and regenerated.
 - Hand back in the shape of `references/handback.md`: re-run warning first,
-  files (markdown is what gets filed; PNGs are for GitHub attachments; the
-  PDF is a review copy), slots, filing steps, data defects for
+  files (markdown is what gets filed), slots, filing steps, data defects for
   `/write-analytics-issue`, manifest `generated_at` and `git_sha`.
 - Do not commit, push or open a PR. Maintainers file under
   `tac/project-updates/<year>/` and add the `mkdocs.yml` nav entry under

@@ -7,15 +7,13 @@ they can skim it. Nothing in it repeats the draft.
 Draft status: data to 6 October 2026; re-run after 31 December 2026 before filing.
    (or: complete period, ready to fill in)
    (or: complete period; figures that name no month are snapshots at 6 October 2026)
-Due: 3 September 2026 per the 2026 schedule (past due by 5 weeks)   <- from inventory.py tac
+Due: 3 September 2026 per the 2026 schedule (past due by 5 weeks)   <- from the schedule page
 
 Files
 - <path>/2027-annual-Hiero.md          the draft (what gets filed)
-- <path>/figures/*.svg, *.png          3 figures; PNGs are what GitHub attachments take
-- <path>/2027-annual-Hiero.pdf         review copy for the TSC, not for filing
 
 Ran against manifest generated 2026-10-06T09:15Z, analytics revision 62a5652.
-check_draft.py: passed (or: N warnings, listed below)
+Checklist: passed (or: N items to review, listed below)
 
 Yours to write (9 slots)
 1. Community Calls
@@ -30,9 +28,7 @@ Yours to write (9 slots)
 
 To file
 1. Fill the slots; delete the "> [MAINTAINER INPUT]" lines.
-2. Upload figures/*.png to the governance PR (drag into the description),
-   replace each ![...](figures/...) line with the <img> GitHub inserts.
-3. Add the file under tac/project-updates/2027/ and the mkdocs.yml nav
+2. Add the file under tac/project-updates/2027/ and the mkdocs.yml nav
    entry under 2027 → Annual (or → MidYear; match the live nav). Open the
    PR against lf-decentralized-trust/governance.
 
@@ -48,5 +44,5 @@ Rules:
 
 - The re-run warning is the first line whenever the period is incomplete.
 - Paths are absolute. Say once that the files are untracked.
-- The slot list matches the draft exactly; count them with `check_draft.py`.
+- The slot list matches the draft exactly; count them in the draft.
 - Never paste the draft, a figure, or the gap list into the note.
