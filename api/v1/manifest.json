@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-23T01:26:24.177187+00:00",
+ "generated_at": "2026-10-24T01:29:45.523393+00:00",
  "provenance": {
-  "git_sha": "c58f490",
-  "data_as_of": "2026-10-23T01:16:08.000442+00:00"
+  "git_sha": "a8f3b4a",
+  "data_as_of": "2026-10-24T01:13:56.713303+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -519,7 +519,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 864,
+     "row_count": 865,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-23T01:24:49.114139+00:00"
+      "generated_at": "2026-10-24T01:28:22.239575+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-23T01:24:49.109625+00:00"
+      "generated_at": "2026-10-24T01:28:22.237122+00:00"
      }
     },
     {
@@ -1673,7 +1673,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 98,
+      "value": 99,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -2266,7 +2266,7 @@
      },
      {
       "label": "active last month %",
-      "value": "39%",
+      "value": "37%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -2795,13 +2795,6 @@
          "interactive": {
           "kind": "categories",
           "path": "LFDT-CLPR/charts/maintainer_pipeline_by_repo_30d.json"
-         }
-        },
-        {
-         "label": "Week",
-         "interactive": {
-          "kind": "categories",
-          "path": "LFDT-CLPR/charts/maintainer_pipeline_by_repo_7d.json"
          }
         }
        ],

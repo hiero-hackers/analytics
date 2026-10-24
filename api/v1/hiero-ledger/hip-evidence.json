@@ -1996,8 +1996,8 @@
    "repo": "hiero-ledger/hiero-consensus-node",
    "pr_number": 27590,
    "pr_title": "fix: scale simple fees for contract id keys, NFT allowance serials and token dissociate",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-23 21:14:49+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -6861,6 +6861,20 @@
    "counted": true,
    "snippet": "ion**: Root cause: The test validates HIP-993's irreversible preceding stream items v",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/25027"
+  },
+  {
+   "hip": 993,
+   "hip_title": "Improve record stream legibility and extensibility",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27846,
+   "pr_title": "fix: externalize committed EVM self-destruct deletions",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "sed | | `SelfDestructRecordsSuite` plus HIP-993 natural dispatch ordering, four-node su",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27846"
   },
   {
    "hip": 991,
@@ -12155,8 +12169,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 864,
- "generated_at": "2026-10-23T01:24:49.104246+00:00",
+ "row_count": 865,
+ "generated_at": "2026-10-24T01:28:22.234221+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

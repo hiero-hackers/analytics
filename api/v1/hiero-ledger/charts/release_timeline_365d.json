@@ -62,21 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-23T01:24:08.198260+00:00"
+  "end": "2026-10-24T01:27:45.667662+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-block-node",
-   "time": "2025-10-23T23:49:12Z",
-   "tag_name": "v0.21.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-block-node",
-   "time": "2025-10-23T23:50:15Z",
-   "tag_name": "v0.21.1",
-   "type": "release"
-  },
   {
    "repo": "hiero-gradle-conventions",
    "time": "2025-10-24T10:49:55Z",
@@ -3562,8 +3550,20 @@
    "time": "2026-10-22T17:54:45Z",
    "tag_name": "v0.44.3",
    "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-10-23T18:39:22Z",
+   "tag_name": "v0.78.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-23T19:01:13Z",
+   "tag_name": "v0.165.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-23T01:24:08.198260+00:00",
+ "generated_at": "2026-10-24T01:27:45.667662+00:00",
  "stale": false
 }
