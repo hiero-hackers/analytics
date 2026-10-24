@@ -553,6 +553,8 @@ def test_data_api_emits_the_bespoke_views(outputs_root: Path):
     ci_health_matrix = json.loads((api_dir / PRIMARY / "ci-health-matrix.json").read_text())
     assert ci_health_matrix["rows"], "CI health matrix emitted with no rows"
     assert ci_health_matrix["columns"], "CI health matrix emitted with no columns"
+    assert ci_health_matrix["bands"], "CI health matrix emitted with no header bands"
+    assert sum(band["span"] for band in ci_health_matrix["bands"]) == len(ci_health_matrix["columns"])
 
 
 def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
