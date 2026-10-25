@@ -48,8 +48,8 @@
   "hiero-json-rpc-relay",
   "solo-charts",
   "hiero-gradle-conventions",
-  "solo-containers",
   "hiero-sdk-java",
+  "solo-containers",
   "hiero-sdk-go",
   "hiero-solo-action",
   "hiero-sdk-cpp",
@@ -69,15 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-24T01:27:45.667662+00:00"
+  "end": "2026-10-25T01:25:47.359140+00:00"
  },
  "rows": [
-  {
-   "repo": "solo-containers",
-   "time": "2025-04-24T20:01:45Z",
-   "tag_name": "v0.37.2",
-   "type": "release"
-  },
   {
    "repo": "hiero-mirror-node-explorer",
    "time": "2025-04-25T15:18:36Z",
@@ -5215,6 +5209,6 @@
    "type": "release"
   }
  ],
- "generated_at": "2026-10-24T01:27:45.667662+00:00",
+ "generated_at": "2026-10-25T01:25:47.359140+00:00",
  "stale": false
 }

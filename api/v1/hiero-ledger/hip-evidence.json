@@ -411,6 +411,20 @@
   {
    "hip": 1340,
    "hip_title": "EOA Code Delegation",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27854,
+   "pr_title": "fix: require EIP-7702 authority to match the account's current key",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "odeDelegationAuthorityKeyRotationTest` (HIP-1340 HAPI): after rotating an ECDSA account",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27854"
+  },
+  {
+   "hip": 1340,
+   "hip_title": "EOA Code Delegation",
    "repo": "hiero-ledger/hiero-json-rpc-relay",
    "pr_number": 5172,
    "pr_title": "feat: return EIP-7702 delegation designator for eth_getCode (#5033)",
@@ -12169,8 +12183,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 865,
- "generated_at": "2026-10-24T01:28:22.234221+00:00",
+ "row_count": 866,
+ "generated_at": "2026-10-25T01:26:25.496066+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
