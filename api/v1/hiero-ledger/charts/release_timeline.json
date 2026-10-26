@@ -69,15 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-25T01:25:47.359140+00:00"
+  "end": "2026-10-26T01:26:54.368487+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node-explorer",
-   "time": "2025-04-25T15:18:36Z",
-   "tag_name": "v24.14.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-mirror-node",
    "time": "2025-04-29T16:39:41Z",
@@ -5207,8 +5201,14 @@
    "time": "2026-10-23T19:01:13Z",
    "tag_name": "v0.165.1",
    "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-10-25T16:02:59Z",
+   "tag_name": "v0.80.3",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-25T01:25:47.359140+00:00",
+ "generated_at": "2026-10-26T01:26:54.368487+00:00",
  "stale": false
 }

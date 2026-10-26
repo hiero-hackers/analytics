@@ -3,22 +3,39 @@
  "kind": "ci_health_matrix",
  "group": "CI health",
  "title": "CI health matrix",
- "description": "Repository-level CI health checks covering GitHub Actions SHA pinning, explicit workflow permissions, and repository security configuration. Click a fail or review cell to inspect the supporting evidence.",
+ "description": "Repository-level CI health checks sorted worst-first by fail count, then review count, then repository name. Pass and na do not affect repo priority. Click a fail or review cell to inspect the supporting evidence.",
  "badge": "5 repositories",
  "source": "ci_health_checks.csv",
  "row_header": "Repository",
  "columns": [
   {
    "key": "actions_sha_pinned",
-   "label": "Actions SHA Pinned"
+   "label": "Actions SHA Pinned",
+   "band": "actions"
   },
   {
    "key": "explicit_permissions",
-   "label": "Explicit Permissions"
+   "label": "Explicit Permissions",
+   "band": "permissions"
   },
   {
    "key": "repository_security_configuration",
-   "label": "Security Config"
+   "label": "Security Config",
+   "band": "repository"
+  }
+ ],
+ "bands": [
+  {
+   "label": "Actions",
+   "span": 1
+  },
+  {
+   "label": "Permissions",
+   "span": 1
+  },
+  {
+   "label": "Repository",
+   "span": 1
   }
  ],
  "rows": [
@@ -31,21 +48,21 @@
      "label": "Actions SHA Pinned",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "nan"
+     "location": ""
     }
    ]
   },
@@ -58,21 +75,21 @@
      "label": "Actions SHA Pinned",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "nan"
+     "location": ""
     }
    ]
   },
@@ -85,21 +102,21 @@
      "label": "Actions SHA Pinned",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "nan"
+     "location": ""
     }
    ]
   },
@@ -112,21 +129,21 @@
      "label": "Actions SHA Pinned",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "nan"
+     "location": ""
     }
    ]
   },
@@ -139,21 +156,21 @@
      "label": "Actions SHA Pinned",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "na",
      "evidence": "Repository has no GitHub Actions workflows.",
-     "location": "nan"
+     "location": ""
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "nan"
+     "location": ""
     }
    ]
   }
@@ -165,6 +182,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-10-25T01:27:38.200486+00:00",
+ "generated_at": "2026-10-26T01:29:05.486360+00:00",
  "stale": false
 }
