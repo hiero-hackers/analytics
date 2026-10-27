@@ -188,6 +188,7 @@ def test_a_merge_before_its_creation_is_dropped_as_a_data_error():
 
 
 def test_pr_output_has_no_cohort_dimension():
+    """Ensure PR response-time output does not expose unsupported cohorts."""
     prs = pr_response_times(
         _frame(
             _opened("sdk", "alice", 2),
@@ -196,6 +197,7 @@ def test_pr_output_has_no_cohort_dimension():
     )
     assert "cohort" not in prs.columns
     assert "cohort" not in PR_RESPONSE_COLUMNS
+
 
 @pytest.mark.parametrize(
     "records",
@@ -304,11 +306,14 @@ def test_every_window_has_a_row_even_when_empty():
     assert empty["merged_prs"] == 0
     assert empty["reviewed_share"] == 0
 
+
 def test_summary_reports_all_eligible_prs_once():
+    """Ensure each eligible PR is counted once in the summary."""
     summary = responsiveness_summary(_prs_for_summary(), [("all", None)])
     overall = _cell(summary, period="all")
     assert overall["merged_prs"] == 6
     assert "cohort" not in summary.columns
+
 
 def test_per_repo_summary_carries_the_repo_and_the_same_statistics():
     """The per-repo table is the same statistics keyed by repository."""
