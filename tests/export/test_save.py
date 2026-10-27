@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pandas as pd
-
+from hiero_analytics.data_sources import dataset_store
+from hiero_analytics.data_sources.dataset_store import track_pipeline_datasets
 from hiero_analytics import provenance
 from hiero_analytics.export.save import save_dataframe, write_output_meta
 
@@ -57,6 +59,30 @@ def test_sidecar_records_a_zero_row_count(tmp_path):
 
     meta = json.loads((tmp_path / "empty.csv.meta.json").read_text(encoding="utf-8"))
     assert meta["record_count"] == 0
+
+
+def test_output_sidecar_records_pipeline_source_fetch_times(tmp_path, monkeypatch):
+    """A pipeline's output metadata records its source datasets' fetch times."""
+
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir(parents=True, exist_ok=True)
+    source = datasets_dir / "issues_org_all.json"
+    stamp = datetime(2026, 10, 20, 10, 0, tzinfo=UTC)
+    source.write_text(
+        json.dumps({"version": 2, "fetched_at": stamp.isoformat(), "fetched_through": "2026-10-01T00:00:00+00:00", "records": []}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(dataset_store.paths, "DATASETS_DIR", datasets_dir)
+    dataset_store.forget_touched_datasets()
+    dataset_store._record_touch(source)
+    path = tmp_path / "table.csv"
+
+    with track_pipeline_datasets():
+        dataset_store._record_touch(source)
+        save_dataframe(pd.DataFrame([{"a": 1}]), path)
+
+    meta = json.loads(Path(f"{path}.meta.json").read_text(encoding="utf-8"))
+    assert meta["source_datasets"] == [{"name": source.name, "fetched_at": stamp.isoformat()}]
 
 
 def test_csv_body_is_left_unstamped(tmp_path):

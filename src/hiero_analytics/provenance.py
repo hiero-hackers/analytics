@@ -262,6 +262,23 @@ def _predates_fetched_at(path: Path) -> bool:
     return isinstance(_read_stamp(path, _WATERMARK_RE), datetime)
 
 
+def dataset_fetched_at(path: Path) -> datetime | None:
+    """Read a persisted dataset's fetch time, falling back only for legacy files.
+
+    ``fetched_at`` is the refresh-time signal. Older datasets written before
+    that field existed use ``fetched_through`` as a conservative fallback;
+    an unreadable current stamp remains unknown rather than being guessed.
+    """
+    fetched = _read_stamp(path, _FETCHED_AT_RE)
+    if isinstance(fetched, datetime):
+        return fetched
+    if _predates_fetched_at(path):
+        fallback = _read_stamp(path, _WATERMARK_RE)
+        if isinstance(fallback, datetime):
+            return fallback
+    return None
+
+
 def resolve_provenance(datasets_dir: Path | None = None) -> Provenance:
     """Resolve the current run's provenance.
 

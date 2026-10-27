@@ -119,24 +119,51 @@ def _read_meta(csv_path: Path) -> dict:
 
 
 def _freshness(csv_path: Path) -> dict:
-    """``generated_at``/``stale`` from the source CSV's sidecar; {} when it has none."""
-    generated_at = _read_meta(csv_path).get("generated_at")
+    """Publish output generation time and source-data staleness when known.
+
+    ``generated_at`` describes the CSV artifact, not its inputs. A staleness
+    verdict is emitted only when every source dataset recorded by the producing
+    pipeline has a usable fetch timestamp. The oldest source fetch is the
+    conservative bound for outputs derived from multiple datasets.
+    """
+    meta = _read_meta(csv_path)
+    generated_at = meta.get("generated_at")
     if not generated_at:
         return {}
     try:
         generated = datetime.fromisoformat(generated_at)
-    except ValueError:
-        # Ship the raw stamp without a staleness verdict, but say so — a sidecar
-        # that stops parsing should show up in the run log, not vanish.
+    except (TypeError, ValueError):
         logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
         return {"generated_at": generated_at}
-    # Sidecars are written UTC-aware, but a hand-edited or legacy one may be
-    # naive; assume UTC rather than letting the subtraction raise TypeError and
-    # fail the entire emit over one stamp.
     if generated.tzinfo is None:
         logger.warning("Naive generated_at %r in sidecar for %s; assuming UTC", generated_at, csv_path)
         generated = generated.replace(tzinfo=UTC)
-    return {"generated_at": generated_at, "stale": datetime.now(UTC) - generated > STALE_AFTER}
+
+    result = {"generated_at": generated_at}
+    sources = meta.get("source_datasets")
+    # Legacy outputs, pipelines with no tracked dataset inputs, or invalid source
+    # metadata cannot support a freshness claim. Keep generated_at for callers.
+    if not isinstance(sources, list) or not sources:
+        return result
+
+    fetched_stamps = []
+    for source in sources:
+        if not isinstance(source, dict) or not isinstance(source.get("fetched_at"), str):
+            logger.warning("Missing source fetch timestamp in sidecar for %s", csv_path)
+            return result
+        try:
+            fetched = datetime.fromisoformat(source["fetched_at"])
+        except ValueError:
+            logger.warning("Unparseable source fetch timestamp %r in sidecar for %s", source["fetched_at"], csv_path)
+            return result
+        if fetched.tzinfo is None:
+            logger.warning("Naive source fetch timestamp %r in sidecar for %s; assuming UTC", source["fetched_at"], csv_path)
+            fetched = fetched.replace(tzinfo=UTC)
+        fetched_stamps.append(fetched.astimezone(UTC))
+
+    oldest_fetch = min(fetched_stamps)
+    result["stale"] = datetime.now(UTC) - oldest_fetch > STALE_AFTER
+    return result
 
 
 def _stamp_freshness(document: dict, csv_path: Path) -> None:
