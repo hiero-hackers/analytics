@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-27T01:35:17.515823+00:00",
+ "generated_at": "2026-10-27T19:08:02.535693+00:00",
  "provenance": {
   "git_sha": "da6d568",
-  "data_as_of": "2026-10-27T01:18:32.258114+00:00"
+  "data_as_of": "2026-10-27T18:54:40.753236+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -405,7 +405,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1508,
+     "row_count": 1511,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-27T01:33:46.983440+00:00"
+      "generated_at": "2026-10-27T19:05:55.869557+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-27T01:33:46.978608+00:00"
+      "generated_at": "2026-10-27T19:05:55.865980+00:00"
      }
     },
     {
@@ -1556,7 +1556,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1508,
+      "value": 1511,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1566,7 +1566,7 @@
      },
      {
       "label": "active last month %",
-      "value": "10%",
+      "value": "11%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1731,7 +1731,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1508
+     "count": 1511
     }
    }
   },
@@ -2372,7 +2372,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 10,
+     "row_count": 11,
      "path": "LFDT-CLPR/profiles.json"
     },
     {
@@ -3119,7 +3119,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 10,
+      "value": 11,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -3138,7 +3138,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "50%",
+      "value": "45%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -3147,7 +3147,7 @@
      },
      {
       "label": "file issues %",
-      "value": "40%",
+      "value": "36%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3156,7 +3156,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "70%",
+      "value": "64%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -3165,7 +3165,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "60%",
+      "value": "64%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -3264,7 +3264,7 @@
     },
     "contributors": {
      "path": "LFDT-CLPR/entities/contributors.json",
-     "count": 10
+     "count": 11
     }
    }
   }

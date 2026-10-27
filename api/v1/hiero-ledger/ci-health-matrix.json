@@ -378,8 +378,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 22 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/acceptance.yaml:31; .github/workflows/charts.yml:13; .github/workflows/cleanup.yml:9; .github/workflows/cleanup.yml:38; .github/workflows/copy-stackgres-cluster.yml:152; .github/workflows/deploy-preprod.yaml:17; .github/workflows/deploy-preprod.yaml:34; .github/workflows/deploy.yaml:10; .github/workflows/deploy.yaml:24; .github/workflows/gas-estimate-accuracy.yml:40; .github/workflows/gh-pages-sync.yaml:16; .github/workflows/gh-pages-sync.yaml:23; .github/workflows/gradle-wrapper-validation.yml:15; .github/workflows/gradle.yml:20; .github/workflows/non-zero-realm-pr.yml:14; .github/workflows/non-zero-realm.yml:18; .github/workflows/release-automation.yml:12; .github/workflows/release-automation.yml:26; .github/workflows/release-automation.yml:150; .github/workflows/release-ghcr.yml:17; .github/workflows/release-ghcr.yml:39; .github/workflows/release-ghcr.yml:82; .github/workflows/release-integration.yml:10; .github/workflows/release-integration.yml:40; .github/workflows/release-integration.yml:118; .github/workflows/release-production.yml:10; .github/workflows/release-production.yml:41; .github/workflows/release-production.yml:121; .github/workflows/release-production.yml:142; .github/workflows/releases-comparator.yml:14; .github/workflows/rosetta.yml:18; .github/workflows/security.yml:20; .github/workflows/snyk-monitor.yml:16; .github/workflows/test-native-images.yml:25; .github/workflows/wrb-differential.yaml:15; .github/workflows/wrb-differential.yaml:40"
+     "evidence": "All 21 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/acceptance.yaml:31; .github/workflows/charts.yml:13; .github/workflows/cleanup.yml:9; .github/workflows/cleanup.yml:38; .github/workflows/copy-stackgres-cluster.yml:152; .github/workflows/deploy-preprod.yaml:17; .github/workflows/deploy-preprod.yaml:34; .github/workflows/deploy.yaml:10; .github/workflows/deploy.yaml:24; .github/workflows/gas-estimate-accuracy.yml:40; .github/workflows/gh-pages-sync.yaml:16; .github/workflows/gh-pages-sync.yaml:23; .github/workflows/gradle-wrapper-validation.yml:15; .github/workflows/gradle.yml:20; .github/workflows/non-zero-realm-pr.yml:14; .github/workflows/non-zero-realm.yml:18; .github/workflows/release-automation.yml:12; .github/workflows/release-automation.yml:26; .github/workflows/release-automation.yml:150; .github/workflows/release-ghcr.yml:17; .github/workflows/release-ghcr.yml:39; .github/workflows/release-ghcr.yml:82; .github/workflows/release-integration.yml:10; .github/workflows/release-integration.yml:40; .github/workflows/release-integration.yml:118; .github/workflows/release-production.yml:10; .github/workflows/release-production.yml:41; .github/workflows/release-production.yml:121; .github/workflows/release-production.yml:142; .github/workflows/releases-comparator.yml:14; .github/workflows/rosetta.yml:18; .github/workflows/security.yml:20; .github/workflows/test-native-images.yml:25; .github/workflows/wrb-differential.yaml:15; .github/workflows/wrb-differential.yaml:40"
     },
     {
      "key": "repository_security_configuration",
@@ -837,8 +837,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/build.yml:20; .github/workflows/gradle-wrapper-validation.yml:16; .github/workflows/pages.yml:13; .github/workflows/pages.yml:23; .github/workflows/pr-formatting.yml:15; .github/workflows/pr-formatting.yml:26; .github/workflows/release-artifacts.yml:19; .github/workflows/release-artifacts.yml:76; .github/workflows/snyk-monitor.yml:10; .github/workflows/snyk-monitor.yml:17"
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/build.yml:20; .github/workflows/gradle-wrapper-validation.yml:16; .github/workflows/pages.yml:13; .github/workflows/pages.yml:23; .github/workflows/pr-formatting.yml:15; .github/workflows/pr-formatting.yml:26; .github/workflows/release-artifacts.yml:19; .github/workflows/release-artifacts.yml:76"
     },
     {
      "key": "repository_security_configuration",
@@ -1235,6 +1235,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-10-27T01:33:31.193976+00:00",
+ "generated_at": "2026-10-27T19:05:38.105754+00:00",
  "stale": false
 }

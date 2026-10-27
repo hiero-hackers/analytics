@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-27T01:35:09.529563+00:00"
+  "end": "2026-10-27T19:07:54.768401+00:00"
  },
  "series": [
   {
@@ -62,28 +62,28 @@
    "maintainer": 1
   },
   {
-   "repo": "governance",
+   "repo": "clpr-endpoint",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "clpr-endpoint",
-   "general_user": 0,
+   "repo": "clpr-smart-contracts",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "clpr-smart-contracts",
-   "general_user": 0,
+   "repo": "governance",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-27T01:35:09.529563+00:00",
+ "generated_at": "2026-10-27T19:07:54.768401+00:00",
  "stale": false
 }

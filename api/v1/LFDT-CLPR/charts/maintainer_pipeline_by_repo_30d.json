@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-27T01:35:09.524523+00:00"
+  "end": "2026-10-27T19:07:54.765207+00:00"
  },
  "series": [
   {
@@ -77,7 +77,7 @@
   },
   {
    "repo": "clpr-endpoint",
-   "general_user": 1,
+   "general_user": 2,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
@@ -91,6 +91,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-27T01:35:09.524523+00:00",
+ "generated_at": "2026-10-27T19:07:54.765207+00:00",
  "stale": false
 }
