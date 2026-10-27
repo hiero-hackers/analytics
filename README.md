@@ -169,7 +169,7 @@ Available pipelines:
 | `discord_analytics` | Discord analytics — needs manual CSV inputs, so not part of the full run |
 | `contributor_churn` | Contributor churn analysis (funnel, retention, transitions and tenure CSVs) — on-demand, not part of the full run |
 | `build_affiliations` | Regenerates `affiliations.yaml` from public signals (hand corrections go in `affiliation_overrides.yaml`) — maintenance tool, needs `gpg` |
-| `pr_responsiveness` | Time-to-first-review and time-to-merge for merged PRs (org-wide, per repo, first PRs vs later PRs, monthly) — writes `pr_responsiveness*.csv`; on-demand until a dashboard section consumes it. Definitions and limits are in `analysis/pr_responsiveness.py` |
+| `pr_responsiveness` | Time-to-first-review and time-to-merge for merged PRs (org-wide, per repo, monthly) — writes `pr_responsiveness*.csv` for dashboard tables. Definitions and limits are in `analysis/pr_responsiveness.py` |
 | `build_affiliations` | Regenerates the curated `affiliations.yaml` from public signals — maintenance tool, needs `gpg` |
 
 > Fetched GitHub data is cached under `outputs/cache/` for 24 hours, so repeated runs within a day reuse it instead of re-querying the API.

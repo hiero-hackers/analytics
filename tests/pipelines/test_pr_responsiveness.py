@@ -53,18 +53,22 @@ def test_writes_the_three_tables_with_sidecars_and_window_stamps(monkeypatch, st
         assert (data_dir / name).exists(), name
         assert (data_dir / f"{name}.meta.json").exists(), name
 
-    overall = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_FILE).set_index("cohort")
+    overall = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_FILE)
+    assert len(overall) == 1
     assert overall["merged_prs"].eq(2).all()
-    assert overall.loc["all", "median_hours_to_first_review"] == 6
-    assert overall.loc["all", "median_hours_to_merge"] == 17
+    assert overall.loc[0, "median_hours_to_first_review"] == 6
+    assert overall.loc[0, "median_hours_to_merge"] == 17
+    assert "cohort" not in overall.columns
     assert overall["window_end"].nunique() == 1
     assert "period" not in overall.columns
 
     # The period-specific files retain only their selected window.
-    week = pd.read_csv(data_dir / "pr_responsiveness_7d.csv").set_index("cohort")
-    assert week.loc["all", "merged_prs"] == 1
-    assert week.loc["all", "median_hours_to_first_review"] == 6
-    assert week.loc["all", "median_hours_to_merge"] == 24
+    week = pd.read_csv(data_dir / "pr_responsiveness_7d.csv")
+    assert len(week) == 1
+    assert week.loc[0, "merged_prs"] == 1
+    assert week.loc[0, "median_hours_to_first_review"] == 6
+    assert week.loc[0, "median_hours_to_merge"] == 24
+    assert "cohort" not in week.columns
     assert "period" not in week.columns
 
     by_repo = pd.read_csv(data_dir / runner.PR_RESPONSIVENESS_BY_REPO_FILE)

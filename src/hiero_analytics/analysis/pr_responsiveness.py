@@ -17,12 +17,6 @@ Definitions:
   count in ``merged_prs`` and contribute to ``reviewed_share``.
 - **Time-to-merge** — merge minus PR creation, in wall-clock hours. Weekends and
   time zones are not discounted.
-- **Cohort** — contributor-history completeness is unavailable in the input
-  events, so the analysis does not infer first-time versus established status.
-  Every eligible PR is assigned to ``unknown``. The ``all`` summary includes
-  all eligible PRs, so ``unknown`` and ``all`` rows contain the same metrics;
-  ``unknown`` is not a separate contributor population.
-
 Windows are ``(key, cutoff)`` pairs. A cutoff is the inclusive lower bound on
 the PR merge time, or ``None`` for all recorded time. The analysis does not
 read the current clock.
@@ -40,10 +34,6 @@ import pandas as pd
 
 Window = tuple[str, datetime | None]
 
-ALL_COHORTS = "all"
-UNKNOWN_COHORT = "unknown"
-COHORTS = (ALL_COHORTS, UNKNOWN_COHORT)
-
 # A 90th percentile of fewer values than this is just the maximum, so it is left
 # empty rather than presented as a statistic.
 P90_MIN_SAMPLE = 10
@@ -52,7 +42,6 @@ PR_RESPONSE_COLUMNS = [
     "repo",
     "pr_number",
     "author",
-    "cohort",
     "created_at",
     "first_review_at",
     "merged_at",
@@ -69,11 +58,10 @@ _STAT_COLUMNS = [
     "median_hours_to_merge",
     "p90_hours_to_merge",
 ]
-SUMMARY_COLUMNS = ["period", "cohort", *_STAT_COLUMNS]
+SUMMARY_COLUMNS = ["period", *_STAT_COLUMNS]
 REPO_SUMMARY_COLUMNS = ["repo", *SUMMARY_COLUMNS]
 MONTHLY_COLUMNS = [
     "month",
-    "cohort",
     "merged_prs",
     "reviewed_prs",
     "median_hours_to_first_review",
@@ -96,10 +84,6 @@ def _utc(values: pd.Series) -> pd.Series:
 def pr_response_times(events: pd.DataFrame) -> pd.DataFrame:
     """Return one row per merged PR, with review and merge waits in hours.
 
-    Contributor-history completeness is not available in the input events.
-    Therefore every eligible PR receives the ``unknown`` cohort rather than
-    inferring first-time or established-contributor status.
-
     Parameters
     ----------
     events
@@ -121,8 +105,6 @@ def pr_response_times(events: pd.DataFrame) -> pd.DataFrame:
         .drop_duplicates(_PR_KEY)
         .rename(columns={"contributor": "author", "occurred_at": "created_at"})[[*_PR_KEY, "author", "created_at"]]
     )
-    created["cohort"] = UNKNOWN_COHORT
-
     merges = (
         merged.sort_values("occurred_at")
         .drop_duplicates(_PR_KEY)
@@ -182,21 +164,16 @@ def _stats(prs: pd.DataFrame) -> dict[str, float | int]:
     }
 
 
-def _cohort_slice(prs: pd.DataFrame, cohort: str) -> pd.DataFrame:
-    """Select all PRs or the requested cohort."""
-    return prs if cohort == ALL_COHORTS else prs[prs["cohort"] == cohort]
-
-
 def responsiveness_summary(
     prs: pd.DataFrame,
     windows: Sequence[Window],
     *,
     by_repo: bool = False,
 ) -> pd.DataFrame:
-    """Summarize review and merge waits per window and cohort.
+    """Summarize review and merge waits per reporting window.
 
-    Every window and cohort gets a row, even when no PRs qualify. Empty groups
-    receive zero counts and missing statistics. With ``by_repo=True``, only
+    Every window gets a row, even when no PRs qualify. Empty groups receive
+    zero counts and missing statistics. With ``by_repo=True``, only
     repositories represented in the PR data appear.
     """
     columns = REPO_SUMMARY_COLUMNS if by_repo else SUMMARY_COLUMNS
@@ -208,38 +185,30 @@ def responsiveness_summary(
     for repo, group in groups:
         for key, cutoff in windows:
             in_window = group if cutoff is None else group[group["merged_at"] >= cutoff]
-            for cohort in COHORTS:
-                row: dict[str, object] = {
-                    "period": key,
-                    "cohort": cohort,
-                    **_stats(_cohort_slice(in_window, cohort)),
-                }
-                rows.append({"repo": repo, **row} if by_repo else row)
+            row: dict[str, object] = {"period": key, **_stats(in_window)}
+            rows.append({"repo": repo, **row} if by_repo else row)
     return pd.DataFrame(rows, columns=columns)
 
 
 def monthly_responsiveness(prs: pd.DataFrame) -> pd.DataFrame:
-    """Summarize review and merge waits by merge month and cohort.
+    """Summarize review and merge waits by merge month.
 
-    Months without PRs in a cohort are omitted instead of zero-filled.
+    Months without merged PRs are omitted instead of zero-filled.
     """
     if prs.empty:
         return pd.DataFrame(columns=MONTHLY_COLUMNS)
 
     month = prs["merged_at"].dt.strftime("%Y-%m")
     rows: list[dict[str, object]] = []
-    for cohort in COHORTS:
-        sliced = _cohort_slice(prs, cohort)
-        for key, group in sliced.groupby(month.loc[sliced.index]):
-            stats = _stats(group)
-            rows.append(
-                {
-                    "month": key,
-                    "cohort": cohort,
-                    "merged_prs": stats["merged_prs"],
-                    "reviewed_prs": stats["reviewed_prs"],
-                    "median_hours_to_first_review": (stats["median_hours_to_first_review"]),
-                    "median_hours_to_merge": stats["median_hours_to_merge"],
-                }
-            )
-    return pd.DataFrame(rows, columns=MONTHLY_COLUMNS).sort_values(["month", "cohort"], ignore_index=True)
+    for key, group in prs.groupby(month):
+        stats = _stats(group)
+        rows.append(
+            {
+                "month": key,
+                "merged_prs": stats["merged_prs"],
+                "reviewed_prs": stats["reviewed_prs"],
+                "median_hours_to_first_review": stats["median_hours_to_first_review"],
+                "median_hours_to_merge": stats["median_hours_to_merge"],
+            }
+        )
+    return pd.DataFrame(rows, columns=MONTHLY_COLUMNS).sort_values("month", ignore_index=True)

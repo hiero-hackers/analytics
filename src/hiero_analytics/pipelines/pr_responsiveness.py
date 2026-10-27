@@ -3,7 +3,7 @@
 Reads the persisted org-wide contributor-activity dataset (the same records the
 contributor profiles and detail views use) and writes, per org, the waits for
 the Week, 1 month and 1 year windows and all time — org-wide and per repository,
-split into authors' first PRs and later PRs — plus a monthly trend. Nothing is
+plus a monthly trend. Nothing is
 fetched beyond that dataset.
 
 Offline-capable: it only reads a dataset another pipeline persisted. See

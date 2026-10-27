@@ -158,19 +158,17 @@ SECTION_SPECS = [
             "Review and merge timing for merged pull requests in the selected period. "
             "Only PRs with recorded creation and merge events are included; unmerged "
             "PRs are excluded. Review time measures elapsed wall-clock hours until the "
-            "first review by someone other than the author. Contributor history cannot "
-            "be verified, so the 'unknown' cohort contains all eligible PRs and "
-            "duplicates the 'all' cohort metrics."
+            "first review by someone other than the author. P90 is the 90th "
+            "percentile of elapsed time, measured in hours."
         ),
         "columns": [
-            ("cohort", "cohort"),
             ("merged_prs", "merged PRs", "number"),
             ("reviewed_prs", "reviewed PRs", "number"),
             ("reviewed_share", "reviewed share", "number"),
             ("median_hours_to_first_review", "median hours to first review", "number"),
-            ("p90_hours_to_first_review", "P90 hours to first review", "number"),
+            ("p90_hours_to_first_review", "P90 time to first review (hours)", "number"),
             ("median_hours_to_merge", "median hours to merge", "number"),
-            ("p90_hours_to_merge", "P90 hours to merge", "number"),
+            ("p90_hours_to_merge", "P90 time to merge (hours)", "number"),
         ],
     },
     {
@@ -180,20 +178,18 @@ SECTION_SPECS = [
         "title": "PR responsiveness by repository",
         "description": (
             "Compare review and merge timing across repositories, considering the "
-            "number of merged pull requests. Unmerged PRs are excluded. Contributor "
-            "history cannot be verified, so 'unknown' contains the same eligible PRs "
-            "as 'all'; these are not separate populations."
+            "number of merged pull requests. Unmerged PRs are excluded. P90 is the "
+            "90th percentile of elapsed time, measured in hours."
         ),
         "columns": [
             ("repo", "repo"),
-            ("cohort", "cohort"),
             ("merged_prs", "merged PRs", "number"),
             ("reviewed_prs", "reviewed PRs", "number"),
             ("reviewed_share", "reviewed share", "number"),
             ("median_hours_to_first_review", "median hours to first review", "number"),
-            ("p90_hours_to_first_review", "P90 hours to first review", "number"),
+            ("p90_hours_to_first_review", "P90 time to first review (hours)", "number"),
             ("median_hours_to_merge", "median hours to merge", "number"),
-            ("p90_hours_to_merge", "P90 hours to merge", "number"),
+            ("p90_hours_to_merge", "P90 time to merge (hours)", "number"),
         ],
     },
     {
@@ -203,13 +199,10 @@ SECTION_SPECS = [
         "title": "Monthly PR responsiveness",
         "description": (
             "Monthly review and merge timing trends, grouped by merge month. Interpret "
-            "timing estimates alongside sample counts; unmerged PRs are excluded. "
-            "Contributor history cannot be verified, so 'unknown' duplicates the "
-            "'all' cohort metrics rather than representing a separate population."
+            "timing estimates alongside sample counts; unmerged PRs are excluded."
         ),
         "columns": [
             ("month", "month"),
-            ("cohort", "cohort"),
             ("merged_prs", "merged PRs", "number"),
             ("reviewed_prs", "reviewed PRs", "number"),
             ("median_hours_to_first_review", "median hours to first review", "number"),
@@ -233,14 +226,13 @@ GLOSSARY = glossary_of(
         "period tabs",
         "login",
         "signal matched",
-        "cohort",
         "merged PRs",
         "reviewed PRs",
         "reviewed share",
         "median hours to first review",
-        "P90 hours to first review",
+        "P90 time to first review (hours)",
         "median hours to merge",
-        "P90 hours to merge",
+        "P90 time to merge (hours)",
         "month",
     ),
     note=(
@@ -248,7 +240,7 @@ GLOSSARY = glossary_of(
         "activities are opening PRs/issues, reviewing, merging, and labeling — comments and reactions "
         "are not counted. PR responsiveness measures elapsed hours from PR creation to first review "
         "and to merge. Reviewed share is a percentage of merged PRs with a qualifying review; P90 is "
-        "the 90th percentile."
+        "the 90th percentile of elapsed time, measured in hours."
     ),
 )
 

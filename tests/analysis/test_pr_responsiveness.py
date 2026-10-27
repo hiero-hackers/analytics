@@ -187,29 +187,26 @@ def test_a_merge_before_its_creation_is_dropped_as_a_data_error():
     assert prs.empty
 
 
-def test_cohort_is_unknown_when_contributor_history_is_incomplete():
-    """Cohort is by the author's own order, counting PRs that never merged."""
-    records = [
-        # alice opens #1 (never merged), #2, then #3: only #1 and #2 are her first two.
-        _opened("sdk", "alice", 1, at=0),
-        _opened("sdk", "alice", 2, at=24),
-        _merged("sdk", "bob", "alice", 2, at=30),
-        _opened("sdk", "alice", 3, at=48),
-        _merged("sdk", "bob", "alice", 3, at=50),
-        # bob's single PR is a first PR.
-        _opened("sdk", "bob", 4, at=60),
-        _merged("sdk", "alice", "bob", 4, at=61),
-    ]
-    prs = pr_response_times(_frame(*records))
+def test_pr_output_has_no_cohort_dimension():
+    prs = pr_response_times(
+        _frame(
+            _opened("sdk", "alice", 2),
+            _merged("sdk", "bob", "alice", 2, at=3),
+        )
+    )
+    assert "cohort" not in prs.columns
+    assert "cohort" not in PR_RESPONSE_COLUMNS
 
-    assert _one(prs, 2)["cohort"] == "unknown"
-    assert _one(prs, 3)["cohort"] == "unknown"
-    assert _one(prs, 4)["cohort"] == "unknown"
-
-
-@pytest.mark.parametrize("records", [[], [_opened("sdk", "alice", 1)], [_merged("sdk", "bob", "alice", 1, at=1)]])
+@pytest.mark.parametrize(
+    "records",
+    [
+        [],
+        [_opened("sdk", "alice", 1)],
+        [_merged("sdk", "bob", "alice", 1, at=1)],
+    ],
+)
 def test_no_merged_pr_gives_an_empty_frame_with_the_schema(records):
-    """With nothing to measure, callers still get the stable column schema."""
+    """Without both creation and merge events, the stable empty schema is returned."""
     prs = pr_response_times(_frame(*records))
 
     assert prs.empty
@@ -244,7 +241,7 @@ def test_summary_reports_medians_and_how_many_prs_were_reviewed():
     """The summary gives the median waits and how many merged PRs were reviewed at all."""
     summary = responsiveness_summary(_prs_for_summary(), [("all", None)])
 
-    row = _cell(summary, period="all", cohort="all")
+    row = _cell(summary, period="all")
     assert list(summary.columns) == SUMMARY_COLUMNS
     assert row["merged_prs"] == 6
     assert row["reviewed_prs"] == 5
@@ -256,7 +253,7 @@ def test_summary_reports_medians_and_how_many_prs_were_reviewed():
 
 def test_p90_is_withheld_below_the_minimum_sample_and_reported_above_it():
     """A 90th percentile of a handful of PRs is just the maximum, so it is left empty."""
-    few = _cell(responsiveness_summary(_prs_for_summary(), [("all", None)]), period="all", cohort="all")
+    few = _cell(responsiveness_summary(_prs_for_summary(), [("all", None)]), period="all")
     assert pd.isna(few["p90_hours_to_first_review"])
     assert pd.isna(few["p90_hours_to_merge"])
 
@@ -270,7 +267,6 @@ def test_p90_is_withheld_below_the_minimum_sample_and_reported_above_it():
     many = _cell(
         responsiveness_summary(pr_response_times(_frame(*records)), [("all", None)]),
         period="all",
-        cohort="all",
     )
     assert many["p90_hours_to_first_review"] == pytest.approx(9.1)
     assert many["p90_hours_to_merge"] == pytest.approx(91)
@@ -290,37 +286,29 @@ def test_windows_select_prs_by_merge_time():
 
     summary = responsiveness_summary(prs, windows)
 
-    assert _cell(summary, period="all", cohort="all")["merged_prs"] == 2
-    recent = _cell(summary, period="7d", cohort="all")
+    assert _cell(summary, period="all")["merged_prs"] == 2
+    recent = _cell(summary, period="7d")
     assert recent["merged_prs"] == 1
     assert recent["median_hours_to_merge"] == pytest.approx(6)
 
 
-def test_every_window_and_cohort_has_a_row_even_when_empty():
-    """An empty cell is a row with zero PRs, so zero and missing are never confused."""
-    prs = pr_response_times(_frame(_opened("sdk", "alice", 1), _merged("sdk", "bob", "alice", 1, at=3)))
-
-    summary = responsiveness_summary(prs, [("all", None), ("7d", T0 + timedelta(days=400))])
-
-    assert len(summary) == 4
-    empty = _cell(summary, period="7d", cohort="unknown")
+def test_every_window_has_a_row_even_when_empty():
+    """Empty windows remain visible with zero PRs and missing statistics."""
+    cutoff = T0 + timedelta(days=30)
+    summary = responsiveness_summary(
+        _prs_for_summary(),
+        [("all", None), ("7d", cutoff)],
+    )
+    assert len(summary) == 2
+    empty = _cell(summary, period="7d")
     assert empty["merged_prs"] == 0
     assert empty["reviewed_share"] == 0
-    assert pd.isna(empty["median_hours_to_merge"])
 
-
-def test_cohorts_are_reported_separately():
-    """Overall and unknown-cohort rows both include all eligible PRs."""
+def test_summary_reports_all_eligible_prs_once():
     summary = responsiveness_summary(_prs_for_summary(), [("all", None)])
-
-    overall = _cell(summary, period="all", cohort="all")
-    unknown = _cell(summary, period="all", cohort="unknown")
-
+    overall = _cell(summary, period="all")
     assert overall["merged_prs"] == 6
-    assert unknown["merged_prs"] == 6
-    assert overall["reviewed_prs"] == unknown["reviewed_prs"]
-    assert overall["median_hours_to_merge"] == unknown["median_hours_to_merge"]
-
+    assert "cohort" not in summary.columns
 
 def test_per_repo_summary_carries_the_repo_and_the_same_statistics():
     """The per-repo table is the same statistics keyed by repository."""
@@ -328,10 +316,10 @@ def test_per_repo_summary_carries_the_repo_and_the_same_statistics():
 
     assert list(summary.columns) == REPO_SUMMARY_COLUMNS
     assert sorted(summary["repo"].unique()) == ["org/docs", "org/sdk"]
-    docs = _cell(summary, repo="org/docs", period="all", cohort="all")
+    docs = _cell(summary, repo="org/docs", period="all")
     assert docs["merged_prs"] == 1
     assert docs["median_hours_to_first_review"] == pytest.approx(100)
-    sdk = _cell(summary, repo="org/sdk", period="all", cohort="all")
+    sdk = _cell(summary, repo="org/sdk", period="all")
     assert sdk["merged_prs"] == 5
     assert sdk["reviewed_share"] == 80
 
@@ -366,11 +354,11 @@ def test_monthly_trend_groups_by_merge_month_and_omits_empty_months():
     monthly = monthly_responsiveness(prs)
 
     assert list(monthly.columns) == MONTHLY_COLUMNS
-    assert monthly.loc[monthly["cohort"] == "all", "month"].tolist() == ["2026-06", "2026-08"]
-    june = _cell(monthly, month="2026-06", cohort="all")
+    assert monthly["month"].tolist() == ["2026-06", "2026-08"]
+    june = _cell(monthly, month="2026-06")
     assert june["merged_prs"] == 1
     assert june["median_hours_to_first_review"] == pytest.approx(4)
     assert june["median_hours_to_merge"] == pytest.approx(8)
-    august = _cell(monthly, month="2026-08", cohort="all")
+    august = _cell(monthly, month="2026-08")
     assert august["median_hours_to_first_review"] == pytest.approx(2)
     assert august["median_hours_to_merge"] == pytest.approx(5)
