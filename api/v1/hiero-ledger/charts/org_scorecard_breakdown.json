@@ -97,7 +97,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-26T01:26:07.669598+00:00"
+  "end": "2026-10-27T01:32:04.507237+00:00"
  },
  "rows": [
   {
@@ -156,7 +156,7 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "score": 7.0,
+   "score": 6.8,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -170,7 +170,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 6.0
+   "SAST": 4.0
   },
   {
    "repo": "hiero-cli",
@@ -228,9 +228,9 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "score": 7.5,
+   "score": 7.4,
    "Maintained": 10.0,
-   "Code-Review": 10.0,
+   "Code-Review": 9.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 9.0,
@@ -300,7 +300,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "score": 7.4,
+   "score": 7.5,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -314,7 +314,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 9.0
+   "SAST": 10.0
   },
   {
    "repo": "hiero-mirror-node-explorer",
@@ -372,9 +372,9 @@
   },
   {
    "repo": "solo",
-   "score": 8.4,
+   "score": 8.6,
    "Maintained": 10.0,
-   "Code-Review": 9.0,
+   "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
@@ -386,7 +386,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 9.0
+   "SAST": 10.0
   },
   {
    "repo": "hiero-block-node",
@@ -426,7 +426,7 @@
   },
   {
    "repo": "hiero-website",
-   "score": 8.9,
+   "score": 9.0,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -440,7 +440,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 9.0
+   "SAST": 10.0
   },
   {
    "repo": "hiero",
@@ -476,7 +476,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 9.0,
    "Packaging": 10.0,
-   "SAST": 9.0
+   "SAST": 10.0
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -656,9 +656,9 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 8.0
+   "SAST": 9.0
   }
  ],
- "generated_at": "2026-10-26T01:26:07.669598+00:00",
+ "generated_at": "2026-10-27T01:32:04.507237+00:00",
  "stale": false
 }

@@ -66,7 +66,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-26T01:26:04.679667+00:00"
+  "end": "2026-10-27T01:31:58.959070+00:00"
  },
  "rows": [
   {
@@ -790,7 +790,7 @@
    "2026-09": 0
   },
   {
-   "team": "hiero-mirror-node-explorer-committers",
+   "team": "hiero-mirror-node-explorer-maintainers",
    "activity score": 1960,
    "2026-04": 355,
    "2026-05": 469,
@@ -800,7 +800,7 @@
    "2026-09": 235
   },
   {
-   "team": "hiero-mirror-node-explorer-maintainers",
+   "team": "hiero-mirror-node-explorer-committers",
    "activity score": 1960,
    "2026-04": 355,
    "2026-05": 469,
@@ -860,7 +860,7 @@
    "2026-09": 201
   },
   {
-   "team": "hiero-docs-committers",
+   "team": "hiero-docs-maintainers",
    "activity score": 1307,
    "2026-04": 238,
    "2026-05": 232,
@@ -870,7 +870,7 @@
    "2026-09": 135
   },
   {
-   "team": "hiero-docs-maintainers",
+   "team": "hiero-docs-committers",
    "activity score": 1307,
    "2026-04": 238,
    "2026-05": 232,
@@ -950,7 +950,7 @@
    "2026-09": 102
   },
   {
-   "team": "tsc-eligibility-check-maintainers",
+   "team": "tsc-eligibility-check-committers",
    "activity score": 1146,
    "2026-04": 176,
    "2026-05": 198,
@@ -960,7 +960,7 @@
    "2026-09": 233
   },
   {
-   "team": "tsc-eligibility-check-committers",
+   "team": "tsc-eligibility-check-maintainers",
    "activity score": 1146,
    "2026-04": 176,
    "2026-05": 198,
@@ -1010,16 +1010,6 @@
    "2026-09": 146
   },
   {
-   "team": "hiero-did-sdk-committers",
-   "activity score": 743,
-   "2026-04": 112,
-   "2026-05": 143,
-   "2026-06": 195,
-   "2026-07": 145,
-   "2026-08": 121,
-   "2026-09": 27
-  },
-  {
    "team": "hiero-did-sdk-js-committers",
    "activity score": 743,
    "2026-04": 112,
@@ -1031,6 +1021,16 @@
   },
   {
    "team": "hiero-did-sdk-python-committers",
+   "activity score": 743,
+   "2026-04": 112,
+   "2026-05": 143,
+   "2026-06": 195,
+   "2026-07": 145,
+   "2026-08": 121,
+   "2026-09": 27
+  },
+  {
+   "team": "hiero-did-sdk-committers",
    "activity score": 743,
    "2026-04": 112,
    "2026-05": 143,
@@ -1160,14 +1160,14 @@
    "2026-09": 85
   },
   {
-   "team": "hiero-consensus-specifications-maintainers",
-   "activity score": 66,
-   "2026-04": 8,
-   "2026-05": 27,
-   "2026-06": 7,
-   "2026-07": 0,
-   "2026-08": 8,
-   "2026-09": 16
+   "team": "hiero-sdk-js-junior-committers",
+   "activity score": 322,
+   "2026-04": 102,
+   "2026-05": 145,
+   "2026-06": 31,
+   "2026-07": 8,
+   "2026-08": 21,
+   "2026-09": 15
   },
   {
    "team": "hiero-consensus-specifications-committers",
@@ -1180,14 +1180,14 @@
    "2026-09": 16
   },
   {
-   "team": "hashgraph-online-standards-sdk-js-committers",
-   "activity score": 63,
+   "team": "hiero-consensus-specifications-maintainers",
+   "activity score": 66,
    "2026-04": 8,
    "2026-05": 27,
    "2026-06": 7,
    "2026-07": 0,
    "2026-08": 8,
-   "2026-09": 13
+   "2026-09": 16
   },
   {
    "team": "hashgraph-online-standards-sdk-js-maintainers",
@@ -1198,8 +1198,18 @@
    "2026-07": 0,
    "2026-08": 8,
    "2026-09": 13
+  },
+  {
+   "team": "hashgraph-online-standards-sdk-js-committers",
+   "activity score": 63,
+   "2026-04": 8,
+   "2026-05": 27,
+   "2026-06": 7,
+   "2026-07": 0,
+   "2026-08": 8,
+   "2026-09": 13
   }
  ],
- "generated_at": "2026-10-26T01:26:04.679667+00:00",
+ "generated_at": "2026-10-27T01:31:58.959070+00:00",
  "stale": false
 }

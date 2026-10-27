@@ -39,36 +39,36 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-26T01:29:01.011844+00:00"
+  "end": "2026-10-27T01:35:11.736869+00:00"
  },
  "nodes": [
+  {
+   "id": ".github",
+   "active": 2,
+   "total": 3,
+   "category": "Governance",
+   "x": -0.2923,
+   "y": 1.718
+  },
   {
    "id": "clpr-endpoint",
    "active": 2,
    "total": 3,
    "category": "Other",
-   "x": -0.2923,
-   "y": 1.718
+   "x": 1.5089,
+   "y": -1.2205
   },
   {
    "id": "clpr-smart-contracts",
    "active": 2,
    "total": 3,
    "category": "EVM / smart contracts",
-   "x": 1.5089,
-   "y": -1.2205
-  },
-  {
-   "id": "governance",
-   "active": 2,
-   "total": 3,
-   "category": "Governance",
    "x": -0.5624,
    "y": -1.718
   },
   {
-   "id": ".github",
-   "active": 1,
+   "id": "governance",
+   "active": 2,
    "total": 3,
    "category": "Governance",
    "x": -1.6762,
@@ -135,6 +135,6 @@
    "shared": 3
   }
  ],
- "generated_at": "2026-10-26T01:29:01.011844+00:00",
+ "generated_at": "2026-10-27T01:35:11.736869+00:00",
  "stale": false
 }
