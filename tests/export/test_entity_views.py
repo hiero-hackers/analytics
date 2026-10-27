@@ -132,7 +132,8 @@ def test_indexes_list_every_entity_with_its_detail_path(org_data):
     assert index["detail_path"] == f"{ORG}/entities/contributors/{{id}}.json"
     assert [row["id"] for row in index["rows"]] == ["alice", "bob", "carol"]
     assert index["rows"][0]["login"] == "Alice"
-    assert "generated_at" in index and index["stale"] is False
+    assert "generated_at" in index
+    assert "stale" not in index
     repos = built.documents[f"{ORG}/entities/repositories.json"]["rows"]
     assert {row["id"]: row["name"] for row in repos} == {"_github": ".github", "hiero-sdk-js": "hiero-sdk-js"}
     for row in repos:
