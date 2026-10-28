@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-27T19:08:02.535693+00:00",
+ "generated_at": "2026-10-28T01:13:34.686416+00:00",
  "provenance": {
   "git_sha": "da6d568",
-  "data_as_of": "2026-10-27T18:54:40.753236+00:00"
+  "data_as_of": "2026-10-28T01:02:11.133470+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-27T19:05:55.869557+00:00"
+      "generated_at": "2026-10-28T01:12:10.126155+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-27T19:05:55.865980+00:00"
+      "generated_at": "2026-10-28T01:12:10.121388+00:00"
      }
     },
     {
@@ -2342,7 +2342,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 1,
+      "value": 2,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",

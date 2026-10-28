@@ -46,10 +46,10 @@
   {
    "repo": "hiero-hackers/hiero-enterprise-js",
    "latest_release": "2026-10-17 20:28:13+00:00",
-   "days_since_last_release": 9.0,
+   "days_since_last_release": 10.0,
    "median_gap_days": 3.0,
-   "staleness_ratio": 3.0,
-   "staleness_bucket": "watch"
+   "staleness_ratio": 3.3,
+   "staleness_bucket": "overdue"
   },
   {
    "repo": "hiero-hackers/analytics",
@@ -142,7 +142,7 @@
   {
    "repo": "hiero-hackers/vscode-hedera-transaction-viewer",
    "latest_release": "2026-08-12 23:07:14+00:00",
-   "days_since_last_release": 75.0,
+   "days_since_last_release": 76.0,
    "median_gap_days": 21.0,
    "staleness_ratio": 3.6,
    "staleness_bucket": "overdue"
@@ -214,7 +214,7 @@
   {
    "repo": "hiero-hackers/hiero-notifications",
    "latest_release": "2026-07-18 22:52:04+00:00",
-   "days_since_last_release": 100.0,
+   "days_since_last_release": 101.0,
    "median_gap_days": null,
    "staleness_ratio": null,
    "staleness_bucket": "insufficient_history"
@@ -261,7 +261,7 @@
   }
  ],
  "row_count": 28,
- "generated_at": "2026-10-27T19:07:39.388727+00:00",
+ "generated_at": "2026-10-28T01:13:15.534516+00:00",
  "stale": false,
  "group": "Release cadence & staleness",
  "macro": "Releases"
