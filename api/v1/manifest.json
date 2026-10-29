@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-28T01:13:34.686416+00:00",
+ "generated_at": "2026-10-29T01:12:20.754916+00:00",
  "provenance": {
   "git_sha": "da6d568",
-  "data_as_of": "2026-10-28T01:02:11.133470+00:00"
+  "data_as_of": "2026-10-29T01:02:04.389265+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -405,7 +405,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1511,
+     "row_count": 1513,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -447,7 +447,7 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 761,
+     "row_count": 762,
      "path": "hiero-ledger/repo.json"
     },
     {
@@ -461,7 +461,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2890,
+     "row_count": 2894,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -519,7 +519,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 866,
+     "row_count": 869,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-28T01:12:10.126155+00:00"
+      "generated_at": "2026-10-29T01:10:42.539924+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-28T01:12:10.121388+00:00"
+      "generated_at": "2026-10-29T01:10:42.535452+00:00"
      }
     },
     {
@@ -1556,7 +1556,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1511,
+      "value": 1513,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1584,7 +1584,7 @@
      },
      {
       "label": "file issues %",
-      "value": "52%",
+      "value": "51%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -1731,7 +1731,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1511
+     "count": 1513
     }
    }
   },
@@ -2407,14 +2407,14 @@
      "id": "gonedark",
      "macro": "Governance",
      "title": "Permission-holders with no recent activity",
-     "row_count": 1,
+     "row_count": 18,
      "path": "LFDT-CLPR/gonedark.json"
     },
     {
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 15,
+     "row_count": 47,
      "path": "LFDT-CLPR/repo.json"
     },
     {
@@ -2449,7 +2449,7 @@
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 0,
+     "row_count": 20,
      "path": "LFDT-CLPR/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -2464,7 +2464,7 @@
      "id": "committerrepodiversity",
      "macro": "Governance",
      "title": "Committer organisation diversity by repo",
-     "row_count": 0,
+     "row_count": 3,
      "path": "LFDT-CLPR/committerrepodiversity.json",
      "absorbed_by": "repodiversity"
     },
@@ -2847,6 +2847,32 @@
         "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
         "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
        ]
+      },
+      {
+       "title": "Committers",
+       "variants": [
+        {
+         "label": "Committers",
+         "interactive": {
+          "kind": "network",
+          "path": "LFDT-CLPR/charts/committer_network.json"
+         },
+         "note": "Each bubble is a repository, sized by how many committers are active in it; two repos are linked when they share a committer (thicker line = more shared). Bubble colour is the repo's category.",
+         "methodology": [
+          "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+          "Make each repository a node, sized by how many holders of that role it has.",
+          "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+          "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+         ]
+        }
+       ],
+       "note": "Each bubble is a repository, sized by how many committers are active in it; two repos are linked when they share a committer (thicker line = more shared). Bubble colour is the repo's category.",
+       "methodology": [
+        "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+        "Make each repository a node, sized by how many holders of that role it has.",
+        "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+        "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+       ]
       }
      ],
      "slideshow": true,
@@ -2874,6 +2900,19 @@
           "That file resolves each person from public signals in priority order: GPG-key email, profile email, the project MAINTAINERS.md, the GitHub company field, profile bio, public org membership, then commit-author email. Obfuscated noreply addresses are ignored; Swirlds Labs counts as Hashgraph.",
           "Count distinct people per organisation; people with an identity but no employer are pooled as 'Independent'. Exclude people with no public signal from the pie; they remain visible as unknown rows in the companion affiliations table so its known share can be assessed.",
           "Rank employers only, keep the two largest, and fold everyone else \u2014 the smaller employers and the whole 'Independent' band \u2014 into a single 'Other' slice, then draw a filled pie of their shares."
+         ]
+        },
+        {
+         "label": "Committers",
+         "interactive": {
+          "kind": "categories",
+          "path": "LFDT-CLPR/charts/affiliation_donut_committers.json"
+         },
+         "note": "The committer view of the same chart: people whose highest role anywhere is committer (write access, no maintainer seat), so this population never overlaps the maintainer tab. Curation is thinner here, so every percentage is a share of resolved committers only. The committer-affiliations known tile states the current coverage; weigh the employer slices against that number. Independents are a larger share of this bench than of the maintainers, and they sit inside 'Other' \u2014 read the affiliations table for the split.",
+         "methodology": [
+          "Same construction as the maintainer tab, over the people whose highest role anywhere is committer: write access in at least one repository and a maintainer seat in none.",
+          "Look up each committer's organisation in the same curated affiliations file, by the same priority order.",
+          "Count distinct resolved committers per organisation, pooling employer-less people as 'Independent' and then, as on the maintainer tab, into 'Other' \u2014 only employers are ranked. Exclude unmapped people from the pie and use the unknown rows in the companion table to assess the known share, which is materially lower than for maintainers."
          ]
         }
        ],
@@ -2958,6 +2997,18 @@
           "Count holders per organisation within the repo; the largest employers across all repos get their own colour, the rest pool into 'Other orgs', and solo/unmapped holders show as 'Independent'/'Unknown'.",
           "Normalise each repo's counts to 100% and stack them into one bar, ordered most-concentrated first (by the largest single employer's share); ties are grouped by the leading organisation's colour.",
           "A dashed line marks 50%: a segment past it means one employer holds the majority. Single-colour bars are single-employer repos; multi-colour bars are cross-org."
+         ]
+        },
+        {
+         "label": "Committers",
+         "interactive": {
+          "kind": "categories",
+          "path": "LFDT-CLPR/charts/repo_affiliation_composition_committers.json"
+         },
+         "note": "The committer view of the same chart. Repos appear only where someone holds committer as their highest role, so the set of bars differs from the maintainer tab \u2014 a repo whose committer bar is multi-colour while its maintainer bar is single-colour has a cross-org bench it could promote from.",
+         "methodology": [
+          "Same construction over each repository's committers, so only repos that grant committer appear.",
+          "Compare a repo's two bars: a single-colour maintainer bar beside a multi-colour committer bar is a concentrated top with a diverse bench underneath it."
          ]
         }
        ],
@@ -3147,7 +3198,7 @@
      },
      {
       "label": "file issues %",
-      "value": "36%",
+      "value": "45%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3196,7 +3247,7 @@
      },
      {
       "label": "committers",
-      "value": 0,
+      "value": 20,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -3225,8 +3276,18 @@
       ]
      },
      {
+      "label": "committer affiliations known",
+      "value": "95%",
+      "note": "The share of highest-role committers whose affiliation is resolved to a named employer or Independent. Read the committer organisation-diversity pie against this coverage.",
+      "methodology": [
+       "Take every row in the committer affiliations reference table.",
+       "Count rows whose status is affiliated or independent.",
+       "Divide by all committer rows, including unknowns, and round to a whole percent."
+      ]
+     },
+     {
       "label": "quiet permission-holders (180d+)",
-      "value": 1,
+      "value": 18,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",

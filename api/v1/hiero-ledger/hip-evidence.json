@@ -61,6 +61,20 @@
   {
    "hip": 1535,
    "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/hiero-sdk-js",
+   "pr_number": 4641,
+   "pr_title": "feat: add HIP-1535 CLPR transactions, queries and ownership helpers",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "feat: add HIP-1535 CLPR transactions, queries and ownershi",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/4641"
+  },
+  {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 287,
    "pr_title": "Add HIP-1535 SDK design doc: CLPR",
@@ -1569,6 +1583,20 @@
    "counted": true,
    "snippet": "feat: Implement HIP-1300 Tests & Add Admin Client Support",
    "url": "https://github.com/hiero-ledger/hiero-sdk-swift/pull/510"
+  },
+  {
+   "hip": 1300,
+   "hip_title": "Increased Transaction Size for Governance Accounts",
+   "repo": "hiero-ledger/hiero-sdk-tck",
+   "pr_number": 789,
+   "pr_title": "chore(deps): bump @hashgraph/sdk from 2.73.1 to 2.81.0",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "/h1> <h3>Addded</h3> <ul> <li>Tests for HIP-1300</li> </ul> <h1>2.79.0-beta.13</h1> <h3>",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-tck/pull/789"
   },
   {
    "hip": 1300,
@@ -3529,6 +3557,20 @@
    "counted": true,
    "snippet": "feat: implement HIP-1195 Hiero Hooks",
    "url": "https://github.com/hiero-ledger/hiero-sdk-swift/pull/497"
+  },
+  {
+   "hip": 1195,
+   "hip_title": "Hiero hooks and an application to allowances",
+   "repo": "hiero-ledger/hiero-sdk-tck",
+   "pr_number": 789,
+   "pr_title": "chore(deps): bump @hashgraph/sdk from 2.73.1 to 2.81.0",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "1.0-beta.1</h1> <h3>Added</h3> <ul> <li>HIP-1195 support. <a href=\"https://redirect.gith",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-tck/pull/789"
   },
   {
    "hip": 1195,
@@ -12183,8 +12225,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 866,
- "generated_at": "2026-10-28T01:12:10.116532+00:00",
+ "row_count": 869,
+ "generated_at": "2026-10-29T01:10:42.530920+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

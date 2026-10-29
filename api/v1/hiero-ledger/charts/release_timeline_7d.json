@@ -33,31 +33,19 @@
  ],
  "categories": [
   "hiero-consensus-node",
-  "hiero-json-rpc-relay",
   "hiero-mirror-node",
-  "solo-containers",
   "hiero-block-node",
   "hiero-cryptography",
-  "solo"
+  "hiero-json-rpc-relay",
+  "solo",
+  "solo-containers"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-28T01:11:29.357754+00:00"
+  "end": "2026-10-29T01:10:04.845493+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-json-rpc-relay",
-   "time": "2026-10-21T14:14:55Z",
-   "tag_name": "v0.80.2",
-   "type": "release"
-  },
-  {
-   "repo": "solo-containers",
-   "time": "2026-10-21T23:59:47Z",
-   "tag_name": "v0.46.3",
-   "type": "release"
-  },
   {
    "repo": "hiero-consensus-node",
    "time": "2026-10-22T15:33:16Z",
@@ -113,6 +101,6 @@
    "type": "release"
   }
  ],
- "generated_at": "2026-10-28T01:11:29.357754+00:00",
+ "generated_at": "2026-10-29T01:10:04.845493+00:00",
  "stale": false
 }

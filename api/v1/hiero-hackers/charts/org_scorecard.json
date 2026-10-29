@@ -25,8 +25,8 @@
  "rank": true,
  "top_n": 15,
  "reference": {
-  "value": 6.95,
-  "label": "Org median 6.95"
+  "value": 6.85,
+  "label": "Org median 6.85"
  },
  "value_max": 10,
  "group": null,
@@ -37,7 +37,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-28T01:12:56.691679+00:00"
+  "end": "2026-10-29T01:11:39.718547+00:00"
  },
  "series": [
   {
@@ -50,7 +50,7 @@
  "rows": [
   {
    "repo": "hiero-enterprise-js",
-   "score": 7.2
+   "score": 7.3
   },
   {
    "repo": "analytics",
@@ -58,11 +58,11 @@
   },
   {
    "repo": "sdk-automations",
-   "score": 8.6
+   "score": 8.5
   },
   {
    "repo": "hiero-verify-fn",
-   "score": 7.0
+   "score": 6.8
   },
   {
    "repo": "hiero-notifications",
@@ -81,6 +81,6 @@
    "score": 5.5
   }
  ],
- "generated_at": "2026-10-28T01:12:56.691679+00:00",
+ "generated_at": "2026-10-29T01:11:39.718547+00:00",
  "stale": false
 }
