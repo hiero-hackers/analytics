@@ -167,13 +167,12 @@ def run_org(org: str, *, primary: bool, fail_fast: bool = False) -> list[str]:
         try:
             # Requests a pipeline makes outside a persisted dataset fetch are
             # attributed to the pipeline itself; dataset fetches narrow this.
-            with usage_scope(org=org, dataset=pipeline.name):
-                with track_pipeline_datasets():
-                    entry = pipeline.resolve()
-                    if "org" in pipeline.args:
-                        entry(org=org)
-                    else:
-                        entry()
+            with usage_scope(org=org, dataset=pipeline.name), track_pipeline_datasets():
+                entry = pipeline.resolve()
+                if "org" in pipeline.args:
+                    entry(org=org)
+                else:
+                    entry()
         except Exception:
             label = failure_label(pipeline.name, org, primary=primary)
             failures.append(label)

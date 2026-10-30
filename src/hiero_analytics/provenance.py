@@ -263,19 +263,14 @@ def _predates_fetched_at(path: Path) -> bool:
 
 
 def dataset_fetched_at(path: Path) -> datetime | None:
-    """Read a persisted dataset's fetch time, falling back only for legacy files.
+    """Read a persisted dataset's fetch time when it is available.
 
-    ``fetched_at`` is the refresh-time signal. Older datasets written before
-    that field existed use ``fetched_through`` as a conservative fallback;
-    an unreadable current stamp remains unknown rather than being guessed.
+    ``fetched_through`` is a content watermark, not a fetch-time signal.
+    Legacy files without ``fetched_at`` therefore remain unknown.
     """
     fetched = _read_stamp(path, _FETCHED_AT_RE)
     if isinstance(fetched, datetime):
         return fetched
-    if _predates_fetched_at(path):
-        fallback = _read_stamp(path, _WATERMARK_RE)
-        if isinstance(fallback, datetime):
-            return fallback
     return None
 
 

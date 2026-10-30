@@ -20,13 +20,13 @@ import json
 import logging
 import os
 import re
-from collections.abc import Callable, Hashable, Iterable
+from collections.abc import Callable, Hashable, Iterable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Iterator, TypeVar
+from typing import TypeVar
 
 from hiero_analytics.config import paths
 from hiero_analytics.config.paths import dataset_path

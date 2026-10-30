@@ -157,7 +157,9 @@ def _freshness(csv_path: Path) -> dict:
             logger.warning("Unparseable source fetch timestamp %r in sidecar for %s", source["fetched_at"], csv_path)
             return result
         if fetched.tzinfo is None:
-            logger.warning("Naive source fetch timestamp %r in sidecar for %s; assuming UTC", source["fetched_at"], csv_path)
+            logger.warning(
+                "Naive source fetch timestamp %r in sidecar for %s; assuming UTC", source["fetched_at"], csv_path
+            )
             fetched = fetched.replace(tzinfo=UTC)
         fetched_stamps.append(fetched.astimezone(UTC))
 
