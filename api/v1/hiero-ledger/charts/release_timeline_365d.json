@@ -46,43 +46,25 @@
   "hiero-sdk-python",
   "hiero-sdk-go",
   "hiero-solo-action",
-  "hiero-sdk-cpp",
   "hiero-sdk-tck",
+  "hiero-sdk-cpp",
   "hiero-sdk-swift",
   "hiero-cli",
   "hiero-local-node",
   "hiero-did-sdk-python",
   "hiero-contracts",
-  "hiero-sdk-rust",
   "hiero-did-sdk-js",
   "hiero-mirror-node-explorer",
+  "hiero-sdk-rust",
   "hiero-enterprise-java",
   "solo-docs"
  ],
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-29T01:10:04.845493+00:00"
+  "end": "2026-10-30T01:11:14.784749+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-rust",
-   "time": "2025-10-29T11:01:05Z",
-   "tag_name": "v0.41.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-cpp",
-   "time": "2025-10-29T11:08:28Z",
-   "tag_name": "v0.47.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "time": "2025-10-29T14:16:30Z",
-   "tag_name": "v2.76.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-mirror-node",
    "time": "2025-10-30T23:30:32Z",
@@ -3538,8 +3520,14 @@
    "time": "2026-10-27T16:52:18Z",
    "tag_name": "v3.24.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-29T19:23:14Z",
+   "tag_name": "v3.25.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-29T01:10:04.845493+00:00",
+ "generated_at": "2026-10-30T01:11:14.784749+00:00",
  "stale": false
 }

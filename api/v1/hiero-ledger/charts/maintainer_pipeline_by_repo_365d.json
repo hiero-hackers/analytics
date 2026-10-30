@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-29T01:04:19.179126+00:00"
+  "end": "2026-10-30T01:05:16.015473+00:00"
  },
  "series": [
   {
@@ -56,7 +56,7 @@
  "rows": [
   {
    "repo": "hiero-sdk-python",
-   "general_user": 212,
+   "general_user": 211,
    "triage": 8,
    "committer": 6,
    "maintainer": 5
@@ -84,7 +84,7 @@
   },
   {
    "repo": "hiero-sdk-java",
-   "general_user": 63,
+   "general_user": 64,
    "triage": 7,
    "committer": 3,
    "maintainer": 4
@@ -133,7 +133,7 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "general_user": 36,
+   "general_user": 37,
    "triage": 9,
    "committer": 1,
    "maintainer": 5
@@ -182,7 +182,7 @@
   },
   {
    "repo": "hiero-cryptography",
-   "general_user": 22,
+   "general_user": 24,
    "triage": 0,
    "committer": 0,
    "maintainer": 4
@@ -350,6 +350,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-29T01:04:19.179126+00:00",
+ "generated_at": "2026-10-30T01:05:16.015473+00:00",
  "stale": false
 }

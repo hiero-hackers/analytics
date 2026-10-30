@@ -66,7 +66,7 @@
    "pr_title": "feat: add HIP-1535 CLPR transactions, queries and ownership helpers",
    "pr_state": "OPEN",
    "pr_merged_at": null,
-   "match_sources": "title",
+   "match_sources": "title|body",
    "qualifier": null,
    "counted": true,
    "snippet": "feat: add HIP-1535 CLPR transactions, queries and ownershi",
@@ -1125,6 +1125,20 @@
   {
    "hip": 1313,
    "hip_title": "High-Volume Entity Creation",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 1879,
+   "pr_title": "fix(tck): forward commonTransactionParams.highVolume",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "monTransactionParams.highVolume, so the HIP-1313 TCK tests sent createAccount without th",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/1879"
+  },
+  {
+   "hip": 1313,
+   "hip_title": "High-Volume Entity Creation",
    "repo": "hiero-ledger/hiero-sdk-java",
    "pr_number": 2572,
    "pr_title": "feat: HIP-1313",
@@ -1135,6 +1149,20 @@
    "counted": true,
    "snippet": "feat: HIP-1313",
    "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/2572"
+  },
+  {
+   "hip": 1313,
+   "hip_title": "High-Volume Entity Creation",
+   "repo": "hiero-ledger/hiero-sdk-java",
+   "pr_number": 3029,
+   "pr_title": "fix(tck): forward commonTransactionParams.highVolume (HIP-1313)",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "ard commonTransactionParams.highVolume (HIP-1313)",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/3029"
   },
   {
    "hip": 1313,
@@ -12225,8 +12253,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 869,
- "generated_at": "2026-10-29T01:10:42.530920+00:00",
+ "row_count": 871,
+ "generated_at": "2026-10-30T01:11:55.571275+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-10-29T01:04:19.192819+00:00"
+  "end": "2026-10-30T01:05:16.025632+00:00"
  },
  "series": [
   {
@@ -58,7 +58,7 @@
    "repo": "hiero-consensus-node",
    "general_user": 5,
    "triage": 1,
-   "committer": 25,
+   "committer": 23,
    "maintainer": 9
   },
   {
@@ -76,18 +76,18 @@
    "maintainer": 2
   },
   {
+   "repo": "solo",
+   "general_user": 5,
+   "triage": 0,
+   "committer": 4,
+   "maintainer": 2
+  },
+  {
    "repo": "hiero-block-node",
    "general_user": 3,
    "triage": 1,
    "committer": 4,
    "maintainer": 3
-  },
-  {
-   "repo": "solo",
-   "general_user": 4,
-   "triage": 0,
-   "committer": 4,
-   "maintainer": 2
   },
   {
    "repo": "hiero-sdk-java",
@@ -104,11 +104,25 @@
    "maintainer": 3
   },
   {
+   "repo": "hiero-cryptography",
+   "general_user": 5,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 3
+  },
+  {
    "repo": "hiero-sdk-python",
    "general_user": 2,
    "triage": 0,
    "committer": 0,
    "maintainer": 5
+  },
+  {
+   "repo": "solo-docs",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 4
   },
   {
    "repo": "hiero-sdk-go",
@@ -118,32 +132,11 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-cryptography",
+   "repo": "solo-containers",
    "general_user": 2,
    "triage": 0,
    "committer": 0,
-   "maintainer": 3
-  },
-  {
-   "repo": "heka-identity-platform",
-   "general_user": 3,
-   "triage": 0,
-   "committer": 0,
    "maintainer": 1
-  },
-  {
-   "repo": "solo-docs",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
   },
   {
    "repo": "governance",
@@ -153,13 +146,6 @@
    "maintainer": 2
   },
   {
-   "repo": "solo-containers",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
    "repo": "hiero-enterprise-java",
    "general_user": 0,
    "triage": 0,
@@ -167,11 +153,18 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-sdk-cpp",
+   "repo": "heka-identity-platform",
    "general_user": 2,
    "triage": 0,
    "committer": 0,
-   "maintainer": 0
+   "maintainer": 1
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "general_user": 1,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -181,31 +174,17 @@
    "maintainer": 0
   },
   {
-   "repo": ".github",
-   "general_user": 0,
+   "repo": "hiero-sdk-cpp",
+   "general_user": 2,
    "triage": 0,
    "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-website",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
+   "maintainer": 0
   },
   {
    "repo": "sdk-collaboration-hub",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
-  },
-  {
-   "repo": "hiero-mirror-node-explorer",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 1,
    "maintainer": 1
   },
   {
@@ -216,6 +195,20 @@
    "maintainer": 2
   },
   {
+   "repo": "hiero-mirror-node-explorer",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 1
+  },
+  {
+   "repo": ".github",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
    "repo": "hiero-docs",
    "general_user": 0,
    "triage": 0,
@@ -223,14 +216,14 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-cli",
+   "repo": "hiero-solo-action",
    "general_user": 0,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "hiero-solo-action",
+   "repo": "hiero-website",
    "general_user": 0,
    "triage": 0,
    "committer": 0,
@@ -245,6 +238,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-29T01:04:19.192819+00:00",
+ "generated_at": "2026-10-30T01:05:16.025632+00:00",
  "stale": false
 }

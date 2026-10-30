@@ -69,27 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-10-29T01:10:04.845493+00:00"
+  "end": "2026-10-30T01:11:14.784749+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-04-29T16:39:41Z",
-   "tag_name": "v0.128.1",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-04-29T16:42:41Z",
-   "tag_name": "v0.128.2",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-04-29T20:58:55Z",
-   "tag_name": "v0.129.0-rc1",
-   "type": "prerelease"
-  },
   {
    "repo": "hiero-sdk-go",
    "time": "2025-04-30T11:57:42Z",
@@ -5231,8 +5213,14 @@
    "time": "2026-10-27T16:52:18Z",
    "tag_name": "v3.24.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-29T19:23:14Z",
+   "tag_name": "v3.25.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-29T01:10:04.845493+00:00",
+ "generated_at": "2026-10-30T01:11:14.784749+00:00",
  "stale": false
 }
