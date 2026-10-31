@@ -9,6 +9,7 @@ __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.columns import Column
 from hiero_analytics.dashboard_spec.constants import PROJECT_ISSUES_URL
 from hiero_analytics.dashboard_spec.glossary import GLOSSARY_NOTE, glossary_of
 from hiero_analytics.dashboard_spec.interactive import (
@@ -235,16 +236,61 @@ SECTION_SPECS = [
             "within that period. 'actions' = PRs + reviews + merges + issues + labels, summed."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("maintainers", "maintainers", "number"),
-            ("committers", "committers", "number"),
-            ("triage", "triage", "number"),
-            ("active_recent", "active", "number"),
-            ("maintainer_actions_recent", "maint. actions", "number"),
-            ("committer_actions_recent", "comm. actions", "number"),
-            ("triage_actions_recent", "triage actions", "number"),
-            ("actions_recent", "actions", "number"),
-            ("last_active", "last active", "date"),
+            Column("repo", "repo", description="The repository name, as known to the governance config."),
+            Column(
+                "maintainers",
+                "maintainers",
+                format="number",
+                description="Total maintainers with access to this repository, regardless of recent activity.",
+            ),
+            Column(
+                "committers",
+                "committers",
+                format="number",
+                description="Total committers with write access to this repository.",
+            ),
+            Column(
+                "triage",
+                "triage",
+                format="number",
+                description="Total users granted the triage role on this repository.",
+            ),
+            Column(
+                "active_recent",
+                "active",
+                format="number",
+                description="Permission-holders active in this repository within the selected period.",
+            ),
+            Column(
+                "maintainer_actions_recent",
+                "maint. actions",
+                format="number",
+                description="Tracked actions (PRs, reviews, merges, issues, labels) by active maintainers in the selected period.",
+            ),
+            Column(
+                "committer_actions_recent",
+                "comm. actions",
+                format="number",
+                description="Tracked actions (PRs, reviews, merges, issues, labels) by active committers in the selected period.",
+            ),
+            Column(
+                "triage_actions_recent",
+                "triage actions",
+                format="number",
+                description="Tracked actions (PRs, reviews, merges, issues, labels) by active triage holders in the selected period.",
+            ),
+            Column(
+                "actions_recent",
+                "actions",
+                format="number",
+                description="All tracked actions in this repository within the selected period, summed across roles.",
+            ),
+            Column(
+                "last_active",
+                "last active",
+                format="date",
+                description="The most recent date any permission-holder had activity in this repository.",
+            ),
         ],
     },
     {
@@ -258,11 +304,31 @@ SECTION_SPECS = [
             "active maintainers first."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("maintainers", "maintainers", "number"),
-            ("active_maintainers", "active maintainers", "number"),
-            ("committers", "committers", "number"),
-            ("triage", "triage", "number"),
+            Column("repo", "repo", description="The repository name."),
+            Column(
+                "maintainers",
+                "maintainers",
+                format="number",
+                description="Total maintainers with access to this repository.",
+            ),
+            Column(
+                "active_maintainers",
+                "active maintainers",
+                format="number",
+                description="Maintainers with activity in this repository within the selected period.",
+            ),
+            Column(
+                "committers",
+                "committers",
+                format="number",
+                description="Total committers with write access to this repository.",
+            ),
+            Column(
+                "triage",
+                "triage",
+                format="number",
+                description="Total users granted the triage role on this repository.",
+            ),
         ],
     },
     {
@@ -277,11 +343,25 @@ SECTION_SPECS = [
             "concentration first; repos with under 20 review+merge actions in the selected period are omitted."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("top_carrier", "top carrier"),
-            ("top_role", "top role"),
-            ("top_pct", "top %", "percent"),
-            ("top2_pct", "top-2 %", "percent"),
+            Column("repo", "repo", description="The repository name."),
+            Column(
+                "top_carrier",
+                "top carrier",
+                description="The user carrying the most review+merge work in this repository within the selected period.",
+            ),
+            Column("top_role", "top role", description="Whether the busiest carrier is a maintainer or committer."),
+            Column(
+                "top_pct",
+                "top %",
+                format="percent",
+                description="Share of review+merge work in this repository within the selected period done by the busiest person.",
+            ),
+            Column(
+                "top2_pct",
+                "top-2 %",
+                format="percent",
+                description="Combined share of review+merge work done by the two busiest carriers in this repository.",
+            ),
         ],
     },
     {
@@ -297,12 +377,31 @@ SECTION_SPECS = [
             "180-day threshold regardless of the tab."
         ),
         "columns": [
-            ("user", "user"),
-            ("highest_role", "highest role"),
-            ("roles", "roles held"),
-            ("repos_held", "repos", "number"),
-            ("days_since_active", "days since active", "number"),
-            ("last_active", "last active", "date"),
+            Column("user", "user", description="The permission-holder's GitHub login."),
+            Column(
+                "highest_role",
+                "highest role",
+                description="The most senior governance role this user holds anywhere: maintainer, committer, triage, or general.",
+            ),
+            Column("roles", "roles held", description="All governance roles this user holds, across repositories."),
+            Column(
+                "repos_held",
+                "repos",
+                format="number",
+                description="Number of repositories where this user holds a governance role.",
+            ),
+            Column(
+                "days_since_active",
+                "days since active",
+                format="number",
+                description="Days since this user's last recorded activity. Blank means no recorded activity yet.",
+            ),
+            Column(
+                "last_active",
+                "last active",
+                format="date",
+                description="The most recent date this user had any tracked activity, across all repositories.",
+            ),
         ],
     },
     {
@@ -316,16 +415,50 @@ SECTION_SPECS = [
             "Days since active always refers to the latest recorded activity."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("user", "user"),
-            ("granted_role", "role"),
-            ("status", "status"),
-            ("days_since_active", "days since active", "number"),
-            ("prs_recent", "PRs", "number"),
-            ("reviews_recent", "reviews", "number"),
-            ("merges_recent", "merges", "number"),
-            ("issues_recent", "issues", "number"),
-            ("labels_recent", "labels", "number"),
+            Column("repo", "repo", description="The repository name."),
+            Column("user", "user", description="A permission-holder's GitHub login."),
+            Column("granted_role", "role", description="The governance role this user holds in this repository."),
+            Column(
+                "status",
+                "status",
+                description="Whether this user has activity in this repository within the selected period.",
+            ),
+            Column(
+                "days_since_active",
+                "days since active",
+                format="number",
+                description="Days since this user's last activity in this repository.",
+            ),
+            Column(
+                "prs_recent",
+                "PRs",
+                format="number",
+                description="Pull requests opened by this user in this repository within the selected period.",
+            ),
+            Column(
+                "reviews_recent",
+                "reviews",
+                format="number",
+                description="Pull request reviews submitted by this user in this repository within the selected period.",
+            ),
+            Column(
+                "merges_recent",
+                "merges",
+                format="number",
+                description="Pull requests merged by this user in this repository within the selected period.",
+            ),
+            Column(
+                "issues_recent",
+                "issues",
+                format="number",
+                description="Issues opened by this user in this repository within the selected period.",
+            ),
+            Column(
+                "labels_recent",
+                "labels",
+                format="number",
+                description="Labels applied by this user in this repository within the selected period.",
+            ),
         ],
     },
     {
@@ -338,16 +471,35 @@ SECTION_SPECS = [
             "and its active or quiet status. Teams with no activity in that period are listed first."
         ),
         "columns": [
-            ("team", "team"),
-            ("members", "members"),
-            ("active_members", "active"),
-            ("status", "status"),
-            ("days_since_active", "days since active"),
-            ("prs_opened", "PRs"),
-            ("reviews_given", "reviews"),
-            ("merges_done", "merges"),
-            ("issues_opened", "issues"),
-            ("labels_applied", "labels"),
+            Column("team", "team", description="The governance team name."),
+            Column("members", "members", description="Total members of this team."),
+            Column("active_members", "active", description="Members with activity within the selected period."),
+            Column("status", "status", description="Whether this team is active or quiet in the selected period."),
+            Column(
+                "days_since_active",
+                "days since active",
+                format="number",
+                description="Days since this team's last recorded activity.",
+            ),
+            Column(
+                "prs_opened", "PRs", description="Pull requests opened by active team members in the selected period."
+            ),
+            Column(
+                "reviews_given",
+                "reviews",
+                description="Pull request reviews submitted by active team members in the selected period.",
+            ),
+            Column(
+                "merges_done",
+                "merges",
+                description="Pull requests merged by active team members in the selected period.",
+            ),
+            Column(
+                "issues_opened", "issues", description="Issues opened by active team members in the selected period."
+            ),
+            Column(
+                "labels_applied", "labels", description="Labels applied by active team members in the selected period."
+            ),
         ],
     },
     {
@@ -379,15 +531,23 @@ SECTION_SPECS = [
         "title": "TSC activity by repo",
         "description": "For TSC members with activity, which repos they work in and the role they hold there.",
         "columns": [
-            ("account", "member"),
-            ("repo", "repo"),
-            ("repo_role", "role here"),
-            ("prs_opened", "PRs"),
-            ("reviews_given", "reviews"),
-            ("merges_done", "merges"),
-            ("issues_opened", "issues"),
-            ("labels_applied", "labels"),
-            ("last_active", "last active"),
+            Column("account", "member", description="The TSC member's GitHub login."),
+            Column("repo", "repo", description="The repository name."),
+            Column("repo_role", "role here", description="The governance role this member holds in this repository."),
+            Column("prs_opened", "PRs", description="Pull requests opened by this member in this repository."),
+            Column(
+                "reviews_given",
+                "reviews",
+                description="Pull request reviews submitted by this member in this repository.",
+            ),
+            Column("merges_done", "merges", description="Pull requests merged by this member in this repository."),
+            Column("issues_opened", "issues", description="Issues opened by this member in this repository."),
+            Column("labels_applied", "labels", description="Labels applied by this member in this repository."),
+            Column(
+                "last_active",
+                "last active",
+                description="The most recent date this member had activity in this repository.",
+            ),
         ],
     },
     {
@@ -452,14 +612,39 @@ SECTION_SPECS = [
             "seat ('distinct orgs' = 1) are an organisational bus-factor. Single-employer repos first."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("maintainers", "maintainers", "number"),
-            ("distinct_orgs", "distinct orgs", "number"),
-            ("top_org", "largest org"),
-            ("top_org_pct", "largest org %", "percent"),
-            ("independent", "independent"),
-            ("unknown", "unknown"),
-            ("organisations", "organisations"),
+            Column("repo", "repo", description="The repository name."),
+            Column(
+                "maintainers",
+                "maintainers",
+                format="number",
+                description="Number of maintainers active in this repository.",
+            ),
+            Column(
+                "distinct_orgs",
+                "distinct orgs",
+                format="number",
+                description="Number of distinct organisations these maintainers span.",
+            ),
+            Column(
+                "top_org", "largest org", description="The organisation with the most maintainers in this repository."
+            ),
+            Column(
+                "top_org_pct",
+                "largest org %",
+                format="percent",
+                description="Share of maintainers in this repository belonging to the largest organisation.",
+            ),
+            Column(
+                "independent",
+                "independent",
+                description="Maintainers with no curated employer affiliation, counted separately.",
+            ),
+            Column("unknown", "unknown", description="Maintainers whose employer could not be determined."),
+            Column(
+                "organisations",
+                "organisations",
+                description="Organisation mix - full list of organisations with mapped maintainers in this repository.",
+            ),
         ],
         # Same role tabs as the affiliations table above. Here the two variants
         # genuinely differ in shape: the count column is named for the role it
@@ -482,14 +667,41 @@ SECTION_SPECS = [
                     "single-employer reading against it."
                 ),
                 "columns": [
-                    ("repo", "repo"),
-                    ("committers", "committers", "number"),
-                    ("distinct_orgs", "distinct orgs", "number"),
-                    ("top_org", "largest org"),
-                    ("top_org_pct", "largest org %", "percent"),
-                    ("independent", "independent"),
-                    ("unknown", "unknown"),
-                    ("organisations", "organisations"),
+                    Column("repo", "repo", description="The repository name."),
+                    Column(
+                        "committers",
+                        "committers",
+                        format="number",
+                        description="Number of committers active in this repository.",
+                    ),
+                    Column(
+                        "distinct_orgs",
+                        "distinct orgs",
+                        format="number",
+                        description="Number of distinct organisations these committers span.",
+                    ),
+                    Column(
+                        "top_org",
+                        "largest org",
+                        description="The organisation with the most committers in this repository.",
+                    ),
+                    Column(
+                        "top_org_pct",
+                        "largest org %",
+                        format="percent",
+                        description="Share of committers in this repository belonging to the largest organisation.",
+                    ),
+                    Column(
+                        "independent",
+                        "independent",
+                        description="Committers with no curated employer affiliation, counted separately.",
+                    ),
+                    Column("unknown", "unknown", description="Committers whose employer could not be determined."),
+                    Column(
+                        "organisations",
+                        "organisations",
+                        description="Organisation mix - full list of organisations with mapped committers in this repository.",
+                    ),
                 ],
             },
         ],
