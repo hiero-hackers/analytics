@@ -62,15 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-10-30T01:11:14.784749+00:00"
+  "end": "2026-10-31T01:18:52.234129+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-10-30T23:30:32Z",
-   "tag_name": "v0.142.0-rc1",
-   "type": "prerelease"
-  },
   {
    "repo": "hiero-json-rpc-relay",
    "time": "2025-10-31T08:06:50Z",
@@ -3526,8 +3520,32 @@
    "time": "2026-10-29T19:23:14Z",
    "tag_name": "v3.25.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-30T03:36:09Z",
+   "tag_name": "v0.46.0-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-30T08:36:56Z",
+   "tag_name": "v0.166.0-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-30T13:45:06Z",
+   "tag_name": "v0.45.0-rc5",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-30T21:51:34Z",
+   "tag_name": "v3.26.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-30T01:11:14.784749+00:00",
+ "generated_at": "2026-10-31T01:18:52.234129+00:00",
  "stale": false
 }

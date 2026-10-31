@@ -34,14 +34,14 @@
  "categories": [
   "hiero-cryptography",
   "hiero-mirror-node",
+  "hiero-block-node",
   "hiero-consensus-node",
   "hiero-json-rpc-relay",
-  "hiero-block-node",
   "solo",
   "solo-charts",
-  "hiero-enterprise-java",
   "hiero-sdk-js",
   "solo-containers",
+  "hiero-enterprise-java",
   "hiero-sdk-java",
   "hiero-sdk-python",
   "hiero-sdk-tck",
@@ -50,27 +50,9 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-30T01:11:14.784749+00:00"
+  "end": "2026-10-31T01:18:52.234129+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-block-node",
-   "time": "2026-09-30T05:19:33Z",
-   "tag_name": "v0.43.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-json-rpc-relay",
-   "time": "2026-09-30T07:39:36Z",
-   "tag_name": "v0.79.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-enterprise-java",
-   "time": "2026-09-30T19:14:34Z",
-   "tag_name": "v0.21.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-mirror-node",
    "time": "2026-10-01T15:06:20Z",
@@ -370,8 +352,32 @@
    "time": "2026-10-29T19:23:14Z",
    "tag_name": "v3.25.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-30T03:36:09Z",
+   "tag_name": "v0.46.0-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-10-30T08:36:56Z",
+   "tag_name": "v0.166.0-rc1",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-10-30T13:45:06Z",
+   "tag_name": "v0.45.0-rc5",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-10-30T21:51:34Z",
+   "tag_name": "v3.26.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-10-30T01:11:14.784749+00:00",
+ "generated_at": "2026-10-31T01:18:52.234129+00:00",
  "stale": false
 }

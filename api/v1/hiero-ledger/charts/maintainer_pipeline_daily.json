@@ -25,8 +25,8 @@
  "frequency": "day",
  "timezone": "UTC",
  "comparison": {
-  "current": "2026-10-29",
-  "previous": "2026-10-28"
+  "current": "2026-10-30",
+  "previous": "2026-10-29"
  },
  "category": {
   "key": "bucket",
@@ -34,8 +34,8 @@
  },
  "window": {
   "kind": "calendar",
-  "first": "2026-10-24",
-  "last": "2026-10-30"
+  "first": "2026-10-25",
+  "last": "2026-10-31"
  },
  "series": [
   {
@@ -61,14 +61,6 @@
  ],
  "details": [],
  "rows": [
-  {
-   "bucket": "2026-10-24",
-   "general_user": 7,
-   "triage": 0,
-   "committer": 5,
-   "maintainer": 6,
-   "partial": false
-  },
   {
    "bucket": "2026-10-25",
    "general_user": 1,
@@ -111,6 +103,14 @@
   },
   {
    "bucket": "2026-10-30",
+   "general_user": 11,
+   "triage": 1,
+   "committer": 24,
+   "maintainer": 24,
+   "partial": false
+  },
+  {
+   "bucket": "2026-10-31",
    "general_user": 0,
    "triage": 0,
    "committer": 1,
@@ -118,6 +118,6 @@
    "partial": true
   }
  ],
- "generated_at": "2026-10-30T01:05:15.887502+00:00",
+ "generated_at": "2026-10-31T01:08:04.522321+00:00",
  "stale": false
 }

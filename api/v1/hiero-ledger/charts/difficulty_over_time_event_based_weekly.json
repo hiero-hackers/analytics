@@ -36,8 +36,8 @@
  },
  "window": {
   "kind": "calendar",
-  "first": "2025-10-30",
-  "last": "2026-10-30"
+  "first": "2025-10-31",
+  "last": "2026-10-31"
  },
  "series": [
   {
@@ -64,7 +64,7 @@
  "details": [],
  "rows": [
   {
-   "bucket": "2025-10-30",
+   "bucket": "2025-10-31",
    "gfi": 0,
    "beginner": 0,
    "intermediate": 0,
@@ -72,15 +72,23 @@
    "partial": false
   },
   {
-   "bucket": "2025-11-06",
-   "gfi": 4,
+   "bucket": "2025-11-07",
+   "gfi": 2,
    "beginner": 0,
    "intermediate": 0,
    "advanced": 0,
    "partial": false
   },
   {
-   "bucket": "2025-11-13",
+   "bucket": "2025-11-14",
+   "gfi": 8,
+   "beginner": 0,
+   "intermediate": 0,
+   "advanced": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2025-11-21",
    "gfi": 12,
    "beginner": 0,
    "intermediate": 0,
@@ -88,15 +96,7 @@
    "partial": false
   },
   {
-   "bucket": "2025-11-20",
-   "gfi": 13,
-   "beginner": 0,
-   "intermediate": 0,
-   "advanced": 0,
-   "partial": false
-  },
-  {
-   "bucket": "2025-11-27",
+   "bucket": "2025-11-28",
    "gfi": 6,
    "beginner": 0,
    "intermediate": 0,
@@ -104,7 +104,7 @@
    "partial": false
   },
   {
-   "bucket": "2025-12-04",
+   "bucket": "2025-12-05",
    "gfi": 4,
    "beginner": 0,
    "intermediate": 0,
@@ -112,23 +112,23 @@
    "partial": false
   },
   {
-   "bucket": "2025-12-11",
-   "gfi": 12,
+   "bucket": "2025-12-12",
+   "gfi": 14,
    "beginner": 0,
    "intermediate": 0,
    "advanced": 0,
    "partial": false
   },
   {
-   "bucket": "2025-12-18",
-   "gfi": 12,
+   "bucket": "2025-12-19",
+   "gfi": 8,
    "beginner": 0,
-   "intermediate": 23,
-   "advanced": 6,
+   "intermediate": 19,
+   "advanced": 7,
    "partial": false
   },
   {
-   "bucket": "2025-12-25",
+   "bucket": "2025-12-26",
    "gfi": 13,
    "beginner": 0,
    "intermediate": 14,
@@ -136,63 +136,63 @@
    "partial": false
   },
   {
-   "bucket": "2026-01-01",
-   "gfi": 11,
+   "bucket": "2026-01-02",
+   "gfi": 12,
    "beginner": 0,
-   "intermediate": 18,
-   "advanced": 6,
+   "intermediate": 15,
+   "advanced": 4,
    "partial": false
   },
   {
-   "bucket": "2026-01-08",
-   "gfi": 7,
-   "beginner": 7,
-   "intermediate": 20,
+   "bucket": "2026-01-09",
+   "gfi": 9,
+   "beginner": 5,
+   "intermediate": 17,
    "advanced": 9,
    "partial": false
   },
   {
-   "bucket": "2026-01-15",
-   "gfi": 10,
-   "beginner": 7,
-   "intermediate": 14,
+   "bucket": "2026-01-16",
+   "gfi": 11,
+   "beginner": 10,
+   "intermediate": 16,
    "advanced": 7,
    "partial": false
   },
   {
-   "bucket": "2026-01-22",
-   "gfi": 37,
-   "beginner": 6,
-   "intermediate": 14,
-   "advanced": 6,
+   "bucket": "2026-01-23",
+   "gfi": 40,
+   "beginner": 12,
+   "intermediate": 18,
+   "advanced": 12,
    "partial": false
   },
   {
-   "bucket": "2026-01-29",
-   "gfi": 33,
-   "beginner": 22,
-   "intermediate": 21,
-   "advanced": 11,
+   "bucket": "2026-01-30",
+   "gfi": 36,
+   "beginner": 21,
+   "intermediate": 24,
+   "advanced": 12,
    "partial": false
   },
   {
-   "bucket": "2026-02-05",
-   "gfi": 25,
-   "beginner": 19,
-   "intermediate": 31,
+   "bucket": "2026-02-06",
+   "gfi": 31,
+   "beginner": 24,
+   "intermediate": 33,
    "advanced": 24,
    "partial": false
   },
   {
-   "bucket": "2026-02-12",
+   "bucket": "2026-02-13",
    "gfi": 16,
-   "beginner": 18,
+   "beginner": 17,
    "intermediate": 31,
    "advanced": 20,
    "partial": false
   },
   {
-   "bucket": "2026-02-19",
+   "bucket": "2026-02-20",
    "gfi": 20,
    "beginner": 17,
    "intermediate": 33,
@@ -200,167 +200,167 @@
    "partial": false
   },
   {
-   "bucket": "2026-02-26",
-   "gfi": 13,
+   "bucket": "2026-02-27",
+   "gfi": 14,
    "beginner": 21,
-   "intermediate": 29,
-   "advanced": 17,
+   "intermediate": 31,
+   "advanced": 18,
    "partial": false
   },
   {
-   "bucket": "2026-03-05",
+   "bucket": "2026-03-06",
    "gfi": 17,
-   "beginner": 20,
+   "beginner": 21,
+   "intermediate": 26,
+   "advanced": 22,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-13",
+   "gfi": 19,
+   "beginner": 17,
+   "intermediate": 24,
+   "advanced": 22,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-20",
+   "gfi": 16,
+   "beginner": 17,
+   "intermediate": 23,
+   "advanced": 22,
+   "partial": false
+  },
+  {
+   "bucket": "2026-03-27",
+   "gfi": 15,
+   "beginner": 25,
+   "intermediate": 28,
+   "advanced": 25,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-03",
+   "gfi": 11,
+   "beginner": 31,
+   "intermediate": 24,
+   "advanced": 26,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-10",
+   "gfi": 24,
+   "beginner": 26,
+   "intermediate": 28,
+   "advanced": 24,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-17",
+   "gfi": 26,
+   "beginner": 24,
+   "intermediate": 24,
+   "advanced": 24,
+   "partial": false
+  },
+  {
+   "bucket": "2026-04-24",
+   "gfi": 20,
+   "beginner": 28,
+   "intermediate": 34,
+   "advanced": 25,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-01",
+   "gfi": 18,
+   "beginner": 23,
+   "intermediate": 37,
+   "advanced": 25,
+   "partial": false
+  },
+  {
+   "bucket": "2026-05-08",
+   "gfi": 19,
+   "beginner": 26,
    "intermediate": 27,
    "advanced": 21,
    "partial": false
   },
   {
-   "bucket": "2026-03-12",
-   "gfi": 17,
-   "beginner": 18,
-   "intermediate": 24,
-   "advanced": 23,
-   "partial": false
-  },
-  {
-   "bucket": "2026-03-19",
-   "gfi": 14,
-   "beginner": 17,
-   "intermediate": 23,
-   "advanced": 23,
-   "partial": false
-  },
-  {
-   "bucket": "2026-03-26",
-   "gfi": 15,
-   "beginner": 21,
-   "intermediate": 27,
-   "advanced": 26,
-   "partial": false
-  },
-  {
-   "bucket": "2026-04-02",
-   "gfi": 11,
-   "beginner": 28,
-   "intermediate": 23,
-   "advanced": 28,
-   "partial": false
-  },
-  {
-   "bucket": "2026-04-09",
-   "gfi": 24,
-   "beginner": 30,
-   "intermediate": 28,
-   "advanced": 24,
-   "partial": false
-  },
-  {
-   "bucket": "2026-04-16",
-   "gfi": 27,
-   "beginner": 25,
-   "intermediate": 25,
-   "advanced": 25,
-   "partial": false
-  },
-  {
-   "bucket": "2026-04-23",
-   "gfi": 20,
-   "beginner": 24,
-   "intermediate": 28,
-   "advanced": 24,
-   "partial": false
-  },
-  {
-   "bucket": "2026-04-30",
-   "gfi": 19,
-   "beginner": 24,
-   "intermediate": 36,
-   "advanced": 25,
-   "partial": false
-  },
-  {
-   "bucket": "2026-05-07",
-   "gfi": 21,
-   "beginner": 29,
-   "intermediate": 28,
-   "advanced": 22,
-   "partial": false
-  },
-  {
-   "bucket": "2026-05-14",
-   "gfi": 33,
+   "bucket": "2026-05-15",
+   "gfi": 32,
    "beginner": 40,
-   "intermediate": 31,
+   "intermediate": 30,
    "advanced": 23,
    "partial": false
   },
   {
-   "bucket": "2026-05-21",
-   "gfi": 29,
-   "beginner": 37,
-   "intermediate": 33,
+   "bucket": "2026-05-22",
+   "gfi": 30,
+   "beginner": 36,
+   "intermediate": 32,
    "advanced": 24,
    "partial": false
   },
   {
-   "bucket": "2026-05-28",
-   "gfi": 27,
+   "bucket": "2026-05-29",
+   "gfi": 24,
    "beginner": 35,
-   "intermediate": 30,
-   "advanced": 24,
+   "intermediate": 27,
+   "advanced": 23,
    "partial": false
   },
   {
-   "bucket": "2026-06-04",
+   "bucket": "2026-06-05",
    "gfi": 23,
    "beginner": 34,
-   "intermediate": 27,
-   "advanced": 22,
+   "intermediate": 29,
+   "advanced": 23,
    "partial": false
   },
   {
-   "bucket": "2026-06-11",
+   "bucket": "2026-06-12",
    "gfi": 24,
-   "beginner": 35,
+   "beginner": 38,
    "intermediate": 29,
    "advanced": 20,
    "partial": false
   },
   {
-   "bucket": "2026-06-18",
+   "bucket": "2026-06-19",
    "gfi": 24,
    "beginner": 38,
    "intermediate": 29,
-   "advanced": 23,
-   "partial": false
-  },
-  {
-   "bucket": "2026-06-25",
-   "gfi": 24,
-   "beginner": 38,
-   "intermediate": 30,
    "advanced": 28,
    "partial": false
   },
   {
-   "bucket": "2026-07-02",
-   "gfi": 23,
+   "bucket": "2026-06-26",
+   "gfi": 24,
    "beginner": 38,
    "intermediate": 29,
-   "advanced": 29,
+   "advanced": 28,
    "partial": false
   },
   {
-   "bucket": "2026-07-09",
-   "gfi": 21,
+   "bucket": "2026-07-03",
+   "gfi": 23,
+   "beginner": 38,
+   "intermediate": 29,
+   "advanced": 30,
+   "partial": false
+  },
+  {
+   "bucket": "2026-07-10",
+   "gfi": 20,
    "beginner": 37,
    "intermediate": 27,
    "advanced": 30,
    "partial": false
   },
   {
-   "bucket": "2026-07-16",
+   "bucket": "2026-07-17",
    "gfi": 24,
    "beginner": 44,
    "intermediate": 29,
@@ -368,23 +368,23 @@
    "partial": false
   },
   {
-   "bucket": "2026-07-23",
-   "gfi": 24,
+   "bucket": "2026-07-24",
+   "gfi": 21,
    "beginner": 44,
-   "intermediate": 29,
-   "advanced": 27,
+   "intermediate": 28,
+   "advanced": 26,
    "partial": false
   },
   {
-   "bucket": "2026-07-30",
-   "gfi": 22,
-   "beginner": 43,
-   "intermediate": 26,
-   "advanced": 28,
+   "bucket": "2026-07-31",
+   "gfi": 24,
+   "beginner": 46,
+   "intermediate": 30,
+   "advanced": 24,
    "partial": false
   },
   {
-   "bucket": "2026-08-06",
+   "bucket": "2026-08-07",
    "gfi": 22,
    "beginner": 46,
    "intermediate": 29,
@@ -392,98 +392,90 @@
    "partial": false
   },
   {
-   "bucket": "2026-08-13",
+   "bucket": "2026-08-14",
    "gfi": 20,
-   "beginner": 45,
+   "beginner": 42,
    "intermediate": 30,
    "advanced": 25,
    "partial": false
   },
   {
-   "bucket": "2026-08-20",
+   "bucket": "2026-08-21",
    "gfi": 20,
-   "beginner": 43,
-   "intermediate": 31,
+   "beginner": 42,
+   "intermediate": 30,
    "advanced": 25,
    "partial": false
   },
   {
-   "bucket": "2026-08-27",
-   "gfi": 18,
+   "bucket": "2026-08-28",
+   "gfi": 19,
    "beginner": 38,
-   "intermediate": 46,
+   "intermediate": 47,
    "advanced": 36,
    "partial": false
   },
   {
-   "bucket": "2026-09-03",
+   "bucket": "2026-09-04",
    "gfi": 23,
-   "beginner": 36,
-   "intermediate": 42,
+   "beginner": 37,
+   "intermediate": 41,
    "advanced": 35,
    "partial": false
   },
   {
-   "bucket": "2026-09-10",
+   "bucket": "2026-09-11",
    "gfi": 23,
-   "beginner": 35,
+   "beginner": 34,
    "intermediate": 39,
-   "advanced": 27,
+   "advanced": 26,
    "partial": false
   },
   {
-   "bucket": "2026-09-17",
-   "gfi": 21,
-   "beginner": 34,
+   "bucket": "2026-09-18",
+   "gfi": 20,
+   "beginner": 33,
    "intermediate": 35,
    "advanced": 26,
    "partial": false
   },
   {
-   "bucket": "2026-09-24",
-   "gfi": 20,
+   "bucket": "2026-09-25",
+   "gfi": 19,
    "beginner": 32,
    "intermediate": 32,
    "advanced": 25,
    "partial": false
   },
   {
-   "bucket": "2026-10-01",
-   "gfi": 20,
+   "bucket": "2026-10-02",
+   "gfi": 22,
    "beginner": 32,
-   "intermediate": 31,
+   "intermediate": 30,
    "advanced": 25,
    "partial": false
   },
   {
-   "bucket": "2026-10-08",
-   "gfi": 25,
-   "beginner": 35,
+   "bucket": "2026-10-09",
+   "gfi": 26,
+   "beginner": 36,
    "intermediate": 29,
    "advanced": 27,
    "partial": false
   },
   {
-   "bucket": "2026-10-15",
-   "gfi": 25,
-   "beginner": 35,
+   "bucket": "2026-10-16",
+   "gfi": 24,
+   "beginner": 34,
    "intermediate": 33,
    "advanced": 24,
    "partial": false
   },
   {
-   "bucket": "2026-10-22",
-   "gfi": 23,
-   "beginner": 33,
-   "intermediate": 34,
-   "advanced": 22,
-   "partial": false
-  },
-  {
-   "bucket": "2026-10-29",
-   "gfi": 19,
-   "beginner": 30,
-   "intermediate": 28,
+   "bucket": "2026-10-23",
+   "gfi": 20,
+   "beginner": 31,
+   "intermediate": 33,
    "advanced": 22,
    "partial": false
   },
@@ -494,8 +486,16 @@
    "intermediate": 28,
    "advanced": 22,
    "partial": false
+  },
+  {
+   "bucket": "2026-10-31",
+   "gfi": 17,
+   "beginner": 30,
+   "intermediate": 28,
+   "advanced": 21,
+   "partial": false
   }
  ],
- "generated_at": "2026-10-30T01:03:20.783847+00:00",
+ "generated_at": "2026-10-31T01:06:03.814216+00:00",
  "stale": false
 }
