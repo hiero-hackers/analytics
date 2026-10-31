@@ -44,7 +44,7 @@ jobs:
         with:
           egress-policy: audit
 
-      # Pinned to the v0.1.1 release commit; bump the SHA to take a new release.
-      - uses: hiero-hackers/sdk-automations@6c81ab1ed114117740e5b9d3c3514c09ca83c802 # v0.1.1
+      # Pinned to the v0.1.3 release commit; bump the SHA to take a new release.
+      - uses: hiero-hackers/sdk-automations@e140212f1121eea04795ac7439dbf5b10a954fcf # v0.1.3
         with:
           arm-writes: "false"
