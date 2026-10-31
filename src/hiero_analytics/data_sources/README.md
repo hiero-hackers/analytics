@@ -204,12 +204,15 @@ paginate_cursor(fetch_page)  # fetch_page(cursor, page_size)
 Used by GraphQL queries for repositories, issues, and pull requests. Queries take
 the page size as a `$pageSize` variable; on a `GitHubServerError` (GitHub's 502/504
 for a query that ran too long) the loop halves the page size and retries the same
-cursor, then recovers after a few clean pages.
+cursor, then recovers after a few clean pages. When a page reports another page
+but the cursor is missing or unchanged, that response is discarded and the same
+page is retried once; a second stall raises `CursorStalledError` instead of
+looping or returning a truncated result as complete.
 
 Both helpers provide:
 
 - logging for long-running pagination loops
-- safety guards via `max_pages`
+- safety guards via `max_pages`, and a one-retry stall guard on cursor pagination
 - automatic result aggregation
 
 ---

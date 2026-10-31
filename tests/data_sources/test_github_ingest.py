@@ -14,6 +14,7 @@ from hiero_analytics.data_sources.models import (
     ReleaseRecord,
     RepositoryRecord,
 )
+from hiero_analytics.data_sources.pagination import CursorStalledError
 
 # ---------------------------------------------------------
 # helpers
@@ -96,6 +97,43 @@ def test_fetch_org_repos_sends_page_size_and_shrinks_on_server_error(mock_client
     assert [repo.name for repo in repos] == ["a", "b"]
     sent = [call.args[1] for call in mock_client.graphql.call_args_list]
     assert [(v["cursor"], v["pageSize"]) for v in sent] == [(None, 100), ("C1", 100), ("C1", 50)]
+
+
+def test_fetch_org_repos_retries_a_repeated_cursor_once(mock_client):
+    """A page that repeats its cursor is retried; the stalled page is not stored twice."""
+    mock_client.graphql.side_effect = [
+        _repos_page(["a"], has_next=True, cursor="C1"),
+        _repos_page(["a"], has_next=True, cursor="C1"),
+        _repos_page(["b"]),
+    ]
+
+    repos = ingest.fetch_org_repos_graphql(mock_client, "org", use_cache=False)
+
+    assert [repo.name for repo in repos] == ["a", "b"]
+    sent = [call.args[1]["cursor"] for call in mock_client.graphql.call_args_list]
+    assert sent == [None, "C1", "C1"]
+
+
+def test_stalled_org_repo_pagination_raises_and_is_not_cached(mock_client, monkeypatch):
+    """A cursor that never advances fails the fetch and does not cache a partial repo list."""
+    saved: list[bool] = []
+    calls = {"n": 0}
+    monkeypatch.setattr(ingest._common, "load_records_cache", lambda *_a, **_k: None)
+    monkeypatch.setattr(ingest._common, "save_records_cache", lambda *_a, **_k: saved.append(True))
+
+    def graphql(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] > 2:
+            raise AssertionError("cursor pagination did not stop")
+        return _repos_page(["a"], has_next=True, cursor=None)
+
+    mock_client.graphql.side_effect = graphql
+
+    with pytest.raises(CursorStalledError, match="did not advance"):
+        ingest.fetch_org_repos_graphql(mock_client, "org")
+
+    assert calls["n"] == 2
+    assert saved == []
 
 
 # ---------------------------------------------------------
@@ -510,6 +548,28 @@ def test_fetch_org_resource_parallel_raises_partial_instead_of_returning_incompl
     assert [r.name for r in excinfo.value.failed_repos] == ["broken"]
 
 
+def test_cursor_stall_is_retried_once_then_surfaces_as_a_partial_org_fetch(monkeypatch):
+    """A repo whose pagination stalls is retried; a second stall becomes a partial org fetch."""
+    repos = [_repo("flaky"), _repo("stuck")]
+    monkeypatch.setattr(ingest._common, "fetch_org_repos_graphql", lambda *_a, **_k: repos)
+    calls: dict[str, int] = {}
+
+    def per_repo(repo):
+        calls[repo.name] = calls.get(repo.name, 0) + 1
+        if repo.name == "flaky" and calls["flaky"] == 1:
+            raise CursorStalledError("stalled")
+        if repo.name == "stuck":
+            raise CursorStalledError("stalled")
+        return ["flaky-rec"]
+
+    with pytest.raises(PartialOrgFetchError) as excinfo:
+        ingest.fetch_org_resource_parallel(Mock(), "org", per_repo, 2, task_desc="test")
+
+    assert calls == {"flaky": 2, "stuck": 2}
+    assert excinfo.value.records == ["flaky-rec"]
+    assert [r.name for r in excinfo.value.failed_repos] == ["stuck"]
+
+
 # ---------------------------------------------------------
 # merged-PR incremental delta: the real page loop + watermark early-stop
 # ---------------------------------------------------------
@@ -563,6 +623,27 @@ def test_merged_pr_since_stops_paginating_past_the_watermark(mock_client):
 
     assert {r.pr_number for r in records} == {1, 2}  # boundary record still returned
     assert mock_client.graphql.call_count == 2  # did NOT request a third page
+
+
+def test_merged_pr_since_raises_when_a_cursor_repeats(mock_client):
+    """A non-advancing cursor aborts the delta instead of returning the pages collected so far."""
+    since = datetime(2024, 6, 1, tzinfo=UTC)
+    calls = {"n": 0}
+
+    def graphql(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] > 3:
+            raise AssertionError("cursor pagination did not stop")
+        if calls["n"] == 1:
+            return _pr_page([_pr_node(1, "2024-07-01T00:00:00Z")], cursor="c1", has_next=True)
+        return _pr_page([_pr_node(2, "2024-07-02T00:00:00Z")], cursor="c1", has_next=True)
+
+    mock_client.graphql.side_effect = graphql
+
+    with pytest.raises(CursorStalledError, match="did not advance"):
+        ingest.pull_requests.fetch_repo_merged_pr_difficulty_since_graphql(mock_client, "org", "repo", since)
+
+    assert calls["n"] == 3
 
 
 # ---------------------------------------------------------
