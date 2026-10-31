@@ -77,8 +77,11 @@ def _run_window(
 
     included_issues = labeled_issues | unknown_issues
 
-    issue_keys = pd.MultiIndex.from_arrays([df["repo"], df["number"]])
-    df = df[(df["state"] == "open") & issue_keys.isin(included_issues)].copy()
+    # An org with no open issues gives a frame with no columns at all, so
+    # there is nothing to filter; skip straight to the empty-output path.
+    if not df.empty:
+        issue_keys = pd.MultiIndex.from_arrays([df["repo"], df["number"]])
+        df = df[(df["state"] == "open") & issue_keys.isin(included_issues)].copy()
 
     if df.empty:
         # A quiet window (no labeling or new issues) is data, not an error;
