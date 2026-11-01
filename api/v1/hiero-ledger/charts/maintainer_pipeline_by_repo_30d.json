@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-10-31T01:08:04.659485+00:00"
+  "end": "2026-11-01T01:03:14.092897+00:00"
  },
  "series": [
   {
@@ -70,17 +70,17 @@
   },
   {
    "repo": "solo",
-   "general_user": 9,
+   "general_user": 8,
    "triage": 0,
    "committer": 6,
    "maintainer": 3
   },
   {
-   "repo": "hiero-sdk-python",
-   "general_user": 10,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 5
+   "repo": "hiero-block-node",
+   "general_user": 8,
+   "triage": 1,
+   "committer": 5,
+   "maintainer": 3
   },
   {
    "repo": "hiero-sdk-java",
@@ -90,11 +90,11 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-block-node",
-   "general_user": 7,
-   "triage": 1,
-   "committer": 5,
-   "maintainer": 3
+   "repo": "hiero-sdk-python",
+   "general_user": 10,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 5
   },
   {
    "repo": "hiero-mirror-node",
@@ -112,7 +112,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "general_user": 7,
+   "general_user": 6,
    "triage": 0,
    "committer": 3,
    "maintainer": 3
@@ -294,6 +294,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-10-31T01:08:04.659485+00:00",
+ "generated_at": "2026-11-01T01:03:14.092897+00:00",
  "stale": false
 }

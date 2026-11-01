@@ -30,8 +30,8 @@
  "frequency": "month",
  "timezone": "UTC",
  "comparison": {
-  "current": "2026-09",
-  "previous": "2026-08"
+  "current": "2026-10",
+  "previous": "2026-09"
  },
  "category": {
   "key": "bucket",
@@ -40,7 +40,7 @@
  "window": {
   "kind": "calendar",
   "first": "2026-08",
-  "last": "2026-10"
+  "last": "2026-11"
  },
  "series": [
   {
@@ -64,9 +64,14 @@
   {
    "bucket": "2026-10",
    "repos_created": 0,
+   "partial": false
+  },
+  {
+   "bucket": "2026-11",
+   "repos_created": 0,
    "partial": true
   }
  ],
- "generated_at": "2026-10-31T01:20:59.316371+00:00",
+ "generated_at": "2026-11-01T01:16:22.819923+00:00",
  "stale": false
 }

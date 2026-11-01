@@ -3057,6 +3057,20 @@
   {
    "hip": 1195,
    "hip_title": "Hiero hooks and an application to allowances",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 28003,
+   "pr_title": "fix: require target-entity ownership for HookDispatch CREATION/DELETION",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "ION and DELETION (EXECUTION unchanged \u2014 HIP-1195). - `HookDispatchHandler.handle`: for C",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/28003"
+  },
+  {
+   "hip": 1195,
+   "hip_title": "Hiero hooks and an application to allowances",
    "repo": "hiero-ledger/hiero-contracts",
    "pr_number": 72,
    "pr_title": "chore(deps-dev): Bump @hashgraph/sdk from 2.79.0 to 2.81.0",
@@ -12253,8 +12267,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 871,
- "generated_at": "2026-10-31T01:19:28.380061+00:00",
+ "row_count": 872,
+ "generated_at": "2026-11-01T01:15:03.368910+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

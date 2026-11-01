@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-31T01:20:54.377693+00:00"
+  "end": "2026-11-01T01:16:16.986462+00:00"
  },
  "series": [
   {
@@ -45,14 +45,14 @@
    "color": "#1F77B4"
   },
   {
-   "key": "LimeChain",
-   "label": "LimeChain",
-   "color": "#FF7F0E"
-  },
-  {
    "key": "BlockyDevs",
    "label": "BlockyDevs",
    "color": "#D62728"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
   },
   {
    "key": "Independent",
@@ -70,28 +70,28 @@
   {
    "repo": "clpr-spec",
    "Hashgraph": 6,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "Independent": 1,
    "Unknown": 0
   },
   {
    "repo": "clpr-endpoint",
    "Hashgraph": 8,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "Independent": 1,
    "Unknown": 1
   },
   {
    "repo": "clpr-smart-contracts",
    "Hashgraph": 11,
-   "LimeChain": 1,
    "BlockyDevs": 1,
+   "LimeChain": 1,
    "Independent": 2,
    "Unknown": 0
   }
  ],
- "generated_at": "2026-10-31T01:20:54.377693+00:00",
+ "generated_at": "2026-11-01T01:16:16.986462+00:00",
  "stale": false
 }

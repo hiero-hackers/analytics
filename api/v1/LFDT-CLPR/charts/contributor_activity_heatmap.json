@@ -33,10 +33,6 @@
  },
  "columns": [
   {
-   "key": "2026-04",
-   "label": "2026-04"
-  },
-  {
    "key": "2026-05",
    "label": "2026-05"
   },
@@ -55,12 +51,16 @@
   {
    "key": "2026-09",
    "label": "2026-09"
+  },
+  {
+   "key": "2026-10",
+   "label": "2026-10"
   }
  ],
  "value_label": "Weighted activity score",
  "scale": {
   "min": 0,
-  "max": 25,
+  "max": 115,
   "steps": 5
  },
  "missing": null,
@@ -70,65 +70,142 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-10-31T01:20:53.865263+00:00"
+  "end": "2026-11-01T01:16:16.149920+00:00"
  },
  "rows": [
   {
-   "contributor name": "ryjones",
+   "contributor name": "shayansal",
    "role": "General User",
-   "activity score": 25,
-   "2026-04": 0,
+   "activity score": 118,
    "2026-05": 0,
    "2026-06": 0,
    "2026-07": 0,
    "2026-08": 0,
-   "2026-09": 25
+   "2026-09": 3,
+   "2026-10": 115
   },
   {
    "contributor name": "jwagantall",
    "role": "General User",
-   "activity score": 12,
-   "2026-04": 0,
+   "activity score": 96,
    "2026-05": 0,
    "2026-06": 0,
    "2026-07": 0,
    "2026-08": 0,
-   "2026-09": 12
+   "2026-09": 12,
+   "2026-10": 84
+  },
+  {
+   "contributor name": "ryjones",
+   "role": "General User",
+   "activity score": 44,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 25,
+   "2026-10": 19
   },
   {
    "contributor name": "edward-swirldslabs",
    "role": "Maintainer",
-   "activity score": 10,
-   "2026-04": 0,
+   "activity score": 39,
    "2026-05": 0,
    "2026-06": 0,
    "2026-07": 0,
    "2026-08": 0,
-   "2026-09": 10
+   "2026-09": 10,
+   "2026-10": 29
   },
   {
    "contributor name": "hendrikebbers",
    "role": "Maintainer",
-   "activity score": 6,
-   "2026-04": 0,
+   "activity score": 39,
    "2026-05": 0,
    "2026-06": 0,
    "2026-07": 0,
    "2026-08": 0,
-   "2026-09": 6
+   "2026-09": 6,
+   "2026-10": 33
   },
   {
-   "contributor name": "shayansal",
+   "contributor name": "tinker-michaelj",
    "role": "General User",
-   "activity score": 3,
-   "2026-04": 0,
+   "activity score": 24,
    "2026-05": 0,
    "2026-06": 0,
    "2026-07": 0,
    "2026-08": 0,
-   "2026-09": 3
+   "2026-09": 0,
+   "2026-10": 24
+  },
+  {
+   "contributor name": "jasuwienas",
+   "role": "Committer",
+   "activity score": 17,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 17
+  },
+  {
+   "contributor name": "lukasz-hashgraph",
+   "role": "Committer",
+   "activity score": 9,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 9
+  },
+  {
+   "contributor name": "Neeharika-Sompalli",
+   "role": "Committer",
+   "activity score": 3,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 3
+  },
+  {
+   "contributor name": "Reccetech",
+   "role": "General User",
+   "activity score": 3,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 3
+  },
+  {
+   "contributor name": "chipleinen",
+   "role": "General User",
+   "activity score": 3,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 3
+  },
+  {
+   "contributor name": "exploreriii",
+   "role": "General User",
+   "activity score": 2,
+   "2026-05": 0,
+   "2026-06": 0,
+   "2026-07": 0,
+   "2026-08": 0,
+   "2026-09": 0,
+   "2026-10": 2
   }
  ],
- "generated_at": "2026-10-31T01:20:53.865263+00:00",
+ "generated_at": "2026-11-01T01:16:16.149920+00:00",
  "stale": false
 }

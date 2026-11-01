@@ -391,10 +391,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-10-31T01:20:59.415856+00:00",
+ "generated_at": "2026-11-01T01:16:22.928888+00:00",
  "provenance": {
-  "git_sha": "6734b68",
-  "data_as_of": "2026-10-31T01:05:57.449326+00:00"
+  "git_sha": "36655bb",
+  "data_as_of": "2026-11-01T01:01:20.767951+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -519,7 +519,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 871,
+     "row_count": 872,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1186,7 +1186,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-10-31T01:19:28.387123+00:00"
+      "generated_at": "2026-11-01T01:15:03.378691+00:00"
      }
     },
     {
@@ -1262,7 +1262,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-10-31T01:19:28.383765+00:00"
+      "generated_at": "2026-11-01T01:15:03.374000+00:00"
      }
     },
     {
@@ -1673,7 +1673,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 99,
+      "value": 100,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -2275,7 +2275,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "37%",
+      "value": "39%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -2311,7 +2311,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "29%",
+      "value": "31%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
