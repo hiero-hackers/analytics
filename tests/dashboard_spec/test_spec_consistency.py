@@ -239,11 +239,12 @@ def test_column_glossaries_cover_the_columns_their_tables_show():
         # Through the role variants: a label that only appears on a tab is
         # still a label the tab shows, and must still be explained.
         shown = {
-            column[1]
+            column.label.lower() if hasattr(column, "label") else column[1].lower()
             for spec in family.SECTION_SPECS
             for variant in table_variants(spec)
             for column in variant["columns"]
         }
+        defined = {part.strip().lower() for entry in glossary["terms"] for part in entry["term"].split("/")}
         unexplained = shown - defined - SELF_EVIDENT
         assert not unexplained, f"{macro_name}: columns shown but not explained: {sorted(unexplained)}"
 
@@ -272,6 +273,13 @@ def test_every_chart_has_a_note_and_a_methodology():
     assert not missing_method, f"charts with no step-by-step methodology: {sorted(set(missing_method))}"
 
 
+def _get_column_format(column):
+    """Get the format from a column, works for both tuples and Column objects."""
+    if hasattr(column, "__getitem__"):
+        return column[2] if len(column) > 2 else None
+    return column.format if hasattr(column, "format") and column.format else None
+
+
 def test_column_formats_are_ones_the_frontend_implements():
     """A column may only declare a format the dashboard knows how to render.
 
@@ -279,11 +287,11 @@ def test_column_formats_are_ones_the_frontend_implements():
     plain text — so without this a typo ships as a quietly unformatted column.
     """
     unknown = {
-        (family.CHART_MACRO["name"], spec["id"], column[0], column[2])
+        (family.CHART_MACRO["name"], spec["id"], _get_column_format(column))
         for family in TABLE_FAMILIES.values()
         for spec in family.SECTION_SPECS
         for column in spec["columns"]
-        if len(column) > 2 and column[2] not in COLUMN_FORMATS
+        if _get_column_format(column) is not None and _get_column_format(column) not in COLUMN_FORMATS
     }
     assert not unknown, f"columns declaring an unknown format: {sorted(unknown)}"
 

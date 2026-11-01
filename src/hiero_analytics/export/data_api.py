@@ -74,6 +74,7 @@ from hiero_analytics.dashboard_spec import (
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.export.chart_data import chart_document, is_empty
+from hiero_analytics.export.columns import column_key, column_spec
 from hiero_analytics.export.csv_safety import sanitize_csv_text
 from hiero_analytics.export.entity_views import build_entity_documents
 from hiero_analytics.export.macro_metrics import macro_metrics
@@ -161,7 +162,7 @@ def _contract_frame(section: dict, frame: pd.DataFrame, where: str) -> pd.DataFr
     an accidental key becomes a promise we cannot withdraw. Nothing is hidden —
     the produced CSV under ``outputs/data/org/`` remains the full artifact.
     """
-    declared = [column[0] for column in section["columns"]]
+    declared = [column_key(column) for column in section["columns"]]
     missing = [key for key in declared if key not in frame.columns]
     if missing:
         raise DataApiContractError(
@@ -198,12 +199,7 @@ def _variant_document(variant: dict, org: str, org_data_dir: Path) -> dict | Non
         "title": variant["title"],
         "description": variant["description"],
         "source": variant["file"],
-        # Column entries mirror the spec: (key, label) plus an optional display
-        # format — serialized as objects so consumers need no tuple knowledge.
-        "columns": [
-            {"key": column[0], "label": column[1], **({"format": column[2]} if len(column) > 2 else {})}
-            for column in variant["columns"]
-        ],
+        "columns": [column_spec(column) for column in variant["columns"]],
         "rows": _rows(frame),
         "row_count": len(frame),
     }

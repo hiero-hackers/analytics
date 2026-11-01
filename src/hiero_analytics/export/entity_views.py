@@ -33,6 +33,7 @@ from hiero_analytics.dashboard_spec import entities as spec
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
 from hiero_analytics.domain.repos import bare_repo
 from hiero_analytics.export.chart_data import chart_document
+from hiero_analytics.export.columns import Column, column_key, column_spec
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +171,12 @@ def _activity_table(
     freshness: dict,
 ) -> dict:
     """A section-shaped table (all-time rows plus period variants) the dashboard's table renders."""
-    keys = [first[0], *(column[0] for column in columns)]
+    keys = [first[0]]
+    keys.extend(
+        column_key(column)
+        for column in columns
+        if isinstance(column, Column) or (isinstance(column, (tuple, list)) and len(column) > 0)
+    )
 
     def rows(period: str) -> list[dict]:
         scoped = pairs[pairs["period"] == period].sort_values("last_active", ascending=False)
@@ -182,8 +188,8 @@ def _activity_table(
         "description": description,
         "source": source,
         "columns": [
-            {"key": first[0], "label": first[1]},
-            *({"key": key, "label": label, **({"format": fmt[0]} if fmt else {})} for key, label, *fmt in columns),
+            column_spec((first[0], first[1])),
+            *[column_spec(column) for column in columns],
         ],
         "rows": rows(ALL_TIME),
         "periods": {period.key: rows(period.key) for period in ACTIVITY_PERIODS},
@@ -194,8 +200,8 @@ def _activity_table(
 
 
 _COUNT_COLUMNS = [(name, label, "number") for name, label in spec.COUNT_LABELS.items()]
-_TOTAL_COLUMN = ("total_actions", "All tracked actions", "number")
-_LAST_ACTIVE_COLUMN = ("last_active", "Last active (UTC)", "date")
+_TOTAL_COLUMN = Column("total_actions", "All tracked actions", format="number")
+_LAST_ACTIVE_COLUMN = Column("last_active", "Last active (UTC)", format="date")
 
 
 def _related_row(frame: pd.DataFrame, repo_id: str) -> pd.DataFrame:
@@ -258,10 +264,14 @@ def _related(repo_id: str, tables: _Tables, sources: SourceSections) -> tuple[li
             if match.empty:
                 continue
             row = _json_rows(match.head(1))[0]
-            for key, label, *fmt in part["columns"]:
-                if key in row and row[key] is not None:
+            for column in part["columns"]:
+                spec_ = column_spec(column)
+                if spec_["key"] in row and row[spec_["key"]] is not None:
                     fields.append(
-                        {"key": key, "label": label, "value": row[key], **({"format": fmt[0]} if fmt else {})}
+                        {
+                            **spec_,
+                            "value": row[spec_["key"]],
+                        }
                     )
         section = {
             "id": section_id,
@@ -274,7 +284,7 @@ def _related(repo_id: str, tables: _Tables, sources: SourceSections) -> tuple[li
             list_frame = tables.frame(listing["file"])
             if list_frame is not None:
                 matches = _related_row(list_frame, repo_id)
-                keys = [column[0] for column in listing["columns"] if column[0] in matches.columns]
+                keys = [column_key(column) for column in listing["columns"] if column_key(column) in matches.columns]
                 if not matches.empty and keys:
                     ascending = listing["sort"] != "published_at"
                     matches = matches.sort_values(listing["sort"], ascending=ascending)
@@ -283,12 +293,10 @@ def _related(repo_id: str, tables: _Tables, sources: SourceSections) -> tuple[li
                     section["list"] = {
                         "title": listing["title"],
                         "source": listing["file"],
-                        "columns": [
-                            {"key": key, "label": label, **({"format": fmt[0]} if fmt else {})}
-                            for key, label, *fmt in listing["columns"]
-                            if key in keys
-                        ],
-                        "rows": _json_rows(matches[keys]),
+                        "columns": [column_spec(column) for column in listing["columns"] if column_key(column) in keys],
+                        "rows": _json_rows(
+                            matches[[column_key(column) for column in listing["columns"] if column_key(column) in keys]]
+                        ),
                         **tables.freshness(listing["file"]),
                     }
                 if listing["file"] not in files:
