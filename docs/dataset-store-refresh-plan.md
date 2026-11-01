@@ -1,8 +1,8 @@
 # Dataset store: self-heal, per-repo state, and fetch salvage
 
-Status: proposed for #623, 2026-11-01. Section 3.A (PR 1) is implemented on
-`fix/623-dataset-store-self-heal`; sections 3.B to 3.E are the plan for the PRs that
-follow. Kept as the design record, like `fetch-hardening-plan.md`.
+Status: proposed for #623, 2026-11-01. Sections 3.A (PR 1) and 3.B (PR 2, which also
+carries most of 3.C) are implemented on `fix/623-dataset-store-self-heal`; the rest is
+the plan for the PRs that follow. Kept as the design record, like `fetch-hardening-plan.md`.
 
 ## 1. What is wrong
 
@@ -127,11 +127,16 @@ page 1 then costs nothing. So:
 `records`, written by the same atomic `replace`:
 
 ```json
-{"version": 3, "fetched_at": "...", "fetched_through": "...", "last_full_at": "...",
+{"version": 2, "fetched_at": "...", "fetched_through": "...",
  "records": [...],
  "repos": {"hiero-ledger/solo": {"watermark": "...", "last_full_at": "...",
-           "complete": true, "records": 11532, "holds": 0, "missing_runs": 0}}}
+                                 "holds": 0, "missing_runs": 0}}}
 ```
+
+The key is additive, so `DATASET_VERSION` stays at 2, the precedent `save_dataset` set
+for `fetched_at`. Older code ignores the key and rewrites the file without it, so a
+rollback costs nothing. A file without the key is seeded in place (below), so the
+switch costs no cold fetch.
 
 Rejected alternatives:
 
@@ -143,86 +148,129 @@ Rejected alternatives:
 - **Stamps first, then `repos`, then `records`.** `_is_dataset_file` requires `"records"`
   in the first 256 bytes, so a large `repos` map ahead of it would hide the file from
   the prune.
+- **A version bump to 3.** It would invalidate every dataset at once, which is the
+  cold fetch this work exists to avoid.
 
-`OrgIncrementalResource` gains `repo_of` (every incremental record already carries
-`repo`). Each run plans each listed repo:
+`OrgIncrementalResource` gains `repo_of` (defaulting to `record.repo`, which every
+incremental record has). The engine is `dataset_store.fetch_incremental_by_repo`, and
+`fetch_org_incremental` lists the org once and calls it. Each run plans each listed
+repo:
 
 | Repo state | Fetch |
 |---|---|
-| no entry (new, late-joining, or no records) | full fetch of that repo (backfill) |
-| `complete: false` (an earlier full fetch failed) | full fetch of that repo |
-| `last_full_at` due (3.C) | full fetch of that repo, if within tonight's budget |
+| no entry, or no watermark (new, late-joining, or a first fetch that failed) | full fetch of that repo (backfill) |
+| `last_full_at` older than `full_refresh_after` (30 days), or `--refresh` | full fetch of that repo |
 | otherwise | delta from that repo's own watermark |
 
-The planner calls `fetch_org_records_batched` once per group, with the repo subset and
-that group's query (`since` per group: repos are bucketed by watermark day, so a delta
-round still shares one `$since`).
+**What a repo's watermark means.** It is the dataset's content watermark (the newest
+`updated_at` in the dataset) as of the last run in which that repo's fetch completed.
+That is the value today's org-wide watermark has, so deltas see exactly what they saw
+before. Repos that complete together share it, so a night's delta is still one batched
+fetch. A held repo keeps its older value and gets a second, small delta group.
+Per-repo *content* watermarks were rejected: every quiet repo would get its own
+`since`, breaking batching into one request per repo.
 
 - A repo's full fetch that completes *replaces* that repo's rows. That is where
   deleted and transferred records go.
-- A partial full fetch *merges* and leaves the repo `complete: false`.
+- A partial full fetch *merges*, and `last_full_at` does not move, so the refresh is
+  retried the next night.
 - A delta merges, and advances only the watermarks of the repos it completed.
+- The dataset-level `fetched_through` is the oldest listed repo's watermark, which is
+  what it always meant. `fetched_at` keeps its prior value on any run that held a
+  repo, as a held watermark always did.
 
 **Partial first fetch.** Today a first fetch that loses one repo persists nothing,
-which is how the 14 Oct run threw away 23 good repos. With per-repo completeness, the
-complete repos are saved with watermarks and the failed ones are saved
-`complete: false`. Resuming the failed repos from a stored cursor the next night is
-rejected: cursors on `UPDATED_AT`-ordered connections drift, so a resumed fetch could
-skip records with no signal. A fresh full fetch of the failed repos is correct, and
-3.A makes it cheap to retry.
+which is how the 14 Oct run threw away 23 good repos. Now the repos that completed are
+saved with watermarks, and the failed ones are saved without one, so they are fetched
+in full the next night. Only a first fetch in which *nothing* completed re-raises. With
+no prior freshness stamp to keep, such a file claims its own content watermark as
+`fetched_at`, never "now".
+
+Resuming the failed repos from a stored cursor the next night is rejected: cursors on
+`UPDATED_AT`-ordered connections drift, so a resumed fetch could skip records with no
+signal. A fresh full fetch of the failed repos is correct, and 3.A makes it cheap to
+retry.
 
 **Retiring a repo that left the org.** The listing can come from the 14-day TTL cache,
 and a single listing call can miss a repo. Rows are retired only when all of these
 hold:
 
-1. the repo has been absent from the listing on 2 or more runs (`missing_runs`);
-2. a direct `repository(owner, name)` lookup confirms it: `NOT_FOUND`, or
-   `nameWithOwner` now outside the org;
-3. fewer than 20% of the dataset's repos are missing at once (a revoked token or an
-   empty listing must not retire everything).
+1. the repo has been absent from the listing on 2 or more consecutive runs
+   (`missing_runs`);
+2. a direct `repository(owner, name)` lookup (`_common.repository_is_gone`, one point)
+   confirms it: `NOT_FOUND`, or a different `nameWithOwner`, meaning GitHub resolved a
+   rename or transfer. A failed lookup is not evidence.
+3. no more than 20% of the dataset's repos are missing at once (at least one may always
+   retire). A revoked token or an empty listing must not retire everything.
 
-Retirement is logged at WARNING and listed in `SNAPSHOT.json`.
+Until then the repo's rows stay and it is simply not fetched. Retirement is logged at
+WARNING; listing it in `SNAPSHOT.json` is part of 3.E. A rename is handled correctly as
+a side effect: the new name is backfilled the night it appears, and the old name's rows
+retire two runs later, so nothing is counted twice.
 
-**Migration from format 2.** `load_dataset` accepts format 2 files and upgrades them in
-memory. Nothing is discarded, so nothing is cold-fetched:
+**Migration (a file without `repos`).** Nothing is discarded, so nothing is
+cold-fetched:
 
-- each repo with records gets `watermark` = the file's `fetched_through`,
-  `complete: true`, and a *seeded* `last_full_at`, so its first full refresh is spread
-  over the window (3.C);
+- each repo with records gets `watermark` = the file's `fetched_through`, and a
+  *seeded* `last_full_at` (3.C), so its first full refresh lands somewhere in the next
+  30 days, not tonight;
 - repos with no records get no entry, so they are fetched in full tonight. That is
   cheap by construction, and it backfills repos the old org-wide `since` never covered.
+- Repos with records that are no longer listed (rows that have outlived their repo)
+  are seeded too, so they enter the retirement rules. **This will lower some all-time
+  totals on first deploy**, by design.
 
-`solo-charts` (47 records) gets an entry and is corrected by its scheduled full
-refresh within N days. Tests: a recorded format 2 fixture loads, upgrades, and
-round-trips. A dry run of the planner against the latest nightly snapshot
-(`seed-datasets`, offline) prints the per-night full-refresh schedule and the estimated
-points, for the PR note.
+`solo-charts` (47 records) gets an entry and is corrected by its seeded full refresh
+within 30 days.
+
+Tests:
+
+- `test_dataset_store_per_repo.py` covers planning, holds, partial first fetches,
+  replace-on-refresh, migration, corrupt state, offline runs and every retirement rule.
+- `test_refresh_simulation.py` runs 60 nights of a fake org through the real
+  `fetch_org_issues_graphql`, batched engine and store, and covers #623's (a) to (d)
+  plus a retirement.
+
+Still to do for the PR note: a dry run of the planner against the latest nightly
+snapshot (`seed-datasets`, offline), printing the per-night full-refresh schedule and
+estimated points. It needs the snapshot artifact, which takes a token.
 
 ### C. Staggered `last_full_at` self-heal (PR 3)
 
-- A repo is due when `now - last_full_at >= full_refresh_after` (30 days, unchanged).
-- Migration seeds `last_full_at = now - N + slot`, where
-  `slot = hash(resource, org, repo) mod N` days. Due dates spread uniformly, and after
-  that each repo comes due N days after its own last refresh.
-- Tonight's budget is `ceil(2 * repos / N)` scheduled full refreshes per (resource,
-  org); the most overdue go first. Backfills (no state) are not budgeted, because they
-  are the only way to get the data.
-- A missed night or a skipped save cannot bunch the schedule beyond the budget.
-- `fetch_incremental`'s own `full_refresh_after` (used by the HIP inventory,
-  `hip_references.py:226`) switches to the stored dataset-level `last_full_at`, which
-  fixes the quiet-dataset-every-night case for single-file datasets.
+The per-repo gate (`now - last_full_at >= full_refresh_after`) and the stagger shipped
+with 3.B, because the migration's seeding *is* the stagger:
 
-Budget: with N = 30 and the 2x cap, a night fully refreshes at most about 7% of a
-dataset's repos, against about 3% on average. `docs/api-budget.md` gets the measured
-nightly cost from the rehearsal.
+- A seeded `last_full_at` is `now - N * (1 - f)`, where `f` comes from
+  `sha256(dataset file, repo)` in `[0, 1)`. The repo comes due `N * f` days later:
+  spread uniformly, staggered across resources and orgs, and deterministic.
+- A repo's *first* full fetch (a cold fetch, or a backfill) gets the same seeded stamp,
+  not "now". Otherwise a cold fetch of a whole org would come due again all on one
+  night 30 days later. This costs at most one early refresh per repo, once.
+- After that, each repo comes due N days after its own last refresh.
+
+Measured in the tests: 40 migrated repos, at most 4 full refreshes on any night of the
+first window, each repo exactly once. 60 cold-fetched repos, at most 6 a night. In the
+60-night simulation, at most 2 a night.
+
+What remains for PR 3:
+
+- **A nightly budget**: at most `ceil(2 * repos / N)` scheduled refreshes per
+  (resource, org), most overdue first. Backfills are not budgeted, because they are the
+  only way to get the data. This is the backstop for missed nights (a cache eviction,
+  a skipped save), which would otherwise bunch the overdue repos.
+- **Single-file datasets**: `fetch_incremental`'s own `full_refresh_after` (the HIP
+  inventory, `hip_references.py:226`) still gates on the content watermark. It switches
+  to a stored dataset-level `last_full_at`, which fixes the quiet-dataset-every-night
+  case.
+- **The budget figures** in `docs/api-budget.md`, from the rehearsal.
 
 ### D. Per-resource schema versions (PR 4)
 
-`version` becomes the *file format* (3 after PR 2). Each resource declares
+`version` stays the *file format* (still 2: 3.B was additive). Each resource declares
 `schema_version` on `OrgIncrementalResource`, defaulting to 1, and on the `load_or_fetch`
 callers. The file stores `"schema"`, and a mismatch invalidates that resource only.
-Format 2 files map to schema 1 for every resource, since the global v2 bump already
-covered `issue_label_events`. `dataset_seed` validation accepts format 2 and format 3.
+A file without `"schema"` maps to schema 1 for every resource, since the global v2
+bump already covered `issue_label_events`.
 
 ### E. Held watermarks, health gate, plausibility (PR 5)
 
@@ -254,8 +302,8 @@ covered `issue_label_events`. `dataset_seed` validation accepts format 2 and for
 | PR | Change | Needs | Verify | Rollback |
 |---|---|---|---|---|
 | 1 | 3.A | #621 (merged) | fakes for each recorded shape; a forced cold run of `issue_label_events` for hiero-ledger, reporting points from `SNAPSHOT.json` `api_usage` | revert; no data format change |
-| 2 | 3.B | 1 | format 2 fixture upgrade; planner dry run on the nightly snapshot; multi-night simulation (late joiner backfilled) | revert; format 3 files read as a cache miss, so keep the revert *and* restore the last format 2 cache |
-| 3 | 3.C | 2 | simulation: an active dataset refreshes on schedule, a deleted issue disappears, the nightly share stays within budget | revert; the schedule is data, nothing to undo |
+| 2 | 3.B, and 3.C's gate and stagger | 1 | migration in place; planner dry run on the nightly snapshot; 60-night simulation, (a) to (d) | revert; the `repos` key is additive, so older code ignores it |
+| 3 | rest of 3.C | 2 | a missed-nights simulation stays within the budget; the HIP inventory stops refreshing nightly | revert; the schedule is data, nothing to undo |
 | 4 | 3.D | 2 | bump one resource's schema in a test; the others load | revert |
 | 5 | 3.E | 3 | a simulated 3-night hold fails the gate after save; a shrink fixture fails it | revert the job |
 

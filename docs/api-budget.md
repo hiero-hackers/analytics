@@ -53,7 +53,7 @@ Datasets follow one of two paths:
 | Path | Datasets (examples) | Behaviour on an existing dataset |
 | --- | --- | --- |
 | Reused (`load_or_fetch`) | `contributor_activity`, `ci_health`, `onboarding`, the REST `codeowner_and_runner` data | Reused with **no fetch** by a run's later pipelines while the last fetch is under 6 hours old (`DEFAULT_REUSE_MAX_AGE`, measured from `fetched_at`); every new run refetches. |
-| Incremental (`fetch_incremental`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since the watermark **on every run**, regardless of age; a full refetch once the watermark is over 30 days old (`full_refresh_after`). |
+| Incremental (`fetch_incremental_by_repo`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since each repository's watermark **on every run**, regardless of age. Each repository is also refetched in full every 30 days (`full_refresh_after`), on its own staggered night, so a night carries about 1/30 of the org's full-fetch cost rather than all of it; a repository with no watermark yet (new to the org) is fetched in full the night it appears. |
 
 So a run's floor is not zero: the incremental datasets are always queried. The
 reuse window only saves the datasets on the first path, and only within one run.

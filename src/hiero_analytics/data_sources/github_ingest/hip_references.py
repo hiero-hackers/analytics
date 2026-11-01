@@ -32,7 +32,7 @@ from hiero_analytics.data_sources.queries import load_query
 
 from ..dataset_store import fetch_incremental
 from ..github_client import GitHubClient
-from ..models import HipReferenceRecord, HipSpecRecord
+from ..models import HipReferenceRecord, HipSpecRecord, RepositoryRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
 from ..serialization import parse_github_datetime
 from ._common import node_older_than
@@ -104,7 +104,7 @@ def fetch_org_pr_hip_refs_graphql(
     the bound so the dataset can never be confused with an unbounded sweep.
     """
 
-    def bounded_fetch(since: datetime) -> list[HipReferenceRecord]:
+    def bounded_fetch(repos: list[RepositoryRecord], since: datetime) -> list[HipReferenceRecord]:
         cutoff = max(since, _HIERO_ERA_START_AT)
         return fetch_org_records_batched(
             client,
@@ -116,12 +116,14 @@ def fetch_org_pr_hip_refs_graphql(
             per_repo=lambda repo: fetch_repo_pr_hip_refs_since_graphql(client, repo.owner, repo.name, cutoff),
             task_desc=f"organization {PR_HIP_REFS_RESOURCE.task_desc}",
             max_workers=max_workers,
+            repos=repos,
         )
 
     return fetch_org_incremental(
         PR_HIP_REFS_RESOURCE,
+        client=client,
         org=org,
-        full_fetch=lambda: bounded_fetch(_HIERO_ERA_START_AT),
+        full_fetch=lambda repos: bounded_fetch(repos, _HIERO_ERA_START_AT),
         since_fetch=bounded_fetch,
         fingerprint="hiero-era",
         refresh=refresh,

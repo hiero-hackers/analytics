@@ -427,6 +427,7 @@ def fetch_org_records_batched(
     max_workers: int,
     variables: dict | None = None,
     stop_node: Callable[[dict], bool] | None = None,
+    repos: list[RepositoryRecord] | None = None,
 ) -> list:
     """Org-wide batched fetch with a per-repo fallback for repos the batch never started.
 
@@ -440,8 +441,11 @@ def fetch_org_records_batched(
     If any repository is incomplete or still failing, :class:`PartialOrgFetchError`
     is raised carrying *all* records that did arrive, so the incremental store
     can merge them while holding the watermark.
+
+    ``repos`` limits the fetch to those repositories (the dataset store plans
+    full and delta fetches per repository); by default the whole org is listed.
     """
-    all_repos = _common.fetch_org_repos_graphql(client, org)
+    all_repos = repos if repos is not None else _common.fetch_org_repos_graphql(client, org)
     outcome = _fetch_batched_progress(
         client,
         all_repos,

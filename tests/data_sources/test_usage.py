@@ -12,9 +12,10 @@ import requests
 import hiero_analytics.config.paths as paths
 import hiero_analytics.data_sources.github_client as github_client
 from hiero_analytics.data_sources.dataset_store import load_or_fetch
+from hiero_analytics.data_sources.github_ingest import _common
 from hiero_analytics.data_sources.github_ingest._common import fetch_all_with_retry
 from hiero_analytics.data_sources.github_ingest.incremental import OrgIncrementalResource, fetch_org_incremental
-from hiero_analytics.data_sources.models import IssueTimelineEventRecord
+from hiero_analytics.data_sources.models import IssueTimelineEventRecord, RepositoryRecord
 from hiero_analytics.data_sources.usage import (
     UNATTRIBUTED,
     UsageLedger,
@@ -361,18 +362,24 @@ def test_fetch_org_incremental_scopes_its_fetches(monkeypatch, tmp_path):
     )
     seen: list[UsageScope] = []
 
-    def full() -> list:
+    def listing(_client, _org) -> list:
+        seen.append(current_scope())
+        return [RepositoryRecord(full_name="org/repo", name="repo", owner="org")]
+
+    def full(_repos: list) -> list:
         seen.append(current_scope())
         return [event]
 
-    def since(_when: datetime) -> list:
+    def since(_repos: list, _when: datetime) -> list:
         seen.append(current_scope())
         return []
 
-    fetch_org_incremental(resource, org="acme", full_fetch=full, since_fetch=since)
-    fetch_org_incremental(resource, org="acme", full_fetch=full, since_fetch=since)
+    monkeypatch.setattr(_common, "fetch_org_repos_graphql", listing)
+    fetch_org_incremental(resource, client=None, org="acme", full_fetch=full, since_fetch=since)
+    fetch_org_incremental(resource, client=None, org="acme", full_fetch=full, since_fetch=since)
 
-    assert seen == [UsageScope("acme", "scoped_events")] * 2
+    # The listing, the full fetch, the listing again, and the delta.
+    assert seen == [UsageScope("acme", "scoped_events")] * 4
     assert current_scope() == UsageScope(None, None)
 
 

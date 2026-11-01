@@ -7,12 +7,12 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 import hiero_analytics.config.paths as paths
-from hiero_analytics.data_sources.github_ingest import ORG_INCREMENTAL_RESOURCES
+from hiero_analytics.data_sources.github_ingest import ORG_INCREMENTAL_RESOURCES, _common
 from hiero_analytics.data_sources.github_ingest.incremental import (
     OrgIncrementalResource,
     fetch_org_incremental,
 )
-from hiero_analytics.data_sources.models import IssueTimelineEventRecord
+from hiero_analytics.data_sources.models import IssueTimelineEventRecord, RepositoryRecord
 
 _NOW = datetime.now(UTC)
 
@@ -37,6 +37,15 @@ _RESOURCE = OrgIncrementalResource(
 )
 
 
+def _list_repo(monkeypatch) -> None:
+    """The org lists the one repository the test events belong to."""
+    monkeypatch.setattr(
+        _common,
+        "fetch_org_repos_graphql",
+        lambda _client, _org: [RepositoryRecord(full_name="org/repo", name="repo", owner="org")],
+    )
+
+
 def test_registry_lists_every_org_incremental_resource():
     """The registry is the enumerable source of truth for org-wide datasets."""
     assert set(ORG_INCREMENTAL_RESOURCES) == {
@@ -53,22 +62,25 @@ def test_registry_lists_every_org_incremental_resource():
 def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
     """First run does a full fetch; the next fetches the delta and merges."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    _list_repo(monkeypatch)
     calls: list[str] = []
 
     first = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: calls.append("full") or [_event(1, days_ago=10)],
-        since_fetch=lambda _since: calls.append("since") or [],
+        full_fetch=lambda _repos: calls.append("full") or [_event(1, days_ago=10)],
+        since_fetch=lambda _repos, _since: calls.append("since") or [],
     )
     assert calls == ["full"]
     assert [event.issue_number for event in first] == [1]
 
     second = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: calls.append("full") or [],
-        since_fetch=lambda _since: calls.append("since") or [_event(2, days_ago=1)],
+        full_fetch=lambda _repos: calls.append("full") or [],
+        since_fetch=lambda _repos, _since: calls.append("since") or [_event(2, days_ago=1)],
     )
     assert calls == ["full", "since"]
     assert {event.issue_number for event in second} == {1, 2}
@@ -77,21 +89,24 @@ def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
 def test_since_failure_falls_back_to_full(monkeypatch, tmp_path):
     """A non-partial since failure falls back to a full fetch instead of raising."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    _list_repo(monkeypatch)
 
     fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: [_event(1, days_ago=10)],
-        since_fetch=lambda _since: [],
+        full_fetch=lambda _repos: [_event(1, days_ago=10)],
+        since_fetch=lambda _repos, _since: [],
     )
 
-    def broken_since(_since: datetime) -> list:
+    def broken_since(_repos: list, _since: datetime) -> list:
         raise ValueError("boom")
 
     result = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: [_event(3, days_ago=2)],
+        full_fetch=lambda _repos: [_event(3, days_ago=2)],
         since_fetch=broken_since,
     )
     # The fallback's records merge into the stored dataset (idempotent upsert),

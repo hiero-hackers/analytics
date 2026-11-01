@@ -4,27 +4,32 @@ Unlike the TTL cache (``data_sources/cache.py``), this is the *system of record*
 the full accumulated dataset for a resource, persisted under ``outputs/`` together
 with the high-watermark timestamp it was fetched through. Incremental fetches pull
 only records changed since that watermark and merge them in, so a weekly run
-re-pulls a small delta instead of all history.
+re-pulls a small delta instead of all history. Org-wide datasets keep a watermark
+per repository as well (:func:`fetch_incremental_by_repo`), so one failing or
+late-joining repository is handled on its own instead of through the org's.
 
 These datasets are gitignored; CI persists them between runs via the GitHub
 Actions cache, while local runs keep them on disk under ``outputs/``.
 
 This module is deliberately resource-agnostic: callers supply ``key_of`` (the
-upsert identity) and ``updated_at_of`` (the watermark field) so the same engine
-serves issues, pull requests, events, etc.
+upsert identity), ``updated_at_of`` (the watermark field) and, for the per-repo
+engine, ``repo_of``, so the same engine serves issues, pull requests, events, etc.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import re
-from collections.abc import Callable, Hashable, Iterable
+from collections import Counter
+from collections.abc import Callable, Hashable, Iterable, Mapping, Sequence
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from hiero_analytics.config import paths
 from hiero_analytics.config.paths import dataset_path
@@ -67,6 +72,16 @@ _touched_datasets: set[Path] = set()
 
 # How much of a file to inspect when deciding whether it is one of ours.
 _DATASET_PREFIX_BYTES = 256
+
+# A repository's rows are retired only after it has been missing from the org
+# listing on this many consecutive runs *and* a direct lookup confirms it is
+# gone. One listing call can miss a repository, and the listing can come from a
+# TTL cache that lives for days, so absence alone is never enough.
+RETIRE_AFTER_MISSING_RUNS = 2
+# ...and never while more than this share of a dataset's repositories is missing
+# at once: that is a broken listing (a revoked token, an empty response), not an
+# exodus. At least one repository may always retire, so small orgs are not stuck.
+_RETIRE_MAX_MISSING_SHARE = 0.2
 
 
 def offline_mode_enabled() -> bool:
@@ -210,6 +225,73 @@ class PartialOrgFetchError(Exception):
 T = TypeVar("T")
 
 
+def _parse_stamp(raw: object) -> datetime | None:
+    """An ISO timestamp from a dataset file, or None when absent or malformed."""
+    if not isinstance(raw, str):
+        return None
+    try:
+        stamp = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=UTC)
+
+
+@dataclass(frozen=True)
+class RepoState:
+    """What the store knows about one repository's slice of an org-wide dataset.
+
+    ``watermark`` is the dataset's content watermark as of the last run in which
+    this repository's fetch completed; its next delta starts there. ``None``
+    means it never completed, so the next run fetches it in full.
+    ``last_full_at`` is when its last complete *full* fetch finished: the
+    self-heal clock, since only a full fetch can see deletions and transfers.
+    ``holds`` counts consecutive runs in which its fetch failed, and
+    ``missing_runs`` consecutive runs in which the org listing left it out.
+    """
+
+    watermark: datetime | None = None
+    last_full_at: datetime | None = None
+    holds: int = 0
+    missing_runs: int = 0
+
+    def to_json(self) -> dict[str, Any]:
+        """The JSON form persisted under the dataset's ``repos`` map."""
+        return {
+            "watermark": self.watermark.isoformat() if self.watermark else None,
+            "last_full_at": self.last_full_at.isoformat() if self.last_full_at else None,
+            "holds": self.holds,
+            "missing_runs": self.missing_runs,
+        }
+
+    @classmethod
+    def from_json(cls, raw: object) -> RepoState:
+        """Parse a persisted entry; raises ValueError on a shape this module never writes."""
+        if not isinstance(raw, dict):
+            raise ValueError(f"repo state must be an object, got {type(raw).__name__}")
+        holds, missing_runs = raw.get("holds", 0), raw.get("missing_runs", 0)
+        if not isinstance(holds, int) or not isinstance(missing_runs, int):
+            raise ValueError("repo state counters must be integers")
+        return cls(
+            watermark=_parse_stamp(raw.get("watermark")),
+            last_full_at=_parse_stamp(raw.get("last_full_at")),
+            holds=holds,
+            missing_runs=missing_runs,
+        )
+
+
+@dataclass(frozen=True)
+class _StoredDataset:
+    """A dataset file as loaded: records, content watermark, and per-repo state.
+
+    ``repos`` is None for a file written before per-repo state existed (or by a
+    single-file dataset that never has any); the per-repo engine seeds it.
+    """
+
+    records: list
+    fetched_through: datetime
+    repos: dict[str, RepoState] | None
+
+
 def merge_records(  # noqa: UP047
     existing: Iterable[T],
     incoming: Iterable[T],
@@ -240,8 +322,9 @@ def save_dataset(  # noqa: UP047
     fetched_through: datetime,
     *,
     fetched_at: datetime | None = None,
+    repos: Mapping[str, RepoState] | None = None,
 ) -> None:
-    """Atomically write the dataset and its two stamps to ``path`` as JSON.
+    """Atomically write the dataset, its two stamps, and any per-repo state to ``path`` as JSON.
 
     The two answer different questions and must not be conflated:
 
@@ -263,10 +346,17 @@ def save_dataset(  # noqa: UP047
     absence is handled explicitly by readers, and every live dataset gains it on
     the next successful run — bumping would force a full re-fetch of everything
     to acquire a field that costs nothing to backfill.
+
+    ``repos`` (see :func:`fetch_incremental_by_repo`) is additive for the same
+    reason: older code ignores the key and rewrites the file without it, so a
+    rollback costs nothing, and a file without it is seeded in place. It is
+    written in the same atomic replace as the records, so the two can never
+    disagree, and after them, so ``"records"`` stays inside the prefix that
+    identifies a dataset file.
     """
     _record_touch(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
+    payload: dict[str, Any] = {
         "version": DATASET_VERSION,
         # Ordered ahead of the records so both stamps stay inside the fixed
         # prefix `provenance` reads rather than parsing the whole file.
@@ -274,6 +364,8 @@ def save_dataset(  # noqa: UP047
         "fetched_through": fetched_through.isoformat(),
         "records": [serialize_record(record) for record in records],
     }
+    if repos is not None:
+        payload["repos"] = {name: repos[name].to_json() for name in sorted(repos)}
     with NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
         # Compact separators: these files are machine-read only, and pretty-printing
         # a large dataset is meaningfully slower and bigger on disk.
@@ -308,11 +400,11 @@ def _read_prior_fetched_at(path: Path) -> datetime | None:
     return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=UTC)
 
 
-def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
-    """Load ``(records, fetched_through)``, or None if absent or incompatible."""
+def _load_stored(path: Path, model_class: type) -> _StoredDataset | None:
+    """Load a dataset file with its per-repo state, or None if absent or incompatible."""
     # Before the existence check on purpose: a resource asking for this path is
     # what marks it live, whether or not a file is there yet. Every read route
-    # (load_or_fetch's reuse, fetch_incremental's baseline) passes through here.
+    # (load_or_fetch's reuse, the incremental fetchers' baseline) passes through here.
     _record_touch(path)
     if not path.exists():
         return None
@@ -333,7 +425,25 @@ def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] |
         fetched_through = datetime.fromisoformat(raw_through)
     except (TypeError, ValueError, KeyError, AttributeError):  # fmt: skip
         return None
-    return records, fetched_through
+    repos: dict[str, RepoState] | None = None
+    raw_repos = payload.get("repos")
+    if raw_repos is not None:
+        # Unreadable per-repo state is re-seeded from the watermark rather than
+        # costing the records: the records are the expensive part.
+        try:
+            if not isinstance(raw_repos, dict):
+                raise ValueError("repos must be an object")
+            repos = {str(name): RepoState.from_json(state) for name, state in raw_repos.items()}
+        except ValueError:
+            logger.warning("Dataset %s has unreadable per-repo state; re-seeding it", path.name)
+            repos = None
+    return _StoredDataset(records, fetched_through, repos)
+
+
+def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
+    """Load ``(records, fetched_through)``, or None if absent or incompatible."""
+    stored = _load_stored(path, model_class)
+    return None if stored is None else (stored.records, stored.fetched_through)
 
 
 def load_or_fetch(  # noqa: UP047
@@ -462,4 +572,291 @@ def fetch_incremental(  # noqa: UP047
     if held_watermark is not None:
         preserved_fetched_at = _read_prior_fetched_at(path) or held_watermark
     save_dataset(path, records, watermark, fetched_at=preserved_fetched_at)
+    return records
+
+
+# ---------------------------------------------------------------------------
+# Per-repository incremental fetching for org-wide datasets
+# ---------------------------------------------------------------------------
+
+
+def _seeded_last_full_at(salt: str, repo: str, current: datetime, full_refresh_after: timedelta) -> datetime:
+    """A ``last_full_at`` that brings ``repo`` due at a stable, spread-out point of the next window.
+
+    Seeding every repository with the same stamp would make them all due on one
+    night: the cold fetch of everything the migration exists to avoid. Hashing
+    (dataset, repo) spreads the due dates uniformly over ``full_refresh_after``,
+    staggers datasets and orgs against each other, and is deterministic, so
+    re-seeding the same file picks the same dates. ``hashlib``, not ``hash()``:
+    the builtin is salted per process.
+    """
+    digest = hashlib.sha256(f"{salt}\0{repo}".encode()).digest()
+    fraction = int.from_bytes(digest[:8], "big") / 2**64
+    return current - full_refresh_after * (1 - fraction)
+
+
+def _seed_repo_states(
+    records: list,
+    fetched_through: datetime,
+    repo_of: Callable[[Any], str],
+    *,
+    salt: str,
+    current: datetime,
+    full_refresh_after: timedelta | None,
+) -> dict[str, RepoState]:
+    """Per-repo state for a dataset written before it existed, without fetching anything.
+
+    Every repository that has records resumes from the file's org-wide
+    watermark, exactly where the old code would have resumed it, with a
+    staggered ``last_full_at`` so its first full refresh lands somewhere in the
+    next window rather than tonight. A listed repository with *no* records gets
+    no state, so it is fetched in full on the next run: cheap if it really is
+    empty, and the backfill a late-joining repository needs.
+    """
+    names = sorted({name for record in records if (name := repo_of(record))})
+    return {
+        name: RepoState(
+            watermark=fetched_through,
+            last_full_at=(
+                _seeded_last_full_at(salt, name, current, full_refresh_after) if full_refresh_after else None
+            ),
+        )
+        for name in names
+    }
+
+
+def _due(state: RepoState, current: datetime, full_refresh_after: timedelta | None) -> bool:
+    """Whether the repository's periodic full refresh is due."""
+    if full_refresh_after is None:
+        return False
+    return state.last_full_at is None or state.last_full_at <= current - full_refresh_after
+
+
+def _failed_name(repo: object) -> str:
+    """The ``owner/name`` a failed-repo entry stands for (a RepositoryRecord or a plain name)."""
+    full_name = getattr(repo, "full_name", None)
+    return full_name if isinstance(full_name, str) else str(repo)
+
+
+def _collect(fetch: Callable[[list[str]], list[T]], names: list[str], failed: set[str]) -> list[T]:  # noqa: UP047
+    """Run one fetch group, noting the repositories a partial fetch reports as failed."""
+    try:
+        return fetch(names)
+    except PartialOrgFetchError as exc:
+        failed.update(_failed_name(repo) for repo in exc.failed_repos)
+        return list(exc.records)
+
+
+def _retire_missing(
+    path: Path,
+    missing: dict[str, RepoState],
+    total: int,
+    confirm_gone: Callable[[str], bool] | None,
+) -> set[str]:
+    """The missing repositories whose rows should go, under the rules on ``RETIRE_AFTER_MISSING_RUNS``."""
+    candidates = sorted(name for name, state in missing.items() if state.missing_runs >= RETIRE_AFTER_MISSING_RUNS)
+    if not candidates or confirm_gone is None:
+        return set()
+    if len(missing) > max(1, int(_RETIRE_MAX_MISSING_SHARE * total)):
+        logger.warning(
+            "%s: %d of %d repositories are missing from the org listing at once; retiring none, "
+            "since that looks like a broken listing rather than repositories leaving",
+            path.name,
+            len(missing),
+            total,
+        )
+        return set()
+    retired: set[str] = set()
+    for name in candidates:
+        try:
+            gone = confirm_gone(name)
+        except Exception:
+            logger.warning("Could not confirm whether %s is gone; keeping its rows in %s", name, path.name)
+            continue
+        if gone:
+            logger.warning(
+                "Retiring %s from %s: missing from the org listing for %d runs and no longer resolvable under that name",
+                name,
+                path.name,
+                missing[name].missing_runs,
+            )
+            retired.add(name)
+        else:
+            logger.info("%s is missing from the org listing but still exists; keeping its rows in %s", name, path.name)
+    return retired
+
+
+def fetch_incremental_by_repo(  # noqa: UP047
+    *,
+    path: Path,
+    model_class: type[T],
+    key_of: Callable[[T], Hashable],
+    updated_at_of: Callable[[T], datetime | None],
+    repo_of: Callable[[T], str],
+    list_repos: Callable[[], Sequence[str]],
+    full_fetch: Callable[[list[str]], list[T]],
+    since_fetch: Callable[[list[str], datetime], list[T]],
+    confirm_gone: Callable[[str], bool] | None = None,
+    overlap: timedelta = DEFAULT_OVERLAP,
+    force_full: bool = False,
+    full_refresh_after: timedelta | None = None,
+    now: datetime | None = None,
+) -> list[T]:
+    """Fetch an org-wide dataset incrementally, keeping a watermark per repository.
+
+    :func:`fetch_incremental` keeps one watermark for the whole org, so a
+    repository that joined after it was only ever fetched from that point on,
+    and one failing repository held everyone back. Here each repository listed
+    by ``list_repos`` (``owner/name``) is planned on its own:
+
+    - no state yet (new, late-joining, or a first fetch that failed): a full
+      fetch of that repository, which is the backfill;
+    - its periodic full refresh is due (``last_full_at`` older than
+      ``full_refresh_after``), or ``force_full``: a full fetch;
+    - otherwise: a delta from its own watermark. Repositories that completed
+      together share a watermark, so a delta is usually one ``since_fetch``.
+
+    A repository whose full fetch completes has its rows *replaced*: that is
+    where deleted and transferred records go. Everything else is merged. A
+    repository the fetch reports as failed (:class:`PartialOrgFetchError`) keeps
+    its rows and its watermark, and is planned the same way next run; the others
+    advance. A first fetch in which some repositories completed is saved, with
+    the failed ones left without state, rather than discarded; only a first
+    fetch in which *nothing* completed re-raises.
+
+    A dataset written before per-repo state existed is seeded in place (see
+    :func:`_seed_repo_states`), so the switch costs no cold fetch. A repository
+    that drops out of the listing keeps its rows until the retirement rules
+    hold (``RETIRE_AFTER_MISSING_RUNS``, confirmed by ``confirm_gone``).
+
+    ``full_fetch`` and ``since_fetch`` receive repository names; the caller maps
+    them back to whatever its fetchers need.
+    """
+    current = now or datetime.now(UTC)
+    stored = _load_stored(path, model_class)
+    if offline_mode_enabled():
+        if stored is None:
+            raise OfflineDatasetMissingError(f"Offline mode requires a valid cached dataset at {path}")
+        logger.info("Reusing offline dataset %s (%d records)", path, len(stored.records))
+        return stored.records
+
+    existing: list[T] = stored.records if stored is not None else []
+    if stored is None:
+        states: dict[str, RepoState] = {}
+    elif stored.repos is None:
+        states = _seed_repo_states(
+            existing,
+            stored.fetched_through,
+            repo_of,
+            salt=path.name,
+            current=current,
+            full_refresh_after=full_refresh_after,
+        )
+        logger.info(
+            "Dataset %s has no per-repo state yet; seeded %d repositories from its watermark %s",
+            path.name,
+            len(states),
+            stored.fetched_through.isoformat(),
+        )
+    else:
+        states = dict(stored.repos)
+
+    listed = list(dict.fromkeys(list_repos()))
+    full_names: list[str] = []
+    delta_groups: dict[datetime, list[str]] = {}
+    for name in listed:
+        state = states.get(name)
+        if force_full or state is None or state.watermark is None or _due(state, current, full_refresh_after):
+            full_names.append(name)
+        else:
+            delta_groups.setdefault(state.watermark, []).append(name)
+    logger.info(
+        "%s: %d repositories to fetch in full (%d without state), %d by delta",
+        path.name,
+        len(full_names),
+        sum(1 for name in full_names if states.get(name) is None or states[name].watermark is None),
+        sum(len(group) for group in delta_groups.values()),
+    )
+
+    failed: set[str] = set()
+    full_records = _collect(full_fetch, full_names, failed) if full_names else []
+    delta_records: list[T] = []
+    for watermark in sorted(delta_groups):
+        since = watermark - overlap
+        delta_records.extend(
+            _collect(lambda names, since=since: since_fetch(names, since), delta_groups[watermark], failed)
+        )
+
+    if stored is None and listed and failed.issuperset(listed):
+        # Nothing completed and there is no baseline: saving would persist an
+        # empty or fragmentary dataset as if it were a start.
+        raise PartialOrgFetchError([*full_records, *delta_records], sorted(failed))
+
+    refreshed = {name for name in full_names if name not in failed}
+    if refreshed:
+        had = Counter(repo_of(record) for record in existing)
+        arrived = Counter(repo_of(record) for record in full_records)
+        for name in sorted(refreshed):
+            if had[name] and not arrived[name]:
+                # Legitimate (every record deleted, issues disabled) but never routine:
+                # say so, since nothing else will.
+                logger.warning(
+                    "%s: full refresh of %s returned no rows; replacing its %d rows with none",
+                    path.name,
+                    name,
+                    had[name],
+                )
+            elif had[name]:
+                logger.info(
+                    "%s: full refresh of %s replaced %d rows with %d", path.name, name, had[name], arrived[name]
+                )
+    kept = [record for record in existing if repo_of(record) not in refreshed]
+    records = merge_records(kept, [*full_records, *delta_records], key_of)
+
+    listed_names = set(listed)
+    missing = {
+        name: replace(state, missing_runs=state.missing_runs + 1)
+        for name, state in states.items()
+        if name not in listed_names
+    }
+    retired = _retire_missing(path, missing, len(states), confirm_gone)
+    if retired:
+        records = [record for record in records if repo_of(record) not in retired]
+
+    content = _max_updated_at(records, updated_at_of) or current
+    new_states: dict[str, RepoState] = {}
+    for name in listed:
+        prior = states.get(name, RepoState())
+        if name in failed:
+            new_states[name] = replace(prior, holds=prior.holds + 1, missing_runs=0)
+            continue
+        last_full_at = prior.last_full_at
+        if name in refreshed:
+            # A repository's *first* full fetch gets a staggered stamp, as a
+            # migrated one does: after a cold fetch of the whole org, stamping
+            # them all "now" would bring them all due again on one night.
+            first = prior.watermark is None and full_refresh_after is not None
+            last_full_at = _seeded_last_full_at(path.name, name, current, full_refresh_after) if first else current
+        new_states[name] = RepoState(watermark=content, last_full_at=last_full_at)
+    new_states.update((name, state) for name, state in missing.items() if name not in retired)
+
+    if failed:
+        logger.warning(
+            "%s: holding the watermark of %d repositories this run: %s",
+            path.name,
+            len(failed),
+            ", ".join(sorted(failed)),
+        )
+    # The dataset-level watermark is the point through which *every* listed
+    # repository is known complete, which is what the single-watermark format
+    # always meant: the oldest per-repo watermark, or the content watermark.
+    fetched_through = min(
+        (state.watermark for name, state in new_states.items() if name in listed_names and state.watermark),
+        default=content,
+    )
+    # A run that missed repositories keeps the prior freshness stamp, as a held
+    # watermark always did; a first fetch has none, so it claims no more than
+    # its own watermark.
+    preserved_fetched_at = (_read_prior_fetched_at(path) or fetched_through) if failed else None
+    save_dataset(path, records, fetched_through, fetched_at=preserved_fetched_at, repos=new_states)
     return records
