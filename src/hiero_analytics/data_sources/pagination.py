@@ -15,7 +15,11 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from hiero_analytics.config.github import GITHUB_GRAPHQL_MIN_PAGE_SIZE, GITHUB_GRAPHQL_PAGE_SIZE
+from hiero_analytics.config.github import (
+    GITHUB_GRAPHQL_MAX_PAGES,
+    GITHUB_GRAPHQL_MIN_PAGE_SIZE,
+    GITHUB_GRAPHQL_PAGE_SIZE,
+)
 
 from .github_client import GitHubServerError
 
@@ -29,7 +33,17 @@ class CursorStalledError(RuntimeError):
 
     :func:`paginate_cursor` retries that page once. A transient hiccup succeeds
     on the retry; a second stall raises this error so the failure surfaces
-    instead of spinning or returning a truncated result.
+    instead of spinning or returning a truncated result. A cursor seen earlier
+    in the same pagination (a cycle, not just an immediate repeat) counts as a
+    stall too.
+    """
+
+
+class PaginationLimitError(RuntimeError):
+    """A cursor connection ran past the hard page cap (``GITHUB_GRAPHQL_MAX_PAGES``).
+
+    Raised instead of returning what was collected, so a runaway connection is
+    never saved as if it were complete.
     """
 
 
@@ -54,27 +68,34 @@ class PageSizePolicy:
     that follow.
 
     Shared by the per-repo cursor loop (:func:`paginate_cursor`) and the batched
-    round loop so the arithmetic lives in one place.
+    round loop so the arithmetic lives in one place. The batched loop also uses
+    one for its round width (aliases per request); ``label`` names the quantity
+    in the log lines.
     """
 
     def __init__(
         self,
         page_size: int = GITHUB_GRAPHQL_PAGE_SIZE,
         min_page_size: int = GITHUB_GRAPHQL_MIN_PAGE_SIZE,
+        *,
+        label: str = "GraphQL page size",
     ) -> None:
         """Start at ``page_size``; never shrink below ``min_page_size`` (capped at ``page_size``)."""
         self.ceiling = max(1, page_size)
         self.floor = max(1, min(min_page_size, self.ceiling))
         self.current = self.ceiling
+        self.label = label
         self._clean = 0
 
-    def shrink(self) -> bool:
-        """Halve the page size after a server error; return False when already at the floor."""
+    def shrink(self, reason: str = "GitHub server error") -> bool:
+        """Halve the size after ``reason``; return False when already at the floor."""
         if self.current <= self.floor:
             return False
         reduced = max(self.floor, self.current // 2)
         logger.warning(
-            "GitHub server error; reducing GraphQL page size from %d to %d and retrying",
+            "%s; reducing %s from %d to %d and retrying",
+            reason,
+            self.label,
             self.current,
             reduced,
         )
@@ -90,7 +111,7 @@ class PageSizePolicy:
         if self._clean >= _RECOVERY_CLEAN_PAGES:
             self.current = min(self.ceiling, self.current * 2)
             self._clean = 0
-            logger.info("GraphQL page size recovering to %d", self.current)
+            logger.info("%s recovering to %d", self.label, self.current)
 
 
 # --------------------------------------------------------
@@ -98,9 +119,13 @@ class PageSizePolicy:
 # --------------------------------------------------------
 
 
-def _cursor_advances(cursor: str | None, next_cursor: object) -> bool:
-    """Return whether ``next_cursor`` is a new, non-empty cursor string."""
-    return isinstance(next_cursor, str) and next_cursor != "" and next_cursor != cursor
+def cursor_advances(seen: set[str], next_cursor: object) -> bool:
+    """Return whether ``next_cursor`` is a non-empty cursor string not already in ``seen``.
+
+    ``seen`` holds every cursor the pagination has sent, so a cycle back to an
+    earlier page is caught as well as an immediate repeat.
+    """
+    return isinstance(next_cursor, str) and next_cursor != "" and next_cursor not in seen
 
 
 def paginate_cursor(
@@ -110,6 +135,7 @@ def paginate_cursor(
     page_size: int = GITHUB_GRAPHQL_PAGE_SIZE,
     min_page_size: int = GITHUB_GRAPHQL_MIN_PAGE_SIZE,
     start_cursor: str | None = None,
+    hard_max_pages: int = GITHUB_GRAPHQL_MAX_PAGES,
 ) -> list[Any]:
     """
     Generic paginator for cursor-based APIs such as GraphQL.
@@ -124,12 +150,13 @@ def paginate_cursor(
     after a few clean ones (see :class:`PageSizePolicy`).
 
     When ``has_next_page`` is true but ``next_cursor`` is missing, blank, not a
-    string, or equal to the cursor just requested, that response is discarded and
-    the same page is retried once. A transient hiccup therefore costs one extra
-    request. If the retry also fails to advance, :class:`CursorStalledError` is
-    raised and nothing is returned: a repeating cursor cannot spin, and a
-    truncated page is never handed back as a complete result. ``max_pages`` does
-    not cover this — a stall raises on the retry, whatever cap was passed.
+    string, or a cursor this pagination already sent (an immediate repeat or a
+    cycle), that response is discarded and the same page is retried once. A
+    transient hiccup therefore costs one extra request. If the retry also fails
+    to advance, :class:`CursorStalledError` is raised and nothing is returned: a
+    repeating cursor cannot spin, and a truncated page is never handed back as a
+    complete result. ``max_pages`` does not cover this — a stall raises on the
+    retry, whatever cap was passed.
 
     Parameters
     ----------
@@ -137,7 +164,9 @@ def paginate_cursor(
         Function that retrieves a single page of at most ``page_size`` items.
 
     max_pages:
-        Optional debugging guard to stop runaway pagination.
+        Optional soft cap: stop after this many pages and return what was
+        collected, with a warning. For callers that accept a truncated tail
+        (follow-up review pages); everything else relies on ``hard_max_pages``.
 
     page_size:
         Nodes to request per page, and the size recovery grows back to.
@@ -150,10 +179,15 @@ def paginate_cursor(
         beginning. Follow-up pagination (review pages a parent query already
         consumed) passes the cursor it left off at, so the stall check compares
         against the cursor that was actually sent.
+
+    hard_max_pages:
+        Requesting more pages than this raises :class:`PaginationLimitError`
+        rather than returning a truncated result.
     """
     policy = PageSizePolicy(page_size, min_page_size)
     results: list[Any] = []
     cursor: str | None = start_cursor
+    seen: set[str] = {cursor} if cursor else set()
     stalls = 0
     page = 1
 
@@ -185,7 +219,7 @@ def paginate_cursor(
         )
 
         # hasNextPage with a cursor that does not move would loop forever.
-        if has_next and not _cursor_advances(cursor, next_cursor):
+        if has_next and not cursor_advances(seen, next_cursor):
             if stalls >= _CURSOR_STALL_RETRIES:
                 raise CursorStalledError(
                     f"Cursor pagination stalled on page {page}: hasNextPage is true "
@@ -210,6 +244,7 @@ def paginate_cursor(
             break
 
         cursor = next_cursor
+        seen.add(next_cursor)
         page += 1
 
         if max_pages is not None and page > max_pages:
@@ -218,6 +253,11 @@ def paginate_cursor(
                 max_pages,
             )
             break
+        if page > hard_max_pages:
+            raise PaginationLimitError(
+                f"Cursor pagination exceeded {hard_max_pages} pages (GITHUB_GRAPHQL_MAX_PAGES); "
+                "refusing to return a truncated result"
+            )
 
     logger.info("Cursor pagination collected %d items total", len(results))
 

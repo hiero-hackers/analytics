@@ -113,3 +113,72 @@ def test_batched_delta_styles_are_mutually_exclusive():
             per_repo=lambda _repo: [],
             per_repo_since=lambda _repo, _since: [],
         )
+
+
+# ---------------------------------------------------------
+# a fetch night that hits GitHub's resource limits
+# ---------------------------------------------------------
+
+
+def _issue_node(number: int, updated: str) -> dict:
+    return {
+        "number": number,
+        "title": f"issue {number}",
+        "state": "OPEN",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "closedAt": None,
+        "updatedAt": updated,
+        "labels": {"nodes": []},
+    }
+
+
+def _issues_page(nodes: list[dict], *, cursor: str | None = None) -> dict:
+    return {"issues": {"pageInfo": {"hasNextPage": cursor is not None, "endCursor": cursor}, "nodes": nodes}}
+
+
+def test_a_first_fetch_that_hits_resource_limits_still_completes_and_saves(monkeypatch, tmp_path):
+    """#623 (d): RESOURCE_LIMITS_EXCEEDED and a 502 on a cold org fetch are absorbed, not a failed night.
+
+    Before, either error lost the whole chunk; on a first fetch that meant no dataset at all.
+    """
+    from unittest.mock import Mock
+
+    from hiero_analytics.data_sources.github_client import GitHubServerError
+    from hiero_analytics.data_sources.github_ingest import _common, issues
+    from hiero_analytics.data_sources.models import RepositoryRecord
+    from hiero_analytics.data_sources.rate_limit import GraphQLResponseError
+
+    monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    repos = [RepositoryRecord(full_name=f"org/{name}", name=name, owner="org") for name in ("a", "b", "c")]
+    monkeypatch.setattr(_common, "fetch_org_repos_graphql", lambda *_a, **_k: repos)
+    client = Mock()
+    client.graphql.side_effect = [
+        GraphQLResponseError(
+            {
+                "data": {
+                    "r0": _issues_page([_issue_node(1, "2026-10-01T00:00:00Z")], cursor="A1"),
+                    "r1": None,
+                    "r2": _issues_page([_issue_node(7, "2026-10-03T00:00:00Z")]),
+                },
+                "errors": [
+                    {
+                        "type": "RESOURCE_LIMITS_EXCEEDED",
+                        "path": ["r1", "issues"],
+                        "message": "Resource limits for this query exceeded.",
+                    }
+                ],
+            }
+        ),
+        # b retries smaller alongside a, and GitHub times out; the width drops to 1.
+        GitHubServerError("502"),
+        {"data": {"r1": _issues_page([_issue_node(4, "2026-10-02T00:00:00Z")])}},
+        {"data": {"r0": _issues_page([_issue_node(2, "2026-10-04T00:00:00Z")])}},
+    ]
+
+    records = issues.fetch_org_issues_graphql(client, "org", max_workers=1)
+
+    assert sorted((r.repo, r.number) for r in records) == [("org/a", 1), ("org/a", 2), ("org/b", 4), ("org/c", 7)]
+    saved = paths.DATASETS_DIR / "issues_org_all.json"
+    assert saved.exists()
+    # Complete, so the watermark advanced to the newest record instead of being held.
+    assert '"fetched_through":"2026-10-04T00:00:00+00:00"' in saved.read_text(encoding="utf-8")

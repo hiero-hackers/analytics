@@ -205,15 +205,30 @@ Used by GraphQL queries for repositories, issues, and pull requests. Queries tak
 the page size as a `$pageSize` variable; on a `GitHubServerError` (GitHub's 502/504
 for a query that ran too long) the loop halves the page size and retries the same
 cursor, then recovers after a few clean pages. When a page reports another page
-but the cursor is missing or unchanged, that response is discarded and the same
-page is retried once; a second stall raises `CursorStalledError` instead of
-looping or returning a truncated result as complete.
+but the cursor is missing or one already sent (a repeat or a cycle), that response
+is discarded and the same page is retried once; a second stall raises
+`CursorStalledError` instead of looping or returning a truncated result as
+complete. Past `GITHUB_GRAPHQL_MAX_PAGES` (default 5,000) the loop raises
+`PaginationLimitError`.
 
 Both helpers provide:
 
 - logging for long-running pagination loops
-- safety guards via `max_pages`, and a one-retry stall guard on cursor pagination
+- a hard page cap, an optional soft `max_pages` cap that truncates on purpose,
+  and a one-retry stall guard on cursor pagination
 - automatic result aggregation
+
+### Batched rounds (`github_ingest/batched.py`)
+
+Org-wide fetches alias several repositories into one query. Repositories wait in
+a queue, and each round carries up to `GITHUB_GRAPHQL_BATCH_SIZE` of them. A
+GraphQL error in the response body names its alias in `errors[].path[0]`, so the
+other aliases in that response are kept. A query that was too big
+(`RESOURCE_LIMITS_EXCEEDED`, `MAX_NODE_LIMIT_EXCEEDED`, or a 502/504) halves both
+the page size and the round width, and the affected repositories retry from the
+cursor they were on. A repository that fails partway is retried once from its
+last good cursor; only a repository that never fetched a page goes to the
+per-repo fallback.
 
 ---
 

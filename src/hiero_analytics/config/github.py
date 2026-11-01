@@ -37,6 +37,13 @@ GITHUB_GRAPHQL_PAGE_SIZE = env_int("GITHUB_GRAPHQL_PAGE_SIZE", 100, minimum=1)
 # The smallest page the shrink-on-server-error loop will try before giving up and
 # re-raising the error.
 GITHUB_GRAPHQL_MIN_PAGE_SIZE = env_int("GITHUB_GRAPHQL_MIN_PAGE_SIZE", 10, minimum=1)
+# Hard cap on pages of one cursor connection (one repository's issues, say).
+# A connection whose cursors keep advancing but never end would otherwise spend
+# the whole budget; past the cap the fetch raises instead of returning a
+# truncated list. 5,000 pages is 50,000 nodes even at the minimum page size;
+# the largest connection seen (hiero-ledger/solo's pull requests) is about 115
+# pages of 100.
+GITHUB_GRAPHQL_MAX_PAGES = env_int("GITHUB_GRAPHQL_MAX_PAGES", 5000, minimum=1)
 
 # Default concurrency for org-wide parallel fetches. GitHub's secondary (abuse)
 # rate limit is triggered by request burst/concurrency, not just hourly quota,

@@ -71,7 +71,11 @@ and only adds round trips. The client requests 100 nodes per page
 answers a query that ran too long with a 502 or 504, pagination halves the page
 (never below `GITHUB_GRAPHQL_MIN_PAGE_SIZE`, default 10), retries the same
 cursor, and doubles back up after three clean pages. Batched rounds shrink
-together, since the round's cost is the sum of its repositories.
+together, since the round's cost is the sum of its repositories. A
+`RESOURCE_LIMITS_EXCEEDED` error in a 200 response is handled the same way, and
+the round's width (repositories per request, `GITHUB_GRAPHQL_BATCH_SIZE`) halves
+with it. Aliases that succeeded in the same response are kept, so a failure
+re-spends only the affected repositories' current page.
 
 ## Measured cost
 
