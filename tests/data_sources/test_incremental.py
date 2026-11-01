@@ -59,6 +59,14 @@ def test_registry_lists_every_org_incremental_resource():
         assert resource.name == name
 
 
+def test_registered_resources_refresh_their_largest_repos_on_evenly_spaced_nights():
+    """Distinct, evenly spaced phases: an org's datasets never put their full refreshes of the giants together."""
+    phases = sorted(resource.refresh_phase for resource in ORG_INCREMENTAL_RESOURCES.values())
+    assert None not in phases
+    count = len(phases)
+    assert phases == pytest.approx([index / count for index in range(count)])
+
+
 def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
     """First run does a full fetch; the next fetches the delta and merges."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)

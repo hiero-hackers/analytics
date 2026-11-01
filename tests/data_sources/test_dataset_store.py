@@ -223,10 +223,12 @@ def test_force_full_redoes_full_fetch_ignoring_dataset(tmp_path):
     assert by_key == {"a": 2, "b": 3}  # full fetch overwrote, not merged onto old
 
 
-def test_stale_watermark_triggers_full_refresh(tmp_path):
-    """A watermark older than full_refresh_after forces a full fetch."""
+def test_an_active_dataset_full_refreshes_once_its_last_full_fetch_is_due(tmp_path):
+    """#623 (1): the newest record is recent, but the last full fetch was 60 days ago, so it is due."""
     path = tmp_path / "issues.json"
-    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    save_dataset(
+        path, [_rec("a", 1, 1)], datetime(2024, 2, 29, tzinfo=UTC), last_full_at=datetime(2024, 1, 1, tzinfo=UTC)
+    )
 
     def since_fetch(_since):
         raise AssertionError("since_fetch called when a full refresh was due")
@@ -239,10 +241,57 @@ def test_stale_watermark_triggers_full_refresh(tmp_path):
         full_fetch=lambda: [_rec("a", 9, 2)],
         since_fetch=since_fetch,
         full_refresh_after=timedelta(days=30),
-        now=datetime(2024, 3, 1, tzinfo=UTC),  # ~60 days after the watermark
+        now=datetime(2024, 3, 1, tzinfo=UTC),
     )
 
     assert [r.value for r in result] == [9]
+    assert json.loads(path.read_text(encoding="utf-8"))["last_full_at"] == "2024-03-01T00:00:00+00:00"
+
+
+def test_a_quiet_dataset_no_longer_refreshes_every_night(tmp_path):
+    """#623 (1): an old newest record alone used to force a full fetch every night; the last full fetch decides."""
+    path = tmp_path / "issues.json"
+    save_dataset(
+        path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC), last_full_at=datetime(2024, 2, 25, tzinfo=UTC)
+    )
+
+    def full_fetch():
+        raise AssertionError("full_fetch called on a quiet dataset refreshed four days ago")
+
+    result = fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=full_fetch,
+        since_fetch=lambda _s: [],
+        full_refresh_after=timedelta(days=30),
+        now=datetime(2024, 3, 1, tzinfo=UTC),
+    )
+
+    assert [r.key for r in result] == ["a"]
+    assert json.loads(path.read_text(encoding="utf-8"))["last_full_at"] == "2024-02-25T00:00:00+00:00"  # kept
+
+
+def test_a_dataset_without_last_full_at_is_seeded_rather_than_refreshed_at_once(tmp_path):
+    """A file from before the stamp gets one within the next window, persisted, instead of a refresh tonight."""
+    path = tmp_path / "issues.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    now = datetime(2024, 3, 1, tzinfo=UTC)
+
+    fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=lambda: [_rec("a", 9, 2)],
+        since_fetch=lambda _s: [],
+        full_refresh_after=timedelta(days=30),
+        now=now,
+    )
+
+    seeded = datetime.fromisoformat(json.loads(path.read_text(encoding="utf-8"))["last_full_at"])
+    assert now - timedelta(days=30) < seeded <= now
 
 
 def test_fresh_watermark_uses_incremental_not_full_refresh(tmp_path):

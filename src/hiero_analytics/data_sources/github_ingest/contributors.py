@@ -39,6 +39,7 @@ CONTRIBUTOR_ACTIVITY_RESOURCE = OrgIncrementalResource(
     ),
     updated_at_of=lambda event: event.occurred_at,
     task_desc="contributor activity",
+    refresh_phase=0.6,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 _CONTRIBUTOR_ACTIVITY_TYPES = [

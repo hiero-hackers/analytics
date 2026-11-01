@@ -120,10 +120,10 @@ def test_a_cold_fetch_staggers_the_next_full_refreshes():
     _run(org, now=_DAY0, window=_WINDOW)
 
     due_nights = Counter(
-        math.floor((state.last_full_at + _WINDOW - _DAY0) / timedelta(days=1)) for state in _states().values()
+        round((state.last_full_at + _WINDOW - _DAY0) / timedelta(days=1)) for state in _states().values()
     )
-    assert set(due_nights) <= set(range(30))  # every repo comes due within the window (the N-day bound)
-    assert max(due_nights.values()) <= 6  # spread, about 2 a night, not 60 on night 30
+    assert set(due_nights) == set(range(1, 31))  # each of the next 30 nights, never tonight: the N-day bound
+    assert max(due_nights.values()) == 2  # 60 equal repos: exactly two a night, not 60 on night 30
 
 
 def test_repos_that_completed_together_share_one_delta():
@@ -243,11 +243,13 @@ def test_a_due_full_refresh_replaces_the_repos_rows():
     after_delta = _run(org, now=_DAY0 + timedelta(minutes=5), window=_WINDOW)
     assert ("org/a", 1) in _numbers(after_delta)  # a delta cannot see a deletion
 
-    # The first fetch staggered the next refreshes, but none later than one window on.
-    after_refresh = _run(org, now=_DAY0 + _WINDOW, window=_WINDOW)
+    # The first fetch staggered the next refreshes, none later than one window on. Two
+    # repos make a budget of one scheduled refresh a night, so the second may wait a night.
+    _run(org, now=_DAY0 + _WINDOW, window=_WINDOW)
+    after_refresh = _run(org, now=_DAY0 + _WINDOW + timedelta(days=1), window=_WINDOW)
     assert ("org/a", 1) not in _numbers(after_refresh)
     assert ("org/b", 1) in _numbers(after_refresh)
-    assert _states()["org/a"].last_full_at == _DAY0 + _WINDOW
+    assert _states()["org/a"].last_full_at in {_DAY0 + _WINDOW, _DAY0 + _WINDOW + timedelta(days=1)}
 
 
 def test_a_partial_full_refresh_merges_and_stays_due():
@@ -307,27 +309,58 @@ def test_migration_backfills_a_listed_repo_that_has_no_records():
     assert ("full", ("org/never-seen",), None) in org.calls
 
 
-def test_migration_spreads_first_full_refreshes_over_the_window():
-    """No night of the first window carries a cold fetch: due dates are spread, and each repo comes due once."""
-    names = [f"org/repo-{i}" for i in range(120)]
-    current = _DAY0
-    due_days = Counter()
-    for name in names:
-        seeded = dataset_store._seeded_last_full_at("rows_org_all.json", name, current, _WINDOW)
-        due_days[math.floor((seeded + _WINDOW - current) / timedelta(days=1))] += 1
+def test_the_stagger_balances_work_not_just_repositories():
+    """Largest repos first, each on the lightest night: no night draws two of the giants.
 
-    assert sum(due_days.values()) == len(names)
-    assert set(due_days) <= set(range(30))  # all within the window, none overdue on night 0
-    assert max(due_days.values()) <= 3 * len(names) / 30  # 4 a night on average, never a pile-up
-    # Deterministic: re-seeding the same dataset picks the same dates; another dataset picks others.
-    again = dataset_store._seeded_last_full_at("rows_org_all.json", names[0], current, _WINDOW)
-    other = dataset_store._seeded_last_full_at("rows_other_all.json", names[0], current, _WINDOW)
-    assert again == dataset_store._seeded_last_full_at("rows_org_all.json", names[0], current, _WINDOW)
-    assert other != again
+    The production snapshot had a 40% night when a hash put two of the largest
+    repositories together; three giants, ten mid-size and a hundred small ones
+    must spread so the heaviest night is just the largest single repository.
+    """
+    weights = {f"org/giant-{i}": 1000 for i in range(3)}
+    weights |= {f"org/mid-{i}": 50 for i in range(10)}
+    weights |= {f"org/small-{i}": 1 for i in range(100)}
+
+    stamps = dataset_store._stagger(weights, (), salt="rows_org_all.json", current=_DAY0, full_refresh_after=_WINDOW)
+
+    night_of = {name: round((stamp + _WINDOW - _DAY0) / timedelta(days=1)) for name, stamp in stamps.items()}
+    assert set(night_of.values()) <= set(range(1, 31))
+    load, count = Counter(), Counter()
+    for name, night in night_of.items():
+        load[night] += weights[name]
+        count[night] += 1
+    assert len({night_of[f"org/giant-{i}"] for i in range(3)}) == 3
+    assert max(load.values()) == 1000  # the floor: one giant, alone
+    assert max(count.values()) <= math.ceil(2 * len(weights) / 30)  # within the nightly budget
+
+
+def test_the_stagger_is_deterministic_and_rotated_per_dataset():
+    """Same inputs, same nights; another dataset or org starts its largest repository elsewhere."""
+    weights = {"org/big": 500, "org/small": 1}
+
+    def biggest_night(salt):
+        stamp = dataset_store._stagger(weights, (), salt=salt, current=_DAY0, full_refresh_after=_WINDOW)["org/big"]
+        return round((stamp + _WINDOW - _DAY0) / timedelta(days=1))
+
+    assert biggest_night("issues_org_all.json") == biggest_night("issues_org_all.json")
+    nights = {
+        biggest_night(f"{name}_org_all.json") for name in ("issues", "issue_label_events", "merged_pr_difficulty")
+    }
+    assert len(nights) == 3
+
+
+def test_a_late_joiner_goes_to_the_lightest_night_of_the_existing_schedule():
+    """A backfilled repository is placed around the repositories that already have nights."""
+    scheduled = [(_DAY0 - _WINDOW + timedelta(days=night), 100) for night in range(1, 31) if night != 17]
+
+    stamps = dataset_store._stagger(
+        {"org/late": 40}, scheduled, salt="rows_org_all.json", current=_DAY0, full_refresh_after=_WINDOW
+    )
+
+    assert stamps["org/late"] == _DAY0 - _WINDOW + timedelta(days=17)  # the only empty night
 
 
 def test_a_migrated_dataset_refreshes_every_repo_once_per_window_without_bunching():
-    """Over the first window after migration (nights 0 to 30), each repository is fully refreshed exactly once."""
+    """Over the first window after migration, each repository is fully refreshed exactly once, never on deploy night."""
     names = [f"org/repo-{i}" for i in range(40)]
     _legacy([_row(name, 1, -3) for name in names], fetched_through=_DAY0 - timedelta(days=1))
     org = _Org({name: [_row(name, 1, -3)] for name in names})
@@ -340,7 +373,8 @@ def test_a_migrated_dataset_refreshes_every_repo_once_per_window_without_bunchin
 
     refreshed = Counter(name for kind, group, _ in org.calls if kind == "full" for name in group)
     assert set(refreshed) == set(names) and set(refreshed.values()) == {1}
-    assert max(per_night) <= 4  # about 1.3 a night on average
+    assert per_night[0] == 0  # deploy night carries backfills only
+    assert max(per_night) == 2  # 40 equal repos over 30 nights
 
 
 # ---------------------------------------------------------
@@ -488,3 +522,54 @@ def test_a_full_refresh_that_empties_a_repo_says_so(caplog):
 
     assert records == []
     assert any("full refresh of org/a returned no rows" in record.getMessage() for record in caplog.records)
+
+
+# ---------------------------------------------------------
+# step 3: the due tolerance and the nightly budget
+# ---------------------------------------------------------
+
+
+def test_a_run_that_starts_a_little_earlier_still_refreshes_on_time():
+    """Thirty nights later, a run ten minutes earlier than the last refresh does not slip a day."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)]})
+    _run(org, now=_DAY0, window=_WINDOW, force_full=True)
+
+    _run(org, now=_DAY0 + _WINDOW - timedelta(minutes=10), window=_WINDOW)
+
+    assert org.calls[-1] == ("full", ("org/a",), None)
+
+
+def test_after_missed_nights_the_backlog_drains_within_the_budget_most_overdue_first():
+    """Twelve nights without a run leave a backlog; it is refreshed a budget's worth a night, oldest first."""
+    names = [f"org/r{i:02}" for i in range(30)]
+    _legacy([_row(name, 1, -3) for name in names], fetched_through=_DAY0 - timedelta(days=1))
+    org = _Org({name: [_row(name, 1, -3)] for name in names})
+    _run(org, now=_DAY0, window=_WINDOW)
+    due_before = {name: state.last_full_at for name, state in _states().items()}
+
+    per_night = []
+    for night in range(13, 20):  # the job comes back after nights 1 to 12 were missed
+        before = len(org.calls)
+        _run(org, now=_DAY0 + timedelta(days=night), window=_WINDOW)
+        per_night.append([name for kind, group, _ in org.calls[before:] if kind == "full" for name in group])
+
+    budget = math.ceil(2 * len(names) / 30)
+    assert all(len(names_) <= budget for names_ in per_night)
+    assert len(per_night[0]) == budget  # the backlog binds on the first night back
+    drained = [name for names_ in per_night for name in names_]
+    # Most overdue first: whatever a night refreshed was at least as overdue as anything a later night did.
+    for earlier, later in zip(per_night, per_night[1:], strict=False):
+        if earlier and later:
+            assert max(due_before[name] for name in earlier) <= min(due_before[name] for name in later)
+    overdue = {name for name, stamp in due_before.items() if stamp <= _DAY0 + timedelta(days=12) - _WINDOW}
+    assert overdue <= set(drained)  # and it does drain
+
+
+def test_backfills_are_never_deferred_by_the_budget():
+    """A repository with no state is the only way to get its data, so the budget never holds it back."""
+    names = [f"org/new-{i}" for i in range(10)]
+    org = _Org({name: [_row(name, 1, -1)] for name in names})
+
+    _run(org, now=_DAY0, window=_WINDOW)
+
+    assert org.calls == [("full", tuple(names), None)]  # all ten, above a budget of one

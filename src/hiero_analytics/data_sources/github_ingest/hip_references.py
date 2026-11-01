@@ -47,6 +47,7 @@ PR_HIP_REFS_RESOURCE = OrgIncrementalResource(
     key_of=lambda record: (record.repo, record.pr_number, record.hip),
     updated_at_of=lambda record: record.updated_at,
     task_desc="PR HIP references",
+    refresh_phase=0.8,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 

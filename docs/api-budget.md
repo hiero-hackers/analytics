@@ -157,6 +157,33 @@ from nothing:
 Its largest dataset was `merged_pr_difficulty` (30 points). Its nightly cost
 will be lower still, so an org of this size is negligible against either token.
 
+### Periodic full refreshes (projected)
+
+Every repository of every org-wide dataset is refetched in full once every 30
+days, on a night chosen for it (#623, `docs/dataset-store-refresh-plan.md`). A
+full refresh costs a repository's extra pages over the one page its nightly
+delta already pays for, so it only matters for repositories with history.
+Projected from the 2026-11-01 nightly snapshot (1,000 points that night) by
+pricing each extra page at that dataset's own points per repository that
+night. This is an estimate, not a measurement:
+
+| | Extra GraphQL points |
+| --- | ---: |
+| Deploy night (backfills of listed repositories with no rows) | about 155 |
+| Average night | about 160 |
+| Worst night | about 620 |
+| One 30-day window | about 5,000 (about one full fetch of everything) |
+
+The worst nights are each one large repository: `hiero-consensus-node`'s full
+merged-PR history is about 580 points on its own, a floor no schedule can go
+below without splitting one repository's refresh across nights. The stagger
+puts each dataset's largest repositories on the least-loaded nights, and the
+datasets' phases keep an org's largest repositories on different nights (here
+1, 7, 13 and 19). If the job misses nights, at most twice a fair share of a
+dataset's repositories are refreshed per run, most overdue first, until the
+backlog drains. Even the worst night stays far inside one hour of either
+token's budget.
+
 ## Forecast: adding one more organisation
 
 Registering an org in `config/orgs.py` (see

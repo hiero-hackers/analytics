@@ -1,8 +1,8 @@
 # Dataset store: self-heal, per-repo state, and fetch salvage
 
-Status: proposed for #623, 2026-11-01. Sections 3.A (PR 1) and 3.B (PR 2, which also
-carries most of 3.C) are implemented on `fix/623-dataset-store-self-heal`; the rest is
-the plan for the PRs that follow. Kept as the design record, like `fetch-hardening-plan.md`.
+Status: proposed for #623, 2026-11-01. Sections 3.A to 3.C (PRs 1 to 3) are
+implemented on `fix/623-dataset-store-self-heal`; 3.D and 3.E are the plan for the PRs
+that follow. Kept as the design record, like `fetch-hardening-plan.md`.
 
 ## 1. What is wrong
 
@@ -261,39 +261,56 @@ cache.
 
 ### C. Staggered `last_full_at` self-heal (PR 3)
 
-The per-repo gate (`now - last_full_at >= full_refresh_after`) and the stagger shipped
-with 3.B, because the migration's seeding *is* the stagger:
+The per-repo gate shipped with 3.B; this section finishes it.
 
-- A seeded `last_full_at` is `now - N * (1 - f)`, where `f` comes from
-  `sha256(dataset file, repo)` in `[0, 1)`. The repo comes due `N * f` days later:
-  spread uniformly, staggered across resources and orgs, and deterministic.
-- A repo's *first* full fetch (a cold fetch, or a backfill) gets the same seeded stamp,
-  not "now". Otherwise a cold fetch of a whole org would come due again all on one
-  night 30 days later. This costs at most one early refresh per repo, once.
-- After that, each repo comes due N days after its own last refresh.
+**When a refresh is due.** A repo is due once `now - last_full_at >= full_refresh_after
+- 12h`. The job runs nightly, but not at the same minute. Without the slack, a run
+that starts ten minutes earlier than the one that did the last refresh finds the repo
+a few minutes short of due, and every cycle slips a day.
 
-Measured in the tests: 40 migrated repos, at most 4 full refreshes on any night of the
-first window, each repo exactly once. 60 cold-fetched repos, at most 6 a night. In the
-60-night simulation, at most 2 a night.
+**Choosing the nights: by work, not by hash.** The dry run showed that a hash spreads
+repos evenly but not work: one night drew 40% of a dataset. `_stagger` gives each repo
+that needs a night one of the next N nights (1 to N, never tonight, so the N-day bound
+holds from the start). Repos are placed largest first (estimated pages), each on the
+night with the least work already scheduled. That covers:
 
-What remains for PR 3:
+- every repo of a migrated dataset;
+- every repo of a cold fetch, so the org does not come due again all on one night;
+- a late joiner after its backfill, placed around the existing schedule.
 
-- **Size-aware seeding.** The dry run shows a hash spreads repos evenly but not
-  *work*: a night that draws two of the largest repos carries 40% of a dataset. Seed
-  instead by greedy assignment, largest repo first, to the night with the least
-  estimated pages so far (deterministic, still per resource and org). Everything after
-  the first window keeps that spacing. `hiero-consensus-node` alone is 25 to 30% of
-  some datasets, a floor no schedule can go below without splitting one repo's refresh
-  across nights.
-- **A nightly budget**: at most `ceil(2 * repos / N)` scheduled refreshes per
-  (resource, org), most overdue first. Backfills are not budgeted, because they are the
-  only way to get the data. This is the backstop for missed nights (a cache eviction,
-  a skipped save), which would otherwise bunch the overdue repos.
-- **Single-file datasets**: `fetch_incremental`'s own `full_refresh_after` (the HIP
-  inventory, `hip_references.py:226`) still gates on the content watermark. It switches
-  to a stored dataset-level `last_full_at`, which fixes the quiet-dataset-every-night
-  case.
-- **The budget figures** in `docs/api-budget.md`, from the rehearsal.
+After the first window, each repo keeps its spacing: it comes due N days after its own
+refresh.
+
+**Phases across datasets.** An org's datasets tend to share their largest repo
+(`hiero-consensus-node` is the largest in four of five). Each
+`OrgIncrementalResource` therefore declares a distinct `refresh_phase`, evenly spaced
+over the window and enforced by a registry test. This is where the stagger starts
+placing repos, shifted by a stable per-org offset. On the snapshot,
+`hiero-consensus-node` is refreshed on nights 1, 7, 13 and 19 for the four datasets
+where it is largest.
+
+**A nightly budget.** At most `ceil(2 * repos / N)` *scheduled* refreshes per dataset
+per run, most overdue first. A normal night stays well inside it. It binds after
+missed nights (an evicted cache, a skipped save), and drains the backlog instead of
+refreshing everything at once. Backfills are never deferred and do not count: they
+are the only way to get that data. `--refresh` ignores the budget.
+
+**Single-file datasets.** `fetch_incremental` (the HIP inventory) now gates on a
+stored dataset-level `last_full_at`, written after each complete full fetch, instead
+of the content watermark. A file without the stamp is seeded with a hash-chosen point
+of the next window and the seed is persisted. That fixes the quiet-dataset-every-night
+case. In practice it changes no fetch for the HIP inventory, whose delta *is* a full
+fetch.
+
+**Result on the production snapshot** (offline, same listings as the dry run):
+
+| | Before (hash stagger) | After |
+|---|---|---|
+| Worst night's share of one dataset's rows | 40% (two giants) | the largest single repo, in every dataset |
+| Extra points, worst night | 667 | 616 (`hiero-consensus-node`'s merged-PR history alone is 577) |
+| Extra points, average night | 162 | 163 |
+
+`docs/api-budget.md` carries these projections.
 
 ### D. Per-resource schema versions (PR 4)
 
@@ -334,7 +351,7 @@ bump already covered `issue_label_events`.
 |---|---|---|---|---|
 | 1 | 3.A | #621 (merged) | fakes for each recorded shape; a forced cold run of `issue_label_events` for hiero-ledger, reporting points from `SNAPSHOT.json` `api_usage` | revert; no data format change |
 | 2 | 3.B, and 3.C's gate and stagger | 1 | migration in place; planner dry run on the nightly snapshot; 60-night simulation, (a) to (d) | revert; the `repos` key is additive, so older code ignores it |
-| 3 | rest of 3.C | 2 | a missed-nights simulation stays within the budget; the HIP inventory stops refreshing nightly | revert; the schedule is data, nothing to undo |
+| 3 | rest of 3.C | 2 | missed nights drain within the budget, most overdue first; size-aware placement; recomputed schedule on the snapshot | revert; the stamps it wrote stay valid under step 2's gate |
 | 4 | 3.D | 2 | bump one resource's schema in a test; the others load | revert |
 | 5 | 3.E | 3 | a simulated 3-night hold fails the gate after save; a shrink fixture fails it | revert the job |
 

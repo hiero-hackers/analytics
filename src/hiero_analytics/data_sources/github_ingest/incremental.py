@@ -18,6 +18,7 @@ dedicated ``*_since`` query, or reuse of the base query ordered
 
 from __future__ import annotations
 
+import hashlib
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -48,7 +49,10 @@ class OrgIncrementalResource:
     ``updated_at_of`` gives the timestamp that advances the watermark;
     ``repo_of`` gives the ``owner/name`` a record belongs to, which is how the
     store keeps state per repository and replaces a repository's rows on its
-    full refresh.
+    full refresh. ``refresh_phase`` (a fraction of the refresh window, distinct
+    per resource) is where in the window this resource's largest repositories
+    are refreshed, so an org's datasets do not all refresh their largest
+    repository (usually the same one) on the same night.
     """
 
     name: str
@@ -58,6 +62,15 @@ class OrgIncrementalResource:
     task_desc: str
     full_refresh_after: timedelta = timedelta(days=30)
     repo_of: Callable[[Any], str] = attrgetter("repo")
+    refresh_phase: float | None = None
+
+
+def _stagger_phase(resource: OrgIncrementalResource, org: str) -> float | None:
+    """The resource's phase, shifted by a stable per-org offset so orgs do not line up either."""
+    if resource.refresh_phase is None:
+        return None
+    org_offset = int.from_bytes(hashlib.sha256(org.encode()).digest()[:8], "big") / 2**64
+    return (resource.refresh_phase + org_offset) % 1.0
 
 
 def fetch_org_incremental(
@@ -112,6 +125,7 @@ def fetch_org_incremental(
             confirm_gone=lambda name: _common.repository_is_gone(client, name),
             force_full=refresh,
             full_refresh_after=resource.full_refresh_after,
+            stagger_phase=_stagger_phase(resource, org),
         )
 
 

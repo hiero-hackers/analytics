@@ -21,6 +21,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 from collections import Counter
@@ -82,6 +83,18 @@ RETIRE_AFTER_MISSING_RUNS = 2
 # at once: that is a broken listing (a revoked token, an empty response), not an
 # exodus. At least one repository may always retire, so small orgs are not stuck.
 _RETIRE_MAX_MISSING_SHARE = 0.2
+
+# A full refresh is due once ``full_refresh_after`` *less this* has passed. The
+# job runs once a night but not at the same minute: without the slack, a run
+# that starts ten minutes earlier than the one that did the last refresh finds
+# it a few minutes short of due, and every cycle slips a day.
+_DUE_TOLERANCE = timedelta(hours=12)
+# At most this many times a fair share of a dataset's repositories (all of them
+# over ``full_refresh_after``) get a *scheduled* full refresh in one run. The
+# stagger keeps a normal night well inside it; it binds after missed nights
+# (an evicted cache, a skipped save), when it drains the backlog most overdue
+# first instead of refreshing everything at once.
+_NIGHTLY_REFRESH_MULTIPLIER = 2
 
 
 def offline_mode_enabled() -> bool:
@@ -290,6 +303,7 @@ class _StoredDataset:
     records: list
     fetched_through: datetime
     repos: dict[str, RepoState] | None
+    last_full_at: datetime | None = None
 
 
 def merge_records(  # noqa: UP047
@@ -322,6 +336,7 @@ def save_dataset(  # noqa: UP047
     fetched_through: datetime,
     *,
     fetched_at: datetime | None = None,
+    last_full_at: datetime | None = None,
     repos: Mapping[str, RepoState] | None = None,
 ) -> None:
     """Atomically write the dataset, its two stamps, and any per-repo state to ``path`` as JSON.
@@ -347,8 +362,9 @@ def save_dataset(  # noqa: UP047
     the next successful run — bumping would force a full re-fetch of everything
     to acquire a field that costs nothing to backfill.
 
-    ``repos`` (see :func:`fetch_incremental_by_repo`) is additive for the same
-    reason: older code ignores the key and rewrites the file without it, so a
+    ``last_full_at`` (when a single-file dataset was last fetched in full, see
+    :func:`fetch_incremental`) and ``repos`` (see :func:`fetch_incremental_by_repo`)
+    are additive for the same reason: older code ignores the key and rewrites the file without it, so a
     rollback costs nothing, and a file without it is seeded in place. It is
     written in the same atomic replace as the records, so the two can never
     disagree, and after them, so ``"records"`` stays inside the prefix that
@@ -364,6 +380,8 @@ def save_dataset(  # noqa: UP047
         "fetched_through": fetched_through.isoformat(),
         "records": [serialize_record(record) for record in records],
     }
+    if last_full_at is not None:
+        payload["last_full_at"] = last_full_at.isoformat()
     if repos is not None:
         payload["repos"] = {name: repos[name].to_json() for name in sorted(repos)}
     with NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
@@ -437,7 +455,7 @@ def _load_stored(path: Path, model_class: type) -> _StoredDataset | None:
         except ValueError:
             logger.warning("Dataset %s has unreadable per-repo state; re-seeding it", path.name)
             repos = None
-    return _StoredDataset(records, fetched_through, repos)
+    return _StoredDataset(records, fetched_through, repos, _parse_stamp(payload.get("last_full_at")))
 
 
 def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
@@ -524,9 +542,13 @@ def fetch_incremental(  # noqa: UP047
     the current time when no record carries one.
 
     Self-heal controls: ``force_full`` re-does a full fetch ignoring any stored
-    dataset; ``full_refresh_after`` forces a full fetch when the stored watermark
-    is older than that, bounding staleness and reclaiming deleted/missed records
-    that an incremental ``since`` query can never see.
+    dataset; ``full_refresh_after`` forces a full fetch once the last *complete
+    full fetch* (the stored ``last_full_at``) is that old, reclaiming
+    deleted/missed records that an incremental ``since`` query can never see.
+    It used to compare the content watermark instead, which never fired on an
+    active dataset (its newest record is always recent) and fired every night on
+    a quiet one. A file that predates the stamp gets a seeded one, spread over
+    the next window, rather than an immediate refresh.
 
     Partial fetches: if ``full_fetch``/``since_fetch`` raise
     :class:`PartialOrgFetchError` (some repos failed even after retry), the records
@@ -536,18 +558,27 @@ def fetch_incremental(  # noqa: UP047
     snapshot with an advanced watermark and re-raise instead.
     """
     current = now or datetime.now(UTC)
-    state = load_dataset(path, model_class)
+    stored = _load_stored(path, model_class)
+    state = None if stored is None else (stored.records, stored.fetched_through)
     if offline_mode_enabled():
         if state is None:
             raise OfflineDatasetMissingError(f"Offline mode requires a valid cached dataset at {path}")
         records, _ = state
         logger.info("Reusing offline dataset %s (%d records)", path, len(records))
         return records
-    is_stale = full_refresh_after is not None and state is not None and state[1] < current - full_refresh_after
+    last_full_at = stored.last_full_at if stored is not None else None
+    if stored is not None and last_full_at is None and full_refresh_after is not None:
+        last_full_at = _seeded_last_full_at(path.name, "", current, full_refresh_after)
+    is_stale = (
+        full_refresh_after is not None
+        and last_full_at is not None
+        and last_full_at <= current - full_refresh_after + _DUE_TOLERANCE
+    )
     held_watermark: datetime | None = None
     if state is None or force_full or is_stale:
         try:
             records = full_fetch()
+            last_full_at = current
         except PartialOrgFetchError as exc:
             if state is None:
                 raise  # no baseline to fall back on; don't persist a partial one
@@ -571,7 +602,7 @@ def fetch_incremental(  # noqa: UP047
     preserved_fetched_at = None
     if held_watermark is not None:
         preserved_fetched_at = _read_prior_fetched_at(path) or held_watermark
-    save_dataset(path, records, watermark, fetched_at=preserved_fetched_at)
+    save_dataset(path, records, watermark, fetched_at=preserved_fetched_at, last_full_at=last_full_at)
     return records
 
 
@@ -580,19 +611,81 @@ def fetch_incremental(  # noqa: UP047
 # ---------------------------------------------------------------------------
 
 
-def _seeded_last_full_at(salt: str, repo: str, current: datetime, full_refresh_after: timedelta) -> datetime:
-    """A ``last_full_at`` that brings ``repo`` due at a stable, spread-out point of the next window.
+def _seeded_last_full_at(salt: str, item: str, current: datetime, full_refresh_after: timedelta) -> datetime:
+    """A ``last_full_at`` that brings ``item`` due at a stable, hash-chosen point of the next window.
 
-    Seeding every repository with the same stamp would make them all due on one
-    night: the cold fetch of everything the migration exists to avoid. Hashing
-    (dataset, repo) spreads the due dates uniformly over ``full_refresh_after``,
-    staggers datasets and orgs against each other, and is deterministic, so
-    re-seeding the same file picks the same dates. ``hashlib``, not ``hash()``:
-    the builtin is salted per process.
+    For a single-file dataset that predates the stamp: there is one item, so
+    there is nothing to balance, only the need not to come due on the night of
+    the upgrade. ``hashlib``, not ``hash()``: the builtin is salted per process.
     """
-    digest = hashlib.sha256(f"{salt}\0{repo}".encode()).digest()
+    digest = hashlib.sha256(f"{salt}\0{item}".encode()).digest()
     fraction = int.from_bytes(digest[:8], "big") / 2**64
     return current - full_refresh_after * (1 - fraction)
+
+
+def _nights(full_refresh_after: timedelta) -> int:
+    """How many nightly runs one refresh window spans."""
+    return max(1, round(full_refresh_after / timedelta(days=1)))
+
+
+def _pages(rows: int) -> int:
+    """Rough cost of a repository's full fetch, in pages: what the stagger balances."""
+    return max(1, math.ceil(rows / 100))
+
+
+def _nights_until_due(last_full_at: datetime, current: datetime, full_refresh_after: timedelta) -> int:
+    """Runs from now until a full refresh stamped ``last_full_at`` comes due (0: due now)."""
+    due_at = last_full_at + full_refresh_after - _DUE_TOLERANCE
+    return max(0, math.ceil((due_at - current) / timedelta(days=1)))
+
+
+def _stagger(
+    weights: Mapping[str, int],
+    scheduled: Iterable[tuple[datetime, int]],
+    *,
+    salt: str,
+    current: datetime,
+    full_refresh_after: timedelta,
+    phase: float | None = None,
+) -> dict[str, datetime]:
+    """Choose ``last_full_at`` stamps that spread the next full refreshes of ``weights``' repositories.
+
+    Each repository comes due on one of the next ``full_refresh_after`` nights
+    (1 to N, never tonight), so the N-day bound holds from the start. They are
+    placed largest first, each on the night with the least work already on it:
+    ``scheduled`` (the due stamps and weights of repositories that keep theirs)
+    plus the ones placed so far. A hash spreads *repositories* evenly but not
+    work: on the production snapshot it put two of the largest on one night, 40%
+    of a dataset. Ties go to the night with fewer repositories, then to a
+    starting night: ``phase`` (a fraction of the window) when the caller
+    coordinates several datasets, so an org's largest repositories never share
+    a night across datasets; otherwise one rotated by ``salt``. Deterministic
+    for the same inputs.
+    """
+    nights = _nights(full_refresh_after)
+    load = dict.fromkeys(range(1, nights + 1), 0)
+    count = dict.fromkeys(range(1, nights + 1), 0)
+    for last_full_at, weight in scheduled:
+        night = _nights_until_due(last_full_at, current, full_refresh_after)
+        if night in load:
+            load[night] += weight
+            count[night] += 1
+    if phase is None:
+        rotation = int.from_bytes(hashlib.sha256(salt.encode()).digest()[:8], "big") % nights
+    else:
+        rotation = round(phase * nights) % nights
+
+    def tie_break(name: str) -> bytes:
+        return hashlib.sha256(f"{salt}\0{name}".encode()).digest()
+
+    stamps: dict[str, datetime] = {}
+    for name in sorted(weights, key=lambda n: (-weights[n], tie_break(n))):
+        night = min(load, key=lambda n: (load[n], count[n], (n - 1 - rotation) % nights))
+        load[night] += weights[name]
+        count[night] += 1
+        # Due on exactly that night: the tolerance absorbs the run's start time.
+        stamps[name] = current - full_refresh_after + timedelta(days=night)
+    return stamps
 
 
 def _seed_repo_states(
@@ -603,33 +696,38 @@ def _seed_repo_states(
     salt: str,
     current: datetime,
     full_refresh_after: timedelta | None,
+    phase: float | None = None,
 ) -> dict[str, RepoState]:
     """Per-repo state for a dataset written before it existed, without fetching anything.
 
     Every repository that has records resumes from the file's org-wide
     watermark, exactly where the old code would have resumed it, with a
-    staggered ``last_full_at`` so its first full refresh lands somewhere in the
-    next window rather than tonight. A listed repository with *no* records gets
-    no state, so it is fetched in full on the next run: cheap if it really is
-    empty, and the backfill a late-joining repository needs.
+    staggered ``last_full_at`` (:func:`_stagger`) so its first full refresh lands
+    on one of the next N nights rather than tonight. A listed repository with *no*
+    records gets no state, so it is fetched in full on the next run: cheap if it
+    really is empty, and the backfill a late-joining repository needs.
     """
-    names = sorted({name for record in records if (name := repo_of(record))})
-    return {
-        name: RepoState(
-            watermark=fetched_through,
-            last_full_at=(
-                _seeded_last_full_at(salt, name, current, full_refresh_after) if full_refresh_after else None
-            ),
+    rows = Counter(name for record in records if (name := repo_of(record)))
+    stamps = (
+        _stagger(
+            {name: _pages(n) for name, n in rows.items()},
+            (),
+            salt=salt,
+            current=current,
+            full_refresh_after=full_refresh_after,
+            phase=phase,
         )
-        for name in names
-    }
+        if full_refresh_after
+        else {}
+    )
+    return {name: RepoState(watermark=fetched_through, last_full_at=stamps.get(name)) for name in sorted(rows)}
 
 
 def _due(state: RepoState, current: datetime, full_refresh_after: timedelta | None) -> bool:
-    """Whether the repository's periodic full refresh is due."""
+    """Whether the repository's periodic full refresh is due (within ``_DUE_TOLERANCE``)."""
     if full_refresh_after is None:
         return False
-    return state.last_full_at is None or state.last_full_at <= current - full_refresh_after
+    return state.last_full_at is None or state.last_full_at <= current - full_refresh_after + _DUE_TOLERANCE
 
 
 def _failed_name(repo: object) -> str:
@@ -700,6 +798,7 @@ def fetch_incremental_by_repo(  # noqa: UP047
     overlap: timedelta = DEFAULT_OVERLAP,
     force_full: bool = False,
     full_refresh_after: timedelta | None = None,
+    stagger_phase: float | None = None,
     now: datetime | None = None,
 ) -> list[T]:
     """Fetch an org-wide dataset incrementally, keeping a watermark per repository.
@@ -730,7 +829,9 @@ def fetch_incremental_by_repo(  # noqa: UP047
     hold (``RETIRE_AFTER_MISSING_RUNS``, confirmed by ``confirm_gone``).
 
     ``full_fetch`` and ``since_fetch`` receive repository names; the caller maps
-    them back to whatever its fetchers need.
+    them back to whatever its fetchers need. ``stagger_phase`` (see
+    :func:`_stagger`) lets the caller keep several datasets' largest
+    repositories on different nights.
     """
     current = now or datetime.now(UTC)
     stored = _load_stored(path, model_class)
@@ -751,6 +852,7 @@ def fetch_incremental_by_repo(  # noqa: UP047
             salt=path.name,
             current=current,
             full_refresh_after=full_refresh_after,
+            phase=stagger_phase,
         )
         logger.info(
             "Dataset %s has no per-repo state yet; seeded %d repositories from its watermark %s",
@@ -762,19 +864,41 @@ def fetch_incremental_by_repo(  # noqa: UP047
         states = dict(stored.repos)
 
     listed = list(dict.fromkeys(list_repos()))
-    full_names: list[str] = []
+    backfill = [name for name in listed if (state := states.get(name)) is None or state.watermark is None]
+    without_state = set(backfill)
+    due = [
+        name
+        for name in listed
+        if name not in without_state and (force_full or _due(states[name], current, full_refresh_after))
+    ]
+    deferred: list[str] = []
+    if full_refresh_after is not None and not force_full:
+        budget = math.ceil(_NIGHTLY_REFRESH_MULTIPLIER * len(listed) / _nights(full_refresh_after))
+        if len(due) > budget:
+            # Most overdue first; backfills are never deferred (they are the only
+            # way to get that data at all) and do not count against the budget.
+            due.sort(key=lambda name: (states[name].last_full_at or datetime.min.replace(tzinfo=UTC), name))
+            due, deferred = due[:budget], due[budget:]
+            logger.info(
+                "%s: %d full refreshes are due; doing the %d most overdue tonight and deferring %d",
+                path.name,
+                len(due) + len(deferred),
+                budget,
+                len(deferred),
+            )
+    fetch_in_full = without_state | set(due)
+    full_names = [name for name in listed if name in fetch_in_full]
     delta_groups: dict[datetime, list[str]] = {}
     for name in listed:
-        state = states.get(name)
-        if force_full or state is None or state.watermark is None or _due(state, current, full_refresh_after):
-            full_names.append(name)
-        else:
-            delta_groups.setdefault(state.watermark, []).append(name)
+        watermark = states[name].watermark if name in states else None
+        if name not in fetch_in_full and watermark is not None:
+            delta_groups.setdefault(watermark, []).append(name)
     logger.info(
-        "%s: %d repositories to fetch in full (%d without state), %d by delta",
+        "%s: %d repositories to fetch in full (%d without state, %d due), %d by delta",
         path.name,
         len(full_names),
-        sum(1 for name in full_names if states.get(name) is None or states[name].watermark is None),
+        len(backfill),
+        len(due),
         sum(len(group) for group in delta_groups.values()),
     )
 
@@ -825,20 +949,35 @@ def fetch_incremental_by_repo(  # noqa: UP047
 
     content = _max_updated_at(records, updated_at_of) or current
     new_states: dict[str, RepoState] = {}
+    first_full: list[str] = []
     for name in listed:
         prior = states.get(name, RepoState())
         if name in failed:
             new_states[name] = replace(prior, holds=prior.holds + 1, missing_runs=0)
             continue
-        last_full_at = prior.last_full_at
-        if name in refreshed:
-            # A repository's *first* full fetch gets a staggered stamp, as a
-            # migrated one does: after a cold fetch of the whole org, stamping
-            # them all "now" would bring them all due again on one night.
-            first = prior.watermark is None and full_refresh_after is not None
-            last_full_at = _seeded_last_full_at(path.name, name, current, full_refresh_after) if first else current
+        if name in refreshed and prior.watermark is None and full_refresh_after is not None:
+            # Its first full fetch: stamped below with the others, so that after a
+            # cold fetch of the whole org they do not all come due on one night.
+            first_full.append(name)
+        last_full_at = current if name in refreshed else prior.last_full_at
         new_states[name] = RepoState(watermark=content, last_full_at=last_full_at)
     new_states.update((name, state) for name, state in missing.items() if name not in retired)
+    if first_full and full_refresh_after is not None:
+        rows = Counter(repo_of(record) for record in records)
+        stamps = _stagger(
+            {name: _pages(rows[name]) for name in first_full},
+            (
+                (state.last_full_at, _pages(rows[name]))
+                for name, state in new_states.items()
+                if name not in first_full and state.last_full_at is not None
+            ),
+            salt=path.name,
+            current=current,
+            full_refresh_after=full_refresh_after,
+            phase=stagger_phase,
+        )
+        for name, stamp in stamps.items():
+            new_states[name] = replace(new_states[name], last_full_at=stamp)
 
     if failed:
         logger.warning(
