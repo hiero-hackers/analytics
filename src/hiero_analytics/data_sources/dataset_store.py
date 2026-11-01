@@ -20,7 +20,9 @@ import json
 import logging
 import os
 import re
-from collections.abc import Callable, Hashable, Iterable
+from collections.abc import Callable, Hashable, Iterable, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -85,8 +87,31 @@ def forget_touched_datasets() -> None:
 
 
 def _record_touch(path: Path) -> None:
-    """Note that a resource claimed ``path`` this run, whether or not it existed."""
-    _touched_datasets.add(path.resolve())
+    """Note a dataset globally and, when active, for the current pipeline."""
+    resolved = path.resolve()
+    _touched_datasets.add(resolved)
+    current = _pipeline_datasets.get()
+    if current is not None:
+        current.add(resolved)
+
+
+_pipeline_datasets: ContextVar[set[Path] | None] = ContextVar("pipeline_datasets", default=None)
+
+
+@contextmanager
+def track_pipeline_datasets() -> Iterator[None]:
+    """Track datasets read by one pipeline without losing run-wide prune tracking."""
+    token = _pipeline_datasets.set(set())
+    try:
+        yield
+    finally:
+        _pipeline_datasets.reset(token)
+
+
+def current_pipeline_datasets() -> frozenset[Path] | None:
+    """Return datasets read by the current pipeline, or None outside its scope."""
+    current = _pipeline_datasets.get()
+    return None if current is None else frozenset(current)
 
 
 def _is_dataset_file(path: Path) -> bool:
