@@ -82,6 +82,14 @@ DEFAULT_REUSE_MAX_AGE = timedelta(hours=6)
 # disk. Reading it still registers here.
 _touched_datasets: set[Path] = set()
 
+# Org-wide datasets this run has already refreshed. Two pipelines can ask for
+# the same dataset in one run (difficulty and difficulty_over_time both read
+# the org's issues); the second request reads what the first wrote instead of
+# fetching again. Fetching twice cost a second delta, and advanced the per-run
+# counters (holds, missing runs, the no-shrink streak) and spent the nightly
+# refresh budget twice. See start_run().
+_refreshed_this_run: set[Path] = set()
+
 # How much of a file to inspect when deciding whether it is one of ours.
 _DATASET_PREFIX_BYTES = 256
 
@@ -121,6 +129,17 @@ def touched_datasets() -> frozenset[Path]:
 def forget_touched_datasets() -> None:
     """Clear the touch record (tests; a process runs the pipelines once)."""
     _touched_datasets.clear()
+    _refreshed_this_run.clear()
+
+
+def start_run() -> None:
+    """Mark the start of a run: from here, each org-wide dataset is refreshed at most once.
+
+    ``run_all`` calls it once per run. A process that refreshes the same
+    dataset for several simulated runs (the tests' multi-night simulations)
+    calls it between them.
+    """
+    _refreshed_this_run.clear()
 
 
 def _record_touch(path: Path) -> None:
@@ -830,11 +849,28 @@ def _retire_missing(
     path: Path,
     missing: dict[str, RepoState],
     total: int,
-    confirm_gone: Callable[[str], bool] | None,
+    resolve_repo: Callable[[str], str | None] | None,
+    fetched_now: set[str],
 ) -> set[str]:
-    """The missing repositories whose rows should go, under the rules on ``RETIRE_AFTER_MISSING_RUNS``."""
-    candidates = sorted(name for name, state in missing.items() if state.missing_runs >= RETIRE_AFTER_MISSING_RUNS)
-    if not candidates or confirm_gone is None:
+    """The missing repositories whose rows should go.
+
+    Each missing repository is looked up directly (``resolve_repo`` returns the
+    ``owner/name`` GitHub resolves it to, or None when it is not found):
+
+    - it resolves to itself: the listing missed it; keep its rows;
+    - it resolves to a repository this run fetched successfully (a rename
+      inside the org): retire the old name now, since its rows are already
+      back under the new one and keeping them would count the repository
+      twice;
+    - it is not found, or it moved out of the org: retire it once it has been
+      missing for ``RETIRE_AFTER_MISSING_RUNS`` runs.
+
+    Nothing is looked up, or retired, while more than
+    ``_RETIRE_MAX_MISSING_SHARE`` of the dataset's repositories are missing at
+    once: that is a broken listing, not repositories leaving. A failed lookup
+    is not evidence either.
+    """
+    if not missing or resolve_repo is None:
         return set()
     if len(missing) > max(1, int(_RETIRE_MAX_MISSING_SHARE * total)):
         logger.warning(
@@ -845,23 +881,40 @@ def _retire_missing(
             total,
         )
         return set()
+    fetched = {name.lower() for name in fetched_now}
     retired: set[str] = set()
-    for name in candidates:
+    for name in sorted(missing):
         try:
-            gone = confirm_gone(name)
+            resolved = resolve_repo(name)
         except Exception:
-            logger.warning("Could not confirm whether %s is gone; keeping its rows in %s", name, path.name)
+            logger.warning("Could not look up %s; keeping its rows in %s", name, path.name)
             continue
-        if gone:
+        if resolved is not None and resolved.lower() == name.lower():
+            logger.info("%s is missing from the org listing but still exists; keeping its rows in %s", name, path.name)
+        elif resolved is not None and resolved.lower() in fetched:
             logger.warning(
-                "Retiring %s from %s: missing from the org listing for %d runs and no longer resolvable under that name",
+                "Retiring %s from %s: GitHub resolves it to %s, which this run fetched under that name",
+                name,
+                path.name,
+                resolved,
+            )
+            retired.add(name)
+        elif missing[name].missing_runs >= RETIRE_AFTER_MISSING_RUNS:
+            logger.warning(
+                "Retiring %s from %s: missing from the org listing for %d runs and %s",
                 name,
                 path.name,
                 missing[name].missing_runs,
+                f"now {resolved}, outside this org" if resolved else "no longer found",
             )
             retired.add(name)
         else:
-            logger.info("%s is missing from the org listing but still exists; keeping its rows in %s", name, path.name)
+            logger.info(
+                "%s is missing from the org listing (%s); %s keeps its rows unless it is still missing next run",
+                name,
+                f"now {resolved}" if resolved else "not found",
+                path.name,
+            )
     return retired
 
 
@@ -875,7 +928,7 @@ def fetch_incremental_by_repo(  # noqa: UP047
     list_repos: Callable[[], Sequence[str]],
     full_fetch: Callable[[list[str]], list[T]],
     since_fetch: Callable[[list[str], datetime], list[T]],
-    confirm_gone: Callable[[str], bool] | None = None,
+    resolve_repo: Callable[[str], str | None] | None = None,
     overlap: timedelta = DEFAULT_OVERLAP,
     force_full: bool = False,
     full_refresh_after: timedelta | None = None,
@@ -908,10 +961,12 @@ def fetch_incremental_by_repo(  # noqa: UP047
     A dataset written before per-repo state existed is seeded in place (see
     :func:`_seed_repo_states`), so the switch costs no cold fetch. A repository
     that drops out of the listing keeps its rows until the retirement rules
-    hold (``RETIRE_AFTER_MISSING_RUNS``, confirmed by ``confirm_gone``).
+    hold (see :func:`_retire_missing`; ``resolve_repo`` does the direct lookup).
 
     ``full_fetch`` and ``since_fetch`` receive repository names; the caller maps
-    them back to whatever its fetchers need. ``stagger_phase`` (see
+    them back to whatever its fetchers need. A dataset is refreshed at most
+    once per run (:func:`start_run`): a later request in the same run returns
+    what is on disk. ``stagger_phase`` (see
     :func:`_stagger`) lets the caller keep several datasets' largest
     repositories on different nights. A stored dataset of another
     ``schema_version`` is treated as absent: a first fetch of this resource
@@ -923,6 +978,11 @@ def fetch_incremental_by_repo(  # noqa: UP047
         if stored is None:
             raise OfflineDatasetMissingError(f"Offline mode requires a valid cached dataset at {path}")
         logger.info("Reusing offline dataset %s (%d records)", path, len(stored.records))
+        return stored.records
+    if stored is not None and path.resolve() in _refreshed_this_run:
+        logger.info(
+            "Dataset %s was already refreshed this run; reusing it (%d records)", path.name, len(stored.records)
+        )
         return stored.records
 
     existing: list[T] = stored.records if stored is not None else []
@@ -1027,7 +1087,7 @@ def fetch_incremental_by_repo(  # noqa: UP047
         for name, state in states.items()
         if name not in listed_names
     }
-    retired = _retire_missing(path, missing, len(states), confirm_gone)
+    retired = _retire_missing(path, missing, len(states), resolve_repo, {name for name in listed if name not in failed})
     if retired:
         records = [record for record in records if repo_of(record) not in retired]
 
@@ -1128,4 +1188,5 @@ def fetch_incremental_by_repo(  # noqa: UP047
         schema_version=schema_version,
         health={"runs_without_shrink": shrink_streak},
     )
+    _refreshed_this_run.add(path.resolve())
     return records

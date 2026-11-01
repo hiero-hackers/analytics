@@ -139,7 +139,9 @@ Fetching is **incremental** and has two persistence layers, by design:
   Every repository is fully refreshed at least every 30 days, on staggered nights,
   which replaces its rows and so drops what a delta cannot see (deletions, transfers).
   A repository that leaves the org has its rows retired once a direct lookup confirms
-  it is gone. Reuse is bounded (`load_or_fetch` refuses data older than a few hours).
+  it is gone; one renamed inside the org is retired the night its new name is fetched.
+  Each dataset is refreshed at most once per run, however many pipelines read it.
+  Reuse is bounded (`load_or_fetch` refuses data older than a few hours).
   Both stores fail safe: a corrupt file is a cache miss. Each resource declares a
   record `schema_version`, and bumping it invalidates that resource's dataset only.
   The `dataset_store` and `dataset_health` module docstrings have the details.

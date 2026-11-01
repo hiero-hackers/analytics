@@ -114,26 +114,26 @@ def fetch_github_resource(  # noqa: UP047
     return records
 
 
-def repository_is_gone(client: GitHubClient, full_name: str) -> bool:
-    """Whether ``owner/name`` no longer resolves to that repository on GitHub.
+def resolve_repository(client: GitHubClient, full_name: str) -> str | None:
+    """The ``owner/name`` GitHub resolves ``full_name`` to today, or None when it is not found.
 
-    The evidence the dataset store asks for before retiring a repository's rows:
-    the org listing can miss a repository (one bad page, a days-old TTL cache
-    entry), a direct lookup cannot. ``NOT_FOUND``, a null node, or a different
-    ``nameWithOwner`` (GitHub resolving a rename or a transfer) all mean nothing
-    will ever refresh the rows filed under this name again. One GraphQL point.
-    Any other failure propagates: no answer is not evidence.
+    The evidence the dataset store asks for before retiring a repository's
+    rows: the org listing can miss a repository (one bad page, a days-old TTL
+    cache entry), a direct lookup cannot. GitHub follows renames and transfers,
+    so a moved repository comes back under its new name (``clpr-evm-endpoint``
+    resolves to ``LFDT-CLPR/clpr-endpoint``). One GraphQL point. Any failure
+    other than ``NOT_FOUND`` propagates: no answer is not evidence.
     """
     owner, _, name = full_name.partition("/")
     try:
         data = client.graphql(load_query("repo_lookup"), {"owner": owner, "repo": name})
     except GraphQLResponseError as exc:
         if any(error.get("type") == "NOT_FOUND" for error in exc.errors):
-            return True
+            return None
         raise
     node = (data.get("data") or {}).get("repository")
     found = node.get("nameWithOwner") if isinstance(node, dict) else None
-    return not (isinstance(found, str) and found.lower() == full_name.lower())
+    return found if isinstance(found, str) else None
 
 
 def fetch_org_login(client: GitHubClient, org: str) -> str | None:

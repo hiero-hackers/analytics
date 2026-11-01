@@ -11,6 +11,7 @@ import requests
 
 import hiero_analytics.config.paths as paths
 import hiero_analytics.data_sources.github_client as github_client
+from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.dataset_store import load_or_fetch
 from hiero_analytics.data_sources.github_ingest import _common
 from hiero_analytics.data_sources.github_ingest._common import fetch_all_with_retry
@@ -376,6 +377,7 @@ def test_fetch_org_incremental_scopes_its_fetches(monkeypatch, tmp_path):
 
     monkeypatch.setattr(_common, "fetch_org_repos_graphql", listing)
     fetch_org_incremental(resource, client=None, org="acme", full_fetch=full, since_fetch=since)
+    dataset_store.start_run()  # the next nightly run
     fetch_org_incremental(resource, client=None, org="acme", full_fetch=full, since_fetch=since)
 
     # The listing, the full fetch, the listing again, and the delta.

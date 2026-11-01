@@ -760,3 +760,15 @@ def test_the_step_output_is_skipped_outside_actions(monkeypatch, main_env, tmp_p
     run_all.main()
 
     assert not (tmp_path / "outputs").exists()
+
+
+def test_each_run_starts_with_no_dataset_refreshed(monkeypatch, main_env):
+    """A dataset refreshed by an earlier run in the process is fetched again, once, by this one."""
+    from hiero_analytics.data_sources import dataset_store
+
+    dataset_store._refreshed_this_run.add(paths.DATASETS_DIR / "issues_org_all.json")
+    _use(monkeypatch, _pipeline("p"))
+
+    run_all.main()
+
+    assert dataset_store._refreshed_this_run == set()

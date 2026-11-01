@@ -126,7 +126,7 @@ def fetch_org_incremental(
             list_repos=list_repos,
             full_fetch=lambda names: full_fetch(repos_named(names)),
             since_fetch=guarded_since,
-            confirm_gone=lambda name: _common.repository_is_gone(client, name),
+            resolve_repo=lambda name: _common.resolve_repository(client, name),
             force_full=refresh,
             full_refresh_after=resource.full_refresh_after,
             stagger_phase=_stagger_phase(resource, org),

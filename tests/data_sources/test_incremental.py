@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 import hiero_analytics.config.paths as paths
+from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.github_ingest import ORG_INCREMENTAL_RESOURCES, _common
 from hiero_analytics.data_sources.github_ingest.incremental import (
     OrgIncrementalResource,
@@ -89,6 +90,7 @@ def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
     assert calls == ["full"]
     assert [event.issue_number for event in first] == [1]
 
+    dataset_store.start_run()  # the next nightly run
     second = fetch_org_incremental(
         _RESOURCE,
         client=None,
@@ -116,6 +118,7 @@ def test_since_failure_falls_back_to_full(monkeypatch, tmp_path):
     def broken_since(_repos: list, _since: datetime) -> list:
         raise ValueError("boom")
 
+    dataset_store.start_run()  # the next nightly run
     result = fetch_org_incremental(
         _RESOURCE,
         client=None,

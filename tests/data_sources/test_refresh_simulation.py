@@ -44,14 +44,16 @@ class _FakeGitHub:
         self.full_starts: dict[str, list[int]] = {}  # repo -> nights a full fetch began
         self.resource_error_pending = False
         self.resource_errors_sent = 0
+        self.renamed: dict[str, str] = {}  # old repo name -> new, as GitHub redirects
 
     def listing(self, _client, _org) -> list[RepositoryRecord]:
         return [RepositoryRecord(full_name=f"org/{name}", name=name, owner="org") for name in self.issues]
 
     def graphql(self, query: str, variables: dict) -> dict:
         if "REPO_LOOKUP_QUERY" in query:
-            if variables["repo"] in self.issues:
-                return {"data": {"repository": {"nameWithOwner": f"org/{variables['repo']}"}}}
+            name = self.renamed.get(variables["repo"], variables["repo"])
+            if name in self.issues:
+                return {"data": {"repository": {"nameWithOwner": f"org/{name}"}}}
             raise GraphQLResponseError(
                 {"data": {"repository": None}, "errors": [{"type": "NOT_FOUND", "path": ["repository"]}]}
             )
@@ -127,6 +129,7 @@ def github(monkeypatch):
 
 
 def _night(github: _FakeGitHub, night: int) -> set[tuple[str, int]]:
+    dataset_store.start_run()
     github.night = night
     _Clock.current = _DAY0 + timedelta(days=night)
     records = issues.fetch_org_issues_graphql(github, "org", max_workers=1)
@@ -163,6 +166,9 @@ def test_sixty_nights_of_an_org(github):
             github.resource_error_pending = True
         if night == 15:
             del github.issues["busy"]  # transferred out of the org
+        if night == 20:
+            github.issues["lib-zero"] = github.issues.pop("lib0")  # renamed inside the org
+            github.renamed["lib0"] = "lib-zero"
 
         contents[night] = _night(github, night)
         dataset = _dataset()
@@ -177,7 +183,7 @@ def test_sixty_nights_of_an_org(github):
 
     # (a) Every repository is fully refreshed at least once per 30 days, active ones included.
     for name, nights in github.full_starts.items():
-        horizon = 15 if name == "busy" else 60  # busy left the org on night 15
+        horizon = {"busy": 15, "lib0": 20}.get(name, 60)  # busy left on night 15; lib0 was renamed on 20
         checkpoints = [*nights, horizon]
         assert all(later - earlier <= 30 for earlier, later in zip(checkpoints, checkpoints[1:], strict=False)), name
     assert len(github.full_starts["active"]) >= 2
@@ -190,6 +196,11 @@ def test_sixty_nights_of_an_org(github):
     # (c) The late-joining repository has its whole history the night it appears, not just what changed since.
     assert github.full_starts["late"][0] == 10
     assert {n for repo, n in contents[10] if repo == "org/late"} == set(range(1, 26))
+
+    # A rename inside the org: the new name is backfilled and the old one retired the same night,
+    # so no night ever counts the repository twice.
+    assert all(not ({"org/lib0", "org/lib-zero"} <= {repo for repo, _ in contents[n]}) for n in range(61))
+    assert any(repo == "org/lib-zero" for repo, _ in contents[20])
 
     # Retirement: busy is missing on nights 15 and 16, confirmed gone, and its rows go on night 16.
     assert any(repo == "org/busy" for repo, _ in contents[15])

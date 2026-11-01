@@ -64,7 +64,9 @@ class _Org:
         return self._serve(names, lambda row: row.updated_at is not None and row.updated_at >= since)
 
 
-def _run(org: _Org, *, now: datetime, path=None, confirm_gone=None, force_full=False, window=None):
+def _run(org: _Org, *, now: datetime, path=None, resolve_repo=None, force_full=False, window=None):
+    """One nightly run: a new run, so the dataset may be refreshed again."""
+    dataset_store.start_run()
     return fetch_incremental_by_repo(
         path=path or paths.DATASETS_DIR / "rows_org_all.json",
         model_class=_Row,
@@ -74,7 +76,7 @@ def _run(org: _Org, *, now: datetime, path=None, confirm_gone=None, force_full=F
         list_repos=org.listing,
         full_fetch=org.full,
         since_fetch=org.since,
-        confirm_gone=confirm_gone,
+        resolve_repo=resolve_repo,
         force_full=force_full,
         full_refresh_after=window,
         now=now,
@@ -437,47 +439,94 @@ def _org_of(count: int) -> _Org:
     return _Org({f"org/r{i}": [_row(f"org/r{i}", 1, -1)] for i in range(count)})
 
 
+def _not_found(_name):
+    return None
+
+
 def test_a_repo_missing_once_keeps_its_rows():
-    """One run without the repository in the listing changes nothing but its missing count."""
+    """One run without the repository in the listing, and not found: kept, its missing count started."""
     org = _org_of(5)
     _run(org, now=_DAY0)
     del org.rows["org/r0"]
     asked = []
 
-    records = _run(org, now=_DAY0 + timedelta(days=1), confirm_gone=lambda name: asked.append(name) or True)
+    records = _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=lambda name: asked.append(name))
 
     assert ("org/r0", 1) in _numbers(records)
-    assert asked == []  # one absence is not evidence: no lookup yet
+    assert asked == ["org/r0"]  # looked up at once, so a rename would be caught tonight
     assert _states()["org/r0"].missing_runs == 1
 
 
-def test_a_repo_missing_twice_and_confirmed_gone_is_retired():
-    """Two absent runs plus a lookup that confirms it is gone: its rows and state are dropped."""
+def test_a_repo_missing_twice_and_not_found_is_retired():
+    """Two absent runs plus a lookup that cannot find it: its rows and state are dropped."""
     org = _org_of(5)
     _run(org, now=_DAY0)
     del org.rows["org/r0"]
-    _run(org, now=_DAY0 + timedelta(days=1), confirm_gone=lambda _name: True)
+    _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=_not_found)
 
-    records = _run(org, now=_DAY0 + timedelta(days=2), confirm_gone=lambda _name: True)
+    records = _run(org, now=_DAY0 + timedelta(days=2), resolve_repo=_not_found)
 
     assert ("org/r0", 1) not in _numbers(records)
     assert "org/r0" not in _states()
 
 
-@pytest.mark.parametrize("answer", [False, "raises"])
-def test_a_missing_repo_that_cannot_be_confirmed_gone_keeps_its_rows(answer):
-    """A listing gap (the repo still resolves) or a failed lookup is not evidence."""
+def test_a_repo_moved_to_another_org_retires_after_two_runs():
+    """It resolves, but outside this org's listing: the same two-run rule as a deleted repository."""
     org = _org_of(5)
     _run(org, now=_DAY0)
     del org.rows["org/r0"]
 
-    def confirm(_name):
+    def moved(_name):
+        return "elsewhere/r0"
+
+    first = _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=moved)
+    second = _run(org, now=_DAY0 + timedelta(days=2), resolve_repo=moved)
+
+    assert ("org/r0", 1) in _numbers(first)
+    assert ("org/r0", 1) not in _numbers(second)
+
+
+def test_a_repo_renamed_inside_the_org_is_not_counted_twice():
+    """The new name is backfilled and the old name retired in the same run: never both at once."""
+    org = _org_of(5)
+    _run(org, now=_DAY0)
+    org.rows["org/renamed"] = [_row("org/renamed", 1, -1)]
+    del org.rows["org/r0"]
+
+    records = _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=lambda _name: "org/Renamed")
+
+    assert ("org/renamed", 1) in _numbers(records)
+    assert ("org/r0", 1) not in _numbers(records)
+    assert "org/r0" not in _states()
+
+
+def test_a_rename_whose_new_name_failed_to_fetch_keeps_the_old_rows():
+    """Retiring the old name before the new one has its rows would undercount it instead."""
+    org = _org_of(5)
+    _run(org, now=_DAY0)
+    org.rows["org/renamed"] = [_row("org/renamed", 1, -1)]
+    del org.rows["org/r0"]
+    org.fail = {"org/renamed"}
+
+    records = _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=lambda _name: "org/renamed")
+
+    assert ("org/r0", 1) in _numbers(records)
+
+
+@pytest.mark.parametrize("answer", ["itself", "raises"])
+def test_a_missing_repo_that_still_exists_or_cannot_be_looked_up_keeps_its_rows(answer):
+    """A listing gap (the repo resolves to itself) or a failed lookup is not evidence."""
+    org = _org_of(5)
+    _run(org, now=_DAY0)
+    del org.rows["org/r0"]
+
+    def resolve(name):
         if answer == "raises":
             raise RuntimeError("lookup failed")
-        return answer
+        return name.upper()  # GitHub's spelling may differ in case
 
     for night in (1, 2, 3):
-        records = _run(org, now=_DAY0 + timedelta(days=night), confirm_gone=confirm)
+        records = _run(org, now=_DAY0 + timedelta(days=night), resolve_repo=resolve)
 
     assert ("org/r0", 1) in _numbers(records)
     assert _states()["org/r0"].missing_runs == 3
@@ -492,7 +541,7 @@ def test_nothing_is_retired_when_too_many_repos_vanish_at_once():
     asked = []
 
     for night in (1, 2):
-        records = _run(org, now=_DAY0 + timedelta(days=night), confirm_gone=lambda n: asked.append(n) or True)
+        records = _run(org, now=_DAY0 + timedelta(days=night), resolve_repo=lambda n: asked.append(n))
 
     assert asked == []
     assert {("org/r0", 1), ("org/r1", 1), ("org/r2", 1)} <= _numbers(records)
@@ -503,10 +552,10 @@ def test_a_repo_that_comes_back_resets_its_missing_count():
     org = _org_of(5)
     _run(org, now=_DAY0)
     rows = org.rows.pop("org/r0")
-    _run(org, now=_DAY0 + timedelta(days=1), confirm_gone=lambda _name: True)
+    _run(org, now=_DAY0 + timedelta(days=1), resolve_repo=_not_found)
     org.rows["org/r0"] = rows
 
-    _run(org, now=_DAY0 + timedelta(days=2), confirm_gone=lambda _name: True)
+    _run(org, now=_DAY0 + timedelta(days=2), resolve_repo=_not_found)
 
     assert _states()["org/r0"].missing_runs == 0
 
@@ -586,6 +635,7 @@ def test_a_schema_bump_refetches_only_that_resource():
     org_a, org_b = _Org({"org/a": [_row("org/a", 1, -1)]}), _Org({"org/a": [_row("org/a", 1, -1)]})
 
     def run(org, path, schema):
+        dataset_store.start_run()
         return fetch_incremental_by_repo(
             path=path,
             model_class=_Row,
@@ -656,6 +706,7 @@ def test_rows_lost_by_a_repo_that_was_not_refreshed_are_flagged():
     path = paths.DATASETS_DIR / "rows_org_all.json"
 
     def run(now):
+        dataset_store.start_run()
         return fetch_incremental_by_repo(
             path=path,
             model_class=_Row,
@@ -706,3 +757,64 @@ def test_the_no_shrink_streak_counts_runs_and_resets_when_a_refresh_removes_rows
     _run(org, now=_DAY0 + timedelta(hours=3), force_full=True)
 
     assert _stored()["health"]["runs_without_shrink"] == 0
+
+
+# ---------------------------------------------------------
+# a dataset is refreshed at most once per run
+# ---------------------------------------------------------
+
+
+def _same_run(org: _Org, *, now: datetime):
+    """Another request for the dataset inside the current run (no start_run)."""
+    return fetch_incremental_by_repo(
+        path=paths.DATASETS_DIR / "rows_org_all.json",
+        model_class=_Row,
+        key_of=lambda row: (row.repo, row.number),
+        updated_at_of=lambda row: row.updated_at,
+        repo_of=lambda row: row.repo,
+        list_repos=org.listing,
+        full_fetch=org.full,
+        since_fetch=org.since,
+        resolve_repo=_not_found,
+        now=now,
+    )
+
+
+def test_a_second_request_in_the_same_run_reads_the_dataset_without_fetching():
+    """Two pipelines reading one dataset in a run cost one fetch, and both get the same rows."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)]})
+    first = _run(org, now=_DAY0)
+    org.rows["org/a"].append(_row("org/a", 2, 0.5))
+
+    second = _same_run(org, now=_DAY0 + timedelta(minutes=5))
+
+    assert len(org.calls) == 1
+    assert _numbers(second) == _numbers(first)
+
+
+def test_counters_advance_once_per_run_however_often_the_dataset_is_read():
+    """A failing repo gains one hold a run and a missing one one missing run, as the thresholds assume."""
+    org = _org_of(6)
+    _run(org, now=_DAY0)
+    org.fail = {"org/r1"}
+    del org.rows["org/r0"]
+
+    for night in (1, 2):
+        _run(org, now=_DAY0 + timedelta(days=night), resolve_repo=lambda name: name)
+        _same_run(org, now=_DAY0 + timedelta(days=night, minutes=5))
+
+    states = _states()
+    assert states["org/r1"].holds == 2
+    assert states["org/r0"].missing_runs == 2
+    assert _stored()["health"]["runs_without_shrink"] == 3
+
+
+def test_a_new_run_refreshes_the_dataset_again():
+    """The reuse lasts one run: the next run fetches its delta as usual."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)]})
+    _run(org, now=_DAY0)
+    _same_run(org, now=_DAY0 + timedelta(minutes=5))
+
+    _run(org, now=_DAY0 + timedelta(days=1))
+
+    assert [kind for kind, _, _ in org.calls] == ["full", "since"]

@@ -35,7 +35,7 @@ from hiero_analytics.config import orgs as org_registry
 from hiero_analytics.config import paths
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.data_sources import dataset_health
-from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets
+from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets, start_run
 from hiero_analytics.data_sources.github_ingest import fetch_org_login
 from hiero_analytics.data_sources.usage import render_usage_markdown, usage_scope
 from hiero_analytics.pipelines import PIPELINES_BY_NAME, default_run_pipelines
@@ -277,6 +277,7 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     setup_logging()
     reset_api_usage()  # each run reports only its own spend
     dataset_health.forget()  # ...and only its own dataset refreshes
+    start_run()  # each dataset is refreshed at most once per run
 
     orgs = _rendered_orgs()
     logger.info("Rendering %d org(s): %s", len(orgs), ", ".join(orgs))
