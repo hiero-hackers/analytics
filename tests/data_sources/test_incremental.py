@@ -67,6 +67,12 @@ def test_registered_resources_refresh_their_largest_repos_on_evenly_spaced_night
     assert phases == pytest.approx([index / count for index in range(count)])
 
 
+def test_registered_resources_declare_a_record_schema():
+    """Each resource's dataset is versioned on its own; 1 is the schema every file had before the field."""
+    for resource in ORG_INCREMENTAL_RESOURCES.values():
+        assert isinstance(resource.schema_version, int) and resource.schema_version >= 1
+
+
 def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
     """First run does a full fetch; the next fetches the delta and merges."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)

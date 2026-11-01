@@ -40,10 +40,19 @@ from .usage import usage_scope
 
 logger = logging.getLogger(__name__)
 
-# Bump to invalidate persisted datasets after a schema change so the next run does
-# one full refresh. v2: IssueTimelineEventRecord gained an ``actor`` field, so older
-# label-event datasets must be re-fetched to populate it.
+# The *file format*: the layout of a dataset file itself. Bumping it invalidates
+# every dataset at once, a cold fetch of everything, so it is reserved for a
+# change to the file layout. A change to one resource's records bumps that
+# resource's ``schema_version`` instead (see ``DEFAULT_SCHEMA_VERSION``).
+# v2: IssueTimelineEventRecord gained an ``actor`` field (from before per-resource
+# schema versions existed, so it invalidated everything).
 DATASET_VERSION = 2
+
+# A resource's record schema, written as ``"schema"`` in its dataset file and
+# compared on load: a mismatch makes that one dataset a cache miss, so only that
+# resource is refetched in full. A file written before the key existed counts as
+# schema 1. Each resource declares its own (``OrgIncrementalResource.schema_version``).
+DEFAULT_SCHEMA_VERSION = 1
 
 # Re-fetch a small window before the stored watermark so edits that landed
 # mid-fetch (or under minor clock skew) are not missed. Re-merges are idempotent.
@@ -338,6 +347,7 @@ def save_dataset(  # noqa: UP047
     fetched_at: datetime | None = None,
     last_full_at: datetime | None = None,
     repos: Mapping[str, RepoState] | None = None,
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> None:
     """Atomically write the dataset, its two stamps, and any per-repo state to ``path`` as JSON.
 
@@ -374,6 +384,7 @@ def save_dataset(  # noqa: UP047
     path.parent.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] = {
         "version": DATASET_VERSION,
+        "schema": schema_version,
         # Ordered ahead of the records so both stamps stay inside the fixed
         # prefix `provenance` reads rather than parsing the whole file.
         "fetched_at": (fetched_at or datetime.now(UTC)).isoformat(),
@@ -418,8 +429,12 @@ def _read_prior_fetched_at(path: Path) -> datetime | None:
     return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=UTC)
 
 
-def _load_stored(path: Path, model_class: type) -> _StoredDataset | None:
-    """Load a dataset file with its per-repo state, or None if absent or incompatible."""
+def _load_stored(path: Path, model_class: type, schema_version: int = DEFAULT_SCHEMA_VERSION) -> _StoredDataset | None:
+    """Load a dataset file with its per-repo state, or None if absent or incompatible.
+
+    Incompatible means another file format (``DATASET_VERSION``) or another
+    record schema than the caller's ``schema_version``.
+    """
     # Before the existence check on purpose: a resource asking for this path is
     # what marks it live, whether or not a file is there yet. Every read route
     # (load_or_fetch's reuse, the incremental fetchers' baseline) passes through here.
@@ -431,6 +446,16 @@ def _load_stored(path: Path, model_class: type) -> _StoredDataset | None:
     except (OSError, json.JSONDecodeError):  # fmt: skip
         return None
     if payload.get("version") != DATASET_VERSION:
+        return None
+    stored_schema = payload.get("schema", DEFAULT_SCHEMA_VERSION)
+    if stored_schema != schema_version:
+        # Worth a line: it is about to cost a full fetch of this resource.
+        logger.info(
+            "Dataset %s has record schema %s, not %s; refetching this resource in full",
+            path.name,
+            stored_schema,
+            schema_version,
+        )
         return None
     raw_through = payload.get("fetched_through")
     if not isinstance(raw_through, str):
@@ -458,9 +483,11 @@ def _load_stored(path: Path, model_class: type) -> _StoredDataset | None:
     return _StoredDataset(records, fetched_through, repos, _parse_stamp(payload.get("last_full_at")))
 
 
-def load_dataset(path: Path, model_class: type[T]) -> tuple[list[T], datetime] | None:  # noqa: UP047
+def load_dataset(  # noqa: UP047
+    path: Path, model_class: type[T], *, schema_version: int = DEFAULT_SCHEMA_VERSION
+) -> tuple[list[T], datetime] | None:
     """Load ``(records, fetched_through)``, or None if absent or incompatible."""
-    stored = _load_stored(path, model_class)
+    stored = _load_stored(path, model_class, schema_version)
     return None if stored is None else (stored.records, stored.fetched_through)
 
 
@@ -472,6 +499,7 @@ def load_or_fetch(  # noqa: UP047
     *,
     max_age: timedelta | None = DEFAULT_REUSE_MAX_AGE,
     fingerprint: str = "all",
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> list[T]:
     """Reuse the persisted ``(resource, org)`` dataset if fresh enough, else build it.
 
@@ -490,10 +518,11 @@ def load_or_fetch(  # noqa: UP047
 
     ``fingerprint`` must match what ``fetch_fn`` writes (the incremental
     fetchers derive it from their query variables, e.g. issue states) — a
-    mismatch would read one dataset while writing another.
+    mismatch would read one dataset while writing another. ``schema_version``
+    must match too, or every call misses and refetches.
     """
     path = dataset_path(resource, org, fingerprint)
-    state = load_dataset(path, model_class)
+    state = load_dataset(path, model_class, schema_version=schema_version)
     if state is not None:
         records, fetched_through = state
         if offline_mode_enabled():
@@ -532,6 +561,7 @@ def fetch_incremental(  # noqa: UP047
     overlap: timedelta = DEFAULT_OVERLAP,
     force_full: bool = False,
     full_refresh_after: timedelta | None = None,
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
     now: datetime | None = None,
 ) -> list[T]:
     """Fetch a resource incrementally, persisting the merged dataset.
@@ -558,7 +588,7 @@ def fetch_incremental(  # noqa: UP047
     snapshot with an advanced watermark and re-raise instead.
     """
     current = now or datetime.now(UTC)
-    stored = _load_stored(path, model_class)
+    stored = _load_stored(path, model_class, schema_version)
     state = None if stored is None else (stored.records, stored.fetched_through)
     if offline_mode_enabled():
         if state is None:
@@ -602,7 +632,14 @@ def fetch_incremental(  # noqa: UP047
     preserved_fetched_at = None
     if held_watermark is not None:
         preserved_fetched_at = _read_prior_fetched_at(path) or held_watermark
-    save_dataset(path, records, watermark, fetched_at=preserved_fetched_at, last_full_at=last_full_at)
+    save_dataset(
+        path,
+        records,
+        watermark,
+        fetched_at=preserved_fetched_at,
+        last_full_at=last_full_at,
+        schema_version=schema_version,
+    )
     return records
 
 
@@ -799,6 +836,7 @@ def fetch_incremental_by_repo(  # noqa: UP047
     force_full: bool = False,
     full_refresh_after: timedelta | None = None,
     stagger_phase: float | None = None,
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
     now: datetime | None = None,
 ) -> list[T]:
     """Fetch an org-wide dataset incrementally, keeping a watermark per repository.
@@ -831,10 +869,12 @@ def fetch_incremental_by_repo(  # noqa: UP047
     ``full_fetch`` and ``since_fetch`` receive repository names; the caller maps
     them back to whatever its fetchers need. ``stagger_phase`` (see
     :func:`_stagger`) lets the caller keep several datasets' largest
-    repositories on different nights.
+    repositories on different nights. A stored dataset of another
+    ``schema_version`` is treated as absent: a first fetch of this resource
+    only, with the partial-first-fetch and stagger rules above.
     """
     current = now or datetime.now(UTC)
-    stored = _load_stored(path, model_class)
+    stored = _load_stored(path, model_class, schema_version)
     if offline_mode_enabled():
         if stored is None:
             raise OfflineDatasetMissingError(f"Offline mode requires a valid cached dataset at {path}")
@@ -997,5 +1037,12 @@ def fetch_incremental_by_repo(  # noqa: UP047
     # watermark always did; a first fetch has none, so it claims no more than
     # its own watermark.
     preserved_fetched_at = (_read_prior_fetched_at(path) or fetched_through) if failed else None
-    save_dataset(path, records, fetched_through, fetched_at=preserved_fetched_at, repos=new_states)
+    save_dataset(
+        path,
+        records,
+        fetched_through,
+        fetched_at=preserved_fetched_at,
+        repos=new_states,
+        schema_version=schema_version,
+    )
     return records

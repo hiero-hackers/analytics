@@ -1,8 +1,8 @@
 # Dataset store: self-heal, per-repo state, and fetch salvage
 
-Status: proposed for #623, 2026-11-01. Sections 3.A to 3.C (PRs 1 to 3) are
-implemented on `fix/623-dataset-store-self-heal`; 3.D and 3.E are the plan for the PRs
-that follow. Kept as the design record, like `fetch-hardening-plan.md`.
+Status: proposed for #623, 2026-11-01. Sections 3.A to 3.D (PRs 1 to 4) are
+implemented on `fix/623-dataset-store-self-heal`; 3.E is the plan for the PR that
+follows. Kept as the design record, like `fetch-hardening-plan.md`.
 
 ## 1. What is wrong
 
@@ -314,11 +314,30 @@ fetch.
 
 ### D. Per-resource schema versions (PR 4)
 
-`version` stays the *file format* (still 2: 3.B was additive). Each resource declares
-`schema_version` on `OrgIncrementalResource`, defaulting to 1, and on the `load_or_fetch`
-callers. The file stores `"schema"`, and a mismatch invalidates that resource only.
-A file without `"schema"` maps to schema 1 for every resource, since the global v2
-bump already covered `issue_label_events`.
+`DATASET_VERSION` stays the *file format* (still 2), reserved for a change to the
+layout of a dataset file itself, since bumping it invalidates everything at once.
+
+- **Each resource declares its own schema.** `OrgIncrementalResource.schema_version`
+  defaults to 1, and a registry test checks every resource has one.
+  `fetch_incremental` (the HIP inventory) takes one too.
+- **The file records it** under `"schema"`. A file without the key counts as schema 1,
+  so deploying this invalidates nothing.
+- **A mismatch is a cache miss for that dataset only, and it is logged.** Only that
+  resource is refetched in full. With 3.A to 3.C, that first fetch salvages partial
+  errors, saves partial progress, and staggers its next refreshes, so a bump is no
+  longer the risky cold path it was.
+- **Readers follow their writers.** The two pipeline-side readers
+  (`load_contributor_activity`, `load_issue_label_events`) take the dataset name and
+  schema from the resource that writes the file. A bump there cannot leave them
+  missing, and refetching, on every call; a test pins this.
+
+**Rollback across a bump.** Older code ignores `"schema"`, so after a rollback it
+reads the new records with the old model:
+
+- a bump that adds or removes a field fails deserialization, which is a cache miss
+  and safe;
+- a bump that changes what an existing field *means* would be read silently. Such a
+  change should rename the field as well as bump the schema.
 
 ### E. Held watermarks, health gate, plausibility (PR 5)
 
@@ -352,7 +371,7 @@ bump already covered `issue_label_events`.
 | 1 | 3.A | #621 (merged) | fakes for each recorded shape; a forced cold run of `issue_label_events` for hiero-ledger, reporting points from `SNAPSHOT.json` `api_usage` | revert; no data format change |
 | 2 | 3.B, and 3.C's gate and stagger | 1 | migration in place; planner dry run on the nightly snapshot; 60-night simulation, (a) to (d) | revert; the `repos` key is additive, so older code ignores it |
 | 3 | rest of 3.C | 2 | missed nights drain within the budget, most overdue first; size-aware placement; recomputed schedule on the snapshot | revert; the stamps it wrote stay valid under step 2's gate |
-| 4 | 3.D | 2 | bump one resource's schema in a test; the others load | revert |
+| 4 | 3.D | 2 | a bumped dataset is a first fetch while another in the same run keeps its deltas; legacy files count as schema 1; readers follow the resource | revert; files keep a harmless `schema` key |
 | 5 | 3.E | 3 | a simulated 3-night hold fails the gate after save; a shrink fixture fails it | revert the job |
 
 The multi-night simulation is one test module driving the real

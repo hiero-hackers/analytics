@@ -30,7 +30,7 @@ from hiero_analytics.config.github import GITHUB_MAX_WORKERS
 from hiero_analytics.config.paths import dataset_path
 from hiero_analytics.data_sources.queries import load_query
 
-from ..dataset_store import PartialOrgFetchError, fetch_incremental_by_repo
+from ..dataset_store import DEFAULT_SCHEMA_VERSION, PartialOrgFetchError, fetch_incremental_by_repo
 from ..github_client import GitHubClient
 from ..models import RepositoryRecord
 from ..usage import usage_scope
@@ -52,7 +52,10 @@ class OrgIncrementalResource:
     full refresh. ``refresh_phase`` (a fraction of the refresh window, distinct
     per resource) is where in the window this resource's largest repositories
     are refreshed, so an org's datasets do not all refresh their largest
-    repository (usually the same one) on the same night.
+    repository (usually the same one) on the same night. ``schema_version`` is
+    the record schema of this resource's dataset: bump it when ``model_class``
+    changes in a way old records cannot satisfy, and only this resource is
+    refetched in full.
     """
 
     name: str
@@ -63,6 +66,7 @@ class OrgIncrementalResource:
     full_refresh_after: timedelta = timedelta(days=30)
     repo_of: Callable[[Any], str] = attrgetter("repo")
     refresh_phase: float | None = None
+    schema_version: int = DEFAULT_SCHEMA_VERSION
 
 
 def _stagger_phase(resource: OrgIncrementalResource, org: str) -> float | None:
@@ -126,6 +130,7 @@ def fetch_org_incremental(
             force_full=refresh,
             full_refresh_after=resource.full_refresh_after,
             stagger_phase=_stagger_phase(resource, org),
+            schema_version=resource.schema_version,
         )
 
 

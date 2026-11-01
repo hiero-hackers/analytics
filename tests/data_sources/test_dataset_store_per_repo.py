@@ -573,3 +573,37 @@ def test_backfills_are_never_deferred_by_the_budget():
     _run(org, now=_DAY0, window=_WINDOW)
 
     assert org.calls == [("full", tuple(names), None)]  # all ten, above a budget of one
+
+
+# ---------------------------------------------------------
+# step 4: per-resource schema versions
+# ---------------------------------------------------------
+
+
+def test_a_schema_bump_refetches_only_that_resource():
+    """One resource's bump makes its dataset a first fetch; another dataset in the same run keeps its deltas."""
+    bumped, untouched = paths.DATASETS_DIR / "events_org_all.json", paths.DATASETS_DIR / "rows_org_all.json"
+    org_a, org_b = _Org({"org/a": [_row("org/a", 1, -1)]}), _Org({"org/a": [_row("org/a", 1, -1)]})
+
+    def run(org, path, schema):
+        return fetch_incremental_by_repo(
+            path=path,
+            model_class=_Row,
+            key_of=lambda row: (row.repo, row.number),
+            updated_at_of=lambda row: row.updated_at,
+            repo_of=lambda row: row.repo,
+            list_repos=org.listing,
+            full_fetch=org.full,
+            since_fetch=org.since,
+            schema_version=schema,
+            now=_DAY0,
+        )
+
+    run(org_a, bumped, 1)
+    run(org_b, untouched, 1)
+    run(org_a, bumped, 2)
+    run(org_b, untouched, 1)
+
+    assert [kind for kind, _, _ in org_a.calls] == ["full", "full"]
+    assert [kind for kind, _, _ in org_b.calls] == ["full", "since"]
+    assert _stored(bumped)["schema"] == 2 and _stored(untouched)["schema"] == 1
