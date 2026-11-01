@@ -26,6 +26,7 @@ ISSUES_RESOURCE = OrgIncrementalResource(
     key_of=lambda record: (record.repo, record.number),
     updated_at_of=lambda record: record.updated_at,
     task_desc="issues",
+    refresh_phase=0.0,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 ISSUE_LABEL_EVENTS_RESOURCE = OrgIncrementalResource(
@@ -36,6 +37,7 @@ ISSUE_LABEL_EVENTS_RESOURCE = OrgIncrementalResource(
     key_of=lambda event: (event.repo, event.issue_number, event.event_type, event.occurred_at, event.label),
     updated_at_of=lambda event: event.occurred_at,
     task_desc="issue label events",
+    refresh_phase=0.2,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 

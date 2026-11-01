@@ -283,6 +283,7 @@ def write_snapshot_manifest(
     failures: list[str] | None = None,
     run_id: str | None = None,
     api_usage: dict[str, Any] | None = None,
+    dataset_refresh: dict[str, Any] | None = None,
 ) -> Path:
     """Write the run manifest that makes an archived dataset snapshot self-describing.
 
@@ -297,6 +298,10 @@ def write_snapshot_manifest(
     when given it is recorded under the same key, so the cost of a run is
     archived beside the data it bought. Omitted when not supplied, which keeps
     the manifest unchanged for callers that do not track usage.
+
+    ``dataset_refresh`` (see ``data_sources.dataset_health``) records what each
+    incremental dataset's refresh did: held watermarks, full refreshes, retired
+    repositories, and the health verdict. Omitted when not supplied.
     """
     provenance = resolve_provenance(datasets_dir)
     datasets = [_manifest_entry(dataset) for dataset in _dataset_files(datasets_dir)]
@@ -310,6 +315,8 @@ def write_snapshot_manifest(
     }
     if api_usage is not None:
         manifest["api_usage"] = api_usage
+    if dataset_refresh is not None:
+        manifest["dataset_refresh"] = dataset_refresh
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     logger.info("Wrote snapshot manifest %s (%d dataset(s))", path, len(datasets))

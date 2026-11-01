@@ -14,6 +14,8 @@ from hiero_analytics.config.paths import ensure_org_dirs, ensure_repo_dirs
 from hiero_analytics.data_sources.dataset_store import load_or_fetch
 from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.github_ingest import (
+    CONTRIBUTOR_ACTIVITY_RESOURCE,
+    ISSUE_LABEL_EVENTS_RESOURCE,
     fetch_org_contributor_activity_graphql,
     fetch_org_issue_label_events_graphql,
 )
@@ -77,11 +79,14 @@ def load_contributor_activity(client: GitHubClient, org: str) -> list[Contributo
     Shared across pipelines within a run: whichever pipeline needs it first
     fetches and persists it; the rest read it from disk.
     """
+    # Name and schema come from the resource that writes the file, so a schema
+    # bump there cannot leave this reader missing on every call.
     return load_or_fetch(
-        "contributor_activity",
+        CONTRIBUTOR_ACTIVITY_RESOURCE.name,
         org,
         ContributorActivityRecord,
         lambda: fetch_org_contributor_activity_graphql(client, org=org, lookback_days=None),
+        schema_version=CONTRIBUTOR_ACTIVITY_RESOURCE.schema_version,
     )
 
 
@@ -104,8 +109,9 @@ def load_issue_label_events(
     """
     kwargs = {} if max_workers is None else {"max_workers": max_workers}
     return load_or_fetch(
-        "issue_label_events",
+        ISSUE_LABEL_EVENTS_RESOURCE.name,
         org,
         IssueTimelineEventRecord,
         lambda: fetch_org_issue_label_events_graphql(client, org=org, **kwargs),
+        schema_version=ISSUE_LABEL_EVENTS_RESOURCE.schema_version,
     )

@@ -13,9 +13,19 @@ api/v1/                    the emitted JSON API, exactly as published
   manifest.json
   <org>/<section>.json
 SNAPSHOT.json              the run's provenance: git sha, run id, per-dataset
-                           watermarks and SHA-256s, failed pipelines, and the
-                           run's GitHub API spend (`api_usage`, see api-budget.md)
+                           watermarks and SHA-256s, failed pipelines, the
+                           run's GitHub API spend (`api_usage`, see api-budget.md),
+                           and what each incremental dataset's refresh did
+                           (`dataset_refresh`, see below)
 ```
+
+`dataset_refresh` has a `healthy` verdict, the `problems` that fail the
+workflow's **Check dataset health** job, `warnings`, and per dataset: row counts
+before and after, the repositories fully refreshed (and which of those were
+backfills), deferred by the nightly budget, held (with how many runs in a row)
+or retired, rows lost outside a full refresh, overdue full refreshes, and how
+many runs the dataset has gone without shrinking. The rules are in
+`data_sources/dataset_health.py`.
 
 History lives in the commits, not in dated directories. Each commit message
 carries the lookup keys:

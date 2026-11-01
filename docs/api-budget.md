@@ -53,7 +53,7 @@ Datasets follow one of two paths:
 | Path | Datasets (examples) | Behaviour on an existing dataset |
 | --- | --- | --- |
 | Reused (`load_or_fetch`) | `contributor_activity`, `ci_health`, `onboarding`, the REST `codeowner_and_runner` data | Reused with **no fetch** by a run's later pipelines while the last fetch is under 6 hours old (`DEFAULT_REUSE_MAX_AGE`, measured from `fetched_at`); every new run refetches. |
-| Incremental (`fetch_incremental`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since the watermark **on every run**, regardless of age; a full refetch once the watermark is over 30 days old (`full_refresh_after`). |
+| Incremental (`fetch_incremental_by_repo`) | `issues`, `issue_label_events`, `merged_pr_difficulty`, `releases`, `pr_hip_references` | Fetches records updated since each repository's watermark **on every run**, regardless of age. Each repository is also refetched in full every 30 days (`full_refresh_after`), on its own staggered night, so a night carries about 1/30 of the org's full-fetch cost rather than all of it; a repository with no watermark yet (new to the org) is fetched in full the night it appears. |
 
 So a run's floor is not zero: the incremental datasets are always queried. The
 reuse window only saves the datasets on the first path, and only within one run.
@@ -71,7 +71,11 @@ and only adds round trips. The client requests 100 nodes per page
 answers a query that ran too long with a 502 or 504, pagination halves the page
 (never below `GITHUB_GRAPHQL_MIN_PAGE_SIZE`, default 10), retries the same
 cursor, and doubles back up after three clean pages. Batched rounds shrink
-together, since the round's cost is the sum of its repositories.
+together, since the round's cost is the sum of its repositories. A
+`RESOURCE_LIMITS_EXCEEDED` error in a 200 response is handled the same way, and
+the round's width (repositories per request, `GITHUB_GRAPHQL_BATCH_SIZE`) halves
+with it. Aliases that succeeded in the same response are kept, so a failure
+re-spends only the affected repositories' current page.
 
 ## Measured cost
 
@@ -152,6 +156,33 @@ from nothing:
 
 Its largest dataset was `merged_pr_difficulty` (30 points). Its nightly cost
 will be lower still, so an org of this size is negligible against either token.
+
+### Periodic full refreshes (projected)
+
+Every repository of every org-wide dataset is refetched in full once every 30
+days, on a night chosen for it (#623). A
+full refresh costs a repository's extra pages over the one page its nightly
+delta already pays for, so it only matters for repositories with history.
+Projected from the 2026-11-01 nightly snapshot (1,000 points that night) by
+pricing each extra page at that dataset's own points per repository that
+night. This is an estimate, not a measurement:
+
+| | Extra GraphQL points |
+| --- | ---: |
+| Deploy night (backfills of listed repositories with no rows) | about 155 |
+| Average night | about 160 |
+| Worst night | about 620 |
+| One 30-day window | about 5,000 (about one full fetch of everything) |
+
+The worst nights are each one large repository: `hiero-consensus-node`'s full
+merged-PR history is about 580 points on its own, a floor no schedule can go
+below without splitting one repository's refresh across nights. The stagger
+puts each dataset's largest repositories on the least-loaded nights, and the
+datasets' phases keep an org's largest repositories on different nights (here
+1, 7, 13 and 19). If the job misses nights, at most twice a fair share of a
+dataset's repositories are refreshed per run, most overdue first, until the
+backlog drains. Even the worst night stays far inside one hour of either
+token's budget.
 
 ## Forecast: adding one more organisation
 

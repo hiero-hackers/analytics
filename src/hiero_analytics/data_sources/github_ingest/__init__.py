@@ -64,7 +64,11 @@ from .releases import (
 )
 
 # Every org-wide incrementally fetched resource, by dataset name — the
-# declarative registry the individual fetchers are built from.
+# declarative registry the individual fetchers are built from. Each declares a
+# distinct ``refresh_phase``, evenly spaced over [0, 1): the point of the 30-day
+# refresh window where its largest repositories are fully refetched, so an
+# org's datasets refresh their largest repository (usually the same one) on
+# different nights. A new resource takes a free phase and respaces the others.
 ORG_INCREMENTAL_RESOURCES: dict[str, OrgIncrementalResource] = {
     resource.name: resource
     for resource in (
