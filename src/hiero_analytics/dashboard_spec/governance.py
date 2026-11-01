@@ -224,6 +224,18 @@ CHART_MACRO = {
 # Each section: which CSV it reads and how to render it. Sections appear only when
 # their CSV exists and is non-empty, so governance-only tables are simply absent
 # for orgs without a governance config.
+# Shared column descriptions (deduplicated).
+REPO_NAME_DESC = "The repository name."
+TOTAL_COMMITTERS_DESC = "Total committers with write access to this repository."
+TOTAL_TRIAGE_DESC = "Total users granted the triage role on this repository."
+GOVERNANCE_TEAM_DESC = "The governance team name."
+TEAM_PRS_OPENED_DESC = "Pull requests opened by active team members in the selected period."
+TEAM_REVIEWS_DESC = "Pull request reviews submitted by active team members in the selected period."
+TEAM_MERGES_DESC = "Pull requests merged by active team members in the selected period."
+TEAM_ISSUES_DESC = "Issues opened by active team members in the selected period."
+TEAM_LABELS_DESC = "Labels applied by active team members in the selected period."
+
+
 SECTION_SPECS = [
     {
         "id": "repoactivity",
@@ -247,13 +259,13 @@ SECTION_SPECS = [
                 "committers",
                 "committers",
                 format="number",
-                description="Total committers with write access to this repository.",
+                description=TOTAL_COMMITTERS_DESC,
             ),
             Column(
                 "triage",
                 "triage",
                 format="number",
-                description="Total users granted the triage role on this repository.",
+                description=TOTAL_TRIAGE_DESC,
             ),
             Column(
                 "active_recent",
@@ -304,7 +316,7 @@ SECTION_SPECS = [
             "active maintainers first."
         ),
         "columns": [
-            Column("repo", "repo", description="The repository name."),
+            Column("repo", "repo", description=REPO_NAME_DESC),
             Column(
                 "maintainers",
                 "maintainers",
@@ -321,13 +333,13 @@ SECTION_SPECS = [
                 "committers",
                 "committers",
                 format="number",
-                description="Total committers with write access to this repository.",
+                description=TOTAL_COMMITTERS_DESC,
             ),
             Column(
                 "triage",
                 "triage",
                 format="number",
-                description="Total users granted the triage role on this repository.",
+                description=TOTAL_TRIAGE_DESC,
             ),
         ],
     },
@@ -343,7 +355,7 @@ SECTION_SPECS = [
             "concentration first; repos with under 20 review+merge actions in the selected period are omitted."
         ),
         "columns": [
-            Column("repo", "repo", description="The repository name."),
+            Column("repo", "repo", description=REPO_NAME_DESC),
             Column(
                 "top_carrier",
                 "top carrier",
@@ -415,7 +427,7 @@ SECTION_SPECS = [
             "Days since active always refers to the latest recorded activity."
         ),
         "columns": [
-            Column("repo", "repo", description="The repository name."),
+            Column("repo", "repo", description=REPO_NAME_DESC),
             Column("user", "user", description="A permission-holder's GitHub login."),
             Column("granted_role", "role", description="The governance role this user holds in this repository."),
             Column(
@@ -471,7 +483,7 @@ SECTION_SPECS = [
             "and its active or quiet status. Teams with no activity in that period are listed first."
         ),
         "columns": [
-            Column("team", "team", description="The governance team name."),
+            Column("team", "team", description=GOVERNANCE_TEAM_DESC),
             Column("members", "members", description="Total members of this team."),
             Column("active_members", "active", description="Members with activity within the selected period."),
             Column("status", "status", description="Whether this team is active or quiet in the selected period."),
@@ -481,25 +493,19 @@ SECTION_SPECS = [
                 format="number",
                 description="Days since this team's last recorded activity.",
             ),
-            Column(
-                "prs_opened", "PRs", description="Pull requests opened by active team members in the selected period."
-            ),
+            Column("prs_opened", "PRs", description=TEAM_PRS_OPENED_DESC),
             Column(
                 "reviews_given",
                 "reviews",
-                description="Pull request reviews submitted by active team members in the selected period.",
+                description=TEAM_REVIEWS_DESC,
             ),
             Column(
                 "merges_done",
                 "merges",
-                description="Pull requests merged by active team members in the selected period.",
+                description=TEAM_MERGES_DESC,
             ),
-            Column(
-                "issues_opened", "issues", description="Issues opened by active team members in the selected period."
-            ),
-            Column(
-                "labels_applied", "labels", description="Labels applied by active team members in the selected period."
-            ),
+            Column("issues_opened", "issues", description=TEAM_ISSUES_DESC),
+            Column("labels_applied", "labels", description=TEAM_LABELS_DESC),
         ],
     },
     {
@@ -513,15 +519,23 @@ SECTION_SPECS = [
             "'Roles and recent activity by repo' table, and for individual TSC members, see the TSC table."
         ),
         "columns": [
-            ("team", "team"),
-            ("repo", "repo"),
-            ("members_active", "members active"),
-            ("prs_opened", "PRs"),
-            ("reviews_given", "reviews"),
-            ("merges_done", "merges"),
-            ("issues_opened", "issues"),
-            ("labels_applied", "labels"),
-            ("last_active", "last active"),
+            Column("team", "team", description=GOVERNANCE_TEAM_DESC),
+            Column("repo", "repo", description=REPO_NAME_DESC),
+            Column(
+                "members_active",
+                "members active",
+                description="The number of active team members in the selected period.",
+            ),
+            Column("prs_opened", "PRs", description=TEAM_PRS_OPENED_DESC),
+            Column("reviews_given", "reviews", description=TEAM_REVIEWS_DESC),
+            Column("merges_done", "merges", description=TEAM_MERGES_DESC),
+            Column("issues_opened", "issues", description=TEAM_ISSUES_DESC),
+            Column("labels_applied", "labels", description=TEAM_LABELS_DESC),
+            Column(
+                "last_active",
+                "last active",
+                description="The most recent date this team had activity in the selected period.",
+            ),
         ],
     },
     {
@@ -532,7 +546,7 @@ SECTION_SPECS = [
         "description": "For TSC members with activity, which repos they work in and the role they hold there.",
         "columns": [
             Column("account", "member", description="The TSC member's GitHub login."),
-            Column("repo", "repo", description="The repository name."),
+            Column("repo", "repo", description=REPO_NAME_DESC),
             Column("repo_role", "role here", description="The governance role this member holds in this repository."),
             Column("prs_opened", "PRs", description="Pull requests opened by this member in this repository."),
             Column(
@@ -565,10 +579,10 @@ SECTION_SPECS = [
         "action_url": AFFILIATION_ISSUE_URL,
         "action_label": "Suggest a correction",
         "columns": [
-            ("login", "maintainer"),
-            ("organisation", "organisation"),
-            ("status", "status"),
-            ("method", "method"),
+            Column("login", "maintainer", description="The maintainer's GitHub login."),
+            Column("organisation", "organisation", description="The organisation the maintainer is affiliated with."),
+            Column("status", "status", description="The status of the maintainer's affiliation."),
+            Column("method", "method", description="The method used to determine the maintainer's affiliation."),
         ],
         # Role tabs, not two stacked cards: the populations are disjoint views
         # of one reference table and are read against each other. Both variants
@@ -591,10 +605,12 @@ SECTION_SPECS = [
                     "correction' to open an issue on the analytics repo."
                 ),
                 "columns": [
-                    ("login", "committer"),
-                    ("organisation", "organisation"),
-                    ("status", "status"),
-                    ("method", "method"),
+                    Column("login", "committer", description="The committer's GitHub login."),
+                    Column(
+                        "organisation", "organisation", description="The organisation the committer is affiliated with."
+                    ),
+                    Column("status", "status", description="The status of the committer's affiliation."),
+                    Column("method", "method", description="The method used to determine the committer's affiliation."),
                 ],
             },
         ],
@@ -612,7 +628,7 @@ SECTION_SPECS = [
             "seat ('distinct orgs' = 1) are an organisational bus-factor. Single-employer repos first."
         ),
         "columns": [
-            Column("repo", "repo", description="The repository name."),
+            Column("repo", "repo", description=REPO_NAME_DESC),
             Column(
                 "maintainers",
                 "maintainers",
@@ -667,7 +683,7 @@ SECTION_SPECS = [
                     "single-employer reading against it."
                 ),
                 "columns": [
-                    Column("repo", "repo", description="The repository name."),
+                    Column("repo", "repo", description=REPO_NAME_DESC),
                     Column(
                         "committers",
                         "committers",
@@ -721,16 +737,33 @@ SECTION_SPECS = [
             "on a mostly-unknown team with caution. Most concentrated first."
         ),
         "columns": [
-            ("team", "team"),
-            ("members", "members"),
-            ("resolved", "resolved"),
-            ("distinct_orgs", "distinct orgs"),
-            ("top_org", "largest org"),
-            ("top_org_pct", "largest org %", "percent"),
-            ("hhi", "HHI"),
-            ("unknown", "unknown"),
-            ("single_employer", "single employer"),
-            ("organisations", "organisation mix"),
+            Column("team", "team", description="The governance team."),
+            Column("members", "members", description="The total number of members in the team."),
+            Column("resolved", "resolved", description="The number of members whose employer has been resolved."),
+            Column(
+                "distinct_orgs",
+                "distinct orgs",
+                description="The number of distinct organisations the members are affiliated with.",
+            ),
+            Column("top_org", "largest org", description="The organisation with the most members in the team."),
+            Column(
+                "top_org_pct",
+                "largest org %",
+                format="percent",
+                description="The percentage of members in the team belonging to the largest organisation.",
+            ),
+            Column("hhi", "HHI", description="The Herfindahl-Hirschman Index for organisation concentration."),
+            Column("unknown", "unknown", description="The number of members whose employer could not be determined."),
+            Column(
+                "single_employer",
+                "single employer",
+                description="The number of teams where one employer holds all resolved seats.",
+            ),
+            Column(
+                "organisations",
+                "organisation mix",
+                description="A list of organisations with mapped members in the team.",
+            ),
         ],
     },
 ]

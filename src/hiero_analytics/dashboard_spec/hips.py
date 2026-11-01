@@ -139,13 +139,14 @@ SECTION_SPECS = [
             "they remain visible in the governance board's Approved column."
         ),
         "columns": [
-            Column("hip", "HIP", description="The HIP specification number, e.g., 'HIP-1200'."),
+            Column("hip", "HIP", format="hip", description="The HIP specification number, e.g., 'HIP-1200'."),
             Column(
                 "hip_title", "title", description="The title of the HIP specification as defined in its frontmatter."
             ),
             Column(
                 "hip_status",
                 "spec status",
+                format="status",
                 description="The current status of the HIP: Draft, Review, Last Call, Approved, Accepted, Final, Active, or Retired.",
             ),
             Column(
@@ -168,21 +169,35 @@ SECTION_SPECS = [
             "the cue and the counted flag make each exclusion auditable."
         ),
         "columns": [
-            ("hip", "HIP", "hip"),
-            ("hip_title", "HIP title"),
-            ("repo", "repository"),
-            ("pr_number", "PR"),
-            ("pr_title", "PR title"),
-            ("pr_state", "state"),
-            ("pr_merged_at", "merged", "date"),
-            ("match_sources", "matched in"),
-            ("qualifier", "distancing cue"),
-            ("counted", "counted", "flag"),
+            Column(
+                "hip", "HIP", format="hip", description="The HIP specification number this evidence reference is for."
+            ),
+            Column(
+                "hip_title",
+                "HIP title",
+                description="The title of the HIP specification as defined in its frontmatter.",
+            ),
+            Column("repo", "repository", description="The repository this evidence reference is for."),
+            Column("pr_number", "PR", description="The pull request number that provides evidence for this HIP."),
+            Column(
+                "pr_title", "PR title", description="The title of the pull request providing evidence for this HIP."
+            ),
+            Column("pr_state", "state", description="The state of the pull request."),
+            Column("pr_merged_at", "merged", format="date", description="The date the pull request was merged."),
+            Column("match_sources", "matched in", description="The sources where the HIP reference was matched."),
+            Column("qualifier", "distancing cue", description="The distancing cue used in the reference."),
+            Column("counted", "counted", format="flag", description="Whether the reference is counted."),
             # The coverage matrix's evidence popover reads this, and the
             # description above promises it: declare it so it is part of the
             # API contract rather than an undeclared column riding along.
-            ("snippet", "matched text"),
-            ("url", "link", "link"),
+            Column(
+                "snippet",
+                "matched text",
+                description="A short text excerpt from the PR title, body, or description that matched the HIP reference pattern.",
+            ),
+            Column(
+                "url", "link", format="link", description="A link to the pull request providing evidence for this HIP."
+            ),
         ],
     },
     {

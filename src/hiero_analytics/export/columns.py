@@ -92,3 +92,20 @@ def column_spec(column: Any) -> dict[str, Any]:
     if description:
         spec["description"] = description
     return spec
+
+
+def column_key(column: Any) -> str:
+    """Return the stable key of a column declaration.
+
+    Mirrors :func:`column_spec`: a ``Column`` instance exposes ``.key``
+    directly, while tuple/list declarations carry it in position 0. Any other
+    object exposing a ``key`` attribute is also accepted. This is the single
+    normalizer callers should use instead of repeating the
+    ``column.key if isinstance(column, Column) else column[0]`` idiom.
+    """
+    key = getattr(column, "key", None)
+    if key is not None:
+        return key
+    if isinstance(column, (tuple, list)) and len(column) > 0:
+        return column[0]
+    raise TypeError(f"expected a Column or a non-empty tuple/list, got {type(column).__name__}")

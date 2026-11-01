@@ -196,7 +196,7 @@ export function DataTable({
                       data-print-hide
                       className={cn(
                         'group/sort -mx-2 h-7 px-2 font-medium text-inherit hover:bg-background/70',
-                        numeric && 'flex-row-reverse',
+                        'flex-row-reverse',
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -206,7 +206,7 @@ export function DataTable({
                       </span>
                       {/* Always an icon, so sorting never shifts the column. */}
                       <SortIcon
-                        data-icon={numeric ? 'inline-start' : 'inline-end'}
+                        data-icon="inline-start"
                         aria-hidden="true"
                         className={cn(
                           'transition-opacity',

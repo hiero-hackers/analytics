@@ -117,6 +117,7 @@ SECTION_SPECS = [
             Column(
                 "staleness_bucket",
                 "pace",
+                format="staleness",
                 description="Staleness category: on pace (1x typical gap), watch (1-3x typical gap), overdue (3x+), never released, or not enough history to judge. This is a relative signal based on the repo's release history.",
             ),
         ],

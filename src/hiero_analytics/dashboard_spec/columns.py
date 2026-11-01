@@ -5,6 +5,6 @@ can depend on it without circular imports. Family modules should import
 them from `hiero_analytics.dashboard_spec.columns`.
 """
 
-from hiero_analytics.export.columns import Column, column_spec  # type: ignore[no-redef]
+from hiero_analytics.export.columns import Column, column_key, column_spec  # type: ignore[no-redef]
 
-__all__ = ["Column", "column_spec"]
+__all__ = ["Column", "column_key", "column_spec"]
