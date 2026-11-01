@@ -26,6 +26,16 @@ from .models import DependencyManifestRecord, RunnerRecord, SbomCoverageRecord
 
 logger = logging.getLogger(__name__)
 
+
+class SbomNotReadyError(RuntimeError):
+    """GitHub was still generating a repository's SBOM when polling ran out.
+
+    Raised (rather than returned as an ``"error"`` row) so the org-wide fan-out
+    in ``fetch_org_sbom_data`` retries the repository; only if it is still
+    pending after that retry does the repository become an ``"error"`` row.
+    """
+
+
 GITHUB_HOSTED_PATTERNS = [
     r"^ubuntu-.*",
     r"^windows-.*",
@@ -175,7 +185,9 @@ def _sbom_error(repo: str) -> tuple[SbomCoverageRecord, list[DependencyManifestR
     return SbomCoverageRecord(repo=repo, status="error", package_count=0), []
 
 
-def _parse_sbom_document(repo: str, payload: object) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
+def _parse_sbom_document(
+    org: str, repo: str, payload: object
+) -> tuple[SbomCoverageRecord, list[DependencyManifestRecord]]:
     """Parse a downloaded SPDX document into a coverage row and dependency records.
 
     Accepts the document either enveloped (``{"sbom": {...}}``, the shape the
@@ -191,12 +203,12 @@ def _parse_sbom_document(repo: str, payload: object) -> tuple[SbomCoverageRecord
         elif "packages" in payload or "spdxVersion" in payload:
             sbom = payload
     if not isinstance(sbom, dict):
-        logger.error("Malformed SBOM response for %s", repo)
+        logger.error("Malformed SBOM response for %s/%s", org, repo)
         return _sbom_error(repo)
 
     raw_packages = sbom.get("packages")
     if raw_packages is not None and not isinstance(raw_packages, list):
-        logger.error("Malformed SBOM package list for %s", repo)
+        logger.error("Malformed SBOM package list for %s/%s", org, repo)
         return _sbom_error(repo)
     packages = raw_packages or []
     described_ids = set(sbom.get("documentDescribes") or [])
@@ -236,7 +248,8 @@ def _fetch_repo_sbom_uncached(
     being built and redirects to the SPDX download once it is ready (``requests``
     follows the redirect). Polling is bounded by ``max_poll_attempts`` with
     ``poll_interval_seconds`` between attempts; a report that is still pending
-    after the last attempt is reported as ``"error"``.
+    after the last attempt raises :class:`SbomNotReadyError` so the org-wide
+    fan-out retries it (and reports ``"error"`` only if it is still pending).
 
     Only a 404 on generation counts as ``"disabled"`` (dependency graph off for
     this repo) -- the same 404-vs-error contract ``has_codeowners_file``/
@@ -293,13 +306,13 @@ def _fetch_repo_sbom_uncached(
             logger.error("SBOM response for %s/%s is not valid JSON", org, repo)
             return _sbom_error(repo)
 
-        coverage, records = _parse_sbom_document(repo, payload)
+        coverage, records = _parse_sbom_document(org, repo, payload)
         if coverage.status == "ok":
             logger.info("SBOM fetched for %s/%s: %d dependency packages", org, repo, len(records))
         return coverage, records
 
     logger.error("SBOM for %s/%s not ready after %d attempts", org, repo, max_poll_attempts)
-    return _sbom_error(repo)
+    raise SbomNotReadyError(f"SBOM for {org}/{repo} not ready after {max_poll_attempts} polling attempts")
 
 
 def _is_self_hosted(label: str) -> bool | None:

@@ -13,7 +13,9 @@ from unittest.mock import Mock
 import pytest
 import requests
 
+from hiero_analytics.config.github import SBOM_POLL_MAX_ATTEMPTS
 from hiero_analytics.data_sources.github_rest import (
+    SbomNotReadyError,
     _is_self_hosted,
     _parse_purl,
     _process_workflow_file,
@@ -271,16 +273,15 @@ def test_fetch_repo_sbom_polls_while_202_then_succeeds(no_sleep):
     assert records[0].ecosystem == "pypi"
 
 
-def test_fetch_repo_sbom_reports_error_when_polling_is_exhausted(no_sleep):
-    """A report that never becomes ready ends as 'error' after a bounded number of requests."""
+def test_fetch_repo_sbom_raises_when_polling_is_exhausted(no_sleep):
+    """A report that never becomes ready raises (so the org fan-out retries) after a bounded number of requests."""
     client = _sbom_client(*[_report_response(status_code=202) for _ in range(3)])
 
-    coverage, records = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=3, poll_interval_seconds=1.0)
+    with pytest.raises(SbomNotReadyError):
+        fetch_repo_sbom(client, "org", "repo", max_poll_attempts=3, poll_interval_seconds=1.0)
 
     assert client.get_response.call_count == 3
     assert no_sleep.call_count == 2  # no pointless wait after the final attempt
-    assert coverage == SbomCoverageRecord(repo="repo", status="error", package_count=0)
-    assert records == []
 
 
 def test_fetch_repo_sbom_skips_packages_without_a_parseable_purl(no_sleep):
@@ -423,6 +424,43 @@ def test_fetch_org_sbom_data_retries_http_failures(no_sleep):
     assert len(packages) == 1
 
 
+def test_fetch_org_sbom_data_retries_a_report_that_was_not_ready(no_sleep):
+    """A repo whose report is still pending after the first polling round is retried by the org fan-out."""
+    client = Mock()
+    client.get.return_value = {"sbom_url": REPORT_URL}
+    pending = [_report_response(status_code=202) for _ in range(SBOM_POLL_MAX_ATTEMPTS)]
+    client.get_response.side_effect = [*pending, _ok_report("pkg:npm/left-pad@1.0.0")]
+
+    coverage, packages = fetch_org_sbom_data(client, "org", ["repo"], max_workers=1)
+
+    assert client.get.call_count == 2  # generated again on the retry
+    assert client.get_response.call_count == SBOM_POLL_MAX_ATTEMPTS + 1
+    assert coverage == [SbomCoverageRecord(repo="repo", status="ok", package_count=1)]
+    assert [p.package_name for p in packages] == ["left-pad"]
+
+
+def test_fetch_org_sbom_data_reports_error_when_a_report_never_becomes_ready(no_sleep):
+    """If the report is still pending after the retry, the repo is an 'error' row and others are unaffected."""
+
+    def fake_get(url):
+        repo = url.split("/")[5]
+        return {"sbom_url": f"https://api.github.com/repos/org/{repo}/dependency-graph/sbom/fetch-report/x"}
+
+    def fake_get_response(url):
+        if "/repo-slow/" in url:
+            return _report_response(status_code=202)
+        return _ok_report("pkg:npm/left-pad@1.0.0")
+
+    client = Mock()
+    client.get.side_effect = fake_get
+    client.get_response.side_effect = fake_get_response
+
+    coverage, packages = fetch_org_sbom_data(client, "org", ["repo-fast", "repo-slow"], max_workers=1)
+
+    assert {c.repo: c.status for c in coverage} == {"repo-fast": "ok", "repo-slow": "error"}
+    assert [p.repo for p in packages] == ["repo-fast"]
+
+
 # -- SBOM TTL caching ----------------------------------------------------------
 
 
@@ -552,14 +590,14 @@ def test_fetch_repo_sbom_does_not_cache_propagated_http_errors():
 
 
 def test_fetch_repo_sbom_does_not_cache_exhausted_polling(no_sleep):
-    """A report that never became ready is an error and is fetched again next time."""
+    """A report that never became ready writes nothing; the next call fetches again."""
     client = _sbom_client(_report_response(status_code=202), _ok_report("pkg:npm/left-pad@1.0.0"))
 
-    first_coverage, _ = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=1)
-    second_coverage, _ = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=1)
+    with pytest.raises(SbomNotReadyError):
+        fetch_repo_sbom(client, "org", "repo", max_poll_attempts=1)
+    coverage, _ = fetch_repo_sbom(client, "org", "repo", max_poll_attempts=1)
 
-    assert first_coverage.status == "error"
-    assert second_coverage.status == "ok"
+    assert coverage.status == "ok"
     assert client.get.call_count == 2
 
 
