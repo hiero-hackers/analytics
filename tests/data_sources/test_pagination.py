@@ -40,17 +40,18 @@ def test_paginate_cursor_single_page():
 
 
 def test_paginate_cursor_max_pages_guard():
-    """Test that max_pages stops infinite cursor pagination."""
+    """max_pages stops a cursor that keeps advancing, after that many pages."""
 
-    def fetch(_cursor, _page_size):
-        return ([1], "next", True)
+    def fetch(cursor, _page_size):
+        page_no = 0 if cursor is None else int(cursor)
+        return ([page_no], str(page_no + 1), True)
 
     results = pagination.paginate_cursor(
         fetch,
         max_pages=2,
     )
 
-    assert len(results) == 2
+    assert results == [0, 1]
 
 
 def test_paginate_cursor_handles_empty_items():
@@ -63,6 +64,163 @@ def test_paginate_cursor_handles_empty_items():
     results = pagination.paginate_cursor(fetch)
 
     assert results == []
+
+
+# ---------------------------------------------------------
+# stalled cursors
+# ---------------------------------------------------------
+
+
+@pytest.mark.parametrize("next_cursor", [None, "", 5])
+def test_paginate_cursor_raises_when_the_cursor_does_not_advance(next_cursor):
+    """A claimed next page with no usable cursor retries once and raises, instead of running to max_pages."""
+    calls = []
+
+    def fetch(cursor, _page_size):
+        calls.append(cursor)
+        return ([1], next_cursor, True)
+
+    with pytest.raises(pagination.CursorStalledError, match="did not advance"):
+        pagination.paginate_cursor(fetch, max_pages=50)
+
+    assert calls == [None, None]
+
+
+def test_paginate_cursor_raises_when_a_later_page_repeats_its_cursor():
+    """A cursor that advances once and then repeats raises, instead of appending that page forever."""
+    calls = []
+
+    def fetch(cursor, _page_size):
+        calls.append(cursor)
+        if cursor is None:
+            return ([1], "A", True)
+        return ([2], "A", True)
+
+    with pytest.raises(pagination.CursorStalledError, match=r"cursor='A'"):
+        pagination.paginate_cursor(fetch)
+
+    assert calls == [None, "A", "A"]
+
+
+def test_paginate_cursor_retries_a_repeated_cursor_without_keeping_duplicate_items(caplog):
+    """One repeated cursor is fetched again; the stalled response's items are not appended."""
+    attempts = {"A": 0}
+
+    def fetch(cursor, _page_size):
+        if cursor is None:
+            return ([1, 2], "A", True)
+        attempts["A"] += 1
+        if attempts["A"] == 1:
+            return ([1, 2], "A", True)
+        return ([3], None, False)
+
+    with caplog.at_level(logging.WARNING, logger=pagination.logger.name):
+        results = pagination.paginate_cursor(fetch)
+
+    assert results == [1, 2, 3]
+    assert attempts["A"] == 2
+    assert sum("retrying the same page" in record.getMessage() for record in caplog.records) == 1
+
+
+def test_paginate_cursor_retries_a_missing_cursor_then_continues():
+    """A first page that claims a successor but omits the cursor succeeds when the retry supplies one."""
+    calls = []
+
+    def fetch(cursor, _page_size):
+        calls.append(cursor)
+        if cursor is None and len(calls) == 1:
+            return ([1], None, True)
+        if cursor is None:
+            return ([1], "A", True)
+        return ([2], None, False)
+
+    assert pagination.paginate_cursor(fetch) == [1, 2]
+    assert calls == [None, None, "A"]
+
+
+def test_paginate_cursor_allows_one_stall_on_each_page():
+    """The retry budget is per stalled page, so a later hiccup also self-heals."""
+    seen: dict[str | None, int] = {}
+
+    def fetch(cursor, _page_size):
+        seen[cursor] = seen.get(cursor, 0) + 1
+        if cursor is None:
+            if seen[None] == 1:
+                return ([1], None, True)
+            return ([1], "A", True)
+        if seen["A"] == 1:
+            return ([2], "A", True)
+        return ([2], None, False)
+
+    assert pagination.paginate_cursor(fetch) == [1, 2]
+    assert seen == {None: 2, "A": 2}
+
+
+def test_paginate_cursor_retries_a_stall_at_the_same_page_size():
+    """A stall is not a server error: the retry asks for the same page size."""
+    calls = []
+
+    def fetch(cursor, page_size):
+        calls.append((cursor, page_size))
+        if len(calls) == 1:
+            return ([1], None, True)
+        if cursor is None:
+            return ([1], "A", True)
+        return ([2], None, False)
+
+    assert pagination.paginate_cursor(fetch, page_size=80, min_page_size=10) == [1, 2]
+    assert calls == [(None, 80), (None, 80), ("A", 80)]
+
+
+def test_paginate_cursor_start_cursor_must_advance():
+    """start_cursor is the cursor actually sent, so echoing it is a stall, not the first page."""
+    calls = []
+
+    def fetch(cursor, _page_size):
+        calls.append(cursor)
+        if len(calls) == 1:
+            return ([1], "seed", True)
+        if len(calls) == 2:
+            return ([2], "next", True)
+        return ([3], None, False)
+
+    results = pagination.paginate_cursor(fetch, start_cursor="seed")
+
+    assert calls == ["seed", "seed", "next"]
+    assert results == [2, 3]
+
+
+def test_paginate_cursor_stall_does_not_count_as_a_clean_page():
+    """A discarded stall is not one of the successes that grow the page size back."""
+    calls = []
+
+    def fetch(cursor, page_size):
+        calls.append((cursor, page_size))
+        if len(calls) == 1:
+            raise GitHubServerError("502")
+        if cursor is None and len(calls) == 2:
+            return ([1], None, True)
+        if cursor is None:
+            return ([1], "A", True)
+        nxt = {"A": "B", "B": "C", "C": None}[cursor]
+        return ([1], nxt, nxt is not None)
+
+    pagination.paginate_cursor(fetch, page_size=100, min_page_size=10)
+
+    # The 502 shrinks to 50. The stall is retried at 50 and does not count, so
+    # recovery to 100 waits for three accepted pages after that retry.
+    assert [size for _cursor, size in calls] == [100, 50, 50, 50, 50, 100]
+
+
+def test_paginate_cursor_accepts_a_last_page_whose_cursor_does_not_advance():
+    """A repeated cursor ends the fetch when the API says there is no next page."""
+
+    def fetch(cursor, _page_size):
+        if cursor is None:
+            return ([1], "A", True)
+        return ([2], "A", False)
+
+    assert pagination.paginate_cursor(fetch) == [1, 2]
 
 
 # ---------------------------------------------------------

@@ -7,6 +7,7 @@ import pytest
 
 import hiero_analytics.data_sources.github_ingest as ingest
 from hiero_analytics.data_sources.models import ContributorActivityRecord, RepositoryRecord
+from hiero_analytics.data_sources.pagination import CursorStalledError
 
 
 @pytest.fixture
@@ -376,6 +377,37 @@ def test_pull_request_reviews_paginate_across_pages(mock_client, caplog):
     assert mock_client.graphql.call_args_list[1].args[1]["number"] == 7
     assert mock_client.graphql.call_args_list[2].args[1]["cursor"] == "c2"
     assert "review history truncated" not in caplog.text
+
+
+def test_stalled_review_cursor_raises_instead_of_truncating(mock_client):
+    """A follow-up review page that repeats the cursor it was sent raises.
+
+    The main query already consumed that cursor, so echoing it is not another
+    page. The review-page cap must not turn the stall into a silently truncated
+    review list.
+    """
+    ts = _to_iso(datetime.now(UTC) - timedelta(hours=5))
+    calls = {"n": 0}
+
+    def graphql(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] > 3:
+            raise AssertionError("review pagination did not stop")
+        if calls["n"] == 1:
+            return _pr_page(
+                {
+                    "pageInfo": {"hasNextPage": True, "endCursor": "c1"},
+                    "nodes": [_review("r1", ts)],
+                }
+            )
+        return _reviews_page([_review("r2", ts)], True, "c1")
+
+    mock_client.graphql.side_effect = graphql
+
+    with pytest.raises(CursorStalledError, match="did not advance"):
+        ingest.contributors._fetch_repo_pull_request_activity_graphql(mock_client, "org", "repo", None)
+
+    assert calls["n"] == 3
 
 
 def test_pull_request_reviews_single_page_makes_no_follow_up(mock_client):

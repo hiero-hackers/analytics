@@ -70,12 +70,10 @@ def _fetch_remaining_reviews(
         )
         return extract_graphql_cursor_page(data, ["repository", "pullRequest", "reviews"])
 
-    # paginate_cursor always starts from a None cursor, so seed the first
-    # call with the cursor where the main query left off.
-    def seeded(page_cursor: str | None, page_size: int) -> tuple[list[dict], str | None, bool]:
-        return page(page_cursor if page_cursor is not None else cursor, page_size)
-
-    return paginate_cursor(seeded, max_pages=_MAX_REVIEW_PAGES)
+    # The main query already consumed the page at ``cursor``. Pass it as the
+    # start cursor so the stall check compares against the cursor that is sent,
+    # not against the paginator's default of None.
+    return paginate_cursor(page, max_pages=_MAX_REVIEW_PAGES, start_cursor=cursor)
 
 
 def _merge_remaining_reviews(
