@@ -333,7 +333,7 @@ def _as_of(ws: Workspace, rel: str, fallback: str) -> str:
 
 
 class UnknownIdError(Exception):
-    """An id given to ``doc`` or ``sources`` names nothing in the manifest (the message says why)."""
+    """An id given to ``sources`` names nothing in the manifest (the message says why)."""
 
 
 def _document_source(kind: str, ref: dict, ws: Workspace, fallback: str) -> dict:
@@ -523,7 +523,7 @@ def cmd_sources(org: str, idents: list[str], work: Path, start: int, base: str, 
 
 
 ID_FORMS = """\
-ID forms (the same for doc and sources):
+ID forms for sources:
   understaffed                 a section id
   maintainer-pipeline          a card id: every variant of every chart on it
   maintainer_pipeline_yearly   a chart document id: cited as its card plus the variant
