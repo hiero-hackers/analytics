@@ -25,8 +25,7 @@ before and after, the repositories fully refreshed (and which of those were
 backfills), deferred by the nightly budget, held (with how many runs in a row)
 or retired, rows lost outside a full refresh, overdue full refreshes, and how
 many runs the dataset has gone without shrinking. The rules are in
-`data_sources/dataset_health.py`; the design is in
-[dataset-store-refresh-plan.md](dataset-store-refresh-plan.md).
+`data_sources/dataset_health.py`.
 
 History lives in the commits, not in dated directories. Each commit message
 carries the lookup keys:

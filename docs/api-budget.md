@@ -160,7 +160,7 @@ will be lower still, so an org of this size is negligible against either token.
 ### Periodic full refreshes (projected)
 
 Every repository of every org-wide dataset is refetched in full once every 30
-days, on a night chosen for it (#623, `docs/dataset-store-refresh-plan.md`). A
+days, on a night chosen for it (#623). A
 full refresh costs a repository's extra pages over the one page its nightly
 delta already pays for, so it only matters for repositories with history.
 Projected from the 2026-11-01 nightly snapshot (1,000 points that night) by

@@ -142,7 +142,7 @@ Fetching is **incremental** and has two persistence layers, by design:
   it is gone. Reuse is bounded (`load_or_fetch` refuses data older than a few hours).
   Both stores fail safe: a corrupt file is a cache miss. Each resource declares a
   record `schema_version`, and bumping it invalidates that resource's dataset only.
-  See `docs/dataset-store-refresh-plan.md`.
+  The `dataset_store` and `dataset_health` module docstrings have the details.
 
 `run_all` executes the default pipelines in order, isolating failures (one bad
 pipeline can't sink the run; CI still sees a non-zero exit), then emits the data
