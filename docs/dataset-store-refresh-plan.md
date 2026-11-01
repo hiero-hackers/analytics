@@ -231,9 +231,33 @@ Tests:
   `fetch_org_issues_graphql`, batched engine and store, and covers #623's (a) to (d)
   plus a retirement.
 
-Still to do for the PR note: a dry run of the planner against the latest nightly
-snapshot (`seed-datasets`, offline), printing the per-night full-refresh schedule and
-estimated points. It needs the snapshot artifact, which takes a token.
+**Dry run against production data** (2026-11-01, nightly run 41259245903 at
+`36655bb`, all three orgs, 13 per-repo datasets, about 460,000 rows). Read-only: the
+snapshot was seeded into a scratch directory, and each org was listed without the
+cache.
+
+- **Every dataset migrates in place.** Each one loads and seeds, so no cold fetch
+  happens on deploy night.
+- **Backfills on deploy night** are listed repos with no rows in that dataset: 2 to 5
+  per hiero-ledger dataset (for example `hiero-identity-standards`,
+  `solo-build-actions`), 6 to 17 for hiero-hackers, 0 to 4 for LFDT-CLPR.
+- **Retirements: two repos.** `hiero-hackers/clpr-evm-endpoint` and
+  `hiero-hackers/clpr-smart-contracts` were transferred to LFDT-CLPR. The lookup
+  confirms both are gone, so their 2 merged-PR rows and 7 contributor-activity rows
+  leave hiero-hackers' totals. No rows are filed under another owner.
+- **`solo-charts`** has 47 label-event rows, the figure in #623. Its seeded first full
+  refresh falls on night 15.
+- **Scheduled refreshes by repo count:** at most 4 per night per dataset, about 1.4 on
+  average.
+- **By size, the nights are uneven.** Repos differ by orders of magnitude, so one
+  night refreshes 40% of `contributor_activity`'s rows (`hiero-consensus-node`,
+  `heka-identity-platform`, `hiero-sdk-python` and `solo-containers` together), and
+  another 29% of `issue_label_events`.
+- **Estimated extra cost.** Points per repo page come from that night's own
+  `api_usage` (1,000 points in total). Each due repo adds about (pages - 1) of them:
+  about 160 points a night on average, about 5,000 across the window (about one full
+  fetch of everything, as expected), and 600 to 670 on the three worst nights. That is
+  well within a 5,000-points-an-hour PAT, but lumpy. 3.C weights the stagger by size.
 
 ### C. Staggered `last_full_at` self-heal (PR 3)
 
@@ -254,6 +278,13 @@ first window, each repo exactly once. 60 cold-fetched repos, at most 6 a night. 
 
 What remains for PR 3:
 
+- **Size-aware seeding.** The dry run shows a hash spreads repos evenly but not
+  *work*: a night that draws two of the largest repos carries 40% of a dataset. Seed
+  instead by greedy assignment, largest repo first, to the night with the least
+  estimated pages so far (deterministic, still per resource and org). Everything after
+  the first window keeps that spacing. `hiero-consensus-node` alone is 25 to 30% of
+  some datasets, a floor no schedule can go below without splitting one repo's refresh
+  across nights.
 - **A nightly budget**: at most `ceil(2 * repos / N)` scheduled refreshes per
   (resource, org), most overdue first. Backfills are not budgeted, because they are the
   only way to get the data. This is the backstop for missed nights (a cache eviction,
