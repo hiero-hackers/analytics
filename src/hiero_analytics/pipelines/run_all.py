@@ -34,6 +34,7 @@ from pathlib import Path
 from hiero_analytics.config import orgs as org_registry
 from hiero_analytics.config import paths
 from hiero_analytics.config.logging_config import setup_logging
+from hiero_analytics.data_sources import dataset_health
 from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets
 from hiero_analytics.data_sources.github_ingest import fetch_org_login
 from hiero_analytics.data_sources.usage import render_usage_markdown, usage_scope
@@ -196,6 +197,37 @@ def _append_step_summary(markdown: str) -> None:
         logger.warning("Could not write the job summary to %s", target, exc_info=True)
 
 
+def _set_step_output(name: str, value: str) -> None:
+    """Set an output of the current Actions step, when running in Actions.
+
+    ``GITHUB_OUTPUT`` names the file Actions reads step outputs from; outside
+    Actions it is unset and this does nothing.
+    """
+    target = os.getenv("GITHUB_OUTPUT", "").strip()
+    if not target:
+        return
+    try:
+        with Path(target).open("a", encoding="utf-8") as handle:
+            handle.write(f"{name}={value}\n")
+    except OSError:
+        logger.warning("Could not write the step output %s to %s", name, target, exc_info=True)
+
+
+def _report_dataset_health(dataset_refresh: dict) -> None:
+    """Log the dataset health verdict and hand it to the workflow's health-check job.
+
+    Deliberately not a failure of this run: failing here would skip the
+    workflow's "Save incremental datasets" and throw away the night's progress,
+    which is how a fetch that keeps failing used to fail every night. The
+    workflow's ``dataset-health`` job fails the run instead, after the save.
+    """
+    for problem in dataset_refresh["problems"]:
+        logger.error("Dataset health: %s", problem)
+    for warning in dataset_refresh["warnings"]:
+        logger.warning("Dataset health: %s", warning)
+    _set_step_output("dataset_health", "ok" if dataset_refresh["healthy"] else "fail")
+
+
 def _write_usage_step_summary(api_usage: dict) -> None:
     """Append the API usage table to the Actions job summary."""
     _append_step_summary(render_usage_markdown(api_usage))
@@ -244,6 +276,7 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     """
     setup_logging()
     reset_api_usage()  # each run reports only its own spend
+    dataset_health.forget()  # ...and only its own dataset refreshes
 
     orgs = _rendered_orgs()
     logger.info("Rendering %d org(s): %s", len(orgs), ", ".join(orgs))
@@ -313,9 +346,14 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     # The run's API spend rides in the same manifest, and the job summary renders
     # that same dict, so the two cannot disagree.
     api_usage = api_usage_summary()
+    dataset_refresh = dataset_health.summary(dataset_health.recorded())
+    _report_dataset_health(dataset_refresh)
     try:
         write_snapshot_manifest(
-            paths.DATASETS_DIR / SNAPSHOT_MANIFEST_NAME, failures=list(failures), api_usage=api_usage
+            paths.DATASETS_DIR / SNAPSHOT_MANIFEST_NAME,
+            failures=list(failures),
+            api_usage=api_usage,
+            dataset_refresh=dataset_refresh,
         )
     except Exception:
         logger.exception("Could not write the snapshot manifest")
@@ -339,6 +377,7 @@ def main(*, fail_fast: bool = False, strict: bool = False) -> None:
     # SNAPSHOT.json report identical figures. (The data API re-renders local
     # datasets and makes no GitHub requests of its own.)
     _write_usage_step_summary(api_usage)
+    _append_step_summary(dataset_health.render_markdown(dataset_refresh))
     _append_step_summary(render_failures_markdown(failures, tolerated=not blocking))
 
     if blocking:

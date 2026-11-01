@@ -698,3 +698,65 @@ def test_main_is_silent_about_left_out_orgs_when_the_registry_is_rendered(monkey
     with caplog.at_level("INFO", logger="hiero_analytics.pipelines.run_all"):
         run_all.main()
     assert not [r for r in caplog.records if "leaves out registered org" in r.getMessage()]
+
+
+# ---------------------------------------------------------
+# dataset refresh record and health verdict (#623)
+# ---------------------------------------------------------
+
+
+def _held_three_runs(**_kwargs):
+    from hiero_analytics.data_sources.dataset_health import DatasetRefresh, record
+
+    record(DatasetRefresh(dataset="issues_org_all", rows_before=5, rows_after=5, held={"org/a": 3}))
+
+
+def test_an_unhealthy_dataset_is_reported_but_does_not_fail_the_run(monkeypatch, main_env, tmp_path):
+    """The verdict reaches the manifest, the job summary and the step output; the run itself still succeeds.
+
+    Failing here would skip the workflow's dataset save; the separate dataset-health job fails the run instead.
+    """
+    _use(monkeypatch, _pipeline("p", _held_three_runs))
+    summary, outputs = tmp_path / "summary.md", tmp_path / "outputs"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    monkeypatch.setenv("GITHUB_OUTPUT", str(outputs))
+
+    run_all.main()  # no SystemExit
+
+    block = _manifest(main_env)["dataset_refresh"]
+    assert block["healthy"] is False
+    assert block["problems"] == ["issues_org_all: org/a has been held for 3 runs in a row"]
+    assert "## Dataset refresh" in summary.read_text(encoding="utf-8")
+    assert outputs.read_text(encoding="utf-8") == "dataset_health=fail\n"
+
+
+def test_a_healthy_run_reports_ok_to_the_workflow(monkeypatch, main_env, tmp_path):
+    """Nothing held, lost or overdue: the dataset-health job gets ok."""
+    outputs = tmp_path / "outputs"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(outputs))
+    _use(monkeypatch, _pipeline("p"))
+
+    run_all.main()
+
+    assert outputs.read_text(encoding="utf-8") == "dataset_health=ok\n"
+    assert _manifest(main_env)["dataset_refresh"] == {"healthy": True, "problems": [], "warnings": [], "datasets": {}}
+
+
+def test_refreshes_recorded_before_the_run_do_not_leak_into_its_verdict(monkeypatch, main_env):
+    """Like the API spend, the verdict covers only this run."""
+    _held_three_runs()
+    _use(monkeypatch, _pipeline("p"))
+
+    run_all.main()
+
+    assert _manifest(main_env)["dataset_refresh"]["healthy"] is True
+
+
+def test_the_step_output_is_skipped_outside_actions(monkeypatch, main_env, tmp_path):
+    """Without GITHUB_OUTPUT (a local run) the verdict is only logged and archived."""
+    monkeypatch.delenv("GITHUB_OUTPUT", raising=False)
+    _use(monkeypatch, _pipeline("p", _held_three_runs))
+
+    run_all.main()
+
+    assert not (tmp_path / "outputs").exists()

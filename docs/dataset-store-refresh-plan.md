@@ -1,8 +1,7 @@
 # Dataset store: self-heal, per-repo state, and fetch salvage
 
-Status: proposed for #623, 2026-11-01. Sections 3.A to 3.D (PRs 1 to 4) are
-implemented on `fix/623-dataset-store-self-heal`; 3.E is the plan for the PR that
-follows. Kept as the design record, like `fetch-hardening-plan.md`.
+Status: #623, 2026-11-01. Sections 3.A to 3.E (PRs 1 to 5) are implemented on
+`fix/623-dataset-store-self-heal`. Kept as the design record, like `fetch-hardening-plan.md`.
 
 ## 1. What is wrong
 
@@ -341,28 +340,44 @@ reads the new records with the old model:
 
 ### E. Held watermarks, health gate, plausibility (PR 5)
 
-- **Recording.** `fetch_incremental` records each dataset's outcome (held repos,
-  consecutive holds, full-refreshed repos, retired repos, records added and removed)
-  in a per-process registry, like `touched_datasets`. `write_snapshot_manifest` adds
-  it to `SNAPSHOT.json`, and the job summary gets a "Held watermarks" table.
-- **Failing loudly without losing data.** If the pipeline step failed on a hold, CI
-  would skip `Save incremental datasets` and throw away the night's progress, which
-  is the loop this issue is about. So the pipeline step stays green on holds. A
-  separate `dataset-health` job after `refresh-data` reads the archived `SNAPSHOT.json`
-  and fails when any repo has 3 or more consecutive holds (configurable). The data is
-  saved, the dashboard deploys, and the run is red.
-- **Plausibility.** The gate also fails when:
-  - a dataset shrinks by more than 5% in a run that neither full-refreshed nor retired
-    the repos that lost rows. A delta merge cannot remove rows, so this means
-    corruption.
-  - a repo's `last_full_at` is older than `full_refresh_after` + 7 days. That is the
-    invariant the self-heal guarantees, and the direct form of "grew monotonically for
-    30 runs".
+**Recording.** Each incremental fetch, single-file or per repo, records a
+`DatasetRefresh` in `data_sources/dataset_health.py`, a per-process record like
+`touched_datasets`. It holds:
 
-  Monotonic growth itself is shown as a warning, not a failure. Event datasets
-  (`contributor_activity`, `issue_label_events`) are append-only, and a healthy
-  `issues` dataset grows on net through any night with more new issues than
-  deletions. As a failing check it would cry wolf.
+- row counts before and after;
+- the repos fully refreshed, and which of those were backfills;
+- deferred, held (with consecutive-hold counts) and retired repos;
+- rows lost outside a full refresh, and overdue refreshes;
+- the dataset's no-shrink streak.
+
+`run_all` clears the record at the start of a run. It writes the record as
+`dataset_refresh` in `SNAPSHOT.json`, adds a "Dataset refresh" section to the job
+summary, and sets the step output `dataset_health=ok|fail`. Hold counts travel in
+the per-repo state (`holds`). The streak, and a hold count for single-file datasets,
+travel in an additive `health` key in the dataset file.
+
+**Failing loudly without losing data.** The pipeline step never fails on dataset
+health. Failing there would skip `Save incremental datasets` and throw away the
+night's progress, which is the every-night loop this issue started from. Instead a
+`dataset-health` job, after `refresh-data`, fails the run when the output is not
+`ok`, including when it is missing. The data is saved, the dashboard deploys, the
+run is red, and the summary and manifest say why.
+
+**What fails the check:**
+
+- a repo held for 3 runs in a row (`HOLD_FAIL_AFTER`);
+- rows lost by a repo that was neither fully refreshed nor retired. A delta merge
+  only adds or updates rows, so this means the upsert identity is wrong, for
+  example keys that collide across repos (tested exactly that way);
+- a repo whose last full refresh is older than its window plus 7 days
+  (`OVERDUE_GRACE`): the self-heal is not keeping up. This is the direct form of
+  "grew monotonically for 30 runs".
+
+**What only warns:** holds below the threshold, refreshes deferred by the budget,
+and a dataset that has not shrunk in 30 runs (`MONOTONIC_WARN_AFTER`).
+Event datasets (`contributor_activity`, `issue_label_events`) are append-only, and a
+healthy `issues` dataset grows on net through any night with more new issues than
+deletions, so as a failure it would cry wolf. It stays visible in every summary.
 
 ## 4. Rollout
 
@@ -372,7 +387,7 @@ reads the new records with the old model:
 | 2 | 3.B, and 3.C's gate and stagger | 1 | migration in place; planner dry run on the nightly snapshot; 60-night simulation, (a) to (d) | revert; the `repos` key is additive, so older code ignores it |
 | 3 | rest of 3.C | 2 | missed nights drain within the budget, most overdue first; size-aware placement; recomputed schedule on the snapshot | revert; the stamps it wrote stay valid under step 2's gate |
 | 4 | 3.D | 2 | a bumped dataset is a first fetch while another in the same run keeps its deltas; legacy files count as schema 1; readers follow the resource | revert; files keep a harmless `schema` key |
-| 5 | 3.E | 3 | a simulated 3-night hold fails the gate after save; a shrink fixture fails it | revert the job |
+| 5 | 3.E | 3 | three held runs fail the verdict without failing the run; colliding upsert keys are caught as unexplained loss; overdue refreshes are reported; `actionlint` on the workflow | revert; the `health` key and `dataset_refresh` block are additive |
 
 The multi-night simulation is one test module driving the real
 `fetch_org_batched_incremental` (planner, batched engine, store) against a fake GitHub
@@ -388,3 +403,8 @@ org with a clock. Nights inject a deletion, a transfer, a late-joining repo, a
    literal ask, for the reason given there.
 4. **`GITHUB_GRAPHQL_MAX_PAGES` = 5,000.** A guess with headroom, not a measurement.
    The largest connection seen is `solo` PRs at about 115 pages of 100.
+5. **Overdue grace.** 7 days past the window before an unfinished full refresh fails
+   the check.
+6. **A missing verdict fails the health job.** A `refresh-data` that succeeded but
+   reported no `dataset_health` means the reporting broke, which should not pass
+   silently.

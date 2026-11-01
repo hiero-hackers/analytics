@@ -12,7 +12,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from hiero_analytics.config import paths
-from hiero_analytics.data_sources import dataset_store
+from hiero_analytics.data_sources import dataset_health, dataset_store
 from hiero_analytics.data_sources.dataset_store import (
     DEFAULT_OVERLAP,
     PartialOrgFetchError,
@@ -607,3 +607,102 @@ def test_a_schema_bump_refetches_only_that_resource():
     assert [kind for kind, _, _ in org_a.calls] == ["full", "full"]
     assert [kind for kind, _, _ in org_b.calls] == ["full", "since"]
     assert _stored(bumped)["schema"] == 2 and _stored(untouched)["schema"] == 1
+
+
+# ---------------------------------------------------------
+# step 5: what each refresh records for the health check
+# ---------------------------------------------------------
+
+
+def _refresh():
+    (refresh,) = dataset_health.recorded()
+    return refresh
+
+
+def test_a_refresh_records_full_refreshes_backfills_and_rows(monkeypatch):
+    """The record names what was refetched in full, which of those were backfills, and the row counts."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)]})
+    _run(org, now=_DAY0)
+    org.rows["org/late"] = [_row("org/late", n, -400) for n in (1, 2)]
+    dataset_health.forget()
+
+    _run(org, now=_DAY0 + timedelta(days=1))
+
+    refresh = _refresh()
+    assert (refresh.rows_before, refresh.rows_after) == (1, 3)
+    assert refresh.full_refreshed == ["org/late"] and refresh.backfilled == ["org/late"]
+    assert refresh.held == {} and refresh.unexplained_loss == {} and refresh.overdue == {}
+
+
+def test_three_held_runs_in_a_row_fail_the_health_check():
+    """The hold count travels in the per-repo state, so the third failing run trips the check."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)], "org/b": [_row("org/b", 1, -1)]})
+    _run(org, now=_DAY0)
+    org.fail = {"org/b"}
+
+    for night in (1, 2, 3):
+        dataset_health.forget()
+        _run(org, now=_DAY0 + timedelta(days=night))
+        assert _refresh().held == {"org/b": night}
+
+    assert dataset_health.problems(dataset_health.recorded()) == [
+        "rows_org_all: org/b has been held for 3 runs in a row"
+    ]
+
+
+def test_rows_lost_by_a_repo_that_was_not_refreshed_are_flagged():
+    """With an upsert key that forgets the repository, one repo's delta overwrites another's row: caught."""
+    org = _Org({"org/a": [_row("org/a", 1, -2)], "org/b": [_row("org/b", 2, -2)]})
+    path = paths.DATASETS_DIR / "rows_org_all.json"
+
+    def run(now):
+        return fetch_incremental_by_repo(
+            path=path,
+            model_class=_Row,
+            key_of=lambda row: row.number,  # the bug: issue numbers collide across repositories
+            updated_at_of=lambda row: row.updated_at,
+            repo_of=lambda row: row.repo,
+            list_repos=org.listing,
+            full_fetch=org.full,
+            since_fetch=org.since,
+            now=now,
+        )
+
+    run(_DAY0)
+    org.rows["org/b"].append(_row("org/b", 1, 0.5))  # b#1 takes a#1's key
+    dataset_health.forget()
+
+    run(_DAY0 + timedelta(days=1))
+
+    assert _refresh().unexplained_loss == {"org/a": 1}
+
+
+def test_a_repo_whose_full_refresh_keeps_failing_becomes_overdue():
+    """Past its window plus the grace period, a repo that never completes its refresh is reported."""
+    org = _Org({"org/a": [_row("org/a", 1, -1)]})
+    path = paths.DATASETS_DIR / "rows_org_all.json"
+    stale = _DAY0 - _WINDOW - timedelta(days=8)
+    save_dataset(
+        path,
+        org.rows["org/a"],
+        _DAY0 - timedelta(days=1),
+        repos={"org/a": RepoState(watermark=_DAY0 - timedelta(days=1), last_full_at=stale)},
+    )
+    org.fail = {"org/a"}
+
+    _run(org, now=_DAY0, window=_WINDOW)
+
+    assert _refresh().overdue == {"org/a": stale.isoformat()}
+
+
+def test_the_no_shrink_streak_counts_runs_and_resets_when_a_refresh_removes_rows():
+    """The streak behind the monotonic-growth warning is persisted, and a shrinking run resets it."""
+    org = _Org({"org/a": [_row("org/a", 1, -2), _row("org/a", 2, -1)]})
+    for night in range(3):
+        _run(org, now=_DAY0 + timedelta(hours=night))
+    assert _stored()["health"]["runs_without_shrink"] == 3
+
+    del org.rows["org/a"][0]
+    _run(org, now=_DAY0 + timedelta(hours=3), force_full=True)
+
+    assert _stored()["health"]["runs_without_shrink"] == 0

@@ -744,3 +744,28 @@ def test_load_or_fetch_refetches_when_the_schema_differs(monkeypatch):
 
     assert load_or_fetch("label_events", "an-org", _Record, fetch_fn, schema_version=2) == ["fresh"]
     assert fetched == [True]
+
+
+def test_a_single_file_dataset_counts_consecutive_holds(tmp_path):
+    """The whole-dataset hold count persists, so three partial runs in a row fail the health check."""
+    from hiero_analytics.data_sources import dataset_health
+
+    path = tmp_path / "hip.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+
+    def partial():
+        raise PartialOrgFetchError([], failed_repos=["o/broken"])
+
+    for _ in range(3):
+        fetch_incremental(
+            path=path,
+            model_class=_Record,
+            key_of=_key,
+            updated_at_of=_updated,
+            full_fetch=partial,
+            since_fetch=lambda _s: partial(),
+        )
+
+    (refresh,) = dataset_health.recorded()
+    assert refresh.held == {dataset_health.WHOLE_DATASET: 3}
+    assert dataset_health.problems([refresh]) == ["hip: (whole dataset) has been held for 3 runs in a row"]

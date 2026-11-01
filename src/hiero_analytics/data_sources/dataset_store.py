@@ -26,7 +26,7 @@ import os
 import re
 from collections import Counter
 from collections.abc import Callable, Hashable, Iterable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -35,6 +35,8 @@ from typing import Any, TypeVar
 from hiero_analytics.config import paths
 from hiero_analytics.config.paths import dataset_path
 
+from . import dataset_health
+from .dataset_health import DatasetRefresh
 from .serialization import deserialize_record, serialize_record
 from .usage import usage_scope
 
@@ -313,6 +315,7 @@ class _StoredDataset:
     fetched_through: datetime
     repos: dict[str, RepoState] | None
     last_full_at: datetime | None = None
+    health: dict[str, Any] = field(default_factory=dict)
 
 
 def merge_records(  # noqa: UP047
@@ -348,6 +351,7 @@ def save_dataset(  # noqa: UP047
     last_full_at: datetime | None = None,
     repos: Mapping[str, RepoState] | None = None,
     schema_version: int = DEFAULT_SCHEMA_VERSION,
+    health: Mapping[str, Any] | None = None,
 ) -> None:
     """Atomically write the dataset, its two stamps, and any per-repo state to ``path`` as JSON.
 
@@ -393,6 +397,9 @@ def save_dataset(  # noqa: UP047
     }
     if last_full_at is not None:
         payload["last_full_at"] = last_full_at.isoformat()
+    if health:
+        # Counters the health check needs across runs (dataset_health.py).
+        payload["health"] = dict(health)
     if repos is not None:
         payload["repos"] = {name: repos[name].to_json() for name in sorted(repos)}
     with NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
@@ -480,7 +487,14 @@ def _load_stored(path: Path, model_class: type, schema_version: int = DEFAULT_SC
         except ValueError:
             logger.warning("Dataset %s has unreadable per-repo state; re-seeding it", path.name)
             repos = None
-    return _StoredDataset(records, fetched_through, repos, _parse_stamp(payload.get("last_full_at")))
+    health = payload.get("health")
+    return _StoredDataset(
+        records,
+        fetched_through,
+        repos,
+        _parse_stamp(payload.get("last_full_at")),
+        health if isinstance(health, dict) else {},
+    )
 
 
 def load_dataset(  # noqa: UP047
@@ -632,6 +646,35 @@ def fetch_incremental(  # noqa: UP047
     preserved_fetched_at = None
     if held_watermark is not None:
         preserved_fetched_at = _read_prior_fetched_at(path) or held_watermark
+    prior_health = stored.health if stored is not None else {}
+    holds = int(prior_health.get("holds", 0)) + 1 if held_watermark is not None else 0
+    rows_before = len(state[0]) if state is not None else 0
+    shrink_streak = int(prior_health.get("runs_without_shrink", 0)) + 1 if len(records) >= rows_before else 0
+    overdue = {}
+    if (
+        full_refresh_after is not None
+        and last_full_at is not None
+        and last_full_at < current - full_refresh_after - dataset_health.OVERDUE_GRACE
+    ):
+        overdue[dataset_health.WHOLE_DATASET] = last_full_at.isoformat()
+    full = state is None or force_full or is_stale
+    dataset_health.record(
+        DatasetRefresh(
+            dataset=path.stem,
+            rows_before=rows_before,
+            rows_after=len(records),
+            full_refreshed=[dataset_health.WHOLE_DATASET] if full and held_watermark is None else [],
+            held={dataset_health.WHOLE_DATASET: holds} if holds else {},
+            # A delta merge only adds or updates: fewer rows after one is a bug.
+            unexplained_loss=(
+                {dataset_health.WHOLE_DATASET: rows_before - len(records)}
+                if not full and len(records) < rows_before
+                else {}
+            ),
+            overdue=overdue,
+            runs_without_shrink=shrink_streak,
+        )
+    )
     save_dataset(
         path,
         records,
@@ -639,6 +682,7 @@ def fetch_incremental(  # noqa: UP047
         fetched_at=preserved_fetched_at,
         last_full_at=last_full_at,
         schema_version=schema_version,
+        health={"holds": holds, "runs_without_shrink": shrink_streak},
     )
     return records
 
@@ -1037,6 +1081,44 @@ def fetch_incremental_by_repo(  # noqa: UP047
     # watermark always did; a first fetch has none, so it claims no more than
     # its own watermark.
     preserved_fetched_at = (_read_prior_fetched_at(path) or fetched_through) if failed else None
+
+    # What this refresh did, for SNAPSHOT.json and the health check.
+    prior_health = stored.health if stored is not None else {}
+    shrink_streak = int(prior_health.get("runs_without_shrink", 0)) + 1 if len(records) >= len(existing) else 0
+    rows_had, rows_have = (
+        Counter(repo_of(record) for record in existing),
+        Counter(repo_of(record) for record in records),
+    )
+    overdue = {}
+    if full_refresh_after is not None:
+        cutoff = current - full_refresh_after - dataset_health.OVERDUE_GRACE
+        overdue = {
+            name: state.last_full_at.isoformat()
+            for name, state in new_states.items()
+            if name in listed_names and state.last_full_at is not None and state.last_full_at < cutoff
+        }
+    dataset_health.record(
+        DatasetRefresh(
+            dataset=path.stem,
+            rows_before=len(existing),
+            rows_after=len(records),
+            full_refreshed=sorted(refreshed),
+            backfilled=sorted(name for name in backfill if name in refreshed),
+            deferred=sorted(deferred),
+            held={name: new_states[name].holds for name in sorted(failed) if name in new_states},
+            retired=sorted(retired),
+            # A delta merge only adds or updates rows, so a repository that was
+            # neither refreshed nor retired can never lose any: if it did, the
+            # upsert identity is wrong (two repositories sharing keys, say).
+            unexplained_loss={
+                name: rows_had[name] - rows_have[name]
+                for name in sorted(rows_had)
+                if rows_have[name] < rows_had[name] and name not in refreshed and name not in retired
+            },
+            overdue=overdue,
+            runs_without_shrink=shrink_streak,
+        )
+    )
     save_dataset(
         path,
         records,
@@ -1044,5 +1126,6 @@ def fetch_incremental_by_repo(  # noqa: UP047
         fetched_at=preserved_fetched_at,
         repos=new_states,
         schema_version=schema_version,
+        health={"runs_without_shrink": shrink_streak},
     )
     return records
