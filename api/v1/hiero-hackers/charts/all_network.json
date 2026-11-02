@@ -64,7 +64,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-01T01:15:19.414830+00:00"
+  "end": "2026-11-02T01:08:05.941929+00:00"
  },
  "nodes": [
   {
@@ -72,24 +72,24 @@
    "active": 21,
    "total": 31,
    "category": "Tooling / DevEx",
-   "x": -0.0621,
-   "y": 0.081
+   "x": -0.0005,
+   "y": -0.1445
   },
   {
    "id": "sdk-automations",
    "active": 8,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": -1.5652,
-   "y": -0.6464
+   "x": -1.1365,
+   "y": -1.718
   },
   {
    "id": "hiero-enterprise-js",
    "active": 7,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": 1.5652,
-   "y": 0.8574
+   "x": 1.6971,
+   "y": -1.3691
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -101,11 +101,11 @@
   },
   {
    "id": "hiero-streams-rs",
-   "active": 4,
+   "active": 3,
    "total": 5,
    "category": "Other",
-   "x": 0.7934,
-   "y": -1.718
+   "x": 1.3444,
+   "y": 1.718
   },
   {
    "id": "clpr-smart-contracts",
@@ -160,8 +160,8 @@
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": -0.8498,
-   "y": 1.718
+   "x": -1.6971,
+   "y": 1.0816
   },
   {
    "id": "hiero-checkout",
@@ -282,6 +282,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-01T01:15:19.414830+00:00",
+ "generated_at": "2026-11-02T01:08:05.941929+00:00",
  "stale": false
 }
