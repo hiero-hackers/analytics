@@ -9,6 +9,7 @@ the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.columns import Column
 from hiero_analytics.dashboard_spec.interactive import RELEASE_TIMELINE_SOURCES
 
 # One line under the tab's title saying what the tab is for.
@@ -88,12 +89,37 @@ SECTION_SPECS = [
             "absent. See the glossary below for what 'staleness_ratio' and 'pace' mean."
         ),
         "columns": [
-            ("repo", "repo"),
-            ("latest_release", "latest release", "date"),
-            ("days_since_last_release", "days since", "number"),
-            ("median_gap_days", "typical gap (days)", "number"),
-            ("staleness_ratio", "× overdue vs. own pace", "number"),
-            ("staleness_bucket", "pace", "staleness"),
+            Column("repo", "repo", description="The repository name."),
+            Column(
+                "latest_release",
+                "latest release",
+                format="date",
+                description="The most recent GitHub Release date for this repository.",
+            ),
+            Column(
+                "days_since_last_release",
+                "days since",
+                format="number",
+                description="Number of days since the latest release. A blank value means no release has been recorded.",
+            ),
+            Column(
+                "median_gap_days",
+                "typical gap (days)",
+                format="number",
+                description="Median number of days between consecutive releases for this repository.",
+            ),
+            Column(
+                "staleness_ratio",
+                "overdue vs. own pace",
+                format="number",
+                description="Ratio of days since last release divided by the repo's own median gap. Above 1 means currently past typical pace; below 1 means on schedule. This is relative to the repo's own history, not a fixed threshold.",
+            ),
+            Column(
+                "staleness_bucket",
+                "pace",
+                format="staleness",
+                description="Staleness category: on pace (1x typical gap), watch (1-3x typical gap), overdue (3x+), never released, or not enough history to judge. This is a relative signal based on the repo's release history.",
+            ),
         ],
     },
 ]

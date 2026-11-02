@@ -62,6 +62,7 @@ from hiero_analytics.data_sources.models import (
     ScorecardRecord,
 )
 from hiero_analytics.domain.periods import ACTIVITY_PERIODS
+from hiero_analytics.export.columns import column_key
 
 # Every table section across the table-bearing macros (Contributors, Governance),
 # flattened through its role variants: a variant the dashboard renders as a tab
@@ -514,7 +515,7 @@ def test_data_api_covers_every_produced_spec_section(outputs_root: Path):
         if (org_data / spec["file"]).exists():
             assert spec["id"] in listed, f"{spec['id']} produced but absent from the data API"
             document = json.loads((api_dir / PRIMARY / f"{spec['id']}.json").read_text())
-            declared = {column[0] for column in spec["columns"]}
+            declared = {column_key(column) for column in spec["columns"]}
             emitted = {column["key"] for column in document["columns"]}
             assert declared == emitted
             # The column list agreeing is not enough: the rows are what a

@@ -93,18 +93,17 @@ def issues_to_dataframe(issues: list[IssueRecord]) -> pd.DataFrame:
     pd.DataFrame
         DataFrame containing one row per issue.
     """
-    return pd.DataFrame(
-        [
-            {
-                "repo": issue.repo,
-                "number": issue.number,
-                "state": issue.state.lower(),
-                "created_at": issue.created_at,
-                "year": issue.created_at.year,
-                "labels": issue.labels,
-            }
-            for issue in issues
-        ]
+    return records_to_dataframe(
+        issues,
+        lambda issue: {
+            "repo": issue.repo,
+            "number": issue.number,
+            "state": issue.state.lower(),
+            "created_at": issue.created_at,
+            "year": issue.created_at.year,
+            "labels": issue.labels,
+        },
+        ["repo", "number", "state", "created_at", "year", "labels"],
     )
 
 

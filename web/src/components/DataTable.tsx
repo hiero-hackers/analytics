@@ -18,6 +18,7 @@ import { flexRender } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, SearchIcon, XIcon } from 'lucide-react';
 import { cn } from 'cn';
+import { ColumnHelp } from '@/components/ColumnHelp';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -161,6 +162,7 @@ export function DataTable({
                   return null;
                 const sorted = header.column.getIsSorted() as string;
                 const numeric = header.column.columnDef.meta?.numeric;
+                const description = header.column.columnDef.meta?.description;
                 const SortIcon =
                   sorted === 'asc'
                     ? ArrowUpIcon
@@ -194,7 +196,7 @@ export function DataTable({
                       data-print-hide
                       className={cn(
                         'group/sort -mx-2 h-7 px-2 font-medium text-inherit hover:bg-background/70',
-                        numeric && 'flex-row-reverse',
+                        'flex-row-reverse',
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -204,7 +206,7 @@ export function DataTable({
                       </span>
                       {/* Always an icon, so sorting never shifts the column. */}
                       <SortIcon
-                        data-icon={numeric ? 'inline-start' : 'inline-end'}
+                        data-icon="inline-start"
                         aria-hidden="true"
                         className={cn(
                           'transition-opacity',
@@ -212,6 +214,12 @@ export function DataTable({
                         )}
                       />
                     </Button>
+                    {description && (
+                      <ColumnHelp
+                        label={header.column.columnDef.header as string}
+                        description={description}
+                      />
+                    )}
                   </TableHead>
                 );
               })}

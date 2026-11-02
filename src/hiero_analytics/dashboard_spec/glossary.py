@@ -22,6 +22,14 @@ TERMS: dict[str, str] = {
     "merges": "pull requests they merged (clicked ‘merge’).",
     "issues": "issues they opened.",
     "labels": "label add/remove actions they performed (triage).",
+    "issues opened": "issues this person opened.",
+    "labels applied": "labels this person applied.",
+    "PRs opened": "pull requests this person opened (authored).",
+    "repositories touched": "repositories this person touched.",
+    "issues opened / issues": "issues this person opened, split by issue status.",
+    "labels applied / labels": "labels this person applied, split by label type.",
+    "PRs opened / PRs": "pull requests this person opened (authored), split by PR status.",
+    "repositories touched / repos": "repositories this person touched, split by repo type.",
     "actions": (
         "PRs + reviews + merges + issues + labels, summed — one activity total. "
         "“maint./comm. actions” split it by the repo’s maintainers / committers / triage."

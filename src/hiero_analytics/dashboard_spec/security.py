@@ -5,6 +5,7 @@ Pure data; see the package __init__ for assembly.
 
 from __future__ import annotations
 
+from hiero_analytics.dashboard_spec.columns import Column
 from hiero_analytics.dashboard_spec.interactive import OWNERSHIP_SOURCES, SCORECARD_CHECKS
 
 # One line under the tab's title saying what the tab is for.
@@ -94,8 +95,10 @@ SECTION_SPECS = [
             "relevance is a human call. Checked in the standard locations (root, .github/, docs/)."
         ),
         "columns": [
-            ("repo", "repository"),
-            ("status", "CODEOWNERS", "presence"),
+            Column("repo", "repository", description="The repository this evidence reference is for."),
+            Column(
+                "status", "CODEOWNERS", format="presence", description="Whether the repository declares code owners."
+            ),
         ],
     },
 ]

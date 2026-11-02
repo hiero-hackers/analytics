@@ -64,6 +64,11 @@ declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- interface merging requires the type params
   interface ColumnMeta<TFeatures, TData, TValue> {
     numeric?: boolean;
+    /**
+     * The column's own description, published with the spec. Carried here so a
+     * header can offer it as help without the table having to re-derive it.
+     */
+    description?: string;
   }
 }
 
@@ -115,7 +120,10 @@ export function useDataTable(
               return <RepoCell name={value} />;
             return <FormattedCell value={value} format={spec.format} />;
           },
-          meta: { numeric: spec.format === 'number' || spec.format === 'percent' },
+          meta: {
+            numeric: spec.format === 'number' || spec.format === 'percent',
+            description: spec.description,
+          },
         }),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- columns derive from the key
