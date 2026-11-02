@@ -188,6 +188,8 @@ def test_activity_specs_use_the_shared_period_set():
         "teams",
         "teamrepo",
         "tscrepo",
+        "prwaits",
+        "prwaitsrepo",
     }
     assert all(spec["periods"] is True for spec in tabbed.values())
 

@@ -43,6 +43,12 @@ PIPELINES: tuple[Pipeline, ...] = (
         args=("org",),
         offline=True,
     ),
+    Pipeline(
+        "pr_responsiveness",
+        "Measure time-to-first-review and time-to-merge for merged PRs (writes pr_responsiveness CSVs)",
+        args=("org",),
+        offline=True,
+    ),
     # Org-independent: labels contributors by role where the org is governed.
     Pipeline("contributor_heatmap", "Build contributor activity heatmap tables", args=("org",), offline=True),
     Pipeline(
