@@ -1,20 +1,20 @@
 # sdk-automations.yml — read by the sdk-automations Action from the default branch.
-# Observe only: it reads and decides, and writes nothing. Every row in a run's job summary
-# is a decision it would have recorded, never an act. Every shipped capability is on, and each
-# block states `mode: observe` of its own, which pins it: raising the file's `mode` promotes
+# Dry-run only: it reads and decides, writes nothing, and records each proposed change as
+# a `wouldApply` finding in the job summary. Every shipped capability is on, and each
+# block states `mode: dry-run` of its own, which pins it: raising the file's `mode` promotes
 # nothing. A capability is promoted on its own, in its own reviewed diff, by raising its line.
 
-mode: observe
+mode: dry-run
 
 capabilities:
   triageQueue: # a new issue is labelled awaitingTriage
     enabled: true
-    mode: observe
+    mode: dry-run
     welcome: false
 
   prDashboard: # one comment per pull request: what stops it being reviewable
     enabled: true
-    mode: observe
+    mode: dry-run
     checks:
       dcoSignoff:
         enabled: true
@@ -30,11 +30,11 @@ capabilities:
 
   configReport: # a pull request that changes this file gets one comment saying what it would mean
     enabled: true
-    mode: observe
+    mode: dry-run
 
   inactivity: # on the hourly schedule: remind about stalled work, then release it
     enabled: true
-    mode: observe
+    mode: dry-run
     issues:
       enabled: true
       reap:
@@ -57,7 +57,7 @@ capabilities:
 
   assignment: # a contributor claims an issue with a comment, and releases it the same way
     enabled: true
-    mode: observe
+    mode: dry-run
     autoAssign:
       enabled: true
       notClaimableWhen: [blocked]
