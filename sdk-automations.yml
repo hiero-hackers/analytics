@@ -1,10 +1,11 @@
 # sdk-automations.yml — read by the sdk-automations Action from the default branch.
 # Dry-run only: it reads and decides, writes nothing, and records each proposed change as
-# a `wouldApply` finding in the job summary. Every shipped capability is on, and each
-# block states `mode: dry-run` of its own, which pins it: raising the file's `mode` promotes
-# nothing. A capability is promoted on its own, in its own reviewed diff, by raising its line.
+# a `wouldApply` finding in the job summary. The file's `mode` is `active`, and each block
+# states `mode: dry-run` of its own, which holds it: a capability goes live in its own
+# reviewed diff, by deleting its block's `mode` line, once the workflow's `arm-writes`
+# input — the second gate — is `"true"`.
 
-mode: dry-run
+mode: active
 
 capabilities:
   triageQueue: # a new issue is labelled awaitingTriage
