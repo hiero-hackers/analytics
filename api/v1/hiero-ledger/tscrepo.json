@@ -6,39 +6,48 @@
  "columns": [
   {
    "key": "account",
-   "label": "member"
+   "label": "member",
+   "description": "The TSC member's GitHub login."
   },
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name."
   },
   {
    "key": "repo_role",
-   "label": "role here"
+   "label": "role here",
+   "description": "The governance role this member holds in this repository."
   },
   {
    "key": "prs_opened",
-   "label": "PRs"
+   "label": "PRs",
+   "description": "Pull requests opened by this member in this repository."
   },
   {
    "key": "reviews_given",
-   "label": "reviews"
+   "label": "reviews",
+   "description": "Pull request reviews submitted by this member in this repository."
   },
   {
    "key": "merges_done",
-   "label": "merges"
+   "label": "merges",
+   "description": "Pull requests merged by this member in this repository."
   },
   {
    "key": "issues_opened",
-   "label": "issues"
+   "label": "issues",
+   "description": "Issues opened by this member in this repository."
   },
   {
    "key": "labels_applied",
-   "label": "labels"
+   "label": "labels",
+   "description": "Labels applied by this member in this repository."
   },
   {
    "key": "last_active",
-   "label": "last active"
+   "label": "last active",
+   "description": "The most recent date this member had activity in this repository."
   }
  ],
  "rows": [
@@ -291,9 +300,9 @@
    "prs_opened": 95,
    "reviews_given": 203,
    "merges_done": 165,
-   "issues_opened": 5,
+   "issues_opened": 6,
    "labels_applied": 0,
-   "last_active": "2026-10-28 14:50:42+00:00"
+   "last_active": "2026-11-02 14:48:10+00:00"
   },
   {
    "account": "hendrikebbers",
@@ -1243,7 +1252,7 @@
   }
  ],
  "row_count": 109,
- "generated_at": "2026-11-02T01:06:04.119268+00:00",
+ "generated_at": "2026-11-03T01:09:14.263377+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -1252,22 +1261,11 @@
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 3,
-    "merges_done": 2,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-10-28 14:50:42+00:00"
-   },
-   {
-    "account": "hendrikebbers",
-    "repo": "hiero-ledger/.github",
-    "repo_role": "maintainer",
-    "prs_opened": 0,
-    "reviews_given": 0,
+    "reviews_given": 2,
     "merges_done": 1,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-26 12:03:24+00:00"
+    "last_active": "2026-11-02 14:48:10+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1289,9 +1287,9 @@
     "prs_opened": 0,
     "reviews_given": 9,
     "merges_done": 8,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-28 14:50:42+00:00"
+    "last_active": "2026-11-02 14:48:10+00:00"
    },
    {
     "account": "hendrikebbers",
@@ -1478,9 +1476,9 @@
     "prs_opened": 30,
     "reviews_given": 65,
     "merges_done": 39,
-    "issues_opened": 4,
+    "issues_opened": 5,
     "labels_applied": 0,
-    "last_active": "2026-10-28 14:50:42+00:00"
+    "last_active": "2026-11-02 14:48:10+00:00"
    },
    {
     "account": "hendrikebbers",

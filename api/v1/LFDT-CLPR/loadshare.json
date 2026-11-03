@@ -6,30 +6,35 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name."
   },
   {
    "key": "top_carrier",
-   "label": "top carrier"
+   "label": "top carrier",
+   "description": "The user carrying the most review+merge work in this repository within the selected period."
   },
   {
    "key": "top_role",
-   "label": "top role"
+   "label": "top role",
+   "description": "Whether the busiest carrier is a maintainer or committer."
   },
   {
    "key": "top_pct",
    "label": "top %",
-   "format": "percent"
+   "format": "percent",
+   "description": "Share of review+merge work in this repository within the selected period done by the busiest person."
   },
   {
    "key": "top2_pct",
    "label": "top-2 %",
-   "format": "percent"
+   "format": "percent",
+   "description": "Combined share of review+merge work done by the two busiest carriers in this repository."
   }
  ],
  "rows": [],
  "row_count": 0,
- "generated_at": "2026-11-02T01:09:11.296900+00:00",
+ "generated_at": "2026-11-03T01:12:01.347624+00:00",
  "stale": false,
  "periods": {
   "7d": [],

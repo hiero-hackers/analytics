@@ -6,54 +6,72 @@
  "columns": [
   {
    "key": "contributor",
-   "label": "contributor"
+   "label": "Contributor",
+   "description": "The unique identifier for each person tracked on this dashboard, usually their GitHub login."
   },
   {
    "key": "prs_opened",
-   "label": "PRs",
-   "format": "number"
+   "label": "PRs opened",
+   "format": "number",
+   "description": "Pull requests opened by this contributor. Used to measure contribution volume."
   },
   {
    "key": "reviews_given",
-   "label": "reviews",
-   "format": "number"
+   "label": "Reviews",
+   "format": "number",
+   "description": "Pull request reviews submitted by this contributor. Highlights code review activity."
   },
   {
    "key": "merges_done",
-   "label": "merges",
-   "format": "number"
+   "label": "Merges",
+   "format": "number",
+   "description": "Merged pull requests by this contributor. Tracks contribution volume through merged work."
   },
   {
    "key": "issues_opened",
-   "label": "issues",
-   "format": "number"
+   "label": "Issues opened",
+   "format": "number",
+   "description": "Issues opened by this contributor. Shows how actively they file and track bugs or feature requests."
   },
   {
    "key": "labels_applied",
-   "label": "labels",
-   "format": "number"
+   "label": "Labels applied",
+   "format": "number",
+   "description": "Labels applied by this contributor across repositories. Indicates their involvement in code ownership or triage."
   },
   {
    "key": "repos_touched",
-   "label": "repos",
-   "format": "number"
+   "label": "Repositories touched",
+   "format": "number",
+   "description": "Distinct repositories this contributor has committed to. Shows the breadth of their impact across the codebase."
   },
   {
    "key": "last_active",
-   "label": "last active",
-   "format": "date"
+   "label": "Last active",
+   "format": "date",
+   "description": "The most recent date this contributor had any tracked activity. Used to measure ongoing engagement."
   }
  ],
  "rows": [
   {
    "contributor": "tinker-michaelj",
    "prs_opened": 2,
-   "reviews_given": 6,
+   "reviews_given": 7,
    "merges_done": 0,
    "issues_opened": 0,
    "labels_applied": 0,
    "repos_touched": 1,
-   "last_active": "2026-10-30 17:48:52+00:00"
+   "last_active": "2026-11-02 20:06:04+00:00"
+  },
+  {
+   "contributor": "edward-swirldslabs",
+   "prs_opened": 5,
+   "reviews_given": 6,
+   "merges_done": 2,
+   "issues_opened": 2,
+   "labels_applied": 0,
+   "repos_touched": 5,
+   "last_active": "2026-11-02 17:19:47+00:00"
   },
   {
    "contributor": "jasuwienas",
@@ -64,16 +82,6 @@
    "labels_applied": 0,
    "repos_touched": 1,
    "last_active": "2026-10-30 14:59:33+00:00"
-  },
-  {
-   "contributor": "edward-swirldslabs",
-   "prs_opened": 5,
-   "reviews_given": 6,
-   "merges_done": 2,
-   "issues_opened": 1,
-   "labels_applied": 0,
-   "repos_touched": 5,
-   "last_active": "2026-10-29 15:20:11+00:00"
   },
   {
    "contributor": "jwagantall",
@@ -167,19 +175,29 @@
   }
  ],
  "row_count": 12,
- "generated_at": "2026-11-02T01:09:09.023731+00:00",
+ "generated_at": "2026-11-03T01:11:59.714780+00:00",
  "stale": false,
  "periods": {
   "7d": [
    {
     "contributor": "tinker-michaelj",
     "prs_opened": 2,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
     "repos_touched": 1,
-    "last_active": "2026-10-30 17:48:52+00:00"
+    "last_active": "2026-11-02 20:06:04+00:00"
+   },
+   {
+    "contributor": "edward-swirldslabs",
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 0,
+    "repos_touched": 3,
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "contributor": "jasuwienas",
@@ -192,20 +210,10 @@
     "last_active": "2026-10-30 14:59:33+00:00"
    },
    {
-    "contributor": "edward-swirldslabs",
-    "prs_opened": 3,
-    "reviews_given": 2,
-    "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0,
-    "repos_touched": 5,
-    "last_active": "2026-10-29 15:20:11+00:00"
-   },
-   {
     "contributor": "jwagantall",
-    "prs_opened": 2,
-    "reviews_given": 8,
-    "merges_done": 5,
+    "prs_opened": 1,
+    "reviews_given": 6,
+    "merges_done": 3,
     "issues_opened": 0,
     "labels_applied": 0,
     "repos_touched": 2,
@@ -223,7 +231,7 @@
    },
    {
     "contributor": "hendrikebbers",
-    "prs_opened": 4,
+    "prs_opened": 2,
     "reviews_given": 1,
     "merges_done": 0,
     "issues_opened": 0,
@@ -246,12 +254,22 @@
    {
     "contributor": "tinker-michaelj",
     "prs_opened": 2,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
     "repos_touched": 1,
-    "last_active": "2026-10-30 17:48:52+00:00"
+    "last_active": "2026-11-02 20:06:04+00:00"
+   },
+   {
+    "contributor": "edward-swirldslabs",
+    "prs_opened": 3,
+    "reviews_given": 6,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 0,
+    "repos_touched": 5,
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "contributor": "jasuwienas",
@@ -262,16 +280,6 @@
     "labels_applied": 0,
     "repos_touched": 1,
     "last_active": "2026-10-30 14:59:33+00:00"
-   },
-   {
-    "contributor": "edward-swirldslabs",
-    "prs_opened": 3,
-    "reviews_given": 6,
-    "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0,
-    "repos_touched": 5,
-    "last_active": "2026-10-29 15:20:11+00:00"
    },
    {
     "contributor": "jwagantall",
@@ -368,12 +376,22 @@
    {
     "contributor": "tinker-michaelj",
     "prs_opened": 2,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
     "repos_touched": 1,
-    "last_active": "2026-10-30 17:48:52+00:00"
+    "last_active": "2026-11-02 20:06:04+00:00"
+   },
+   {
+    "contributor": "edward-swirldslabs",
+    "prs_opened": 5,
+    "reviews_given": 6,
+    "merges_done": 2,
+    "issues_opened": 2,
+    "labels_applied": 0,
+    "repos_touched": 5,
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "contributor": "jasuwienas",
@@ -384,16 +402,6 @@
     "labels_applied": 0,
     "repos_touched": 1,
     "last_active": "2026-10-30 14:59:33+00:00"
-   },
-   {
-    "contributor": "edward-swirldslabs",
-    "prs_opened": 5,
-    "reviews_given": 6,
-    "merges_done": 2,
-    "issues_opened": 1,
-    "labels_applied": 0,
-    "repos_touched": 5,
-    "last_active": "2026-10-29 15:20:11+00:00"
    },
    {
     "contributor": "jwagantall",

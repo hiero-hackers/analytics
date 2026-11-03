@@ -6,43 +6,54 @@
  "columns": [
   {
    "key": "team",
-   "label": "team"
+   "label": "team",
+   "description": "The governance team name."
   },
   {
    "key": "members",
-   "label": "members"
+   "label": "members",
+   "description": "Total members of this team."
   },
   {
    "key": "active_members",
-   "label": "active"
+   "label": "active",
+   "description": "Members with activity within the selected period."
   },
   {
    "key": "status",
-   "label": "status"
+   "label": "status",
+   "description": "Whether this team is active or quiet in the selected period."
   },
   {
    "key": "days_since_active",
-   "label": "days since active"
+   "label": "days since active",
+   "format": "number",
+   "description": "Days since this team's last recorded activity."
   },
   {
    "key": "prs_opened",
-   "label": "PRs"
+   "label": "PRs",
+   "description": "Pull requests opened by active team members in the selected period."
   },
   {
    "key": "reviews_given",
-   "label": "reviews"
+   "label": "reviews",
+   "description": "Pull request reviews submitted by active team members in the selected period."
   },
   {
    "key": "merges_done",
-   "label": "merges"
+   "label": "merges",
+   "description": "Pull requests merged by active team members in the selected period."
   },
   {
    "key": "issues_opened",
-   "label": "issues"
+   "label": "issues",
+   "description": "Issues opened by active team members in the selected period."
   },
   {
    "key": "labels_applied",
-   "label": "labels"
+   "label": "labels",
+   "description": "Labels applied by active team members in the selected period."
   }
  ],
  "rows": [
@@ -51,7 +62,7 @@
    "members": 3,
    "active_members": 2,
    "status": "active",
-   "days_since_active": 4,
+   "days_since_active": 5,
    "prs_opened": 14,
    "reviews_given": 16,
    "merges_done": 16,
@@ -63,11 +74,11 @@
    "members": 5,
    "active_members": 2,
    "status": "active",
-   "days_since_active": 3,
+   "days_since_active": 0,
    "prs_opened": 5,
    "reviews_given": 9,
    "merges_done": 2,
-   "issues_opened": 1,
+   "issues_opened": 2,
    "labels_applied": 0
   },
   {
@@ -75,11 +86,11 @@
    "members": 3,
    "active_members": 2,
    "status": "active",
-   "days_since_active": 3,
+   "days_since_active": 0,
    "prs_opened": 10,
    "reviews_given": 10,
    "merges_done": 3,
-   "issues_opened": 6,
+   "issues_opened": 7,
    "labels_applied": 4
   },
   {
@@ -87,35 +98,11 @@
    "members": 5,
    "active_members": 1,
    "status": "active",
-   "days_since_active": 3,
+   "days_since_active": 0,
    "prs_opened": 5,
    "reviews_given": 6,
    "merges_done": 2,
-   "issues_opened": 1,
-   "labels_applied": 0
-  },
-  {
-   "team": "clpr-spec-committers",
-   "members": 2,
-   "active_members": 1,
-   "status": "active",
-   "days_since_active": 3,
-   "prs_opened": 5,
-   "reviews_given": 6,
-   "merges_done": 2,
-   "issues_opened": 1,
-   "labels_applied": 0
-  },
-  {
-   "team": "security-maintainers",
-   "members": 3,
-   "active_members": 1,
-   "status": "active",
-   "days_since_active": 3,
-   "prs_opened": 5,
-   "reviews_given": 6,
-   "merges_done": 2,
-   "issues_opened": 1,
+   "issues_opened": 2,
    "labels_applied": 0
   },
   {
@@ -123,16 +110,40 @@
    "members": 10,
    "active_members": 4,
    "status": "active",
-   "days_since_active": 2,
+   "days_since_active": 0,
    "prs_opened": 7,
-   "reviews_given": 18,
+   "reviews_given": 19,
+   "merges_done": 2,
+   "issues_opened": 3,
+   "labels_applied": 0
+  },
+  {
+   "team": "clpr-spec-committers",
+   "members": 2,
+   "active_members": 1,
+   "status": "active",
+   "days_since_active": 0,
+   "prs_opened": 5,
+   "reviews_given": 6,
+   "merges_done": 2,
+   "issues_opened": 2,
+   "labels_applied": 0
+  },
+  {
+   "team": "security-maintainers",
+   "members": 3,
+   "active_members": 1,
+   "status": "active",
+   "days_since_active": 0,
+   "prs_opened": 5,
+   "reviews_given": 6,
    "merges_done": 2,
    "issues_opened": 2,
    "labels_applied": 0
   }
  ],
  "row_count": 7,
- "generated_at": "2026-11-02T01:09:11.607868+00:00",
+ "generated_at": "2026-11-03T01:12:01.634341+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -141,10 +152,10 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 4,
-    "prs_opened": 2,
-    "reviews_given": 9,
-    "merges_done": 6,
+    "days_since_active": 5,
+    "prs_opened": 1,
+    "reviews_given": 7,
+    "merges_done": 4,
     "issues_opened": 0,
     "labels_applied": 0
    },
@@ -153,11 +164,11 @@
     "members": 5,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
+    "days_since_active": 0,
+    "prs_opened": 1,
     "reviews_given": 5,
     "merges_done": 0,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -165,11 +176,11 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 7,
+    "days_since_active": 0,
+    "prs_opened": 3,
     "reviews_given": 3,
     "merges_done": 0,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -177,35 +188,11 @@
     "members": 5,
     "active_members": 1,
     "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
+    "days_since_active": 0,
+    "prs_opened": 1,
     "reviews_given": 2,
     "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "clpr-spec-committers",
-    "members": 2,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
-    "reviews_given": 2,
-    "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "security-maintainers",
-    "members": 3,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
-    "reviews_given": 2,
-    "merges_done": 0,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -213,9 +200,33 @@
     "members": 10,
     "active_members": 3,
     "status": "active",
-    "days_since_active": 2,
-    "prs_opened": 5,
-    "reviews_given": 12,
+    "days_since_active": 0,
+    "prs_opened": 3,
+    "reviews_given": 13,
+    "merges_done": 0,
+    "issues_opened": 3,
+    "labels_applied": 0
+   },
+   {
+    "team": "clpr-spec-committers",
+    "members": 2,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 0
+   },
+   {
+    "team": "security-maintainers",
+    "members": 3,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -227,7 +238,7 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 4,
+    "days_since_active": 5,
     "prs_opened": 8,
     "reviews_given": 13,
     "merges_done": 11,
@@ -239,11 +250,11 @@
     "members": 5,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 3,
     "reviews_given": 9,
     "merges_done": 0,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -251,11 +262,11 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 8,
     "reviews_given": 8,
     "merges_done": 1,
-    "issues_opened": 6,
+    "issues_opened": 7,
     "labels_applied": 4
    },
    {
@@ -263,35 +274,11 @@
     "members": 5,
     "active_members": 1,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 3,
     "reviews_given": 6,
     "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "clpr-spec-committers",
-    "members": 2,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
-    "reviews_given": 6,
-    "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "security-maintainers",
-    "members": 3,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 3,
-    "reviews_given": 6,
-    "merges_done": 0,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -299,9 +286,33 @@
     "members": 10,
     "active_members": 4,
     "status": "active",
-    "days_since_active": 2,
+    "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 18,
+    "reviews_given": 19,
+    "merges_done": 0,
+    "issues_opened": 3,
+    "labels_applied": 0
+   },
+   {
+    "team": "clpr-spec-committers",
+    "members": 2,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 3,
+    "reviews_given": 6,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 0
+   },
+   {
+    "team": "security-maintainers",
+    "members": 3,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 3,
+    "reviews_given": 6,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -313,7 +324,7 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 4,
+    "days_since_active": 5,
     "prs_opened": 14,
     "reviews_given": 16,
     "merges_done": 16,
@@ -325,11 +336,11 @@
     "members": 5,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 5,
     "reviews_given": 9,
     "merges_done": 2,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -337,11 +348,11 @@
     "members": 3,
     "active_members": 2,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 10,
     "reviews_given": 10,
     "merges_done": 3,
-    "issues_opened": 6,
+    "issues_opened": 7,
     "labels_applied": 4
    },
    {
@@ -349,35 +360,11 @@
     "members": 5,
     "active_members": 1,
     "status": "active",
-    "days_since_active": 3,
+    "days_since_active": 0,
     "prs_opened": 5,
     "reviews_given": 6,
     "merges_done": 2,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "clpr-spec-committers",
-    "members": 2,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 5,
-    "reviews_given": 6,
-    "merges_done": 2,
-    "issues_opened": 1,
-    "labels_applied": 0
-   },
-   {
-    "team": "security-maintainers",
-    "members": 3,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 3,
-    "prs_opened": 5,
-    "reviews_given": 6,
-    "merges_done": 2,
-    "issues_opened": 1,
+    "issues_opened": 2,
     "labels_applied": 0
    },
    {
@@ -385,9 +372,33 @@
     "members": 10,
     "active_members": 4,
     "status": "active",
-    "days_since_active": 2,
+    "days_since_active": 0,
     "prs_opened": 7,
-    "reviews_given": 18,
+    "reviews_given": 19,
+    "merges_done": 2,
+    "issues_opened": 3,
+    "labels_applied": 0
+   },
+   {
+    "team": "clpr-spec-committers",
+    "members": 2,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 5,
+    "reviews_given": 6,
+    "merges_done": 2,
+    "issues_opened": 2,
+    "labels_applied": 0
+   },
+   {
+    "team": "security-maintainers",
+    "members": 3,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 5,
+    "reviews_given": 6,
     "merges_done": 2,
     "issues_opened": 2,
     "labels_applied": 0

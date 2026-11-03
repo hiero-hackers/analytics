@@ -7,21 +7,25 @@
   {
    "key": "hip",
    "label": "HIP",
-   "format": "hip"
+   "format": "hip",
+   "description": "The HIP specification number, e.g., 'HIP-1200'."
   },
   {
    "key": "hip_title",
-   "label": "title"
+   "label": "title",
+   "description": "The title of the HIP specification as defined in its frontmatter."
   },
   {
    "key": "hip_status",
    "label": "spec status",
-   "format": "status"
+   "format": "status",
+   "description": "The current status of the HIP: Draft, Review, Last Call, Approved, Accepted, Final, Active, or Retired."
   },
   {
    "key": "hip_created",
    "label": "spec created",
-   "format": "date"
+   "format": "date",
+   "description": "The date this HIP specification was created, as recorded in its frontmatter."
   }
  ],
  "rows": [
@@ -45,7 +49,7 @@
   }
  ],
  "row_count": 3,
- "generated_at": "2026-11-02T01:07:50.162923+00:00",
+ "generated_at": "2026-11-03T01:10:46.202825+00:00",
  "stale": false,
  "group": "What is left to do",
  "macro": "HIPs"

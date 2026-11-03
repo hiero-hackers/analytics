@@ -6,38 +6,46 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name."
   },
   {
    "key": "committers",
    "label": "committers",
-   "format": "number"
+   "format": "number",
+   "description": "Number of committers active in this repository."
   },
   {
    "key": "distinct_orgs",
    "label": "distinct orgs",
-   "format": "number"
+   "format": "number",
+   "description": "Number of distinct organisations these committers span."
   },
   {
    "key": "top_org",
-   "label": "largest org"
+   "label": "largest org",
+   "description": "The organisation with the most committers in this repository."
   },
   {
    "key": "top_org_pct",
    "label": "largest org %",
-   "format": "percent"
+   "format": "percent",
+   "description": "Share of committers in this repository belonging to the largest organisation."
   },
   {
    "key": "independent",
-   "label": "independent"
+   "label": "independent",
+   "description": "Committers with no curated employer affiliation, counted separately."
   },
   {
    "key": "unknown",
-   "label": "unknown"
+   "label": "unknown",
+   "description": "Committers whose employer could not be determined."
   },
   {
    "key": "organisations",
-   "label": "organisations"
+   "label": "organisations",
+   "description": "Organisation mix - full list of organisations with mapped committers in this repository."
   }
  ],
  "rows": [
@@ -324,7 +332,7 @@
  ],
  "row_count": 28,
  "label": "Committers",
- "generated_at": "2026-11-02T01:06:04.431766+00:00",
+ "generated_at": "2026-11-03T01:09:14.550827+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance",

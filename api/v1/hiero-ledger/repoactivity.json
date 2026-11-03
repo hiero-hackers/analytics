@@ -6,52 +6,62 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name, as known to the governance config."
   },
   {
    "key": "maintainers",
    "label": "maintainers",
-   "format": "number"
+   "format": "number",
+   "description": "Total maintainers with access to this repository, regardless of recent activity."
   },
   {
    "key": "committers",
    "label": "committers",
-   "format": "number"
+   "format": "number",
+   "description": "Total committers with write access to this repository."
   },
   {
    "key": "triage",
    "label": "triage",
-   "format": "number"
+   "format": "number",
+   "description": "Total users granted the triage role on this repository."
   },
   {
    "key": "active_recent",
    "label": "active",
-   "format": "number"
+   "format": "number",
+   "description": "Permission-holders active in this repository within the selected period."
   },
   {
    "key": "maintainer_actions_recent",
    "label": "maint. actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active maintainers in the selected period."
   },
   {
    "key": "committer_actions_recent",
    "label": "comm. actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active committers in the selected period."
   },
   {
    "key": "triage_actions_recent",
    "label": "triage actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active triage holders in the selected period."
   },
   {
    "key": "actions_recent",
    "label": "actions",
-   "format": "number"
+   "format": "number",
+   "description": "All tracked actions in this repository within the selected period, summed across roles."
   },
   {
    "key": "last_active",
    "label": "last active",
-   "format": "date"
+   "format": "date",
+   "description": "The most recent date any permission-holder had activity in this repository."
   }
  ],
  "rows": [
@@ -61,11 +71,11 @@
    "committers": 60,
    "triage": 3,
    "active_recent": 75,
-   "maintainer_actions_recent": 48461,
-   "committer_actions_recent": 51676,
+   "maintainer_actions_recent": 48492,
+   "committer_actions_recent": 51750,
    "triage_actions_recent": 259,
-   "actions_recent": 100396,
-   "last_active": "2026-10-31 11:05:35+00:00"
+   "actions_recent": 100501,
+   "last_active": "2026-11-02 23:50:53+00:00"
   },
   {
    "repo": "hiero-mirror-node",
@@ -73,11 +83,11 @@
    "committers": 11,
    "triage": 0,
    "active_recent": 13,
-   "maintainer_actions_recent": 37425,
-   "committer_actions_recent": 10784,
+   "maintainer_actions_recent": 37438,
+   "committer_actions_recent": 10800,
    "triage_actions_recent": 0,
-   "actions_recent": 48209,
-   "last_active": "2026-11-01 22:49:52+00:00"
+   "actions_recent": 48238,
+   "last_active": "2026-11-02 21:23:21+00:00"
   },
   {
    "repo": "hiero-json-rpc-relay",
@@ -85,11 +95,11 @@
    "committers": 14,
    "triage": 1,
    "active_recent": 21,
-   "maintainer_actions_recent": 13099,
-   "committer_actions_recent": 7813,
+   "maintainer_actions_recent": 13102,
+   "committer_actions_recent": 7824,
    "triage_actions_recent": 0,
-   "actions_recent": 20912,
-   "last_active": "2026-10-30 16:51:34+00:00"
+   "actions_recent": 20926,
+   "last_active": "2026-11-02 15:28:53+00:00"
   },
   {
    "repo": "hiero-block-node",
@@ -97,11 +107,11 @@
    "committers": 11,
    "triage": 2,
    "active_recent": 17,
-   "maintainer_actions_recent": 11714,
-   "committer_actions_recent": 6536,
-   "triage_actions_recent": 316,
-   "actions_recent": 18566,
-   "last_active": "2026-10-30 20:22:13+00:00"
+   "maintainer_actions_recent": 11736,
+   "committer_actions_recent": 6564,
+   "triage_actions_recent": 321,
+   "actions_recent": 18621,
+   "last_active": "2026-11-03 00:42:07+00:00"
   },
   {
    "repo": "solo",
@@ -109,11 +119,11 @@
    "committers": 9,
    "triage": 1,
    "active_recent": 14,
-   "maintainer_actions_recent": 11587,
-   "committer_actions_recent": 5156,
+   "maintainer_actions_recent": 11604,
+   "committer_actions_recent": 5167,
    "triage_actions_recent": 110,
-   "actions_recent": 16853,
-   "last_active": "2026-11-01 22:18:05+00:00"
+   "actions_recent": 16881,
+   "last_active": "2026-11-02 17:56:24+00:00"
   },
   {
    "repo": "hiero-sdk-python",
@@ -121,11 +131,11 @@
    "committers": 6,
    "triage": 13,
    "active_recent": 22,
-   "maintainer_actions_recent": 8428,
-   "committer_actions_recent": 1027,
+   "maintainer_actions_recent": 8442,
+   "committer_actions_recent": 1028,
    "triage_actions_recent": 372,
-   "actions_recent": 9827,
-   "last_active": "2026-11-01 09:15:41+00:00"
+   "actions_recent": 9842,
+   "last_active": "2026-11-03 00:14:00+00:00"
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -134,10 +144,10 @@
    "triage": 0,
    "active_recent": 79,
    "maintainer_actions_recent": 2399,
-   "committer_actions_recent": 3165,
+   "committer_actions_recent": 3172,
    "triage_actions_recent": 0,
-   "actions_recent": 5564,
-   "last_active": "2026-10-30 03:52:01+00:00"
+   "actions_recent": 5571,
+   "last_active": "2026-11-02 13:44:46+00:00"
   },
   {
    "repo": "hiero-mirror-node-explorer",
@@ -145,11 +155,11 @@
    "committers": 1,
    "triage": 0,
    "active_recent": 4,
-   "maintainer_actions_recent": 5489,
+   "maintainer_actions_recent": 5500,
    "committer_actions_recent": 48,
    "triage_actions_recent": 0,
-   "actions_recent": 5537,
-   "last_active": "2026-10-31 08:51:11+00:00"
+   "actions_recent": 5548,
+   "last_active": "2026-11-02 13:22:27+00:00"
   },
   {
    "repo": "hiero-sdk-js",
@@ -157,11 +167,11 @@
    "committers": 2,
    "triage": 13,
    "active_recent": 19,
-   "maintainer_actions_recent": 4203,
+   "maintainer_actions_recent": 4216,
    "committer_actions_recent": 572,
-   "triage_actions_recent": 266,
-   "actions_recent": 5041,
-   "last_active": "2026-10-30 13:47:03+00:00"
+   "triage_actions_recent": 267,
+   "actions_recent": 5055,
+   "last_active": "2026-11-02 10:12:09+00:00"
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -181,11 +191,11 @@
    "committers": 4,
    "triage": 12,
    "active_recent": 17,
-   "maintainer_actions_recent": 2227,
+   "maintainer_actions_recent": 2231,
    "committer_actions_recent": 361,
    "triage_actions_recent": 121,
-   "actions_recent": 2709,
-   "last_active": "2026-10-30 12:23:02+00:00"
+   "actions_recent": 2713,
+   "last_active": "2026-11-02 11:07:23+00:00"
   },
   {
    "repo": "hiero-sdk-go",
@@ -193,11 +203,11 @@
    "committers": 1,
    "triage": 11,
    "active_recent": 15,
-   "maintainer_actions_recent": 2558,
+   "maintainer_actions_recent": 2566,
    "committer_actions_recent": 25,
    "triage_actions_recent": 75,
-   "actions_recent": 2658,
-   "last_active": "2026-10-27 10:40:48+00:00"
+   "actions_recent": 2666,
+   "last_active": "2026-11-02 14:41:36+00:00"
   },
   {
    "repo": "hiero-cli",
@@ -217,11 +227,11 @@
    "committers": 52,
    "triage": 0,
    "active_recent": 55,
-   "maintainer_actions_recent": 2040,
+   "maintainer_actions_recent": 2041,
    "committer_actions_recent": 386,
    "triage_actions_recent": 0,
-   "actions_recent": 2426,
-   "last_active": "2026-10-28 14:50:42+00:00"
+   "actions_recent": 2427,
+   "last_active": "2026-11-02 14:48:10+00:00"
   },
   {
    "repo": "hiero-sdk-tck",
@@ -229,11 +239,11 @@
    "committers": 5,
    "triage": 8,
    "active_recent": 15,
-   "maintainer_actions_recent": 1178,
+   "maintainer_actions_recent": 1239,
    "committer_actions_recent": 594,
-   "triage_actions_recent": 73,
-   "actions_recent": 1845,
-   "last_active": "2026-10-30 09:17:48+00:00"
+   "triage_actions_recent": 74,
+   "actions_recent": 1907,
+   "last_active": "2026-11-02 11:48:13+00:00"
   },
   {
    "repo": "hiero-website",
@@ -241,11 +251,11 @@
    "committers": 1,
    "triage": 5,
    "active_recent": 9,
-   "maintainer_actions_recent": 1647,
+   "maintainer_actions_recent": 1650,
    "committer_actions_recent": 53,
    "triage_actions_recent": 49,
-   "actions_recent": 1749,
-   "last_active": "2026-11-01 21:44:14+00:00"
+   "actions_recent": 1752,
+   "last_active": "2026-11-02 23:55:55+00:00"
   },
   {
    "repo": "hiero-docs",
@@ -253,11 +263,11 @@
    "committers": 0,
    "triage": 0,
    "active_recent": 3,
-   "maintainer_actions_recent": 1637,
+   "maintainer_actions_recent": 1639,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 1637,
-   "last_active": "2026-10-26 17:08:54+00:00"
+   "actions_recent": 1639,
+   "last_active": "2026-11-02 17:03:21+00:00"
   },
   {
    "repo": "hiero-cryptography",
@@ -265,11 +275,11 @@
    "committers": 5,
    "triage": 0,
    "active_recent": 6,
-   "maintainer_actions_recent": 1086,
+   "maintainer_actions_recent": 1088,
    "committer_actions_recent": 298,
    "triage_actions_recent": 0,
-   "actions_recent": 1384,
-   "last_active": "2026-10-30 23:17:01+00:00"
+   "actions_recent": 1386,
+   "last_active": "2026-11-02 23:39:50+00:00"
   },
   {
    "repo": "solo-docs",
@@ -277,11 +287,11 @@
    "committers": 3,
    "triage": 0,
    "active_recent": 11,
-   "maintainer_actions_recent": 1014,
+   "maintainer_actions_recent": 1016,
    "committer_actions_recent": 17,
    "triage_actions_recent": 0,
-   "actions_recent": 1031,
-   "last_active": "2026-10-29 13:46:56+00:00"
+   "actions_recent": 1033,
+   "last_active": "2026-11-02 18:29:50+00:00"
   },
   {
    "repo": "hiero-sdk-rust",
@@ -313,11 +323,11 @@
    "committers": 0,
    "triage": 0,
    "active_recent": 4,
-   "maintainer_actions_recent": 975,
+   "maintainer_actions_recent": 983,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 975,
-   "last_active": "2026-10-13 19:04:06+00:00"
+   "actions_recent": 983,
+   "last_active": "2026-11-02 14:20:12+00:00"
   },
   {
    "repo": "hiero-local-node",
@@ -385,11 +395,11 @@
    "committers": 0,
    "triage": 0,
    "active_recent": 3,
-   "maintainer_actions_recent": 333,
+   "maintainer_actions_recent": 336,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 333,
-   "last_active": "2026-10-23 09:19:08+00:00"
+   "actions_recent": 336,
+   "last_active": "2026-11-02 09:43:44+00:00"
   },
   {
    "repo": "heka-identity-platform",
@@ -397,11 +407,11 @@
    "committers": 3,
    "triage": 0,
    "active_recent": 3,
-   "maintainer_actions_recent": 278,
+   "maintainer_actions_recent": 282,
    "committer_actions_recent": 49,
    "triage_actions_recent": 0,
-   "actions_recent": 327,
-   "last_active": "2026-10-31 21:22:16+00:00"
+   "actions_recent": 331,
+   "last_active": "2026-11-02 14:26:19+00:00"
   },
   {
    "repo": "hiero-contracts",
@@ -492,12 +502,12 @@
    "maintainers": 12,
    "committers": 13,
    "triage": 0,
-   "active_recent": 2,
-   "maintainer_actions_recent": 50,
+   "active_recent": 3,
+   "maintainer_actions_recent": 52,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 50,
-   "last_active": "2026-10-30 15:52:35+00:00"
+   "actions_recent": 52,
+   "last_active": "2026-11-02 12:59:15+00:00"
   },
   {
    "repo": "solo-charts",
@@ -585,7 +595,7 @@
   }
  ],
  "row_count": 44,
- "generated_at": "2026-11-02T01:05:59.213177+00:00",
+ "generated_at": "2026-11-03T01:09:09.246096+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -594,12 +604,12 @@
     "maintainers": 16,
     "committers": 60,
     "triage": 3,
-    "active_recent": 32,
-    "maintainer_actions_recent": 202,
-    "committer_actions_recent": 389,
+    "active_recent": 35,
+    "maintainer_actions_recent": 189,
+    "committer_actions_recent": 376,
     "triage_actions_recent": 2,
-    "actions_recent": 593,
-    "last_active": "2026-10-31 11:05:35+00:00"
+    "actions_recent": 567,
+    "last_active": "2026-11-02 23:50:53+00:00"
    },
    {
     "repo": "hiero-block-node",
@@ -607,23 +617,11 @@
     "committers": 11,
     "triage": 2,
     "active_recent": 8,
-    "maintainer_actions_recent": 154,
-    "committer_actions_recent": 103,
-    "triage_actions_recent": 4,
-    "actions_recent": 261,
-    "last_active": "2026-10-30 20:22:13+00:00"
-   },
-   {
-    "repo": "solo",
-    "maintainers": 4,
-    "committers": 9,
-    "triage": 1,
-    "active_recent": 6,
-    "maintainer_actions_recent": 98,
-    "committer_actions_recent": 123,
-    "triage_actions_recent": 0,
-    "actions_recent": 221,
-    "last_active": "2026-11-01 22:18:05+00:00"
+    "maintainer_actions_recent": 149,
+    "committer_actions_recent": 118,
+    "triage_actions_recent": 3,
+    "actions_recent": 270,
+    "last_active": "2026-11-03 00:42:07+00:00"
    },
    {
     "repo": "hiero-mirror-node",
@@ -631,23 +629,35 @@
     "committers": 11,
     "triage": 0,
     "active_recent": 9,
-    "maintainer_actions_recent": 109,
-    "committer_actions_recent": 102,
+    "maintainer_actions_recent": 93,
+    "committer_actions_recent": 101,
     "triage_actions_recent": 0,
-    "actions_recent": 211,
-    "last_active": "2026-11-01 22:49:52+00:00"
+    "actions_recent": 194,
+    "last_active": "2026-11-02 21:23:21+00:00"
    },
    {
-    "repo": "hiero-sdk-js",
-    "maintainers": 6,
-    "committers": 2,
-    "triage": 13,
+    "repo": "solo",
+    "maintainers": 4,
+    "committers": 9,
+    "triage": 1,
+    "active_recent": 6,
+    "maintainer_actions_recent": 88,
+    "committer_actions_recent": 103,
+    "triage_actions_recent": 0,
+    "actions_recent": 191,
+    "last_active": "2026-11-02 17:56:24+00:00"
+   },
+   {
+    "repo": "hiero-sdk-tck",
+    "maintainers": 4,
+    "committers": 5,
+    "triage": 8,
     "active_recent": 3,
-    "maintainer_actions_recent": 125,
+    "maintainer_actions_recent": 74,
     "committer_actions_recent": 0,
-    "triage_actions_recent": 10,
-    "actions_recent": 135,
-    "last_active": "2026-10-30 13:47:03+00:00"
+    "triage_actions_recent": 1,
+    "actions_recent": 75,
+    "last_active": "2026-11-02 11:48:13+00:00"
    },
    {
     "repo": "hiero-json-rpc-relay",
@@ -655,47 +665,35 @@
     "committers": 14,
     "triage": 1,
     "active_recent": 4,
-    "maintainer_actions_recent": 21,
+    "maintainer_actions_recent": 22,
     "committer_actions_recent": 39,
     "triage_actions_recent": 0,
-    "actions_recent": 60,
-    "last_active": "2026-10-30 16:51:34+00:00"
+    "actions_recent": 61,
+    "last_active": "2026-11-02 15:28:53+00:00"
+   },
+   {
+    "repo": "hiero-sdk-js",
+    "maintainers": 6,
+    "committers": 2,
+    "triage": 13,
+    "active_recent": 3,
+    "maintainer_actions_recent": 48,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 7,
+    "actions_recent": 55,
+    "last_active": "2026-11-02 10:12:09+00:00"
    },
    {
     "repo": "hiero-sdk-python",
     "maintainers": 5,
     "committers": 6,
     "triage": 13,
-    "active_recent": 5,
-    "maintainer_actions_recent": 53,
-    "committer_actions_recent": 0,
+    "active_recent": 6,
+    "maintainer_actions_recent": 49,
+    "committer_actions_recent": 1,
     "triage_actions_recent": 0,
-    "actions_recent": 53,
-    "last_active": "2026-11-01 09:15:41+00:00"
-   },
-   {
-    "repo": "hiero-cryptography",
-    "maintainers": 4,
-    "committers": 5,
-    "triage": 0,
-    "active_recent": 3,
-    "maintainer_actions_recent": 41,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 41,
-    "last_active": "2026-10-30 23:17:01+00:00"
-   },
-   {
-    "repo": "hiero-sdk-java",
-    "maintainers": 4,
-    "committers": 4,
-    "triage": 12,
-    "active_recent": 3,
-    "maintainer_actions_recent": 31,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 1,
-    "actions_recent": 32,
-    "last_active": "2026-10-30 12:23:02+00:00"
+    "actions_recent": 50,
+    "last_active": "2026-11-03 00:14:00+00:00"
    },
    {
     "repo": "hiero-website",
@@ -703,11 +701,35 @@
     "committers": 1,
     "triage": 5,
     "active_recent": 4,
-    "maintainer_actions_recent": 22,
+    "maintainer_actions_recent": 25,
     "committer_actions_recent": 10,
     "triage_actions_recent": 0,
-    "actions_recent": 32,
-    "last_active": "2026-11-01 21:44:14+00:00"
+    "actions_recent": 35,
+    "last_active": "2026-11-02 23:55:55+00:00"
+   },
+   {
+    "repo": "hiero-cryptography",
+    "maintainers": 4,
+    "committers": 5,
+    "triage": 0,
+    "active_recent": 3,
+    "maintainer_actions_recent": 34,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 34,
+    "last_active": "2026-11-02 23:39:50+00:00"
+   },
+   {
+    "repo": "hiero-sdk-java",
+    "maintainers": 4,
+    "committers": 4,
+    "triage": 12,
+    "active_recent": 3,
+    "maintainer_actions_recent": 30,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 1,
+    "actions_recent": 31,
+    "last_active": "2026-11-02 11:07:23+00:00"
    },
    {
     "repo": "hiero-mirror-node-explorer",
@@ -715,18 +737,18 @@
     "committers": 1,
     "triage": 0,
     "active_recent": 3,
-    "maintainer_actions_recent": 24,
+    "maintainer_actions_recent": 18,
     "committer_actions_recent": 5,
     "triage_actions_recent": 0,
-    "actions_recent": 29,
-    "last_active": "2026-10-31 08:51:11+00:00"
+    "actions_recent": 23,
+    "last_active": "2026-11-02 13:22:27+00:00"
    },
    {
     "repo": "hiero-enterprise-java",
     "maintainers": 3,
     "committers": 2,
     "triage": 12,
-    "active_recent": 3,
+    "active_recent": 2,
     "maintainer_actions_recent": 16,
     "committer_actions_recent": 3,
     "triage_actions_recent": 0,
@@ -743,43 +765,19 @@
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 17,
-    "last_active": "2026-10-31 21:22:16+00:00"
-   },
-   {
-    "repo": "hiero-sdk-tck",
-    "maintainers": 4,
-    "committers": 5,
-    "triage": 8,
-    "active_recent": 2,
-    "maintainer_actions_recent": 13,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 13,
-    "last_active": "2026-10-30 09:17:48+00:00"
+    "last_active": "2026-11-02 14:26:19+00:00"
    },
    {
     "repo": "solo-docs",
     "maintainers": 8,
     "committers": 3,
     "triage": 0,
-    "active_recent": 4,
-    "maintainer_actions_recent": 8,
-    "committer_actions_recent": 2,
+    "active_recent": 5,
+    "maintainer_actions_recent": 10,
+    "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 10,
-    "last_active": "2026-10-29 13:46:56+00:00"
-   },
-   {
-    "repo": "governance",
-    "maintainers": 25,
-    "committers": 52,
-    "triage": 0,
-    "active_recent": 3,
-    "maintainer_actions_recent": 6,
-    "committer_actions_recent": 1,
-    "triage_actions_recent": 0,
-    "actions_recent": 7,
-    "last_active": "2026-10-28 14:50:42+00:00"
+    "last_active": "2026-11-02 18:29:50+00:00"
    },
    {
     "repo": "hiero-sdk-go",
@@ -787,23 +785,47 @@
     "committers": 1,
     "triage": 11,
     "active_recent": 3,
-    "maintainer_actions_recent": 2,
+    "maintainer_actions_recent": 8,
     "committer_actions_recent": 0,
-    "triage_actions_recent": 2,
-    "actions_recent": 4,
-    "last_active": "2026-10-27 10:40:48+00:00"
+    "triage_actions_recent": 1,
+    "actions_recent": 9,
+    "last_active": "2026-11-02 14:41:36+00:00"
    },
    {
-    "repo": "sdk-collaboration-hub",
-    "maintainers": 3,
-    "committers": 5,
-    "triage": 6,
+    "repo": "hiero-improvement-proposals",
+    "maintainers": 4,
+    "committers": 77,
+    "triage": 0,
+    "active_recent": 2,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 8,
+    "triage_actions_recent": 0,
+    "actions_recent": 8,
+    "last_active": "2026-11-02 13:44:46+00:00"
+   },
+   {
+    "repo": "hiero-gradle-conventions",
+    "maintainers": 4,
+    "committers": 0,
+    "triage": 0,
     "active_recent": 1,
-    "maintainer_actions_recent": 4,
+    "maintainer_actions_recent": 8,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 4,
-    "last_active": "2026-10-26 11:39:42+00:00"
+    "actions_recent": 8,
+    "last_active": "2026-11-02 14:20:12+00:00"
+   },
+   {
+    "repo": "governance",
+    "maintainers": 25,
+    "committers": 52,
+    "triage": 0,
+    "active_recent": 3,
+    "maintainer_actions_recent": 5,
+    "committer_actions_recent": 1,
+    "triage_actions_recent": 0,
+    "actions_recent": 6,
+    "last_active": "2026-11-02 14:48:10+00:00"
    },
    {
     "repo": "hiero-contracts",
@@ -818,6 +840,30 @@
     "last_active": "2026-10-30 17:05:05+00:00"
    },
    {
+    "repo": "hiero-ethereum-execution-spec-tests",
+    "maintainers": 12,
+    "committers": 13,
+    "triage": 0,
+    "active_recent": 2,
+    "maintainer_actions_recent": 3,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 3,
+    "last_active": "2026-11-02 12:59:15+00:00"
+   },
+   {
+    "repo": "hiero-solo-action",
+    "maintainers": 3,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 3,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 3,
+    "last_active": "2026-11-02 09:43:44+00:00"
+   },
+   {
     "repo": "hiero-docs",
     "maintainers": 3,
     "committers": 0,
@@ -827,7 +873,7 @@
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 2,
-    "last_active": "2026-10-26 17:08:54+00:00"
+    "last_active": "2026-11-02 17:03:21+00:00"
    },
    {
     "repo": "solo-charts",
@@ -842,54 +888,6 @@
     "last_active": "2026-10-29 21:00:01+00:00"
    },
    {
-    "repo": "solo-containers",
-    "maintainers": 5,
-    "committers": 3,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 2,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 2,
-    "last_active": "2026-10-26 10:45:48+00:00"
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "committers": 13,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 1,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 1,
-    "last_active": "2026-10-30 15:52:35+00:00"
-   },
-   {
-    "repo": "hiero-improvement-proposals",
-    "maintainers": 4,
-    "committers": 77,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 1,
-    "triage_actions_recent": 0,
-    "actions_recent": 1,
-    "last_active": "2026-10-30 03:52:01+00:00"
-   },
-   {
-    "repo": ".github",
-    "maintainers": 16,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 1,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 1,
-    "last_active": "2026-10-26 12:03:24+00:00"
-   },
-   {
     "repo": "awesome-contributions",
     "maintainers": 7,
     "committers": 0,
@@ -900,6 +898,18 @@
     "triage_actions_recent": 0,
     "actions_recent": 0,
     "last_active": "2026-08-14 19:39:38+00:00"
+   },
+   {
+    "repo": ".github",
+    "maintainers": 16,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2026-10-26 12:03:24+00:00"
    },
    {
     "repo": "hiero",
@@ -950,30 +960,6 @@
     "last_active": "2026-10-19 14:55:22+00:00"
    },
    {
-    "repo": "hiero-local-node",
-    "maintainers": 3,
-    "committers": 3,
-    "triage": 0,
-    "active_recent": 0,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 0,
-    "last_active": "2026-05-12 08:15:22+00:00"
-   },
-   {
-    "repo": "hiero-gradle-conventions",
-    "maintainers": 4,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 0,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 0,
-    "last_active": "2026-10-13 19:04:06+00:00"
-   },
-   {
     "repo": "hiero-did-sdk-python",
     "maintainers": 9,
     "committers": 2,
@@ -984,6 +970,30 @@
     "triage_actions_recent": 0,
     "actions_recent": 0,
     "last_active": "2026-03-24 20:21:27+00:00"
+   },
+   {
+    "repo": "hiero-hederium",
+    "maintainers": 2,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 0,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2025-09-04 06:41:29+00:00"
+   },
+   {
+    "repo": "hiero-local-node",
+    "maintainers": 3,
+    "committers": 3,
+    "triage": 0,
+    "active_recent": 0,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2026-05-12 08:15:22+00:00"
    },
    {
     "repo": "hiero-sdk-cpp",
@@ -998,16 +1008,16 @@
     "last_active": "2026-10-20 22:18:47+00:00"
    },
    {
-    "repo": "hiero-hederium",
-    "maintainers": 2,
-    "committers": 0,
-    "triage": 0,
+    "repo": "hiero-sdk-rust",
+    "maintainers": 4,
+    "committers": 2,
+    "triage": 12,
     "active_recent": 0,
     "maintainer_actions_recent": 0,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 0,
-    "last_active": "2025-09-04 06:41:29+00:00"
+    "last_active": "2026-10-20 22:19:03+00:00"
    },
    {
     "repo": "hiero-sdk-swift",
@@ -1058,28 +1068,16 @@
     "last_active": "2026-09-30 06:42:32+00:00"
    },
    {
-    "repo": "hiero-solo-action",
+    "repo": "sdk-collaboration-hub",
     "maintainers": 3,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 0,
+    "committers": 5,
+    "triage": 6,
+    "active_recent": 1,
     "maintainer_actions_recent": 0,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 0,
-    "last_active": "2026-10-23 09:19:08+00:00"
-   },
-   {
-    "repo": "hiero-sdk-rust",
-    "maintainers": 4,
-    "committers": 2,
-    "triage": 12,
-    "active_recent": 0,
-    "maintainer_actions_recent": 0,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 0,
-    "last_active": "2026-10-20 22:19:03+00:00"
+    "last_active": "2026-10-26 11:39:42+00:00"
    },
    {
     "repo": "solo-build-actions",
@@ -1092,6 +1090,18 @@
     "triage_actions_recent": 0,
     "actions_recent": 0,
     "last_active": null
+   },
+   {
+    "repo": "solo-containers",
+    "maintainers": 5,
+    "committers": 3,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2026-10-26 10:45:48+00:00"
    },
    {
     "repo": "tsc",
@@ -1125,11 +1135,11 @@
     "committers": 60,
     "triage": 3,
     "active_recent": 45,
-    "maintainer_actions_recent": 743,
-    "committer_actions_recent": 1265,
+    "maintainer_actions_recent": 774,
+    "committer_actions_recent": 1338,
     "triage_actions_recent": 10,
-    "actions_recent": 2018,
-    "last_active": "2026-10-31 11:05:35+00:00"
+    "actions_recent": 2122,
+    "last_active": "2026-11-02 23:50:53+00:00"
    },
    {
     "repo": "hiero-block-node",
@@ -1137,11 +1147,11 @@
     "committers": 11,
     "triage": 2,
     "active_recent": 9,
-    "maintainer_actions_recent": 669,
-    "committer_actions_recent": 372,
-    "triage_actions_recent": 28,
-    "actions_recent": 1069,
-    "last_active": "2026-10-30 20:22:13+00:00"
+    "maintainer_actions_recent": 686,
+    "committer_actions_recent": 397,
+    "triage_actions_recent": 33,
+    "actions_recent": 1116,
+    "last_active": "2026-11-03 00:42:07+00:00"
    },
    {
     "repo": "hiero-mirror-node",
@@ -1149,11 +1159,11 @@
     "committers": 11,
     "triage": 0,
     "active_recent": 9,
-    "maintainer_actions_recent": 445,
-    "committer_actions_recent": 451,
+    "maintainer_actions_recent": 458,
+    "committer_actions_recent": 467,
     "triage_actions_recent": 0,
-    "actions_recent": 896,
-    "last_active": "2026-11-01 22:49:52+00:00"
+    "actions_recent": 925,
+    "last_active": "2026-11-02 21:23:21+00:00"
    },
    {
     "repo": "solo",
@@ -1161,11 +1171,11 @@
     "committers": 9,
     "triage": 1,
     "active_recent": 9,
-    "maintainer_actions_recent": 360,
-    "committer_actions_recent": 474,
+    "maintainer_actions_recent": 377,
+    "committer_actions_recent": 482,
     "triage_actions_recent": 0,
-    "actions_recent": 834,
-    "last_active": "2026-11-01 22:18:05+00:00"
+    "actions_recent": 859,
+    "last_active": "2026-11-02 17:56:24+00:00"
    },
    {
     "repo": "hiero-sdk-js",
@@ -1173,11 +1183,11 @@
     "committers": 2,
     "triage": 13,
     "active_recent": 3,
-    "maintainer_actions_recent": 456,
+    "maintainer_actions_recent": 469,
     "committer_actions_recent": 0,
-    "triage_actions_recent": 22,
-    "actions_recent": 478,
-    "last_active": "2026-10-30 13:47:03+00:00"
+    "triage_actions_recent": 23,
+    "actions_recent": 492,
+    "last_active": "2026-11-02 10:12:09+00:00"
    },
    {
     "repo": "hiero-json-rpc-relay",
@@ -1185,47 +1195,47 @@
     "committers": 14,
     "triage": 1,
     "active_recent": 6,
-    "maintainer_actions_recent": 112,
-    "committer_actions_recent": 210,
+    "maintainer_actions_recent": 115,
+    "committer_actions_recent": 221,
     "triage_actions_recent": 0,
-    "actions_recent": 322,
-    "last_active": "2026-10-30 16:51:34+00:00"
+    "actions_recent": 336,
+    "last_active": "2026-11-02 15:28:53+00:00"
    },
    {
     "repo": "hiero-sdk-python",
     "maintainers": 5,
     "committers": 6,
     "triage": 13,
-    "active_recent": 6,
-    "maintainer_actions_recent": 273,
-    "committer_actions_recent": 2,
+    "active_recent": 7,
+    "maintainer_actions_recent": 287,
+    "committer_actions_recent": 3,
     "triage_actions_recent": 0,
-    "actions_recent": 275,
-    "last_active": "2026-11-01 09:15:41+00:00"
-   },
-   {
-    "repo": "hiero-cryptography",
-    "maintainers": 4,
-    "committers": 5,
-    "triage": 0,
-    "active_recent": 4,
-    "maintainer_actions_recent": 160,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 160,
-    "last_active": "2026-10-30 23:17:01+00:00"
+    "actions_recent": 290,
+    "last_active": "2026-11-03 00:14:00+00:00"
    },
    {
     "repo": "hiero-sdk-tck",
     "maintainers": 4,
     "committers": 5,
     "triage": 8,
-    "active_recent": 2,
-    "maintainer_actions_recent": 126,
+    "active_recent": 3,
+    "maintainer_actions_recent": 187,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 1,
+    "actions_recent": 188,
+    "last_active": "2026-11-02 11:48:13+00:00"
+   },
+   {
+    "repo": "hiero-cryptography",
+    "maintainers": 4,
+    "committers": 5,
+    "triage": 0,
+    "active_recent": 3,
+    "maintainer_actions_recent": 162,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 126,
-    "last_active": "2026-10-30 09:17:48+00:00"
+    "actions_recent": 162,
+    "last_active": "2026-11-02 23:39:50+00:00"
    },
    {
     "repo": "hiero-website",
@@ -1233,11 +1243,11 @@
     "committers": 1,
     "triage": 5,
     "active_recent": 5,
-    "maintainer_actions_recent": 99,
+    "maintainer_actions_recent": 102,
     "committer_actions_recent": 16,
     "triage_actions_recent": 0,
-    "actions_recent": 115,
-    "last_active": "2026-11-01 21:44:14+00:00"
+    "actions_recent": 118,
+    "last_active": "2026-11-02 23:55:55+00:00"
    },
    {
     "repo": "hiero-enterprise-java",
@@ -1257,11 +1267,11 @@
     "committers": 1,
     "triage": 0,
     "active_recent": 3,
-    "maintainer_actions_recent": 96,
+    "maintainer_actions_recent": 107,
     "committer_actions_recent": 5,
     "triage_actions_recent": 0,
-    "actions_recent": 101,
-    "last_active": "2026-10-31 08:51:11+00:00"
+    "actions_recent": 112,
+    "last_active": "2026-11-02 13:22:27+00:00"
    },
    {
     "repo": "hiero-sdk-java",
@@ -1269,11 +1279,11 @@
     "committers": 4,
     "triage": 12,
     "active_recent": 4,
-    "maintainer_actions_recent": 87,
+    "maintainer_actions_recent": 91,
     "committer_actions_recent": 1,
     "triage_actions_recent": 2,
-    "actions_recent": 90,
-    "last_active": "2026-10-30 12:23:02+00:00"
+    "actions_recent": 94,
+    "last_active": "2026-11-02 11:07:23+00:00"
    },
    {
     "repo": "heka-identity-platform",
@@ -1281,23 +1291,23 @@
     "committers": 3,
     "triage": 0,
     "active_recent": 1,
-    "maintainer_actions_recent": 58,
+    "maintainer_actions_recent": 62,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 58,
-    "last_active": "2026-10-31 21:22:16+00:00"
+    "actions_recent": 62,
+    "last_active": "2026-11-02 14:26:19+00:00"
    },
    {
-    "repo": "solo-docs",
-    "maintainers": 8,
-    "committers": 3,
-    "triage": 0,
-    "active_recent": 8,
+    "repo": "hiero-sdk-go",
+    "maintainers": 5,
+    "committers": 1,
+    "triage": 11,
+    "active_recent": 5,
     "maintainer_actions_recent": 39,
-    "committer_actions_recent": 6,
-    "triage_actions_recent": 0,
-    "actions_recent": 45,
-    "last_active": "2026-10-29 13:46:56+00:00"
+    "committer_actions_recent": 1,
+    "triage_actions_recent": 8,
+    "actions_recent": 48,
+    "last_active": "2026-11-02 14:41:36+00:00"
    },
    {
     "repo": "hiero-improvement-proposals",
@@ -1306,34 +1316,34 @@
     "triage": 0,
     "active_recent": 4,
     "maintainer_actions_recent": 40,
-    "committer_actions_recent": 1,
+    "committer_actions_recent": 8,
     "triage_actions_recent": 0,
-    "actions_recent": 41,
-    "last_active": "2026-10-30 03:52:01+00:00"
+    "actions_recent": 48,
+    "last_active": "2026-11-02 13:44:46+00:00"
+   },
+   {
+    "repo": "solo-docs",
+    "maintainers": 8,
+    "committers": 3,
+    "triage": 0,
+    "active_recent": 8,
+    "maintainer_actions_recent": 41,
+    "committer_actions_recent": 6,
+    "triage_actions_recent": 0,
+    "actions_recent": 47,
+    "last_active": "2026-11-02 18:29:50+00:00"
    },
    {
     "repo": "hiero-ethereum-execution-spec-tests",
     "maintainers": 12,
     "committers": 13,
     "triage": 0,
-    "active_recent": 2,
-    "maintainer_actions_recent": 40,
+    "active_recent": 3,
+    "maintainer_actions_recent": 42,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 40,
-    "last_active": "2026-10-30 15:52:35+00:00"
-   },
-   {
-    "repo": "hiero-sdk-go",
-    "maintainers": 5,
-    "committers": 1,
-    "triage": 11,
-    "active_recent": 5,
-    "maintainer_actions_recent": 31,
-    "committer_actions_recent": 1,
-    "triage_actions_recent": 8,
-    "actions_recent": 40,
-    "last_active": "2026-10-27 10:40:48+00:00"
+    "actions_recent": 42,
+    "last_active": "2026-11-02 12:59:15+00:00"
    },
    {
     "repo": "hiero-solo-action",
@@ -1341,11 +1351,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 30,
+    "maintainer_actions_recent": 33,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 30,
-    "last_active": "2026-10-23 09:19:08+00:00"
+    "actions_recent": 33,
+    "last_active": "2026-11-02 09:43:44+00:00"
    },
    {
     "repo": "governance",
@@ -1353,11 +1363,35 @@
     "committers": 52,
     "triage": 0,
     "active_recent": 7,
-    "maintainer_actions_recent": 21,
+    "maintainer_actions_recent": 22,
     "committer_actions_recent": 3,
     "triage_actions_recent": 0,
-    "actions_recent": 24,
-    "last_active": "2026-10-28 14:50:42+00:00"
+    "actions_recent": 25,
+    "last_active": "2026-11-02 14:48:10+00:00"
+   },
+   {
+    "repo": "hiero-gradle-conventions",
+    "maintainers": 4,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 3,
+    "maintainer_actions_recent": 22,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 22,
+    "last_active": "2026-11-02 14:20:12+00:00"
+   },
+   {
+    "repo": "hiero-docs",
+    "maintainers": 3,
+    "committers": 0,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 15,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 15,
+    "last_active": "2026-11-02 17:03:21+00:00"
    },
    {
     "repo": "solo-charts",
@@ -1370,30 +1404,6 @@
     "triage_actions_recent": 0,
     "actions_recent": 15,
     "last_active": "2026-10-29 21:00:01+00:00"
-   },
-   {
-    "repo": "hiero-gradle-conventions",
-    "maintainers": 4,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 3,
-    "maintainer_actions_recent": 14,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 14,
-    "last_active": "2026-10-13 19:04:06+00:00"
-   },
-   {
-    "repo": "hiero-docs",
-    "maintainers": 3,
-    "committers": 0,
-    "triage": 0,
-    "active_recent": 1,
-    "maintainer_actions_recent": 13,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 13,
-    "last_active": "2026-10-26 17:08:54+00:00"
    },
    {
     "repo": "sdk-collaboration-hub",
@@ -1508,7 +1518,7 @@
     "maintainers": 3,
     "committers": 1,
     "triage": 15,
-    "active_recent": 2,
+    "active_recent": 1,
     "maintainer_actions_recent": 1,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
@@ -1655,11 +1665,11 @@
     "committers": 60,
     "triage": 3,
     "active_recent": 64,
-    "maintainer_actions_recent": 8151,
-    "committer_actions_recent": 14244,
+    "maintainer_actions_recent": 8182,
+    "committer_actions_recent": 14318,
     "triage_actions_recent": 259,
-    "actions_recent": 22654,
-    "last_active": "2026-10-31 11:05:35+00:00"
+    "actions_recent": 22759,
+    "last_active": "2026-11-02 23:50:53+00:00"
    },
    {
     "repo": "hiero-block-node",
@@ -1667,11 +1677,11 @@
     "committers": 11,
     "triage": 2,
     "active_recent": 15,
-    "maintainer_actions_recent": 6442,
-    "committer_actions_recent": 4240,
-    "triage_actions_recent": 314,
-    "actions_recent": 10996,
-    "last_active": "2026-10-30 20:22:13+00:00"
+    "maintainer_actions_recent": 6464,
+    "committer_actions_recent": 4268,
+    "triage_actions_recent": 319,
+    "actions_recent": 11051,
+    "last_active": "2026-11-03 00:42:07+00:00"
    },
    {
     "repo": "hiero-mirror-node",
@@ -1679,11 +1689,11 @@
     "committers": 11,
     "triage": 0,
     "active_recent": 13,
-    "maintainer_actions_recent": 5437,
-    "committer_actions_recent": 3669,
+    "maintainer_actions_recent": 5450,
+    "committer_actions_recent": 3675,
     "triage_actions_recent": 0,
-    "actions_recent": 9106,
-    "last_active": "2026-11-01 22:49:52+00:00"
+    "actions_recent": 9125,
+    "last_active": "2026-11-02 21:23:21+00:00"
    },
    {
     "repo": "solo",
@@ -1691,11 +1701,11 @@
     "committers": 9,
     "triage": 1,
     "active_recent": 13,
-    "maintainer_actions_recent": 4624,
-    "committer_actions_recent": 3607,
+    "maintainer_actions_recent": 4641,
+    "committer_actions_recent": 3618,
     "triage_actions_recent": 79,
-    "actions_recent": 8310,
-    "last_active": "2026-11-01 22:18:05+00:00"
+    "actions_recent": 8338,
+    "last_active": "2026-11-02 17:56:24+00:00"
    },
    {
     "repo": "hiero-sdk-python",
@@ -1703,11 +1713,11 @@
     "committers": 6,
     "triage": 13,
     "active_recent": 19,
-    "maintainer_actions_recent": 6834,
+    "maintainer_actions_recent": 6837,
     "committer_actions_recent": 666,
     "triage_actions_recent": 271,
-    "actions_recent": 7771,
-    "last_active": "2026-11-01 09:15:41+00:00"
+    "actions_recent": 7774,
+    "last_active": "2026-11-03 00:14:00+00:00"
    },
    {
     "repo": "hiero-json-rpc-relay",
@@ -1715,11 +1725,11 @@
     "committers": 14,
     "triage": 1,
     "active_recent": 14,
-    "maintainer_actions_recent": 2841,
-    "committer_actions_recent": 1670,
+    "maintainer_actions_recent": 2844,
+    "committer_actions_recent": 1681,
     "triage_actions_recent": 0,
-    "actions_recent": 4511,
-    "last_active": "2026-10-30 16:51:34+00:00"
+    "actions_recent": 4525,
+    "last_active": "2026-11-02 15:28:53+00:00"
    },
    {
     "repo": "hiero-cli",
@@ -1734,6 +1744,18 @@
     "last_active": "2026-10-22 15:05:58+00:00"
    },
    {
+    "repo": "hiero-sdk-js",
+    "maintainers": 6,
+    "committers": 2,
+    "triage": 13,
+    "active_recent": 15,
+    "maintainer_actions_recent": 1955,
+    "committer_actions_recent": 77,
+    "triage_actions_recent": 170,
+    "actions_recent": 2202,
+    "last_active": "2026-11-02 10:12:09+00:00"
+   },
+   {
     "repo": "hiero-sdk-cpp",
     "maintainers": 3,
     "committers": 0,
@@ -1746,28 +1768,16 @@
     "last_active": "2026-10-20 22:18:47+00:00"
    },
    {
-    "repo": "hiero-sdk-js",
-    "maintainers": 6,
-    "committers": 2,
-    "triage": 13,
-    "active_recent": 15,
-    "maintainer_actions_recent": 1942,
-    "committer_actions_recent": 77,
-    "triage_actions_recent": 169,
-    "actions_recent": 2188,
-    "last_active": "2026-10-30 13:47:03+00:00"
-   },
-   {
     "repo": "hiero-website",
     "maintainers": 4,
     "committers": 1,
     "triage": 5,
     "active_recent": 9,
-    "maintainer_actions_recent": 1474,
+    "maintainer_actions_recent": 1477,
     "committer_actions_recent": 53,
     "triage_actions_recent": 48,
-    "actions_recent": 1575,
-    "last_active": "2026-11-01 21:44:14+00:00"
+    "actions_recent": 1578,
+    "last_active": "2026-11-02 23:55:55+00:00"
    },
    {
     "repo": "hiero-mirror-node-explorer",
@@ -1775,11 +1785,11 @@
     "committers": 1,
     "triage": 0,
     "active_recent": 4,
-    "maintainer_actions_recent": 1008,
+    "maintainer_actions_recent": 1019,
     "committer_actions_recent": 21,
     "triage_actions_recent": 0,
-    "actions_recent": 1029,
-    "last_active": "2026-10-31 08:51:11+00:00"
+    "actions_recent": 1040,
+    "last_active": "2026-11-02 13:22:27+00:00"
    },
    {
     "repo": "solo-docs",
@@ -1787,11 +1797,11 @@
     "committers": 3,
     "triage": 0,
     "active_recent": 11,
-    "maintainer_actions_recent": 1012,
+    "maintainer_actions_recent": 1014,
     "committer_actions_recent": 17,
     "triage_actions_recent": 0,
-    "actions_recent": 1029,
-    "last_active": "2026-10-29 13:46:56+00:00"
+    "actions_recent": 1031,
+    "last_active": "2026-11-02 18:29:50+00:00"
    },
    {
     "repo": "governance",
@@ -1799,11 +1809,11 @@
     "committers": 52,
     "triage": 0,
     "active_recent": 46,
-    "maintainer_actions_recent": 859,
+    "maintainer_actions_recent": 860,
     "committer_actions_recent": 164,
     "triage_actions_recent": 0,
-    "actions_recent": 1023,
-    "last_active": "2026-10-28 14:50:42+00:00"
+    "actions_recent": 1024,
+    "last_active": "2026-11-02 14:48:10+00:00"
    },
    {
     "repo": "hiero-enterprise-java",
@@ -1823,11 +1833,11 @@
     "committers": 4,
     "triage": 12,
     "active_recent": 14,
-    "maintainer_actions_recent": 743,
+    "maintainer_actions_recent": 747,
     "committer_actions_recent": 49,
     "triage_actions_recent": 85,
-    "actions_recent": 877,
-    "last_active": "2026-10-30 12:23:02+00:00"
+    "actions_recent": 881,
+    "last_active": "2026-11-02 11:07:23+00:00"
    },
    {
     "repo": "hiero-cryptography",
@@ -1835,11 +1845,11 @@
     "committers": 5,
     "triage": 0,
     "active_recent": 4,
-    "maintainer_actions_recent": 764,
+    "maintainer_actions_recent": 766,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 764,
-    "last_active": "2026-10-30 23:17:01+00:00"
+    "actions_recent": 766,
+    "last_active": "2026-11-02 23:39:50+00:00"
    },
    {
     "repo": "hiero-improvement-proposals",
@@ -1848,10 +1858,10 @@
     "triage": 0,
     "active_recent": 22,
     "maintainer_actions_recent": 454,
-    "committer_actions_recent": 295,
+    "committer_actions_recent": 302,
     "triage_actions_recent": 0,
-    "actions_recent": 749,
-    "last_active": "2026-10-30 03:52:01+00:00"
+    "actions_recent": 756,
+    "last_active": "2026-11-02 13:44:46+00:00"
    },
    {
     "repo": "sdk-collaboration-hub",
@@ -1871,11 +1881,11 @@
     "committers": 1,
     "triage": 11,
     "active_recent": 15,
-    "maintainer_actions_recent": 558,
+    "maintainer_actions_recent": 566,
     "committer_actions_recent": 25,
     "triage_actions_recent": 44,
-    "actions_recent": 627,
-    "last_active": "2026-10-27 10:40:48+00:00"
+    "actions_recent": 635,
+    "last_active": "2026-11-02 14:41:36+00:00"
    },
    {
     "repo": "hiero-sdk-swift",
@@ -1895,11 +1905,11 @@
     "committers": 5,
     "triage": 8,
     "active_recent": 12,
-    "maintainer_actions_recent": 238,
+    "maintainer_actions_recent": 299,
     "committer_actions_recent": 138,
-    "triage_actions_recent": 36,
-    "actions_recent": 412,
-    "last_active": "2026-10-30 09:17:48+00:00"
+    "triage_actions_recent": 37,
+    "actions_recent": 474,
+    "last_active": "2026-11-02 11:48:13+00:00"
    },
    {
     "repo": "hiero-gradle-conventions",
@@ -1907,11 +1917,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 4,
-    "maintainer_actions_recent": 400,
+    "maintainer_actions_recent": 408,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 400,
-    "last_active": "2026-10-13 19:04:06+00:00"
+    "actions_recent": 408,
+    "last_active": "2026-11-02 14:20:12+00:00"
    },
    {
     "repo": "heka-identity-platform",
@@ -1919,11 +1929,11 @@
     "committers": 3,
     "triage": 0,
     "active_recent": 3,
-    "maintainer_actions_recent": 278,
+    "maintainer_actions_recent": 282,
     "committer_actions_recent": 49,
     "triage_actions_recent": 0,
-    "actions_recent": 327,
-    "last_active": "2026-10-31 21:22:16+00:00"
+    "actions_recent": 331,
+    "last_active": "2026-11-02 14:26:19+00:00"
    },
    {
     "repo": "hiero-contracts",
@@ -1944,9 +1954,9 @@
     "triage": 12,
     "active_recent": 10,
     "maintainer_actions_recent": 181,
-    "committer_actions_recent": 31,
+    "committer_actions_recent": 30,
     "triage_actions_recent": 47,
-    "actions_recent": 259,
+    "actions_recent": 258,
     "last_active": "2026-10-20 22:19:03+00:00"
    },
    {
@@ -1979,11 +1989,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 3,
-    "maintainer_actions_recent": 93,
+    "maintainer_actions_recent": 96,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 93,
-    "last_active": "2026-10-23 09:19:08+00:00"
+    "actions_recent": 96,
+    "last_active": "2026-11-02 09:43:44+00:00"
    },
    {
     "repo": "hiero-docs",
@@ -1991,11 +2001,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 3,
-    "maintainer_actions_recent": 73,
+    "maintainer_actions_recent": 75,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 73,
-    "last_active": "2026-10-26 17:08:54+00:00"
+    "actions_recent": 75,
+    "last_active": "2026-11-02 17:03:21+00:00"
    },
    {
     "repo": "tsc",
@@ -2038,12 +2048,12 @@
     "maintainers": 12,
     "committers": 13,
     "triage": 0,
-    "active_recent": 2,
-    "maintainer_actions_recent": 50,
+    "active_recent": 3,
+    "maintainer_actions_recent": 52,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 50,
-    "last_active": "2026-10-30 15:52:35+00:00"
+    "actions_recent": 52,
+    "last_active": "2026-11-02 12:59:15+00:00"
    },
    {
     "repo": "hiero-did-sdk-python",

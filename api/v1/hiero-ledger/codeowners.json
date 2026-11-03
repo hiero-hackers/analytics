@@ -6,12 +6,14 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repository"
+   "label": "repository",
+   "description": "The repository this evidence reference is for."
   },
   {
    "key": "status",
    "label": "CODEOWNERS",
-   "format": "presence"
+   "format": "presence",
+   "description": "Whether the repository declares code owners."
   }
  ],
  "rows": [
@@ -193,7 +195,7 @@
   }
  ],
  "row_count": 44,
- "generated_at": "2026-11-02T01:06:22.744147+00:00",
+ "generated_at": "2026-11-03T01:09:30.907177+00:00",
  "stale": false,
  "group": "Ownership",
  "macro": "Security & scorecards"

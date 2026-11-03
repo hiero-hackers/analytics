@@ -6,27 +6,32 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name."
   },
   {
    "key": "maintainers",
    "label": "maintainers",
-   "format": "number"
+   "format": "number",
+   "description": "Total maintainers with access to this repository."
   },
   {
    "key": "active_maintainers",
    "label": "active maintainers",
-   "format": "number"
+   "format": "number",
+   "description": "Maintainers with activity in this repository within the selected period."
   },
   {
    "key": "committers",
    "label": "committers",
-   "format": "number"
+   "format": "number",
+   "description": "Total committers with write access to this repository."
   },
   {
    "key": "triage",
    "label": "triage",
-   "format": "number"
+   "format": "number",
+   "description": "Total users granted the triage role on this repository."
   }
  ],
  "rows": [
@@ -39,7 +44,7 @@
   }
  ],
  "row_count": 1,
- "generated_at": "2026-11-02T01:09:11.294956+00:00",
+ "generated_at": "2026-11-03T01:12:01.345523+00:00",
  "stale": false,
  "periods": {
   "7d": [

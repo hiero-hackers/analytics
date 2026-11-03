@@ -6,30 +6,36 @@
  "columns": [
   {
    "key": "user",
-   "label": "user"
+   "label": "user",
+   "description": "The permission-holder's GitHub login."
   },
   {
    "key": "highest_role",
-   "label": "highest role"
+   "label": "highest role",
+   "description": "The most senior governance role this user holds anywhere: maintainer, committer, triage, or general."
   },
   {
    "key": "roles",
-   "label": "roles held"
+   "label": "roles held",
+   "description": "All governance roles this user holds, across repositories."
   },
   {
    "key": "repos_held",
    "label": "repos",
-   "format": "number"
+   "format": "number",
+   "description": "Number of repositories where this user holds a governance role."
   },
   {
    "key": "days_since_active",
    "label": "days since active",
-   "format": "number"
+   "format": "number",
+   "description": "Days since this user's last recorded activity. Blank means no recorded activity yet."
   },
   {
    "key": "last_active",
    "label": "last active",
-   "format": "date"
+   "format": "date",
+   "description": "The most recent date this user had any tracked activity, across all repositories."
   }
  ],
  "rows": [
@@ -171,7 +177,7 @@
   }
  ],
  "row_count": 17,
- "generated_at": "2026-11-02T01:09:11.596539+00:00",
+ "generated_at": "2026-11-03T01:12:01.622236+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -316,7 +322,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 1,
-    "days_since_active": 16.0,
+    "days_since_active": 17.0,
     "last_active": "2026-10-16 03:49:50+00:00"
    }
   ],

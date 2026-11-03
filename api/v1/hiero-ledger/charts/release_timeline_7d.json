@@ -35,27 +35,14 @@
   "hiero-cryptography",
   "hiero-block-node",
   "hiero-mirror-node",
-  "solo",
-  "solo-containers"
+  "solo"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-02T01:07:10.486220+00:00"
+  "end": "2026-11-03T01:10:08.756019+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2026-10-26T19:42:15Z",
-   "tag_name": "v0.165.2-rc1",
-   "type": "prerelease"
-  },
-  {
-   "repo": "solo-containers",
-   "time": "2026-10-26T23:07:13Z",
-   "tag_name": "v0.47.0",
-   "type": "release"
-  },
   {
    "repo": "solo",
    "time": "2026-10-27T16:24:51Z",
@@ -99,6 +86,6 @@
    "type": "release"
   }
  ],
- "generated_at": "2026-11-02T01:07:10.486220+00:00",
+ "generated_at": "2026-11-03T01:10:08.756019+00:00",
  "stale": false
 }

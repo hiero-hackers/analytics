@@ -6,44 +6,54 @@
  "columns": [
   {
    "key": "team",
-   "label": "team"
+   "label": "team",
+   "description": "The governance team."
   },
   {
    "key": "members",
-   "label": "members"
+   "label": "members",
+   "description": "The total number of members in the team."
   },
   {
    "key": "resolved",
-   "label": "resolved"
+   "label": "resolved",
+   "description": "The number of members whose employer has been resolved."
   },
   {
    "key": "distinct_orgs",
-   "label": "distinct orgs"
+   "label": "distinct orgs",
+   "description": "The number of distinct organisations the members are affiliated with."
   },
   {
    "key": "top_org",
-   "label": "largest org"
+   "label": "largest org",
+   "description": "The organisation with the most members in the team."
   },
   {
    "key": "top_org_pct",
    "label": "largest org %",
-   "format": "percent"
+   "format": "percent",
+   "description": "The percentage of members in the team belonging to the largest organisation."
   },
   {
    "key": "hhi",
-   "label": "HHI"
+   "label": "HHI",
+   "description": "The Herfindahl-Hirschman Index for organisation concentration."
   },
   {
    "key": "unknown",
-   "label": "unknown"
+   "label": "unknown",
+   "description": "The number of members whose employer could not be determined."
   },
   {
    "key": "single_employer",
-   "label": "single employer"
+   "label": "single employer",
+   "description": "The number of teams where one employer holds all resolved seats."
   },
   {
    "key": "organisations",
-   "label": "organisation mix"
+   "label": "organisation mix",
+   "description": "A list of organisations with mapped members in the team."
   }
  ],
  "rows": [
@@ -133,7 +143,7 @@
   }
  ],
  "row_count": 7,
- "generated_at": "2026-11-02T01:09:11.712507+00:00",
+ "generated_at": "2026-11-03T01:12:01.726892+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

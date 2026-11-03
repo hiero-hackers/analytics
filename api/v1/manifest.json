@@ -9,8 +9,20 @@
      "definition": "a GitHub login."
     },
     {
-     "term": "PRs",
-     "definition": "pull requests this person opened (authored)."
+     "term": "issues opened / issues",
+     "definition": "issues this person opened, split by issue status."
+    },
+    {
+     "term": "labels applied / labels",
+     "definition": "labels this person applied, split by label type."
+    },
+    {
+     "term": "PRs opened / PRs",
+     "definition": "pull requests this person opened (authored), split by PR status."
+    },
+    {
+     "term": "repositories touched / repos",
+     "definition": "repositories this person touched, split by repo type."
     },
     {
      "term": "reviews",
@@ -21,36 +33,16 @@
      "definition": "pull requests they merged (clicked \u2018merge\u2019)."
     },
     {
-     "term": "issues",
-     "definition": "issues they opened."
-    },
-    {
-     "term": "labels",
-     "definition": "label add/remove actions they performed (triage)."
-    },
-    {
-     "term": "actions",
-     "definition": "PRs + reviews + merges + issues + labels, summed \u2014 one activity total. \u201cmaint./comm. actions\u201d split it by the repo\u2019s maintainers / committers / triage."
-    },
-    {
-     "term": "repos",
-     "definition": "number of distinct repositories they were active in."
+     "term": "signal matched",
+     "definition": "the weak automation signal that fired \u2014 one of *automation*, *actions*, *ci*, *svc*, *service*, *auto*, or *bot* appearing as a whole segment of the login, never glued onto a longer word \u2014 the reason it's here, not proof it's a bot. Confirmed bots move to BOT_LOGINS by hand; confirmed people move to bot_suspect_dismissals.yaml."
     },
     {
      "term": "last active",
      "definition": "date of their most recent tracked activity (all-time)."
     },
     {
-     "term": "period tabs",
-     "definition": "activity counts and active / quiet status use the selected rolling period; All time includes every tracked event."
-    },
-    {
      "term": "login",
      "definition": "the GitHub login flagged for review."
-    },
-    {
-     "term": "signal matched",
-     "definition": "the weak automation signal that fired \u2014 one of *automation*, *actions*, *ci*, *svc*, *service*, *auto*, or *bot* appearing as a whole segment of the login, never glued onto a longer word \u2014 the reason it's here, not proof it's a bot. Confirmed bots move to BOT_LOGINS by hand; confirmed people move to bot_suspect_dismissals.yaml."
     }
    ],
    "note": "Tabbed activity tables use the selected period; the all-time columns are cumulative. Tracked activities are opening PRs/issues, reviewing, merging, and labeling \u2014 comments and reactions are not counted."
@@ -391,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-02T01:09:16.865494+00:00",
+ "generated_at": "2026-11-03T01:12:05.799116+00:00",
  "provenance": {
-  "git_sha": "2c3b70c",
-  "data_as_of": "2026-11-02T01:01:33.546090+00:00"
+  "git_sha": "831565d",
+  "data_as_of": "2026-11-03T01:01:38.836613+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -519,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 872,
+     "row_count": 873,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1186,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-02T01:07:50.164344+00:00"
+      "generated_at": "2026-11-03T01:10:46.204187+00:00"
      }
     },
     {
@@ -1262,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-02T01:07:50.160955+00:00"
+      "generated_at": "2026-11-03T01:10:46.200932+00:00"
      }
     },
     {
@@ -1673,7 +1665,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 100,
+      "value": 99,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1743,7 +1735,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 51,
+     "row_count": 52,
      "path": "hiero-hackers/profiles.json"
     },
     {
@@ -2221,13 +2213,6 @@
           "kind": "events",
           "path": "hiero-hackers/charts/release_timeline_30d.json"
          }
-        },
-        {
-         "label": "Week",
-         "interactive": {
-          "kind": "events",
-          "path": "hiero-hackers/charts/release_timeline_7d.json"
-         }
         }
        ],
        "note": "One dot per release, diamonds for prereleases. Repos with zero releases in the selected span aren't shown on the chart (see the table for those).",
@@ -2256,7 +2241,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 51,
+      "value": 52,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -2266,7 +2251,7 @@
      },
      {
       "label": "active last month %",
-      "value": "39%",
+      "value": "40%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -2275,7 +2260,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "39%",
+      "value": "38%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -2284,7 +2269,7 @@
      },
      {
       "label": "file issues %",
-      "value": "53%",
+      "value": "52%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -2293,7 +2278,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "82%",
+      "value": "83%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -2302,7 +2287,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "55%",
+      "value": "54%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -2311,7 +2296,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "31%",
+      "value": "33%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -2359,7 +2344,7 @@
     },
     "contributors": {
      "path": "hiero-hackers/entities/contributors.json",
-     "count": 51
+     "count": 52
     }
    }
   },

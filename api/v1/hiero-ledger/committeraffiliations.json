@@ -6,19 +6,23 @@
  "columns": [
   {
    "key": "login",
-   "label": "committer"
+   "label": "committer",
+   "description": "The committer's GitHub login."
   },
   {
    "key": "organisation",
-   "label": "organisation"
+   "label": "organisation",
+   "description": "The organisation the committer is affiliated with."
   },
   {
    "key": "status",
-   "label": "status"
+   "label": "status",
+   "description": "The status of the committer's affiliation."
   },
   {
    "key": "method",
-   "label": "method"
+   "label": "method",
+   "description": "The method used to determine the committer's affiliation."
   }
  ],
  "rows": [
@@ -803,7 +807,7 @@
   "url": "https://github.com/hiero-hackers/analytics/issues",
   "label": "Suggest a correction"
  },
- "generated_at": "2026-11-02T01:06:04.407361+00:00",
+ "generated_at": "2026-11-03T01:09:14.525943+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance",

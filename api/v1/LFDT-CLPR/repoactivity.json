@@ -6,52 +6,62 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name, as known to the governance config."
   },
   {
    "key": "maintainers",
    "label": "maintainers",
-   "format": "number"
+   "format": "number",
+   "description": "Total maintainers with access to this repository, regardless of recent activity."
   },
   {
    "key": "committers",
    "label": "committers",
-   "format": "number"
+   "format": "number",
+   "description": "Total committers with write access to this repository."
   },
   {
    "key": "triage",
    "label": "triage",
-   "format": "number"
+   "format": "number",
+   "description": "Total users granted the triage role on this repository."
   },
   {
    "key": "active_recent",
    "label": "active",
-   "format": "number"
+   "format": "number",
+   "description": "Permission-holders active in this repository within the selected period."
   },
   {
    "key": "maintainer_actions_recent",
    "label": "maint. actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active maintainers in the selected period."
   },
   {
    "key": "committer_actions_recent",
    "label": "comm. actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active committers in the selected period."
   },
   {
    "key": "triage_actions_recent",
    "label": "triage actions",
-   "format": "number"
+   "format": "number",
+   "description": "Tracked actions (PRs, reviews, merges, issues, labels) by active triage holders in the selected period."
   },
   {
    "key": "actions_recent",
    "label": "actions",
-   "format": "number"
+   "format": "number",
+   "description": "All tracked actions in this repository within the selected period, summed across roles."
   },
   {
    "key": "last_active",
    "label": "last active",
-   "format": "date"
+   "format": "date",
+   "description": "The most recent date any permission-holder had activity in this repository."
   }
  ],
  "rows": [
@@ -61,11 +71,11 @@
    "committers": 0,
    "triage": 0,
    "active_recent": 2,
-   "maintainer_actions_recent": 19,
+   "maintainer_actions_recent": 20,
    "committer_actions_recent": 0,
    "triage_actions_recent": 0,
-   "actions_recent": 19,
-   "last_active": "2026-10-28 18:42:40+00:00"
+   "actions_recent": 20,
+   "last_active": "2026-11-02 17:19:47+00:00"
   },
   {
    "repo": "clpr-smart-contracts",
@@ -117,7 +127,7 @@
   }
  ],
  "row_count": 5,
- "generated_at": "2026-11-02T01:09:11.288124+00:00",
+ "generated_at": "2026-11-03T01:12:01.338253+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -127,10 +137,10 @@
     "committers": 15,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 1,
+    "maintainer_actions_recent": 0,
     "committer_actions_recent": 5,
     "triage_actions_recent": 0,
-    "actions_recent": 6,
+    "actions_recent": 5,
     "last_active": "2026-10-30 14:59:33+00:00"
    },
    {
@@ -143,7 +153,7 @@
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
     "actions_recent": 5,
-    "last_active": "2026-10-28 18:42:40+00:00"
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "repo": "clpr-endpoint",
@@ -151,10 +161,10 @@
     "committers": 10,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 1,
+    "maintainer_actions_recent": 0,
     "committer_actions_recent": 3,
     "triage_actions_recent": 0,
-    "actions_recent": 4,
+    "actions_recent": 3,
     "last_active": "2026-10-27 15:56:07+00:00"
    },
    {
@@ -163,10 +173,10 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 3,
+    "maintainer_actions_recent": 2,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 3,
+    "actions_recent": 2,
     "last_active": "2026-10-27 19:33:40+00:00"
    },
    {
@@ -189,11 +199,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 19,
+    "maintainer_actions_recent": 20,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 19,
-    "last_active": "2026-10-28 18:42:40+00:00"
+    "actions_recent": 20,
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "repo": "clpr-smart-contracts",
@@ -251,11 +261,11 @@
     "committers": 0,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 19,
+    "maintainer_actions_recent": 20,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,
-    "actions_recent": 19,
-    "last_active": "2026-10-28 18:42:40+00:00"
+    "actions_recent": 20,
+    "last_active": "2026-11-02 17:19:47+00:00"
    },
    {
     "repo": "clpr-smart-contracts",

@@ -6,16 +6,18 @@
  "columns": [
   {
    "key": "login",
-   "label": "login"
+   "label": "Login",
+   "description": "The unique GitHub login identifying a contributor. Used to track all activity attributed to this person."
   },
   {
    "key": "signal",
-   "label": "signal matched"
+   "label": "Signal matched",
+   "description": "A weak automation signal found in the login. Triggers bot suspects review: matches patterns like 'automation', 'actions', 'service', 'auto', 'svc', 'ci', or 'bot' as a whole segment."
   }
  ],
  "rows": [],
  "row_count": 0,
- "generated_at": "2026-11-02T01:03:32.975895+00:00",
+ "generated_at": "2026-11-03T01:03:38.288760+00:00",
  "stale": false,
  "group": "Bot suspects (review)",
  "macro": "Contributors"

@@ -6,38 +6,46 @@
  "columns": [
   {
    "key": "repo",
-   "label": "repo"
+   "label": "repo",
+   "description": "The repository name."
   },
   {
    "key": "maintainers",
    "label": "maintainers",
-   "format": "number"
+   "format": "number",
+   "description": "Number of maintainers active in this repository."
   },
   {
    "key": "distinct_orgs",
    "label": "distinct orgs",
-   "format": "number"
+   "format": "number",
+   "description": "Number of distinct organisations these maintainers span."
   },
   {
    "key": "top_org",
-   "label": "largest org"
+   "label": "largest org",
+   "description": "The organisation with the most maintainers in this repository."
   },
   {
    "key": "top_org_pct",
    "label": "largest org %",
-   "format": "percent"
+   "format": "percent",
+   "description": "Share of maintainers in this repository belonging to the largest organisation."
   },
   {
    "key": "independent",
-   "label": "independent"
+   "label": "independent",
+   "description": "Maintainers with no curated employer affiliation, counted separately."
   },
   {
    "key": "unknown",
-   "label": "unknown"
+   "label": "unknown",
+   "description": "Maintainers whose employer could not be determined."
   },
   {
    "key": "organisations",
-   "label": "organisations"
+   "label": "organisations",
+   "description": "Organisation mix - full list of organisations with mapped maintainers in this repository."
   }
  ],
  "rows": [
@@ -94,7 +102,7 @@
  ],
  "row_count": 5,
  "label": "Maintainers",
- "generated_at": "2026-11-02T01:09:11.678677+00:00",
+ "generated_at": "2026-11-03T01:12:01.692478+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -106,38 +114,46 @@
    "columns": [
     {
      "key": "repo",
-     "label": "repo"
+     "label": "repo",
+     "description": "The repository name."
     },
     {
      "key": "maintainers",
      "label": "maintainers",
-     "format": "number"
+     "format": "number",
+     "description": "Number of maintainers active in this repository."
     },
     {
      "key": "distinct_orgs",
      "label": "distinct orgs",
-     "format": "number"
+     "format": "number",
+     "description": "Number of distinct organisations these maintainers span."
     },
     {
      "key": "top_org",
-     "label": "largest org"
+     "label": "largest org",
+     "description": "The organisation with the most maintainers in this repository."
     },
     {
      "key": "top_org_pct",
      "label": "largest org %",
-     "format": "percent"
+     "format": "percent",
+     "description": "Share of maintainers in this repository belonging to the largest organisation."
     },
     {
      "key": "independent",
-     "label": "independent"
+     "label": "independent",
+     "description": "Maintainers with no curated employer affiliation, counted separately."
     },
     {
      "key": "unknown",
-     "label": "unknown"
+     "label": "unknown",
+     "description": "Maintainers whose employer could not be determined."
     },
     {
      "key": "organisations",
-     "label": "organisations"
+     "label": "organisations",
+     "description": "Organisation mix - full list of organisations with mapped maintainers in this repository."
     }
    ],
    "rows": [
@@ -194,7 +210,7 @@
    ],
    "row_count": 5,
    "label": "Maintainers",
-   "generated_at": "2026-11-02T01:09:11.678677+00:00",
+   "generated_at": "2026-11-03T01:12:01.692478+00:00",
    "stale": false
   },
   {
@@ -205,38 +221,46 @@
    "columns": [
     {
      "key": "repo",
-     "label": "repo"
+     "label": "repo",
+     "description": "The repository name."
     },
     {
      "key": "committers",
      "label": "committers",
-     "format": "number"
+     "format": "number",
+     "description": "Number of committers active in this repository."
     },
     {
      "key": "distinct_orgs",
      "label": "distinct orgs",
-     "format": "number"
+     "format": "number",
+     "description": "Number of distinct organisations these committers span."
     },
     {
      "key": "top_org",
-     "label": "largest org"
+     "label": "largest org",
+     "description": "The organisation with the most committers in this repository."
     },
     {
      "key": "top_org_pct",
      "label": "largest org %",
-     "format": "percent"
+     "format": "percent",
+     "description": "Share of committers in this repository belonging to the largest organisation."
     },
     {
      "key": "independent",
-     "label": "independent"
+     "label": "independent",
+     "description": "Committers with no curated employer affiliation, counted separately."
     },
     {
      "key": "unknown",
-     "label": "unknown"
+     "label": "unknown",
+     "description": "Committers whose employer could not be determined."
     },
     {
      "key": "organisations",
-     "label": "organisations"
+     "label": "organisations",
+     "description": "Organisation mix - full list of organisations with mapped committers in this repository."
     }
    ],
    "rows": [
@@ -273,7 +297,7 @@
    ],
    "row_count": 3,
    "label": "Committers",
-   "generated_at": "2026-11-02T01:09:11.690406+00:00",
+   "generated_at": "2026-11-03T01:12:01.704417+00:00",
    "stale": false
   }
  ],

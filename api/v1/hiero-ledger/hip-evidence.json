@@ -7,57 +7,83 @@
   {
    "key": "hip",
    "label": "HIP",
-   "format": "hip"
+   "format": "hip",
+   "description": "The HIP specification number this evidence reference is for."
   },
   {
    "key": "hip_title",
-   "label": "HIP title"
+   "label": "HIP title",
+   "description": "The title of the HIP specification as defined in its frontmatter."
   },
   {
    "key": "repo",
-   "label": "repository"
+   "label": "repository",
+   "description": "The repository this evidence reference is for."
   },
   {
    "key": "pr_number",
-   "label": "PR"
+   "label": "PR",
+   "description": "The pull request number that provides evidence for this HIP."
   },
   {
    "key": "pr_title",
-   "label": "PR title"
+   "label": "PR title",
+   "description": "The title of the pull request providing evidence for this HIP."
   },
   {
    "key": "pr_state",
-   "label": "state"
+   "label": "state",
+   "description": "The state of the pull request."
   },
   {
    "key": "pr_merged_at",
    "label": "merged",
-   "format": "date"
+   "format": "date",
+   "description": "The date the pull request was merged."
   },
   {
    "key": "match_sources",
-   "label": "matched in"
+   "label": "matched in",
+   "description": "The sources where the HIP reference was matched."
   },
   {
    "key": "qualifier",
-   "label": "distancing cue"
+   "label": "distancing cue",
+   "description": "The distancing cue used in the reference."
   },
   {
    "key": "counted",
    "label": "counted",
-   "format": "flag"
+   "format": "flag",
+   "description": "Whether the reference is counted."
   },
   {
    "key": "snippet",
-   "label": "matched text"
+   "label": "matched text",
+   "description": "A short text excerpt from the PR title, body, or description that matched the HIP reference pattern."
   },
   {
    "key": "url",
    "label": "link",
-   "format": "link"
+   "format": "link",
+   "description": "A link to the pull request providing evidence for this HIP."
   }
  ],
  "rows": [
+  {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 1891,
+   "pr_title": " feat: add HIP-1535 CLPR support",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "feat: add HIP-1535 CLPR support",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/1891"
+  },
   {
    "hip": 1535,
    "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
@@ -1128,8 +1154,8 @@
    "repo": "hiero-ledger/hiero-sdk-go",
    "pr_number": 1879,
    "pr_title": "fix(tck): forward commonTransactionParams.highVolume",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-02 10:16:32+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -6966,8 +6992,8 @@
    "repo": "hiero-ledger/hiero-consensus-node",
    "pr_number": 27846,
    "pr_title": "fix: externalize committed EVM self-destruct deletions",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-02 17:24:20+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -12267,8 +12293,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 872,
- "generated_at": "2026-11-02T01:07:50.157240+00:00",
+ "row_count": 873,
+ "generated_at": "2026-11-03T01:10:46.197228+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
