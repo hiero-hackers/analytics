@@ -34,27 +34,15 @@
  "categories": [
   "hiero-cryptography",
   "hiero-block-node",
-  "hiero-mirror-node",
-  "solo"
+  "hiero-gradle-conventions",
+  "hiero-mirror-node"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-03T01:10:08.756019+00:00"
+  "end": "2026-11-04T01:11:16.069837+00:00"
  },
  "rows": [
-  {
-   "repo": "solo",
-   "time": "2026-10-27T16:24:51Z",
-   "tag_name": "v0.95.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-cryptography",
-   "time": "2026-10-27T16:52:18Z",
-   "tag_name": "v3.24.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-cryptography",
    "time": "2026-10-29T19:23:14Z",
@@ -84,8 +72,20 @@
    "time": "2026-10-30T21:51:34Z",
    "tag_name": "v3.26.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "time": "2026-11-03T13:50:05Z",
+   "tag_name": "v0.7.13",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-11-03T21:34:39Z",
+   "tag_name": "v3.27.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-03T01:10:08.756019+00:00",
+ "generated_at": "2026-11-04T01:11:16.069837+00:00",
  "stale": false
 }

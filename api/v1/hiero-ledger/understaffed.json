@@ -51,7 +51,7 @@
   }
  ],
  "row_count": 2,
- "generated_at": "2026-11-03T01:09:09.287014+00:00",
+ "generated_at": "2026-11-04T01:10:06.924939+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -61,6 +61,13 @@
     "active_maintainers": 0,
     "committers": 0,
     "triage": 0
+   },
+   {
+    "repo": "sdk-collaboration-hub",
+    "maintainers": 3,
+    "active_maintainers": 0,
+    "committers": 5,
+    "triage": 6
    },
    {
     "repo": "roadmap",
@@ -126,6 +133,13 @@
     "triage": 0
    },
    {
+    "repo": "solo-containers",
+    "maintainers": 5,
+    "active_maintainers": 0,
+    "committers": 3,
+    "triage": 0
+   },
+   {
     "repo": "hiero-consensus-specifications",
     "maintainers": 5,
     "active_maintainers": 0,
@@ -168,6 +182,13 @@
     "triage": 0
    },
    {
+    "repo": ".github",
+    "maintainers": 16,
+    "active_maintainers": 0,
+    "committers": 0,
+    "triage": 0
+   },
+   {
     "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -180,13 +201,6 @@
     "active_maintainers": 0,
     "committers": 0,
     "triage": 0
-   },
-   {
-    "repo": "sdk-collaboration-hub",
-    "maintainers": 3,
-    "active_maintainers": 1,
-    "committers": 5,
-    "triage": 6
    },
    {
     "repo": "hiero-enterprise-java",
@@ -203,11 +217,18 @@
     "triage": 0
    },
    {
-    "repo": "hiero-solo-action",
-    "maintainers": 3,
+    "repo": "solo",
+    "maintainers": 4,
     "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
+    "committers": 9,
+    "triage": 1
+   },
+   {
+    "repo": "hiero-sdk-java",
+    "maintainers": 4,
+    "active_maintainers": 1,
+    "committers": 4,
+    "triage": 12
    },
    {
     "repo": "heka-identity-platform",
@@ -231,32 +252,11 @@
     "triage": 0
    },
    {
-    "repo": "solo-containers",
-    "maintainers": 5,
-    "active_maintainers": 1,
-    "committers": 3,
-    "triage": 0
-   },
-   {
     "repo": "hiero-sdk-go",
     "maintainers": 5,
     "active_maintainers": 1,
     "committers": 1,
     "triage": 11
-   },
-   {
-    "repo": "hiero-contracts",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 30,
-    "triage": 1
-   },
-   {
-    "repo": ".github",
-    "maintainers": 16,
-    "active_maintainers": 1,
-    "committers": 0,
-    "triage": 0
    }
   ],
   "30d": [
@@ -406,13 +406,6 @@
     "active_maintainers": 1,
     "committers": 2,
     "triage": 0
-   },
-   {
-    "repo": "hiero-contracts",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 30,
-    "triage": 1
    },
    {
     "repo": "tsc",

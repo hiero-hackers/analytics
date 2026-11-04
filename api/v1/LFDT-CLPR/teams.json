@@ -58,25 +58,13 @@
  ],
  "rows": [
   {
-   "team": "lfdt-staff",
-   "members": 3,
-   "active_members": 2,
-   "status": "active",
-   "days_since_active": 5,
-   "prs_opened": 14,
-   "reviews_given": 16,
-   "merges_done": 16,
-   "issues_opened": 9,
-   "labels_applied": 13
-  },
-  {
    "team": "clpr-endpoint-committers",
    "members": 5,
    "active_members": 2,
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 5,
-   "reviews_given": 9,
+   "reviews_given": 10,
    "merges_done": 2,
    "issues_opened": 2,
    "labels_applied": 0
@@ -88,7 +76,7 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 10,
-   "reviews_given": 10,
+   "reviews_given": 11,
    "merges_done": 3,
    "issues_opened": 7,
    "labels_applied": 4
@@ -100,7 +88,7 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 5,
-   "reviews_given": 6,
+   "reviews_given": 7,
    "merges_done": 2,
    "issues_opened": 2,
    "labels_applied": 0
@@ -112,7 +100,7 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 7,
-   "reviews_given": 19,
+   "reviews_given": 20,
    "merges_done": 2,
    "issues_opened": 3,
    "labels_applied": 0
@@ -124,10 +112,22 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 5,
-   "reviews_given": 6,
+   "reviews_given": 7,
    "merges_done": 2,
    "issues_opened": 2,
    "labels_applied": 0
+  },
+  {
+   "team": "lfdt-staff",
+   "members": 3,
+   "active_members": 2,
+   "status": "active",
+   "days_since_active": 0,
+   "prs_opened": 16,
+   "reviews_given": 16,
+   "merges_done": 16,
+   "issues_opened": 9,
+   "labels_applied": 13
   },
   {
    "team": "security-maintainers",
@@ -136,29 +136,17 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 5,
-   "reviews_given": 6,
+   "reviews_given": 7,
    "merges_done": 2,
    "issues_opened": 2,
    "labels_applied": 0
   }
  ],
  "row_count": 7,
- "generated_at": "2026-11-03T01:12:01.634341+00:00",
+ "generated_at": "2026-11-04T01:13:24.709865+00:00",
  "stale": false,
  "periods": {
   "7d": [
-   {
-    "team": "lfdt-staff",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 5,
-    "prs_opened": 1,
-    "reviews_given": 7,
-    "merges_done": 4,
-    "issues_opened": 0,
-    "labels_applied": 0
-   },
    {
     "team": "clpr-endpoint-committers",
     "members": 5,
@@ -166,7 +154,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 1,
-    "reviews_given": 5,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -177,8 +165,8 @@
     "active_members": 2,
     "status": "active",
     "days_since_active": 0,
-    "prs_opened": 3,
-    "reviews_given": 3,
+    "prs_opened": 2,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -202,7 +190,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 3,
-    "reviews_given": 13,
+    "reviews_given": 11,
     "merges_done": 0,
     "issues_opened": 3,
     "labels_applied": 0
@@ -217,6 +205,18 @@
     "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 2,
+    "labels_applied": 0
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 2,
+    "reviews_given": 6,
+    "merges_done": 3,
+    "issues_opened": 0,
     "labels_applied": 0
    },
    {
@@ -234,25 +234,13 @@
   ],
   "30d": [
    {
-    "team": "lfdt-staff",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 5,
-    "prs_opened": 8,
-    "reviews_given": 13,
-    "merges_done": 11,
-    "issues_opened": 9,
-    "labels_applied": 13
-   },
-   {
     "team": "clpr-endpoint-committers",
     "members": 5,
     "active_members": 2,
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 3,
-    "reviews_given": 9,
+    "reviews_given": 10,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -264,7 +252,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 8,
-    "reviews_given": 8,
+    "reviews_given": 9,
     "merges_done": 1,
     "issues_opened": 7,
     "labels_applied": 4
@@ -276,7 +264,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 3,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -288,7 +276,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 19,
+    "reviews_given": 20,
     "merges_done": 0,
     "issues_opened": 3,
     "labels_applied": 0
@@ -300,10 +288,22 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 3,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 10,
+    "reviews_given": 13,
+    "merges_done": 11,
+    "issues_opened": 9,
+    "labels_applied": 13
    },
    {
     "team": "security-maintainers",
@@ -312,7 +312,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 3,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0
@@ -320,25 +320,13 @@
   ],
   "365d": [
    {
-    "team": "lfdt-staff",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 5,
-    "prs_opened": 14,
-    "reviews_given": 16,
-    "merges_done": 16,
-    "issues_opened": 9,
-    "labels_applied": 13
-   },
-   {
     "team": "clpr-endpoint-committers",
     "members": 5,
     "active_members": 2,
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 9,
+    "reviews_given": 10,
     "merges_done": 2,
     "issues_opened": 2,
     "labels_applied": 0
@@ -350,7 +338,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 10,
-    "reviews_given": 10,
+    "reviews_given": 11,
     "merges_done": 3,
     "issues_opened": 7,
     "labels_applied": 4
@@ -362,7 +350,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 2,
     "issues_opened": 2,
     "labels_applied": 0
@@ -374,7 +362,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 7,
-    "reviews_given": 19,
+    "reviews_given": 20,
     "merges_done": 2,
     "issues_opened": 3,
     "labels_applied": 0
@@ -386,10 +374,22 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 2,
     "issues_opened": 2,
     "labels_applied": 0
+   },
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 16,
+    "reviews_given": 16,
+    "merges_done": 16,
+    "issues_opened": 9,
+    "labels_applied": 13
    },
    {
     "team": "security-maintainers",
@@ -398,7 +398,7 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 5,
-    "reviews_given": 6,
+    "reviews_given": 7,
     "merges_done": 2,
     "issues_opened": 2,
     "labels_applied": 0

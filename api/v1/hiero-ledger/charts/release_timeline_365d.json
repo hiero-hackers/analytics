@@ -41,8 +41,8 @@
   "hiero-json-rpc-relay",
   "solo-containers",
   "solo-charts",
-  "hiero-sdk-java",
   "hiero-gradle-conventions",
+  "hiero-sdk-java",
   "hiero-sdk-python",
   "hiero-sdk-go",
   "hiero-solo-action",
@@ -62,15 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-11-03T01:10:08.756019+00:00"
+  "end": "2026-11-04T01:11:16.069837+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-11-04T00:49:27Z",
-   "tag_name": "v0.142.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-gradle-conventions",
    "time": "2025-11-05T08:44:38Z",
@@ -3538,8 +3532,20 @@
    "time": "2026-10-30T21:51:34Z",
    "tag_name": "v3.26.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "time": "2026-11-03T13:50:05Z",
+   "tag_name": "v0.7.13",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-11-03T21:34:39Z",
+   "tag_name": "v3.27.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-03T01:10:08.756019+00:00",
+ "generated_at": "2026-11-04T01:11:16.069837+00:00",
  "stale": false
 }

@@ -64,7 +64,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-03T01:10:59.741253+00:00"
+  "end": "2026-11-04T01:12:17.497975+00:00"
  },
  "nodes": [
   {
@@ -72,24 +72,24 @@
    "active": 22,
    "total": 32,
    "category": "Tooling / DevEx",
-   "x": -0.0788,
-   "y": -0.0597
+   "x": -0.059,
+   "y": 0.0781
   },
   {
    "id": "sdk-automations",
    "active": 8,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": -0.1873,
-   "y": -1.5667
+   "x": -1.5672,
+   "y": 0.4378
   },
   {
    "id": "hiero-enterprise-js",
    "active": 7,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": -1.718,
-   "y": 0.0621
+   "x": 0.336,
+   "y": 1.718
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -97,15 +97,15 @@
    "total": 5,
    "category": "SDKs",
    "x": -3.15,
-   "y": -3.1867
+   "y": -3.338
   },
   {
    "id": "hiero-streams-rs",
    "active": 3,
    "total": 5,
    "category": "Other",
-   "x": 1.718,
-   "y": -0.2016
+   "x": -0.5006,
+   "y": -1.718
   },
   {
    "id": "clpr-smart-contracts",
@@ -113,79 +113,79 @@
    "total": 3,
    "category": "EVM / smart contracts",
    "x": -2.25,
-   "y": -3.1867
-  },
-  {
-   "id": "hiero-x402",
-   "active": 2,
-   "total": 4,
-   "category": "Other",
-   "x": -1.35,
-   "y": -3.1867
+   "y": -3.338
   },
   {
    "id": "clpr-evm-endpoint",
    "active": 2,
    "total": 2,
    "category": "EVM / smart contracts",
-   "x": -0.45,
-   "y": -3.1867
+   "x": -1.35,
+   "y": -3.338
   },
   {
    "id": "hiero-payment-requests",
    "active": 2,
    "total": 2,
    "category": "Other",
-   "x": 0.45,
-   "y": -3.1867
+   "x": -0.45,
+   "y": -3.338
   },
   {
    "id": "hiero-tck-action",
    "active": 2,
    "total": 2,
    "category": "Other",
-   "x": 1.35,
-   "y": -3.1867
+   "x": 0.45,
+   "y": -3.338
   },
   {
    "id": "hiero-verify-fn",
    "active": 2,
    "total": 2,
    "category": "Other",
-   "x": 2.25,
-   "y": -3.1867
+   "x": 1.35,
+   "y": -3.338
   },
   {
    "id": "governance",
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": 0.0477,
-   "y": 1.5667
+   "x": 1.5672,
+   "y": -0.3194
   },
   {
    "id": "hiero-checkout",
    "active": 1,
    "total": 3,
    "category": "Other",
-   "x": 3.15,
-   "y": -3.1867
+   "x": 2.25,
+   "y": -3.338
   },
   {
    "id": "hiero-notifications",
    "active": 1,
    "total": 1,
    "category": "Other",
-   "x": -3.15,
-   "y": -4.0867
+   "x": 3.15,
+   "y": -3.338
   },
   {
    "id": "hiero-receipts",
    "active": 1,
    "total": 1,
    "category": "Other",
+   "x": -3.15,
+   "y": -4.238
+  },
+  {
+   "id": "hiero-x402",
+   "active": 0,
+   "total": 4,
+   "category": "Other",
    "x": -2.25,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "agentic-support-hiero",
@@ -193,7 +193,7 @@
    "total": 3,
    "category": "Other",
    "x": -1.35,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-block-verifier-js",
@@ -201,7 +201,7 @@
    "total": 2,
    "category": "Other",
    "x": -0.45,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-did-sdk-rs",
@@ -209,7 +209,7 @@
    "total": 2,
    "category": "Identity / DID",
    "x": 0.45,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-journal-rs",
@@ -217,7 +217,7 @@
    "total": 2,
    "category": "Other",
    "x": 1.35,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-enterprise-proxy",
@@ -225,7 +225,7 @@
    "total": 1,
    "category": "Apps / Integrations",
    "x": 2.25,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-maintainer-automation-prototype",
@@ -233,7 +233,7 @@
    "total": 1,
    "category": "Tooling / DevEx",
    "x": 3.15,
-   "y": -4.0867
+   "y": -4.238
   },
   {
    "id": "hiero-sdk-csharp",
@@ -241,7 +241,7 @@
    "total": 1,
    "category": "SDKs",
    "x": -3.15,
-   "y": -4.9867
+   "y": -5.138
   },
   {
    "id": "rs-hiero-mirror-node",
@@ -249,7 +249,7 @@
    "total": 1,
    "category": "Core network",
    "x": -2.25,
-   "y": -4.9867
+   "y": -5.138
   },
   {
    "id": "vscode-hedera-transaction-viewer",
@@ -257,7 +257,7 @@
    "total": 1,
    "category": "Other",
    "x": -1.35,
-   "y": -4.9867
+   "y": -5.138
   }
  ],
  "edges": [
@@ -282,6 +282,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-03T01:10:59.741253+00:00",
+ "generated_at": "2026-11-04T01:12:17.497975+00:00",
  "stale": false
 }
