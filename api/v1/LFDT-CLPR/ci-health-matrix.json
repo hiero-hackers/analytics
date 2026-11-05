@@ -4,7 +4,7 @@
  "group": "CI health",
  "title": "CI health matrix",
  "description": "Repository-level CI health checks sorted worst-first by fail count, then review count, then repository name. Pass and na do not affect repo priority. Click a fail or review cell to inspect the supporting evidence.",
- "badge": "5 repositories",
+ "badge": "6 repositories",
  "source": "ci_health_checks.csv",
  "row_header": "Repository",
  "columns": [
@@ -42,6 +42,33 @@
   {
    "key": "LFDT-CLPR/.github",
    "label": "LFDT-CLPR/.github",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-e2e",
+   "label": "LFDT-CLPR/clpr-e2e",
    "cells": [
     {
      "key": "actions_sha_pinned",
@@ -182,6 +209,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-04T01:13:28.815192+00:00",
+ "generated_at": "2026-11-05T01:13:56.307703+00:00",
  "stale": false
 }

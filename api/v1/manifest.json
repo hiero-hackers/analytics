@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-04T01:13:28.928580+00:00",
+ "generated_at": "2026-11-05T01:13:56.420057+00:00",
  "provenance": {
   "git_sha": "7fc8e29",
-  "data_as_of": "2026-11-04T01:01:33.881948+00:00"
+  "data_as_of": "2026-11-05T01:02:00.684066+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1516,
+     "row_count": 1518,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -504,14 +504,14 @@
      "id": "hip-no-activity",
      "macro": "HIPs",
      "title": "Approved, no implementation PRs found",
-     "row_count": 3,
+     "row_count": 5,
      "path": "hiero-ledger/hip-no-activity.json"
     },
     {
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 876,
+     "row_count": 877,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-04T01:12:00.515435+00:00"
+      "generated_at": "2026-11-05T01:11:54.263911+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-04T01:12:00.511018+00:00"
+      "generated_at": "2026-11-05T01:11:54.259277+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1516,
+      "value": 1518,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1665,7 +1665,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 99,
+      "value": 100,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1516
+     "count": 1518
     }
    }
   },
@@ -2378,14 +2378,14 @@
      "id": "repoactivity",
      "macro": "Governance",
      "title": "Repository activity \u2014 permission-holders by role",
-     "row_count": 5,
+     "row_count": 6,
      "path": "LFDT-CLPR/repoactivity.json"
     },
     {
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 1,
+     "row_count": 2,
      "path": "LFDT-CLPR/understaffed.json"
     },
     {
@@ -2399,28 +2399,28 @@
      "id": "gonedark",
      "macro": "Governance",
      "title": "Permission-holders with no recent activity",
-     "row_count": 17,
+     "row_count": 20,
      "path": "LFDT-CLPR/gonedark.json"
     },
     {
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 47,
+     "row_count": 59,
      "path": "LFDT-CLPR/repo.json"
     },
     {
      "id": "teams",
      "macro": "Governance",
      "title": "Team activity overview",
-     "row_count": 7,
+     "row_count": 8,
      "path": "LFDT-CLPR/teams.json"
     },
     {
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 33,
+     "row_count": 38,
      "path": "LFDT-CLPR/teamrepo.json"
     },
     {
@@ -2441,7 +2441,7 @@
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 20,
+     "row_count": 23,
      "path": "LFDT-CLPR/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -2449,14 +2449,14 @@
      "id": "repodiversity",
      "macro": "Governance",
      "title": "Organisation diversity by repo",
-     "row_count": 5,
+     "row_count": 6,
      "path": "LFDT-CLPR/repodiversity.json"
     },
     {
      "id": "committerrepodiversity",
      "macro": "Governance",
      "title": "Committer organisation diversity by repo",
-     "row_count": 3,
+     "row_count": 4,
      "path": "LFDT-CLPR/committerrepodiversity.json",
      "absorbed_by": "repodiversity"
     },
@@ -2464,21 +2464,21 @@
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
-     "row_count": 7,
+     "row_count": 8,
      "path": "LFDT-CLPR/teamdiversity.json"
     },
     {
      "id": "codeowners",
      "macro": "Security & scorecards",
      "title": "CODEOWNERS by repository",
-     "row_count": 5,
+     "row_count": 6,
      "path": "LFDT-CLPR/codeowners.json"
     },
     {
      "id": "release-staleness",
      "macro": "Releases",
      "title": "Release staleness by repo",
-     "row_count": 5,
+     "row_count": 6,
      "path": "LFDT-CLPR/release-staleness.json"
     }
    ],
@@ -3179,7 +3179,7 @@
      },
      {
       "label": "active last month %",
-      "value": "100%",
+      "value": "92%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -3246,7 +3246,7 @@
      },
      {
       "label": "committers",
-      "value": 20,
+      "value": 23,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -3276,7 +3276,7 @@
      },
      {
       "label": "committer affiliations known",
-      "value": "95%",
+      "value": "96%",
       "note": "The share of highest-role committers whose affiliation is resolved to a named employer or Independent. Read the committer organisation-diversity pie against this coverage.",
       "methodology": [
        "Take every row in the committer affiliations reference table.",
@@ -3286,7 +3286,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 17,
+      "value": 20,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -3308,7 +3308,7 @@
     "Releases": [
      {
       "label": "repos with releases",
-      "value": "0 of 5",
+      "value": "0 of 6",
       "note": "How many repos have ever published a GitHub Release, out of the org's full repo count. Most zero-release repos are docs/governance/meta repos, not neglected code \u2014 this tile is the denominator the other release tiles are scoped to, so that scoping is visible.",
       "methodology": [
        "Fetch every published, non-draft GitHub Release for each repo in the org.",

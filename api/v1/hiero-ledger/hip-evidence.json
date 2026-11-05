@@ -12097,6 +12097,20 @@
    "url": "https://github.com/hiero-ledger/governance/pull/174"
   },
   {
+   "hip": 410,
+   "hip_title": "Wrapping Ethereum Transaction Bytes in a Hedera Transaction",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5969,
+   "pr_title": "fix: use the earliest recorded gas price for blocks before the fee schedule has one",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "hose blocks: mainnet before 2022-08-16 (HIP-410, block 36,401,332) and the first 2,425",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/5969"
+  },
+  {
    "hip": 406,
    "hip_title": "Staking",
    "repo": "hiero-ledger/hiero-consensus-node",
@@ -12335,8 +12349,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 876,
- "generated_at": "2026-11-04T01:12:00.505852+00:00",
+ "row_count": 877,
+ "generated_at": "2026-11-05T01:11:54.254192+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

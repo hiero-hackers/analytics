@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-11-04T01:01:35.620130+00:00"
+  "end": "2026-11-05T01:02:02.415098+00:00"
  },
  "series": [
   {
@@ -85,7 +85,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "Unknown": 377,
+   "Unknown": 380,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -93,7 +93,7 @@
   },
   {
    "repo": "hiero-cli",
-   "Unknown": 36,
+   "Unknown": 35,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +101,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 659,
+   "Unknown": 650,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -110,14 +110,6 @@
   {
    "repo": "hiero-consensus-specifications",
    "Unknown": 4,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-contracts",
-   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -240,8 +232,8 @@
    "Unknown": 7,
    "Good First Issue": 3,
    "Beginner": 4,
-   "Intermediate": 5,
-   "Advanced": 11
+   "Intermediate": 4,
+   "Advanced": 10
   },
   {
    "repo": "hiero-sdk-rust",
@@ -293,7 +285,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 104,
+   "Unknown": 100,
    "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
@@ -340,6 +332,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-11-04T01:01:35.620130+00:00",
+ "generated_at": "2026-11-05T01:02:02.415098+00:00",
  "stale": false
 }

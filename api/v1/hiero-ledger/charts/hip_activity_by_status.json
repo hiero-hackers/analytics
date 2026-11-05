@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-04T01:12:00.519655+00:00"
+  "end": "2026-11-05T01:11:54.268200+00:00"
  },
  "series": [
   {
@@ -66,17 +66,17 @@
    "bucket": "Approved / Accepted",
    "merged": 14,
    "open_only": 1,
-   "none_awaiting": 10,
+   "none_awaiting": 12,
    "citation_gap": 0
   },
   {
    "bucket": "Final / Active",
    "merged": 39,
-   "open_only": 0,
+   "open_only": 1,
    "none_awaiting": 0,
-   "citation_gap": 85
+   "citation_gap": 84
   }
  ],
- "generated_at": "2026-11-04T01:12:00.519655+00:00",
+ "generated_at": "2026-11-05T01:11:54.268200+00:00",
  "stale": false
 }

@@ -30,6 +30,18 @@
  ],
  "rows": [
   {
+   "hip": 1495,
+   "hip_title": "Kubernetes-Native Consensus Node Deployment",
+   "hip_status": "Approved",
+   "hip_created": "2026-05-01"
+  },
+  {
+   "hip": 1494,
+   "hip_title": "Consensus Node Deployment Package Specification",
+   "hip_status": "Approved",
+   "hip_created": "2026-05-07"
+  },
+  {
    "hip": 1448,
    "hip_title": "Simple Event Broadcast",
    "hip_status": "Approved",
@@ -48,8 +60,8 @@
    "hip_created": "2024-09-19"
   }
  ],
- "row_count": 3,
- "generated_at": "2026-11-04T01:12:00.513597+00:00",
+ "row_count": 5,
+ "generated_at": "2026-11-05T01:11:54.262104+00:00",
  "stale": false,
  "group": "What is left to do",
  "macro": "HIPs"

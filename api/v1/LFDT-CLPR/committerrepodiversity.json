@@ -60,6 +60,16 @@
    "organisations": "Hashgraph"
   },
   {
+   "repo": "clpr-e2e",
+   "committers": 9,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 89,
+   "independent": 1,
+   "unknown": 0,
+   "organisations": "Hashgraph"
+  },
+  {
    "repo": "clpr-spec",
    "committers": 7,
    "distinct_orgs": 1,
@@ -80,9 +90,9 @@
    "organisations": "Hashgraph, BlockyDevs, LimeChain"
   }
  ],
- "row_count": 3,
+ "row_count": 4,
  "label": "Committers",
- "generated_at": "2026-11-04T01:13:24.801240+00:00",
+ "generated_at": "2026-11-05T01:13:48.708460+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance",
