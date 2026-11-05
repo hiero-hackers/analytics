@@ -131,12 +131,20 @@ Fetching is **incremental** and has two persistence layers, by design:
 - **`cache`** — a short-TTL cache for repeated within-day runs (e.g. per-repo
   fetches). Disposable.
 - **`dataset_store`** — the durable "system of record" for org-wide datasets. Keeps
-  full history; later runs fetch only the delta since a watermark and merge it
-  (idempotent upsert). Partial org failures *hold* the watermark so the gap refetches
-  next run rather than being lost; any other delta failure falls back to a full fetch.
-  Reuse is bounded (`load_or_fetch` refuses data older than a few days), and a periodic
-  forced full refresh self-heals drift. Both stores fail safe: a corrupt file is a
-  cache miss, and version bumps invalidate.
+  full history and a watermark *per repository*; later runs fetch only the delta
+  since each repository's watermark and merge it (idempotent upsert). A repository
+  with no watermark (first run, or one that joined the org later) is fetched in full.
+  A repository whose fetch fails *holds* its own watermark so the gap refetches next
+  run rather than being lost; any other delta failure falls back to a full fetch.
+  Every repository is fully refreshed at least every 30 days, on staggered nights,
+  which replaces its rows and so drops what a delta cannot see (deletions, transfers).
+  A repository that leaves the org has its rows retired once a direct lookup confirms
+  it is gone; one renamed inside the org is retired the night its new name is fetched.
+  Each dataset is refreshed at most once per run, however many pipelines read it.
+  Reuse is bounded (`load_or_fetch` refuses data older than a few hours).
+  Both stores fail safe: a corrupt file is a cache miss. Each resource declares a
+  record `schema_version`, and bumping it invalidates that resource's dataset only.
+  The `dataset_store` and `dataset_health` module docstrings have the details.
 
 `run_all` executes the default pipelines in order, isolating failures (one bad
 pipeline can't sink the run; CI still sees a non-zero exit), then emits the data

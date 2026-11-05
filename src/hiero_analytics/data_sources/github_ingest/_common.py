@@ -22,6 +22,7 @@ from ..dataset_store import PartialOrgFetchError
 from ..github_client import GitHubClient
 from ..models import BaseRecord, RepositoryRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
+from ..rate_limit import GraphQLResponseError
 from ..serialization import parse_github_datetime
 
 logger = logging.getLogger(__name__)
@@ -111,6 +112,28 @@ def fetch_github_resource(  # noqa: UP047
     records = paginate_cursor(page)
     save_records_cache(cache_key, cache_scope, cache_parameters, model_class, records, use_cache=use_cache)
     return records
+
+
+def resolve_repository(client: GitHubClient, full_name: str) -> str | None:
+    """The ``owner/name`` GitHub resolves ``full_name`` to today, or None when it is not found.
+
+    The evidence the dataset store asks for before retiring a repository's
+    rows: the org listing can miss a repository (one bad page, a days-old TTL
+    cache entry), a direct lookup cannot. GitHub follows renames and transfers,
+    so a moved repository comes back under its new name (``clpr-evm-endpoint``
+    resolves to ``LFDT-CLPR/clpr-endpoint``). One GraphQL point. Any failure
+    other than ``NOT_FOUND`` propagates: no answer is not evidence.
+    """
+    owner, _, name = full_name.partition("/")
+    try:
+        data = client.graphql(load_query("repo_lookup"), {"owner": owner, "repo": name})
+    except GraphQLResponseError as exc:
+        if any(error.get("type") == "NOT_FOUND" for error in exc.errors):
+            return None
+        raise
+    node = (data.get("data") or {}).get("repository")
+    found = node.get("nameWithOwner") if isinstance(node, dict) else None
+    return found if isinstance(found, str) else None
 
 
 def fetch_org_login(client: GitHubClient, org: str) -> str | None:

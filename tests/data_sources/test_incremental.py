@@ -7,12 +7,13 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 import hiero_analytics.config.paths as paths
-from hiero_analytics.data_sources.github_ingest import ORG_INCREMENTAL_RESOURCES
+from hiero_analytics.data_sources import dataset_store
+from hiero_analytics.data_sources.github_ingest import ORG_INCREMENTAL_RESOURCES, _common
 from hiero_analytics.data_sources.github_ingest.incremental import (
     OrgIncrementalResource,
     fetch_org_incremental,
 )
-from hiero_analytics.data_sources.models import IssueTimelineEventRecord
+from hiero_analytics.data_sources.models import IssueTimelineEventRecord, RepositoryRecord
 
 _NOW = datetime.now(UTC)
 
@@ -37,6 +38,15 @@ _RESOURCE = OrgIncrementalResource(
 )
 
 
+def _list_repo(monkeypatch) -> None:
+    """The org lists the one repository the test events belong to."""
+    monkeypatch.setattr(
+        _common,
+        "fetch_org_repos_graphql",
+        lambda _client, _org: [RepositoryRecord(full_name="org/repo", name="repo", owner="org")],
+    )
+
+
 def test_registry_lists_every_org_incremental_resource():
     """The registry is the enumerable source of truth for org-wide datasets."""
     assert set(ORG_INCREMENTAL_RESOURCES) == {
@@ -50,25 +60,43 @@ def test_registry_lists_every_org_incremental_resource():
         assert resource.name == name
 
 
+def test_registered_resources_refresh_their_largest_repos_on_evenly_spaced_nights():
+    """Distinct, evenly spaced phases: an org's datasets never put their full refreshes of the giants together."""
+    phases = sorted(resource.refresh_phase for resource in ORG_INCREMENTAL_RESOURCES.values())
+    assert None not in phases
+    count = len(phases)
+    assert phases == pytest.approx([index / count for index in range(count)])
+
+
+def test_registered_resources_declare_a_record_schema():
+    """Each resource's dataset is versioned on its own; 1 is the schema every file had before the field."""
+    for resource in ORG_INCREMENTAL_RESOURCES.values():
+        assert isinstance(resource.schema_version, int) and resource.schema_version >= 1
+
+
 def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
     """First run does a full fetch; the next fetches the delta and merges."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    _list_repo(monkeypatch)
     calls: list[str] = []
 
     first = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: calls.append("full") or [_event(1, days_ago=10)],
-        since_fetch=lambda _since: calls.append("since") or [],
+        full_fetch=lambda _repos: calls.append("full") or [_event(1, days_ago=10)],
+        since_fetch=lambda _repos, _since: calls.append("since") or [],
     )
     assert calls == ["full"]
     assert [event.issue_number for event in first] == [1]
 
+    dataset_store.start_run()  # the next nightly run
     second = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: calls.append("full") or [],
-        since_fetch=lambda _since: calls.append("since") or [_event(2, days_ago=1)],
+        full_fetch=lambda _repos: calls.append("full") or [],
+        since_fetch=lambda _repos, _since: calls.append("since") or [_event(2, days_ago=1)],
     )
     assert calls == ["full", "since"]
     assert {event.issue_number for event in second} == {1, 2}
@@ -77,21 +105,25 @@ def test_first_run_full_then_incremental_merge(monkeypatch, tmp_path):
 def test_since_failure_falls_back_to_full(monkeypatch, tmp_path):
     """A non-partial since failure falls back to a full fetch instead of raising."""
     monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    _list_repo(monkeypatch)
 
     fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: [_event(1, days_ago=10)],
-        since_fetch=lambda _since: [],
+        full_fetch=lambda _repos: [_event(1, days_ago=10)],
+        since_fetch=lambda _repos, _since: [],
     )
 
-    def broken_since(_since: datetime) -> list:
+    def broken_since(_repos: list, _since: datetime) -> list:
         raise ValueError("boom")
 
+    dataset_store.start_run()  # the next nightly run
     result = fetch_org_incremental(
         _RESOURCE,
+        client=None,
         org="org",
-        full_fetch=lambda: [_event(3, days_ago=2)],
+        full_fetch=lambda _repos: [_event(3, days_ago=2)],
         since_fetch=broken_since,
     )
     # The fallback's records merge into the stored dataset (idempotent upsert),
@@ -113,3 +145,72 @@ def test_batched_delta_styles_are_mutually_exclusive():
             per_repo=lambda _repo: [],
             per_repo_since=lambda _repo, _since: [],
         )
+
+
+# ---------------------------------------------------------
+# a fetch night that hits GitHub's resource limits
+# ---------------------------------------------------------
+
+
+def _issue_node(number: int, updated: str) -> dict:
+    return {
+        "number": number,
+        "title": f"issue {number}",
+        "state": "OPEN",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "closedAt": None,
+        "updatedAt": updated,
+        "labels": {"nodes": []},
+    }
+
+
+def _issues_page(nodes: list[dict], *, cursor: str | None = None) -> dict:
+    return {"issues": {"pageInfo": {"hasNextPage": cursor is not None, "endCursor": cursor}, "nodes": nodes}}
+
+
+def test_a_first_fetch_that_hits_resource_limits_still_completes_and_saves(monkeypatch, tmp_path):
+    """#623 (d): RESOURCE_LIMITS_EXCEEDED and a 502 on a cold org fetch are absorbed, not a failed night.
+
+    Before, either error lost the whole chunk; on a first fetch that meant no dataset at all.
+    """
+    from unittest.mock import Mock
+
+    from hiero_analytics.data_sources.github_client import GitHubServerError
+    from hiero_analytics.data_sources.github_ingest import _common, issues
+    from hiero_analytics.data_sources.models import RepositoryRecord
+    from hiero_analytics.data_sources.rate_limit import GraphQLResponseError
+
+    monkeypatch.setattr(paths, "DATASETS_DIR", tmp_path)
+    repos = [RepositoryRecord(full_name=f"org/{name}", name=name, owner="org") for name in ("a", "b", "c")]
+    monkeypatch.setattr(_common, "fetch_org_repos_graphql", lambda *_a, **_k: repos)
+    client = Mock()
+    client.graphql.side_effect = [
+        GraphQLResponseError(
+            {
+                "data": {
+                    "r0": _issues_page([_issue_node(1, "2026-10-01T00:00:00Z")], cursor="A1"),
+                    "r1": None,
+                    "r2": _issues_page([_issue_node(7, "2026-10-03T00:00:00Z")]),
+                },
+                "errors": [
+                    {
+                        "type": "RESOURCE_LIMITS_EXCEEDED",
+                        "path": ["r1", "issues"],
+                        "message": "Resource limits for this query exceeded.",
+                    }
+                ],
+            }
+        ),
+        # b retries smaller alongside a, and GitHub times out; the width drops to 1.
+        GitHubServerError("502"),
+        {"data": {"r1": _issues_page([_issue_node(4, "2026-10-02T00:00:00Z")])}},
+        {"data": {"r0": _issues_page([_issue_node(2, "2026-10-04T00:00:00Z")])}},
+    ]
+
+    records = issues.fetch_org_issues_graphql(client, "org", max_workers=1)
+
+    assert sorted((r.repo, r.number) for r in records) == [("org/a", 1), ("org/a", 2), ("org/b", 4), ("org/c", 7)]
+    saved = paths.DATASETS_DIR / "issues_org_all.json"
+    assert saved.exists()
+    # Complete, so the watermark advanced to the newest record instead of being held.
+    assert '"fetched_through":"2026-10-04T00:00:00+00:00"' in saved.read_text(encoding="utf-8")

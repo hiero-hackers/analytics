@@ -4,7 +4,7 @@ import pytest
 
 import hiero_analytics.data_sources.cache as cache
 from hiero_analytics.config import paths
-from hiero_analytics.data_sources import dataset_store
+from hiero_analytics.data_sources import dataset_health, dataset_store
 
 
 @pytest.fixture(autouse=True)
@@ -29,8 +29,10 @@ def isolate_datasets_dir(monkeypatch, tmp_path):
     datasets.mkdir()
     monkeypatch.setattr(paths, "DATASETS_DIR", datasets)
     dataset_store.forget_touched_datasets()
+    dataset_health.forget()
     yield
     dataset_store.forget_touched_datasets()
+    dataset_health.forget()
 
 
 @pytest.fixture(autouse=True)

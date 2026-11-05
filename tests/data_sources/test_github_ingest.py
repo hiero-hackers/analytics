@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import pytest
 
 import hiero_analytics.data_sources.github_ingest as ingest
+from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.dataset_store import PartialOrgFetchError
 from hiero_analytics.data_sources.github_client import GitHubServerError
 from hiero_analytics.data_sources.models import (
@@ -373,6 +374,7 @@ def test_fetch_org_merged_pr_difficulty_graphql_is_incremental(monkeypatch, tmp_
     assert first == [r1]
     full.assert_called_once()
 
+    dataset_store.start_run()  # the next nightly run
     second = ingest.fetch_org_merged_pr_difficulty_graphql(mock_client, "org", max_workers=2)
     delta.assert_called_once()
     assert len(second) == 2  # r1 deduped by (repo, pr, issue) key, r2 added
@@ -805,3 +807,37 @@ def test_fetch_repo_releases_graphql_rejects_excessive_pagination(mock_client, m
 
     with pytest.raises(RuntimeError, match="refusing to emit partial data"):
         ingest.fetch_repo_releases_graphql(mock_client, "org", "repo")
+
+
+# ---------------------------------------------------------
+# resolving a repository that left the org listing
+# ---------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("response", "expected"),
+    [
+        ({"data": {"repository": {"nameWithOwner": "LFDT-CLPR/clpr-endpoint"}}}, "LFDT-CLPR/clpr-endpoint"),
+        ({"data": {"repository": None}}, None),
+    ],
+)
+def test_resolve_repository_returns_the_name_github_resolves_to(response, expected):
+    """GitHub follows renames and transfers; a null node means it is gone."""
+    client = Mock()
+    client.graphql.return_value = response
+
+    assert ingest._common.resolve_repository(client, "hiero-hackers/clpr-evm-endpoint") == expected
+    assert client.graphql.call_args[0][1] == {"owner": "hiero-hackers", "repo": "clpr-evm-endpoint"}
+
+
+def test_resolve_repository_reads_not_found_as_gone_and_raises_on_anything_else():
+    """NOT_FOUND is an answer; any other failure is not evidence, so it propagates."""
+    from hiero_analytics.data_sources.rate_limit import GraphQLResponseError
+
+    client = Mock()
+    client.graphql.side_effect = GraphQLResponseError({"errors": [{"type": "NOT_FOUND", "path": ["repository"]}]})
+    assert ingest._common.resolve_repository(client, "org/gone") is None
+
+    client.graphql.side_effect = GraphQLResponseError({"errors": [{"type": "FORBIDDEN"}]})
+    with pytest.raises(GraphQLResponseError):
+        ingest._common.resolve_repository(client, "org/private")

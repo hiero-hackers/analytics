@@ -28,6 +28,7 @@ MERGED_PR_RESOURCE = OrgIncrementalResource(
     key_of=lambda record: (record.repo, record.pr_number, record.issue_number),
     updated_at_of=lambda record: record.updated_at,
     task_desc="merged PR difficulty",
+    refresh_phase=0.4,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 

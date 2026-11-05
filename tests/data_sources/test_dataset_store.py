@@ -223,10 +223,12 @@ def test_force_full_redoes_full_fetch_ignoring_dataset(tmp_path):
     assert by_key == {"a": 2, "b": 3}  # full fetch overwrote, not merged onto old
 
 
-def test_stale_watermark_triggers_full_refresh(tmp_path):
-    """A watermark older than full_refresh_after forces a full fetch."""
+def test_an_active_dataset_full_refreshes_once_its_last_full_fetch_is_due(tmp_path):
+    """#623 (1): the newest record is recent, but the last full fetch was 60 days ago, so it is due."""
     path = tmp_path / "issues.json"
-    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    save_dataset(
+        path, [_rec("a", 1, 1)], datetime(2024, 2, 29, tzinfo=UTC), last_full_at=datetime(2024, 1, 1, tzinfo=UTC)
+    )
 
     def since_fetch(_since):
         raise AssertionError("since_fetch called when a full refresh was due")
@@ -239,10 +241,57 @@ def test_stale_watermark_triggers_full_refresh(tmp_path):
         full_fetch=lambda: [_rec("a", 9, 2)],
         since_fetch=since_fetch,
         full_refresh_after=timedelta(days=30),
-        now=datetime(2024, 3, 1, tzinfo=UTC),  # ~60 days after the watermark
+        now=datetime(2024, 3, 1, tzinfo=UTC),
     )
 
     assert [r.value for r in result] == [9]
+    assert json.loads(path.read_text(encoding="utf-8"))["last_full_at"] == "2024-03-01T00:00:00+00:00"
+
+
+def test_a_quiet_dataset_no_longer_refreshes_every_night(tmp_path):
+    """#623 (1): an old newest record alone used to force a full fetch every night; the last full fetch decides."""
+    path = tmp_path / "issues.json"
+    save_dataset(
+        path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC), last_full_at=datetime(2024, 2, 25, tzinfo=UTC)
+    )
+
+    def full_fetch():
+        raise AssertionError("full_fetch called on a quiet dataset refreshed four days ago")
+
+    result = fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=full_fetch,
+        since_fetch=lambda _s: [],
+        full_refresh_after=timedelta(days=30),
+        now=datetime(2024, 3, 1, tzinfo=UTC),
+    )
+
+    assert [r.key for r in result] == ["a"]
+    assert json.loads(path.read_text(encoding="utf-8"))["last_full_at"] == "2024-02-25T00:00:00+00:00"  # kept
+
+
+def test_a_dataset_without_last_full_at_is_seeded_rather_than_refreshed_at_once(tmp_path):
+    """A file from before the stamp gets one within the next window, persisted, instead of a refresh tonight."""
+    path = tmp_path / "issues.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    now = datetime(2024, 3, 1, tzinfo=UTC)
+
+    fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=lambda: [_rec("a", 9, 2)],
+        since_fetch=lambda _s: [],
+        full_refresh_after=timedelta(days=30),
+        now=now,
+    )
+
+    seeded = datetime.fromisoformat(json.loads(path.read_text(encoding="utf-8"))["last_full_at"])
+    assert now - timedelta(days=30) < seeded <= now
 
 
 def test_fresh_watermark_uses_incremental_not_full_refresh(tmp_path):
@@ -408,7 +457,7 @@ def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
     """When a fresh-enough dataset exists on disk, its records are returned without fetching."""
     persisted = ["rec-a", "rec-b"]
     recent = datetime.now(UTC) - timedelta(hours=1)
-    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (persisted, recent))
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model, **_kwargs: (persisted, recent))
 
     fetched = []
 
@@ -425,7 +474,7 @@ def test_load_or_fetch_reuses_persisted_dataset(monkeypatch):
 def test_load_or_fetch_refreshes_stale_dataset(monkeypatch):
     """A dataset older than max_age triggers a refresh instead of silent reuse."""
     stale = datetime.now(UTC) - timedelta(days=30)
-    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (["old"], stale))
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model, **_kwargs: (["old"], stale))
 
     result = load_or_fetch("contributor_activity", "an-org", object, lambda: ["fresh"])
 
@@ -462,7 +511,7 @@ def test_load_or_fetch_reuses_a_fresh_fetch_of_a_quiet_dataset(tmp_path, monkeyp
 def test_load_or_fetch_max_age_none_disables_staleness_bound(monkeypatch):
     """max_age=None keeps the old reuse-whatever-is-on-disk behavior."""
     ancient = datetime(2024, 1, 1, tzinfo=UTC)
-    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: (["old"], ancient))
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model, **_kwargs: (["old"], ancient))
 
     result = load_or_fetch("contributor_activity", "an-org", object, lambda: ["fresh"], max_age=None)
 
@@ -471,7 +520,7 @@ def test_load_or_fetch_max_age_none_disables_staleness_bound(monkeypatch):
 
 def test_load_or_fetch_falls_back_to_fetch_when_absent(monkeypatch):
     """With no persisted dataset, the fetch function is called."""
-    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: None)
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model, **_kwargs: None)
 
     result = load_or_fetch("issue_label_events", "an-org", object, lambda: ["fresh"])
 
@@ -480,7 +529,7 @@ def test_load_or_fetch_falls_back_to_fetch_when_absent(monkeypatch):
 
 def test_load_or_fetch_offline_requires_dataset(monkeypatch):
     """A reuse-only caller cannot fall back to its fetch callback offline."""
-    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model: None)
+    monkeypatch.setattr(dataset_store, "load_dataset", lambda _path, _model, **_kwargs: None)
     monkeypatch.setenv("HIERO_ANALYTICS_OFFLINE", "yes")
 
     with pytest.raises(OfflineDatasetMissingError, match="cached issue_label_events/an-org dataset"):
@@ -627,3 +676,96 @@ def test_prune_spares_files_the_caller_asks_to_keep(tmp_path):
         "issues_failed-org_all.json",
         "issues_live-org_all.json",
     ]
+
+
+# ---------------------------------------------------------
+# per-resource record schema (#623)
+# ---------------------------------------------------------
+
+
+def test_a_file_written_before_schema_versions_counts_as_schema_1(tmp_path):
+    """No ``schema`` key: readers at schema 1 (every resource today) load it; a bumped reader does not."""
+    path = tmp_path / "issues.json"
+    payload = {
+        "version": dataset_store.DATASET_VERSION,
+        "fetched_through": "2024-01-02T00:00:00+00:00",
+        "records": [{"key": "a", "value": 1, "updated_at": "2024-01-02T00:00:00+00:00"}],
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+    assert load_dataset(path, _Record) is not None
+    assert load_dataset(path, _Record, schema_version=2) is None
+
+
+def test_a_schema_mismatch_is_a_logged_cache_miss_for_that_dataset_only(tmp_path, caplog):
+    """Bumping one resource's schema invalidates its file; a file at the expected schema still loads."""
+    bumped, other = tmp_path / "issue_label_events.json", tmp_path / "issues.json"
+    save_dataset(bumped, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    save_dataset(other, [_rec("b", 2, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+    assert json.loads(bumped.read_text(encoding="utf-8"))["schema"] == 1
+
+    with caplog.at_level("INFO", logger=dataset_store.logger.name):
+        assert load_dataset(bumped, _Record, schema_version=2) is None
+    assert load_dataset(other, _Record, schema_version=1) is not None
+    assert any("record schema 1, not 2" in record.getMessage() for record in caplog.records)
+
+
+def test_fetch_incremental_refetches_in_full_after_a_schema_bump(tmp_path):
+    """The next run after a bump is a first fetch: full, and the file is rewritten at the new schema."""
+    path = tmp_path / "hip.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+
+    def since_fetch(_since):
+        raise AssertionError("a delta onto records of the old schema")
+
+    result = fetch_incremental(
+        path=path,
+        model_class=_Record,
+        key_of=_key,
+        updated_at_of=_updated,
+        full_fetch=lambda: [_rec("a", 7, 2)],
+        since_fetch=since_fetch,
+        schema_version=2,
+    )
+
+    assert [r.value for r in result] == [7]
+    assert json.loads(path.read_text(encoding="utf-8"))["schema"] == 2
+
+
+def test_load_or_fetch_refetches_when_the_schema_differs(monkeypatch):
+    """A fresh file of another schema is not reused: the fetch runs."""
+    path = dataset_store.dataset_path("label_events", "an-org")
+    save_dataset(path, [_rec("a", 1, 1)], datetime.now(UTC))
+    fetched = []
+
+    def fetch_fn():
+        fetched.append(True)
+        return ["fresh"]
+
+    assert load_or_fetch("label_events", "an-org", _Record, fetch_fn, schema_version=2) == ["fresh"]
+    assert fetched == [True]
+
+
+def test_a_single_file_dataset_counts_consecutive_holds(tmp_path):
+    """The whole-dataset hold count persists, so three partial runs in a row fail the health check."""
+    from hiero_analytics.data_sources import dataset_health
+
+    path = tmp_path / "hip.json"
+    save_dataset(path, [_rec("a", 1, 1)], datetime(2024, 1, 1, tzinfo=UTC))
+
+    def partial():
+        raise PartialOrgFetchError([], failed_repos=["o/broken"])
+
+    for _ in range(3):
+        fetch_incremental(
+            path=path,
+            model_class=_Record,
+            key_of=_key,
+            updated_at_of=_updated,
+            full_fetch=partial,
+            since_fetch=lambda _s: partial(),
+        )
+
+    (refresh,) = dataset_health.recorded()
+    assert refresh.held == {dataset_health.WHOLE_DATASET: 3}
+    assert dataset_health.problems([refresh]) == ["hip: (whole dataset) has been held for 3 runs in a row"]

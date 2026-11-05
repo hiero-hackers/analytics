@@ -13,8 +13,10 @@ import pytest
 
 from hiero_analytics.data_sources.rate_limit import (
     Action,
+    GraphQLResponseError,
     RateLimitPolicy,
     RateLimitSnapshot,
+    is_resource_limit_error,
 )
 
 # -- snapshot construction ----------------------------------------------------
@@ -140,6 +142,49 @@ def test_graphql_non_rate_limit_error_raises():
     data = {"errors": [{"type": "NOT_FOUND", "message": "no such repo"}]}
     with pytest.raises(RuntimeError, match="GraphQL error"):
         RateLimitPolicy().check_graphql_errors(data, snapshot=None)
+
+
+def test_graphql_error_carries_the_partial_data_for_salvage():
+    """The raised error keeps the response, so a batching caller can keep the aliases that succeeded."""
+    data = {
+        "data": {"r0": {"issues": {"nodes": []}}, "r1": None},
+        "errors": [{"type": "RESOURCE_LIMITS_EXCEEDED", "path": ["r1", "issues"], "message": "too big"}, "junk"],
+    }
+    with pytest.raises(GraphQLResponseError) as excinfo:
+        RateLimitPolicy().check_graphql_errors(data, snapshot=None)
+
+    assert isinstance(excinfo.value, RuntimeError)  # existing `except RuntimeError` handlers still apply
+    assert "NOT_FOUND" not in str(excinfo.value) and "RESOURCE_LIMITS_EXCEEDED" in str(excinfo.value)
+    assert excinfo.value.data == {"r0": {"issues": {"nodes": []}}, "r1": None}
+    assert [error["path"] for error in excinfo.value.errors] == [["r1", "issues"]]  # non-dict entries dropped
+
+
+def test_graphql_error_without_data_exposes_an_empty_mapping():
+    """MAX_NODE_LIMIT_EXCEEDED rejects the query before it runs: there is no data to salvage."""
+    error = GraphQLResponseError({"errors": [{"type": "MAX_NODE_LIMIT_EXCEEDED", "message": "too many nodes"}]})
+    assert error.data == {}
+
+
+@pytest.mark.parametrize(
+    ("error", "expected"),
+    [
+        ({"type": "RESOURCE_LIMITS_EXCEEDED", "message": "Resource limits for this query exceeded."}, True),
+        ({"type": "MAX_NODE_LIMIT_EXCEEDED", "message": "exceeds the maximum limit of 500,000"}, True),
+        (
+            {
+                "message": "Something went wrong while executing your query. This may be the result of a "
+                "timeout, or it could be a GitHub bug. Please include `ABCD:1234` when reporting this issue."
+            },
+            True,
+        ),
+        ({"type": "NOT_FOUND", "message": "Could not resolve to a Repository."}, False),
+        ({"type": "FORBIDDEN", "message": "may be the result of a timeout"}, False),  # typed: trust the type
+        ({"message": "Field 'x' doesn't exist on type 'Repository'"}, False),
+    ],
+)
+def test_is_resource_limit_error_classifies_what_a_smaller_query_cures(error, expected):
+    """Only errors that a smaller page or a narrower batch can cure count as resource errors."""
+    assert is_resource_limit_error(error) is expected
 
 
 def test_graphql_no_errors_proceeds():

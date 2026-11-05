@@ -14,11 +14,12 @@ from hiero_analytics.data_sources.queries import load_query
 
 from ..cache import load_records_cache, save_records_cache
 from ..github_client import GitHubClient
-from ..models import ContributorActivityRecord
+from ..models import ContributorActivityRecord, RepositoryRecord
 from ..pagination import extract_graphql_cursor_page, paginate_cursor
 from ._common import (
     _cache_kwargs,
     _parse_graphql_datetime,
+    fetch_all_with_retry,
     fetch_org_resource_parallel,
 )
 from .incremental import OrgIncrementalResource, fetch_org_incremental
@@ -38,6 +39,7 @@ CONTRIBUTOR_ACTIVITY_RESOURCE = OrgIncrementalResource(
     ),
     updated_at_of=lambda event: event.occurred_at,
     task_desc="contributor activity",
+    refresh_phase=0.6,  # see ORG_INCREMENTAL_RESOURCES
 )
 
 _CONTRIBUTOR_ACTIVITY_TYPES = [
@@ -337,26 +339,25 @@ def _fetch_org_activity_full_history(
 ) -> list[ContributorActivityRecord]:
     """Full-history incremental fetch via the dataset store (org-wide only)."""
 
-    def full_fetch() -> list[ContributorActivityRecord]:
-        return fetch_org_resource_parallel(
-            client,
-            org,
-            lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, None),
+    def full_fetch(repos: list[RepositoryRecord]) -> list[ContributorActivityRecord]:
+        return fetch_all_with_retry(
+            repos,
             max_workers,
-            task_desc="contributor activity (full)",
+            lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, None),
+            "contributor activity (full)",
         )
 
-    def since_fetch(since: datetime) -> list[ContributorActivityRecord]:
-        return fetch_org_resource_parallel(
-            client,
-            org,
-            lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, since),
+    def since_fetch(repos: list[RepositoryRecord], since: datetime) -> list[ContributorActivityRecord]:
+        return fetch_all_with_retry(
+            repos,
             max_workers,
-            task_desc="contributor activity updates",
+            lambda repo: _fetch_repo_contributor_activity_at_cutoff(client, repo.owner, repo.name, since),
+            "contributor activity updates",
         )
 
     return fetch_org_incremental(
         CONTRIBUTOR_ACTIVITY_RESOURCE,
+        client=client,
         org=org,
         full_fetch=full_fetch,
         since_fetch=since_fetch,

@@ -21,6 +21,55 @@ logger = logging.getLogger(__name__)
 
 JSON = dict[str, Any]
 
+# GraphQL error types GitHub returns when one query asked for more work than it
+# allows. Asking for less (fewer nodes per page, fewer aliases per request)
+# cures them, so batched callers shrink and retry rather than giving up.
+# MAX_NODE_LIMIT_EXCEEDED rejects the query before it runs; RESOURCE_LIMITS_EXCEEDED
+# arrives with partial data and nulls the field that ran over.
+_RESOURCE_LIMIT_ERROR_TYPES = frozenset({"RESOURCE_LIMITS_EXCEEDED", "MAX_NODE_LIMIT_EXCEEDED"})
+# The untyped body GitHub sends when a query ran too long. Usually it comes with
+# a 502, which the transport raises as GitHubServerError, but it can also arrive
+# as a 200 with this message in ``errors``.
+_TIMEOUT_MESSAGE_MARKER = "may be the result of a timeout"
+
+
+class GraphQLResponseError(RuntimeError):
+    """GitHub answered with a GraphQL ``errors`` list that is not a rate limit.
+
+    Carries the whole parsed response. A query that batches several independent
+    selections (``batched`` aliases one repository per field) can then keep the
+    selections that succeeded: each error's ``path[0]`` names the field it
+    belongs to, and ``data`` still holds the others.
+
+    A RuntimeError subclass with the message it always had, so callers that
+    catch RuntimeError or match on the message (``NOT_FOUND``) keep working.
+    """
+
+    def __init__(self, response: JSON) -> None:
+        """Wrap the parsed GraphQL response that carried the errors."""
+        super().__init__(f"GitHub GraphQL error: {response}")
+        self.response = response
+
+    @property
+    def errors(self) -> list[JSON]:
+        """The response's error objects (non-dict entries dropped)."""
+        raw = self.response.get("errors")
+        return [error for error in raw if isinstance(error, dict)] if isinstance(raw, list) else []
+
+    @property
+    def data(self) -> JSON:
+        """The partial ``data`` GitHub returned alongside the errors, or ``{}``."""
+        data = self.response.get("data")
+        return data if isinstance(data, dict) else {}
+
+
+def is_resource_limit_error(error: Mapping[str, Any]) -> bool:
+    """Whether a GraphQL error object means "this query was too big", which a smaller query cures."""
+    if error.get("type") in _RESOURCE_LIMIT_ERROR_TYPES:
+        return True
+    message = error.get("message")
+    return error.get("type") is None and isinstance(message, str) and _TIMEOUT_MESSAGE_MARKER in message
+
 
 # --------------------------------------------------------
 # NORMALIZED SNAPSHOT
@@ -274,7 +323,9 @@ class RateLimitPolicy:
         Inspect GraphQL errors list.
 
         - RATE_LIMIT type   → DELAY_THEN_RETRY_FRESH (sleep until reset, retry fresh)
-        - Any other error   → raises RuntimeError immediately (not retriable)
+        - Any other error   → raises GraphQLResponseError immediately (not retriable
+                              as-is; it carries the partial data for callers that
+                              can salvage it or retry with a smaller query)
         - No errors         → PROCEED
         """
         errors = data.get("errors")
@@ -282,7 +333,7 @@ class RateLimitPolicy:
             return RateLimitDecision(Action.PROCEED)
 
         for err in errors:
-            if err.get("type") == "RATE_LIMIT":
+            if isinstance(err, dict) and err.get("type") == "RATE_LIMIT":
                 logger.warning("GraphQL RATE_LIMIT error received.")
 
                 sleep_seconds = _GRAPHQL_ERROR_FALLBACK_SLEEP
@@ -302,6 +353,6 @@ class RateLimitPolicy:
                     reason="GraphQL RATE_LIMIT error",
                 )
 
-        # Non-rate-limit GraphQL errors are programming errors or server bugs.
-        # Raise immediately.
-        raise RuntimeError(f"GitHub GraphQL error: {data}")
+        # Not a rate limit: retrying the same query cannot help. Raise with the
+        # response attached so a batching caller can keep the clean aliases.
+        raise GraphQLResponseError(data)

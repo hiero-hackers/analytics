@@ -38,6 +38,9 @@ jobs:
     # GraphQL points/hour spends most of its wall time sleeping for budget
     # resets; give it the whole runner allowance rather than an eager cutoff.
     timeout-minutes: 355
+    outputs:
+      # ok or fail, from the run's dataset_refresh block; read by dataset-health.
+      dataset_health: ${{ steps.pipelines.outputs.dataset_health }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -79,6 +82,7 @@ jobs:
       # enough) gets 5,000. Falls back to the Actions token when the secret is
       # absent, so forks keep working.
       - name: Run all analytics pipelines
+        id: pipelines
         env:
           GITHUB_TOKEN: ${{ secrets.ANALYTICS_PAT || secrets.GITHUB_TOKEN }}
           # Fewer parallel GraphQL workers = smaller burst load, so fewer 502s
@@ -267,6 +271,38 @@ jobs:
             commit -q -m "snapshot: $(date -u +%Y-%m-%d) run ${GITHUB_RUN_ID} code ${GITHUB_SHA:0:7}"
           git push -q origin "$BRANCH"
           echo "Archived $(du -sh . | cut -f1) to $BRANCH."
+
+  # Fail the run, loudly, when the datasets are unhealthy: a repository's
+  # watermark held for several runs in a row, rows lost outside a full refresh,
+  # or a full refresh long overdue (see data_sources/dataset_health.py). A job of
+  # its own on purpose. Failing the pipeline step would skip "Save incremental
+  # datasets" and throw away the night's progress, so the next night would
+  # restore the same cache and fail the same way; failing refresh-data would
+  # also hold back the deploy. This way the data is saved, the dashboard
+  # deploys, and the run is still red. The details are in the refresh-data job
+  # summary ("Dataset refresh") and under dataset_refresh in SNAPSHOT.json.
+  dataset-health:
+    name: Check dataset health
+    needs: refresh-data
+    if: ${{ !inputs.trial_orgs }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
+      # A missing verdict fails too: it means the pipeline step stopped reporting it.
+      - name: Fail on unhealthy datasets
+        env:
+          DATASET_HEALTH: ${{ needs.refresh-data.outputs.dataset_health }}
+        run: |
+          if [ "$DATASET_HEALTH" = "ok" ]; then
+            echo "Datasets are healthy."
+            exit 0
+          fi
+          echo "::error title=Dataset health::Dataset health check: ${DATASET_HEALTH:-no verdict}. See the Dataset refresh section of the refresh-data job summary, or dataset_refresh in SNAPSHOT.json."
+          exit 1
 
   # Publish the freshly-built dashboard to GitHub Pages. Runs after the data refresh
   # regardless of whether the data changed, so the public page always reflects the

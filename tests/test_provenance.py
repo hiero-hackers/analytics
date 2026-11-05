@@ -399,3 +399,22 @@ def test_manifest_omits_api_usage_when_not_tracked(tmp_path):
     path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path)
 
     assert "api_usage" not in json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_manifest_records_the_dataset_refresh_when_given(tmp_path):
+    """What each dataset's refresh did, and the health verdict, are archived with the snapshot."""
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-20T09:00:00+00:00")
+    block = {"healthy": True, "problems": [], "warnings": [], "datasets": {}}
+
+    path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path, dataset_refresh=block)
+
+    assert json.loads(path.read_text(encoding="utf-8"))["dataset_refresh"] == block
+
+
+def test_manifest_omits_the_dataset_refresh_when_not_given(tmp_path):
+    """Callers that do not pass one get the manifest they always got."""
+    _write_dataset(tmp_path, "issues_org_all.json", "2026-07-20T09:00:00+00:00")
+
+    path = write_snapshot_manifest(tmp_path / SNAPSHOT_MANIFEST_NAME, datasets_dir=tmp_path)
+
+    assert "dataset_refresh" not in json.loads(path.read_text(encoding="utf-8"))

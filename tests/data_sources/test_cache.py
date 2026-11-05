@@ -12,6 +12,7 @@ import pytest
 import hiero_analytics.data_sources.cache as cache
 import hiero_analytics.data_sources.github_ingest as ingest
 import hiero_analytics.data_sources.serialization as serialization
+from hiero_analytics.data_sources import dataset_store
 from hiero_analytics.data_sources.models import (
     ContributorActivityRecord,
     IssueRecord,
@@ -506,6 +507,7 @@ def test_fetch_org_issues_first_run_full_then_incremental(monkeypatch, tmp_path)
     delta.assert_not_called()
 
     full.reset_mock()
+    dataset_store.start_run()  # the next nightly run
     second = ingest.fetch_org_issues_graphql(mock_client, "org")
 
     full.assert_not_called()  # second run does not do a full fetch
@@ -567,6 +569,7 @@ def test_fetch_org_label_events_incremental_dedups_on_merge(monkeypatch, tmp_pat
     assert first == [ev1]
     full.assert_called_once()
 
+    dataset_store.start_run()  # the next nightly run
     second = ingest.fetch_org_issue_label_events_graphql(mock_client, "org")
     delta.assert_called_once()
     keys = {(e.repo, e.issue_number, e.event_type, e.occurred_at, e.label) for e in second}
@@ -607,6 +610,7 @@ def test_fetch_org_contributor_activity_full_history_is_incremental(monkeypatch,
     first = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=None)
     assert first == [ev1]
 
+    dataset_store.start_run()  # the next nightly run
     second = ingest.fetch_org_contributor_activity_graphql(mock_client, "org", lookback_days=None)
     keys = {(e.repo, e.activity_type, e.actor, e.occurred_at, e.target_type, e.target_number) for e in second}
     assert len(second) == 2  # ev1 deduped, ev2 added

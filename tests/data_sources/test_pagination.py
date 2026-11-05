@@ -389,3 +389,53 @@ def test_page_size_policy_shrink_resets_the_clean_streak():
     policy.record_success()
 
     assert policy.current == 25
+
+
+def test_paginate_cursor_catches_a_cursor_that_cycles_back():
+    """A cursor already sent earlier (A, B, A) stalls like an immediate repeat: retried once, then raised."""
+    pages = {None: ([1], "A", True), "A": ([2], "B", True), "B": ([3], "A", True)}
+    calls = []
+
+    def fetch(cursor, _page_size):
+        calls.append(cursor)
+        return pages[cursor]
+
+    with pytest.raises(pagination.CursorStalledError):
+        pagination.paginate_cursor(fetch)
+
+    assert calls == [None, "A", "B", "B"]
+
+
+def test_paginate_cursor_hard_page_cap_raises_instead_of_truncating():
+    """Past hard_max_pages the paginator raises; it never returns the pages collected so far."""
+
+    def fetch(cursor, _page_size):
+        index = int(cursor or 0)
+        return ([index], str(index + 1), True)
+
+    with pytest.raises(pagination.PaginationLimitError, match="exceeded 3 pages"):
+        pagination.paginate_cursor(fetch, hard_max_pages=3)
+
+
+def test_paginate_cursor_soft_max_pages_still_truncates_below_the_hard_cap():
+    """max_pages keeps its documented meaning: stop and return what was collected."""
+
+    def fetch(cursor, _page_size):
+        index = int(cursor or 0)
+        return ([index], str(index + 1), True)
+
+    assert pagination.paginate_cursor(fetch, max_pages=2, hard_max_pages=10) == [0, 1]
+
+
+def test_page_size_policy_names_what_it_shrinks(caplog):
+    """The batched engine reuses the policy for its round width; the log line says which quantity moved."""
+    policy = pagination.PageSizePolicy(5, 1, label="GraphQL batch width")
+
+    with caplog.at_level(logging.WARNING, logger=pagination.logger.name):
+        assert policy.shrink("GraphQL resource limits exceeded")
+
+    assert policy.current == 2
+    assert any(
+        record.getMessage() == "GraphQL resource limits exceeded; reducing GraphQL batch width from 5 to 2 and retrying"
+        for record in caplog.records
+    )
