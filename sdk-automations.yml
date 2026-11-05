@@ -1,21 +1,17 @@
 # sdk-automations.yml — read by the sdk-automations Action from the default branch.
-# Dry-run only: it reads and decides, writes nothing, and records each proposed change as
-# a `wouldApply` finding in the job summary. The file's `mode` is `active`, and each block
-# states `mode: dry-run` of its own, which holds it: a capability goes live in its own
-# reviewed diff, by deleting its block's `mode` line, once the workflow's `arm-writes`
-# input — the second gate — is `"true"`.
+# Active: every capability writes. The file's `mode` is `active` and the workflow's
+# `arm-writes` input, the second gate, is `"true"`. To hold one capability back, give its
+# block `mode: dry-run`: it then only records a `wouldApply` finding in the job summary.
 
 mode: active
 
 capabilities:
   triageQueue: # a new issue is labelled awaitingTriage
     enabled: true
-    mode: dry-run
     welcome: false
 
   prDashboard: # one comment per pull request: what stops it being reviewable
     enabled: true
-    mode: dry-run
     checks:
       dcoSignoff:
         enabled: true
@@ -31,11 +27,9 @@ capabilities:
 
   configReport: # a pull request that changes this file gets one comment saying what it would mean
     enabled: true
-    mode: dry-run
 
   inactivity: # on the hourly schedule: remind about stalled work, then release it
     enabled: true
-    mode: dry-run
     issues:
       enabled: true
       reap:
@@ -58,7 +52,6 @@ capabilities:
 
   assignment: # a contributor claims an issue with a comment, and releases it the same way
     enabled: true
-    mode: dry-run
     autoAssign:
       enabled: true
       notClaimableWhen: [blocked]
