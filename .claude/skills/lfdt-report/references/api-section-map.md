@@ -46,8 +46,7 @@ Variant labels are period words, not shapes; the document path and its `frequenc
 
 ## Reading rules
 
-The inventory (`scripts/inventory.py show`) applies these for you; they are
-spelled out so you can check it and so the appendix can explain a figure.
+Apply these when you read the manifest; the appendix should explain any figure they affect.
 
 - **Provenance first.** `generated_at`, `provenance.git_sha`,
   `provenance.data_as_of` and `wip` go in the appendix. `data_as_of` is the
