@@ -50,6 +50,25 @@ class Column:
         object.__setattr__(self, "description", description)
 
 
+def _normalize_column(column: Any) -> Column:
+    """Turn a column declaration into a Column.
+
+    Accepts a Column (returned as is) or a 2-, 3-, or 4-element tuple/list of
+    (key, label, format?, description?). Anything else raises, so callers only
+    ever deal with one shape.
+    """
+    if isinstance(column, Column):
+        return column
+    if isinstance(column, (tuple, list)):
+        if len(column) not in (2, 3, 4):
+            raise ValueError(f"column declaration has {len(column)} elements; expected 2, 3, or 4")
+        key, label, *rest = column
+        format_ = rest[0] if len(rest) > 0 else None
+        description = rest[1] if len(rest) > 1 else None
+        return Column(key, label, format=format_, description=description)
+    raise TypeError(f"expected a Column or a 2-/3-/4-element tuple, got {type(column).__name__}")
+
+
 def column_spec(column: Any) -> dict[str, Any]:
     """Serialize a column declaration to the API's dict shape.
 
@@ -63,34 +82,15 @@ def column_spec(column: Any) -> dict[str, Any]:
         - format (str) — only when the declaration included a format
         - description (str) — only when the declaration included a description
     """
-    if isinstance(column, Column):
-        key, label, format_, description = (
-            column.key,
-            column.label,
-            column.format,
-            column.description,
-        )
-    elif isinstance(column, (tuple, list)):
-        if len(column) == 2:
-            key, label, format_, description = column[0], column[1], None, None
-        elif len(column) == 3:
-            key, label, format_ = column[0], column[1], column[2]
-            description = None
-        elif len(column) == 4:
-            key, label, format_, description = column[0], column[1], column[2], column[3]
-        else:
-            raise ValueError(f"column declaration has {len(column)} elements; expected 2, 3, or 4")
-    else:
-        raise TypeError(f"expected a Column or a 2-/3-/4-element tuple, got {type(column).__name__}")
-
+    normalized = _normalize_column(column)
     spec: dict[str, Any] = {
-        "key": key,
-        "label": label,
+        "key": normalized.key,
+        "label": normalized.label,
     }
-    if format_:
-        spec["format"] = format_
-    if description:
-        spec["description"] = description
+    if normalized.format:
+        spec["format"] = normalized.format
+    if normalized.description:
+        spec["description"] = normalized.description
     return spec
 
 
