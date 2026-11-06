@@ -62,10 +62,11 @@ def _normalize_column(column: Any) -> Column:
     if isinstance(column, (tuple, list)):
         if len(column) not in (2, 3, 4):
             raise ValueError(f"column declaration has {len(column)} elements; expected 2, 3, or 4")
-        key, label, *rest = column
-        format_ = rest[0] if len(rest) > 0 else None
-        description = rest[1] if len(rest) > 1 else None
-        return Column(key, label, format=format_, description=description)
+        # Index rather than unpack, so subclasses with a custom __iter__ still
+        # read positions 0-3 the way they always did.
+        format_ = column[2] if len(column) > 2 else None
+        description = column[3] if len(column) > 3 else None
+        return Column(column[0], column[1], format=format_, description=description)
     raise TypeError(f"expected a Column or a 2-/3-/4-element tuple, got {type(column).__name__}")
 
 
