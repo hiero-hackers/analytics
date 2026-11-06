@@ -69,21 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-11-05T01:11:10.086808+00:00"
+  "end": "2026-11-06T01:11:07.686587+00:00"
  },
  "rows": [
-  {
-   "repo": "solo-charts",
-   "time": "2025-05-06T14:04:48Z",
-   "tag_name": "v0.52.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2025-05-06T17:19:48Z",
-   "tag_name": "v0.129.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-solo-action",
    "time": "2025-05-07T08:35:12Z",
@@ -5249,8 +5237,20 @@
    "time": "2026-11-04T15:20:28Z",
    "tag_name": "v0.96.0",
    "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-11-05T17:56:04Z",
+   "tag_name": "v0.166.0-rc2",
+   "type": "prerelease"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-11-05T21:53:10Z",
+   "tag_name": "v0.46.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-05T01:11:10.086808+00:00",
+ "generated_at": "2026-11-06T01:11:07.686587+00:00",
  "stale": false
 }

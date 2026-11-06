@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-05T01:02:02.472218+00:00"
+  "end": "2026-11-06T01:02:09.776007+00:00"
  },
  "series": [
   {
@@ -69,7 +69,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "Unknown": 91,
+   "Unknown": 92,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -85,7 +85,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 128,
+   "Unknown": 130,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -93,7 +93,7 @@
   },
   {
    "repo": "hiero-cryptography",
-   "Unknown": 2,
+   "Unknown": 3,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -109,7 +109,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 11,
+   "Unknown": 8,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -117,7 +117,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 30,
+   "Unknown": 34,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -150,24 +150,24 @@
   {
    "repo": "hiero-sdk-java",
    "Unknown": 3,
-   "Good First Issue": 1,
+   "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
    "repo": "hiero-sdk-js",
-   "Unknown": 9,
+   "Unknown": 10,
    "Good First Issue": 0,
-   "Beginner": 3,
-   "Intermediate": 3,
-   "Advanced": 0
+   "Beginner": 5,
+   "Intermediate": 5,
+   "Advanced": 1
   },
   {
    "repo": "hiero-sdk-python",
    "Unknown": 2,
    "Good First Issue": 1,
-   "Beginner": 3,
+   "Beginner": 2,
    "Intermediate": 1,
    "Advanced": 0
   },
@@ -189,7 +189,7 @@
   },
   {
    "repo": "hiero-sdk-tck",
-   "Unknown": 62,
+   "Unknown": 35,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -197,7 +197,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 23,
+   "Unknown": 32,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -218,16 +218,8 @@
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
-  },
-  {
-   "repo": "tsc-eligibility-check",
-   "Unknown": 1,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
   }
  ],
- "generated_at": "2026-11-05T01:02:02.472218+00:00",
+ "generated_at": "2026-11-06T01:02:09.776007+00:00",
  "stale": false
 }

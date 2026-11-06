@@ -80,6 +80,16 @@
    "organisations": "Hashgraph"
   },
   {
+   "repo": "clpr-website",
+   "committers": 7,
+   "distinct_orgs": 2,
+   "top_org": "Hashgraph",
+   "top_org_pct": 71,
+   "independent": 1,
+   "unknown": 0,
+   "organisations": "Hashgraph, OpenElements"
+  },
+  {
    "repo": "clpr-smart-contracts",
    "committers": 15,
    "distinct_orgs": 3,
@@ -90,9 +100,9 @@
    "organisations": "Hashgraph, BlockyDevs, LimeChain"
   }
  ],
- "row_count": 4,
+ "row_count": 5,
  "label": "Committers",
- "generated_at": "2026-11-05T01:13:48.708460+00:00",
+ "generated_at": "2026-11-06T01:13:47.026962+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance",

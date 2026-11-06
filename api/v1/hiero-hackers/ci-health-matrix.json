@@ -270,8 +270,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 10 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/cflite_pr.yml:3; .github/workflows/cflite_pr.yml:17; .github/workflows/codeql.yml:3; .github/workflows/codeql.yml:20; .github/workflows/dashboard-preview-comment.yml:20; .github/workflows/dashboard-preview.yml:12; .github/workflows/lint.yml:11; .github/workflows/refresh-affiliations.yml:16; .github/workflows/refresh-affiliations.yml:28; .github/workflows/scorecard.yml:15; .github/workflows/scorecard.yml:21; .github/workflows/sdk-automations.yml:27; .github/workflows/test.yml:11; .github/workflows/update-analytics.yml:25; .github/workflows/update-analytics.yml:208; .github/workflows/update-analytics.yml:282"
+     "evidence": "All 11 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/cflite_pr.yml:3; .github/workflows/cflite_pr.yml:17; .github/workflows/codeql.yml:3; .github/workflows/codeql.yml:20; .github/workflows/dashboard-preview-comment.yml:20; .github/workflows/dashboard-preview.yml:12; .github/workflows/dependency-review.yml:11; .github/workflows/lint.yml:11; .github/workflows/refresh-affiliations.yml:16; .github/workflows/refresh-affiliations.yml:28; .github/workflows/scorecard.yml:15; .github/workflows/scorecard.yml:21; .github/workflows/sdk-automations.yml:27; .github/workflows/test.yml:11; .github/workflows/update-analytics.yml:25; .github/workflows/update-analytics.yml:212; .github/workflows/update-analytics.yml:318"
     },
     {
      "key": "repository_security_configuration",
@@ -803,6 +803,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-05T01:13:41.262355+00:00",
+ "generated_at": "2026-11-06T01:13:38.916310+00:00",
  "stale": false
 }

@@ -31,6 +31,11 @@
    "color": "#EF4444"
   },
   {
+   "key": "Docs / Web",
+   "label": "Docs / Web",
+   "color": "#64748B"
+  },
+  {
    "key": "Other",
    "label": "Other",
    "color": "#94A3B8"
@@ -39,7 +44,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-05T01:13:45.870504+00:00"
+  "end": "2026-11-06T01:13:43.959249+00:00"
  },
  "nodes": [
   {
@@ -81,6 +86,14 @@
    "category": "Other",
    "x": 0.5601,
    "y": 1.718
+  },
+  {
+   "id": "clpr-website",
+   "active": 1,
+   "total": 1,
+   "category": "Docs / Web",
+   "x": 0.0,
+   "y": -3.338
   }
  ],
  "edges": [
@@ -135,6 +148,6 @@
    "shared": 1
   }
  ],
- "generated_at": "2026-11-05T01:13:45.870504+00:00",
+ "generated_at": "2026-11-06T01:13:43.959249+00:00",
  "stale": false
 }

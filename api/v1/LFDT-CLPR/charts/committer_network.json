@@ -26,6 +26,11 @@
    "color": "#14B8A6"
   },
   {
+   "key": "Docs / Web",
+   "label": "Docs / Web",
+   "color": "#64748B"
+  },
+  {
    "key": "Other",
    "label": "Other",
    "color": "#94A3B8"
@@ -34,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-05T01:13:48.206275+00:00"
+  "end": "2026-11-06T01:13:46.464151+00:00"
  },
  "nodes": [
   {
@@ -42,32 +47,40 @@
    "active": 2,
    "total": 15,
    "category": "EVM / smart contracts",
-   "x": 0.5865,
-   "y": 1.6
+   "x": -0.2353,
+   "y": 1.718
   },
   {
    "id": "clpr-endpoint",
    "active": 1,
    "total": 10,
    "category": "Other",
-   "x": 1.5997,
-   "y": -0.5864
+   "x": 1.4331,
+   "y": -1.3181
+  },
+  {
+   "id": "clpr-website",
+   "active": 1,
+   "total": 7,
+   "category": "Docs / Web",
+   "x": -0.6699,
+   "y": -1.718
   },
   {
    "id": "clpr-e2e",
    "active": 0,
    "total": 9,
    "category": "Other",
-   "x": -0.5865,
-   "y": -1.6
+   "x": -1.7005,
+   "y": 0.1573
   },
   {
    "id": "clpr-spec",
    "active": 0,
    "total": 7,
    "category": "Other",
-   "x": -1.5997,
-   "y": 0.5864
+   "x": 1.7005,
+   "y": 0.8054
   }
  ],
  "edges": [
@@ -87,6 +100,11 @@
    "shared": 6
   },
   {
+   "source": "clpr-e2e",
+   "target": "clpr-website",
+   "shared": 6
+  },
+  {
    "source": "clpr-endpoint",
    "target": "clpr-smart-contracts",
    "shared": 6
@@ -97,11 +115,26 @@
    "shared": 6
   },
   {
+   "source": "clpr-endpoint",
+   "target": "clpr-website",
+   "shared": 6
+  },
+  {
    "source": "clpr-smart-contracts",
    "target": "clpr-spec",
    "shared": 6
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-website",
+   "shared": 6
+  },
+  {
+   "source": "clpr-spec",
+   "target": "clpr-website",
+   "shared": 6
   }
  ],
- "generated_at": "2026-11-05T01:13:48.206275+00:00",
+ "generated_at": "2026-11-06T01:13:46.464151+00:00",
  "stale": false
 }

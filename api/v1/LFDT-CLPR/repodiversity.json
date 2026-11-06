@@ -100,6 +100,16 @@
    "organisations": "Hashgraph"
   },
   {
+   "repo": "clpr-website",
+   "maintainers": 3,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "independent": 0,
+   "unknown": 0,
+   "organisations": "Hashgraph"
+  },
+  {
    "repo": "governance",
    "maintainers": 3,
    "distinct_orgs": 1,
@@ -110,9 +120,9 @@
    "organisations": "Hashgraph"
   }
  ],
- "row_count": 6,
+ "row_count": 7,
  "label": "Maintainers",
- "generated_at": "2026-11-05T01:13:48.689768+00:00",
+ "generated_at": "2026-11-06T01:13:47.007527+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -218,6 +228,16 @@
      "organisations": "Hashgraph"
     },
     {
+     "repo": "clpr-website",
+     "maintainers": 3,
+     "distinct_orgs": 1,
+     "top_org": "Hashgraph",
+     "top_org_pct": 100,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "Hashgraph"
+    },
+    {
      "repo": "governance",
      "maintainers": 3,
      "distinct_orgs": 1,
@@ -228,9 +248,9 @@
      "organisations": "Hashgraph"
     }
    ],
-   "row_count": 6,
+   "row_count": 7,
    "label": "Maintainers",
-   "generated_at": "2026-11-05T01:13:48.689768+00:00",
+   "generated_at": "2026-11-06T01:13:47.007527+00:00",
    "stale": false
   },
   {
@@ -315,6 +335,16 @@
      "organisations": "Hashgraph"
     },
     {
+     "repo": "clpr-website",
+     "committers": 7,
+     "distinct_orgs": 2,
+     "top_org": "Hashgraph",
+     "top_org_pct": 71,
+     "independent": 1,
+     "unknown": 0,
+     "organisations": "Hashgraph, OpenElements"
+    },
+    {
      "repo": "clpr-smart-contracts",
      "committers": 15,
      "distinct_orgs": 3,
@@ -325,9 +355,9 @@
      "organisations": "Hashgraph, BlockyDevs, LimeChain"
     }
    ],
-   "row_count": 4,
+   "row_count": 5,
    "label": "Committers",
-   "generated_at": "2026-11-05T01:13:48.708460+00:00",
+   "generated_at": "2026-11-06T01:13:47.026962+00:00",
    "stale": false
   }
  ],

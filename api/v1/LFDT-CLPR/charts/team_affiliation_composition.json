@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-05T01:13:48.730279+00:00"
+  "end": "2026-11-06T01:13:47.049948+00:00"
  },
  "series": [
   {
@@ -48,14 +48,14 @@
    "color": "#1F77B4"
   },
   {
-   "key": "BlockyDevs",
-   "label": "BlockyDevs",
-   "color": "#D62728"
-  },
-  {
    "key": "LimeChain",
    "label": "LimeChain",
    "color": "#FF7F0E"
+  },
+  {
+   "key": "BlockyDevs",
+   "label": "BlockyDevs",
+   "color": "#D62728"
   },
   {
    "key": "Independent",
@@ -73,36 +73,36 @@
   {
    "team": "clpr-release-engineers",
    "Hashgraph": 5,
-   "BlockyDevs": 0,
    "LimeChain": 0,
+   "BlockyDevs": 0,
    "Independent": 0,
    "Unknown": 0
   },
   {
    "team": "clpr-e2e-committers",
    "Hashgraph": 4,
-   "BlockyDevs": 0,
    "LimeChain": 0,
+   "BlockyDevs": 0,
    "Independent": 0,
    "Unknown": 0
   },
   {
    "team": "clpr-endpoint-committers",
    "Hashgraph": 4,
-   "BlockyDevs": 0,
    "LimeChain": 0,
+   "BlockyDevs": 0,
    "Independent": 0,
    "Unknown": 1
   },
   {
    "team": "clpr-smart-contracts-committers",
    "Hashgraph": 7,
-   "BlockyDevs": 1,
    "LimeChain": 1,
+   "BlockyDevs": 1,
    "Independent": 1,
    "Unknown": 0
   }
  ],
- "generated_at": "2026-11-05T01:13:48.730279+00:00",
+ "generated_at": "2026-11-06T01:13:47.049948+00:00",
  "stale": false
 }

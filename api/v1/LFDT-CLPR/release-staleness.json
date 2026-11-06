@@ -88,10 +88,18 @@
    "median_gap_days": null,
    "staleness_ratio": null,
    "staleness_bucket": "never_released"
+  },
+  {
+   "repo": "LFDT-CLPR/clpr-website",
+   "latest_release": null,
+   "days_since_last_release": null,
+   "median_gap_days": null,
+   "staleness_ratio": null,
+   "staleness_bucket": "never_released"
   }
  ],
- "row_count": 6,
- "generated_at": "2026-11-05T01:13:54.382770+00:00",
+ "row_count": 7,
+ "generated_at": "2026-11-06T01:13:51.924104+00:00",
  "stale": false,
  "group": "Release cadence & staleness",
  "macro": "Releases"
