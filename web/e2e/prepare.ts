@@ -1,6 +1,6 @@
 /** Stage the built app beside the same typed API fixtures used by Vitest. */
 import { cp, mkdir, rm, writeFile, access } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import { PRINT_MANIFEST, PRINT_ROUTES } from './fixtures.ts';
 
 const site = resolve('.e2e/site');
@@ -9,7 +9,12 @@ await cp('dist', site, { recursive: true });
 
 async function write(relativePath: string, data: string | Uint8Array) {
   const target = resolve(site, relativePath);
-  if (!target.startsWith(`${site}/`)) throw new Error(`Fixture path escapes site: ${relativePath}`);
+  // `resolve()` joins with the platform separator, so the guard has to check
+  // for that separator too — a hardcoded `/` never matches on Windows, where
+  // every legitimate write then throws as if it were a traversal attempt.
+  if (target !== site && !target.startsWith(site + sep)) {
+    throw new Error(`Fixture path escapes site: ${relativePath}`);
+  }
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, data);
 }
