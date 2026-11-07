@@ -134,7 +134,7 @@ def _parse_freshness_timestamp(value: object, *, label: str, csv_path: Path) -> 
     return parsed.astimezone(UTC)
 
 
-def _freshness(csv_path: Path, *, fallback_to_generated_at: bool = False) -> dict:
+def _freshness(csv_path: Path):
     """Publish output generation time and source-data staleness when known.
 
     The oldest source fetch is the conservative freshness bound for outputs
@@ -154,8 +154,6 @@ def _freshness(csv_path: Path, *, fallback_to_generated_at: bool = False) -> dic
     sources = meta.get("source_datasets")
 
     if not isinstance(sources, list) or not sources:
-        if fallback_to_generated_at:
-            result["stale"] = datetime.now(UTC) - generated > STALE_AFTER
         return result
 
     fetched_stamps = []
@@ -185,14 +183,9 @@ def _freshness(csv_path: Path, *, fallback_to_generated_at: bool = False) -> dic
     return result
 
 
-def _stamp_freshness(
-    document: dict,
-    csv_path: Path,
-    *,
-    fallback_to_generated_at: bool = False,
-) -> None:
+def _stamp_freshness(document: dict, csv_path: Path) -> None:
     """Attach freshness metadata from the source CSV's sidecar, if any."""
-    document.update(_freshness(csv_path, fallback_to_generated_at=fallback_to_generated_at))
+    document.update(_freshness(csv_path))
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
@@ -259,7 +252,7 @@ def _variant_document(variant: dict, org: str, org_data_dir: Path) -> dict | Non
     # correction" issue link) travels with the document.
     if action_url := variant.get("action_url"):
         document["action"] = {"url": action_url, "label": variant.get("action_label", "Suggest a correction")}
-    _stamp_freshness(document, csv_path, fallback_to_generated_at=True)
+    _stamp_freshness(document, csv_path)
     if periods := _period_variants(variant, org, org_data_dir):
         document["periods"] = periods
     return document
@@ -353,7 +346,7 @@ def _chart_variant(org: str, org_dir: Path, spec: dict, org_data_dir: Path, labe
         raise DataApiContractError(f"Invalid chart dataset {org}/{source['file']}: {exc}") from exc
     if is_empty(document, source):
         return None
-    _stamp_freshness(document, csv_path, fallback_to_generated_at=True)
+    _stamp_freshness(document, csv_path)
     document = {**variant_annotations(chart_id), **document, "id": chart_id}
     target = org_dir / "charts" / f"{chart_id}.json"
     target.parent.mkdir(parents=True, exist_ok=True)

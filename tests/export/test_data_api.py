@@ -223,8 +223,8 @@ def test_freshness_uses_fetched_at_even_when_content_watermark_does_not_advance(
         [{"name": "issues.json", "fetched_at": "not-a-timestamp"}],
     ],
 )
-def test_unknown_source_freshness_uses_safe_fallback(tmp_path: Path, source_datasets):
-    """Missing source metadata falls back to generated_at; incomplete metadata is stale."""
+def test_unknown_source_freshness_is_not_reported_as_fresh(tmp_path: Path, source_datasets):
+    """Missing source metadata is unknown; incomplete metadata is stale."""
     csv_path = tmp_path / "widgets.csv"
     generated_at = datetime.now(UTC).isoformat()
     meta = {"generated_at": generated_at}
@@ -234,12 +234,12 @@ def test_unknown_source_freshness_uses_safe_fallback(tmp_path: Path, source_data
 
     if not source_datasets:
         assert "stale" not in data_api._freshness(csv_path)
-    freshness = data_api._freshness(csv_path, fallback_to_generated_at=True)
+    freshness = data_api._freshness(csv_path)
 
     assert freshness["generated_at"] == generated_at
 
     if not source_datasets:
-        assert freshness["stale"] is False
+        assert "stale" not in freshness
     else:
         assert freshness["stale"] is True
 
