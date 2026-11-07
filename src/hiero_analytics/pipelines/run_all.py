@@ -35,10 +35,10 @@ from hiero_analytics.config import orgs as org_registry
 from hiero_analytics.config import paths
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.data_sources import dataset_health
-from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets, start_run
 from hiero_analytics.data_sources.dataset_store import (
     offline_mode_enabled,
     prune_untouched_datasets,
+    start_run,
     track_pipeline_datasets,
 )
 from hiero_analytics.data_sources.github_ingest import fetch_org_login

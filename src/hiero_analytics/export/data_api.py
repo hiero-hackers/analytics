@@ -119,59 +119,80 @@ def _read_meta(csv_path: Path) -> dict:
     return payload if isinstance(payload, dict) else {}
 
 
-def _freshness(csv_path: Path) -> dict:
+def _parse_freshness_timestamp(value: object, *, label: str, csv_path: Path) -> datetime | None:
+    """Parse a freshness timestamp and normalize it to UTC."""
+    try:
+        parsed = datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        logger.warning("Unparseable %s timestamp %r in sidecar for %s", label, value, csv_path)
+        return None
+
+    if parsed.tzinfo is None:
+        logger.warning("Naive %s timestamp %r in sidecar for %s; assuming UTC", label, value, csv_path)
+        parsed = parsed.replace(tzinfo=UTC)
+
+    return parsed.astimezone(UTC)
+
+
+def _freshness(csv_path: Path, *, fallback_to_generated_at: bool = False) -> dict:
     """Publish output generation time and source-data staleness when known.
 
-    ``generated_at`` describes the CSV artifact, not its inputs. A staleness
-    verdict is emitted only when every source dataset recorded by the producing
-    pipeline has a usable fetch timestamp. The oldest source fetch is the
-    conservative bound for outputs derived from multiple datasets.
+    The oldest source fetch is the conservative freshness bound for outputs
+    derived from multiple datasets. When enabled, generated_at is the fallback
+    for outputs without tracked source datasets.
     """
     meta = _read_meta(csv_path)
     generated_at = meta.get("generated_at")
     if not generated_at:
         return {}
-    try:
-        generated = datetime.fromisoformat(generated_at)
-    except (TypeError, ValueError):
-        logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
+
+    generated = _parse_freshness_timestamp(generated_at, label="generated_at", csv_path=csv_path)
+    if generated is None:
         return {"generated_at": generated_at}
-    if generated.tzinfo is None:
-        logger.warning("Naive generated_at %r in sidecar for %s; assuming UTC", generated_at, csv_path)
-        generated = generated.replace(tzinfo=UTC)
 
     result = {"generated_at": generated_at}
     sources = meta.get("source_datasets")
-    # Legacy outputs, pipelines with no tracked dataset inputs, or invalid source
-    # metadata cannot support a freshness claim. Keep generated_at for callers.
+
     if not isinstance(sources, list) or not sources:
+        if fallback_to_generated_at:
+            result["stale"] = datetime.now(UTC) - generated > STALE_AFTER
         return result
 
     fetched_stamps = []
+    incomplete = False
+
     for source in sources:
         if not isinstance(source, dict) or not isinstance(source.get("fetched_at"), str):
             logger.warning("Missing source fetch timestamp in sidecar for %s", csv_path)
-            return result
-        try:
-            fetched = datetime.fromisoformat(source["fetched_at"])
-        except ValueError:
-            logger.warning("Unparseable source fetch timestamp %r in sidecar for %s", source["fetched_at"], csv_path)
-            return result
-        if fetched.tzinfo is None:
-            logger.warning(
-                "Naive source fetch timestamp %r in sidecar for %s; assuming UTC", source["fetched_at"], csv_path
-            )
-            fetched = fetched.replace(tzinfo=UTC)
-        fetched_stamps.append(fetched.astimezone(UTC))
+            incomplete = True
+            continue
 
-    oldest_fetch = min(fetched_stamps)
-    result["stale"] = datetime.now(UTC) - oldest_fetch > STALE_AFTER
+        fetched = _parse_freshness_timestamp(
+            source["fetched_at"],
+            label="source fetch",
+            csv_path=csv_path,
+        )
+        if fetched is None:
+            incomplete = True
+        else:
+            fetched_stamps.append(fetched)
+
+    if incomplete:
+        result["stale"] = True
+    elif fetched_stamps:
+        result["stale"] = datetime.now(UTC) - min(fetched_stamps) > STALE_AFTER
+
     return result
 
 
-def _stamp_freshness(document: dict, csv_path: Path) -> None:
-    """Attach ``generated_at``/``stale`` from the source CSV's sidecar, if any."""
-    document.update(_freshness(csv_path))
+def _stamp_freshness(
+    document: dict,
+    csv_path: Path,
+    *,
+    fallback_to_generated_at: bool = False,
+) -> None:
+    """Attach freshness metadata from the source CSV's sidecar, if any."""
+    document.update(_freshness(csv_path, fallback_to_generated_at=fallback_to_generated_at))
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
@@ -238,7 +259,7 @@ def _variant_document(variant: dict, org: str, org_data_dir: Path) -> dict | Non
     # correction" issue link) travels with the document.
     if action_url := variant.get("action_url"):
         document["action"] = {"url": action_url, "label": variant.get("action_label", "Suggest a correction")}
-    _stamp_freshness(document, csv_path)
+    _stamp_freshness(document, csv_path, fallback_to_generated_at=True)
     if periods := _period_variants(variant, org, org_data_dir):
         document["periods"] = periods
     return document
@@ -332,7 +353,7 @@ def _chart_variant(org: str, org_dir: Path, spec: dict, org_data_dir: Path, labe
         raise DataApiContractError(f"Invalid chart dataset {org}/{source['file']}: {exc}") from exc
     if is_empty(document, source):
         return None
-    _stamp_freshness(document, csv_path)
+    _stamp_freshness(document, csv_path, fallback_to_generated_at=True)
     document = {**variant_annotations(chart_id), **document, "id": chart_id}
     target = org_dir / "charts" / f"{chart_id}.json"
     target.parent.mkdir(parents=True, exist_ok=True)
