@@ -138,8 +138,8 @@ def _freshness(csv_path: Path):
     """Publish output generation time and source-data staleness when known.
 
     The oldest source fetch is the conservative freshness bound for outputs
-    derived from multiple datasets. When enabled, generated_at is the fallback
-    for outputs without tracked source datasets.
+    built from multiple datasets. Outputs without source-fetch metadata have
+    unknown freshness, so no stale value is published.
     """
     meta = _read_meta(csv_path)
     generated_at = meta.get("generated_at")
