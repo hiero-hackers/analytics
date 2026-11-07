@@ -58,6 +58,18 @@
  ],
  "rows": [
   {
+   "team": "clpr-e2e-committers",
+   "members": 6,
+   "resolved": 5,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "hhi": 10000,
+   "unknown": 1,
+   "single_employer": true,
+   "organisations": "Hashgraph 5"
+  },
+  {
    "team": "clpr-release-engineers",
    "members": 5,
    "resolved": 5,
@@ -78,18 +90,6 @@
    "top_org_pct": 100,
    "hhi": 10000,
    "unknown": 1,
-   "single_employer": true,
-   "organisations": "Hashgraph 4"
-  },
-  {
-   "team": "clpr-e2e-committers",
-   "members": 4,
-   "resolved": 4,
-   "distinct_orgs": 1,
-   "top_org": "Hashgraph",
-   "top_org_pct": 100,
-   "hhi": 10000,
-   "unknown": 0,
    "single_employer": true,
    "organisations": "Hashgraph 4"
   },
@@ -167,7 +167,7 @@
   }
  ],
  "row_count": 9,
- "generated_at": "2026-11-06T01:13:47.066781+00:00",
+ "generated_at": "2026-11-07T01:13:46.415896+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

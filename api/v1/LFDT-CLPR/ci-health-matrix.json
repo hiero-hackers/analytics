@@ -40,6 +40,33 @@
  ],
  "rows": [
   {
+   "key": "LFDT-CLPR/clpr-website",
+   "label": "LFDT-CLPR/clpr-website",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "fail",
+     "evidence": "Found 6 GitHub Actions reference(s) that are not pinned to a full commit SHA: actions/checkout@v7, actions/checkout@v7, actions/setup-node@v4, actions/checkout@v7, actions/setup-node@v4, actions/github-script@v7",
+     "location": ".github/workflows/dco.yml:17; .github/workflows/explainer.yml:19; .github/workflows/explainer.yml:20; .github/workflows/upstream-watch.yml:18; .github/workflows/upstream-watch.yml:19; .github/workflows/upstream-watch.yml:32"
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 3 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/dco.yml:9; .github/workflows/explainer.yml:12; .github/workflows/upstream-watch.yml:10"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: dco.yml; CodeQL workflow not detected.",
+     "location": ".github/workflows/dco.yml"
+    }
+   ]
+  },
+  {
    "key": "LFDT-CLPR/.github",
    "label": "LFDT-CLPR/.github",
    "cells": [
@@ -100,16 +127,16 @@
     {
      "key": "actions_sha_pinned",
      "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
      "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/200-flow-pr-checks.yaml:20; .github/workflows/200-flow-pr-formatting.yaml:15"
     },
     {
      "key": "repository_security_configuration",
@@ -127,16 +154,16 @@
     {
      "key": "actions_sha_pinned",
      "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
      "location": ""
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/600-flow-pull-request-checks.yaml:16; .github/workflows/601-flow-pull-request-formatting.yaml:19; .github/workflows/604-flow-gas-benchmark.yaml:13; .github/workflows/605-flow-slither-scan.yaml:17"
     },
     {
      "key": "repository_security_configuration",
@@ -150,33 +177,6 @@
   {
    "key": "LFDT-CLPR/clpr-spec",
    "label": "LFDT-CLPR/clpr-spec",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "review",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": ""
-    }
-   ]
-  },
-  {
-   "key": "LFDT-CLPR/clpr-website",
-   "label": "LFDT-CLPR/clpr-website",
    "cells": [
     {
      "key": "actions_sha_pinned",
@@ -236,6 +236,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-06T01:13:53.694033+00:00",
+ "generated_at": "2026-11-07T01:13:53.212343+00:00",
  "stale": false
 }

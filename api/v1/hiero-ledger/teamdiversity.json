@@ -898,6 +898,18 @@
    "organisations": "Hashgraph 1, DSR Corporation 1"
   },
   {
+   "team": "hiero-sdk-js-junior-committers",
+   "members": 3,
+   "resolved": 2,
+   "distinct_orgs": 2,
+   "top_org": "OpenElements",
+   "top_org_pct": 50,
+   "hhi": 5000,
+   "unknown": 1,
+   "single_employer": false,
+   "organisations": "OpenElements 1, Hashgraph 1"
+  },
+  {
    "team": "hiero-enterprise-java-committers",
    "members": 2,
    "resolved": 2,
@@ -932,18 +944,6 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "LimeChain 1, Hashgraph 1"
-  },
-  {
-   "team": "hiero-sdk-js-junior-committers",
-   "members": 2,
-   "resolved": 2,
-   "distinct_orgs": 2,
-   "top_org": "OpenElements",
-   "top_org_pct": 50,
-   "hhi": 5000,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "OpenElements 1, Hashgraph 1"
   },
   {
    "team": "hiero-solo-action-committers",
@@ -1403,7 +1403,7 @@
   }
  ],
  "row_count": 112,
- "generated_at": "2026-11-06T01:10:12.724685+00:00",
+ "generated_at": "2026-11-07T01:10:53.606104+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

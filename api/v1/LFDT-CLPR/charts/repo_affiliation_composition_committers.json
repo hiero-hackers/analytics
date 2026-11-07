@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-06T01:13:47.019857+00:00"
+  "end": "2026-11-07T01:13:46.368602+00:00"
  },
  "series": [
   {
@@ -73,15 +73,6 @@
  "details": [],
  "rows": [
   {
-   "repo": "clpr-e2e",
-   "Hashgraph": 8,
-   "LimeChain": 0,
-   "BlockyDevs": 0,
-   "OpenElements": 0,
-   "Independent": 1,
-   "Unknown": 0
-  },
-  {
    "repo": "clpr-spec",
    "Hashgraph": 6,
    "LimeChain": 0,
@@ -98,6 +89,15 @@
    "OpenElements": 0,
    "Independent": 1,
    "Unknown": 1
+  },
+  {
+   "repo": "clpr-e2e",
+   "Hashgraph": 18,
+   "LimeChain": 1,
+   "BlockyDevs": 1,
+   "OpenElements": 0,
+   "Independent": 2,
+   "Unknown": 2
   },
   {
    "repo": "clpr-smart-contracts",
@@ -118,6 +118,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-11-06T01:13:47.019857+00:00",
+ "generated_at": "2026-11-07T01:13:46.368602+00:00",
  "stale": false
 }

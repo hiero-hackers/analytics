@@ -3783,6 +3783,20 @@
   {
    "hip": 1193,
    "hip_title": "Record Stream to Block Stream Cutover",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 28125,
+   "pr_title": "feat: write block files in HIP-1193 format",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|branch|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "feat: write block files in HIP-1193 format",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/28125"
+  },
+  {
+   "hip": 1193,
+   "hip_title": "Record Stream to Block Stream Cutover",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 12885,
    "pr_title": "HIP-1193 Auto switch to blockstream during cutover",
@@ -10011,20 +10025,6 @@
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/11242"
   },
   {
-   "hip": 719,
-   "hip_title": "Associate and Dissociate Tokens via Facade Contract",
-   "repo": "hiero-ledger/hiero-mirror-node-explorer",
-   "pr_number": 1271,
-   "pr_title": "001268 when call target is a token, it should be decoded using dedicated ABIs",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-08-19 08:48:17+00:00",
-   "match_sources": "body",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "following ABIs are used: - ERC-20 and HIP-719 when token is fungible - ERC-721 and H",
-   "url": "https://github.com/hiero-ledger/hiero-mirror-node-explorer/pull/1271"
-  },
-  {
    "hip": 679,
    "hip_title": "Bucket restructuring for changing stream data folder structure",
    "repo": "hiero-ledger/hiero-mirror-node",
@@ -11637,6 +11637,20 @@
   {
    "hip": 540,
    "hip_title": "Change Or Remove Existing Keys From A Token",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14622,
+   "pr_title": "Fix freeze and KYC status of fee collectors associated by token creates",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "* Treat an empty key list KYC key (the HIP-540 removal sentinel) as disabling KYC for",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14622"
+  },
+  {
+   "hip": 540,
+   "hip_title": "Change Or Remove Existing Keys From A Token",
    "repo": "hiero-ledger/hiero-sdk-cpp",
    "pr_number": 699,
    "pr_title": "feat(HIP-540): Change or remove existing keys from a token",
@@ -12349,8 +12363,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 877,
- "generated_at": "2026-11-06T01:11:52.097567+00:00",
+ "row_count": 878,
+ "generated_at": "2026-11-07T01:12:31.666054+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

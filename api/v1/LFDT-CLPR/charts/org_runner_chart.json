@@ -1,0 +1,79 @@
+{
+ "note": "GitHub Actions runner usage per repository, stacked by type: self-hosted, standard (GitHub-hosted), or indeterminate (could not be classified).",
+ "methodology": [
+  "Read every GitHub Actions workflow file in each repository.",
+  "Classify each job's `runs-on` label as self-hosted, standard (a GitHub-hosted image), or indeterminate when the label cannot be resolved (e.g. a variable or a custom group name).",
+  "Count jobs, not repositories, and stack them per repository \u2014 so a repository with many jobs contributes proportionally more."
+ ],
+ "schema_version": 1,
+ "id": "org_runner_chart",
+ "kind": "categories",
+ "org": "LFDT-CLPR",
+ "source": "org_runner_summary.csv",
+ "metric": "org_runner_summary",
+ "unit": "Workflow jobs",
+ "population": "Workflow job runner declarations, grouped by repository. Indeterminate declarations cannot be classified.",
+ "dimensions": [
+  "repo",
+  "series"
+ ],
+ "mark": "bar",
+ "stacked": true,
+ "normalize": false,
+ "orientation": "horizontal",
+ "value_format": "integer",
+ "rank": true,
+ "top_n": 15,
+ "reference": null,
+ "value_max": null,
+ "group": null,
+ "category": {
+  "key": "repo",
+  "label": "Repository"
+ },
+ "window": {
+  "kind": "snapshot",
+  "days": null,
+  "end": "2026-11-07T01:13:50.698078+00:00"
+ },
+ "series": [
+  {
+   "key": "Self-Hosted",
+   "label": "Self-Hosted",
+   "color": "var(--chart-1)"
+  },
+  {
+   "key": "Standard",
+   "label": "Standard",
+   "color": "var(--chart-2)"
+  },
+  {
+   "key": "Indeterminate",
+   "label": "Indeterminate",
+   "color": "var(--chart-3)"
+  }
+ ],
+ "details": [],
+ "rows": [
+  {
+   "repo": "clpr-smart-contracts",
+   "Self-Hosted": 0,
+   "Standard": 8,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "clpr-endpoint",
+   "Self-Hosted": 0,
+   "Standard": 3,
+   "Indeterminate": 0
+  },
+  {
+   "repo": "clpr-website",
+   "Self-Hosted": 0,
+   "Standard": 3,
+   "Indeterminate": 0
+  }
+ ],
+ "generated_at": "2026-11-07T01:13:50.698078+00:00",
+ "stale": false
+}

@@ -39,15 +39,15 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-06T01:13:46.464151+00:00"
+  "end": "2026-11-07T01:13:45.836968+00:00"
  },
  "nodes": [
   {
    "id": "clpr-smart-contracts",
-   "active": 2,
+   "active": 3,
    "total": 15,
    "category": "EVM / smart contracts",
-   "x": -0.2353,
+   "x": -0.6972,
    "y": 1.718
   },
   {
@@ -55,44 +55,44 @@
    "active": 1,
    "total": 10,
    "category": "Other",
-   "x": 1.4331,
-   "y": -1.3181
+   "x": 0.9063,
+   "y": -1.094
   },
   {
    "id": "clpr-website",
    "active": 1,
    "total": 7,
    "category": "Docs / Web",
-   "x": -0.6699,
+   "x": -1.0484,
    "y": -1.718
   },
   {
    "id": "clpr-e2e",
    "active": 0,
-   "total": 9,
+   "total": 24,
    "category": "Other",
-   "x": -1.7005,
-   "y": 0.1573
+   "x": -1.4972,
+   "y": 0.2322
   },
   {
    "id": "clpr-spec",
    "active": 0,
    "total": 7,
    "category": "Other",
-   "x": 1.7005,
-   "y": 0.8054
+   "x": 1.4972,
+   "y": 0.8936
   }
  ],
  "edges": [
   {
    "source": "clpr-e2e",
-   "target": "clpr-endpoint",
-   "shared": 6
+   "target": "clpr-smart-contracts",
+   "shared": 15
   },
   {
    "source": "clpr-e2e",
-   "target": "clpr-smart-contracts",
-   "shared": 6
+   "target": "clpr-endpoint",
+   "shared": 10
   },
   {
    "source": "clpr-e2e",
@@ -135,6 +135,6 @@
    "shared": 6
   }
  ],
- "generated_at": "2026-11-06T01:13:46.464151+00:00",
+ "generated_at": "2026-11-07T01:13:45.836968+00:00",
  "stale": false
 }

@@ -39,14 +39,7 @@
    "repo": "clpr-e2e",
    "maintainers": 3,
    "active_maintainers": 0,
-   "committers": 9,
-   "triage": 0
-  },
-  {
-   "repo": "clpr-website",
-   "maintainers": 3,
-   "active_maintainers": 0,
-   "committers": 7,
+   "committers": 24,
    "triage": 0
   },
   {
@@ -55,36 +48,29 @@
    "active_maintainers": 1,
    "committers": 7,
    "triage": 0
+  },
+  {
+   "repo": "clpr-website",
+   "maintainers": 3,
+   "active_maintainers": 1,
+   "committers": 7,
+   "triage": 0
   }
  ],
  "row_count": 3,
- "generated_at": "2026-11-06T01:13:46.406808+00:00",
+ "generated_at": "2026-11-07T01:13:45.753830+00:00",
  "stale": false,
  "periods": {
   "7d": [
    {
-    "repo": "clpr-smart-contracts",
-    "maintainers": 3,
-    "active_maintainers": 0,
-    "committers": 15,
-    "triage": 0
-   },
-   {
-    "repo": "clpr-endpoint",
-    "maintainers": 3,
-    "active_maintainers": 0,
-    "committers": 10,
-    "triage": 0
-   },
-   {
     "repo": "clpr-e2e",
     "maintainers": 3,
     "active_maintainers": 0,
-    "committers": 9,
+    "committers": 24,
     "triage": 0
    },
    {
-    "repo": "clpr-website",
+    "repo": "clpr-spec",
     "maintainers": 3,
     "active_maintainers": 0,
     "committers": 7,
@@ -98,7 +84,21 @@
     "triage": 0
    },
    {
-    "repo": "clpr-spec",
+    "repo": "clpr-smart-contracts",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 15,
+    "triage": 0
+   },
+   {
+    "repo": "clpr-endpoint",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 10,
+    "triage": 0
+   },
+   {
+    "repo": "clpr-website",
     "maintainers": 3,
     "active_maintainers": 1,
     "committers": 7,
@@ -110,14 +110,7 @@
     "repo": "clpr-e2e",
     "maintainers": 3,
     "active_maintainers": 0,
-    "committers": 9,
-    "triage": 0
-   },
-   {
-    "repo": "clpr-website",
-    "maintainers": 3,
-    "active_maintainers": 0,
-    "committers": 7,
+    "committers": 24,
     "triage": 0
    },
    {
@@ -140,6 +133,13 @@
     "active_maintainers": 1,
     "committers": 7,
     "triage": 0
+   },
+   {
+    "repo": "clpr-website",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 7,
+    "triage": 0
    }
   ],
   "365d": [
@@ -147,18 +147,18 @@
     "repo": "clpr-e2e",
     "maintainers": 3,
     "active_maintainers": 0,
-    "committers": 9,
-    "triage": 0
-   },
-   {
-    "repo": "clpr-website",
-    "maintainers": 3,
-    "active_maintainers": 0,
-    "committers": 7,
+    "committers": 24,
     "triage": 0
    },
    {
     "repo": "clpr-spec",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 7,
+    "triage": 0
+   },
+   {
+    "repo": "clpr-website",
     "maintainers": 3,
     "active_maintainers": 1,
     "committers": 7,
