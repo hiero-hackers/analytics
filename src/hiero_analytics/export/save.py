@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from hiero_analytics.provenance import git_sha
+from hiero_analytics.data_sources.dataset_store import current_pipeline_datasets
+from hiero_analytics.provenance import dataset_fetched_at, git_sha
 
 
 def write_output_meta(
@@ -34,6 +35,19 @@ def write_output_meta(
     meta: dict[str, object] = {"generated_at": stamp, "git_sha": git_sha()}
     if record_count is not None:
         meta["record_count"] = record_count
+
+    # The data API must distinguish a freshly rebuilt CSV from freshly fetched
+    # inputs. Capture the persisted datasets read by this pipeline; an absent or
+    # unreadable stamp is recorded explicitly so consumers do not claim freshness.
+    source_paths = current_pipeline_datasets()
+    if source_paths is not None:
+        meta["source_datasets"] = [
+            {
+                "name": source.name,
+                "fetched_at": fetched_at.isoformat() if (fetched_at := dataset_fetched_at(source)) else None,
+            }
+            for source in sorted(source_paths)
+        ]
     Path(f"{path}.meta.json").write_text(json.dumps(meta), encoding="utf-8")
 
 
