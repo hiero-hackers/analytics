@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-07T01:05:32.928113+00:00"
+  "end": "2026-11-08T01:04:30.064382+00:00"
  },
  "series": [
   {
@@ -139,8 +139,15 @@
    "maintainer": 4
   },
   {
+   "repo": "hiero-website",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 4
+  },
+  {
    "repo": "hiero-sdk-tck",
-   "general_user": 5,
+   "general_user": 4,
    "triage": 1,
    "committer": 0,
    "maintainer": 2
@@ -151,13 +158,6 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 1
-  },
-  {
-   "repo": "hiero-website",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 4
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -202,14 +202,7 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-solo-action",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-gradle-conventions",
+   "repo": "hiero-ethereum-execution-spec-tests",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
@@ -223,28 +216,7 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 3
-  },
-  {
    "repo": ".github",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "solo-containers",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
-   "repo": "solo-charts",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
@@ -262,6 +234,34 @@
    "general_user": 0,
    "triage": 0,
    "committer": 1,
+   "maintainer": 2
+  },
+  {
+   "repo": "solo-containers",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
+   "repo": "solo-charts",
+   "general_user": 1,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 3
+  },
+  {
+   "repo": "hiero-solo-action",
+   "general_user": 1,
+   "triage": 0,
+   "committer": 0,
    "maintainer": 2
   },
   {
@@ -294,6 +294,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-07T01:05:32.928113+00:00",
+ "generated_at": "2026-11-08T01:04:30.064382+00:00",
  "stale": false
 }

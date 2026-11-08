@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-07T01:05:32.933938+00:00"
+  "end": "2026-11-08T01:04:30.068379+00:00"
  },
  "series": [
   {
@@ -62,10 +62,10 @@
    "maintainer": 10
   },
   {
-   "repo": "hiero-mirror-node",
-   "general_user": 3,
-   "triage": 0,
-   "committer": 7,
+   "repo": "hiero-sdk-js",
+   "general_user": 9,
+   "triage": 2,
+   "committer": 0,
    "maintainer": 2
   },
   {
@@ -76,10 +76,10 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-sdk-js",
-   "general_user": 8,
-   "triage": 2,
-   "committer": 0,
+   "repo": "hiero-mirror-node",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 7,
    "maintainer": 2
   },
   {
@@ -91,7 +91,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "general_user": 3,
+   "general_user": 2,
    "triage": 1,
    "committer": 4,
    "maintainer": 3
@@ -132,6 +132,13 @@
    "maintainer": 3
   },
   {
+   "repo": "hiero-website",
+   "general_user": 1,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 3
+  },
+  {
    "repo": "hiero-improvement-proposals",
    "general_user": 0,
    "triage": 0,
@@ -144,13 +151,6 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 2
-  },
-  {
-   "repo": "hiero-website",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 3
   },
   {
    "repo": "hiero-sdk-go",
@@ -245,6 +245,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-07T01:05:32.933938+00:00",
+ "generated_at": "2026-11-08T01:04:30.068379+00:00",
  "stale": false
 }
