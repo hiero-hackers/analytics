@@ -1,6 +1,6 @@
 {
   "api_usage": {
-    "graphql_remaining": 8885,
+    "graphql_remaining": 9711,
     "orgs": {
       "LFDT-CLPR": {
         "datasets": {
@@ -26,7 +26,7 @@
           },
           "issues": {
             "graphql_points": 8,
-            "graphql_requests": 4,
+            "graphql_requests": 3,
             "rest_requests": 0
           },
           "merged_pr_difficulty": {
@@ -46,7 +46,7 @@
           }
         },
         "graphql_points": 81,
-        "graphql_requests": 33,
+        "graphql_requests": 32,
         "rest_requests": 35
       },
       "hiero-hackers": {
@@ -77,8 +77,8 @@
             "rest_requests": 0
           },
           "merged_pr_difficulty": {
-            "graphql_points": 186,
-            "graphql_requests": 10,
+            "graphql_points": 180,
+            "graphql_requests": 9,
             "rest_requests": 0
           },
           "preflight": {
@@ -92,8 +92,8 @@
             "rest_requests": 0
           }
         },
-        "graphql_points": 334,
-        "graphql_requests": 116,
+        "graphql_points": 328,
+        "graphql_requests": 115,
         "rest_requests": 171
       },
       "hiero-ledger": {
@@ -124,13 +124,13 @@
             "rest_requests": 0
           },
           "issues": {
-            "graphql_points": 82,
-            "graphql_requests": 48,
+            "graphql_points": 66,
+            "graphql_requests": 32,
             "rest_requests": 0
           },
           "merged_pr_difficulty": {
-            "graphql_points": 228,
-            "graphql_requests": 37,
+            "graphql_points": 186,
+            "graphql_requests": 39,
             "rest_requests": 0
           },
           "onboarding": {
@@ -139,8 +139,8 @@
             "rest_requests": 0
           },
           "pr_hip_references": {
-            "graphql_points": 20,
-            "graphql_requests": 20,
+            "graphql_points": 16,
+            "graphql_requests": 16,
             "rest_requests": 0
           },
           "preflight": {
@@ -154,18 +154,18 @@
             "rest_requests": 0
           }
         },
-        "graphql_points": 605,
-        "graphql_requests": 291,
+        "graphql_points": 543,
+        "graphql_requests": 273,
         "rest_requests": 596
       }
     },
     "total": {
-      "graphql_points": 1020,
-      "graphql_requests": 440,
+      "graphql_points": 952,
+      "graphql_requests": 420,
       "rest_requests": 802
     }
   },
-  "data_as_of": "2026-11-08T01:02:08.553227+00:00",
+  "data_as_of": "2026-11-09T01:01:40.444305+00:00",
   "dataset_refresh": {
     "datasets": {
       "contributor_activity_LFDT-CLPR_all": {
@@ -176,9 +176,9 @@
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 166,
+        "rows_after": 167,
         "rows_before": 166,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "contributor_activity_hiero-hackers_all": {
@@ -186,14 +186,14 @@
         "dataset": "contributor_activity_hiero-hackers_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-hackers/noobisoft"
+          "hiero-hackers/hiero-sdk-dart"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
         "rows_after": 3181,
-        "rows_before": 3166,
-        "runs_without_shrink": 3,
+        "rows_before": 3181,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "contributor_activity_hiero-ledger_all": {
@@ -201,14 +201,14 @@
         "dataset": "contributor_activity_hiero-ledger_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-ledger/governance"
+          "hiero-ledger/hiero-cryptography"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 294384,
-        "rows_before": 294352,
-        "runs_without_shrink": 3,
+        "rows_after": 294423,
+        "rows_before": 294384,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "hip_inventory_hiero-ledger_hiero-improvement-proposals_all": {
@@ -221,7 +221,7 @@
         "retired": [],
         "rows_after": 165,
         "rows_before": 165,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issue_label_events_LFDT-CLPR_all": {
@@ -229,14 +229,14 @@
         "dataset": "issue_label_events_LFDT-CLPR_all",
         "deferred": [],
         "full_refreshed": [
-          "LFDT-CLPR/governance"
+          "LFDT-CLPR/clpr-spec"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
         "rows_after": 17,
         "rows_before": 17,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issue_label_events_hiero-hackers_all": {
@@ -244,14 +244,14 @@
         "dataset": "issue_label_events_hiero-hackers_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-hackers/hiero-notifications"
+          "hiero-hackers/hiero-did-sdk-rs"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
         "rows_after": 1043,
         "rows_before": 1043,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issue_label_events_hiero-ledger_all": {
@@ -259,31 +259,28 @@
         "dataset": "issue_label_events_hiero-ledger_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-ledger/hiero-consensus-specifications",
-          "hiero-ledger/solo-containers",
-          "hiero-ledger/tsc-eligibility-check"
+          "hiero-ledger/hiero",
+          "hiero-ledger/hiero-solo-action"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 52589,
-        "rows_before": 52559,
-        "runs_without_shrink": 3,
+        "rows_after": 52590,
+        "rows_before": 52589,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issues_LFDT-CLPR_all": {
         "backfilled": [],
         "dataset": "issues_LFDT-CLPR_all",
         "deferred": [],
-        "full_refreshed": [
-          "LFDT-CLPR/clpr-website"
-        ],
+        "full_refreshed": [],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 20,
+        "rows_after": 21,
         "rows_before": 20,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issues_hiero-hackers_all": {
@@ -291,14 +288,14 @@
         "dataset": "issues_hiero-hackers_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-hackers/hiero-notifications"
+          "hiero-hackers/hiero-journal-rs"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
         "rows_after": 521,
         "rows_before": 521,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "issues_hiero-ledger_all": {
@@ -306,14 +303,14 @@
         "dataset": "issues_hiero-ledger_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-ledger/hiero-mirror-node"
+          "hiero-ledger/hiero-json-rpc-relay"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 34793,
-        "rows_before": 34792,
-        "runs_without_shrink": 3,
+        "rows_after": 34794,
+        "rows_before": 34793,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "merged_pr_difficulty_LFDT-CLPR_all": {
@@ -326,7 +323,7 @@
         "retired": [],
         "rows_after": 25,
         "rows_before": 25,
-        "runs_without_shrink": 3,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "merged_pr_difficulty_hiero-hackers_all": {
@@ -334,14 +331,14 @@
         "dataset": "merged_pr_difficulty_hiero-hackers_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-hackers/analytics"
+          "hiero-hackers/hiero-enterprise-js"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
         "rows_after": 970,
-        "rows_before": 968,
-        "runs_without_shrink": 3,
+        "rows_before": 970,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "merged_pr_difficulty_hiero-ledger_all": {
@@ -349,14 +346,15 @@
         "dataset": "merged_pr_difficulty_hiero-ledger_all",
         "deferred": [],
         "full_refreshed": [
-          "hiero-ledger/hiero-sdk-tck"
+          "hiero-ledger/hiero-did-sdk-python",
+          "hiero-ledger/hiero-enterprise-java"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 44599,
-        "rows_before": 44597,
-        "runs_without_shrink": 3,
+        "rows_after": 44607,
+        "rows_before": 44599,
+        "runs_without_shrink": 4,
         "unexplained_loss": {}
       },
       "pr_hip_references_hiero-ledger_hiero-era": {
@@ -364,13 +362,13 @@
         "dataset": "pr_hip_references_hiero-ledger_hiero-era",
         "deferred": [],
         "full_refreshed": [
-          "hiero-ledger/hiero-sdk-python"
+          "hiero-ledger/hiero-sdk-java"
         ],
         "held": {},
         "overdue": {},
         "retired": [],
-        "rows_after": 28943,
-        "rows_before": 28953,
+        "rows_after": 28941,
+        "rows_before": 28943,
         "runs_without_shrink": 0,
         "unexplained_loss": {}
       }
@@ -381,25 +379,25 @@
   },
   "datasets": [
     {
-      "bytes": 41899,
-      "fetched_at": "2026-11-08T01:17:35.311272+00:00",
-      "fetched_through": "2026-11-06T19:27:10+00:00",
+      "bytes": 42139,
+      "fetched_at": "2026-11-09T01:12:53.233213+00:00",
+      "fetched_through": "2026-11-08T15:24:31+00:00",
       "name": "contributor_activity_LFDT-CLPR_all.json",
-      "sha256": "c77957158c5d98ec7c8a55b1039a1f09cc7ad3f5643e73798d003a4d3bd32f72"
+      "sha256": "a915dea43ba314ebb8907a86a47cf3861373dc1319150e0a106d31026141e701"
     },
     {
       "bytes": 786422,
-      "fetched_at": "2026-11-08T01:16:20.168067+00:00",
+      "fetched_at": "2026-11-09T01:11:43.080493+00:00",
       "fetched_through": "2026-11-07T16:43:21+00:00",
       "name": "contributor_activity_hiero-hackers_all.json",
-      "sha256": "fb7591f532d126e188a9c7b94cc89ee7fb1bfbcb6974ff3a67e175016dac56f7"
+      "sha256": "9a0894545112acb96a965b15811a4a82a444d6e312496790a99529dbb988c179"
     },
     {
-      "bytes": 75345872,
-      "fetched_at": "2026-11-08T01:04:17.017974+00:00",
-      "fetched_through": "2026-11-07T21:25:44+00:00",
+      "bytes": 75355909,
+      "fetched_at": "2026-11-09T01:03:48.814124+00:00",
+      "fetched_through": "2026-11-08T20:25:04+00:00",
       "name": "contributor_activity_hiero-ledger_all.json",
-      "sha256": "a1348f0b9cc75d1b148429775a1af6d88df745676634b89a6ae6739db8acc4f3"
+      "sha256": "58f3b74f9ebf34051ce184277b86169a9f5ab2059598e67465508a54f30197b3"
     },
     {
       "bytes": 3900,
@@ -417,84 +415,84 @@
     },
     {
       "bytes": 39410,
-      "fetched_at": "2026-11-08T01:15:53.969617+00:00",
+      "fetched_at": "2026-11-09T01:11:12.564529+00:00",
       "fetched_through": "2026-11-04T00:00:00+00:00",
       "name": "hip_inventory_hiero-ledger_hiero-improvement-proposals_all.json",
-      "sha256": "7b486bcb4b1df9add95b8c6c9e548178787c64da142c9c53a16e7bda37b96b0c"
+      "sha256": "d8b4d7a88f977202b92619e829086cf69bef72b4ab9ac582354f3387b8353352"
     },
     {
       "bytes": 3849,
-      "fetched_at": "2026-11-08T01:17:33.483677+00:00",
+      "fetched_at": "2026-11-09T01:12:51.265153+00:00",
       "fetched_through": "2026-10-09T15:35:32+00:00",
       "name": "issue_label_events_LFDT-CLPR_all.json",
-      "sha256": "ccef8bd643eedff2902e6d162219e323b9b9ef779646d4a167e29e18cd40df77"
+      "sha256": "b4416ff855d5040ffba6bd6bbbaae96839c2e4c9660c0add17af8616e7176741"
     },
     {
       "bytes": 177249,
-      "fetched_at": "2026-11-08T01:16:12.465647+00:00",
+      "fetched_at": "2026-11-09T01:11:34.026538+00:00",
       "fetched_through": "2026-11-06T05:23:22+00:00",
       "name": "issue_label_events_hiero-hackers_all.json",
-      "sha256": "8f0ab3dcb9c469e7230fb77d5da8f5962e0deb62713ed6e9aeea4ecfdea920d8"
+      "sha256": "ca652736ef26830b12625a2213e1b0ddd7bd6969679c48a65e09c034cfce9dd5"
     },
     {
-      "bytes": 8892699,
-      "fetched_at": "2026-11-08T01:02:14.884687+00:00",
-      "fetched_through": "2026-11-07T17:37:25+00:00",
+      "bytes": 8892852,
+      "fetched_at": "2026-11-09T01:01:47.080741+00:00",
+      "fetched_through": "2026-11-08T05:42:36+00:00",
       "name": "issue_label_events_hiero-ledger_all.json",
-      "sha256": "8f01d320fd0238f0c8ced16f628289d191dccf3daf6b34cc6e5b34a9d01e0151"
+      "sha256": "cbdea724ee116782d2528061b277a6c251bd52e1d88913da6499541d049a33c7"
     },
     {
-      "bytes": 6137,
-      "fetched_at": "2026-11-08T01:17:32.409257+00:00",
-      "fetched_through": "2026-11-05T15:37:15+00:00",
+      "bytes": 6362,
+      "fetched_at": "2026-11-09T01:12:49.974281+00:00",
+      "fetched_through": "2026-11-08T15:24:43+00:00",
       "name": "issues_LFDT-CLPR_all.json",
-      "sha256": "19b6930ec1c533db95dd87fa461f631d4732ef8f77d489f821f7f7a55219d2f7"
+      "sha256": "37e0deda2909dd249318ce86693c6e399cdbcc433d5baf6d6998f469cd015785"
     },
     {
       "bytes": 153026,
-      "fetched_at": "2026-11-08T01:16:10.675023+00:00",
+      "fetched_at": "2026-11-09T01:11:31.595797+00:00",
       "fetched_through": "2026-11-07T17:17:00+00:00",
       "name": "issues_hiero-hackers_all.json",
-      "sha256": "099d2b2e5fe7d8cb68e44457dd8aedb7147ac782ee77dd158af4f3c40935117d"
+      "sha256": "01463a84958c802e67a7f6b723e2706bbac564bc1167ea6a10631e32e4f9a1cd"
     },
     {
-      "bytes": 9908999,
-      "fetched_at": "2026-11-08T01:02:08.553227+00:00",
-      "fetched_through": "2026-11-07T17:37:23+00:00",
+      "bytes": 9909247,
+      "fetched_at": "2026-11-09T01:01:40.444305+00:00",
+      "fetched_through": "2026-11-08T19:17:23+00:00",
       "name": "issues_hiero-ledger_all.json",
-      "sha256": "689254ad633c4b827b64dd05dfcada558460296cf4a67965acea0994795624e4"
+      "sha256": "5eea83d0edfdb7f6591f3e4e5b9ff2ffc6fff528259061b1f06cbc6252f14e06"
     },
     {
       "bytes": 8537,
-      "fetched_at": "2026-11-08T01:17:37.706487+00:00",
+      "fetched_at": "2026-11-09T01:12:55.749132+00:00",
       "fetched_through": "2026-11-06T19:28:21+00:00",
       "name": "merged_pr_difficulty_LFDT-CLPR_all.json",
-      "sha256": "f5897734b9f66b0f6d728b1be8686db1a2a7d51ade961e8506b37b5194bb6163"
+      "sha256": "4a6391c249a054ab56cfd20f85c2bccd3e65363e1f20887c8db581d698a98814"
     },
     {
       "bytes": 298838,
-      "fetched_at": "2026-11-08T01:17:01.077935+00:00",
-      "fetched_through": "2026-11-07T16:43:21+00:00",
+      "fetched_at": "2026-11-09T01:12:15.116680+00:00",
+      "fetched_through": "2026-11-08T22:07:14+00:00",
       "name": "merged_pr_difficulty_hiero-hackers_all.json",
-      "sha256": "58beeb5c59cb022a3b3189bea66fe3cff41c1742971aa34f0e689f140caa128b"
+      "sha256": "931f892c76740286c7f7e13bdec5825cddf69d3a635d89f55deea949f49ad043"
     },
     {
-      "bytes": 13793184,
-      "fetched_at": "2026-11-08T01:14:16.268278+00:00",
-      "fetched_through": "2026-11-07T09:56:14+00:00",
+      "bytes": 13795553,
+      "fetched_at": "2026-11-09T01:09:24.432611+00:00",
+      "fetched_through": "2026-11-08T20:25:44+00:00",
       "name": "merged_pr_difficulty_hiero-ledger_all.json",
-      "sha256": "de759ecd49fedf0a5f4a05c2ef5c292a40c9e475f8551d8f84014f4fe0aee71e"
+      "sha256": "e14438ccbb42a36c7bbc390865faafb852c2a79a120efb9341128004e8c08582"
     },
     {
-      "bytes": 8572286,
-      "fetched_at": "2026-11-08T01:16:07.186795+00:00",
-      "fetched_through": "2026-11-08T00:09:28+00:00",
+      "bytes": 8571378,
+      "fetched_at": "2026-11-09T01:11:27.263670+00:00",
+      "fetched_through": "2026-11-08T20:28:57+00:00",
       "name": "pr_hip_references_hiero-ledger_hiero-era.json",
-      "sha256": "df5aa945da9746693e1087dd949b00905e254b0f841b2bd61a16a69f3f754cc4"
+      "sha256": "5f4168a4aba86aa2d8576a82683cf4871a56342c2e7488d7bbf37b859edab48c"
     }
   ],
   "failed_pipelines": [],
-  "generated_at": "2026-11-08T01:17:45.093198+00:00",
+  "generated_at": "2026-11-09T01:13:04.858742+00:00",
   "git_sha": "c4e6643",
-  "run_id": "42432402351"
+  "run_id": "42543268420"
 }

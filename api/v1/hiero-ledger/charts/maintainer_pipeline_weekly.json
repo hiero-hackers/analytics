@@ -25,8 +25,8 @@
  "frequency": "week",
  "timezone": "UTC",
  "comparison": {
-  "current": "2026-W44",
-  "previous": "2026-W43"
+  "current": "2026-W45",
+  "previous": "2026-W44"
  },
  "category": {
   "key": "bucket",
@@ -34,8 +34,8 @@
  },
  "window": {
   "kind": "calendar",
-  "first": "2026-W41",
-  "last": "2026-W45"
+  "first": "2026-W42",
+  "last": "2026-W46"
  },
  "series": [
   {
@@ -62,14 +62,6 @@
  "details": [],
  "rows": [
   {
-   "bucket": "2026-W41",
-   "general_user": 26,
-   "triage": 3,
-   "committer": 35,
-   "maintainer": 42,
-   "partial": false
-  },
-  {
    "bucket": "2026-W42",
    "general_user": 27,
    "triage": 3,
@@ -95,13 +87,21 @@
   },
   {
    "bucket": "2026-W45",
-   "general_user": 33,
+   "general_user": 36,
    "triage": 3,
    "committer": 33,
    "maintainer": 41,
+   "partial": false
+  },
+  {
+   "bucket": "2026-W46",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0,
    "partial": true
   }
  ],
- "generated_at": "2026-11-08T01:04:29.915736+00:00",
+ "generated_at": "2026-11-09T01:04:03.447743+00:00",
  "stale": false
 }

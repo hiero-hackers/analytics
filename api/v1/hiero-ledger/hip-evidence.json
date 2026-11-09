@@ -11693,34 +11693,6 @@
   {
    "hip": 540,
    "hip_title": "Change Or Remove Existing Keys From A Token",
-   "repo": "hiero-ledger/hiero-sdk-java",
-   "pr_number": 1803,
-   "pr_title": "feat (HIP-540): Change Or Remove Existing Keys From A Token",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-06-12 11:46:22+00:00",
-   "match_sources": "title|branch|body",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "feat (HIP-540): Change Or Remove Existing Keys From A",
-   "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/1803"
-  },
-  {
-   "hip": 540,
-   "hip_title": "Change Or Remove Existing Keys From A Token",
-   "repo": "hiero-ledger/hiero-sdk-java",
-   "pr_number": 1862,
-   "pr_title": "test: fix HIP-540 integration test",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-06-14 07:20:27+00:00",
-   "match_sources": "title|branch|body",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "test: fix HIP-540 integration test",
-   "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/1862"
-  },
-  {
-   "hip": 540,
-   "hip_title": "Change Or Remove Existing Keys From A Token",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 2299,
    "pr_title": "feature:  change or remove existing keys from a token [HIP-540]",
@@ -12267,20 +12239,6 @@
   {
    "hip": 367,
    "hip_title": "Unlimited Token Associations Per Account",
-   "repo": "hiero-ledger/hiero-sdk-java",
-   "pr_number": 1840,
-   "pr_title": "revert: query the consensus nodes for the account balance, account info, and contract info data",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-06-11 10:32:59+00:00",
-   "match_sources": "body",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "ces` (because of the decision regarding HIP-367). 2. #1838 3. #1839 **Related is",
-   "url": "https://github.com/hiero-ledger/hiero-sdk-java/pull/1840"
-  },
-  {
-   "hip": 367,
-   "hip_title": "Unlimited Token Associations Per Account",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 4393,
    "pr_title": "chore(release): v2.89.0",
@@ -12363,8 +12321,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 878,
- "generated_at": "2026-11-08T01:16:08.680101+00:00",
+ "row_count": 875,
+ "generated_at": "2026-11-09T01:11:29.019669+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

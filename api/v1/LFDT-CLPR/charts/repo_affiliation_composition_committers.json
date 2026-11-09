@@ -36,7 +36,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-08T01:17:38.409029+00:00"
+  "end": "2026-11-09T01:12:56.678434+00:00"
  },
  "series": [
   {
@@ -45,14 +45,14 @@
    "color": "#1F77B4"
   },
   {
-   "key": "LimeChain",
-   "label": "LimeChain",
-   "color": "#FF7F0E"
-  },
-  {
    "key": "BlockyDevs",
    "label": "BlockyDevs",
    "color": "#D62728"
+  },
+  {
+   "key": "LimeChain",
+   "label": "LimeChain",
+   "color": "#FF7F0E"
   },
   {
    "key": "OpenElements",
@@ -75,8 +75,8 @@
   {
    "repo": "clpr-spec",
    "Hashgraph": 6,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "OpenElements": 0,
    "Independent": 1,
    "Unknown": 0
@@ -84,8 +84,8 @@
   {
    "repo": "clpr-endpoint",
    "Hashgraph": 8,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "OpenElements": 0,
    "Independent": 1,
    "Unknown": 1
@@ -93,8 +93,8 @@
   {
    "repo": "clpr-e2e",
    "Hashgraph": 18,
-   "LimeChain": 1,
    "BlockyDevs": 1,
+   "LimeChain": 1,
    "OpenElements": 0,
    "Independent": 2,
    "Unknown": 2
@@ -102,8 +102,8 @@
   {
    "repo": "clpr-smart-contracts",
    "Hashgraph": 11,
-   "LimeChain": 1,
    "BlockyDevs": 1,
+   "LimeChain": 1,
    "OpenElements": 0,
    "Independent": 2,
    "Unknown": 0
@@ -111,13 +111,13 @@
   {
    "repo": "clpr-website",
    "Hashgraph": 5,
-   "LimeChain": 0,
    "BlockyDevs": 0,
+   "LimeChain": 0,
    "OpenElements": 1,
    "Independent": 1,
    "Unknown": 0
   }
  ],
- "generated_at": "2026-11-08T01:17:38.409029+00:00",
+ "generated_at": "2026-11-09T01:12:56.678434+00:00",
  "stale": false
 }

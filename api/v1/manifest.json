@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-08T01:17:45.109685+00:00",
+ "generated_at": "2026-11-09T01:13:04.877366+00:00",
  "provenance": {
   "git_sha": "c4e6643",
-  "data_as_of": "2026-11-08T01:02:08.553227+00:00"
+  "data_as_of": "2026-11-09T01:01:40.444305+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1527,
+     "row_count": 1528,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 878,
+     "row_count": 875,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-08T01:16:08.687752+00:00"
+      "generated_at": "2026-11-09T01:11:29.028656+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-08T01:16:08.684146+00:00"
+      "generated_at": "2026-11-09T01:11:29.024461+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1527,
+      "value": 1528,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 6,
+      "value": 8,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1527
+     "count": 1528
     }
    }
   },
@@ -3138,6 +3138,13 @@
          "interactive": {
           "kind": "categories",
           "path": "LFDT-CLPR/charts/difficulty_by_repo_30d.json"
+         }
+        },
+        {
+         "label": "Week",
+         "interactive": {
+          "kind": "categories",
+          "path": "LFDT-CLPR/charts/difficulty_by_repo_7d.json"
          }
         }
        ],

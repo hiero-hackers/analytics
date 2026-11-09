@@ -102,9 +102,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-e2e-committers",
@@ -168,9 +168,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-endpoint-committers",
@@ -234,9 +234,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-maintainers",
@@ -300,9 +300,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-release-engineers",
@@ -333,9 +333,9 @@
    "prs_opened": 2,
    "reviews_given": 8,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-11-02 20:06:04+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-smart-contracts-committers",
@@ -432,9 +432,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "clpr-spec-committers",
@@ -509,9 +509,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "lfdt-staff",
@@ -597,9 +597,9 @@
    "prs_opened": 0,
    "reviews_given": 1,
    "merges_done": 0,
-   "issues_opened": 0,
+   "issues_opened": 1,
    "labels_applied": 0,
-   "last_active": "2026-10-29 15:20:11+00:00"
+   "last_active": "2026-11-08 15:24:31+00:00"
   },
   {
    "team": "security-maintainers",
@@ -614,7 +614,7 @@
   }
  ],
  "row_count": 51,
- "generated_at": "2026-11-08T01:17:38.337350+00:00",
+ "generated_at": "2026-11-09T01:12:56.586239+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -650,6 +650,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "clpr-e2e-committers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-e2e-committers",
@@ -694,6 +705,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "clpr-endpoint-committers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -741,6 +763,17 @@
    },
    {
     "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
+   },
+   {
+    "team": "clpr-maintainers",
     "repo": "LFDT-CLPR/clpr-website",
     "members_active": 1,
     "prs_opened": 0,
@@ -782,6 +815,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "clpr-release-engineers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -818,6 +862,17 @@
    },
    {
     "team": "clpr-smart-contracts-committers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 2,
+    "prs_opened": 0,
+    "reviews_given": 1,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
+   },
+   {
+    "team": "clpr-smart-contracts-committers",
     "repo": "LFDT-CLPR/clpr-endpoint",
     "members_active": 1,
     "prs_opened": 0,
@@ -826,17 +881,6 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:47:04+00:00"
-   },
-   {
-    "team": "clpr-smart-contracts-committers",
-    "repo": "LFDT-CLPR/clpr-spec",
-    "members_active": 1,
-    "prs_opened": 0,
-    "reviews_given": 1,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-11-02 20:06:04+00:00"
    },
    {
     "team": "clpr-smart-contracts-committers",
@@ -881,6 +925,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "clpr-spec-committers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-spec-committers",
@@ -938,6 +993,17 @@
     "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
+    "team": "clpr-website-committers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
+   },
+   {
     "team": "lfdt-staff",
     "repo": "LFDT-CLPR/governance",
     "members_active": 2,
@@ -980,6 +1046,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "security-maintainers",
+    "repo": "LFDT-CLPR/clpr-spec",
+    "members_active": 1,
+    "prs_opened": 0,
+    "reviews_given": 0,
+    "merges_done": 0,
+    "issues_opened": 1,
+    "labels_applied": 0,
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "security-maintainers",
@@ -1045,9 +1122,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-e2e-committers",
@@ -1111,9 +1188,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -1131,10 +1208,10 @@
     "repo": "LFDT-CLPR/governance",
     "members_active": 2,
     "prs_opened": 6,
-    "reviews_given": 5,
-    "merges_done": 1,
-    "issues_opened": 7,
-    "labels_applied": 4,
+    "reviews_given": 4,
+    "merges_done": 0,
+    "issues_opened": 2,
+    "labels_applied": 0,
     "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
@@ -1177,9 +1254,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-maintainers",
@@ -1243,9 +1320,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -1276,9 +1353,9 @@
     "prs_opened": 2,
     "reviews_given": 8,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-11-02 20:06:04+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-smart-contracts-committers",
@@ -1375,9 +1452,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-spec-committers",
@@ -1452,26 +1529,26 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "lfdt-staff",
     "repo": "LFDT-CLPR/governance",
     "members_active": 2,
-    "prs_opened": 6,
-    "reviews_given": 11,
-    "merges_done": 11,
-    "issues_opened": 7,
-    "labels_applied": 11,
+    "prs_opened": 4,
+    "reviews_given": 9,
+    "merges_done": 9,
+    "issues_opened": 0,
+    "labels_applied": 0,
     "last_active": "2026-11-06 18:04:41+00:00"
    },
    {
     "team": "lfdt-staff",
     "repo": "LFDT-CLPR/.github",
     "members_active": 2,
-    "prs_opened": 3,
+    "prs_opened": 2,
     "reviews_given": 4,
     "merges_done": 3,
     "issues_opened": 0,
@@ -1529,9 +1606,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "security-maintainers",
@@ -1597,9 +1674,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-e2e-committers",
@@ -1663,9 +1740,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -1729,9 +1806,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-maintainers",
@@ -1795,9 +1872,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -1828,9 +1905,9 @@
     "prs_opened": 2,
     "reviews_given": 8,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-11-02 20:06:04+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-smart-contracts-committers",
@@ -1927,9 +2004,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "clpr-spec-committers",
@@ -2004,9 +2081,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "lfdt-staff",
@@ -2092,9 +2169,9 @@
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 0,
-    "issues_opened": 0,
+    "issues_opened": 1,
     "labels_applied": 0,
-    "last_active": "2026-10-29 15:20:11+00:00"
+    "last_active": "2026-11-08 15:24:31+00:00"
    },
    {
     "team": "security-maintainers",
