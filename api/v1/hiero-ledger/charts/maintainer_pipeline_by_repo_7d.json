@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-09T01:04:03.597747+00:00"
+  "end": "2026-11-10T01:03:40.119655+00:00"
  },
  "series": [
   {
@@ -56,66 +56,66 @@
  "rows": [
   {
    "repo": "hiero-consensus-node",
-   "general_user": 8,
+   "general_user": 6,
    "triage": 1,
-   "committer": 22,
-   "maintainer": 10
+   "committer": 21,
+   "maintainer": 8
   },
   {
    "repo": "hiero-sdk-js",
-   "general_user": 9,
+   "general_user": 12,
    "triage": 2,
    "committer": 0,
    "maintainer": 2
   },
   {
-   "repo": "hiero-json-rpc-relay",
-   "general_user": 8,
-   "triage": 0,
-   "committer": 2,
-   "maintainer": 2
+   "repo": "hiero-block-node",
+   "general_user": 3,
+   "triage": 1,
+   "committer": 4,
+   "maintainer": 3
   },
   {
    "repo": "hiero-mirror-node",
-   "general_user": 3,
+   "general_user": 2,
    "triage": 0,
    "committer": 7,
    "maintainer": 2
   },
   {
    "repo": "hiero-sdk-python",
-   "general_user": 4,
+   "general_user": 5,
    "triage": 0,
    "committer": 2,
-   "maintainer": 5
+   "maintainer": 4
   },
   {
-   "repo": "hiero-block-node",
-   "general_user": 2,
-   "triage": 1,
-   "committer": 4,
-   "maintainer": 3
+   "repo": "hiero-json-rpc-relay",
+   "general_user": 7,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 2
   },
   {
    "repo": "solo",
-   "general_user": 5,
+   "general_user": 6,
    "triage": 0,
    "committer": 4,
    "maintainer": 1
   },
   {
    "repo": "hiero-sdk-java",
-   "general_user": 4,
+   "general_user": 5,
    "triage": 1,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "hiero-sdk-tck",
+   "repo": "solo-docs",
    "general_user": 2,
-   "triage": 1,
+   "triage": 0,
    "committer": 0,
-   "maintainer": 2
+   "maintainer": 4
   },
   {
    "repo": "hiero-cryptography",
@@ -125,18 +125,18 @@
    "maintainer": 3
   },
   {
+   "repo": "heka-identity-platform",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
    "repo": "hiero-improvement-proposals",
    "general_user": 0,
    "triage": 0,
    "committer": 2,
    "maintainer": 2
-  },
-  {
-   "repo": "solo-docs",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 3
   },
   {
    "repo": "hiero-solo-action",
@@ -153,18 +153,11 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-sdk-go",
+   "repo": "hiero-sdk-tck",
    "general_user": 1,
-   "triage": 1,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
-   "repo": "hiero-consensus-specifications",
-   "general_user": 3,
    "triage": 0,
    "committer": 0,
-   "maintainer": 0
+   "maintainer": 2
   },
   {
    "repo": "hiero-enterprise-java",
@@ -174,25 +167,32 @@
    "maintainer": 1
   },
   {
-   "repo": "governance",
+   "repo": "hiero-hederium",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 2
   },
   {
-   "repo": "heka-identity-platform",
+   "repo": "hiero-cli",
    "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0
+  },
+  {
+   "repo": "governance",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "hiero-hederium",
-   "general_user": 1,
+   "repo": "hiero-mirror-node-explorer",
+   "general_user": 0,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
+   "maintainer": 2
   },
   {
    "repo": "hiero-ethereum-execution-spec-tests",
@@ -202,7 +202,7 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-cli",
+   "repo": "hiero-consensus-specifications",
    "general_user": 2,
    "triage": 0,
    "committer": 0,
@@ -216,11 +216,11 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-mirror-node-explorer",
-   "general_user": 0,
-   "triage": 0,
+   "repo": "hiero-sdk-go",
+   "general_user": 1,
+   "triage": 1,
    "committer": 0,
-   "maintainer": 2
+   "maintainer": 0
   },
   {
    "repo": "hiero-docs",
@@ -245,6 +245,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-09T01:04:03.597747+00:00",
+ "generated_at": "2026-11-10T01:03:40.119655+00:00",
  "stale": false
 }

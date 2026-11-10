@@ -59,7 +59,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-09T01:11:43.718704+00:00"
+  "end": "2026-11-10T01:11:28.065049+00:00"
  },
  "nodes": [
   {
@@ -68,15 +68,15 @@
    "total": 32,
    "category": "Tooling / DevEx",
    "x": 0.1446,
-   "y": 0.0003
+   "y": 0.0001
   },
   {
    "id": "hiero-enterprise-js",
    "active": 7,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": 0.7752,
-   "y": -1.6971
+   "x": -0.0098,
+   "y": 1.6971
   },
   {
    "id": "sdk-automations",
@@ -84,7 +84,7 @@
    "total": 8,
    "category": "Tooling / DevEx",
    "x": 1.718,
-   "y": 0.5859
+   "y": 0.1424
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -100,7 +100,7 @@
    "total": 5,
    "category": "Other",
    "x": -1.718,
-   "y": -0.6926
+   "y": -0.1685
   },
   {
    "id": "hiero-tck-action",
@@ -115,8 +115,8 @@
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": -0.4877,
-   "y": 1.6971
+   "x": 0.2975,
+   "y": -1.6971
   },
   {
    "id": "hiero-payment-requests",
@@ -261,6 +261,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-09T01:11:43.718704+00:00",
+ "generated_at": "2026-11-10T01:11:28.065049+00:00",
  "stale": false
 }

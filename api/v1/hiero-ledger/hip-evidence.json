@@ -11581,6 +11581,20 @@
   {
    "hip": 540,
    "hip_title": "Change Or Remove Existing Keys From A Token",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 27774,
+   "pr_title": "fix: scope native signature requirements to account identity",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "horized by the existing role key alone, HIP-540's `NO_VALIDATION` mode permits installi",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27774"
+  },
+  {
+   "hip": 540,
+   "hip_title": "Change Or Remove Existing Keys From A Token",
    "repo": "hiero-ledger/hiero-contracts",
    "pr_number": 137,
    "pr_title": "chore: bump solo to 0.85.0 and consensus/mirror node versions for CI",
@@ -12321,8 +12335,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 875,
- "generated_at": "2026-11-09T01:11:29.019669+00:00",
+ "row_count": 876,
+ "generated_at": "2026-11-10T01:11:12.760068+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

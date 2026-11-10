@@ -97,27 +97,9 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-09T01:09:58.105465+00:00"
+  "end": "2026-11-10T01:09:20.769116+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-java",
-   "score": 8.1,
-   "Maintained": 10.0,
-   "Code-Review": 10.0,
-   "CII-Best-Practices": 2.0,
-   "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 10.0,
-   "Token-Permissions": 10.0,
-   "Pinned-Dependencies": 10.0,
-   "Fuzzing": 0.0,
-   "License": 10.0,
-   "Signed-Releases": null,
-   "Security-Policy": 10.0,
-   "Branch-Protection": 4.0,
-   "Packaging": 10.0,
-   "SAST": 4.0
-  },
   {
    "repo": "hiero-improvement-proposals",
    "score": 8.7,
@@ -156,7 +138,7 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "score": 7.9,
+   "score": 8.4,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -164,13 +146,13 @@
    "Binary-Artifacts": 10.0,
    "Token-Permissions": 10.0,
    "Pinned-Dependencies": 8.0,
-   "Fuzzing": 0.0,
+   "Fuzzing": 10.0,
    "License": 10.0,
    "Signed-Releases": null,
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 5.0
+   "SAST": 2.0
   },
   {
    "repo": "hiero-cli",
@@ -206,7 +188,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 5.0
+   "SAST": 4.0
   },
   {
    "repo": "hiero-sdk-swift",
@@ -225,24 +207,6 @@
    "Branch-Protection": 4.0,
    "Packaging": null,
    "SAST": 5.0
-  },
-  {
-   "repo": "hiero-consensus-node",
-   "score": 7.4,
-   "Maintained": 10.0,
-   "Code-Review": 10.0,
-   "CII-Best-Practices": 2.0,
-   "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 9.0,
-   "Token-Permissions": 0.0,
-   "Pinned-Dependencies": 9.0,
-   "Fuzzing": 0.0,
-   "License": 10.0,
-   "Signed-Releases": null,
-   "Security-Policy": 10.0,
-   "Branch-Protection": 5.0,
-   "Packaging": 10.0,
-   "SAST": 9.0
   },
   {
    "repo": "hiero-docs",
@@ -278,7 +242,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 7.0
+   "SAST": 6.0
   },
   {
    "repo": "hiero-sdk-rust",
@@ -300,7 +264,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "score": 7.3,
+   "score": 7.4,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -314,7 +278,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
-   "SAST": 7.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-mirror-node-explorer",
@@ -336,7 +300,7 @@
   },
   {
    "repo": "hiero-sdk-tck",
-   "score": 8.2,
+   "score": 8.3,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -350,7 +314,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 8.0
+   "SAST": 9.0
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -372,17 +336,17 @@
   },
   {
    "repo": "solo",
-   "score": 8.6,
+   "score": 8.9,
    "Maintained": 10.0,
    "Code-Review": 9.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
    "Binary-Artifacts": 10.0,
    "Token-Permissions": 10.0,
-   "Pinned-Dependencies": 8.0,
+   "Pinned-Dependencies": 9.0,
    "Fuzzing": 10.0,
    "License": 10.0,
-   "Signed-Releases": 6.0,
+   "Signed-Releases": 8.0,
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
@@ -503,7 +467,7 @@
    "Code-Review": 2.0,
    "CII-Best-Practices": 0.0,
    "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 9.0,
+   "Binary-Artifacts": 10.0,
    "Token-Permissions": 0.0,
    "Pinned-Dependencies": 8.0,
    "Fuzzing": 0.0,
@@ -512,7 +476,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 2.0
+   "SAST": 1.0
   },
   {
    "repo": "hiero-did-sdk-python",
@@ -533,24 +497,6 @@
    "SAST": 5.0
   },
   {
-   "repo": "sdk-collaboration-hub",
-   "score": 5.8,
-   "Maintained": 4.0,
-   "Code-Review": 10.0,
-   "CII-Best-Practices": 2.0,
-   "Dangerous-Workflow": null,
-   "Binary-Artifacts": 10.0,
-   "Token-Permissions": null,
-   "Pinned-Dependencies": null,
-   "Fuzzing": 0.0,
-   "License": 10.0,
-   "Signed-Releases": null,
-   "Security-Policy": 10.0,
-   "Branch-Protection": 4.0,
-   "Packaging": null,
-   "SAST": 0.0
-  },
-  {
    "repo": "hiero-did-sdk-js",
    "score": 5.9,
    "Maintained": 0.0,
@@ -566,7 +512,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 7.0
+   "SAST": 6.0
   },
   {
    "repo": "hiero-enterprise-java",
@@ -659,6 +605,6 @@
    "SAST": 8.0
   }
  ],
- "generated_at": "2026-11-09T01:09:58.105465+00:00",
+ "generated_at": "2026-11-10T01:09:20.769116+00:00",
  "stale": false
 }
