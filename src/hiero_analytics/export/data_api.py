@@ -119,29 +119,72 @@ def _read_meta(csv_path: Path) -> dict:
     return payload if isinstance(payload, dict) else {}
 
 
-def _freshness(csv_path: Path) -> dict:
-    """``generated_at``/``stale`` from the source CSV's sidecar; {} when it has none."""
-    generated_at = _read_meta(csv_path).get("generated_at")
+def _parse_freshness_timestamp(value: object, *, label: str, csv_path: Path) -> datetime | None:
+    """Parse a freshness timestamp and normalize it to UTC."""
+    try:
+        parsed = datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        logger.warning("Unparseable %s timestamp %r in sidecar for %s", label, value, csv_path)
+        return None
+
+    if parsed.tzinfo is None:
+        logger.warning("Naive %s timestamp %r in sidecar for %s; assuming UTC", label, value, csv_path)
+        parsed = parsed.replace(tzinfo=UTC)
+
+    return parsed.astimezone(UTC)
+
+
+def _freshness(csv_path: Path):
+    """Publish output generation time and source-data staleness when known.
+
+    The oldest source fetch is the conservative freshness bound for outputs
+    built from multiple datasets. Outputs without source-fetch metadata have
+    unknown freshness, so no stale value is published.
+    """
+    meta = _read_meta(csv_path)
+    generated_at = meta.get("generated_at")
     if not generated_at:
         return {}
-    try:
-        generated = datetime.fromisoformat(generated_at)
-    except ValueError:
-        # Ship the raw stamp without a staleness verdict, but say so — a sidecar
-        # that stops parsing should show up in the run log, not vanish.
-        logger.warning("Unparseable generated_at %r in sidecar for %s", generated_at, csv_path)
+
+    generated = _parse_freshness_timestamp(generated_at, label="generated_at", csv_path=csv_path)
+    if generated is None:
         return {"generated_at": generated_at}
-    # Sidecars are written UTC-aware, but a hand-edited or legacy one may be
-    # naive; assume UTC rather than letting the subtraction raise TypeError and
-    # fail the entire emit over one stamp.
-    if generated.tzinfo is None:
-        logger.warning("Naive generated_at %r in sidecar for %s; assuming UTC", generated_at, csv_path)
-        generated = generated.replace(tzinfo=UTC)
-    return {"generated_at": generated_at, "stale": datetime.now(UTC) - generated > STALE_AFTER}
+
+    result = {"generated_at": generated_at}
+    sources = meta.get("source_datasets")
+
+    if not isinstance(sources, list) or not sources:
+        return result
+
+    fetched_stamps = []
+    incomplete = False
+
+    for source in sources:
+        if not isinstance(source, dict) or not isinstance(source.get("fetched_at"), str):
+            logger.warning("Missing source fetch timestamp in sidecar for %s", csv_path)
+            incomplete = True
+            continue
+
+        fetched = _parse_freshness_timestamp(
+            source["fetched_at"],
+            label="source fetch",
+            csv_path=csv_path,
+        )
+        if fetched is None:
+            incomplete = True
+        else:
+            fetched_stamps.append(fetched)
+
+    if incomplete:
+        result["stale"] = True
+    elif fetched_stamps:
+        result["stale"] = datetime.now(UTC) - min(fetched_stamps) > STALE_AFTER
+
+    return result
 
 
 def _stamp_freshness(document: dict, csv_path: Path) -> None:
-    """Attach ``generated_at``/``stale`` from the source CSV's sidecar, if any."""
+    """Attach freshness metadata from the source CSV's sidecar, if any."""
     document.update(_freshness(csv_path))
 
 
