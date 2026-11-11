@@ -42,6 +42,14 @@ def ci_health_data(tmp_path: Path) -> Path:
                 "location": "settings.yml:4",
             },
             {
+                "repo": "repo-alpha",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "pass",
+                "evidence": "all pinned",
+                "location": "",
+            },
+            {
                 "repo": "repo-beta",
                 "check": "actions_sha_pinned",
                 "band": "actions",
@@ -63,6 +71,14 @@ def ci_health_data(tmp_path: Path) -> Path:
                 "band": "repository",
                 "status": "pass",
                 "evidence": "repo secure",
+                "location": "",
+            },
+            {
+                "repo": "repo-beta",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "pass",
+                "evidence": "all pinned",
                 "location": "",
             },
             {
@@ -90,6 +106,14 @@ def ci_health_data(tmp_path: Path) -> Path:
                 "location": "",
             },
             {
+                "repo": "repo-gamma",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "pass",
+                "evidence": "all pinned",
+                "location": "",
+            },
+            {
                 "repo": "repo-delta",
                 "check": "actions_sha_pinned",
                 "band": "actions",
@@ -111,6 +135,14 @@ def ci_health_data(tmp_path: Path) -> Path:
                 "band": "repository",
                 "status": "pass",
                 "evidence": "repository secure",
+                "location": "",
+            },
+            {
+                "repo": "repo-delta",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "na",
+                "evidence": "no dockerfiles",
                 "location": "",
             },
         ]
@@ -141,10 +173,10 @@ def test_sort_uses_review_count_then_repository_name_for_fail_ties(ci_health_dat
     path = ci_health_data / "ci_health_checks.csv"
     frame = pd.read_csv(path)
     statuses = {
-        "repo-alpha": ["fail", "review", "pass"],
-        "repo-beta": ["fail", "pass", "pass"],
-        "repo-gamma": ["pass", "review", "review"],
-        "repo-delta": ["fail", "review", "pass"],
+        "repo-alpha": ["fail", "review", "pass", "pass"],
+        "repo-beta": ["fail", "pass", "pass", "pass"],
+        "repo-gamma": ["pass", "review", "review", "pass"],
+        "repo-delta": ["fail", "review", "pass", "pass"],
     }
     for repo, repo_statuses in statuses.items():
         repo_rows = frame["repo"] == repo
@@ -166,8 +198,9 @@ def test_matrix_adds_band_metadata_and_column_band_values(ci_health_data: Path):
         {"label": "Actions", "span": 1},
         {"label": "Permissions", "span": 1},
         {"label": "Repository", "span": 1},
+        {"label": "Docker", "span": 1},
     ]
-    assert [column["band"] for column in matrix["columns"]] == ["actions", "permissions", "repository"]
+    assert [column["band"] for column in matrix["columns"]] == ["actions", "permissions", "repository", "docker"]
 
 
 def test_missing_or_duplicate_checks_raise_value_error(ci_health_data: Path):

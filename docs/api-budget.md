@@ -112,6 +112,7 @@ Where the points go (GraphQL points, cold / warm):
 
 Reading the table:
 
+- `ci_health` spends GraphQL points for workflow trees and repository settings, plus REST requests (one recursive Git tree request per repository and one Git blob request per discovered Dockerfile), which are reused with no fetch on warm runs.
 - The incremental datasets are most of the steady-state cost. Their warm cost
   (e.g. 168 of 192 points for `merged_pr_difficulty`) is close to their cold cost,
   so a delta fetch at this size is far from free. Why is not yet investigated.
