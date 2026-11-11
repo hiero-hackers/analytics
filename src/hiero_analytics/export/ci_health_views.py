@@ -22,12 +22,14 @@ BAND_LABELS = {
     "actions": "Actions",
     "permissions": "Permissions",
     "repository": "Repository",
+    "docker": "Docker",
 }
 
 CHECK_COLUMNS = (
     ("actions_sha_pinned", "Actions SHA Pinned", "actions"),
     ("explicit_permissions", "Explicit Permissions", "permissions"),
     ("repository_security_configuration", "Security Config", "repository"),
+    ("docker_pinning", "Docker Pinning", "docker"),
 )
 
 CHECK_STATUSES = ("pass", "fail", "review", "na")
@@ -123,9 +125,10 @@ def ci_health_matrix(_org: str, org_data_dir: Path) -> dict | None:
         "group": "CI health",
         "title": "CI health matrix",
         "description": (
-            "Repository-level CI health checks sorted worst-first by fail count, then review count, "
-            "then repository name. Pass and na do not affect repo priority. Click a fail or review cell "
-            "to inspect the supporting evidence."
+            "Repository-level CI health checks covering GitHub Actions SHA pinning, "
+            "explicit workflow permissions, repository security configuration, and Docker base-image digest pinning. "
+            "Sorted worst-first by fail count, then review count, then repository name. "
+            "Pass and na do not affect repo priority. Click a fail or review cell to inspect the supporting evidence."
         ),
         "badge": f"{len(rows)} repositories",
         "source": "ci_health_checks.csv",
