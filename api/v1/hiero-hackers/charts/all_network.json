@@ -59,7 +59,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-10T01:11:28.065049+00:00"
+  "end": "2026-11-11T01:11:26.383878+00:00"
  },
  "nodes": [
   {
@@ -67,24 +67,24 @@
    "active": 20,
    "total": 32,
    "category": "Tooling / DevEx",
-   "x": 0.1446,
-   "y": 0.0001
+   "x": -0.0006,
+   "y": -0.1447
   },
   {
    "id": "hiero-enterprise-js",
-   "active": 7,
+   "active": 6,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": -0.0098,
-   "y": 1.6971
+   "x": -1.6971,
+   "y": 0.4952
   },
   {
    "id": "sdk-automations",
    "active": 6,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": 1.718,
-   "y": 0.1424
+   "x": -0.5926,
+   "y": -1.718
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -92,15 +92,15 @@
    "total": 5,
    "category": "SDKs",
    "x": -3.15,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-streams-rs",
    "active": 2,
    "total": 5,
    "category": "Other",
-   "x": -1.718,
-   "y": -0.1685
+   "x": 0.7009,
+   "y": 1.718
   },
   {
    "id": "hiero-tck-action",
@@ -108,15 +108,15 @@
    "total": 2,
    "category": "Other",
    "x": -2.25,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "governance",
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": 0.2975,
-   "y": -1.6971
+   "x": 1.6971,
+   "y": -0.7826
   },
   {
    "id": "hiero-payment-requests",
@@ -124,7 +124,7 @@
    "total": 2,
    "category": "Other",
    "x": -1.35,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-notifications",
@@ -132,7 +132,7 @@
    "total": 1,
    "category": "Other",
    "x": -0.45,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-x402",
@@ -140,7 +140,7 @@
    "total": 4,
    "category": "Other",
    "x": 0.45,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "agentic-support-hiero",
@@ -148,7 +148,7 @@
    "total": 3,
    "category": "Other",
    "x": 1.35,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-checkout",
@@ -156,7 +156,7 @@
    "total": 3,
    "category": "Other",
    "x": 2.25,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-block-verifier-js",
@@ -164,7 +164,7 @@
    "total": 2,
    "category": "Other",
    "x": 3.15,
-   "y": -3.3171
+   "y": -3.338
   },
   {
    "id": "hiero-did-sdk-rs",
@@ -172,7 +172,7 @@
    "total": 2,
    "category": "Identity / DID",
    "x": -3.15,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-journal-rs",
@@ -180,7 +180,7 @@
    "total": 2,
    "category": "Other",
    "x": -2.25,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-verify-fn",
@@ -188,7 +188,7 @@
    "total": 2,
    "category": "Other",
    "x": -1.35,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-enterprise-proxy",
@@ -196,7 +196,7 @@
    "total": 1,
    "category": "Apps / Integrations",
    "x": -0.45,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-maintainer-automation-prototype",
@@ -204,7 +204,7 @@
    "total": 1,
    "category": "Tooling / DevEx",
    "x": 0.45,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-receipts",
@@ -212,7 +212,7 @@
    "total": 1,
    "category": "Other",
    "x": 1.35,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "hiero-sdk-csharp",
@@ -220,7 +220,7 @@
    "total": 1,
    "category": "SDKs",
    "x": 2.25,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "rs-hiero-mirror-node",
@@ -228,7 +228,7 @@
    "total": 1,
    "category": "Core network",
    "x": 3.15,
-   "y": -4.2171
+   "y": -4.238
   },
   {
    "id": "vscode-hedera-transaction-viewer",
@@ -236,7 +236,7 @@
    "total": 1,
    "category": "Other",
    "x": -3.15,
-   "y": -5.1171
+   "y": -5.138
   }
  ],
  "edges": [
@@ -261,6 +261,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-10T01:11:28.065049+00:00",
+ "generated_at": "2026-11-11T01:11:26.383878+00:00",
  "stale": false
 }

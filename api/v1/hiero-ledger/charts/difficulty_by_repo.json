@@ -35,7 +35,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-10T01:01:25.634938+00:00"
+  "end": "2026-11-11T01:01:31.810854+00:00"
  },
  "series": [
   {
@@ -91,8 +91,16 @@
    "Advanced": 0
   },
   {
+   "repo": "hiero-agentic-support",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
    "repo": "hiero-block-node",
-   "Unknown": 560,
+   "Unknown": 561,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -108,7 +116,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 1455,
+   "Unknown": 1453,
    "Good First Issue": 3,
    "Beginner": 0,
    "Intermediate": 0,
@@ -156,7 +164,7 @@
   },
   {
    "repo": "hiero-enterprise-java",
-   "Unknown": 41,
+   "Unknown": 39,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -180,7 +188,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 52,
+   "Unknown": 53,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -196,7 +204,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 226,
+   "Unknown": 225,
    "Good First Issue": 5,
    "Beginner": 0,
    "Intermediate": 0,
@@ -220,7 +228,7 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "Unknown": 34,
+   "Unknown": 35,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -229,18 +237,18 @@
   {
    "repo": "hiero-sdk-java",
    "Unknown": 34,
-   "Good First Issue": 2,
+   "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
    "repo": "hiero-sdk-js",
-   "Unknown": 26,
-   "Good First Issue": 1,
-   "Beginner": 13,
-   "Intermediate": 15,
-   "Advanced": 3
+   "Unknown": 27,
+   "Good First Issue": 0,
+   "Beginner": 12,
+   "Intermediate": 12,
+   "Advanced": 2
   },
   {
    "repo": "hiero-sdk-python",
@@ -248,7 +256,7 @@
    "Good First Issue": 2,
    "Beginner": 3,
    "Intermediate": 4,
-   "Advanced": 9
+   "Advanced": 12
   },
   {
    "repo": "hiero-sdk-rust",
@@ -300,7 +308,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 142,
+   "Unknown": 140,
    "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
@@ -332,7 +340,7 @@
   },
   {
    "repo": "tsc",
-   "Unknown": 14,
+   "Unknown": 13,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -347,6 +355,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-11-10T01:01:25.634938+00:00",
+ "generated_at": "2026-11-11T01:01:31.810854+00:00",
  "stale": false
 }

@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-10T01:13:20.030187+00:00",
+ "generated_at": "2026-11-11T01:12:43.819686+00:00",
  "provenance": {
-  "git_sha": "c4e6643",
-  "data_as_of": "2026-11-10T01:01:16.079616+00:00"
+  "git_sha": "72fcaa8",
+  "data_as_of": "2026-11-11T01:01:18.516346+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -411,14 +411,14 @@
      "id": "repoactivity",
      "macro": "Governance",
      "title": "Repository activity \u2014 permission-holders by role",
-     "row_count": 44,
+     "row_count": 45,
      "path": "hiero-ledger/repoactivity.json"
     },
     {
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 2,
+     "row_count": 3,
      "path": "hiero-ledger/understaffed.json"
     },
     {
@@ -439,28 +439,28 @@
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 763,
+     "row_count": 766,
      "path": "hiero-ledger/repo.json"
     },
     {
      "id": "teams",
      "macro": "Governance",
      "title": "Team activity overview",
-     "row_count": 117,
+     "row_count": 119,
      "path": "hiero-ledger/teams.json"
     },
     {
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 2927,
+     "row_count": 3016,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
      "id": "tscrepo",
      "macro": "Governance",
      "title": "TSC activity by repo",
-     "row_count": 109,
+     "row_count": 110,
      "path": "hiero-ledger/tscrepo.json"
     },
     {
@@ -482,7 +482,7 @@
      "id": "repodiversity",
      "macro": "Governance",
      "title": "Organisation diversity by repo",
-     "row_count": 44,
+     "row_count": 45,
      "path": "hiero-ledger/repodiversity.json"
     },
     {
@@ -497,7 +497,7 @@
      "id": "teamdiversity",
      "macro": "Governance",
      "title": "Team organisation concentration",
-     "row_count": 112,
+     "row_count": 113,
      "path": "hiero-ledger/teamdiversity.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 876,
+     "row_count": 878,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -525,14 +525,14 @@
      "id": "codeowners",
      "macro": "Security & scorecards",
      "title": "CODEOWNERS by repository",
-     "row_count": 44,
+     "row_count": 45,
      "path": "hiero-ledger/codeowners.json"
     },
     {
      "id": "release-staleness",
      "macro": "Releases",
      "title": "Release staleness by repo",
-     "row_count": 44,
+     "row_count": 45,
      "path": "hiero-ledger/release-staleness.json"
     }
    ],
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-10T01:11:12.766870+00:00"
+      "generated_at": "2026-11-11T01:11:08.643646+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-10T01:11:12.763568+00:00"
+      "generated_at": "2026-11-11T01:11:08.640182+00:00"
      }
     },
     {
@@ -1687,7 +1687,7 @@
     "Releases": [
      {
       "label": "repos with releases",
-      "value": "26 of 44",
+      "value": "26 of 45",
       "note": "How many repos have ever published a GitHub Release, out of the org's full repo count. Most zero-release repos are docs/governance/meta repos, not neglected code \u2014 this tile is the denominator the other release tiles are scoped to, so that scoping is visible.",
       "methodology": [
        "Fetch every published, non-draft GitHub Release for each repo in the org.",
@@ -1719,7 +1719,7 @@
    "entities": {
     "repositories": {
      "path": "hiero-ledger/entities/repositories.json",
-     "count": 42
+     "count": 43
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
@@ -1749,14 +1749,14 @@
      "id": "codeowners",
      "macro": "Security & scorecards",
      "title": "CODEOWNERS by repository",
-     "row_count": 28,
+     "row_count": 27,
      "path": "hiero-hackers/codeowners.json"
     },
     {
      "id": "release-staleness",
      "macro": "Releases",
      "title": "Release staleness by repo",
-     "row_count": 28,
+     "row_count": 27,
      "path": "hiero-hackers/release-staleness.json"
     }
    ],
@@ -2315,7 +2315,7 @@
     "Releases": [
      {
       "label": "repos with releases",
-      "value": "8 of 28",
+      "value": "8 of 27",
       "note": "How many repos have ever published a GitHub Release, out of the org's full repo count. Most zero-release repos are docs/governance/meta repos, not neglected code \u2014 this tile is the denominator the other release tiles are scoped to, so that scoping is visible.",
       "methodology": [
        "Fetch every published, non-draft GitHub Release for each repo in the org.",

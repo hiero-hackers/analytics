@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-10T01:01:25.778043+00:00"
+  "end": "2026-11-11T01:01:31.979784+00:00"
  },
  "series": [
   {
@@ -61,7 +61,7 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 40,
+   "Unknown": 34,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -69,14 +69,14 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 31,
+   "Unknown": 25,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
-   "repo": "hiero-cryptography",
+   "repo": "hiero-enterprise-java",
    "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
@@ -85,7 +85,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 1,
+   "Unknown": 4,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -93,7 +93,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 10,
+   "Unknown": 7,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -108,20 +108,28 @@
    "Advanced": 0
   },
   {
+   "repo": "hiero-sdk-go",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
    "repo": "hiero-sdk-java",
    "Unknown": 2,
-   "Good First Issue": 2,
+   "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
    "repo": "hiero-sdk-js",
-   "Unknown": 9,
-   "Good First Issue": 1,
-   "Beginner": 7,
-   "Intermediate": 12,
-   "Advanced": 1
+   "Unknown": 11,
+   "Good First Issue": 0,
+   "Beginner": 5,
+   "Intermediate": 9,
+   "Advanced": 0
   },
   {
    "repo": "hiero-sdk-python",
@@ -129,19 +137,11 @@
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
-   "repo": "hiero-sdk-tck",
-   "Unknown": 1,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
+   "Advanced": 3
   },
   {
    "repo": "solo",
-   "Unknown": 17,
+   "Unknown": 15,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -156,6 +156,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-11-10T01:01:25.778043+00:00",
+ "generated_at": "2026-11-11T01:01:31.979784+00:00",
  "stale": false
 }

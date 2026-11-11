@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-10T01:03:39.908327+00:00"
+  "end": "2026-11-11T01:03:51.380026+00:00"
  },
  "series": [
   {
@@ -110,18 +110,18 @@
    "maintainer": 7
   },
   {
-   "repo": "hiero-sdk-go",
-   "general_user": 127,
-   "triage": 9,
-   "committer": 1,
-   "maintainer": 5
-  },
-  {
    "repo": "governance",
-   "general_user": 86,
+   "general_user": 87,
    "triage": 0,
    "committer": 37,
    "maintainer": 18
+  },
+  {
+   "repo": "hiero-sdk-go",
+   "general_user": 127,
+   "triage": 8,
+   "committer": 2,
+   "maintainer": 5
   },
   {
    "repo": "hiero-docs",
@@ -167,7 +167,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "general_user": 49,
+   "general_user": 50,
    "triage": 2,
    "committer": 11,
    "maintainer": 4
@@ -257,18 +257,18 @@
    "maintainer": 3
   },
   {
-   "repo": "hiero-contracts",
-   "general_user": 11,
-   "triage": 0,
-   "committer": 3,
-   "maintainer": 6
-  },
-  {
    "repo": "solo-docs",
    "general_user": 9,
    "triage": 0,
    "committer": 3,
    "maintainer": 8
+  },
+  {
+   "repo": "hiero-contracts",
+   "general_user": 11,
+   "triage": 0,
+   "committer": 3,
+   "maintainer": 6
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -278,18 +278,18 @@
    "maintainer": 4
   },
   {
-   "repo": "hiero-did-sdk-js",
-   "general_user": 14,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 3
-  },
-  {
    "repo": "homebrew-tools",
    "general_user": 11,
    "triage": 0,
    "committer": 2,
    "maintainer": 5
+  },
+  {
+   "repo": "hiero-did-sdk-js",
+   "general_user": 14,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 3
   },
   {
    "repo": ".github",
@@ -313,14 +313,14 @@
    "maintainer": 2
   },
   {
-   "repo": "identity-collaboration-hub",
+   "repo": "hiero-ethereum-execution-spec-tests",
    "general_user": 5,
    "triage": 0,
    "committer": 0,
    "maintainer": 3
   },
   {
-   "repo": "hiero-ethereum-execution-spec-tests",
+   "repo": "identity-collaboration-hub",
    "general_user": 5,
    "triage": 0,
    "committer": 0,
@@ -353,8 +353,15 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 2
+  },
+  {
+   "repo": "hiero-agentic-support",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 1
   }
  ],
- "generated_at": "2026-11-10T01:03:39.908327+00:00",
+ "generated_at": "2026-11-11T01:03:51.380026+00:00",
  "stale": false
 }

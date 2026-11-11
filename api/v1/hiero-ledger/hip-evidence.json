@@ -127,6 +127,20 @@
    "url": "https://github.com/hiero-ledger/sdk-collaboration-hub/pull/287"
   },
   {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/sdk-collaboration-hub",
+   "pr_number": 290,
+   "pr_title": "docs: update HIP-1535 CLPR SDK design for the Phase 2 baseline",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|branch|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "docs: update HIP-1535 CLPR SDK design for the Phase 2 baselin",
+   "url": "https://github.com/hiero-ledger/sdk-collaboration-hub/pull/290"
+  },
+  {
    "hip": 1522,
    "hip_title": "Account Staking Configuration via the Hedera Account Service",
    "repo": "hiero-ledger/hiero-consensus-node",
@@ -3975,6 +3989,20 @@
    "counted": true,
    "snippet": "inned `v0.156.0 -> latest` (removes the HIP-1137 pin), Solo `0.79.0 -> 0.83.0`, BN `late",
    "url": "https://github.com/hiero-ledger/hiero-block-node/pull/3284"
+  },
+  {
+   "hip": 1137,
+   "hip_title": "Block Node discoverabilty via on chain registry",
+   "repo": "hiero-ledger/hiero-block-node",
+   "pr_number": 4048,
+   "pr_title": "docs(fact-corrections): update shipped-version facts in four p1 docs",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "aths (/healthz/livez, /healthz/readyz); HIP-1137 and block stream cutover (CN 0.77) rewr",
+   "url": "https://github.com/hiero-ledger/hiero-block-node/pull/4048"
   },
   {
    "hip": 1137,
@@ -9111,7 +9139,7 @@
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": "he top-level originals remain: - `hip869/batch/AtomicNodeUpdateTest`, `AtomicNod",
+   "snippet": "The top-level originals remain: - `hip869/batch/AtomicNodeUpdateTest`, `AtomicNod",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27491"
   },
   {
@@ -11183,7 +11211,7 @@
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": ", `AtomicNodeUpdateTestEmbedded`; - `hip551/AtomicFileCreateSuite`; - single tes",
+   "snippet": "`, `AtomicNodeUpdateTestEmbedded`; - `hip551/AtomicFileCreateSuite`; - single test",
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/27491"
   },
   {
@@ -11584,8 +11612,8 @@
    "repo": "hiero-ledger/hiero-consensus-node",
    "pr_number": 27774,
    "pr_title": "fix: scope native signature requirements to account identity",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-10 21:42:39+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -12335,8 +12363,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 876,
- "generated_at": "2026-11-10T01:11:12.760068+00:00",
+ "row_count": 878,
+ "generated_at": "2026-11-11T01:11:08.636305+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

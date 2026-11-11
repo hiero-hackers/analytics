@@ -43,7 +43,6 @@
   "hiero-enterprise-java",
   "hiero-gradle-conventions",
   "hiero-sdk-java",
-  "hiero-sdk-python",
   "hiero-sdk-tck",
   "hiero-solo-action",
   "solo-charts"
@@ -51,15 +50,9 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-10T01:10:25.186554+00:00"
+  "end": "2026-11-11T01:10:20.790637+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-python",
-   "time": "2026-10-11T17:00:18Z",
-   "tag_name": "v0.3.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-tck",
    "time": "2026-10-12T13:01:37Z",
@@ -467,8 +460,14 @@
    "time": "2026-11-10T00:10:31Z",
    "tag_name": "v3.29.0",
    "type": "release"
+  },
+  {
+   "repo": "solo",
+   "time": "2026-11-10T14:53:39Z",
+   "tag_name": "v0.97.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-10T01:10:25.186554+00:00",
+ "generated_at": "2026-11-11T01:10:20.790637+00:00",
  "stale": false
 }

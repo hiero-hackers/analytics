@@ -62,15 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-11-10T01:10:25.186554+00:00"
+  "end": "2026-11-11T01:10:20.790637+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-solo-action",
-   "time": "2025-11-10T15:09:24Z",
-   "tag_name": "v0.15.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-gradle-conventions",
    "time": "2025-11-11T10:49:20Z",
@@ -3634,8 +3628,14 @@
    "time": "2026-11-10T00:10:31Z",
    "tag_name": "v3.29.0",
    "type": "release"
+  },
+  {
+   "repo": "solo",
+   "time": "2026-11-10T14:53:39Z",
+   "tag_name": "v0.97.0",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-10T01:10:25.186554+00:00",
+ "generated_at": "2026-11-11T01:10:20.790637+00:00",
  "stale": false
 }

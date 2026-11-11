@@ -4,7 +4,7 @@
  "group": "CI health",
  "title": "CI health matrix",
  "description": "Repository-level CI health checks sorted worst-first by fail count, then review count, then repository name. Pass and na do not affect repo priority. Click a fail or review cell to inspect the supporting evidence.",
- "badge": "28 repositories",
+ "badge": "27 repositories",
  "source": "ci_health_checks.csv",
  "row_header": "Repository",
  "columns": [
@@ -224,33 +224,6 @@
      "label": "Security Config",
      "status": "fail",
      "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/agentic-support-hiero",
-   "label": "hiero-hackers/agentic-support-hiero",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
     }
    ]
@@ -803,6 +776,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-10T01:13:02.728912+00:00",
+ "generated_at": "2026-11-11T01:12:27.554841+00:00",
  "stale": false
 }

@@ -190,6 +190,16 @@
    "organisations": "Hashgraph"
   },
   {
+   "repo": "hiero-agentic-support",
+   "maintainers": 1,
+   "distinct_orgs": 1,
+   "top_org": "Hashgraph",
+   "top_org_pct": 100,
+   "independent": 0,
+   "unknown": 0,
+   "organisations": "Hashgraph"
+  },
+  {
    "repo": "hiero-consensus-node",
    "maintainers": 16,
    "distinct_orgs": 2,
@@ -490,9 +500,9 @@
    "organisations": "Hashgraph, Linux Foundation, LimeChain, Hgraph, Hashgraph Online, 8bees, Hedera"
   }
  ],
- "row_count": 44,
+ "row_count": 45,
  "label": "Maintainers",
- "generated_at": "2026-11-10T01:09:13.542605+00:00",
+ "generated_at": "2026-11-11T01:09:21.046905+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "variants": [
@@ -680,6 +690,16 @@
     {
      "repo": "hiero-mirror-node",
      "maintainers": 2,
+     "distinct_orgs": 1,
+     "top_org": "Hashgraph",
+     "top_org_pct": 100,
+     "independent": 0,
+     "unknown": 0,
+     "organisations": "Hashgraph"
+    },
+    {
+     "repo": "hiero-agentic-support",
+     "maintainers": 1,
      "distinct_orgs": 1,
      "top_org": "Hashgraph",
      "top_org_pct": 100,
@@ -988,9 +1008,9 @@
      "organisations": "Hashgraph, Linux Foundation, LimeChain, Hgraph, Hashgraph Online, 8bees, Hedera"
     }
    ],
-   "row_count": 44,
+   "row_count": 45,
    "label": "Maintainers",
-   "generated_at": "2026-11-10T01:09:13.542605+00:00",
+   "generated_at": "2026-11-11T01:09:21.046905+00:00",
    "stale": false
   },
   {
@@ -1327,7 +1347,7 @@
    ],
    "row_count": 28,
    "label": "Committers",
-   "generated_at": "2026-11-10T01:09:13.570418+00:00",
+   "generated_at": "2026-11-11T01:09:21.075605+00:00",
    "stale": false
   }
  ],

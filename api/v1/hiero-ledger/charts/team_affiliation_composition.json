@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-10T01:09:13.691900+00:00"
+  "end": "2026-11-11T01:09:21.198656+00:00"
  },
  "series": [
   {
@@ -307,6 +307,18 @@
    "Unknown": 0
   },
   {
+   "team": "hiero-sdk-go-committers",
+   "Hashgraph": 1,
+   "LimeChain": 5,
+   "DSR Corporation": 0,
+   "DevLabs": 0,
+   "BlockyDevs": 0,
+   "Linux Foundation": 0,
+   "Other orgs": 0,
+   "Independent": 0,
+   "Unknown": 0
+  },
+  {
    "team": "hiero-consensus-node-ci-codeowners",
    "Hashgraph": 4,
    "LimeChain": 0,
@@ -328,18 +340,6 @@
    "Linux Foundation": 0,
    "Other orgs": 0,
    "Independent": 1,
-   "Unknown": 0
-  },
-  {
-   "team": "hiero-sdk-go-committers",
-   "Hashgraph": 1,
-   "LimeChain": 4,
-   "DSR Corporation": 0,
-   "DevLabs": 0,
-   "BlockyDevs": 0,
-   "Linux Foundation": 0,
-   "Other orgs": 0,
-   "Independent": 0,
    "Unknown": 0
   },
   {
@@ -1003,6 +1003,6 @@
    "Unknown": 0
   }
  ],
- "generated_at": "2026-11-10T01:09:13.691900+00:00",
+ "generated_at": "2026-11-11T01:09:21.198656+00:00",
  "stale": false
 }
