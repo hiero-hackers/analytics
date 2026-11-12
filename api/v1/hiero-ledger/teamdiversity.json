@@ -586,6 +586,18 @@
    "organisations": "Hashgraph 3, Onepiece Software 1"
   },
   {
+   "team": "hiero-sdk-java-committers",
+   "members": 4,
+   "resolved": 4,
+   "distinct_orgs": 2,
+   "top_org": "LimeChain",
+   "top_org_pct": 75,
+   "hhi": 6250,
+   "unknown": 0,
+   "single_employer": false,
+   "organisations": "LimeChain 3, Hashgraph 1"
+  },
+  {
    "team": "hiero-sdk-java-maintainers",
    "members": 4,
    "resolved": 4,
@@ -716,18 +728,6 @@
    "unknown": 0,
    "single_employer": false,
    "organisations": "Hashgraph 2, LimeChain 1"
-  },
-  {
-   "team": "hiero-sdk-java-committers",
-   "members": 3,
-   "resolved": 3,
-   "distinct_orgs": 2,
-   "top_org": "LimeChain",
-   "top_org_pct": 67,
-   "hhi": 5556,
-   "unknown": 0,
-   "single_employer": false,
-   "organisations": "LimeChain 2, Hashgraph 1"
   },
   {
    "team": "hiero-sdk-rust-committers",
@@ -1415,7 +1415,7 @@
   }
  ],
  "row_count": 113,
- "generated_at": "2026-11-11T01:09:21.315548+00:00",
+ "generated_at": "2026-11-12T01:08:59.272994+00:00",
  "stale": false,
  "group": "Organisation diversity",
  "macro": "Governance"

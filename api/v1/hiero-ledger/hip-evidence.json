@@ -3907,6 +3907,20 @@
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14009"
   },
   {
+   "hip": 1193,
+   "hip_title": "Record Stream to Block Stream Cutover",
+   "repo": "hiero-ledger/solo-charts",
+   "pr_number": 308,
+   "pr_title": "feat: upload .blk.zstd block files from the block stream uploader",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "z`. Consensus nodes are moving to the [HIP-1193](https://hips.hedera.com/hip/hip-1193)",
+   "url": "https://github.com/hiero-ledger/solo-charts/pull/308"
+  },
+  {
    "hip": 1139,
    "hip_title": "Enable Immutable Topic Ids and Updatable Submit Keys without an Admin Key.",
    "repo": "hiero-ledger/sdk-collaboration-hub",
@@ -11682,12 +11696,12 @@
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 14622,
    "pr_title": "Fix freeze and KYC status of fee collectors associated by token creates",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-11 17:07:14+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": "* Treat an empty key list KYC key (the HIP-540 removal sentinel) as disabling KYC for",
+   "snippet": "n empty key list freeze or KYC key (the HIP-540 removal sentinel) as disabling that key",
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14622"
   },
   {
@@ -12363,8 +12377,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 878,
- "generated_at": "2026-11-11T01:11:08.636305+00:00",
+ "row_count": 879,
+ "generated_at": "2026-11-12T01:10:51.393073+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

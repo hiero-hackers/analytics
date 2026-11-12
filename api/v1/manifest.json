@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-11T01:12:43.819686+00:00",
+ "generated_at": "2026-11-12T01:12:23.557312+00:00",
  "provenance": {
   "git_sha": "72fcaa8",
-  "data_as_of": "2026-11-11T01:01:18.516346+00:00"
+  "data_as_of": "2026-11-12T01:01:36.050484+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1530,
+     "row_count": 1533,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -453,7 +453,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 3016,
+     "row_count": 3019,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 878,
+     "row_count": 879,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-11T01:11:08.643646+00:00"
+      "generated_at": "2026-11-12T01:10:51.398818+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-11T01:11:08.640182+00:00"
+      "generated_at": "2026-11-12T01:10:51.396178+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1530,
+      "value": 1533,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1530
+     "count": 1533
     }
    }
   },
@@ -2324,7 +2324,7 @@
      },
      {
       "label": "released last 90d %",
-      "value": "38%",
+      "value": "25%",
       "note": "Of repos that have ever released (not the full repo universe), the share that shipped a release in the last 90 days.",
       "methodology": [
        "Take repos with at least one release ever.",
@@ -2347,7 +2347,7 @@
    "entities": {
     "repositories": {
      "path": "hiero-hackers/entities/repositories.json",
-     "count": 22
+     "count": 21
     },
     "contributors": {
      "path": "hiero-hackers/entities/contributors.json",

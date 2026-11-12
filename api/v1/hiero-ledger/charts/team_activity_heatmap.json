@@ -66,7 +66,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-11T01:09:23.310618+00:00"
+  "end": "2026-11-12T01:09:00.890816+00:00"
  },
  "rows": [
   {
@@ -790,6 +790,16 @@
    "2026-10": 298
   },
   {
+   "team": "hiero-sdk-java-committers",
+   "activity score": 1838,
+   "2026-05": 108,
+   "2026-06": 105,
+   "2026-07": 429,
+   "2026-08": 247,
+   "2026-09": 430,
+   "2026-10": 519
+  },
+  {
    "team": "hiero-enterprise-java-committers",
    "activity score": 1821,
    "2026-05": 475,
@@ -880,16 +890,6 @@
    "2026-10": 187
   },
   {
-   "team": "hiero-docs-maintainers",
-   "activity score": 1193,
-   "2026-05": 232,
-   "2026-06": 332,
-   "2026-07": 169,
-   "2026-08": 201,
-   "2026-09": 135,
-   "2026-10": 124
-  },
-  {
    "team": "hiero-docs-committers",
    "activity score": 1193,
    "2026-05": 232,
@@ -900,7 +900,17 @@
    "2026-10": 124
   },
   {
-   "team": "hiero-did-sdk-js-maintainers",
+   "team": "hiero-docs-maintainers",
+   "activity score": 1193,
+   "2026-05": 232,
+   "2026-06": 332,
+   "2026-07": 169,
+   "2026-08": 201,
+   "2026-09": 135,
+   "2026-10": 124
+  },
+  {
+   "team": "hiero-did-sdk-python-maintainers",
    "activity score": 1154,
    "2026-05": 269,
    "2026-06": 238,
@@ -910,7 +920,7 @@
    "2026-10": 187
   },
   {
-   "team": "hiero-did-sdk-python-maintainers",
+   "team": "hiero-did-sdk-js-maintainers",
    "activity score": 1154,
    "2026-05": 269,
    "2026-06": 238,
@@ -1000,7 +1010,7 @@
    "2026-10": 15
   },
   {
-   "team": "hiero-did-sdk-committers",
+   "team": "hiero-did-sdk-js-committers",
    "activity score": 656,
    "2026-05": 143,
    "2026-06": 195,
@@ -1010,7 +1020,7 @@
    "2026-10": 25
   },
   {
-   "team": "hiero-did-sdk-js-committers",
+   "team": "hiero-did-sdk-committers",
    "activity score": 656,
    "2026-05": 143,
    "2026-06": 195,
@@ -1060,7 +1070,7 @@
    "2026-10": 162
   },
   {
-   "team": "lf-staff",
+   "team": "tsc-eligibility-check-admins",
    "activity score": 572,
    "2026-05": 86,
    "2026-06": 140,
@@ -1070,7 +1080,7 @@
    "2026-10": 16
   },
   {
-   "team": "tsc-eligibility-check-admins",
+   "team": "lf-staff",
    "activity score": 572,
    "2026-05": 86,
    "2026-06": 140,
@@ -1160,16 +1170,6 @@
    "2026-10": 18
   },
   {
-   "team": "hiero-sdk-java-committers",
-   "activity score": 381,
-   "2026-05": 83,
-   "2026-06": 45,
-   "2026-07": 161,
-   "2026-08": 24,
-   "2026-09": 41,
-   "2026-10": 27
-  },
-  {
    "team": "hiero-sdk-js-junior-committers",
    "activity score": 361,
    "2026-05": 151,
@@ -1230,6 +1230,6 @@
    "2026-10": 9
   }
  ],
- "generated_at": "2026-11-11T01:09:23.310618+00:00",
+ "generated_at": "2026-11-12T01:09:00.890816+00:00",
  "stale": false
 }
