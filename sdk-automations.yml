@@ -30,7 +30,6 @@ capabilities:
 
   inactivity: # on the hourly schedule: remind about stalled work, then release it
     enabled: true
-    exemptMaintainers: [MonaaEid, danielmarv, exploreriii] # never reminded or released
     issues:
       enabled: true
       reap:
