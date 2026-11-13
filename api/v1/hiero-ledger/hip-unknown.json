@@ -32,34 +32,6 @@
  ],
  "rows": [
   {
-   "hip": 1485,
-   "repo": "hiero-ledger/hiero-json-rpc-relay",
-   "pr_number": 5817,
-   "pr_title": "feat: support state overrides in eth_call and eth_estimateGas",
-   "snippet": "'s `contracts/call` API as described in HIP-1485. The relay validates the override set,"
-  },
-  {
-   "hip": 1485,
-   "repo": "hiero-ledger/hiero-mirror-node",
-   "pr_number": 13654,
-   "pr_title": "Add callTracer and blockOverride support in web3",
-   "snippet": "s for reviewer**: This PR should await HIP-1485 initial confirmation. **Checklist**"
-  },
-  {
-   "hip": 1485,
-   "repo": "hiero-ledger/hiero-mirror-node",
-   "pr_number": 13931,
-   "pr_title": "HIP-1485 Add POST /api/v1/contracts/simulate to web3",
-   "snippet": "HIP-1485 Add POST /api/v1/contracts/simulate to"
-  },
-  {
-   "hip": 1485,
-   "repo": "hiero-ledger/hiero-mirror-node",
-   "pr_number": 14415,
-   "pr_title": "Add child indicator to contract results and logs",
-   "snippet": "feature/HIP-1485-add-child-column"
-  },
-  {
    "hip": 1183,
    "repo": "hiero-ledger/sdk-collaboration-hub",
    "pr_number": 135,
@@ -95,8 +67,8 @@
    "snippet": "`HIP-432`: Long Term Scheduled Transaction"
   }
  ],
- "row_count": 9,
- "generated_at": "2026-11-12T01:10:51.394036+00:00",
+ "row_count": 5,
+ "generated_at": "2026-11-13T01:22:05.147760+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

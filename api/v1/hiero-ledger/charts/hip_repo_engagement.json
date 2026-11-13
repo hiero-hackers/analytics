@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-12T01:10:51.396178+00:00"
+  "end": "2026-11-13T01:22:05.151072+00:00"
  },
  "series": [
   {
@@ -59,19 +59,25 @@
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
    "matched_prs": 233,
-   "total_prs": 5604
+   "total_prs": 5622
   },
   {
    "repo": "hiero-mirror-node",
-   "distinct_hips_merged": 36,
-   "matched_prs": 195,
-   "total_prs": 3841
+   "distinct_hips_merged": 37,
+   "matched_prs": 196,
+   "total_prs": 3851
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "distinct_hips_merged": 14,
+   "matched_prs": 16,
+   "total_prs": 1478
   },
   {
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 14,
    "matched_prs": 40,
-   "total_prs": 1297
+   "total_prs": 1300
   },
   {
    "repo": "hiero-sdk-go",
@@ -83,19 +89,13 @@
    "repo": "solo",
    "distinct_hips_merged": 13,
    "matched_prs": 13,
-   "total_prs": 2600
-  },
-  {
-   "repo": "hiero-json-rpc-relay",
-   "distinct_hips_merged": 13,
-   "matched_prs": 15,
-   "total_prs": 1475
+   "total_prs": 2605
   },
   {
    "repo": "hiero-sdk-java",
    "distinct_hips_merged": 13,
    "matched_prs": 28,
-   "total_prs": 651
+   "total_prs": 652
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -107,7 +107,7 @@
    "repo": "hiero-mirror-node-explorer",
    "distinct_hips_merged": 12,
    "matched_prs": 17,
-   "total_prs": 1083
+   "total_prs": 1095
   },
   {
    "repo": "hiero-sdk-swift",
@@ -131,13 +131,13 @@
    "repo": "hiero-block-node",
    "distinct_hips_merged": 5,
    "matched_prs": 11,
-   "total_prs": 1737
+   "total_prs": 1754
   },
   {
    "repo": "hiero-sdk-python",
    "distinct_hips_merged": 5,
    "matched_prs": 5,
-   "total_prs": 1097
+   "total_prs": 1098
   },
   {
    "repo": "hiero-sdk-tck",
@@ -149,7 +149,7 @@
    "repo": "hiero-website",
    "distinct_hips_merged": 4,
    "matched_prs": 4,
-   "total_prs": 429
+   "total_prs": 436
   },
   {
    "repo": "hiero-contracts",
@@ -215,7 +215,7 @@
    "repo": "heka-identity-platform",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 153
+   "total_prs": 154
   },
   {
    "repo": "solo-containers",
@@ -227,19 +227,19 @@
    "repo": "solo-charts",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 112
+   "total_prs": 113
   },
   {
    "repo": "hiero-hederium",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 110
+   "total_prs": 111
   },
   {
    "repo": "hiero-solo-action",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 94
+   "total_prs": 95
   },
   {
    "repo": "homebrew-tools",
@@ -308,6 +308,6 @@
    "total_prs": 3
   }
  ],
- "generated_at": "2026-11-12T01:10:51.396178+00:00",
+ "generated_at": "2026-11-13T01:22:05.151072+00:00",
  "stale": false
 }

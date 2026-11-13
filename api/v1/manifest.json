@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-12T01:12:23.557312+00:00",
+ "generated_at": "2026-11-13T01:23:42.603849+00:00",
  "provenance": {
   "git_sha": "72fcaa8",
-  "data_as_of": "2026-11-12T01:01:36.050484+00:00"
+  "data_as_of": "2026-11-12T01:03:37.806988+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -511,14 +511,14 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 879,
+     "row_count": 883,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
      "id": "hip-unknown",
      "macro": "HIPs",
      "title": "Unknown HIP numbers (review)",
-     "row_count": 9,
+     "row_count": 5,
      "path": "hiero-ledger/hip-unknown.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-12T01:10:51.398818+00:00"
+      "generated_at": "2026-11-13T01:22:05.155036+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-12T01:10:51.396178+00:00"
+      "generated_at": "2026-11-13T01:22:05.151072+00:00"
      }
     },
     {
@@ -1603,7 +1603,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "22%",
+      "value": "23%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -2258,7 +2258,7 @@
      },
      {
       "label": "active last month %",
-      "value": "39%",
+      "value": "37%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-12T01:03:47.483666+00:00"
+  "end": "2026-11-13T01:14:22.464938+00:00"
  },
  "series": [
   {
@@ -77,30 +77,23 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "general_user": 1,
+   "general_user": 0,
    "triage": 0,
    "committer": 7,
    "maintainer": 2
   },
   {
    "repo": "solo",
-   "general_user": 4,
+   "general_user": 3,
    "triage": 0,
    "committer": 5,
    "maintainer": 1
   },
   {
-   "repo": "hiero-json-rpc-relay",
-   "general_user": 5,
-   "triage": 0,
-   "committer": 2,
-   "maintainer": 2
-  },
-  {
    "repo": "hiero-sdk-python",
    "general_user": 2,
    "triage": 0,
-   "committer": 2,
+   "committer": 1,
    "maintainer": 5
   },
   {
@@ -116,6 +109,13 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 4
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 2
   },
   {
    "repo": "heka-identity-platform",
@@ -139,18 +139,18 @@
    "maintainer": 1
   },
   {
+   "repo": "hiero-improvement-proposals",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 2
+  },
+  {
    "repo": "solo-charts",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 3
-  },
-  {
-   "repo": "hiero-solo-action",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
   },
   {
    "repo": "hiero-enterprise-java",
@@ -181,22 +181,8 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-improvement-proposals",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 2,
-   "maintainer": 1
-  },
-  {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-sdk-tck",
-   "general_user": 0,
+   "repo": "hiero-solo-action",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 2
@@ -209,6 +195,13 @@
    "maintainer": 2
   },
   {
+   "repo": "sdk-collaboration-hub",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0
+  },
+  {
    "repo": "hiero-docs",
    "general_user": 0,
    "triage": 0,
@@ -216,14 +209,21 @@
    "maintainer": 1
   },
   {
-   "repo": "sdk-collaboration-hub",
-   "general_user": 1,
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "general_user": 0,
    "triage": 0,
    "committer": 0,
-   "maintainer": 0
+   "maintainer": 1
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-12T01:03:47.483666+00:00",
+ "generated_at": "2026-11-13T01:14:22.464938+00:00",
  "stale": false
 }

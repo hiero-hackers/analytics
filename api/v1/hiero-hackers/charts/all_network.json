@@ -59,7 +59,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-12T01:11:07.159819+00:00"
+  "end": "2026-11-13T01:22:19.727036+00:00"
  },
  "nodes": [
   {
@@ -67,24 +67,24 @@
    "active": 20,
    "total": 32,
    "category": "Tooling / DevEx",
-   "x": 0.0565,
-   "y": -0.0759
+   "x": -0.0639,
+   "y": 0.0827
   },
   {
    "id": "hiero-enterprise-js",
    "active": 6,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": -1.2502,
-   "y": -1.718
+   "x": -1.5375,
+   "y": 1.718
   },
   {
    "id": "sdk-automations",
    "active": 6,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": 1.5687,
-   "y": -1.2737
+   "x": -1.5639,
+   "y": -1.2753
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -99,8 +99,8 @@
    "active": 2,
    "total": 5,
    "category": "Other",
-   "x": 1.4978,
-   "y": 1.718
+   "x": 1.5435,
+   "y": -1.718
   },
   {
    "id": "hiero-tck-action",
@@ -115,23 +115,15 @@
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": -1.5687,
-   "y": 1.2266
-  },
-  {
-   "id": "hiero-payment-requests",
-   "active": 1,
-   "total": 2,
-   "category": "Other",
-   "x": -1.35,
-   "y": -3.338
+   "x": 1.5639,
+   "y": 1.5397
   },
   {
    "id": "hiero-notifications",
    "active": 1,
    "total": 1,
    "category": "Other",
-   "x": -0.45,
+   "x": -1.35,
    "y": -3.338
   },
   {
@@ -139,7 +131,7 @@
    "active": 0,
    "total": 4,
    "category": "Other",
-   "x": 0.45,
+   "x": -0.45,
    "y": -3.338
   },
   {
@@ -147,7 +139,7 @@
    "active": 0,
    "total": 3,
    "category": "Other",
-   "x": 1.35,
+   "x": 0.45,
    "y": -3.338
   },
   {
@@ -155,7 +147,7 @@
    "active": 0,
    "total": 2,
    "category": "Other",
-   "x": 2.25,
+   "x": 1.35,
    "y": -3.338
   },
   {
@@ -163,11 +155,19 @@
    "active": 0,
    "total": 2,
    "category": "Identity / DID",
-   "x": 3.15,
+   "x": 2.25,
    "y": -3.338
   },
   {
    "id": "hiero-journal-rs",
+   "active": 0,
+   "total": 2,
+   "category": "Other",
+   "x": 3.15,
+   "y": -3.338
+  },
+  {
+   "id": "hiero-payment-requests",
    "active": 0,
    "total": 2,
    "category": "Other",
@@ -253,6 +253,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-12T01:11:07.159819+00:00",
+ "generated_at": "2026-11-13T01:22:19.727036+00:00",
  "stale": false
 }

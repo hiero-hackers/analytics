@@ -155,6 +155,62 @@
    "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/26944"
   },
   {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 5817,
+   "pr_title": "feat: support state overrides in eth_call and eth_estimateGas",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-02 15:06:31+00:00",
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "'s `contracts/call` API as described in HIP-1485. The relay validates the override set,",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/5817"
+  },
+  {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 13654,
+   "pr_title": "Add callTracer and blockOverride support in web3",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "s for reviewer**: This PR should await HIP-1485 initial confirmation. **Checklist**",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/13654"
+  },
+  {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 13931,
+   "pr_title": "HIP-1485 Add POST /api/v1/contracts/simulate to web3",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|branch",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "HIP-1485 Add POST /api/v1/contracts/simulate to",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/13931"
+  },
+  {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14415,
+   "pr_title": "Add child indicator to contract results and logs",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-10-20 18:50:54+00:00",
+   "match_sources": "branch",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "feature/HIP-1485-add-child-column",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14415"
+  },
+  {
    "hip": 1427,
    "hip_title": "Historical Record File Wrapping for Block Stream Cutover",
    "repo": "hiero-ledger/hiero-mirror-node",
@@ -12377,8 +12433,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 879,
- "generated_at": "2026-11-12T01:10:51.393073+00:00",
+ "row_count": 883,
+ "generated_at": "2026-11-13T01:22:05.146707+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

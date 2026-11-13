@@ -4,12 +4,18 @@
  "group": "Status & coverage",
  "title": "Where specs sit in governance",
  "description": "Every HIP spec, placed by its current lifecycle status \u2014 the columns read left to right as the pipeline, and the Approved / Accepted column is the implementation triage queue. Statuses come from each spec's frontmatter; click a chip to see the spec's title, and jump from there to its row in the coverage matrix below.",
- "badge": "165 specs",
+ "badge": "166 specs",
  "source": "hip_summary.csv",
  "columns": [
   {
    "title": "In review",
    "items": [
+    {
+     "key": 1485,
+     "label": "HIP-1485",
+     "title": "EVM Debug APIs",
+     "status": "Last Call"
+    },
     {
      "key": 1331,
      "label": "HIP-1331",
@@ -1025,6 +1031,6 @@
  ],
  "target_view": "hip-matrix",
  "macro": "HIPs",
- "generated_at": "2026-11-12T01:10:51.397253+00:00",
+ "generated_at": "2026-11-13T01:22:05.152666+00:00",
  "stale": false
 }
