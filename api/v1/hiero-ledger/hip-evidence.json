@@ -4071,7 +4071,7 @@
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": "aths (/healthz/livez, /healthz/readyz); HIP-1137 and block stream cutover (CN 0.77) rewr",
+   "snippet": "`/healthz/livez`, `/healthz/readyz` - HIP-1137 sentence moved to present tense: the re",
    "url": "https://github.com/hiero-ledger/hiero-block-node/pull/4048"
   },
   {
@@ -9551,6 +9551,20 @@
   {
    "hip": 844,
    "hip_title": "Handling and externalisation improvements for account nonce updates",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 872,
+   "pr_title": "feat: Added SignerNonce field to ContractFunctionResults",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-02-23 14:00:21+00:00",
+   "match_sources": "branch|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "00863-add-hip-844-handling-and-externalisation-improvemen",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/872"
+  },
+  {
+   "hip": 844,
+   "hip_title": "Handling and externalisation improvements for account nonce updates",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 2176,
    "pr_title": "feature: handling and externalisation improvements for account nonce updates",
@@ -9817,6 +9831,20 @@
   {
    "hip": 765,
    "hip_title": "NFT Collection Token Metadata Field",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 908,
+   "pr_title": "feat(HIP): HIP-646 and HIP-765",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-04-29 11:09:42+00:00",
+   "match_sources": "title|branch|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "feat(HIP): HIP-646 and HIP-765",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/908"
+  },
+  {
+   "hip": 765,
+   "hip_title": "NFT Collection Token Metadata Field",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 2210,
    "pr_title": "feature: update metadata field of fungible and non-fungible tokens, and dynamic NFTs",
@@ -10013,6 +10041,48 @@
   {
    "hip": 745,
    "hip_title": "Optionally send transaction data without required transaction fields",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 857,
+   "pr_title": "789 add hip 745 optionally send transaction data without required transaction fields",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-01-23 13:52:58+00:00",
+   "match_sources": "title|branch|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "789 add hip 745 optionally send transaction data withou",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/857"
+  },
+  {
+   "hip": 745,
+   "hip_title": "Optionally send transaction data without required transaction fields",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 862,
+   "pr_title": "861 hip 745 integration tests",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-02-05 20:21:46+00:00",
+   "match_sources": "title|branch|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "861 hip 745 integration tests",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/862"
+  },
+  {
+   "hip": 745,
+   "hip_title": "Optionally send transaction data without required transaction fields",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 867,
+   "pr_title": "RELEASE 2.35.0 HIP-745 support",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-02-06 08:48:50+00:00",
+   "match_sources": "title|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "RELEASE 2.35.0 HIP-745 support",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/867"
+  },
+  {
+   "hip": 745,
+   "hip_title": "Optionally send transaction data without required transaction fields",
    "repo": "hiero-ledger/hiero-sdk-rust",
    "pr_number": 966,
    "pr_title": "feat: hip-745",
@@ -10153,6 +10223,20 @@
   {
    "hip": 657,
    "hip_title": "Mutable metadata fields for dynamic NFTs",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 892,
+   "pr_title": "feat(HIP-657): Mutable metadata fields for dynamic NFTs",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-04-29 06:57:09+00:00",
+   "match_sources": "title|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "feat(HIP-657): Mutable metadata fields for dynamic N",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/892"
+  },
+  {
+   "hip": 657,
+   "hip_title": "Mutable metadata fields for dynamic NFTs",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 2210,
    "pr_title": "feature: update metadata field of fungible and non-fungible tokens, and dynamic NFTs",
@@ -10191,6 +10275,20 @@
    "counted": false,
    "snippet": "feat(HIPs-646/657/765): Added implementations for met",
    "url": "https://github.com/hiero-ledger/hiero-sdk-cpp/pull/678"
+  },
+  {
+   "hip": 646,
+   "hip_title": "Fungible Token Metadata Field",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 908,
+   "pr_title": "feat(HIP): HIP-646 and HIP-765",
+   "pr_state": "MERGED",
+   "pr_merged_at": "2024-04-29 11:09:42+00:00",
+   "match_sources": "title|branch|body",
+   "qualifier": "pre-Hiero era",
+   "counted": false,
+   "snippet": "feat(HIP): HIP-646 and HIP-765",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/908"
   },
   {
    "hip": 646,
@@ -12433,8 +12531,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 883,
- "generated_at": "2026-11-13T01:22:05.146707+00:00",
+ "row_count": 890,
+ "generated_at": "2026-11-14T01:13:37.055516+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

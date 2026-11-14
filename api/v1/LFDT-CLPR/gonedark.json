@@ -209,7 +209,7 @@
   }
  ],
  "row_count": 21,
- "generated_at": "2026-11-13T01:23:32.663416+00:00",
+ "generated_at": "2026-11-14T01:15:09.242870+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -278,6 +278,14 @@
     "last_active": null
    },
    {
+    "user": "jnels124",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 5,
+    "days_since_active": null,
+    "last_active": null
+   },
+   {
     "user": "jivkokelchev",
     "highest_role": "committer",
     "roles": "committer",
@@ -286,10 +294,18 @@
     "last_active": null
    },
    {
-    "user": "jnels124",
+    "user": "rwalworth",
     "highest_role": "committer",
     "roles": "committer",
-    "repos_held": 5,
+    "repos_held": 1,
+    "days_since_active": null,
+    "last_active": null
+   },
+   {
+    "user": "simihunjan",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 7,
     "days_since_active": null,
     "last_active": null
    },
@@ -342,26 +358,10 @@
     "last_active": null
    },
    {
-    "user": "rwalworth",
+    "user": "timo0",
     "highest_role": "committer",
     "roles": "committer",
-    "repos_held": 1,
-    "days_since_active": null,
-    "last_active": null
-   },
-   {
-    "user": "simihunjan",
-    "highest_role": "maintainer",
-    "roles": "maintainer",
-    "repos_held": 7,
-    "days_since_active": null,
-    "last_active": null
-   },
-   {
-    "user": "rbair23",
-    "highest_role": "committer",
-    "roles": "committer",
-    "repos_held": 1,
+    "repos_held": 2,
     "days_since_active": null,
     "last_active": null
    },
@@ -374,10 +374,10 @@
     "last_active": null
    },
    {
-    "user": "timo0",
+    "user": "rbair23",
     "highest_role": "committer",
     "roles": "committer",
-    "repos_held": 2,
+    "repos_held": 1,
     "days_since_active": null,
     "last_active": null
    },
@@ -386,7 +386,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 27.0,
+    "days_since_active": 28.0,
     "last_active": "2026-10-16 03:49:50+00:00"
    },
    {
@@ -394,7 +394,7 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 13.0,
+    "days_since_active": 14.0,
     "last_active": "2026-10-30 14:59:33+00:00"
    },
    {
@@ -402,8 +402,24 @@
     "highest_role": "committer",
     "roles": "committer",
     "repos_held": 2,
-    "days_since_active": 10.0,
+    "days_since_active": 11.0,
     "last_active": "2026-11-02 20:06:04+00:00"
+   },
+   {
+    "user": "hendrikebbers",
+    "highest_role": "maintainer",
+    "roles": "maintainer",
+    "repos_held": 7,
+    "days_since_active": 8.0,
+    "last_active": "2026-11-05 12:45:44+00:00"
+   },
+   {
+    "user": "lukasz-hashgraph",
+    "highest_role": "committer",
+    "roles": "committer",
+    "repos_held": 2,
+    "days_since_active": 8.0,
+    "last_active": "2026-11-05 15:54:46+00:00"
    }
   ],
   "30d": [

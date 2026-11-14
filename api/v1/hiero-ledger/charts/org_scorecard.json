@@ -25,8 +25,8 @@
  "rank": true,
  "top_n": 15,
  "reference": {
-  "value": 7.55,
-  "label": "Org median 7.55"
+  "value": 7.7,
+  "label": "Org median 7.7"
  },
  "value_max": 10,
  "group": null,
@@ -37,7 +37,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-13T01:20:13.095967+00:00"
+  "end": "2026-11-14T01:11:47.678968+00:00"
  },
  "series": [
   {
@@ -48,6 +48,10 @@
  ],
  "details": [],
  "rows": [
+  {
+   "repo": "hiero-sdk-java",
+   "score": 8.1
+  },
   {
    "repo": "hiero-improvement-proposals",
    "score": 8.7
@@ -161,6 +165,6 @@
    "score": 8.2
   }
  ],
- "generated_at": "2026-11-13T01:20:13.095967+00:00",
+ "generated_at": "2026-11-14T01:11:47.678968+00:00",
  "stale": false
 }

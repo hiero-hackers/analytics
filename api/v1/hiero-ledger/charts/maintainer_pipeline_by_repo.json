@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-13T01:14:22.385822+00:00"
+  "end": "2026-11-14T01:05:40.445050+00:00"
  },
  "series": [
   {
@@ -110,18 +110,18 @@
    "maintainer": 7
   },
   {
+   "repo": "hiero-sdk-go",
+   "general_user": 128,
+   "triage": 8,
+   "committer": 2,
+   "maintainer": 5
+  },
+  {
    "repo": "governance",
    "general_user": 87,
    "triage": 0,
    "committer": 37,
    "maintainer": 18
-  },
-  {
-   "repo": "hiero-sdk-go",
-   "general_user": 127,
-   "triage": 8,
-   "committer": 2,
-   "maintainer": 5
   },
   {
    "repo": "hiero-docs",
@@ -146,7 +146,7 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "general_user": 94,
+   "general_user": 95,
    "triage": 0,
    "committer": 1,
    "maintainer": 3
@@ -167,7 +167,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "general_user": 50,
+   "general_user": 51,
    "triage": 2,
    "committer": 11,
    "maintainer": 4
@@ -362,6 +362,6 @@
    "maintainer": 1
   }
  ],
- "generated_at": "2026-11-13T01:14:22.385822+00:00",
+ "generated_at": "2026-11-14T01:05:40.445050+00:00",
  "stale": false
 }

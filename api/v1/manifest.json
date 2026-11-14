@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-13T01:23:42.603849+00:00",
+ "generated_at": "2026-11-14T01:15:17.114502+00:00",
  "provenance": {
   "git_sha": "72fcaa8",
-  "data_as_of": "2026-11-12T01:03:37.806988+00:00"
+  "data_as_of": "2026-11-14T01:01:48.235603+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1533,
+     "row_count": 1534,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -453,7 +453,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 3019,
+     "row_count": 3020,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 883,
+     "row_count": 890,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-13T01:22:05.155036+00:00"
+      "generated_at": "2026-11-14T01:13:37.062572+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-13T01:22:05.151072+00:00"
+      "generated_at": "2026-11-14T01:13:37.059230+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1533,
+      "value": 1534,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1603,7 +1603,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "23%",
+      "value": "22%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1533
+     "count": 1534
     }
    }
   },
@@ -2124,13 +2124,6 @@
           "kind": "categories",
           "path": "hiero-hackers/charts/difficulty_by_repo_30d.json"
          }
-        },
-        {
-         "label": "Week",
-         "interactive": {
-          "kind": "categories",
-          "path": "hiero-hackers/charts/difficulty_by_repo_7d.json"
-         }
         }
        ],
        "note": "Open issues per repository, stacked by difficulty level. Each tab limits to issues labelled with a difficulty (or newly created) within its span; 'All time' is the whole open backlog and 'Unknown' = open issues not yet triaged. Wider spans are the closest view of a repo's accumulated triage debt.",
@@ -2212,13 +2205,6 @@
          "interactive": {
           "kind": "events",
           "path": "hiero-hackers/charts/release_timeline_30d.json"
-         }
-        },
-        {
-         "label": "Week",
-         "interactive": {
-          "kind": "events",
-          "path": "hiero-hackers/charts/release_timeline_7d.json"
          }
         }
        ],
@@ -3203,7 +3189,7 @@
      },
      {
       "label": "active last month %",
-      "value": "93%",
+      "value": "86%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

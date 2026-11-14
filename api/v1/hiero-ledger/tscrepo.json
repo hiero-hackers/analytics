@@ -1263,7 +1263,7 @@
   }
  ],
  "row_count": 110,
- "generated_at": "2026-11-13T01:20:02.225553+00:00",
+ "generated_at": "2026-11-14T01:11:41.609132+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -1279,28 +1279,6 @@
     "last_active": "2026-11-10 15:12:33+00:00"
    },
    {
-    "account": "georgi-l95",
-    "repo": "hiero-ledger/hiero-hederium",
-    "repo_role": "maintainer",
-    "prs_opened": 0,
-    "reviews_given": 1,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-11-06 17:14:51+00:00"
-   },
-   {
-    "account": "hendrikebbers",
-    "repo": "hiero-ledger/hiero-solo-action",
-    "repo_role": "maintainer",
-    "prs_opened": 0,
-    "reviews_given": 2,
-    "merges_done": 1,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-11-06 08:12:54+00:00"
-   },
-   {
     "account": "hendrikebbers",
     "repo": "hiero-ledger/hiero-sdk-java",
     "repo_role": "triage",
@@ -1310,17 +1288,6 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-10 07:47:17+00:00"
-   },
-   {
-    "account": "hendrikebbers",
-    "repo": "hiero-ledger/solo",
-    "repo_role": "general",
-    "prs_opened": 0,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 1,
-    "labels_applied": 0,
-    "last_active": "2026-11-06 13:07:15+00:00"
    }
   ],
   "30d": [
@@ -1351,8 +1318,8 @@
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
-    "reviews_given": 6,
-    "merges_done": 6,
+    "reviews_given": 3,
+    "merges_done": 2,
     "issues_opened": 1,
     "labels_applied": 0,
     "last_active": "2026-11-02 14:48:10+00:00"
@@ -1450,7 +1417,7 @@
     "repo": "hiero-ledger/hiero-consensus-specifications",
     "repo_role": "maintainer",
     "prs_opened": 1,
-    "reviews_given": 2,
+    "reviews_given": 0,
     "merges_done": 0,
     "issues_opened": 0,
     "labels_applied": 0,
@@ -1504,17 +1471,6 @@
    },
    {
     "account": "georgi-l95",
-    "repo": "hiero-ledger/hiero-block-node",
-    "repo_role": "general",
-    "prs_opened": 0,
-    "reviews_given": 4,
-    "merges_done": 0,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2025-12-16 09:26:18+00:00"
-   },
-   {
-    "account": "georgi-l95",
     "repo": "hiero-ledger/governance",
     "repo_role": "maintainer",
     "prs_opened": 0,
@@ -1523,6 +1479,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-10 15:12:33+00:00"
+   },
+   {
+    "account": "georgi-l95",
+    "repo": "hiero-ledger/hiero-block-node",
+    "repo_role": "general",
+    "prs_opened": 0,
+    "reviews_given": 3,
+    "merges_done": 0,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2025-12-16 09:26:18+00:00"
    },
    {
     "account": "georgi-l95",
@@ -1550,9 +1517,9 @@
     "account": "hendrikebbers",
     "repo": "hiero-ledger/sdk-collaboration-hub",
     "repo_role": "maintainer",
-    "prs_opened": 47,
+    "prs_opened": 44,
     "reviews_given": 84,
-    "merges_done": 35,
+    "merges_done": 34,
     "issues_opened": 6,
     "labels_applied": 4,
     "last_active": "2026-09-23 14:56:15+00:00"

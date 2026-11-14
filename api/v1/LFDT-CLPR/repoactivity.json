@@ -151,22 +151,10 @@
   }
  ],
  "row_count": 7,
- "generated_at": "2026-11-13T01:23:32.267949+00:00",
+ "generated_at": "2026-11-14T01:15:08.951405+00:00",
  "stale": false,
  "periods": {
   "7d": [
-   {
-    "repo": "clpr-website",
-    "maintainers": 3,
-    "committers": 7,
-    "triage": 0,
-    "active_recent": 2,
-    "maintainer_actions_recent": 3,
-    "committer_actions_recent": 5,
-    "triage_actions_recent": 0,
-    "actions_recent": 8,
-    "last_active": "2026-11-10 10:41:04+00:00"
-   },
    {
     "repo": "clpr-spec",
     "maintainers": 3,
@@ -180,28 +168,16 @@
     "last_active": "2026-11-12 16:12:05+00:00"
    },
    {
-    "repo": "clpr-smart-contracts",
+    "repo": "clpr-website",
     "maintainers": 3,
-    "committers": 15,
+    "committers": 7,
     "triage": 0,
     "active_recent": 2,
-    "maintainer_actions_recent": 1,
-    "committer_actions_recent": 1,
+    "maintainer_actions_recent": 2,
+    "committer_actions_recent": 2,
     "triage_actions_recent": 0,
-    "actions_recent": 2,
-    "last_active": "2026-11-06 19:27:10+00:00"
-   },
-   {
-    "repo": "clpr-endpoint",
-    "maintainers": 3,
-    "committers": 10,
-    "triage": 0,
-    "active_recent": 2,
-    "maintainer_actions_recent": 1,
-    "committer_actions_recent": 0,
-    "triage_actions_recent": 0,
-    "actions_recent": 1,
-    "last_active": "2026-11-06 18:47:04+00:00"
+    "actions_recent": 4,
+    "last_active": "2026-11-10 10:41:04+00:00"
    },
    {
     "repo": ".github",
@@ -216,6 +192,18 @@
     "last_active": "2026-10-27 19:33:40+00:00"
    },
    {
+    "repo": "clpr-endpoint",
+    "maintainers": 3,
+    "committers": 10,
+    "triage": 0,
+    "active_recent": 1,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2026-11-06 18:47:04+00:00"
+   },
+   {
     "repo": "clpr-e2e",
     "maintainers": 3,
     "committers": 24,
@@ -228,11 +216,23 @@
     "last_active": null
    },
    {
+    "repo": "clpr-smart-contracts",
+    "maintainers": 3,
+    "committers": 15,
+    "triage": 0,
+    "active_recent": 2,
+    "maintainer_actions_recent": 0,
+    "committer_actions_recent": 0,
+    "triage_actions_recent": 0,
+    "actions_recent": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
     "repo": "governance",
     "maintainers": 3,
     "committers": 0,
     "triage": 0,
-    "active_recent": 2,
+    "active_recent": 0,
     "maintainer_actions_recent": 0,
     "committer_actions_recent": 0,
     "triage_actions_recent": 0,

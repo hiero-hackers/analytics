@@ -97,9 +97,27 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-13T01:20:13.097459+00:00"
+  "end": "2026-11-14T01:11:47.680116+00:00"
  },
  "rows": [
+  {
+   "repo": "hiero-sdk-java",
+   "score": 8.1,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 2.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 10.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 4.0,
+   "Packaging": 10.0,
+   "SAST": 3.0
+  },
   {
    "repo": "hiero-improvement-proposals",
    "score": 8.7,
@@ -605,6 +623,6 @@
    "SAST": 8.0
   }
  ],
- "generated_at": "2026-11-13T01:20:13.097459+00:00",
+ "generated_at": "2026-11-14T01:11:47.680116+00:00",
  "stale": false
 }
