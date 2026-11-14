@@ -1,10 +1,14 @@
 """Tests for GitHub Actions workflow security checks."""
 
+import pytest
+
 from hiero_analytics.analysis.ci_health import (
     CODEQL_PATTERNS,
     check_actions_sha_pinned,
+    check_dependabot_ecosystems,
     check_explicit_permissions,
     check_repository_security_configuration,
+    detect_manifests,
     extract_action_references,
     find_permissions_with_lines,
     find_unpinned_actions,
@@ -565,3 +569,134 @@ def test_repository_security_configuration_detects_codeql_by_content():
 
     assert result.status == "review"
     assert "CodeQL workflow detected" in result.evidence
+
+
+# --- check_dependabot_ecosystems -------------------------------------------
+
+DEPENDABOT_NPM_AND_ACTIONS = """version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+"""
+
+
+def _rows_by_subject(results):
+    return {result.subject: result for result in results}
+
+
+def test_dependabot_declared_and_needed_passes() -> None:
+    """Declared ecosystems with manifests pass and cite the manifest paths."""
+    results = check_dependabot_ecosystems(
+        ["package.json"],
+        [{"name": "ci.yml", "text": "name: CI\n"}],
+        DEPENDABOT_NPM_AND_ACTIONS,
+    )
+
+    rows = _rows_by_subject(results)
+    assert set(rows) == {"npm", "github-actions"}
+    assert all(result.status == "pass" for result in results)
+    assert all(result.check == "dependabot_ecosystems" and result.band == "dependabot" for result in results)
+    assert rows["npm"].location == "package.json"
+    assert rows["github-actions"].location == ".github/workflows/ci.yml"
+
+
+def test_dependabot_needed_but_undeclared_fails() -> None:
+    """A manifest with no matching Dependabot entry is a failure."""
+    results = check_dependabot_ecosystems(
+        ["package.json", "Dockerfile", "go.mod"],
+        [],
+        DEPENDABOT_NPM_AND_ACTIONS,
+    )
+
+    rows = _rows_by_subject(results)
+    assert rows["npm"].status == "pass"
+    assert rows["docker"].status == "fail"
+    assert rows["gomod"].status == "fail"
+    assert "Dockerfile" in rows["docker"].evidence
+    assert rows["gomod"].location == "go.mod"
+    assert "github-actions" in rows
+    assert rows["github-actions"].status == "na"
+
+
+def test_dependabot_declared_but_unneeded_is_na_not_pass() -> None:
+    """Declaring an ecosystem the repo does not ship is na, never pass."""
+    results = check_dependabot_ecosystems([], [], DEPENDABOT_NPM_AND_ACTIONS)
+
+    assert {result.subject: result.status for result in results} == {
+        "github-actions": "na",
+        "npm": "na",
+    }
+
+
+def test_dependabot_missing_config_with_manifests_fails() -> None:
+    """No config file is its own finding when manifests exist."""
+    results = check_dependabot_ecosystems(["Cargo.toml", "pyproject.toml"], [], None)
+
+    assert len(results) == 1
+    assert results[0].status == "fail"
+    assert results[0].subject == "config"
+    assert results[0].location == ".github/dependabot.yml"
+    assert "cargo" in results[0].evidence
+    assert "pip" in results[0].evidence
+
+
+def test_dependabot_missing_config_without_manifests_is_na() -> None:
+    """No config and nothing to update is not applicable."""
+    results = check_dependabot_ecosystems(["README.md"], [], None)
+
+    assert [(result.status, result.subject) for result in results] == [("na", "")]
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        "updates: [unclosed",
+        "just a string",
+        "version: 2\n",
+        "version: 2\nupdates: not-a-list\n",
+        "version: 2\nupdates:\n  - directory: /\n",
+    ],
+)
+def test_dependabot_malformed_config_fails(config: str) -> None:
+    """Unparseable or structurally invalid configs fail as a config finding."""
+    results = check_dependabot_ecosystems(["package.json"], [], config)
+
+    assert len(results) == 1
+    assert results[0].status == "fail"
+    assert results[0].subject == "config"
+
+
+def test_dependabot_uv_ecosystem_covers_python_manifests() -> None:
+    """The uv ecosystem satisfies pip-style manifests."""
+    config = "version: 2\nupdates:\n  - package-ecosystem: uv\n    directory: /\n"
+    results = check_dependabot_ecosystems(["pyproject.toml", "requirements-dev.txt"], [], config)
+
+    assert [(result.subject, result.status) for result in results] == [("pip", "pass")]
+    assert results[0].location == "pyproject.toml; requirements-dev.txt"
+
+
+def test_dependabot_empty_updates_and_nothing_needed_is_na() -> None:
+    """An empty updates list in a repo with no manifests is a single na row."""
+    results = check_dependabot_ecosystems([], [], "version: 2\nupdates: []\n")
+
+    assert [(result.status, result.subject) for result in results] == [("na", "")]
+
+
+def test_detect_manifests_matches_patterns() -> None:
+    """Wildcard manifest patterns match, and unrelated files do not."""
+    detected = detect_manifests(
+        ["Dockerfile.dev", "main.tf", "requirements-test.txt", "notes.txt", "package.json.bak"],
+        [],
+    )
+
+    assert detected == {
+        "docker": ["Dockerfile.dev"],
+        "pip": ["requirements-test.txt"],
+        "terraform": ["main.tf"],
+    }

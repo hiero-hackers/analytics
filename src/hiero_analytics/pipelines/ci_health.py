@@ -6,6 +6,7 @@ import pandas as pd
 
 from hiero_analytics.analysis.ci_health import (
     check_actions_sha_pinned,
+    check_dependabot_ecosystems,
     check_explicit_permissions,
     check_repository_security_configuration,
 )
@@ -47,6 +48,11 @@ def main(org: str = ORG) -> None:
                 has_projects_enabled=record.has_projects_enabled,
                 web_commit_signoff_required=record.web_commit_signoff_required,
             ),
+            *check_dependabot_ecosystems(
+                record.root_entries,
+                record.workflows,
+                record.dependabot_config,
+            ),
         ]
 
         findings.extend(
@@ -57,6 +63,7 @@ def main(org: str = ORG) -> None:
                 "status": result.status,
                 "evidence": result.evidence,
                 "location": result.location,
+                "subject": result.subject,
             }
             for result in results
         )
@@ -70,6 +77,7 @@ def main(org: str = ORG) -> None:
             "status",
             "evidence",
             "location",
+            "subject",
         ],
     )
 

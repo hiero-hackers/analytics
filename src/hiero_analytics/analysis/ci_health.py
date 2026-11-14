@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import re
+from fnmatch import fnmatchcase
 
 import yaml
 
-from hiero_analytics.analysis.ci_health_types import CheckResult
+from hiero_analytics.analysis.ci_health_types import CheckResult, CheckStatus
 
 USES_PATTERN = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)", re.MULTILINE)
 PERMISSIONS_PATTERN = re.compile(r"^\s*permissions\s*:", re.MULTILINE)
@@ -294,3 +295,170 @@ def check_repository_security_configuration(
         evidence=(settings + ". " + "; ".join(controls) + "."),
         location="; ".join(locations),
     )
+
+
+# Dependabot ecosystem -> root-level manifest file patterns. Data, not branching:
+# supporting a new ecosystem means adding a row here. `github-actions` has no
+# root manifest; it is detected from the workflow files instead.
+ECOSYSTEM_MANIFESTS: dict[str, tuple[str, ...]] = {
+    "npm": ("package.json",),
+    "pip": ("requirements*.txt", "pyproject.toml", "setup.py", "Pipfile"),
+    "docker": ("Dockerfile", "Dockerfile.*", "*.Dockerfile"),
+    "gomod": ("go.mod",),
+    "cargo": ("Cargo.toml",),
+    "maven": ("pom.xml",),
+    "gradle": ("build.gradle", "build.gradle.kts"),
+    "composer": ("composer.json",),
+    "bundler": ("Gemfile",),
+    "swift": ("Package.swift",),
+    "terraform": ("*.tf",),
+    "pub": ("pubspec.yaml",),
+}
+GITHUB_ACTIONS_ECOSYSTEM = "github-actions"
+
+# Dependabot ecosystems that cover the same manifests as one we map above.
+ECOSYSTEM_ALIASES = {"uv": "pip"}
+
+DEPENDABOT_CHECK = "dependabot_ecosystems"
+DEPENDABOT_BAND = "dependabot"
+DEPENDABOT_CONFIG_LOCATION = ".github/dependabot.yml"
+
+
+def detect_manifests(
+    root_entries: list[str],
+    workflows: list[dict[str, str]],
+) -> dict[str, list[str]]:
+    """Return the manifest paths present in a repository, keyed by ecosystem."""
+    detected: dict[str, list[str]] = {}
+
+    for ecosystem, patterns in ECOSYSTEM_MANIFESTS.items():
+        paths = sorted(name for name in root_entries if any(fnmatchcase(name, pattern) for pattern in patterns))
+        if paths:
+            detected[ecosystem] = paths
+
+    if workflows:
+        detected[GITHUB_ACTIONS_ECOSYSTEM] = sorted(f".github/workflows/{workflow['name']}" for workflow in workflows)
+
+    return detected
+
+
+def parse_dependabot_ecosystems(config_text: str) -> set[str] | None:
+    """Return the ecosystems declared in a Dependabot config, or None if it is malformed."""
+    try:
+        config = yaml.safe_load(config_text)
+    except yaml.YAMLError:
+        return None
+
+    if not isinstance(config, dict):
+        return None
+
+    updates = config.get("updates")
+
+    if not isinstance(updates, list):
+        return None
+
+    declared: set[str] = set()
+
+    for update in updates:
+        if not isinstance(update, dict):
+            return None
+
+        ecosystem = update.get("package-ecosystem")
+
+        if not isinstance(ecosystem, str) or not ecosystem:
+            return None
+
+        declared.add(ECOSYSTEM_ALIASES.get(ecosystem, ecosystem))
+
+    return declared
+
+
+def _dependabot_result(
+    status: CheckStatus,
+    evidence: str,
+    location: str = "",
+    subject: str = "",
+) -> CheckResult:
+    return CheckResult(
+        check=DEPENDABOT_CHECK,
+        band=DEPENDABOT_BAND,
+        status=status,
+        evidence=evidence,
+        location=location,
+        subject=subject,
+    )
+
+
+def check_dependabot_ecosystems(
+    root_entries: list[str],
+    workflows: list[dict[str, str]],
+    dependabot_config: str | None,
+) -> list[CheckResult]:
+    """Cross-check the ecosystems Dependabot covers against the manifests a repo ships.
+
+    Emits one row per ecosystem that is either present or declared. A missing or
+    malformed config is its own finding. Ecosystems with no manifests report
+    `na`, never `pass`.
+    """
+    manifests = detect_manifests(root_entries, workflows)
+
+    if dependabot_config is None:
+        if not manifests:
+            return [_dependabot_result("na", "No supported ecosystem manifests and no Dependabot config.")]
+
+        return [
+            _dependabot_result(
+                "fail",
+                "No Dependabot config found, but manifests exist for: " + ", ".join(sorted(manifests)) + ".",
+                DEPENDABOT_CONFIG_LOCATION,
+                subject="config",
+            )
+        ]
+
+    declared = parse_dependabot_ecosystems(dependabot_config)
+
+    if declared is None:
+        return [
+            _dependabot_result(
+                "fail",
+                "Dependabot config could not be parsed or has no valid `updates` entries.",
+                DEPENDABOT_CONFIG_LOCATION,
+                subject="config",
+            )
+        ]
+
+    results: list[CheckResult] = []
+
+    for ecosystem in sorted(set(manifests) | declared):
+        paths = manifests.get(ecosystem, [])
+        location = "; ".join(paths)
+
+        if paths and ecosystem in declared:
+            results.append(
+                _dependabot_result(
+                    "pass", f"Declared in Dependabot; manifests: {', '.join(paths)}.", location, ecosystem
+                )
+            )
+        elif paths:
+            results.append(
+                _dependabot_result(
+                    "fail",
+                    f"Not declared in Dependabot, but manifests exist: {', '.join(paths)}.",
+                    location,
+                    ecosystem,
+                )
+            )
+        else:
+            results.append(
+                _dependabot_result(
+                    "na",
+                    "Declared in Dependabot, but no manifests found at the repository root.",
+                    DEPENDABOT_CONFIG_LOCATION,
+                    ecosystem,
+                )
+            )
+
+    if not results:
+        results.append(_dependabot_result("na", "Dependabot config declares no ecosystems and none are needed."))
+
+    return results

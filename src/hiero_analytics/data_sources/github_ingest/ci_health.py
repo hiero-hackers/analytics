@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from hiero_analytics.data_sources.cache import (
     load_records_cache,
@@ -12,6 +12,7 @@ from hiero_analytics.data_sources.github_client import GitHubClient
 from hiero_analytics.data_sources.queries import load_query
 
 CI_HEALTH_CACHE_KEY = "ci_health"
+DEPENDABOT_CONFIG_NAMES = ("dependabot.yml", "dependabot.yaml")
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,8 @@ class CIHealthRecord:
     has_discussions_enabled: bool
     has_projects_enabled: bool
     web_commit_signoff_required: bool
+    root_entries: list[str] = field(default_factory=list)
+    dependabot_config: str | None = None
 
 
 def fetch_repo_ci_health_graphql(
@@ -39,6 +42,8 @@ def fetch_repo_ci_health_graphql(
     parameters: dict[str, object] = {
         "owner": owner,
         "repo": repo,
+        # Bumped when the record gains fields, so older cache files are refetched.
+        "schema": 2,
     }
     scope = f"{owner}/{repo}"
 
@@ -66,8 +71,16 @@ def fetch_repo_ci_health_graphql(
 
     tree = repository.get("object") or {}
     workflows: list[dict[str, str]] = []
+    dependabot_config: str | None = None
+
+    root_tree = repository.get("root") or {}
+    root_entries = [name for entry in root_tree.get("entries") or [] if (name := entry.get("name"))]
 
     for entry in tree.get("entries") or []:
+        if entry.get("name") in DEPENDABOT_CONFIG_NAMES and dependabot_config is None:
+            dependabot_config = (entry.get("object") or {}).get("text")
+            continue
+
         if entry.get("name") != "workflows":
             continue
 
@@ -114,6 +127,8 @@ def fetch_repo_ci_health_graphql(
         has_discussions_enabled=bool(repository.get("hasDiscussionsEnabled")),
         has_projects_enabled=bool(repository.get("hasProjectsEnabled")),
         web_commit_signoff_required=bool(repository.get("webCommitSignoffRequired")),
+        root_entries=root_entries,
+        dependabot_config=dependabot_config,
     )
 
     save_records_cache(
