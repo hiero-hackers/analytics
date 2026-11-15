@@ -52,11 +52,11 @@
   "hiero-sdk-go",
   "hiero-sdk-java",
   "hiero-solo-action",
-  "hiero-sdk-cpp",
   "hiero-sdk-python",
   "hiero-sdk-tck",
-  "hiero-sdk-swift",
+  "hiero-sdk-cpp",
   "hiero-sdk-rust",
+  "hiero-sdk-swift",
   "hiero-cli",
   "hiero-did-sdk-js",
   "hiero-local-node",
@@ -69,27 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-11-14T01:12:49.249422+00:00"
+  "end": "2026-11-15T01:10:14.334385+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-sdk-cpp",
-   "time": "2025-05-15T10:41:09Z",
-   "tag_name": "v0.40.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-consensus-node",
-   "time": "2025-05-15T20:02:35Z",
-   "tag_name": "v0.61.7",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-swift",
-   "time": "2025-05-15T20:46:06Z",
-   "tag_name": "v0.38.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-block-node",
    "time": "2025-05-16T15:07:54Z",
@@ -5275,6 +5257,6 @@
    "type": "prerelease"
   }
  ],
- "generated_at": "2026-11-14T01:12:49.249422+00:00",
+ "generated_at": "2026-11-15T01:10:14.334385+00:00",
  "stale": false
 }

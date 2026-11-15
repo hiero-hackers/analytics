@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-14T01:13:37.059230+00:00"
+  "end": "2026-11-15T01:10:57.531944+00:00"
  },
  "series": [
   {
@@ -65,7 +65,7 @@
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 37,
    "matched_prs": 196,
-   "total_prs": 3857
+   "total_prs": 3859
   },
   {
    "repo": "hiero-json-rpc-relay",
@@ -77,7 +77,7 @@
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 14,
    "matched_prs": 40,
-   "total_prs": 1302
+   "total_prs": 1303
   },
   {
    "repo": "hiero-sdk-go",
@@ -137,7 +137,7 @@
    "repo": "hiero-sdk-python",
    "distinct_hips_merged": 5,
    "matched_prs": 5,
-   "total_prs": 1100
+   "total_prs": 1101
   },
   {
    "repo": "hiero-sdk-tck",
@@ -185,19 +185,19 @@
    "repo": "hiero-docs",
    "distinct_hips_merged": 1,
    "matched_prs": 1,
-   "total_prs": 68
-  },
-  {
-   "repo": "hiero-gradle-conventions",
-   "distinct_hips_merged": 0,
-   "matched_prs": 0,
-   "total_prs": 428
+   "total_prs": 69
   },
   {
    "repo": "hiero-cryptography",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 424
+   "total_prs": 425
+  },
+  {
+   "repo": "hiero-gradle-conventions",
+   "distinct_hips_merged": 0,
+   "matched_prs": 0,
+   "total_prs": 413
   },
   {
    "repo": "hiero-enterprise-java",
@@ -308,6 +308,6 @@
    "total_prs": 3
   }
  ],
- "generated_at": "2026-11-14T01:13:37.059230+00:00",
+ "generated_at": "2026-11-15T01:10:57.531944+00:00",
  "stale": false
 }

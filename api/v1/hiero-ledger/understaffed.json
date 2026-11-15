@@ -58,7 +58,7 @@
   }
  ],
  "row_count": 3,
- "generated_at": "2026-11-14T01:11:36.654024+00:00",
+ "generated_at": "2026-11-15T01:09:10.828854+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -196,6 +196,13 @@
     "triage": 1
    },
    {
+    "repo": "hiero-ethereum-execution-spec-tests",
+    "maintainers": 12,
+    "active_maintainers": 0,
+    "committers": 13,
+    "triage": 0
+   },
+   {
     "repo": ".github",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -217,6 +224,13 @@
     "triage": 0
    },
    {
+    "repo": "hiero-hederium",
+    "maintainers": 2,
+    "active_maintainers": 1,
+    "committers": 0,
+    "triage": 0
+   },
+   {
     "repo": "hiero-enterprise-java",
     "maintainers": 3,
     "active_maintainers": 1,
@@ -228,6 +242,20 @@
     "maintainers": 3,
     "active_maintainers": 1,
     "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-solo-action",
+    "maintainers": 3,
+    "active_maintainers": 1,
+    "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero-improvement-proposals",
+    "maintainers": 4,
+    "active_maintainers": 1,
+    "committers": 77,
     "triage": 0
    },
    {
@@ -245,6 +273,13 @@
     "triage": 11
    },
    {
+    "repo": "hiero-sdk-tck",
+    "maintainers": 4,
+    "active_maintainers": 1,
+    "committers": 5,
+    "triage": 8
+   },
+   {
     "repo": "heka-identity-platform",
     "maintainers": 4,
     "active_maintainers": 1,
@@ -257,13 +292,6 @@
     "active_maintainers": 1,
     "committers": 2,
     "triage": 10
-   },
-   {
-    "repo": "hiero-ethereum-execution-spec-tests",
-    "maintainers": 12,
-    "active_maintainers": 1,
-    "committers": 13,
-    "triage": 0
    }
   ],
   "30d": [

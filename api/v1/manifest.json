@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-14T01:15:17.114502+00:00",
+ "generated_at": "2026-11-15T01:12:51.234693+00:00",
  "provenance": {
-  "git_sha": "72fcaa8",
-  "data_as_of": "2026-11-14T01:01:48.235603+00:00"
+  "git_sha": "6ff90d3",
+  "data_as_of": "2026-11-15T01:01:07.460955+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-14T01:13:37.062572+00:00"
+      "generated_at": "2026-11-15T01:10:57.536514+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-14T01:13:37.059230+00:00"
+      "generated_at": "2026-11-15T01:10:57.531944+00:00"
      }
     },
     {
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 8,
+      "value": 9,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -2244,7 +2244,7 @@
      },
      {
       "label": "active last month %",
-      "value": "37%",
+      "value": "33%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -3189,7 +3189,7 @@
      },
      {
       "label": "active last month %",
-      "value": "86%",
+      "value": "71%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
