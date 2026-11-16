@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-15T01:12:51.234693+00:00",
+ "generated_at": "2026-11-16T01:16:03.531716+00:00",
  "provenance": {
   "git_sha": "6ff90d3",
-  "data_as_of": "2026-11-15T01:01:07.460955+00:00"
+  "data_as_of": "2026-11-16T01:03:50.930533+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1534,
+     "row_count": 1537,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-15T01:10:57.536514+00:00"
+      "generated_at": "2026-11-16T01:14:14.686310+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-15T01:10:57.531944+00:00"
+      "generated_at": "2026-11-16T01:14:14.683061+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1534,
+      "value": 1537,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1534
+     "count": 1537
     }
    }
   },
@@ -3189,7 +3189,7 @@
      },
      {
       "label": "active last month %",
-      "value": "71%",
+      "value": "64%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",

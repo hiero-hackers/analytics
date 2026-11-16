@@ -614,7 +614,7 @@
   }
  ],
  "row_count": 51,
- "generated_at": "2026-11-15T01:12:43.933203+00:00",
+ "generated_at": "2026-11-16T01:15:55.350400+00:00",
  "stale": false,
  "periods": {
   "7d": [
@@ -625,7 +625,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -647,7 +647,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -669,7 +669,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -691,7 +691,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -713,7 +713,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -735,7 +735,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -757,7 +757,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -779,7 +779,7 @@
     "prs_opened": 1,
     "reviews_given": 0,
     "merges_done": 0,
-    "issues_opened": 2,
+    "issues_opened": 1,
     "labels_applied": 2,
     "last_active": "2026-11-12 16:12:05+00:00"
    },
@@ -798,17 +798,6 @@
   "30d": [
    {
     "team": "clpr-e2e-committers",
-    "repo": "LFDT-CLPR/governance",
-    "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
-   },
-   {
-    "team": "clpr-e2e-committers",
     "repo": "LFDT-CLPR/clpr-spec",
     "members_active": 1,
     "prs_opened": 1,
@@ -820,14 +809,14 @@
    },
    {
     "team": "clpr-e2e-committers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-e2e-committers",
@@ -853,6 +842,17 @@
    },
    {
     "team": "clpr-e2e-committers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
+   },
+   {
+    "team": "clpr-e2e-committers",
     "repo": "LFDT-CLPR/.github",
     "members_active": 1,
     "prs_opened": 0,
@@ -861,17 +861,6 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-10-27 19:33:40+00:00"
-   },
-   {
-    "team": "clpr-endpoint-committers",
-    "repo": "LFDT-CLPR/governance",
-    "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -897,14 +886,14 @@
    },
    {
     "team": "clpr-endpoint-committers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -916,6 +905,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-09 21:10:44+00:00"
+   },
+   {
+    "team": "clpr-endpoint-committers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "clpr-endpoint-committers",
@@ -932,8 +932,8 @@
     "team": "clpr-maintainers",
     "repo": "LFDT-CLPR/governance",
     "members_active": 2,
-    "prs_opened": 6,
-    "reviews_given": 4,
+    "prs_opened": 5,
+    "reviews_given": 2,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0,
@@ -963,17 +963,6 @@
    },
    {
     "team": "clpr-maintainers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
-    "members_active": 1,
-    "prs_opened": 1,
-    "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
-    "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
-   },
-   {
-    "team": "clpr-maintainers",
     "repo": "LFDT-CLPR/clpr-website",
     "members_active": 1,
     "prs_opened": 0,
@@ -995,15 +984,15 @@
     "last_active": "2026-11-06 18:47:04+00:00"
    },
    {
-    "team": "clpr-release-engineers",
-    "repo": "LFDT-CLPR/governance",
+    "team": "clpr-maintainers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
     "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
     "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -1018,14 +1007,14 @@
    },
    {
     "team": "clpr-release-engineers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -1048,6 +1037,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:47:04+00:00"
+   },
+   {
+    "team": "clpr-release-engineers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "clpr-release-engineers",
@@ -1074,9 +1074,9 @@
    {
     "team": "clpr-smart-contracts-committers",
     "repo": "LFDT-CLPR/clpr-smart-contracts",
-    "members_active": 4,
+    "members_active": 3,
     "prs_opened": 1,
-    "reviews_given": 7,
+    "reviews_given": 5,
     "merges_done": 1,
     "issues_opened": 1,
     "labels_applied": 0,
@@ -1087,7 +1087,7 @@
     "repo": "LFDT-CLPR/governance",
     "members_active": 1,
     "prs_opened": 2,
-    "reviews_given": 3,
+    "reviews_given": 1,
     "merges_done": 0,
     "issues_opened": 2,
     "labels_applied": 0,
@@ -1128,17 +1128,6 @@
    },
    {
     "team": "clpr-spec-committers",
-    "repo": "LFDT-CLPR/governance",
-    "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
-   },
-   {
-    "team": "clpr-spec-committers",
     "repo": "LFDT-CLPR/clpr-spec",
     "members_active": 1,
     "prs_opened": 1,
@@ -1150,14 +1139,14 @@
    },
    {
     "team": "clpr-spec-committers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-spec-committers",
@@ -1180,6 +1169,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:47:04+00:00"
+   },
+   {
+    "team": "clpr-spec-committers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "clpr-spec-committers",
@@ -1205,17 +1205,6 @@
    },
    {
     "team": "clpr-website-committers",
-    "repo": "LFDT-CLPR/governance",
-    "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
-   },
-   {
-    "team": "clpr-website-committers",
     "repo": "LFDT-CLPR/clpr-spec",
     "members_active": 1,
     "prs_opened": 1,
@@ -1227,14 +1216,14 @@
    },
    {
     "team": "clpr-website-committers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "clpr-website-committers",
@@ -1246,6 +1235,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:47:04+00:00"
+   },
+   {
+    "team": "clpr-website-committers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "clpr-website-committers",
@@ -1262,9 +1262,9 @@
     "team": "lfdt-staff",
     "repo": "LFDT-CLPR/governance",
     "members_active": 2,
-    "prs_opened": 3,
-    "reviews_given": 9,
-    "merges_done": 9,
+    "prs_opened": 2,
+    "reviews_given": 7,
+    "merges_done": 7,
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:04:41+00:00"
@@ -1282,17 +1282,6 @@
    },
    {
     "team": "security-maintainers",
-    "repo": "LFDT-CLPR/governance",
-    "members_active": 1,
-    "prs_opened": 2,
-    "reviews_given": 3,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 0,
-    "last_active": "2026-11-05 21:38:27+00:00"
-   },
-   {
-    "team": "security-maintainers",
     "repo": "LFDT-CLPR/clpr-spec",
     "members_active": 1,
     "prs_opened": 1,
@@ -1304,14 +1293,14 @@
    },
    {
     "team": "security-maintainers",
-    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "repo": "LFDT-CLPR/governance",
     "members_active": 1,
-    "prs_opened": 1,
+    "prs_opened": 2,
     "reviews_given": 1,
-    "merges_done": 1,
-    "issues_opened": 0,
+    "merges_done": 0,
+    "issues_opened": 2,
     "labels_applied": 0,
-    "last_active": "2026-11-06 19:27:10+00:00"
+    "last_active": "2026-11-05 21:38:27+00:00"
    },
    {
     "team": "security-maintainers",
@@ -1334,6 +1323,17 @@
     "issues_opened": 0,
     "labels_applied": 0,
     "last_active": "2026-11-06 18:47:04+00:00"
+   },
+   {
+    "team": "security-maintainers",
+    "repo": "LFDT-CLPR/clpr-smart-contracts",
+    "members_active": 1,
+    "prs_opened": 1,
+    "reviews_given": 0,
+    "merges_done": 1,
+    "issues_opened": 0,
+    "labels_applied": 0,
+    "last_active": "2026-11-06 19:27:10+00:00"
    },
    {
     "team": "security-maintainers",
