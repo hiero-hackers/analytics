@@ -99,6 +99,17 @@ jobs:
             location="repository settings",
         ),
     )
+    monkeypatch.setattr(
+        ci_health,
+        "check_docker_pinning",
+        lambda _dockerfiles, _discovery_complete: CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="fail",
+            evidence=("Found 1 Dockerfile base image reference(s) that are not pinned to a digest: python:3.11"),
+            location="Dockerfile:1",
+        ),
+    )
 
     save_dataframe = Mock()
     monkeypatch.setattr(ci_health, "save_dataframe", save_dataframe)
@@ -141,6 +152,14 @@ jobs:
                     "CodeQL workflow not detected."
                 ),
                 "location": "repository settings",
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "fail",
+                "evidence": ("Found 1 Dockerfile base image reference(s) that are not pinned to a digest: python:3.11"),
+                "location": "Dockerfile:1",
             },
         ]
     )
@@ -239,6 +258,17 @@ jobs:
             location=(".github/workflows/dco.yml; .github/workflows/codeql.yml"),
         ),
     )
+    monkeypatch.setattr(
+        ci_health,
+        "check_docker_pinning",
+        lambda _dockerfiles, _discovery_complete: CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="pass",
+            evidence="All external base images are pinned by digest.",
+            location="",
+        ),
+    )
 
     save_dataframe = Mock()
     monkeypatch.setattr(ci_health, "save_dataframe", save_dataframe)
@@ -279,6 +309,14 @@ jobs:
                     "CodeQL workflow detected: codeql.yml."
                 ),
                 "location": (".github/workflows/dco.yml; .github/workflows/codeql.yml"),
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "docker_pinning",
+                "band": "docker",
+                "status": "pass",
+                "evidence": "All external base images are pinned by digest.",
+                "location": "",
             },
         ]
     )

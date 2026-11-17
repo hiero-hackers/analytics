@@ -3,9 +3,11 @@
 from hiero_analytics.analysis.ci_health import (
     CODEQL_PATTERNS,
     check_actions_sha_pinned,
+    check_docker_pinning,
     check_explicit_permissions,
     check_repository_security_configuration,
     extract_action_references,
+    find_dockerfile_base_images_with_lines,
     find_permissions_with_lines,
     find_unpinned_actions,
     find_unpinned_actions_with_lines,
@@ -565,3 +567,166 @@ def test_repository_security_configuration_detects_codeql_by_content():
 
     assert result.status == "review"
     assert "CodeQL workflow detected" in result.evidence
+
+
+def test_find_dockerfile_base_images_with_lines_digest_and_tags() -> None:
+    """Classify tagged images, full digests, and partial digests."""
+    full_sha = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    dockerfile = f"""FROM python:3.11
+FROM alpine@sha256:{full_sha}
+FROM node:20@sha256:deadbeef
+"""
+    findings = find_dockerfile_base_images_with_lines(dockerfile)
+    assert len(findings) == 3
+
+    assert findings[0].reference == "python:3.11"
+    assert findings[0].classification == "unpinned"
+    assert findings[0].line_number == 1
+
+    assert findings[1].reference == f"alpine@sha256:{full_sha}"
+    assert findings[1].classification == "pinned"
+    assert findings[1].line_number == 2
+
+    assert findings[2].reference == "node:20@sha256:deadbeef"
+    assert findings[2].classification == "unpinned"
+    assert findings[2].line_number == 3
+
+
+def test_find_dockerfile_base_images_with_lines_platform_flag_and_lowercase() -> None:
+    """Ignore --platform flag and match lowercase from keyword."""
+    dockerfile = """from --platform=linux/amd64 ubuntu:22.04
+FROM --platform=$BUILDPLATFORM golang:1.21 AS builder
+"""
+    findings = find_dockerfile_base_images_with_lines(dockerfile)
+    assert len(findings) == 2
+
+    assert findings[0].reference == "ubuntu:22.04"
+    assert findings[0].classification == "unpinned"
+    assert findings[0].line_number == 1
+
+    assert findings[1].reference == "golang:1.21"
+    assert findings[1].classification == "unpinned"
+    assert findings[1].line_number == 2
+
+
+def test_find_dockerfile_base_images_with_lines_multistage_and_scratch() -> None:
+    """Skip scratch and references to earlier build stages regardless of case."""
+    dockerfile = """FROM scratch
+FROM golang:1.21 AS builder
+FROM builder AS tester
+FROM BUILDER AS runner
+"""
+    findings = find_dockerfile_base_images_with_lines(dockerfile)
+    assert len(findings) == 1
+    assert findings[0].reference == "golang:1.21"
+    assert findings[0].line_number == 2
+
+
+def test_find_dockerfile_base_images_with_lines_continuation() -> None:
+    """Report the 1-based start line when FROM instruction continues across lines."""
+    dockerfile = """# Comment line 1
+FROM \\
+  --platform=linux/amd64 \\
+  alpine:3.18
+"""
+    findings = find_dockerfile_base_images_with_lines(dockerfile)
+    assert len(findings) == 1
+    assert findings[0].reference == "alpine:3.18"
+    assert findings[0].classification == "unpinned"
+    assert findings[0].line_number == 2
+
+
+def test_find_dockerfile_base_images_with_lines_unresolved_variable() -> None:
+    """Classify references with variable expansions ($) without a full digest as unresolved."""
+    dockerfile = """FROM ${BASE_IMAGE}
+FROM ${REPO}/app@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+"""
+    findings = find_dockerfile_base_images_with_lines(dockerfile)
+    assert len(findings) == 2
+    assert findings[0].reference == "${BASE_IMAGE}"
+    assert findings[0].classification == "unresolved"
+
+    assert findings[1].classification == "pinned"
+
+
+def test_check_docker_pinning_fail_multiple_files() -> None:
+    """Fail reports the exact count, references, and '; '-joined locations in file/line order."""
+    dockerfiles = [
+        {
+            "path": "Dockerfile",
+            "text": "FROM python:3.11\nFROM alpine:3.18\n",
+        },
+        {
+            "path": "docker/app.dockerfile",
+            "text": "FROM node:20\n",
+        },
+    ]
+    result = check_docker_pinning(dockerfiles, discovery_complete=True)
+    assert result.check == "docker_pinning"
+    assert result.band == "docker"
+    assert result.status == "fail"
+    assert result.evidence == (
+        "Found 3 Dockerfile base image reference(s) that are not pinned to a digest: python:3.11, alpine:3.18, node:20"
+    )
+    assert result.location == "Dockerfile:1; Dockerfile:2; docker/app.dockerfile:1"
+
+
+def test_check_docker_pinning_pass() -> None:
+    """Pass returns empty location when all base images are pinned."""
+    full_sha = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    dockerfiles = [
+        {
+            "path": "Dockerfile",
+            "text": f"FROM alpine@sha256:{full_sha} AS base\nFROM scratch\nFROM base\n",
+        }
+    ]
+    result = check_docker_pinning(dockerfiles, discovery_complete=True)
+    assert result.status == "pass"
+    assert result.location == ""
+    assert "pinned by digest" in result.evidence
+
+
+def test_check_docker_pinning_na() -> None:
+    """Na is returned only when discovery is complete and no Dockerfiles exist."""
+    result = check_docker_pinning([], discovery_complete=True)
+    assert result.status == "na"
+    assert result.evidence == "Repository has no Dockerfiles."
+    assert result.location == ""
+
+
+def test_check_docker_pinning_review_incomplete_discovery() -> None:
+    """Incomplete discovery returns review with empty location when no unpinned references exist."""
+    result = check_docker_pinning([], discovery_complete=False)
+    assert result.status == "review"
+    assert "Dockerfile inventory could not be confirmed" in result.evidence
+    assert result.location == ""
+
+
+def test_check_docker_pinning_review_unresolved_and_unavailable() -> None:
+    """Unresolved references or unavailable content return review with reported locations."""
+    dockerfiles = [
+        {
+            "path": "Dockerfile.missing",
+            "text": None,
+        },
+        {
+            "path": "sub/Dockerfile",
+            "text": "FROM ${BASE}\n",
+        },
+    ]
+    result = check_docker_pinning(dockerfiles, discovery_complete=True)
+    assert result.status == "review"
+    assert result.location == "Dockerfile.missing; sub/Dockerfile:1"
+
+
+def test_check_docker_pinning_fail_precedence_over_incomplete_discovery() -> None:
+    """Confirmed unpinned failure takes priority over incomplete discovery."""
+    dockerfiles = [
+        {
+            "path": "Dockerfile",
+            "text": "FROM python:3.11\n",
+        }
+    ]
+    result = check_docker_pinning(dockerfiles, discovery_complete=False)
+    assert result.status == "fail"
+    assert result.location == "Dockerfile:1"

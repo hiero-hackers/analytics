@@ -6,6 +6,15 @@ query CI_HEALTH_QUERY($owner: String!, $repo: String!) {
     hasProjectsEnabled
     webCommitSignoffRequired
 
+    headCommit: object(expression: "HEAD") {
+      ... on Commit {
+        oid
+        tree {
+          oid
+        }
+      }
+    }
+
     object(expression: "HEAD:.github") {
       ... on Tree {
         entries {

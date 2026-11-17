@@ -6,6 +6,7 @@ import pandas as pd
 
 from hiero_analytics.analysis.ci_health import (
     check_actions_sha_pinned,
+    check_docker_pinning,
     check_explicit_permissions,
     check_repository_security_configuration,
 )
@@ -46,6 +47,10 @@ def main(org: str = ORG) -> None:
                 has_discussions_enabled=record.has_discussions_enabled,
                 has_projects_enabled=record.has_projects_enabled,
                 web_commit_signoff_required=record.web_commit_signoff_required,
+            ),
+            check_docker_pinning(
+                record.dockerfiles,
+                record.dockerfile_discovery_complete,
             ),
         ]
 

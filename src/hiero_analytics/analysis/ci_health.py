@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import NamedTuple
 
 import yaml
 
@@ -293,4 +294,188 @@ def check_repository_security_configuration(
         status=status,
         evidence=(settings + ". " + "; ".join(controls) + "."),
         location="; ".join(locations),
+    )
+
+
+class DockerfileFinding(NamedTuple):
+    """Classified external base-image reference from a Dockerfile."""
+
+    reference: str
+    classification: str  # "pinned", "unpinned", or "unresolved"
+    line_number: int
+
+
+def _get_dockerfile_logical_lines(dockerfile_text: str) -> list[tuple[str, int]]:
+    r"""Join backslash line continuations into logical instructions with 1-based start line.
+
+    Note: The '# escape=' parser directive is not supported. Backslash ('\') is always
+    treated as the line continuation character.
+    """
+    logical_lines: list[tuple[str, int]] = []
+    current_parts: list[str] = []
+    start_line: int | None = None
+
+    for line_number, raw_line in enumerate(dockerfile_text.splitlines(), start=1):
+        line = raw_line.strip()
+        if start_line is None:
+            if not line or line.startswith("#"):
+                continue
+            start_line = line_number
+
+        if line.endswith("\\"):
+            current_parts.append(line[:-1].rstrip())
+        else:
+            current_parts.append(line)
+            logical_lines.append((" ".join(current_parts), start_line))
+            current_parts = []
+            start_line = None
+
+    if current_parts and start_line is not None:
+        logical_lines.append((" ".join(current_parts), start_line))
+
+    return logical_lines
+
+
+def find_dockerfile_base_images_with_lines(
+    dockerfile_text: str,
+) -> list[DockerfileFinding]:
+    r"""Extract classified external base-image references with 1-based starting lines.
+
+    Note: The '# escape=' parser directive is not supported. Backslash ('\') is always
+    treated as the line continuation character.
+    """
+    findings: list[DockerfileFinding] = []
+    stages: set[str] = set()
+
+    for line, start_line in _get_dockerfile_logical_lines(dockerfile_text):
+        tokens = line.split()
+        if not tokens or tokens[0].upper() != "FROM":
+            continue
+
+        remaining = tokens[1:]
+        image_ref: str | None = None
+        after_image: list[str] = []
+
+        for idx, token in enumerate(remaining):
+            if token.startswith("--"):
+                continue
+            image_ref = token
+            after_image = remaining[idx + 1 :]
+            break
+
+        if not image_ref:
+            continue
+
+        stage_name: str | None = None
+        for idx, token in enumerate(after_image):
+            if token.upper() == "AS" and idx + 1 < len(after_image):
+                stage_name = after_image[idx + 1]
+                break
+
+        is_scratch_or_prior_stage = image_ref.lower() == "scratch" or image_ref.lower() in stages
+
+        if stage_name:
+            stages.add(stage_name.lower())
+
+        if is_scratch_or_prior_stage:
+            continue
+
+        _, _, digest = image_ref.rpartition("@")
+        if bool(re.fullmatch(r"sha256:[0-9a-fA-F]{64}", digest)):
+            classification = "pinned"
+        elif "$" in image_ref:
+            classification = "unresolved"
+        else:
+            classification = "unpinned"
+
+        findings.append(
+            DockerfileFinding(
+                reference=image_ref,
+                classification=classification,
+                line_number=start_line,
+            )
+        )
+
+    return findings
+
+
+def check_docker_pinning(
+    dockerfiles: list[dict[str, str | None]],
+    discovery_complete: bool,
+) -> CheckResult:
+    """Check whether Dockerfile external base images are pinned to immutable digests."""
+    unpinned_findings: list[tuple[str, str, int]] = []
+    uncertain_locations: list[str] = []
+    has_unresolved = False
+    has_unavailable = False
+
+    for df in dockerfiles:
+        path = df.get("path", "")
+        text = df.get("text")
+        if text is None:
+            has_unavailable = True
+            uncertain_locations.append(path)
+            continue
+
+        findings = find_dockerfile_base_images_with_lines(text)
+        for finding in findings:
+            if finding.classification == "unpinned":
+                unpinned_findings.append((finding.reference, path, finding.line_number))
+            elif finding.classification == "unresolved":
+                has_unresolved = True
+                uncertain_locations.append(f"{path}:{finding.line_number}")
+
+    # 1. Confirmed unpinned references produce fail
+    if unpinned_findings:
+        return CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="fail",
+            evidence=(
+                f"Found {len(unpinned_findings)} Dockerfile base image reference(s) "
+                "that are not pinned to a digest: " + ", ".join(ref for ref, _, _ in unpinned_findings)
+            ),
+            location="; ".join(f"{path}:{line}" for _, path, line in unpinned_findings),
+        )
+
+    # 2. Incomplete discovery produces review
+    if not discovery_complete:
+        return CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="review",
+            evidence="Dockerfile inventory could not be confirmed.",
+            location="",
+        )
+
+    # 3. Complete empty discovery produces na
+    if not dockerfiles:
+        return CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="na",
+            evidence="Repository has no Dockerfiles.",
+            location="",
+        )
+
+    # 4. Unresolved references or unavailable content produce review
+    if has_unresolved or has_unavailable:
+        return CheckResult(
+            check="docker_pinning",
+            band="docker",
+            status="review",
+            evidence=(
+                "Dockerfile base images could not be fully verified due to "
+                "unresolved references or unavailable content."
+            ),
+            location="; ".join(uncertain_locations),
+        )
+
+    # 5. Remaining cases produce pass
+    return CheckResult(
+        check="docker_pinning",
+        band="docker",
+        status="pass",
+        evidence="All external base images are pinned by digest.",
+        location="",
     )
