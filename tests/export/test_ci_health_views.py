@@ -12,10 +12,22 @@ from hiero_analytics.export.ci_health_views import build_views, ci_health_matrix
 ORG = "test-org"
 
 
+def _dependabot_row(repo: str, status: str, subject: str, evidence: str, location: str) -> dict[str, str]:
+    return {
+        "repo": repo,
+        "check": "dependabot_ecosystems",
+        "band": "dependabot",
+        "status": status,
+        "evidence": evidence,
+        "location": location,
+        "subject": subject,
+    }
+
+
 @pytest.fixture
 def ci_health_data(tmp_path: Path) -> Path:
     """A small CI health dataset covering all relevant export states."""
-    pd.DataFrame(
+    base = pd.DataFrame(
         [
             {
                 "repo": "repo-alpha",
@@ -114,7 +126,20 @@ def ci_health_data(tmp_path: Path) -> Path:
                 "location": "",
             },
         ]
-    ).to_csv(tmp_path / "ci_health_checks.csv", index=False)
+    )
+    dependabot = pd.DataFrame(
+        [
+            _dependabot_row("repo-alpha", "fail", "npm", "Not declared in Dependabot", "package.json"),
+            _dependabot_row(
+                "repo-alpha", "pass", "github-actions", "Declared in Dependabot", ".github/workflows/ci.yml"
+            ),
+            _dependabot_row("repo-beta", "na", "", "No manifests and no Dependabot config.", ""),
+            _dependabot_row("repo-gamma", "pass", "pip", "Declared in Dependabot", "pyproject.toml"),
+            _dependabot_row("repo-delta", "pass", "pip", "Declared in Dependabot", "pyproject.toml"),
+            _dependabot_row("repo-delta", "na", "docker", "Declared but no manifests", ".github/dependabot.yml"),
+        ]
+    )
+    pd.concat([base, dependabot], ignore_index=True).to_csv(tmp_path / "ci_health_checks.csv", index=False)
     return tmp_path
 
 
@@ -146,8 +171,9 @@ def test_sort_uses_review_count_then_repository_name_for_fail_ties(ci_health_dat
         "repo-gamma": ["pass", "review", "review"],
         "repo-delta": ["fail", "review", "pass"],
     }
+    frame.loc[frame["check"] == "dependabot_ecosystems", "status"] = "na"
     for repo, repo_statuses in statuses.items():
-        repo_rows = frame["repo"] == repo
+        repo_rows = (frame["repo"] == repo) & (frame["check"] != "dependabot_ecosystems")
         frame.loc[repo_rows, "status"] = repo_statuses
 
     frame.to_csv(path, index=False)
@@ -166,8 +192,9 @@ def test_matrix_adds_band_metadata_and_column_band_values(ci_health_data: Path):
         {"label": "Actions", "span": 1},
         {"label": "Permissions", "span": 1},
         {"label": "Repository", "span": 1},
+        {"label": "Dependabot", "span": 1},
     ]
-    assert [column["band"] for column in matrix["columns"]] == ["actions", "permissions", "repository"]
+    assert [column["band"] for column in matrix["columns"]] == ["actions", "permissions", "repository", "dependabot"]
 
 
 def test_missing_or_duplicate_checks_raise_value_error(ci_health_data: Path):
@@ -253,3 +280,72 @@ def test_evidence_and_location_are_passthrough_and_file_only_locations_stay_vali
     permissions = next(cell for cell in row["cells"] if cell["key"] == "explicit_permissions")
     assert permissions["status"] == "na"
     assert permissions["location"] == ""
+
+
+def _cell(matrix: dict, repo: str, key: str) -> dict:
+    row = next(row for row in matrix["rows"] if row["label"] == repo)
+    return next(cell for cell in row["cells"] if cell["key"] == key)
+
+
+def test_per_ecosystem_rows_collapse_into_one_cell_with_worst_status(ci_health_data: Path):
+    """Several dependabot rows for one repo produce a single cell: worst status, joined evidence."""
+    matrix = ci_health_matrix(ORG, ci_health_data)
+
+    assert matrix is not None
+    for row in matrix["rows"]:
+        assert [cell["key"] for cell in row["cells"]].count("dependabot_ecosystems") == 1
+
+    alpha = _cell(matrix, "repo-alpha", "dependabot_ecosystems")
+    assert alpha["status"] == "fail"
+    assert alpha["evidence"] == "npm: Not declared in Dependabot\ngithub-actions: Declared in Dependabot"
+    assert alpha["location"] == "package.json; .github/workflows/ci.yml"
+    assert set(alpha) == {"key", "label", "status", "evidence", "location"}
+
+    delta = _cell(matrix, "repo-delta", "dependabot_ecosystems")
+    assert delta["status"] == "pass"
+
+
+def test_dependabot_row_without_subject_keeps_plain_evidence(ci_health_data: Path):
+    """A subject-less row (nothing to check) is shown without a `subject:` prefix."""
+    matrix = ci_health_matrix(ORG, ci_health_data)
+
+    assert matrix is not None
+    beta = _cell(matrix, "repo-beta", "dependabot_ecosystems")
+    assert beta["status"] == "na"
+    assert beta["evidence"] == "No manifests and no Dependabot config."
+
+
+def test_missing_dependabot_rows_raise_value_error(ci_health_data: Path):
+    """Every repo needs at least one dependabot row."""
+    path = ci_health_data / "ci_health_checks.csv"
+    frame = pd.read_csv(path)
+    frame = frame[~((frame["repo"] == "repo-gamma") & (frame["check"] == "dependabot_ecosystems"))]
+    frame.to_csv(path, index=False)
+
+    with pytest.raises(ValueError, match="Expected at least one dependabot_ecosystems result for repo-gamma"):
+        ci_health_matrix(ORG, ci_health_data)
+
+
+def test_csv_without_subject_column_still_builds(ci_health_data: Path):
+    """CSVs written before the subject column existed collapse without error."""
+    path = ci_health_data / "ci_health_checks.csv"
+    frame = pd.read_csv(path).drop(columns=["subject"])
+    frame.to_csv(path, index=False)
+
+    matrix = ci_health_matrix(ORG, ci_health_data)
+
+    assert matrix is not None
+    assert _cell(matrix, "repo-alpha", "dependabot_ecosystems")["evidence"] == (
+        "Not declared in Dependabot\nDeclared in Dependabot"
+    )
+
+
+def test_unknown_dependabot_status_raises(ci_health_data: Path):
+    """Collapsing validates statuses just like single-row checks."""
+    path = ci_health_data / "ci_health_checks.csv"
+    frame = pd.read_csv(path)
+    frame.loc[frame["check"] == "dependabot_ecosystems", "status"] = "pending"
+    frame.to_csv(path, index=False)
+
+    with pytest.raises(ValueError, match="Unexpected CI health status"):
+        ci_health_matrix(ORG, ci_health_data)

@@ -42,6 +42,7 @@ jobs:
         has_discussions_enabled=False,
         has_projects_enabled=False,
         web_commit_signoff_required=False,
+        root_entries=["package.json"],
     )
 
     monkeypatch.setattr(
@@ -145,6 +146,22 @@ jobs:
         ]
     )
 
+    expected["subject"] = ""
+    dependabot_rows = pd.DataFrame(
+        [
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "dependabot_ecosystems",
+                "band": "dependabot",
+                "status": "fail",
+                "evidence": "No Dependabot config found, but manifests exist for: github-actions, npm.",
+                "location": ".github/dependabot.yml",
+                "subject": "config",
+            },
+        ]
+    )
+    expected = pd.concat([expected, dependabot_rows], ignore_index=True)
+
     pd.testing.assert_frame_equal(saved_df, expected)
 
 
@@ -184,6 +201,12 @@ jobs:
         has_discussions_enabled=False,
         has_projects_enabled=False,
         web_commit_signoff_required=True,
+        root_entries=["package.json"],
+        dependabot_config=(
+            "version: 2\nupdates:\n"
+            "  - package-ecosystem: npm\n    directory: /\n"
+            "  - package-ecosystem: github-actions\n    directory: /\n"
+        ),
     )
 
     monkeypatch.setattr(
@@ -282,5 +305,30 @@ jobs:
             },
         ]
     )
+
+    expected["subject"] = ""
+    dependabot_rows = pd.DataFrame(
+        [
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "dependabot_ecosystems",
+                "band": "dependabot",
+                "status": "pass",
+                "evidence": "Declared in Dependabot; manifests: .github/workflows/build.yml.",
+                "location": ".github/workflows/build.yml",
+                "subject": "github-actions",
+            },
+            {
+                "repo": "hiero-ledger/hiero-sdk-java",
+                "check": "dependabot_ecosystems",
+                "band": "dependabot",
+                "status": "pass",
+                "evidence": "Declared in Dependabot; manifests: package.json.",
+                "location": "package.json",
+                "subject": "npm",
+            },
+        ]
+    )
+    expected = pd.concat([expected, dependabot_rows], ignore_index=True)
 
     pd.testing.assert_frame_equal(saved_df, expected)

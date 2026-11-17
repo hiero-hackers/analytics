@@ -58,6 +58,13 @@ def test_fetch_repo_ci_health_graphql_cache_miss(monkeypatch):
                 "hasDiscussionsEnabled": False,
                 "hasProjectsEnabled": True,
                 "webCommitSignoffRequired": True,
+                "root": {
+                    "entries": [
+                        {"name": "package.json"},
+                        {"name": "Dockerfile"},
+                        {"name": ".github"},
+                    ]
+                },
                 "object": {
                     "entries": [
                         {
@@ -129,6 +136,8 @@ def test_fetch_repo_ci_health_graphql_cache_miss(monkeypatch):
         has_discussions_enabled=False,
         has_projects_enabled=True,
         web_commit_signoff_required=True,
+        root_entries=["package.json", "Dockerfile", ".github"],
+        dependabot_config="version: 2\n",
     )
 
     client.graphql.assert_called_once()
@@ -203,3 +212,60 @@ def test_fetch_repo_ci_health_graphql_empty_workflows(monkeypatch):
         has_projects_enabled=False,
         web_commit_signoff_required=False,
     )
+
+
+def test_fetch_repo_ci_health_graphql_reads_dependabot_yaml_variant(monkeypatch):
+    """Pick up the `.yaml` spelling of the Dependabot config."""
+    client = Mock()
+    client.graphql.return_value = {
+        "data": {
+            "repository": {
+                "root": {"entries": [{"name": "go.mod"}]},
+                "object": {
+                    "entries": [
+                        {
+                            "name": "dependabot.yaml",
+                            "object": {"text": "version: 2\nupdates: []\n"},
+                        }
+                    ]
+                },
+            }
+        }
+    }
+
+    monkeypatch.setattr(
+        "hiero_analytics.data_sources.github_ingest.ci_health.load_records_cache",
+        Mock(return_value=None),
+    )
+    monkeypatch.setattr(
+        "hiero_analytics.data_sources.github_ingest.ci_health.save_records_cache",
+        Mock(),
+    )
+
+    result = fetch_repo_ci_health_graphql(client, "hiero-ledger", "some-repo")
+
+    assert result is not None
+    assert result.dependabot_config == "version: 2\nupdates: []\n"
+    assert result.root_entries == ["go.mod"]
+    assert result.workflows == []
+
+
+def test_fetch_repo_ci_health_graphql_without_dependabot_or_root(monkeypatch):
+    """Missing root tree and config leave the new fields empty rather than failing."""
+    client = Mock()
+    client.graphql.return_value = {"data": {"repository": {"object": None, "root": None}}}
+
+    monkeypatch.setattr(
+        "hiero_analytics.data_sources.github_ingest.ci_health.load_records_cache",
+        Mock(return_value=None),
+    )
+    monkeypatch.setattr(
+        "hiero_analytics.data_sources.github_ingest.ci_health.save_records_cache",
+        Mock(),
+    )
+
+    result = fetch_repo_ci_health_graphql(client, "hiero-ledger", "bare-repo")
+
+    assert result is not None
+    assert result.root_entries == []
+    assert result.dependabot_config is None

@@ -399,6 +399,8 @@ def outputs_root(tmp_path_factory) -> Path:
                 has_discussions_enabled=False,
                 has_projects_enabled=False,
                 web_commit_signoff_required=True,
+                root_entries=["package.json"],
+                dependabot_config=None,
             ),
         )
         mp.setattr(
@@ -563,6 +565,14 @@ def test_data_api_emits_the_bespoke_views(outputs_root: Path):
     assert ci_health_matrix["columns"], "CI health matrix emitted with no columns"
     assert ci_health_matrix["bands"], "CI health matrix emitted with no header bands"
     assert sum(band["span"] for band in ci_health_matrix["bands"]) == len(ci_health_matrix["columns"])
+    # Dependabot ecosystems: per-ecosystem rows collapse to exactly one cell per repo,
+    # with the same cell keys as every other column.
+    assert "dependabot_ecosystems" in [column["key"] for column in ci_health_matrix["columns"]]
+    for matrix_row in ci_health_matrix["rows"]:
+        dependabot_cells = [cell for cell in matrix_row["cells"] if cell["key"] == "dependabot_ecosystems"]
+        assert len(dependabot_cells) == 1
+        assert set(dependabot_cells[0]) == {"key", "label", "status", "evidence", "location"}
+        assert dependabot_cells[0]["status"] == "fail"
 
 
 def test_data_api_ships_every_declared_chart_csv(outputs_root: Path):
