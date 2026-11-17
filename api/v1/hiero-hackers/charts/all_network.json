@@ -59,32 +59,32 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-16T01:14:33.315061+00:00"
+  "end": "2026-11-17T01:11:41.827072+00:00"
  },
  "nodes": [
   {
    "id": "analytics",
-   "active": 20,
+   "active": 19,
    "total": 31,
    "category": "Tooling / DevEx",
-   "x": 0.0019,
-   "y": 0.0574
+   "x": -0.0004,
+   "y": -0.0574
   },
   {
    "id": "hiero-enterprise-js",
    "active": 5,
    "total": 9,
    "category": "Apps / Integrations",
-   "x": 0.4799,
-   "y": -1.4907
+   "x": -0.1009,
+   "y": 1.4907
   },
   {
    "id": "sdk-automations",
    "active": 5,
    "total": 8,
    "category": "Tooling / DevEx",
-   "x": -0.4407,
-   "y": 1.4907
+   "x": 0.0926,
+   "y": -1.4907
   },
   {
    "id": "hiero-sdk-v3-prototyping",
@@ -99,8 +99,8 @@
    "active": 2,
    "total": 5,
    "category": "Other",
-   "x": -1.718,
-   "y": -0.4668
+   "x": 1.718,
+   "y": 0.0479
   },
   {
    "id": "hiero-tck-action",
@@ -115,8 +115,8 @@
    "active": 1,
    "total": 15,
    "category": "Governance",
-   "x": 1.718,
-   "y": 0.594
+   "x": -1.718,
+   "y": -0.1751
   },
   {
    "id": "hiero-notifications",
@@ -253,6 +253,6 @@
    "shared": 4
   }
  ],
- "generated_at": "2026-11-16T01:14:33.315061+00:00",
+ "generated_at": "2026-11-17T01:11:41.827072+00:00",
  "stale": false
 }

@@ -39,7 +39,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-16T01:15:55.097998+00:00"
+  "end": "2026-11-17T01:13:19.481746+00:00"
  },
  "nodes": [
   {
@@ -47,40 +47,40 @@
    "active": 3,
    "total": 15,
    "category": "EVM / smart contracts",
-   "x": -0.6972,
-   "y": 1.718
+   "x": 0.0618,
+   "y": 0.4744
+  },
+  {
+   "id": "clpr-spec",
+   "active": 2,
+   "total": 6,
+   "category": "Other",
+   "x": 1.718,
+   "y": -0.8959
   },
   {
    "id": "clpr-endpoint",
    "active": 1,
    "total": 10,
    "category": "Other",
-   "x": 0.9063,
-   "y": -1.094
+   "x": -1.5877,
+   "y": -0.7826
   },
   {
    "id": "clpr-website",
    "active": 1,
    "total": 7,
    "category": "Docs / Web",
-   "x": -1.0484,
-   "y": -1.718
+   "x": -1.718,
+   "y": 0.8959
   },
   {
    "id": "clpr-e2e",
    "active": 0,
    "total": 24,
    "category": "Other",
-   "x": -1.4972,
-   "y": 0.2322
-  },
-  {
-   "id": "clpr-spec",
-   "active": 0,
-   "total": 7,
-   "category": "Other",
-   "x": 1.4972,
-   "y": 0.8936
+   "x": -0.2036,
+   "y": -0.6877
   }
  ],
  "edges": [
@@ -96,11 +96,6 @@
   },
   {
    "source": "clpr-e2e",
-   "target": "clpr-spec",
-   "shared": 6
-  },
-  {
-   "source": "clpr-e2e",
    "target": "clpr-website",
    "shared": 6
   },
@@ -111,30 +106,30 @@
   },
   {
    "source": "clpr-endpoint",
+   "target": "clpr-website",
+   "shared": 6
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-website",
+   "shared": 6
+  },
+  {
+   "source": "clpr-e2e",
    "target": "clpr-spec",
    "shared": 6
+  },
+  {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-spec",
+   "shared": 5
   },
   {
    "source": "clpr-endpoint",
-   "target": "clpr-website",
-   "shared": 6
-  },
-  {
-   "source": "clpr-smart-contracts",
    "target": "clpr-spec",
-   "shared": 6
-  },
-  {
-   "source": "clpr-smart-contracts",
-   "target": "clpr-website",
-   "shared": 6
-  },
-  {
-   "source": "clpr-spec",
-   "target": "clpr-website",
-   "shared": 6
+   "shared": 1
   }
  ],
- "generated_at": "2026-11-16T01:15:55.097998+00:00",
+ "generated_at": "2026-11-17T01:13:19.481746+00:00",
  "stale": false
 }

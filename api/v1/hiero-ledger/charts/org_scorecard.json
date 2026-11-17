@@ -25,8 +25,8 @@
  "rank": true,
  "top_n": 15,
  "reference": {
-  "value": 7.7,
-  "label": "Org median 7.7"
+  "value": 7.4,
+  "label": "Org median 7.4"
  },
  "value_max": 10,
  "group": null,
@@ -37,7 +37,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-16T01:12:34.739638+00:00"
+  "end": "2026-11-17T01:09:40.122797+00:00"
  },
  "series": [
   {
@@ -50,7 +50,7 @@
  "rows": [
   {
    "repo": "hiero-sdk-java",
-   "score": 8.1
+   "score": 8.3
   },
   {
    "repo": "hiero-improvement-proposals",
@@ -62,7 +62,7 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "score": 8.4
+   "score": 8.3
   },
   {
    "repo": "hiero-cli",
@@ -70,11 +70,15 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "score": 7.9
+   "score": 8.6
   },
   {
    "repo": "hiero-sdk-swift",
    "score": 7.1
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "score": 7.4
   },
   {
    "repo": "hiero-docs",
@@ -82,7 +86,7 @@
   },
   {
    "repo": "hiero-local-node",
-   "score": 7.1
+   "score": 7.0
   },
   {
    "repo": "hiero-sdk-rust",
@@ -94,7 +98,7 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "score": 8.8
+   "score": 8.9
   },
   {
    "repo": "hiero-sdk-tck",
@@ -126,7 +130,7 @@
   },
   {
    "repo": "hiero-sdk-python",
-   "score": 9.3
+   "score": 9.4
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -139,6 +143,10 @@
   {
    "repo": "hiero-did-sdk-python",
    "score": 5.8
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "score": 5.7
   },
   {
    "repo": "hiero-did-sdk-js",
@@ -165,6 +173,6 @@
    "score": 8.2
   }
  ],
- "generated_at": "2026-11-16T01:12:34.739638+00:00",
+ "generated_at": "2026-11-17T01:09:40.122797+00:00",
  "stale": false
 }

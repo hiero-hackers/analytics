@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-16T01:15:52.180881+00:00"
+  "end": "2026-11-17T01:13:16.139542+00:00"
  },
  "series": [
   {
@@ -68,8 +68,22 @@
    "maintainer": 2
   },
   {
+   "repo": "clpr-spec",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 1
+  },
+  {
    "repo": "governance",
    "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
+  },
+  {
+   "repo": ".github",
+   "general_user": 2,
    "triage": 0,
    "committer": 0,
    "maintainer": 2
@@ -82,27 +96,13 @@
    "maintainer": 2
   },
   {
-   "repo": ".github",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": "clpr-spec",
-   "general_user": 3,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
    "repo": "clpr-website",
-   "general_user": 0,
+   "general_user": 1,
    "triage": 0,
    "committer": 1,
    "maintainer": 1
   }
  ],
- "generated_at": "2026-11-16T01:15:52.180881+00:00",
+ "generated_at": "2026-11-17T01:13:16.139542+00:00",
  "stale": false
 }

@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-16T01:14:14.683061+00:00"
+  "end": "2026-11-17T01:11:27.155740+00:00"
  },
  "series": [
   {
@@ -59,43 +59,43 @@
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
    "matched_prs": 233,
-   "total_prs": 5629
+   "total_prs": 5647
   },
   {
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 38,
    "matched_prs": 197,
-   "total_prs": 3865
+   "total_prs": 3866
+  },
+  {
+   "repo": "hiero-sdk-js",
+   "distinct_hips_merged": 15,
+   "matched_prs": 41,
+   "total_prs": 1308
   },
   {
    "repo": "hiero-json-rpc-relay",
    "distinct_hips_merged": 14,
    "matched_prs": 16,
-   "total_prs": 1478
-  },
-  {
-   "repo": "hiero-sdk-js",
-   "distinct_hips_merged": 14,
-   "matched_prs": 40,
-   "total_prs": 1305
+   "total_prs": 1479
   },
   {
    "repo": "hiero-sdk-go",
    "distinct_hips_merged": 14,
    "matched_prs": 25,
-   "total_prs": 502
+   "total_prs": 505
   },
   {
    "repo": "solo",
    "distinct_hips_merged": 13,
    "matched_prs": 13,
-   "total_prs": 2605
+   "total_prs": 2607
   },
   {
    "repo": "hiero-sdk-java",
    "distinct_hips_merged": 13,
    "matched_prs": 28,
-   "total_prs": 653
+   "total_prs": 673
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -131,13 +131,13 @@
    "repo": "hiero-block-node",
    "distinct_hips_merged": 5,
    "matched_prs": 11,
-   "total_prs": 1761
+   "total_prs": 1768
   },
   {
    "repo": "hiero-sdk-python",
    "distinct_hips_merged": 5,
    "matched_prs": 5,
-   "total_prs": 1103
+   "total_prs": 1106
   },
   {
    "repo": "hiero-sdk-tck",
@@ -149,7 +149,7 @@
    "repo": "hiero-website",
    "distinct_hips_merged": 4,
    "matched_prs": 4,
-   "total_prs": 436
+   "total_prs": 433
   },
   {
    "repo": "hiero-contracts",
@@ -182,6 +182,12 @@
    "total_prs": 266
   },
   {
+   "repo": "solo-charts",
+   "distinct_hips_merged": 1,
+   "matched_prs": 1,
+   "total_prs": 113
+  },
+  {
    "repo": "hiero-docs",
    "distinct_hips_merged": 1,
    "matched_prs": 1,
@@ -209,25 +215,19 @@
    "repo": "solo-docs",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 201
+   "total_prs": 202
   },
   {
    "repo": "heka-identity-platform",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 154
+   "total_prs": 155
   },
   {
    "repo": "solo-containers",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
    "total_prs": 118
-  },
-  {
-   "repo": "solo-charts",
-   "distinct_hips_merged": 0,
-   "matched_prs": 0,
-   "total_prs": 113
   },
   {
    "repo": "hiero-hederium",
@@ -308,6 +308,6 @@
    "total_prs": 3
   }
  ],
- "generated_at": "2026-11-16T01:14:14.683061+00:00",
+ "generated_at": "2026-11-17T01:11:27.155740+00:00",
  "stale": false
 }

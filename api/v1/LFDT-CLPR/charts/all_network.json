@@ -44,7 +44,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-16T01:15:52.330313+00:00"
+  "end": "2026-11-17T01:13:16.245748+00:00"
  },
  "nodes": [
   {
@@ -52,15 +52,23 @@
    "active": 8,
    "total": 8,
    "category": "EVM / smart contracts",
-   "x": 1.6664,
-   "y": -0.4117
+   "x": 0.6172,
+   "y": -0.9922
+  },
+  {
+   "id": "clpr-spec",
+   "active": 5,
+   "total": 5,
+   "category": "Other",
+   "x": 1.6799,
+   "y": 0.5389
   },
   {
    "id": "governance",
    "active": 5,
    "total": 5,
    "category": "Governance",
-   "x": 0.6735,
+   "x": -0.7763,
    "y": -1.8247
   },
   {
@@ -68,32 +76,24 @@
    "active": 4,
    "total": 4,
    "category": "Governance",
-   "x": -0.7672,
-   "y": -1.1059
+   "x": -1.6799,
+   "y": -0.6232
   },
   {
    "id": "clpr-endpoint",
    "active": 4,
    "total": 4,
    "category": "Other",
-   "x": 0.2261,
-   "y": 0.7525
-  },
-  {
-   "id": "clpr-spec",
-   "active": 4,
-   "total": 4,
-   "category": "Other",
-   "x": 1.7491,
-   "y": 1.8247
+   "x": -0.074,
+   "y": 0.6
   },
   {
    "id": "clpr-website",
-   "active": 2,
-   "total": 2,
+   "active": 3,
+   "total": 3,
    "category": "Docs / Web",
-   "x": -1.7491,
-   "y": 1.3438
+   "x": -1.4866,
+   "y": 1.8247
   }
  ],
  "edges": [
@@ -118,13 +118,13 @@
    "shared": 3
   },
   {
-   "source": "clpr-endpoint",
+   "source": "clpr-smart-contracts",
    "target": "clpr-spec",
-   "shared": 2
+   "shared": 3
   },
   {
    "source": "clpr-endpoint",
-   "target": "governance",
+   "target": "clpr-spec",
    "shared": 2
   },
   {
@@ -133,8 +133,8 @@
    "shared": 2
   },
   {
-   "source": "clpr-smart-contracts",
-   "target": "clpr-spec",
+   "source": "clpr-endpoint",
+   "target": "governance",
    "shared": 2
   },
   {
@@ -173,6 +173,6 @@
    "shared": 1
   }
  ],
- "generated_at": "2026-11-16T01:15:52.330313+00:00",
+ "generated_at": "2026-11-17T01:13:16.245748+00:00",
  "stale": false
 }

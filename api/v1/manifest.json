@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-16T01:16:03.531716+00:00",
+ "generated_at": "2026-11-17T01:13:28.357302+00:00",
  "provenance": {
   "git_sha": "6ff90d3",
-  "data_as_of": "2026-11-16T01:03:50.930533+00:00"
+  "data_as_of": "2026-11-17T01:01:46.633911+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1537,
+     "row_count": 1538,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -425,7 +425,7 @@
      "id": "loadshare",
      "macro": "Governance",
      "title": "Who carries the review load",
-     "row_count": 39,
+     "row_count": 40,
      "path": "hiero-ledger/loadshare.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-16T01:14:14.686310+00:00"
+      "generated_at": "2026-11-17T01:11:27.158157+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-16T01:14:14.683061+00:00"
+      "generated_at": "2026-11-17T01:11:27.155740+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1537,
+      "value": 1538,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1558,7 +1558,7 @@
      },
      {
       "label": "active last month %",
-      "value": "11%",
+      "value": "10%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -1603,7 +1603,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "22%",
+      "value": "23%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1537
+     "count": 1538
     }
    }
   },
@@ -2350,7 +2350,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 14,
+     "row_count": 15,
      "path": "LFDT-CLPR/profiles.json"
     },
     {
@@ -2385,14 +2385,14 @@
      "id": "gonedark",
      "macro": "Governance",
      "title": "Permission-holders with no recent activity",
-     "row_count": 21,
+     "row_count": 20,
      "path": "LFDT-CLPR/gonedark.json"
     },
     {
      "id": "repo",
      "macro": "Governance",
      "title": "Roles and recent activity by repo",
-     "row_count": 84,
+     "row_count": 89,
      "path": "LFDT-CLPR/repo.json"
     },
     {
@@ -2427,7 +2427,7 @@
      "id": "committeraffiliations",
      "macro": "Governance",
      "title": "Committer affiliations \u2014 reference",
-     "row_count": 26,
+     "row_count": 25,
      "path": "LFDT-CLPR/committeraffiliations.json",
      "absorbed_by": "affiliations"
     },
@@ -2851,6 +2851,32 @@
         "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
         "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
        ]
+      },
+      {
+       "title": "Triage",
+       "variants": [
+        {
+         "label": "Triage",
+         "interactive": {
+          "kind": "network",
+          "path": "LFDT-CLPR/charts/triage_network.json"
+         },
+         "note": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos are linked when they share a triage holder (thicker line = more shared). Bubble colour is the repo's category.",
+         "methodology": [
+          "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+          "Make each repository a node, sized by how many holders of that role it has.",
+          "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+          "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+         ]
+        }
+       ],
+       "note": "Each bubble is a repository, sized by how many triage-role holders are active in it; two repos are linked when they share a triage holder (thicker line = more shared). Bubble colour is the repo's category.",
+       "methodology": [
+        "Resolve who holds the role in each repository from the governance config's team\u2192permission grants (maintain/admin \u2192 maintainer, write \u2192 committer, triage \u2192 triage).",
+        "Make each repository a node, sized by how many holders of that role it has.",
+        "Link two repositories when they share role-holders; thickness is how many they share. Edges use all holders, active or not, so shared ownership shows even where the group is quiet.",
+        "Colour nodes by repository type, and thin links with a minimum-shared threshold so the graph stays legible."
+       ]
       }
      ],
      "slideshow": true,
@@ -3179,7 +3205,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 14,
+      "value": 15,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -3189,7 +3215,7 @@
      },
      {
       "label": "active last month %",
-      "value": "64%",
+      "value": "67%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -3198,7 +3224,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "36%",
+      "value": "40%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -3207,7 +3233,7 @@
      },
      {
       "label": "file issues %",
-      "value": "43%",
+      "value": "47%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3216,7 +3242,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "64%",
+      "value": "67%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -3225,7 +3251,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "64%",
+      "value": "67%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -3256,7 +3282,7 @@
      },
      {
       "label": "committers",
-      "value": 26,
+      "value": 25,
       "note": "People whose highest role anywhere is committer (write access, but not maintainer).",
       "methodology": [
        "Resolve every person's role per repository from the governance config's team\u2192permission grants.",
@@ -3296,7 +3322,7 @@
      },
      {
       "label": "quiet permission-holders (180d+)",
-      "value": 21,
+      "value": 20,
       "note": "People holding a granted role who have had no tracked activity for 180 days or more \u2014 an access-hygiene list, not a judgement about the people on it.",
       "methodology": [
        "Take everyone holding a triage, committer, or maintainer role in any repository.",
@@ -3334,7 +3360,7 @@
     },
     "contributors": {
      "path": "LFDT-CLPR/entities/contributors.json",
-     "count": 14
+     "count": 15
     }
    }
   }
