@@ -260,9 +260,7 @@ def test_freshness_uses_fetched_at_even_when_content_watermark_does_not_advance(
         ([{"name": "issues.json", "fetched_at": "not-a-timestamp"}], True),
     ],
 )
-def test_unknown_source_freshness_is_not_reported_as_fresh(
-    tmp_path: Path, source_datasets, expected_stale: bool
-):
+def test_unknown_source_freshness_is_not_reported_as_fresh(tmp_path: Path, source_datasets, expected_stale: bool):
     """Missing sources use generated_at; incomplete source metadata is stale."""
     csv_path = tmp_path / "widgets.csv"
     generated_at = datetime.now(UTC).isoformat()
@@ -280,6 +278,7 @@ def test_unknown_source_freshness_is_not_reported_as_fresh(
 
     assert freshness["generated_at"] == generated_at
     assert freshness["stale"] is expected_stale
+
 
 def test_missing_declared_column_fails_loudly(api_env: Path):
     """The column contract: a renamed CSV column is an error, not a blank."""
