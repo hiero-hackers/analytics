@@ -58,16 +58,28 @@
  ],
  "rows": [
   {
+   "team": "lfdt-staff",
+   "members": 3,
+   "active_members": 2,
+   "status": "active",
+   "days_since_active": 1,
+   "prs_opened": 16,
+   "reviews_given": 19,
+   "merges_done": 20,
+   "issues_opened": 9,
+   "labels_applied": 13
+  },
+  {
    "team": "clpr-e2e-committers",
    "members": 6,
    "active_members": 1,
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 8,
-   "reviews_given": 10,
-   "merges_done": 4,
-   "issues_opened": 5,
-   "labels_applied": 3
+   "reviews_given": 11,
+   "merges_done": 5,
+   "issues_opened": 8,
+   "labels_applied": 9
   },
   {
    "team": "clpr-endpoint-committers",
@@ -76,10 +88,10 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 8,
-   "reviews_given": 14,
-   "merges_done": 4,
-   "issues_opened": 5,
-   "labels_applied": 3
+   "reviews_given": 15,
+   "merges_done": 5,
+   "issues_opened": 8,
+   "labels_applied": 9
   },
   {
    "team": "clpr-maintainers",
@@ -88,10 +100,10 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 13,
-   "reviews_given": 15,
-   "merges_done": 5,
-   "issues_opened": 10,
-   "labels_applied": 7
+   "reviews_given": 16,
+   "merges_done": 6,
+   "issues_opened": 13,
+   "labels_applied": 13
   },
   {
    "team": "clpr-release-engineers",
@@ -100,10 +112,10 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 8,
-   "reviews_given": 10,
-   "merges_done": 4,
-   "issues_opened": 5,
-   "labels_applied": 3
+   "reviews_given": 11,
+   "merges_done": 5,
+   "issues_opened": 8,
+   "labels_applied": 9
   },
   {
    "team": "clpr-smart-contracts-committers",
@@ -112,10 +124,10 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 10,
-   "reviews_given": 25,
-   "merges_done": 4,
-   "issues_opened": 7,
-   "labels_applied": 3
+   "reviews_given": 26,
+   "merges_done": 5,
+   "issues_opened": 10,
+   "labels_applied": 9
   },
   {
    "team": "clpr-spec-committers",
@@ -124,10 +136,10 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 10,
-   "reviews_given": 29,
-   "merges_done": 4,
-   "issues_opened": 7,
-   "labels_applied": 3
+   "reviews_given": 30,
+   "merges_done": 5,
+   "issues_opened": 10,
+   "labels_applied": 9
   },
   {
    "team": "clpr-website-committers",
@@ -135,23 +147,11 @@
    "active_members": 2,
    "status": "active",
    "days_since_active": 0,
-   "prs_opened": 11,
-   "reviews_given": 11,
-   "merges_done": 8,
-   "issues_opened": 5,
-   "labels_applied": 3
-  },
-  {
-   "team": "lfdt-staff",
-   "members": 3,
-   "active_members": 2,
-   "status": "active",
-   "days_since_active": 0,
-   "prs_opened": 16,
-   "reviews_given": 19,
-   "merges_done": 20,
-   "issues_opened": 9,
-   "labels_applied": 13
+   "prs_opened": 12,
+   "reviews_given": 12,
+   "merges_done": 9,
+   "issues_opened": 8,
+   "labels_applied": 9
   },
   {
    "team": "security-maintainers",
@@ -160,107 +160,23 @@
    "status": "active",
    "days_since_active": 0,
    "prs_opened": 8,
-   "reviews_given": 10,
-   "merges_done": 4,
-   "issues_opened": 5,
-   "labels_applied": 3
+   "reviews_given": 11,
+   "merges_done": 5,
+   "issues_opened": 8,
+   "labels_applied": 9
   }
  ],
  "row_count": 9,
- "generated_at": "2026-11-17T01:13:19.692669+00:00",
+ "generated_at": "2026-11-18T01:12:55.978656+00:00",
  "stale": false,
  "periods": {
   "7d": [
-   {
-    "team": "clpr-e2e-committers",
-    "members": 6,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-endpoint-committers",
-    "members": 5,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-maintainers",
-    "members": 3,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-release-engineers",
-    "members": 5,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-smart-contracts-committers",
-    "members": 10,
-    "active_members": 3,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 1,
-    "merges_done": 0,
-    "issues_opened": 3,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-spec-committers",
-    "members": 7,
-    "active_members": 3,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 1,
-    "merges_done": 0,
-    "issues_opened": 3,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-website-committers",
-    "members": 2,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 1,
-    "reviews_given": 1,
-    "merges_done": 3,
-    "issues_opened": 2,
-    "labels_applied": 3
-   },
    {
     "team": "lfdt-staff",
     "members": 3,
     "active_members": 1,
     "status": "active",
-    "days_since_active": 0,
+    "days_since_active": 1,
     "prs_opened": 0,
     "reviews_given": 1,
     "merges_done": 1,
@@ -268,163 +184,39 @@
     "labels_applied": 0
    },
    {
-    "team": "security-maintainers",
+    "team": "clpr-e2e-committers",
+    "members": 6,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 7
+   },
+   {
+    "team": "clpr-endpoint-committers",
+    "members": 5,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 7
+   },
+   {
+    "team": "clpr-maintainers",
     "members": 3,
     "active_members": 1,
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 1,
-    "reviews_given": 0,
-    "merges_done": 0,
-    "issues_opened": 2,
-    "labels_applied": 3
-   }
-  ],
-  "30d": [
-   {
-    "team": "clpr-e2e-committers",
-    "members": 6,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 6,
-    "reviews_given": 6,
-    "merges_done": 2,
+    "reviews_given": 1,
+    "merges_done": 1,
     "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-endpoint-committers",
-    "members": 5,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 6,
-    "reviews_given": 10,
-    "merges_done": 2,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-maintainers",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 10,
-    "reviews_given": 8,
-    "merges_done": 2,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-release-engineers",
-    "members": 5,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 6,
-    "reviews_given": 6,
-    "merges_done": 2,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-smart-contracts-committers",
-    "members": 10,
-    "active_members": 4,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 8,
-    "reviews_given": 19,
-    "merges_done": 2,
-    "issues_opened": 7,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-spec-committers",
-    "members": 7,
-    "active_members": 5,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 8,
-    "reviews_given": 23,
-    "merges_done": 2,
-    "issues_opened": 7,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-website-committers",
-    "members": 2,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 9,
-    "reviews_given": 7,
-    "merges_done": 6,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "lfdt-staff",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 4,
-    "reviews_given": 12,
-    "merges_done": 10,
-    "issues_opened": 0,
-    "labels_applied": 0
-   },
-   {
-    "team": "security-maintainers",
-    "members": 3,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 6,
-    "reviews_given": 6,
-    "merges_done": 2,
-    "issues_opened": 5,
-    "labels_applied": 3
-   }
-  ],
-  "365d": [
-   {
-    "team": "clpr-e2e-committers",
-    "members": 6,
-    "active_members": 1,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 8,
-    "reviews_given": 10,
-    "merges_done": 4,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-endpoint-committers",
-    "members": 5,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 8,
-    "reviews_given": 14,
-    "merges_done": 4,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "clpr-maintainers",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 13,
-    "reviews_given": 15,
-    "merges_done": 5,
-    "issues_opened": 10,
     "labels_applied": 7
    },
    {
@@ -433,11 +225,231 @@
     "active_members": 1,
     "status": "active",
     "days_since_active": 0,
-    "prs_opened": 8,
-    "reviews_given": 10,
-    "merges_done": 4,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
     "issues_opened": 5,
-    "labels_applied": 3
+    "labels_applied": 7
+   },
+   {
+    "team": "clpr-smart-contracts-committers",
+    "members": 10,
+    "active_members": 3,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 6,
+    "labels_applied": 7
+   },
+   {
+    "team": "clpr-spec-committers",
+    "members": 7,
+    "active_members": 3,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 2,
+    "merges_done": 1,
+    "issues_opened": 6,
+    "labels_applied": 7
+   },
+   {
+    "team": "clpr-website-committers",
+    "members": 2,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 2,
+    "reviews_given": 2,
+    "merges_done": 2,
+    "issues_opened": 5,
+    "labels_applied": 7
+   },
+   {
+    "team": "security-maintainers",
+    "members": 3,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 1,
+    "reviews_given": 1,
+    "merges_done": 1,
+    "issues_opened": 5,
+    "labels_applied": 7
+   }
+  ],
+  "30d": [
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 4,
+    "reviews_given": 12,
+    "merges_done": 10,
+    "issues_opened": 0,
+    "labels_applied": 0
+   },
+   {
+    "team": "clpr-e2e-committers",
+    "members": 6,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 6,
+    "reviews_given": 7,
+    "merges_done": 3,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-endpoint-committers",
+    "members": 5,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 6,
+    "reviews_given": 11,
+    "merges_done": 3,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-maintainers",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 10,
+    "reviews_given": 9,
+    "merges_done": 3,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-release-engineers",
+    "members": 5,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 6,
+    "reviews_given": 7,
+    "merges_done": 3,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-smart-contracts-committers",
+    "members": 10,
+    "active_members": 4,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 8,
+    "reviews_given": 20,
+    "merges_done": 3,
+    "issues_opened": 10,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-spec-committers",
+    "members": 7,
+    "active_members": 5,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 8,
+    "reviews_given": 24,
+    "merges_done": 3,
+    "issues_opened": 10,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-website-committers",
+    "members": 2,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 10,
+    "reviews_given": 8,
+    "merges_done": 7,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "security-maintainers",
+    "members": 3,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 6,
+    "reviews_given": 7,
+    "merges_done": 3,
+    "issues_opened": 8,
+    "labels_applied": 9
+   }
+  ],
+  "365d": [
+   {
+    "team": "lfdt-staff",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 1,
+    "prs_opened": 16,
+    "reviews_given": 19,
+    "merges_done": 20,
+    "issues_opened": 9,
+    "labels_applied": 13
+   },
+   {
+    "team": "clpr-e2e-committers",
+    "members": 6,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 8,
+    "reviews_given": 11,
+    "merges_done": 5,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-endpoint-committers",
+    "members": 5,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 8,
+    "reviews_given": 15,
+    "merges_done": 5,
+    "issues_opened": 8,
+    "labels_applied": 9
+   },
+   {
+    "team": "clpr-maintainers",
+    "members": 3,
+    "active_members": 2,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 13,
+    "reviews_given": 16,
+    "merges_done": 6,
+    "issues_opened": 13,
+    "labels_applied": 13
+   },
+   {
+    "team": "clpr-release-engineers",
+    "members": 5,
+    "active_members": 1,
+    "status": "active",
+    "days_since_active": 0,
+    "prs_opened": 8,
+    "reviews_given": 11,
+    "merges_done": 5,
+    "issues_opened": 8,
+    "labels_applied": 9
    },
    {
     "team": "clpr-smart-contracts-committers",
@@ -446,10 +458,10 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 10,
-    "reviews_given": 25,
-    "merges_done": 4,
-    "issues_opened": 7,
-    "labels_applied": 3
+    "reviews_given": 26,
+    "merges_done": 5,
+    "issues_opened": 10,
+    "labels_applied": 9
    },
    {
     "team": "clpr-spec-committers",
@@ -458,10 +470,10 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 10,
-    "reviews_given": 29,
-    "merges_done": 4,
-    "issues_opened": 7,
-    "labels_applied": 3
+    "reviews_given": 30,
+    "merges_done": 5,
+    "issues_opened": 10,
+    "labels_applied": 9
    },
    {
     "team": "clpr-website-committers",
@@ -469,23 +481,11 @@
     "active_members": 2,
     "status": "active",
     "days_since_active": 0,
-    "prs_opened": 11,
-    "reviews_given": 11,
-    "merges_done": 8,
-    "issues_opened": 5,
-    "labels_applied": 3
-   },
-   {
-    "team": "lfdt-staff",
-    "members": 3,
-    "active_members": 2,
-    "status": "active",
-    "days_since_active": 0,
-    "prs_opened": 16,
-    "reviews_given": 19,
-    "merges_done": 20,
-    "issues_opened": 9,
-    "labels_applied": 13
+    "prs_opened": 12,
+    "reviews_given": 12,
+    "merges_done": 9,
+    "issues_opened": 8,
+    "labels_applied": 9
    },
    {
     "team": "security-maintainers",
@@ -494,10 +494,10 @@
     "status": "active",
     "days_since_active": 0,
     "prs_opened": 8,
-    "reviews_given": 10,
-    "merges_done": 4,
-    "issues_opened": 5,
-    "labels_applied": 3
+    "reviews_given": 11,
+    "merges_done": 5,
+    "issues_opened": 8,
+    "labels_applied": 9
    }
   ]
  },

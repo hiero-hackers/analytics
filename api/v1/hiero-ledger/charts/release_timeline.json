@@ -69,7 +69,7 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-11-17T01:10:42.400854+00:00"
+  "end": "2026-11-18T01:10:32.865565+00:00"
  },
  "rows": [
   {
@@ -5255,8 +5255,26 @@
    "time": "2026-11-16T21:37:01Z",
    "tag_name": "v0.47.0-rc3",
    "type": "prerelease"
+  },
+  {
+   "repo": "solo-charts",
+   "time": "2026-11-17T10:15:21Z",
+   "tag_name": "v0.68.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-11-17T15:53:56Z",
+   "tag_name": "v0.82.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-cryptography",
+   "time": "2026-11-17T20:42:09Z",
+   "tag_name": "v3.29.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-17T01:10:42.400854+00:00",
+ "generated_at": "2026-11-18T01:10:32.865565+00:00",
  "stale": false
 }

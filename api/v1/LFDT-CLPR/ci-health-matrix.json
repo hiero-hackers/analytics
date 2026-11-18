@@ -22,6 +22,11 @@
    "key": "repository_security_configuration",
    "label": "Security Config",
    "band": "repository"
+  },
+  {
+   "key": "dependabot_ecosystems",
+   "label": "Dependabot Ecosystems",
+   "band": "dependabot"
   }
  ],
  "bands": [
@@ -35,6 +40,10 @@
   },
   {
    "label": "Repository",
+   "span": 1
+  },
+  {
+   "label": "Dependabot",
    "span": 1
   }
  ],
@@ -63,6 +72,81 @@
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow detected: dco.yml; CodeQL workflow not detected.",
      "location": ".github/workflows/dco.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: github-actions, npm.",
+     "location": ".github/dependabot.yml"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-endpoint",
+   "label": "LFDT-CLPR/clpr-endpoint",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/200-flow-pr-checks.yaml:20; .github/workflows/200-flow-pr-formatting.yaml:15"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": ""
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "docker: Not declared in Dependabot, but manifests exist: Dockerfile.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/200-flow-pr-checks.yaml, .github/workflows/200-flow-pr-formatting.yaml.\ngradle: Not declared in Dependabot, but manifests exist: build.gradle.kts.",
+     "location": "Dockerfile; .github/workflows/200-flow-pr-checks.yaml; .github/workflows/200-flow-pr-formatting.yaml; build.gradle.kts"
+    }
+   ]
+  },
+  {
+   "key": "LFDT-CLPR/clpr-smart-contracts",
+   "label": "LFDT-CLPR/clpr-smart-contracts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/600-flow-pull-request-checks.yaml:16; .github/workflows/601-flow-pull-request-formatting.yaml:19; .github/workflows/604-flow-gas-benchmark.yaml:13; .github/workflows/605-flow-slither-scan.yaml:17"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "review",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": ""
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/600-flow-pull-request-checks.yaml, .github/workflows/601-flow-pull-request-formatting.yaml, .github/workflows/604-flow-gas-benchmark.yaml, .github/workflows/605-flow-slither-scan.yaml.\nnpm: Not declared in Dependabot, but manifests exist: package.json.",
+     "location": ".github/workflows/600-flow-pull-request-checks.yaml; .github/workflows/601-flow-pull-request-formatting.yaml; .github/workflows/604-flow-gas-benchmark.yaml; .github/workflows/605-flow-slither-scan.yaml; package.json"
     }
    ]
   },
@@ -89,6 +173,13 @@
      "label": "Security Config",
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": ""
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
      "location": ""
     }
    ]
@@ -117,59 +208,12 @@
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": ""
-    }
-   ]
-  },
-  {
-   "key": "LFDT-CLPR/clpr-endpoint",
-   "label": "LFDT-CLPR/clpr-endpoint",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
     },
     {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/200-flow-pr-checks.yaml:20; .github/workflows/200-flow-pr-formatting.yaml:15"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "review",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": ""
-    }
-   ]
-  },
-  {
-   "key": "LFDT-CLPR/clpr-smart-contracts",
-   "label": "LFDT-CLPR/clpr-smart-contracts",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/600-flow-pull-request-checks.yaml:16; .github/workflows/601-flow-pull-request-formatting.yaml:19; .github/workflows/604-flow-gas-benchmark.yaml:13; .github/workflows/605-flow-slither-scan.yaml:17"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "review",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
      "location": ""
     }
    ]
@@ -198,6 +242,13 @@
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": ""
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
     }
    ]
   },
@@ -225,6 +276,13 @@
      "status": "review",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": ""
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
     }
    ]
   }
@@ -236,6 +294,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-17T01:13:28.279786+00:00",
+ "generated_at": "2026-11-18T01:13:05.818126+00:00",
  "stale": false
 }

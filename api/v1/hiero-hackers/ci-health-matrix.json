@@ -22,6 +22,11 @@
    "key": "repository_security_configuration",
    "label": "Security Config",
    "band": "repository"
+  },
+  {
+   "key": "dependabot_ecosystems",
+   "label": "Dependabot Ecosystems",
+   "band": "dependabot"
   }
  ],
  "bands": [
@@ -35,6 +40,10 @@
   },
   {
    "label": "Repository",
+   "span": 1
+  },
+  {
+   "label": "Dependabot",
    "span": 1
   }
  ],
@@ -63,6 +72,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: cargo, github-actions.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -90,6 +106,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: docker, github-actions, maven.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -117,6 +140,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: github-actions, pub.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -144,6 +174,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: github-actions, npm.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -171,222 +208,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-tck-action",
-   "label": "hiero-hackers/hiero-tck-action",
-   "cells": [
+    },
     {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
      "status": "fail",
-     "evidence": "Found 2 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.action, ./.action",
-     "location": ".github/workflows/self-test.yml:42; .github/workflows/weekly.yml:85"
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/docs.yml:17; .github/workflows/docs.yml:28; .github/workflows/docs.yml:72; .github/workflows/lint.yml:9; .github/workflows/self-test.yml:7; .github/workflows/weekly.yml:9"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: self-test.yml, weekly.yml; CodeQL workflow not detected.",
-     "location": "repository settings; .github/workflows/self-test.yml; .github/workflows/weekly.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/.github",
-   "label": "hiero-hackers/.github",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/analytics",
-   "label": "hiero-hackers/analytics",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 11 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/cflite_pr.yml:3; .github/workflows/cflite_pr.yml:17; .github/workflows/codeql.yml:3; .github/workflows/codeql.yml:20; .github/workflows/dashboard-preview-comment.yml:20; .github/workflows/dashboard-preview.yml:12; .github/workflows/dependency-review.yml:11; .github/workflows/lint.yml:11; .github/workflows/refresh-affiliations.yml:16; .github/workflows/refresh-affiliations.yml:28; .github/workflows/scorecard.yml:15; .github/workflows/scorecard.yml:21; .github/workflows/sdk-automations.yml:27; .github/workflows/test.yml:11; .github/workflows/update-analytics.yml:25; .github/workflows/update-analytics.yml:212; .github/workflows/update-analytics.yml:318"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
-     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/governance",
-   "label": "hiero-hackers/governance",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=False, issues=True, discussions=False, projects=False, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-block-verifier-js",
-   "label": "hiero-hackers/hiero-block-verifier-js",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/release.yml:17; .github/workflows/release.yml:24; .github/workflows/release.yml:96"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-checkout",
-   "label": "hiero-hackers/hiero-checkout",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:13; .github/workflows/ci.yml:20; .github/workflows/pages.yml:10; .github/workflows/pages.yml:20; .github/workflows/pages.yml:52"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-differential-fuzz",
-   "label": "hiero-hackers/hiero-differential-fuzz",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-enterprise-js",
-   "label": "hiero-hackers/hiero-enterprise-js",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 9 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/pr-assignee.yml:18; .github/workflows/release.yml:36; .github/workflows/release.yml:48; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
-     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+     "evidence": "config: No Dependabot config found, but manifests exist for: github-actions, npm.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -414,6 +242,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: github-actions, npm.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -441,33 +276,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-maintainer-automation-prototype",
-   "label": "hiero-hackers/hiero-maintainer-automation-prototype",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
     },
     {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
      "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
+     "evidence": "config: No Dependabot config found, but manifests exist for: cargo, github-actions.",
+     "location": ".github/dependabot.yml"
     }
    ]
   },
@@ -495,168 +310,47 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
      "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-payment-requests",
-   "label": "hiero-hackers/hiero-payment-requests",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
     },
     {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:13; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:49; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:97; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
      "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
-     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+     "evidence": "docker: Not declared in Dependabot, but manifests exist: Dockerfile.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/docs.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": "Dockerfile; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/docs.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; package.json"
     }
    ]
   },
   {
-   "key": "hiero-hackers/hiero-receipts",
-   "label": "hiero-hackers/hiero-receipts",
+   "key": "hiero-hackers/hiero-tck-action",
+   "label": "hiero-hackers/hiero-tck-action",
    "cells": [
     {
      "key": "actions_sha_pinned",
      "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:9; .github/workflows/ci.yml:49; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:44; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:57; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
      "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
-     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-sdk-csharp",
-   "label": "hiero-hackers/hiero-sdk-csharp",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-sdk-v3-prototyping",
-   "label": "hiero-hackers/hiero-sdk-v3-prototyping",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-streams-rs",
-   "label": "hiero-hackers/hiero-streams-rs",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
-    },
-    {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "pass",
-     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:20; .github/workflows/codeql.yml:27; .github/workflows/fuzz.yml:11; .github/workflows/release.yml:26; .github/workflows/release.yml:137; .github/workflows/release.yml:202; .github/workflows/sentinel.yml:33; .github/workflows/watch-cutover.yml:27"
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
-     "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml.",
-     "location": "repository settings; .github/workflows/codeql.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/hiero-verify-fn",
-   "label": "hiero-hackers/hiero-verify-fn",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "pass",
-     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
-     "location": ""
+     "evidence": "Found 2 GitHub Actions reference(s) that are not pinned to a full commit SHA: ./.action, ./.action",
+     "location": ".github/workflows/self-test.yml:42; .github/workflows/weekly.yml:85"
     },
     {
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
      "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:14; .github/workflows/codeql.yml:21; .github/workflows/release.yml:18; .github/workflows/scorecard.yml:12; .github/workflows/scorecard.yml:18"
+     "location": ".github/workflows/docs.yml:17; .github/workflows/docs.yml:28; .github/workflows/docs.yml:72; .github/workflows/lint.yml:9; .github/workflows/self-test.yml:7; .github/workflows/weekly.yml:9"
     },
     {
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
-     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: self-test.yml, weekly.yml; CodeQL workflow not detected.",
+     "location": "repository settings; .github/workflows/self-test.yml; .github/workflows/weekly.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/docs.yml, .github/workflows/lint.yml, .github/workflows/self-test.yml, .github/workflows/weekly.yml.",
+     "location": ".github/workflows/docs.yml; .github/workflows/lint.yml; .github/workflows/self-test.yml; .github/workflows/weekly.yml"
     }
    ]
   },
@@ -684,33 +378,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
      "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
-    }
-   ]
-  },
-  {
-   "key": "hiero-hackers/noobisoft",
-   "label": "hiero-hackers/noobisoft",
-   "cells": [
-    {
-     "key": "actions_sha_pinned",
-     "label": "Actions SHA Pinned",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
     },
     {
-     "key": "explicit_permissions",
-     "label": "Explicit Permissions",
-     "status": "na",
-     "evidence": "Repository has no GitHub Actions workflows.",
-     "location": ""
-    },
-    {
-     "key": "repository_security_configuration",
-     "label": "Security Config",
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
      "status": "fail",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
-     "location": "repository settings"
+     "evidence": "github-actions: Not declared in Dependabot, but manifests exist: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; package.json"
     }
    ]
   },
@@ -738,6 +412,523 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "fail",
+     "evidence": "config: No Dependabot config found, but manifests exist for: cargo.",
+     "location": ".github/dependabot.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/.github",
+   "label": "hiero-hackers/.github",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=False, issues=True, discussions=True, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/analytics",
+   "label": "hiero-hackers/analytics",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 11 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/cflite_pr.yml:3; .github/workflows/cflite_pr.yml:17; .github/workflows/codeql.yml:3; .github/workflows/codeql.yml:20; .github/workflows/dashboard-preview-comment.yml:20; .github/workflows/dashboard-preview.yml:12; .github/workflows/dependency-review.yml:11; .github/workflows/lint.yml:11; .github/workflows/refresh-affiliations.yml:16; .github/workflows/refresh-affiliations.yml:28; .github/workflows/scorecard.yml:15; .github/workflows/scorecard.yml:21; .github/workflows/sdk-automations.yml:27; .github/workflows/test.yml:11; .github/workflows/update-analytics.yml:25; .github/workflows/update-analytics.yml:212; .github/workflows/update-analytics.yml:318"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "docker: Declared in Dependabot, but no manifests found at the repository root.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/cflite_pr.yml, .github/workflows/codeql.yml, .github/workflows/dashboard-preview-comment.yml, .github/workflows/dashboard-preview.yml, .github/workflows/dependency-review.yml, .github/workflows/lint.yml, .github/workflows/refresh-affiliations.yml, .github/workflows/scorecard.yml, .github/workflows/sdk-automations.yml, .github/workflows/test.yml, .github/workflows/update-analytics.yml.\nnpm: Declared in Dependabot, but no manifests found at the repository root.\npip: Declared in Dependabot; manifests: pyproject.toml.",
+     "location": ".github/dependabot.yml; .github/workflows/cflite_pr.yml; .github/workflows/codeql.yml; .github/workflows/dashboard-preview-comment.yml; .github/workflows/dashboard-preview.yml; .github/workflows/dependency-review.yml; .github/workflows/lint.yml; .github/workflows/refresh-affiliations.yml; .github/workflows/scorecard.yml; .github/workflows/sdk-automations.yml; .github/workflows/test.yml; .github/workflows/update-analytics.yml; pyproject.toml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/governance",
+   "label": "hiero-hackers/governance",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=False, issues=True, discussions=False, projects=False, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-block-verifier-js",
+   "label": "hiero-hackers/hiero-block-verifier-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 1 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/release.yml:17; .github/workflows/release.yml:24; .github/workflows/release.yml:96"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/release.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/release.yml; package.json"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-checkout",
+   "label": "hiero-hackers/hiero-checkout",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 2 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:13; .github/workflows/ci.yml:20; .github/workflows/pages.yml:10; .github/workflows/pages.yml:20; .github/workflows/pages.yml:52"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/pages.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/ci.yml; .github/workflows/pages.yml; package.json"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-differential-fuzz",
+   "label": "hiero-hackers/hiero-differential-fuzz",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-enterprise-js",
+   "label": "hiero-hackers/hiero-enterprise-js",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 9 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/pr-assignee.yml:18; .github/workflows/release.yml:36; .github/workflows/release.yml:48; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/approved-issues.yml, .github/workflows/build.yml, .github/workflows/codeql.yml, .github/workflows/mainnet-smoke.yml, .github/workflows/moderate-new-issues.yml, .github/workflows/pr-assignee.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml, .github/workflows/spec-drift.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/approved-issues.yml; .github/workflows/build.yml; .github/workflows/codeql.yml; .github/workflows/mainnet-smoke.yml; .github/workflows/moderate-new-issues.yml; .github/workflows/pr-assignee.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; .github/workflows/spec-drift.yml; package.json"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-maintainer-automation-prototype",
+   "label": "hiero-hackers/hiero-maintainer-automation-prototype",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-payment-requests",
+   "label": "hiero-hackers/hiero-payment-requests",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:13; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:49; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:97; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/docs.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/docs.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; package.json"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-receipts",
+   "label": "hiero-hackers/hiero-receipts",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 5 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/ci.yml:49; .github/workflows/codeql.yml:11; .github/workflows/codeql.yml:17; .github/workflows/docs.yml:12; .github/workflows/docs.yml:44; .github/workflows/release.yml:11; .github/workflows/release.yml:18; .github/workflows/release.yml:57; .github/workflows/scorecard.yml:13; .github/workflows/scorecard.yml:19"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow detected: ci.yml; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/docs.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/docs.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; package.json"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-sdk-csharp",
+   "label": "hiero-hackers/hiero-sdk-csharp",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-sdk-v3-prototyping",
+   "label": "hiero-hackers/hiero-sdk-v3-prototyping",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-streams-rs",
+   "label": "hiero-hackers/hiero-streams-rs",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 6 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:20; .github/workflows/codeql.yml:27; .github/workflows/fuzz.yml:11; .github/workflows/release.yml:26; .github/workflows/release.yml:137; .github/workflows/release.yml:202; .github/workflows/sentinel.yml:33; .github/workflows/watch-cutover.yml:27"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "cargo: Declared in Dependabot; manifests: Cargo.toml.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/fuzz.yml, .github/workflows/release.yml, .github/workflows/sentinel.yml, .github/workflows/watch-cutover.yml.\nnpm: Declared in Dependabot, but no manifests found at the repository root.",
+     "location": "Cargo.toml; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/fuzz.yml; .github/workflows/release.yml; .github/workflows/sentinel.yml; .github/workflows/watch-cutover.yml; .github/dependabot.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/hiero-verify-fn",
+   "label": "hiero-hackers/hiero-verify-fn",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "pass",
+     "evidence": "All GitHub Actions are pinned to full commit SHAs.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "pass",
+     "evidence": "All 4 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/ci.yml:9; .github/workflows/codeql.yml:14; .github/workflows/codeql.yml:21; .github/workflows/release.yml:18; .github/workflows/scorecard.yml:12; .github/workflows/scorecard.yml:18"
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
+     "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "cargo: Declared in Dependabot; manifests: Cargo.toml.\ndocker: Declared in Dependabot; manifests: Dockerfile.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.",
+     "location": "Cargo.toml; Dockerfile; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml"
+    }
+   ]
+  },
+  {
+   "key": "hiero-hackers/noobisoft",
+   "label": "hiero-hackers/noobisoft",
+   "cells": [
+    {
+     "key": "actions_sha_pinned",
+     "label": "Actions SHA Pinned",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "explicit_permissions",
+     "label": "Explicit Permissions",
+     "status": "na",
+     "evidence": "Repository has no GitHub Actions workflows.",
+     "location": ""
+    },
+    {
+     "key": "repository_security_configuration",
+     "label": "Security Config",
+     "status": "fail",
+     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "location": "repository settings"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "na",
+     "evidence": "No supported ecosystem manifests and no Dependabot config.",
+     "location": ""
     }
    ]
   },
@@ -765,6 +956,13 @@
      "status": "fail",
      "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=False. web commit sign-off disabled; DCO workflow not detected; CodeQL workflow detected: codeql.yml, scorecard.yml.",
      "location": "repository settings; .github/workflows/codeql.yml; .github/workflows/scorecard.yml"
+    },
+    {
+     "key": "dependabot_ecosystems",
+     "label": "Dependabot Ecosystems",
+     "status": "pass",
+     "evidence": "docker: Declared in Dependabot; manifests: Dockerfile.\ngithub-actions: Declared in Dependabot; manifests: .github/workflows/action-conformance.yml, .github/workflows/ci.yml, .github/workflows/codeql.yml, .github/workflows/conformance.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": "Dockerfile; .github/workflows/action-conformance.yml; .github/workflows/ci.yml; .github/workflows/codeql.yml; .github/workflows/conformance.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; package.json"
     }
    ]
   }
@@ -776,6 +974,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-17T01:13:11.884062+00:00",
+ "generated_at": "2026-11-18T01:12:47.571879+00:00",
  "stale": false
 }

@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-17T01:13:28.357302+00:00",
+ "generated_at": "2026-11-18T01:13:05.965899+00:00",
  "provenance": {
-  "git_sha": "6ff90d3",
-  "data_as_of": "2026-11-17T01:01:46.633911+00:00"
+  "git_sha": "189e890",
+  "data_as_of": "2026-11-18T01:01:34.766634+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 890,
+     "row_count": 889,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-17T01:11:27.158157+00:00"
+      "generated_at": "2026-11-18T01:11:21.320534+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-17T01:11:27.155740+00:00"
+      "generated_at": "2026-11-18T01:11:21.317115+00:00"
      }
     },
     {
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 9,
+      "value": 8,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",

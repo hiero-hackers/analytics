@@ -3965,6 +3965,20 @@
   {
    "hip": 1193,
    "hip_title": "Record Stream to Block Stream Cutover",
+   "repo": "hiero-ledger/solo",
+   "pr_number": 6443,
+   "pr_title": "feat: bump solo-charts to 0.68.0 for .blk.zstd block stream uploads",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "he blockstream-uploader sidecar uploads HIP-1193 `.blk.zstd` block files as well as `.bl",
+   "url": "https://github.com/hiero-ledger/solo/pull/6443"
+  },
+  {
+   "hip": 1193,
+   "hip_title": "Record Stream to Block Stream Cutover",
    "repo": "hiero-ledger/solo-charts",
    "pr_number": 308,
    "pr_title": "feat: upload .blk.zstd block files from the block stream uploader",
@@ -10305,34 +10319,6 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-js/pull/2210"
   },
   {
-   "hip": 646,
-   "hip_title": "Fungible Token Metadata Field",
-   "repo": "hiero-ledger/hiero-sdk-rust",
-   "pr_number": 764,
-   "pr_title": "feat(HIP-646/657/765): add metadata and metadata key to update Nfts and Fungible tokens",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-04-11 00:36:19+00:00",
-   "match_sources": "title|branch",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "feat(HIP-646/657/765): add metadata and metadata key",
-   "url": "https://github.com/hiero-ledger/hiero-sdk-rust/pull/764"
-  },
-  {
-   "hip": 646,
-   "hip_title": "Fungible Token Metadata Field",
-   "repo": "hiero-ledger/hiero-sdk-rust",
-   "pr_number": 772,
-   "pr_title": "feat(HIP-646/657/765): add metadata examples and tests",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-04-25 22:16:03+00:00",
-   "match_sources": "title",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "feat(HIP-646/657/765): add metadata examples and tes",
-   "url": "https://github.com/hiero-ledger/hiero-sdk-rust/pull/772"
-  },
-  {
    "hip": 632,
    "hip_title": "Hedera Account Service (HAS) System Contract",
    "repo": "hiero-ledger/hiero-consensus-node",
@@ -12531,8 +12517,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 890,
- "generated_at": "2026-11-17T01:11:27.153056+00:00",
+ "row_count": 889,
+ "generated_at": "2026-11-18T01:11:21.313136+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
