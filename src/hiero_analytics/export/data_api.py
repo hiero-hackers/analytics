@@ -134,26 +134,32 @@ def _parse_freshness_timestamp(value: object, *, label: str, csv_path: Path) -> 
     return parsed.astimezone(UTC)
 
 
-def _freshness(csv_path: Path):
-    """Publish output generation time and source-data staleness when known.
+def _freshness(csv_path: Path) -> dict:
+    """Publish output generation time and source-data staleness.
 
-    The oldest source fetch is the conservative freshness bound for outputs
-    built from multiple datasets. Outputs without source-fetch metadata have
-    unknown freshness, so no stale value is published.
+    Use the oldest source fetch when source datasets are available.
+    Fall back to generated_at for outputs without usable source metadata.
     """
     meta = _read_meta(csv_path)
     generated_at = meta.get("generated_at")
     if not generated_at:
         return {}
 
-    generated = _parse_freshness_timestamp(generated_at, label="generated_at", csv_path=csv_path)
+    generated = _parse_freshness_timestamp(
+        generated_at,
+        label="generated_at",
+        csv_path=csv_path,
+    )
     if generated is None:
         return {"generated_at": generated_at}
 
     result = {"generated_at": generated_at}
     sources = meta.get("source_datasets")
 
+    # Pipelines using TTL caches and legacy sidecars have no tracked sources.
+    # Preserve their previous freshness behavior using generated_at.
     if not isinstance(sources, list) or not sources:
+        result["stale"] = datetime.now(UTC) - generated > STALE_AFTER
         return result
 
     fetched_stamps = []
