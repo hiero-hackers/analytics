@@ -262,6 +262,18 @@ def _predates_fetched_at(path: Path) -> bool:
     return isinstance(_read_stamp(path, _WATERMARK_RE), datetime)
 
 
+def dataset_fetched_at(path: Path) -> datetime | None:
+    """Read a persisted dataset's fetch time when it is available.
+
+    ``fetched_through`` is a content watermark, not a fetch-time signal.
+    Legacy files without ``fetched_at`` therefore remain unknown.
+    """
+    fetched = _read_stamp(path, _FETCHED_AT_RE)
+    if isinstance(fetched, datetime):
+        return fetched
+    return None
+
+
 def resolve_provenance(datasets_dir: Path | None = None) -> Provenance:
     """Resolve the current run's provenance.
 

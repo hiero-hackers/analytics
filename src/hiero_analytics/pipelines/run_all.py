@@ -35,7 +35,12 @@ from hiero_analytics.config import orgs as org_registry
 from hiero_analytics.config import paths
 from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.data_sources import dataset_health
-from hiero_analytics.data_sources.dataset_store import offline_mode_enabled, prune_untouched_datasets, start_run
+from hiero_analytics.data_sources.dataset_store import (
+    offline_mode_enabled,
+    prune_untouched_datasets,
+    start_run,
+    track_pipeline_datasets,
+)
 from hiero_analytics.data_sources.github_ingest import fetch_org_login
 from hiero_analytics.data_sources.usage import render_usage_markdown, usage_scope
 from hiero_analytics.pipelines import PIPELINES_BY_NAME, default_run_pipelines
@@ -164,7 +169,7 @@ def run_org(org: str, *, primary: bool, fail_fast: bool = False) -> list[str]:
         try:
             # Requests a pipeline makes outside a persisted dataset fetch are
             # attributed to the pipeline itself; dataset fetches narrow this.
-            with usage_scope(org=org, dataset=pipeline.name):
+            with usage_scope(org=org, dataset=pipeline.name), track_pipeline_datasets():
                 entry = pipeline.resolve()
                 if "org" in pipeline.args:
                     entry(org=org)
