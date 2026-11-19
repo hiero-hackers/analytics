@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-18T01:13:05.965899+00:00",
+ "generated_at": "2026-11-19T01:22:39.541279+00:00",
  "provenance": {
   "git_sha": "189e890",
-  "data_as_of": "2026-11-18T01:01:34.766634+00:00"
+  "data_as_of": "2026-11-19T01:01:23.643770+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -453,7 +453,7 @@
      "id": "teamrepo",
      "macro": "Governance",
      "title": "Team activity by repo",
-     "row_count": 3020,
+     "row_count": 3029,
      "path": "hiero-ledger/teamrepo.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 889,
+     "row_count": 891,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-18T01:11:21.320534+00:00"
+      "generated_at": "2026-11-19T01:21:07.258637+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-18T01:11:21.317115+00:00"
+      "generated_at": "2026-11-19T01:21:07.256283+00:00"
      }
     },
     {
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 8,
+      "value": 7,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -2123,6 +2123,13 @@
          "interactive": {
           "kind": "categories",
           "path": "hiero-hackers/charts/difficulty_by_repo_30d.json"
+         }
+        },
+        {
+         "label": "Week",
+         "interactive": {
+          "kind": "categories",
+          "path": "hiero-hackers/charts/difficulty_by_repo_7d.json"
          }
         }
        ],
@@ -3224,7 +3231,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "40%",
+      "value": "47%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",

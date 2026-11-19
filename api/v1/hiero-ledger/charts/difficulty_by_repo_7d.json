@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-18T01:02:05.838819+00:00"
+  "end": "2026-11-19T01:01:48.210828+00:00"
  },
  "series": [
   {
@@ -61,7 +61,7 @@
  "rows": [
   {
    "repo": "hiero-block-node",
-   "Unknown": 22,
+   "Unknown": 20,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -69,7 +69,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 58,
+   "Unknown": 51,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +101,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 11,
+   "Unknown": 14,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -109,7 +109,7 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "Unknown": 2,
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -117,6 +117,14 @@
   },
   {
    "repo": "hiero-sdk-go",
+   "Unknown": 1,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "hiero-sdk-js",
    "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
@@ -132,30 +140,22 @@
    "Advanced": 4
   },
   {
-   "repo": "hiero-solo-action",
-   "Unknown": 1,
-   "Good First Issue": 0,
-   "Beginner": 0,
-   "Intermediate": 0,
-   "Advanced": 0
-  },
-  {
    "repo": "solo",
-   "Unknown": 10,
+   "Unknown": 4,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   },
   {
-   "repo": "solo-charts",
-   "Unknown": 1,
+   "repo": "solo-docs",
+   "Unknown": 2,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
    "Advanced": 0
   }
  ],
- "generated_at": "2026-11-18T01:02:05.838819+00:00",
+ "generated_at": "2026-11-19T01:01:48.210828+00:00",
  "stale": false
 }

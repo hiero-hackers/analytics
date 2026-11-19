@@ -35,9 +35,9 @@
   "hiero-block-node",
   "hiero-mirror-node",
   "hiero-cryptography",
+  "hiero-consensus-node",
   "hiero-json-rpc-relay",
   "solo",
-  "hiero-consensus-node",
   "solo-containers",
   "hiero-enterprise-java",
   "hiero-gradle-conventions",
@@ -48,15 +48,9 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-18T01:10:32.865565+00:00"
+  "end": "2026-11-19T01:20:24.725977+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-cryptography",
-   "time": "2026-10-19T18:17:15Z",
-   "tag_name": "v3.23.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-enterprise-java",
    "time": "2026-10-20T11:43:53Z",
@@ -380,8 +374,50 @@
    "time": "2026-11-17T20:42:09Z",
    "tag_name": "v3.29.1",
    "type": "release"
+  },
+  {
+   "repo": "solo",
+   "time": "2026-11-18T09:09:25Z",
+   "tag_name": "v0.98.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-11-18T11:18:37Z",
+   "tag_name": "v0.82.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-11-18T21:10:23Z",
+   "tag_name": "v0.167.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "time": "2026-11-18T23:16:00Z",
+   "tag_name": "v0.167.1",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-11-19T00:04:14Z",
+   "tag_name": "v0.79.2",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-11-19T00:57:16Z",
+   "tag_name": "v0.79.0",
+   "type": "release"
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "time": "2026-11-19T00:58:01Z",
+   "tag_name": "v0.79.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-18T01:10:32.865565+00:00",
+ "generated_at": "2026-11-19T01:20:24.725977+00:00",
  "stale": false
 }

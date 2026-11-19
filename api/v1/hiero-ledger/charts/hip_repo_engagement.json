@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-18T01:11:21.317115+00:00"
+  "end": "2026-11-19T01:21:07.256283+00:00"
  },
  "series": [
   {
@@ -59,25 +59,25 @@
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
    "matched_prs": 233,
-   "total_prs": 5661
+   "total_prs": 5676
   },
   {
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 38,
    "matched_prs": 197,
-   "total_prs": 3872
+   "total_prs": 3885
   },
   {
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 15,
    "matched_prs": 41,
-   "total_prs": 1312
+   "total_prs": 1313
   },
   {
    "repo": "hiero-json-rpc-relay",
    "distinct_hips_merged": 14,
    "matched_prs": 16,
-   "total_prs": 1490
+   "total_prs": 1492
   },
   {
    "repo": "hiero-sdk-go",
@@ -89,7 +89,7 @@
    "repo": "solo",
    "distinct_hips_merged": 13,
    "matched_prs": 13,
-   "total_prs": 2614
+   "total_prs": 2617
   },
   {
    "repo": "hiero-sdk-java",
@@ -131,7 +131,7 @@
    "repo": "hiero-block-node",
    "distinct_hips_merged": 5,
    "matched_prs": 11,
-   "total_prs": 1771
+   "total_prs": 1772
   },
   {
    "repo": "hiero-sdk-python",
@@ -143,7 +143,7 @@
    "repo": "hiero-sdk-tck",
    "distinct_hips_merged": 5,
    "matched_prs": 3,
-   "total_prs": 366
+   "total_prs": 368
   },
   {
    "repo": "hiero-website",
@@ -179,7 +179,7 @@
    "repo": "hiero-local-node",
    "distinct_hips_merged": 1,
    "matched_prs": 2,
-   "total_prs": 266
+   "total_prs": 262
   },
   {
    "repo": "solo-charts",
@@ -203,13 +203,13 @@
    "repo": "hiero-cryptography",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 409
+   "total_prs": 410
   },
   {
    "repo": "hiero-enterprise-java",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 263
+   "total_prs": 269
   },
   {
    "repo": "solo-docs",
@@ -308,6 +308,6 @@
    "total_prs": 4
   }
  ],
- "generated_at": "2026-11-18T01:11:21.317115+00:00",
+ "generated_at": "2026-11-19T01:21:07.256283+00:00",
  "stale": false
 }

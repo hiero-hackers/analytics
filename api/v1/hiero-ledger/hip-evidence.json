@@ -211,6 +211,34 @@
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14415"
   },
   {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14715,
+   "pr_title": "Add BlockOverride support in web3",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "for eth_call and eth_estimateGas as per HIP-1485 definition. **Related issue(s)**: Fix",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14715"
+  },
+  {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14721,
+   "pr_title": "Extract ThrottleManager usage from ContractCallService",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "mentations for new REST APIs defined in HIP-1485, we will allow the execution or tracing",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14721"
+  },
+  {
    "hip": 1427,
    "hip_title": "Historical Record File Wrapping for Block Stream Cutover",
    "repo": "hiero-ledger/hiero-mirror-node",
@@ -12517,8 +12545,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 889,
- "generated_at": "2026-11-18T01:11:21.313136+00:00",
+ "row_count": 891,
+ "generated_at": "2026-11-19T01:21:07.253591+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
