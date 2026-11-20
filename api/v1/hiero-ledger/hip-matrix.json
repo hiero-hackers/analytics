@@ -1683,8 +1683,8 @@
     },
     {
      "key": "hiero-ledger/solo",
-     "merged": 0,
-     "open": 1
+     "merged": 1,
+     "open": 0
     },
     {
      "key": "hiero-ledger/hiero-local-node",
@@ -2120,8 +2120,8 @@
     },
     {
      "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 1,
-     "open": 4
+     "merged": 2,
+     "open": 3
     },
     {
      "key": "hiero-ledger/hiero-block-node",
@@ -2607,6 +2607,96 @@
    }
   },
   {
+   "key": 1535,
+   "label": "HIP-1535",
+   "sublabel": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "status": "Approved",
+   "cells": [
+    {
+     "key": "hiero-ledger/hiero-consensus-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-block-node",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-java",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-go",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-js",
+     "merged": 1,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-cpp",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-rust",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-swift",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-sdk-python",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-json-rpc-relay",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-mirror-node-explorer",
+     "merged": 0,
+     "open": 1
+    },
+    {
+     "key": "hiero-ledger/solo",
+     "merged": 0,
+     "open": 0
+    },
+    {
+     "key": "hiero-ledger/hiero-local-node",
+     "merged": 0,
+     "open": 0
+    }
+   ],
+   "note": {
+    "kind": "partial",
+    "text": "java \u00b7 go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
+    "items": [
+     "java",
+     "go",
+     "cpp",
+     "rust",
+     "swift",
+     "python"
+    ]
+   }
+  },
+  {
    "key": 1357,
    "label": "HIP-1357",
    "sublabel": "Tier 1 Block Node Operation Rewards",
@@ -2771,96 +2861,6 @@
     "items": [
      "java",
      "js",
-     "cpp",
-     "rust",
-     "swift",
-     "python"
-    ]
-   }
-  },
-  {
-   "key": 1535,
-   "label": "HIP-1535",
-   "sublabel": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
-   "status": "Approved",
-   "cells": [
-    {
-     "key": "hiero-ledger/hiero-consensus-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-block-node",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-java",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-go",
-     "merged": 0,
-     "open": 1
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-js",
-     "merged": 1,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-cpp",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-rust",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-swift",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-sdk-python",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-json-rpc-relay",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-mirror-node-explorer",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/solo",
-     "merged": 0,
-     "open": 0
-    },
-    {
-     "key": "hiero-ledger/hiero-local-node",
-     "merged": 0,
-     "open": 0
-    }
-   ],
-   "note": {
-    "kind": "partial",
-    "text": "java \u00b7 go \u00b7 cpp \u00b7 rust \u00b7 swift \u00b7 python",
-    "items": [
-     "java",
-     "go",
      "cpp",
      "rust",
      "swift",
@@ -13818,6 +13818,6 @@
  ],
  "evidence_section": "hip-evidence",
  "macro": "HIPs",
- "generated_at": "2026-11-19T01:21:07.255826+00:00",
+ "generated_at": "2026-11-20T01:20:10.051802+00:00",
  "stale": false
 }

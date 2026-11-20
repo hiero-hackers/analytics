@@ -87,6 +87,20 @@
   {
    "hip": 1535,
    "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/hiero-mirror-node-explorer",
+   "pr_number": 2873,
+   "pr_title": "chore: bump @hiero-ledger/proto from 2.32.0 to 2.32.1 in /_frontend",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "ased</h1> <h3>Added</h3> <ul> <li>Added HIP-1535 CLPR support: eight transactions, two p",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node-explorer/pull/2873"
+  },
+  {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
    "repo": "hiero-ledger/hiero-sdk-go",
    "pr_number": 1891,
    "pr_title": " feat: add HIP-1535 CLPR support",
@@ -230,8 +244,8 @@
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 14721,
    "pr_title": "Extract ThrottleManager usage from ContractCallService",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-19 20:57:31+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -3996,8 +4010,8 @@
    "repo": "hiero-ledger/solo",
    "pr_number": 6443,
    "pr_title": "feat: bump solo-charts to 0.68.0 for .blk.zstd block stream uploads",
-   "pr_state": "OPEN",
-   "pr_merged_at": null,
+   "pr_state": "MERGED",
+   "pr_merged_at": "2026-11-19 10:28:02+00:00",
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
@@ -12545,8 +12559,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 891,
- "generated_at": "2026-11-19T01:21:07.253591+00:00",
+ "row_count": 892,
+ "generated_at": "2026-11-20T01:20:10.048732+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"
