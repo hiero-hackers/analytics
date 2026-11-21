@@ -69,12 +69,12 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-20T01:18:03.424617+00:00"
+  "end": "2026-11-21T01:16:28.361852+00:00"
  },
  "nodes": [
   {
    "id": "hiero-consensus-node",
-   "active": 36,
+   "active": 37,
    "total": 60,
    "category": "Core network",
    "x": 1.7058,
@@ -82,7 +82,7 @@
   },
   {
    "id": "governance",
-   "active": 9,
+   "active": 8,
    "total": 52,
    "category": "Governance",
    "x": 0.855,
@@ -122,7 +122,7 @@
   },
   {
    "id": "hiero-improvement-proposals",
-   "active": 4,
+   "active": 5,
    "total": 77,
    "category": "Governance",
    "x": 1.4989,
@@ -830,6 +830,6 @@
    "shared": 1
   }
  ],
- "generated_at": "2026-11-20T01:18:03.424617+00:00",
+ "generated_at": "2026-11-21T01:16:28.361852+00:00",
  "stale": false
 }

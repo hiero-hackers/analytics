@@ -115,6 +115,20 @@
   {
    "hip": 1535,
    "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
+   "repo": "hiero-ledger/hiero-sdk-go",
+   "pr_number": 1905,
+   "pr_title": "chore: update protos to v0.80.0-alpha.5",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "odule to the consensus node schema that HIP-1535 CLPR targets (the same commit the JS SD",
+   "url": "https://github.com/hiero-ledger/hiero-sdk-go/pull/1905"
+  },
+  {
+   "hip": 1535,
+   "hip_title": "CLPR \u2014 A Cross Ledger Protocol for Hiero",
    "repo": "hiero-ledger/hiero-sdk-js",
    "pr_number": 4641,
    "pr_title": "feat: add HIP-1535 CLPR transactions, queries and ownership helpers",
@@ -3429,6 +3443,20 @@
    "counted": true,
    "snippet": "HIP-1195 Replace LambdaSStore with HookStore",
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/12803"
+  },
+  {
+   "hip": 1195,
+   "hip_title": "Hiero hooks and an application to allowances",
+   "repo": "hiero-ledger/hiero-mirror-node",
+   "pr_number": 14636,
+   "pr_title": "feat(clpr): Add remaining transaction handlers and full-pipeline E2E coverage",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "nsensus Node execution scenario because HIP-1195 prohibits hook execution within atomic",
+   "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14636"
   },
   {
    "hip": 1195,
@@ -12559,8 +12587,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 892,
- "generated_at": "2026-11-20T01:20:10.048732+00:00",
+ "row_count": 894,
+ "generated_at": "2026-11-21T01:18:12.390741+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

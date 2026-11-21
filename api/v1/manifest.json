@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-20T01:22:02.350944+00:00",
+ "generated_at": "2026-11-21T01:19:37.186068+00:00",
  "provenance": {
   "git_sha": "189e890",
-  "data_as_of": "2026-11-20T01:01:22.597032+00:00"
+  "data_as_of": "2026-11-21T01:01:29.917702+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1538,
+     "row_count": 1537,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 892,
+     "row_count": 894,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-20T01:20:10.055635+00:00"
+      "generated_at": "2026-11-21T01:18:12.397464+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-20T01:20:10.052368+00:00"
+      "generated_at": "2026-11-21T01:18:12.394336+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1538,
+      "value": 1537,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1538
+     "count": 1537
     }
    }
   },
@@ -2357,7 +2357,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 15,
+     "row_count": 16,
      "path": "LFDT-CLPR/profiles.json"
     },
     {
@@ -3212,7 +3212,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 15,
+      "value": 16,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -3222,7 +3222,7 @@
      },
      {
       "label": "active last month %",
-      "value": "67%",
+      "value": "75%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -3231,7 +3231,7 @@
      },
      {
       "label": "multi-repo %",
-      "value": "47%",
+      "value": "44%",
       "note": "The share of contributors active in two or more repositories \u2014 how much the contributor base spans the organisation rather than sitting in one project.",
       "methodology": [
        "For each contributor, count the distinct repositories they were active in (all-time).",
@@ -3240,7 +3240,7 @@
      },
      {
       "label": "file issues %",
-      "value": "47%",
+      "value": "50%",
       "note": "The share of contributors who have opened at least one issue.",
       "methodology": [
        "Count contributors whose all-time issues-opened total is above zero.",
@@ -3249,7 +3249,7 @@
      },
      {
       "label": "open PRs %",
-      "value": "67%",
+      "value": "69%",
       "note": "The share of contributors who have authored at least one pull request. Used as the proxy for \u201cwrites code\u201d: commits themselves are not ingested, only PRs.",
       "methodology": [
        "Count contributors whose all-time PRs-opened total is above zero.",
@@ -3258,7 +3258,7 @@
      },
      {
       "label": "give reviews %",
-      "value": "67%",
+      "value": "62%",
       "note": "The share of contributors who have reviewed at least one pull request \u2014 the review load's breadth, not its volume.",
       "methodology": [
        "Count contributors whose all-time reviews-given total is above zero.",
@@ -3367,7 +3367,7 @@
     },
     "contributors": {
      "path": "LFDT-CLPR/entities/contributors.json",
-     "count": 15
+     "count": 16
     }
    }
   }

@@ -97,7 +97,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-20T01:18:14.642523+00:00"
+  "end": "2026-11-21T01:16:38.706387+00:00"
  },
  "rows": [
   {
@@ -225,6 +225,24 @@
    "Branch-Protection": 4.0,
    "Packaging": null,
    "SAST": 5.0
+  },
+  {
+   "repo": "hiero-consensus-node",
+   "score": 7.4,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 2.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 9.0,
+   "Token-Permissions": 0.0,
+   "Pinned-Dependencies": 9.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 5.0,
+   "Packaging": 10.0,
+   "SAST": 9.0
   },
   {
    "repo": "hiero-docs",
@@ -623,6 +641,6 @@
    "SAST": 8.0
   }
  ],
- "generated_at": "2026-11-20T01:18:14.642523+00:00",
+ "generated_at": "2026-11-21T01:16:38.706387+00:00",
  "stale": false
 }
