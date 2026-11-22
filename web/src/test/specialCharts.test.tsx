@@ -205,9 +205,11 @@ describe('Heatmap matrix', () => {
     expect(
       within(grid).getByRole('gridcell', { name: 'sdk, Fuzzing: Not scored' }),
     ).toHaveTextContent('?');
-    expect(within(grid).getByRole('gridcell', { name: 'sdk, Maintained: 10' })).toHaveStyle({
-      backgroundColor: 'var(--heat-5)',
-    });
+    // The inline style names the theme token; jsdom resolves var() in computed
+    // style, and the tokens are not loaded here, so check the declaration.
+    expect(
+      within(grid).getByRole('gridcell', { name: 'sdk, Maintained: 10' }).style.backgroundColor,
+    ).toBe('var(--heat-5)');
     expect(screen.getByText('? Not scored')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('radio', { name: 'Data' }));
     expect(within(screen.getByRole('table')).getByText('Not scored')).toBeInTheDocument();
