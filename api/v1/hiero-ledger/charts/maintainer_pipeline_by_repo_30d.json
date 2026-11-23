@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-22T01:03:37.795604+00:00"
+  "end": "2026-11-23T01:03:46.082213+00:00"
  },
  "series": [
   {
@@ -56,44 +56,23 @@
  "rows": [
   {
    "repo": "hiero-consensus-node",
-   "general_user": 12,
+   "general_user": 11,
    "triage": 1,
    "committer": 29,
    "maintainer": 11
   },
   {
    "repo": "hiero-sdk-js",
-   "general_user": 23,
+   "general_user": 21,
    "triage": 2,
    "committer": 0,
    "maintainer": 2
   },
   {
    "repo": "solo",
-   "general_user": 12,
-   "triage": 0,
-   "committer": 5,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-block-node",
-   "general_user": 8,
-   "triage": 1,
-   "committer": 5,
-   "maintainer": 3
-  },
-  {
-   "repo": "hiero-json-rpc-relay",
    "general_user": 11,
    "triage": 0,
-   "committer": 3,
-   "maintainer": 3
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "general_user": 13,
-   "triage": 1,
-   "committer": 1,
+   "committer": 5,
    "maintainer": 2
   },
   {
@@ -104,6 +83,20 @@
    "maintainer": 2
   },
   {
+   "repo": "hiero-sdk-java",
+   "general_user": 13,
+   "triage": 1,
+   "committer": 1,
+   "maintainer": 2
+  },
+  {
+   "repo": "hiero-block-node",
+   "general_user": 8,
+   "triage": 1,
+   "committer": 5,
+   "maintainer": 3
+  },
+  {
    "repo": "hiero-sdk-python",
    "general_user": 10,
    "triage": 0,
@@ -111,11 +104,11 @@
    "maintainer": 5
   },
   {
-   "repo": "governance",
-   "general_user": 4,
+   "repo": "hiero-json-rpc-relay",
+   "general_user": 11,
    "triage": 0,
    "committer": 2,
-   "maintainer": 5
+   "maintainer": 3
   },
   {
    "repo": "hiero-sdk-go",
@@ -130,6 +123,13 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 3
+  },
+  {
+   "repo": "governance",
+   "general_user": 4,
+   "triage": 0,
+   "committer": 2,
+   "maintainer": 5
   },
   {
    "repo": "solo-docs",
@@ -153,6 +153,13 @@
    "maintainer": 2
   },
   {
+   "repo": "heka-identity-platform",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 1,
+   "maintainer": 1
+  },
+  {
    "repo": "hiero-mirror-node-explorer",
    "general_user": 2,
    "triage": 0,
@@ -160,11 +167,11 @@
    "maintainer": 2
   },
   {
-   "repo": "heka-identity-platform",
-   "general_user": 3,
+   "repo": "hiero-enterprise-java",
+   "general_user": 2,
    "triage": 0,
    "committer": 1,
-   "maintainer": 1
+   "maintainer": 2
   },
   {
    "repo": "hiero-website",
@@ -174,25 +181,11 @@
    "maintainer": 3
   },
   {
-   "repo": "hiero-consensus-specifications",
-   "general_user": 3,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
-  },
-  {
-   "repo": "hiero-enterprise-java",
+   "repo": "hiero-contracts",
    "general_user": 1,
    "triage": 0,
    "committer": 1,
    "maintainer": 2
-  },
-  {
-   "repo": "sdk-collaboration-hub",
-   "general_user": 3,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
   },
   {
    "repo": "solo-charts",
@@ -209,28 +202,28 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-contracts",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 3
-  },
-  {
-   "repo": "solo-containers",
-   "general_user": 2,
+   "repo": "hiero-consensus-specifications",
+   "general_user": 3,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
    "repo": "hiero-hederium",
+   "general_user": 1,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
+  },
+  {
+   "repo": "sdk-collaboration-hub",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
+   "repo": "hiero-ethereum-execution-spec-tests",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
@@ -251,11 +244,11 @@
    "maintainer": 0
   },
   {
-   "repo": "hiero-sdk-cpp",
-   "general_user": 2,
+   "repo": "solo-containers",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
-   "maintainer": 0
+   "maintainer": 1
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -280,6 +273,6 @@
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-22T01:03:37.795604+00:00",
+ "generated_at": "2026-11-23T01:03:46.082213+00:00",
  "stale": false
 }

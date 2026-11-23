@@ -34,7 +34,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-22T01:03:37.751327+00:00"
+  "end": "2026-11-23T01:03:46.037330+00:00"
  },
  "series": [
   {
@@ -251,7 +251,7 @@
   },
   {
    "repo": "hiero-enterprise-java",
-   "general_user": 16,
+   "general_user": 17,
    "triage": 0,
    "committer": 2,
    "maintainer": 3
@@ -313,6 +313,13 @@
    "maintainer": 3
   },
   {
+   "repo": "solo-containers",
+   "general_user": 9,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 5
+  },
+  {
    "repo": "hiero-hederium",
    "general_user": 8,
    "triage": 0,
@@ -329,13 +336,6 @@
   {
    "repo": "identity-collaboration-hub",
    "general_user": 5,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 3
-  },
-  {
-   "repo": "solo-containers",
-   "general_user": 4,
    "triage": 0,
    "committer": 0,
    "maintainer": 3
@@ -362,6 +362,6 @@
    "maintainer": 1
   }
  ],
- "generated_at": "2026-11-22T01:03:37.751327+00:00",
+ "generated_at": "2026-11-23T01:03:46.037330+00:00",
  "stale": false
 }
