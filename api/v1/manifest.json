@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-23T01:13:54.013763+00:00",
+ "generated_at": "2026-11-24T01:14:39.250065+00:00",
  "provenance": {
   "git_sha": "12befde",
-  "data_as_of": "2026-11-23T01:01:27.903326+00:00"
+  "data_as_of": "2026-11-24T01:01:30.610365+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -511,7 +511,7 @@
      "id": "hip-evidence",
      "macro": "HIPs",
      "title": "Evidence (per PR)",
-     "row_count": 894,
+     "row_count": 895,
      "path": "hiero-ledger/hip-evidence.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-23T01:12:12.427078+00:00"
+      "generated_at": "2026-11-24T01:12:40.658062+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-23T01:12:12.422610+00:00"
+      "generated_at": "2026-11-24T01:12:40.653846+00:00"
      }
     },
     {
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 7,
+      "value": 8,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",
@@ -2251,7 +2251,7 @@
      },
      {
       "label": "active last month %",
-      "value": "33%",
+      "value": "31%",
       "note": "The share of all-time contributors who did something in the last 30 days \u2014 a staleness check on the contributor base, not a measure of output.",
       "methodology": [
        "Take the 30-day activity table, which lists exactly the contributors active in that window.",
@@ -2378,7 +2378,7 @@
      "id": "understaffed",
      "macro": "Governance",
      "title": "Repos with one or fewer active maintainers",
-     "row_count": 3,
+     "row_count": 2,
      "path": "LFDT-CLPR/understaffed.json"
     },
     {

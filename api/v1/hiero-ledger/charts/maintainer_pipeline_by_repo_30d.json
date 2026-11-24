@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-23T01:03:46.082213+00:00"
+  "end": "2026-11-24T01:03:58.007400+00:00"
  },
  "series": [
   {
@@ -63,7 +63,7 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "general_user": 21,
+   "general_user": 19,
    "triage": 2,
    "committer": 0,
    "maintainer": 2
@@ -105,17 +105,17 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "general_user": 11,
+   "general_user": 10,
    "triage": 0,
    "committer": 2,
-   "maintainer": 3
+   "maintainer": 2
   },
   {
-   "repo": "hiero-sdk-go",
-   "general_user": 7,
-   "triage": 1,
-   "committer": 2,
-   "maintainer": 1
+   "repo": "governance",
+   "general_user": 4,
+   "triage": 0,
+   "committer": 3,
+   "maintainer": 5
   },
   {
    "repo": "hiero-cryptography",
@@ -125,11 +125,11 @@
    "maintainer": 3
   },
   {
-   "repo": "governance",
-   "general_user": 4,
-   "triage": 0,
+   "repo": "hiero-sdk-go",
+   "general_user": 7,
+   "triage": 1,
    "committer": 2,
-   "maintainer": 5
+   "maintainer": 1
   },
   {
    "repo": "solo-docs",
@@ -147,7 +147,7 @@
   },
   {
    "repo": "hiero-improvement-proposals",
-   "general_user": 2,
+   "general_user": 1,
    "triage": 0,
    "committer": 3,
    "maintainer": 2
@@ -237,6 +237,13 @@
    "maintainer": 1
   },
   {
+   "repo": "hiero-gradle-conventions",
+   "general_user": 0,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 2
+  },
+  {
    "repo": "hiero-cli",
    "general_user": 2,
    "triage": 0,
@@ -251,7 +258,7 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-gradle-conventions",
+   "repo": "hiero-docs",
    "general_user": 0,
    "triage": 0,
    "committer": 0,
@@ -263,16 +270,9 @@
    "triage": 0,
    "committer": 0,
    "maintainer": 1
-  },
-  {
-   "repo": "hiero-docs",
-   "general_user": 0,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 1
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-23T01:03:46.082213+00:00",
+ "generated_at": "2026-11-24T01:03:58.007400+00:00",
  "stale": false
 }

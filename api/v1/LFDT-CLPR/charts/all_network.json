@@ -44,7 +44,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-23T01:13:42.528144+00:00"
+  "end": "2026-11-24T01:14:26.876854+00:00"
  },
  "nodes": [
   {
@@ -52,8 +52,8 @@
    "active": 8,
    "total": 8,
    "category": "EVM / smart contracts",
-   "x": 1.0336,
-   "y": -0.5261
+   "x": 0.7474,
+   "y": -0.0249
   },
   {
    "id": "clpr-spec",
@@ -61,39 +61,39 @@
    "total": 6,
    "category": "Other",
    "x": 1.8247,
-   "y": 1.1055
+   "y": 1.4098
+  },
+  {
+   "id": "clpr-website",
+   "active": 5,
+   "total": 5,
+   "category": "Docs / Web",
+   "x": -1.8247,
+   "y": -1.5295
   },
   {
    "id": "governance",
    "active": 5,
    "total": 5,
    "category": "Governance",
-   "x": -0.1649,
-   "y": -1.7654
+   "x": -1.6694,
+   "y": 0.1504
   },
   {
    "id": ".github",
    "active": 4,
    "total": 4,
    "category": "Governance",
-   "x": -1.3826,
-   "y": -0.7512
+   "x": 0.133,
+   "y": -1.6439
   },
   {
    "id": "clpr-endpoint",
    "active": 4,
    "total": 4,
    "category": "Other",
-   "x": -0.032,
-   "y": 0.9761
-  },
-  {
-   "id": "clpr-website",
-   "active": 4,
-   "total": 4,
-   "category": "Docs / Web",
-   "x": -1.8247,
-   "y": 1.7654
+   "x": -0.6517,
+   "y": 1.6439
   }
  ],
  "edges": [
@@ -123,8 +123,8 @@
    "shared": 3
   },
   {
-   "source": "clpr-endpoint",
-   "target": "clpr-spec",
+   "source": ".github",
+   "target": "clpr-website",
    "shared": 2
   },
   {
@@ -133,7 +133,27 @@
    "shared": 2
   },
   {
+   "source": "clpr-smart-contracts",
+   "target": "clpr-website",
+   "shared": 2
+  },
+  {
    "source": "clpr-endpoint",
+   "target": "clpr-spec",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "governance",
+   "shared": 2
+  },
+  {
+   "source": "clpr-endpoint",
+   "target": "clpr-website",
+   "shared": 2
+  },
+  {
+   "source": "clpr-website",
    "target": "governance",
    "shared": 2
   },
@@ -143,36 +163,16 @@
    "shared": 1
   },
   {
-   "source": ".github",
-   "target": "clpr-website",
-   "shared": 1
-  },
-  {
-   "source": "clpr-endpoint",
-   "target": "clpr-website",
-   "shared": 1
-  },
-  {
-   "source": "clpr-smart-contracts",
-   "target": "clpr-website",
-   "shared": 1
-  },
-  {
    "source": "clpr-spec",
    "target": "clpr-website",
    "shared": 1
   },
   {
    "source": "clpr-spec",
-   "target": "governance",
-   "shared": 1
-  },
-  {
-   "source": "clpr-website",
    "target": "governance",
    "shared": 1
   }
  ],
- "generated_at": "2026-11-23T01:13:42.528144+00:00",
+ "generated_at": "2026-11-24T01:14:26.876854+00:00",
  "stale": false
 }

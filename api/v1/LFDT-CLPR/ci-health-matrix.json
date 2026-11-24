@@ -240,7 +240,7 @@
      "key": "repository_security_configuration",
      "label": "Security Config",
      "status": "review",
-     "evidence": "wiki=True, issues=True, discussions=False, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
+     "evidence": "wiki=True, issues=True, discussions=True, projects=True, web_commit_signoff_required=True. web commit sign-off enabled; DCO workflow not detected; CodeQL workflow not detected.",
      "location": ""
     },
     {
@@ -294,6 +294,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-23T01:13:53.898609+00:00",
+ "generated_at": "2026-11-24T01:14:39.122458+00:00",
  "stale": false
 }

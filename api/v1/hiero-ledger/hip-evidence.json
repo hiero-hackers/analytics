@@ -199,6 +199,20 @@
   {
    "hip": 1485,
    "hip_title": "EVM Debug APIs",
+   "repo": "hiero-ledger/hiero-json-rpc-relay",
+   "pr_number": 6036,
+   "pr_title": "fix: adapt state overrides and prestate to mirror node v0.167 numeric balance and nonce",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": ".0, which changed two formats to follow HIP-1485 (hiero-ledger/hiero-mirror-node#14658,",
+   "url": "https://github.com/hiero-ledger/hiero-json-rpc-relay/pull/6036"
+  },
+  {
+   "hip": 1485,
+   "hip_title": "EVM Debug APIs",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 13654,
    "pr_title": "Add callTracer and blockOverride support in web3",
@@ -249,7 +263,7 @@
    "match_sources": "body",
    "qualifier": null,
    "counted": true,
-   "snippet": "for eth_call and eth_estimateGas as per HIP-1485 definition. **Related issue(s)**: Fix",
+   "snippet": "for eth_call and eth_estimateGas as per HIP-1485 definition. Migrate all web3 code to u",
    "url": "https://github.com/hiero-ledger/hiero-mirror-node/pull/14715"
   },
   {
@@ -12587,8 +12601,8 @@
    "url": "https://github.com/hiero-ledger/hiero-sdk-python/pull/380"
   }
  ],
- "row_count": 894,
- "generated_at": "2026-11-23T01:12:12.417687+00:00",
+ "row_count": 895,
+ "generated_at": "2026-11-24T01:12:40.649015+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

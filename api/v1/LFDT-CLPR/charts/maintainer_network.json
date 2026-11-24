@@ -44,7 +44,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-23T01:13:45.612622+00:00"
+  "end": "2026-11-24T01:14:30.915425+00:00"
  },
  "nodes": [
   {
@@ -72,26 +72,26 @@
    "y": -1.6962
   },
   {
+   "id": "clpr-website",
+   "active": 2,
+   "total": 3,
+   "category": "Docs / Web",
+   "x": -1.9141,
+   "y": -0.2134
+  },
+  {
    "id": "governance",
    "active": 2,
    "total": 3,
    "category": "Governance",
-   "x": -1.9141,
-   "y": -0.2134
+   "x": 1.7571,
+   "y": 0.9677
   },
   {
    "id": "clpr-spec",
    "active": 1,
    "total": 3,
    "category": "Other",
-   "x": 1.7571,
-   "y": 0.9677
-  },
-  {
-   "id": "clpr-website",
-   "active": 1,
-   "total": 3,
-   "category": "Docs / Web",
    "x": -1.3091,
    "y": 1.3947
   },
@@ -211,6 +211,6 @@
    "shared": 3
   }
  ],
- "generated_at": "2026-11-23T01:13:45.612622+00:00",
+ "generated_at": "2026-11-24T01:14:30.915425+00:00",
  "stale": false
 }

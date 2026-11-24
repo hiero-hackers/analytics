@@ -97,7 +97,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-23T01:10:39.734211+00:00"
+  "end": "2026-11-24T01:10:55.434550+00:00"
  },
  "rows": [
   {
@@ -282,8 +282,8 @@
   },
   {
    "repo": "hiero-sdk-rust",
-   "score": 6.5,
-   "Maintained": 2.0,
+   "score": 6.4,
+   "Maintained": 1.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
    "Dangerous-Workflow": 10.0,
@@ -353,24 +353,6 @@
    "SAST": 3.0
   },
   {
-   "repo": "solo",
-   "score": 8.9,
-   "Maintained": 10.0,
-   "Code-Review": 9.0,
-   "CII-Best-Practices": 2.0,
-   "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 10.0,
-   "Token-Permissions": 10.0,
-   "Pinned-Dependencies": 9.0,
-   "Fuzzing": 10.0,
-   "License": 10.0,
-   "Signed-Releases": 8.0,
-   "Security-Policy": 10.0,
-   "Branch-Protection": 4.0,
-   "Packaging": 10.0,
-   "SAST": 10.0
-  },
-  {
    "repo": "hiero-block-node",
    "score": 6.5,
    "Maintained": 10.0,
@@ -422,7 +404,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 4.0,
    "Packaging": null,
-   "SAST": 9.0
+   "SAST": 8.0
   },
   {
    "repo": "hiero",
@@ -444,7 +426,7 @@
   },
   {
    "repo": "hiero-sdk-python",
-   "score": 9.4,
+   "score": 9.3,
    "Maintained": 10.0,
    "Code-Review": 10.0,
    "CII-Best-Practices": 2.0,
@@ -458,7 +440,7 @@
    "Security-Policy": 10.0,
    "Branch-Protection": 9.0,
    "Packaging": 10.0,
-   "SAST": 9.0
+   "SAST": 8.0
   },
   {
    "repo": "hiero-gradle-conventions",
@@ -641,6 +623,6 @@
    "SAST": 8.0
   }
  ],
- "generated_at": "2026-11-23T01:10:39.734211+00:00",
+ "generated_at": "2026-11-24T01:10:55.434550+00:00",
  "stale": false
 }
