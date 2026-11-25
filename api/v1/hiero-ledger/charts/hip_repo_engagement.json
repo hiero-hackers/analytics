@@ -33,7 +33,7 @@
  "window": {
   "kind": "all",
   "days": null,
-  "end": "2026-11-24T01:12:40.653846+00:00"
+  "end": "2026-11-25T01:12:48.324134+00:00"
  },
  "series": [
   {
@@ -59,31 +59,31 @@
    "repo": "hiero-consensus-node",
    "distinct_hips_merged": 38,
    "matched_prs": 233,
-   "total_prs": 5729
+   "total_prs": 5734
   },
   {
    "repo": "hiero-mirror-node",
    "distinct_hips_merged": 38,
-   "matched_prs": 198,
-   "total_prs": 3903
+   "matched_prs": 199,
+   "total_prs": 3910
   },
   {
    "repo": "hiero-sdk-js",
    "distinct_hips_merged": 15,
    "matched_prs": 41,
-   "total_prs": 1319
+   "total_prs": 1321
   },
   {
    "repo": "solo",
    "distinct_hips_merged": 14,
    "matched_prs": 14,
-   "total_prs": 2625
+   "total_prs": 2634
   },
   {
    "repo": "hiero-json-rpc-relay",
    "distinct_hips_merged": 14,
    "matched_prs": 16,
-   "total_prs": 1502
+   "total_prs": 1505
   },
   {
    "repo": "hiero-sdk-go",
@@ -131,13 +131,13 @@
    "repo": "hiero-block-node",
    "distinct_hips_merged": 5,
    "matched_prs": 11,
-   "total_prs": 1783
+   "total_prs": 1785
   },
   {
    "repo": "hiero-sdk-python",
    "distinct_hips_merged": 5,
    "matched_prs": 5,
-   "total_prs": 1110
+   "total_prs": 1113
   },
   {
    "repo": "hiero-sdk-tck",
@@ -149,7 +149,7 @@
    "repo": "hiero-website",
    "distinct_hips_merged": 4,
    "matched_prs": 4,
-   "total_prs": 439
+   "total_prs": 440
   },
   {
    "repo": "hiero-contracts",
@@ -185,7 +185,7 @@
    "repo": "solo-charts",
    "distinct_hips_merged": 1,
    "matched_prs": 1,
-   "total_prs": 114
+   "total_prs": 214
   },
   {
    "repo": "hiero-docs",
@@ -197,7 +197,7 @@
    "repo": "hiero-gradle-conventions",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 416
+   "total_prs": 417
   },
   {
    "repo": "hiero-cryptography",
@@ -227,7 +227,7 @@
    "repo": "heka-identity-platform",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 156
+   "total_prs": 157
   },
   {
    "repo": "hiero-hederium",
@@ -239,7 +239,7 @@
    "repo": "hiero-solo-action",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 96
+   "total_prs": 97
   },
   {
    "repo": "homebrew-tools",
@@ -251,7 +251,7 @@
    "repo": "hiero",
    "distinct_hips_merged": 0,
    "matched_prs": 0,
-   "total_prs": 78
+   "total_prs": 75
   },
   {
    "repo": ".github",
@@ -308,6 +308,6 @@
    "total_prs": 4
   }
  ],
- "generated_at": "2026-11-24T01:12:40.653846+00:00",
+ "generated_at": "2026-11-25T01:12:48.324134+00:00",
  "stale": false
 }
