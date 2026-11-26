@@ -41,27 +41,14 @@
   "hiero-gradle-conventions",
   "hiero-sdk-js",
   "hiero-solo-action",
-  "solo-charts",
-  "solo-containers"
+  "solo-charts"
  ],
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-25T01:12:01.423984+00:00"
+  "end": "2026-11-26T01:27:06.724918+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2026-10-26T19:42:15Z",
-   "tag_name": "v0.165.2-rc1",
-   "type": "prerelease"
-  },
-  {
-   "repo": "solo-containers",
-   "time": "2026-10-26T23:07:13Z",
-   "tag_name": "v0.47.0",
-   "type": "release"
-  },
   {
    "repo": "solo",
    "time": "2026-10-27T16:24:51Z",
@@ -403,8 +390,14 @@
    "time": "2026-11-24T21:57:27Z",
    "tag_name": "v0.79.4",
    "type": "release"
+  },
+  {
+   "repo": "hiero-block-node",
+   "time": "2026-11-25T19:09:09Z",
+   "tag_name": "v0.48.0-rc1",
+   "type": "prerelease"
   }
  ],
- "generated_at": "2026-11-25T01:12:01.423984+00:00",
+ "generated_at": "2026-11-26T01:27:06.724918+00:00",
  "stale": false
 }

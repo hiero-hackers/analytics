@@ -58,10 +58,17 @@
   }
  ],
  "row_count": 3,
- "generated_at": "2026-11-25T01:10:47.504623+00:00",
+ "generated_at": "2026-11-26T01:25:44.750559+00:00",
  "stale": false,
  "periods": {
   "7d": [
+   {
+    "repo": "hiero-agentic-support",
+    "maintainers": 1,
+    "active_maintainers": 0,
+    "committers": 2,
+    "triage": 0
+   },
    {
     "repo": "sdk-collaboration-hub",
     "maintainers": 3,
@@ -126,6 +133,13 @@
     "triage": 0
    },
    {
+    "repo": "solo-charts",
+    "maintainers": 5,
+    "active_maintainers": 0,
+    "committers": 3,
+    "triage": 0
+   },
+   {
     "repo": "solo-containers",
     "maintainers": 5,
     "active_maintainers": 0,
@@ -175,7 +189,7 @@
     "triage": 1
    },
    {
-    "repo": "hiero",
+    "repo": ".github",
     "maintainers": 16,
     "active_maintainers": 0,
     "committers": 0,
@@ -186,13 +200,6 @@
     "maintainers": 16,
     "active_maintainers": 0,
     "committers": 0,
-    "triage": 0
-   },
-   {
-    "repo": "hiero-agentic-support",
-    "maintainers": 1,
-    "active_maintainers": 1,
-    "committers": 2,
     "triage": 0
    },
    {
@@ -238,13 +245,6 @@
     "triage": 0
    },
    {
-    "repo": "solo-charts",
-    "maintainers": 5,
-    "active_maintainers": 1,
-    "committers": 3,
-    "triage": 0
-   },
-   {
     "repo": "hiero-consensus-specifications",
     "maintainers": 5,
     "active_maintainers": 1,
@@ -266,7 +266,7 @@
     "triage": 0
    },
    {
-    "repo": ".github",
+    "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 1,
     "committers": 0,
@@ -366,13 +366,6 @@
     "triage": 0
    },
    {
-    "repo": "hiero",
-    "maintainers": 16,
-    "active_maintainers": 0,
-    "committers": 0,
-    "triage": 0
-   },
-   {
     "repo": "tsc",
     "maintainers": 16,
     "active_maintainers": 0,
@@ -430,6 +423,13 @@
    },
    {
     "repo": ".github",
+    "maintainers": 16,
+    "active_maintainers": 1,
+    "committers": 0,
+    "triage": 0
+   },
+   {
+    "repo": "hiero",
     "maintainers": 16,
     "active_maintainers": 1,
     "committers": 0,

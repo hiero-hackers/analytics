@@ -69,296 +69,296 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-25T01:04:05.185232+00:00"
+  "end": "2026-11-26T01:13:52.325324+00:00"
  },
  "nodes": [
   {
    "id": "hiero-consensus-node",
-   "active": 74,
+   "active": 75,
    "total": 295,
    "category": "Core network",
-   "x": -0.8663,
-   "y": 2.1017
+   "x": -1.3881,
+   "y": 1.4167
   },
   {
    "id": "hiero-sdk-js",
-   "active": 53,
-   "total": 371,
+   "active": 54,
+   "total": 373,
    "category": "SDKs",
-   "x": -1.0288,
-   "y": 1.8712
+   "x": -1.3561,
+   "y": 1.1416
   },
   {
    "id": "hiero-sdk-java",
-   "active": 38,
+   "active": 36,
    "total": 225,
    "category": "SDKs",
-   "x": -0.8263,
-   "y": 1.6527
+   "x": -0.9716,
+   "y": 1.1639
   },
   {
    "id": "hiero-sdk-python",
    "active": 34,
    "total": 288,
    "category": "SDKs",
-   "x": -1.3115,
-   "y": 1.0852
+   "x": -0.8566,
+   "y": 0.576
   },
   {
    "id": "governance",
    "active": 30,
    "total": 143,
    "category": "Governance",
-   "x": -1.4239,
-   "y": 1.7306
+   "x": -1.1648,
+   "y": 1.1497
   },
   {
    "id": "solo",
    "active": 29,
    "total": 102,
    "category": "Tooling / DevEx",
-   "x": -1.124,
-   "y": 2.1712
+   "x": -1.1678,
+   "y": 1.617
   },
   {
    "id": "hiero-json-rpc-relay",
-   "active": 25,
+   "active": 24,
    "total": 159,
    "category": "EVM / smart contracts",
-   "x": -0.5669,
-   "y": 2.3599
+   "x": -1.4855,
+   "y": 1.7067
   },
   {
    "id": "hiero-mirror-node",
-   "active": 24,
-   "total": 245,
+   "active": 23,
+   "total": 244,
    "category": "Core network",
-   "x": -0.658,
-   "y": 2.1073
+   "x": -1.6029,
+   "y": 1.3374
   },
   {
    "id": "hiero-block-node",
-   "active": 24,
+   "active": 23,
    "total": 68,
    "category": "Core network",
-   "x": -1.434,
-   "y": 2.3474
+   "x": -1.6626,
+   "y": 1.6331
   },
   {
    "id": "hiero-improvement-proposals",
-   "active": 21,
+   "active": 19,
    "total": 182,
    "category": "Governance",
-   "x": -1.2063,
-   "y": 1.7029
-  },
-  {
-   "id": "hiero-sdk-cpp",
-   "active": 18,
-   "total": 117,
-   "category": "SDKs",
-   "x": -0.56,
-   "y": 1.6689
+   "x": -1.5675,
+   "y": 0.9113
   },
   {
    "id": "hiero-sdk-go",
    "active": 17,
    "total": 143,
    "category": "SDKs",
-   "x": -1.3726,
-   "y": 2.028
+   "x": -1.2262,
+   "y": 0.9059
+  },
+  {
+   "id": "hiero-sdk-cpp",
+   "active": 17,
+   "total": 117,
+   "category": "SDKs",
+   "x": -0.9067,
+   "y": 1.4159
   },
   {
    "id": "hiero-cryptography",
    "active": 17,
    "total": 39,
    "category": "Core network",
-   "x": -0.9635,
-   "y": 2.9383
+   "x": -1.4518,
+   "y": 2.1603
   },
   {
    "id": "hiero-sdk-tck",
    "active": 14,
    "total": 46,
    "category": "SDKs",
-   "x": -0.9113,
-   "y": 1.2837
+   "x": -0.6796,
+   "y": 1.0041
   },
   {
    "id": "hiero-website",
    "active": 11,
    "total": 84,
    "category": "Docs / Web",
-   "x": -0.2268,
-   "y": 1.2566
-  },
-  {
-   "id": "hiero-sdk-swift",
-   "active": 11,
-   "total": 59,
-   "category": "SDKs",
-   "x": -0.1275,
-   "y": 1.8705
+   "x": -0.3066,
+   "y": 1.0292
   },
   {
    "id": "solo-docs",
    "active": 11,
    "total": 20,
    "category": "Tooling / DevEx",
-   "x": -1.5368,
-   "y": 2.9203
+   "x": -0.6123,
+   "y": 2.2364
+  },
+  {
+   "id": "hiero-sdk-swift",
+   "active": 10,
+   "total": 59,
+   "category": "SDKs",
+   "x": -0.8496,
+   "y": 1.8255
   },
   {
    "id": "hiero-sdk-rust",
-   "active": 9,
+   "active": 8,
    "total": 56,
    "category": "SDKs",
-   "x": -0.3396,
-   "y": 1.9516
-  },
-  {
-   "id": "hiero-solo-action",
-   "active": 9,
-   "total": 29,
-   "category": "Tooling / DevEx",
-   "x": -0.5467,
-   "y": 1.0765
-  },
-  {
-   "id": "hiero-cli",
-   "active": 8,
-   "total": 59,
-   "category": "Tooling / DevEx",
-   "x": -0.281,
-   "y": 2.5913
+   "x": -0.6725,
+   "y": 1.5265
   },
   {
    "id": "tsc",
    "active": 8,
    "total": 31,
    "category": "Governance",
-   "x": -1.9026,
-   "y": 1.3831
+   "x": -1.6272,
+   "y": 0.2563
   },
   {
-   "id": "hiero-consensus-specifications",
+   "id": "hiero-solo-action",
    "active": 8,
-   "total": 25,
-   "category": "Core network",
-   "x": -3.8016,
-   "y": 1.5846
+   "total": 29,
+   "category": "Tooling / DevEx",
+   "x": -0.3941,
+   "y": 1.3481
+  },
+  {
+   "id": "solo-containers",
+   "active": 8,
+   "total": 15,
+   "category": "Tooling / DevEx",
+   "x": -2.0648,
+   "y": 2.6426
   },
   {
    "id": "hiero-mirror-node-explorer",
    "active": 7,
    "total": 100,
    "category": "Core network",
-   "x": -0.783,
-   "y": 2.5769
+   "x": -1.9056,
+   "y": 1.4634
+  },
+  {
+   "id": "hiero-cli",
+   "active": 7,
+   "total": 59,
+   "category": "Tooling / DevEx",
+   "x": -1.9073,
+   "y": 1.8832
   },
   {
    "id": "sdk-collaboration-hub",
    "active": 7,
    "total": 42,
    "category": "SDKs",
-   "x": -1.0063,
-   "y": 0.9958
+   "x": -0.5534,
+   "y": 0.7316
   },
   {
    "id": "heka-identity-platform",
    "active": 7,
    "total": 34,
    "category": "Identity / DID",
-   "x": 0.9623,
-   "y": -3.7172
+   "x": 2.3642,
+   "y": -2.7448
   },
   {
-   "id": "hiero-contracts",
+   "id": "hiero-consensus-specifications",
    "active": 7,
-   "total": 20,
-   "category": "EVM / smart contracts",
-   "x": 0.0867,
-   "y": 3.0003
+   "total": 25,
+   "category": "Core network",
+   "x": -1.7437,
+   "y": -1.2617
   },
   {
    "id": "solo-charts",
    "active": 7,
    "total": 18,
    "category": "Tooling / DevEx",
-   "x": -0.6122,
-   "y": 3.4942
-  },
-  {
-   "id": "solo-containers",
-   "active": 7,
-   "total": 14,
-   "category": "Tooling / DevEx",
-   "x": -1.2144,
-   "y": 3.6728
+   "x": -1.4935,
+   "y": 2.7448
   },
   {
    "id": "hiero-enterprise-java",
    "active": 6,
    "total": 22,
    "category": "Apps / Integrations",
-   "x": -1.5879,
-   "y": 0.3643
+   "x": 0.2694,
+   "y": 1.6623
+  },
+  {
+   "id": "hiero-contracts",
+   "active": 6,
+   "total": 20,
+   "category": "EVM / smart contracts",
+   "x": -2.512,
+   "y": 1.7754
   },
   {
    "id": "hiero-gradle-conventions",
    "active": 6,
    "total": 19,
    "category": "Tooling / DevEx",
-   "x": -1.7256,
-   "y": 1.1175
+   "x": -2.1254,
+   "y": 0.6219
   },
   {
    "id": ".github",
    "active": 5,
    "total": 16,
    "category": "Governance",
-   "x": -0.1877,
-   "y": 0.8424
+   "x": -1.2908,
+   "y": 0.0652
   },
   {
    "id": "hiero-ethereum-execution-spec-tests",
-   "active": 5,
+   "active": 4,
    "total": 8,
    "category": "EVM / smart contracts",
-   "x": 1.4394,
-   "y": 3.6833
+   "x": -3.8016,
+   "y": 2.4371
   },
   {
    "id": "hiero-docs",
-   "active": 4,
+   "active": 3,
    "total": 135,
    "category": "Docs / Web",
-   "x": -1.6948,
-   "y": 2.0277
-  },
-  {
-   "id": "hiero-hederium",
-   "active": 4,
-   "total": 10,
-   "category": "EVM / smart contracts",
-   "x": -1.8212,
-   "y": 3.7172
+   "x": -1.8025,
+   "y": 0.8124
   },
   {
    "id": "homebrew-tools",
    "active": 3,
    "total": 18,
    "category": "Tooling / DevEx",
-   "x": -1.9571,
-   "y": 2.6807
+   "x": -0.9951,
+   "y": 2.436
   },
   {
-   "id": "hiero-did-sdk-python",
+   "id": "hiero-hederium",
+   "active": 3,
+   "total": 10,
+   "category": "EVM / smart contracts",
+   "x": -3.0852,
+   "y": 0.9357
+  },
+  {
+   "id": "hiero",
    "active": 2,
-   "total": 16,
-   "category": "Identity / DID",
-   "x": -0.9281,
-   "y": 0.2933
+   "total": 25,
+   "category": "Other",
+   "x": -1.215,
+   "y": 0.3747
   },
   {
    "id": "tsc-eligibility-check",
@@ -366,39 +366,23 @@
    "total": 5,
    "category": "Governance",
    "x": -0.45,
-   "y": -5.3372
+   "y": -4.3648
   },
   {
-   "id": "hiero-local-node",
+   "id": "hiero-did-sdk-python",
    "active": 1,
-   "total": 95,
-   "category": "Tooling / DevEx",
-   "x": -1.0521,
-   "y": 2.4379
-  },
-  {
-   "id": "hiero",
-   "active": 1,
-   "total": 25,
-   "category": "Other",
-   "x": 0.0411,
-   "y": 1.5103
-  },
-  {
-   "id": "hiero-did-sdk-js",
-   "active": 1,
-   "total": 19,
+   "total": 16,
    "category": "Identity / DID",
-   "x": -0.2635,
-   "y": -0.024
+   "x": -0.6712,
+   "y": -0.0833
   },
   {
    "id": "identity-collaboration-hub",
    "active": 1,
    "total": 8,
    "category": "Identity / DID",
-   "x": -3.7588,
-   "y": -1.2329
+   "x": -2.5076,
+   "y": -2.3708
   },
   {
    "id": "hiero-agentic-support",
@@ -406,7 +390,23 @@
    "total": 3,
    "category": "Other",
    "x": 0.45,
-   "y": -5.3372
+   "y": -4.3648
+  },
+  {
+   "id": "hiero-local-node",
+   "active": 0,
+   "total": 95,
+   "category": "Tooling / DevEx",
+   "x": -1.811,
+   "y": 1.1717
+  },
+  {
+   "id": "hiero-did-sdk-js",
+   "active": 0,
+   "total": 19,
+   "category": "Identity / DID",
+   "x": 0.0666,
+   "y": -0.0373
   },
   {
    "id": "awesome-contributions",
@@ -414,7 +414,7 @@
    "total": 7,
    "category": "Other",
    "x": 3.8016,
-   "y": -0.8215
+   "y": 1.1169
   }
  ],
  "edges": [
@@ -439,13 +439,13 @@
    "shared": 85
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "hiero-sdk-js",
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-mirror-node",
    "shared": 83
   },
   {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-mirror-node",
+   "source": "hiero-mirror-node",
+   "target": "hiero-sdk-js",
    "shared": 83
   },
   {
@@ -514,13 +514,13 @@
    "shared": 56
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "hiero-mirror-node-explorer",
+   "source": "governance",
+   "target": "hiero-improvement-proposals",
    "shared": 55
   },
   {
-   "source": "governance",
-   "target": "hiero-improvement-proposals",
+   "source": "hiero-mirror-node",
+   "target": "hiero-mirror-node-explorer",
    "shared": 55
   },
   {
@@ -539,8 +539,8 @@
    "shared": 52
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-consensus-node",
+   "source": "hiero-docs",
+   "target": "hiero-sdk-js",
    "shared": 51
   },
   {
@@ -549,9 +549,9 @@
    "shared": 51
   },
   {
-   "source": "hiero-docs",
-   "target": "hiero-sdk-js",
-   "shared": 51
+   "source": "hiero-block-node",
+   "target": "hiero-consensus-node",
+   "shared": 50
   },
   {
    "source": "hiero-sdk-cpp",
@@ -559,13 +559,18 @@
    "shared": 49
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-json-rpc-relay",
+   "source": "hiero-mirror-node",
+   "target": "solo",
    "shared": 47
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "solo",
+   "source": "hiero-docs",
+   "target": "hiero-mirror-node",
+   "shared": 47
+  },
+  {
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-json-rpc-relay",
    "shared": 47
   },
   {
@@ -574,9 +579,9 @@
    "shared": 47
   },
   {
-   "source": "hiero-docs",
-   "target": "hiero-mirror-node",
-   "shared": 47
+   "source": "hiero-sdk-js",
+   "target": "solo",
+   "shared": 46
   },
   {
    "source": "governance",
@@ -584,8 +589,8 @@
    "shared": 46
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "solo",
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-mirror-node-explorer",
    "shared": 46
   },
   {
@@ -599,11 +604,6 @@
    "shared": 46
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-mirror-node-explorer",
-   "shared": 46
-  },
-  {
    "source": "hiero-sdk-cpp",
    "target": "hiero-sdk-python",
    "shared": 45
@@ -614,13 +614,13 @@
    "shared": 44
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-sdk-java",
+   "source": "hiero-mirror-node",
+   "target": "hiero-sdk-go",
    "shared": 44
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "hiero-sdk-go",
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-sdk-java",
    "shared": 44
   },
   {
@@ -639,19 +639,9 @@
    "shared": 40
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-mirror-node",
-   "shared": 39
-  },
-  {
    "source": "hiero-improvement-proposals",
    "target": "hiero-sdk-go",
    "shared": 39
-  },
-  {
-   "source": "hiero-sdk-js",
-   "target": "hiero-sdk-swift",
-   "shared": 38
   },
   {
    "source": "hiero-json-rpc-relay",
@@ -664,8 +654,18 @@
    "shared": 38
   },
   {
-   "source": "hiero-consensus-node",
-   "target": "hiero-cryptography",
+   "source": "hiero-block-node",
+   "target": "hiero-mirror-node",
+   "shared": 38
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-swift",
+   "shared": 38
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-sdk-rust",
    "shared": 37
   },
   {
@@ -674,14 +674,9 @@
    "shared": 37
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "hiero-sdk-rust",
+   "source": "hiero-consensus-node",
+   "target": "hiero-cryptography",
    "shared": 37
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "solo",
-   "shared": 36
   },
   {
    "source": "hiero-improvement-proposals",
@@ -691,6 +686,11 @@
   {
    "source": "hiero-sdk-java",
    "target": "hiero-sdk-swift",
+   "shared": 36
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "solo",
    "shared": 36
   },
   {
@@ -714,18 +714,13 @@
    "shared": 33
   },
   {
+   "source": "governance",
+   "target": "hiero-sdk-go",
+   "shared": 32
+  },
+  {
    "source": "hiero-sdk-python",
    "target": "hiero-website",
-   "shared": 32
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "hiero-sdk-cpp",
-   "shared": 32
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "solo",
    "shared": 32
   },
   {
@@ -739,9 +734,19 @@
    "shared": 32
   },
   {
-   "source": "governance",
-   "target": "hiero-sdk-go",
+   "source": "hiero-consensus-node",
+   "target": "hiero-sdk-cpp",
    "shared": 32
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "solo",
+   "shared": 32
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-improvement-proposals",
+   "shared": 31
   },
   {
    "source": "hiero-sdk-cpp",
@@ -754,18 +759,18 @@
    "shared": 31
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-improvement-proposals",
-   "shared": 31
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "hiero-sdk-rust",
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-sdk-java",
    "shared": 30
   },
   {
    "source": "hiero-block-node",
    "target": "hiero-sdk-js",
+   "shared": 30
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "hiero-sdk-rust",
    "shared": 30
   },
   {
@@ -779,9 +784,9 @@
    "shared": 30
   },
   {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-sdk-java",
-   "shared": 30
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-rust",
+   "shared": 29
   },
   {
    "source": "hiero-local-node",
@@ -789,23 +794,8 @@
    "shared": 29
   },
   {
-   "source": "hiero-sdk-go",
-   "target": "hiero-sdk-rust",
-   "shared": 29
-  },
-  {
-   "source": "hiero-sdk-java",
-   "target": "sdk-collaboration-hub",
-   "shared": 28
-  },
-  {
-   "source": "hiero-sdk-java",
-   "target": "hiero-sdk-tck",
-   "shared": 28
-  },
-  {
-   "source": "hiero-sdk-cpp",
-   "target": "hiero-website",
+   "source": "hiero-docs",
+   "target": "hiero-sdk-java",
    "shared": 28
   },
   {
@@ -814,18 +804,63 @@
    "shared": 28
   },
   {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-website",
+   "shared": 28
+  },
+  {
    "source": "hiero-docs",
    "target": "hiero-local-node",
    "shared": 28
   },
   {
-   "source": "hiero-docs",
-   "target": "hiero-sdk-java",
+   "source": "hiero-sdk-java",
+   "target": "hiero-sdk-tck",
    "shared": 28
+  },
+  {
+   "source": "hiero-sdk-java",
+   "target": "sdk-collaboration-hub",
+   "shared": 28
+  },
+  {
+   "source": "governance",
+   "target": "hiero-json-rpc-relay",
+   "shared": 27
   },
   {
    "source": "hiero-mirror-node-explorer",
    "target": "solo",
+   "shared": 27
+  },
+  {
+   "source": "governance",
+   "target": "hiero-mirror-node-explorer",
+   "shared": 27
+  },
+  {
+   "source": "governance",
+   "target": "hiero-sdk-tck",
+   "shared": 27
+  },
+  {
+   "source": "hiero-mirror-node-explorer",
+   "target": "hiero-sdk-java",
+   "shared": 27
+  },
+  {
+   "source": "governance",
+   "target": "sdk-collaboration-hub",
+   "shared": 27
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "hiero-sdk-tck",
+   "shared": 27
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-json-rpc-relay",
    "shared": 27
   },
   {
@@ -835,52 +870,7 @@
   },
   {
    "source": "hiero-consensus-node",
-   "target": "hiero-sdk-tck",
-   "shared": 27
-  },
-  {
-   "source": "governance",
-   "target": "hiero-sdk-tck",
-   "shared": 27
-  },
-  {
-   "source": "governance",
-   "target": "hiero-mirror-node-explorer",
-   "shared": 27
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-json-rpc-relay",
-   "shared": 27
-  },
-  {
-   "source": "governance",
-   "target": "sdk-collaboration-hub",
-   "shared": 27
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "hiero-sdk-java",
-   "shared": 27
-  },
-  {
-   "source": "governance",
-   "target": "hiero-json-rpc-relay",
-   "shared": 27
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-mirror-node",
-   "shared": 26
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "hiero-sdk-cpp",
-   "shared": 26
-  },
-  {
-   "source": "governance",
-   "target": "tsc",
+   "target": "hiero-sdk-swift",
    "shared": 26
   },
   {
@@ -891,6 +881,26 @@
   {
    "source": "hiero-sdk-go",
    "target": "hiero-sdk-tck",
+   "shared": 26
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-website",
+   "shared": 26
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "solo",
+   "shared": 26
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "hiero-sdk-cpp",
+   "shared": 26
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-mirror-node",
    "shared": 26
   },
   {
@@ -899,18 +909,8 @@
    "shared": 26
   },
   {
-   "source": "hiero-sdk-go",
-   "target": "solo",
-   "shared": 26
-  },
-  {
-   "source": "hiero-sdk-js",
-   "target": "hiero-website",
-   "shared": 26
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "hiero-sdk-swift",
+   "source": "governance",
+   "target": "tsc",
    "shared": 26
   },
   {
@@ -919,8 +919,33 @@
    "shared": 25
   },
   {
+   "source": "hiero-sdk-cpp",
+   "target": "solo",
+   "shared": 25
+  },
+  {
+   "source": "hiero-mirror-node-explorer",
+   "target": "hiero-sdk-go",
+   "shared": 25
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "sdk-collaboration-hub",
+   "shared": 25
+  },
+  {
    "source": "hiero-docs",
    "target": "hiero-sdk-go",
+   "shared": 25
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "hiero-sdk-swift",
+   "shared": 25
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-sdk-rust",
    "shared": 25
   },
   {
@@ -934,39 +959,9 @@
    "shared": 25
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "sdk-collaboration-hub",
-   "shared": 25
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "hiero-sdk-go",
-   "shared": 25
-  },
-  {
-   "source": "hiero-sdk-go",
-   "target": "hiero-sdk-swift",
-   "shared": 25
-  },
-  {
-   "source": "hiero-sdk-cpp",
-   "target": "hiero-sdk-rust",
-   "shared": 25
-  },
-  {
-   "source": "hiero-sdk-cpp",
-   "target": "solo",
-   "shared": 25
-  },
-  {
    "source": "hiero-json-rpc-relay",
    "target": "hiero-sdk-go",
    "shared": 25
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "hiero-sdk-rust",
-   "shared": 24
   },
   {
    "source": "hiero-sdk-cpp",
@@ -974,7 +969,32 @@
    "shared": 24
   },
   {
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-java",
+   "shared": 24
+  },
+  {
    "source": "governance",
+   "target": "hiero-sdk-rust",
+   "shared": 24
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "sdk-collaboration-hub",
+   "shared": 24
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-swift",
+   "shared": 24
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "solo",
+   "shared": 24
+  },
+  {
+   "source": "hiero-mirror-node",
    "target": "hiero-sdk-rust",
    "shared": 24
   },
@@ -984,33 +1004,13 @@
    "shared": 24
   },
   {
-   "source": "hiero-sdk-rust",
-   "target": "solo",
-   "shared": 24
-  },
-  {
-   "source": "hiero-sdk-python",
+   "source": "hiero-sdk-go",
    "target": "sdk-collaboration-hub",
-   "shared": 24
-  },
-  {
-   "source": "hiero-sdk-python",
-   "target": "hiero-sdk-swift",
-   "shared": 24
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-sdk-java",
-   "shared": 24
-  },
-  {
-   "source": "hiero-sdk-python",
-   "target": "hiero-sdk-tck",
    "shared": 23
   },
   {
-   "source": "hiero-cli",
-   "target": "hiero-improvement-proposals",
+   "source": "hiero-sdk-tck",
+   "target": "sdk-collaboration-hub",
    "shared": 23
   },
   {
@@ -1019,18 +1019,8 @@
    "shared": 23
   },
   {
-   "source": "governance",
-   "target": "hiero-website",
-   "shared": 23
-  },
-  {
-   "source": "hiero-sdk-tck",
-   "target": "solo",
-   "shared": 23
-  },
-  {
-   "source": "hiero-sdk-tck",
-   "target": "sdk-collaboration-hub",
+   "source": "hiero-cli",
+   "target": "hiero-improvement-proposals",
    "shared": 23
   },
   {
@@ -1039,23 +1029,38 @@
    "shared": 23
   },
   {
+   "source": "governance",
+   "target": "hiero-website",
+   "shared": 23
+  },
+  {
    "source": "hiero-sdk-go",
    "target": "hiero-sdk-python",
    "shared": 23
   },
   {
-   "source": "hiero-sdk-go",
-   "target": "sdk-collaboration-hub",
+   "source": "hiero-sdk-tck",
+   "target": "solo",
    "shared": 23
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-tck",
+   "shared": 23
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-mirror-node-explorer",
+   "shared": 22
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "hiero-sdk-go",
+   "shared": 22
   },
   {
    "source": "governance",
    "target": "hiero-sdk-python",
-   "shared": 22
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-local-node",
    "shared": 22
   },
   {
@@ -1069,48 +1074,18 @@
    "shared": 22
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-mirror-node-explorer",
-   "shared": 22
-  },
-  {
    "source": "hiero-mirror-node",
    "target": "hiero-sdk-swift",
    "shared": 22
   },
   {
-   "source": "hiero-local-node",
-   "target": "hiero-sdk-go",
+   "source": "hiero-block-node",
+   "target": "hiero-local-node",
    "shared": 22
-  },
-  {
-   "source": "hiero-sdk-rust",
-   "target": "hiero-sdk-tck",
-   "shared": 21
   },
   {
    "source": "governance",
    "target": "hiero-cryptography",
-   "shared": 21
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-cryptography",
-   "shared": 21
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-website",
-   "shared": 21
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "tsc",
-   "shared": 21
-  },
-  {
-   "source": "hiero-sdk-js",
-   "target": "hiero-solo-action",
    "shared": 21
   },
   {
@@ -1119,13 +1094,33 @@
    "shared": 21
   },
   {
-   "source": "hiero-docs",
-   "target": "solo",
-   "shared": 20
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-website",
+   "shared": 21
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "hiero-solo-action",
+   "shared": 21
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "hiero-sdk-tck",
+   "shared": 21
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-cryptography",
+   "shared": 21
   },
   {
    "source": "hiero-improvement-proposals",
-   "target": "hiero-sdk-tck",
+   "target": "tsc",
+   "shared": 21
+  },
+  {
+   "source": "hiero-docs",
+   "target": "solo",
    "shared": 20
   },
   {
@@ -1134,13 +1129,8 @@
    "shared": 20
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-sdk-cpp",
-   "shared": 20
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "solo",
+   "source": "hiero-cli",
+   "target": "hiero-sdk-java",
    "shared": 20
   },
   {
@@ -1149,19 +1139,24 @@
    "shared": 20
   },
   {
+   "source": "hiero-cryptography",
+   "target": "solo",
+   "shared": 20
+  },
+  {
    "source": "hiero-json-rpc-relay",
    "target": "hiero-sdk-cpp",
    "shared": 20
   },
   {
-   "source": "hiero-cli",
-   "target": "hiero-sdk-java",
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-sdk-cpp",
    "shared": 20
   },
   {
-   "source": "hiero-website",
-   "target": "solo",
-   "shared": 19
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-sdk-tck",
+   "shared": 20
   },
   {
    "source": "hiero-mirror-node-explorer",
@@ -1179,13 +1174,28 @@
    "shared": 19
   },
   {
-   "source": "hiero-mirror-node",
+   "source": "governance",
+   "target": "hiero",
+   "shared": 19
+  },
+  {
+   "source": "hiero-website",
+   "target": "solo",
+   "shared": 19
+  },
+  {
+   "source": "hiero-sdk-swift",
    "target": "hiero-sdk-tck",
    "shared": 19
   },
   {
    "source": "hiero-consensus-node",
-   "target": "hiero-website",
+   "target": "hiero-gradle-conventions",
+   "shared": 19
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "hiero-sdk-tck",
    "shared": 19
   },
   {
@@ -1195,53 +1205,8 @@
   },
   {
    "source": "hiero-consensus-node",
-   "target": "hiero-gradle-conventions",
+   "target": "hiero-website",
    "shared": 19
-  },
-  {
-   "source": "governance",
-   "target": "hiero",
-   "shared": 19
-  },
-  {
-   "source": "hiero-sdk-swift",
-   "target": "hiero-sdk-tck",
-   "shared": 19
-  },
-  {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-sdk-rust",
-   "shared": 18
-  },
-  {
-   "source": "governance",
-   "target": "hiero-sdk-swift",
-   "shared": 18
-  },
-  {
-   "source": "hiero-solo-action",
-   "target": "solo",
-   "shared": 18
-  },
-  {
-   "source": "hiero-sdk-swift",
-   "target": "solo",
-   "shared": 18
-  },
-  {
-   "source": "solo",
-   "target": "solo-charts",
-   "shared": 18
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-docs",
-   "shared": 18
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "hiero-sdk-rust",
-   "shared": 18
   },
   {
    "source": "hiero-cli",
@@ -1250,26 +1215,66 @@
   },
   {
    "source": "hiero-json-rpc-relay",
+   "target": "hiero-sdk-rust",
+   "shared": 18
+  },
+  {
+   "source": "hiero-mirror-node-explorer",
+   "target": "hiero-sdk-rust",
+   "shared": 18
+  },
+  {
+   "source": "solo",
+   "target": "solo-charts",
+   "shared": 18
+  },
+  {
+   "source": "governance",
    "target": "hiero-sdk-swift",
+   "shared": 18
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "solo",
+   "shared": 18
+  },
+  {
+   "source": "hiero-solo-action",
+   "target": "solo",
+   "shared": 18
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-docs",
+   "shared": 18
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "tsc",
+   "shared": 17
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-json-rpc-relay",
+   "shared": 17
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-local-node",
+   "shared": 17
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "hiero-json-rpc-relay",
+   "shared": 17
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-js",
    "shared": 17
   },
   {
    "source": "hiero-improvement-proposals",
-   "target": "sdk-collaboration-hub",
-   "shared": 17
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "sdk-collaboration-hub",
-   "shared": 17
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-sdk-swift",
-   "shared": 17
-  },
-  {
-   "source": "hiero-sdk-rust",
    "target": "sdk-collaboration-hub",
    "shared": 17
   },
@@ -1279,12 +1284,32 @@
    "shared": 17
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "tsc",
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-sdk-swift",
    "shared": 17
   },
   {
-   "source": "hiero-consensus-node",
+   "source": "hiero-sdk-rust",
+   "target": "sdk-collaboration-hub",
+   "shared": 17
+  },
+  {
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-sdk-swift",
+   "shared": 17
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-sdk-rust",
+   "shared": 17
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "sdk-collaboration-hub",
+   "shared": 17
+  },
+  {
+   "source": "hiero-sdk-js",
    "target": "tsc",
    "shared": 17
   },
@@ -1294,43 +1319,38 @@
    "shared": 17
   },
   {
+   "source": "solo",
+   "target": "solo-docs",
+   "shared": 17
+  },
+  {
    "source": "hiero-cli",
    "target": "solo",
    "shared": 17
   },
   {
    "source": "hiero-contracts",
-   "target": "hiero-json-rpc-relay",
-   "shared": 17
+   "target": "hiero-mirror-node",
+   "shared": 16
   },
   {
-   "source": "hiero-sdk-python",
+   "source": "governance",
+   "target": "hiero-solo-action",
+   "shared": 16
+  },
+  {
+   "source": "hiero-docs",
    "target": "hiero-sdk-rust",
-   "shared": 17
+   "shared": 16
   },
   {
-   "source": "hiero-cryptography",
-   "target": "hiero-local-node",
-   "shared": 17
+   "source": "hiero-cli",
+   "target": "hiero-docs",
+   "shared": 16
   },
   {
-   "source": "hiero-cryptography",
-   "target": "hiero-json-rpc-relay",
-   "shared": 17
-  },
-  {
-   "source": "solo",
-   "target": "solo-docs",
-   "shared": 17
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-js",
-   "shared": 17
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-website",
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-cpp",
    "shared": 16
   },
   {
@@ -1344,23 +1364,8 @@
    "shared": 16
   },
   {
-   "source": "hiero-sdk-java",
-   "target": "hiero-solo-action",
-   "shared": 16
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-sdk-cpp",
-   "shared": 16
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-docs",
-   "shared": 16
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-mirror-node",
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-sdk-python",
    "shared": 16
   },
   {
@@ -1369,17 +1374,12 @@
    "shared": 16
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-sdk-python",
-   "shared": 16
-  },
-  {
-   "source": "hiero-consensus-node",
+   "source": "hiero-sdk-java",
    "target": "hiero-solo-action",
    "shared": 16
   },
   {
-   "source": "governance",
+   "source": "hiero-sdk-tck",
    "target": "hiero-solo-action",
    "shared": 16
   },
@@ -1389,23 +1389,13 @@
    "shared": 16
   },
   {
-   "source": "hiero-sdk-tck",
-   "target": "hiero-solo-action",
+   "source": "hiero",
+   "target": "hiero-website",
    "shared": 16
   },
   {
    "source": "hiero-sdk-tck",
    "target": "hiero-website",
-   "shared": 16
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "solo-charts",
-   "shared": 16
-  },
-  {
-   "source": "hiero-docs",
-   "target": "hiero-sdk-rust",
    "shared": 16
   },
   {
@@ -1414,63 +1404,23 @@
    "shared": 16
   },
   {
-   "source": "hiero-docs",
-   "target": "hiero-website",
-   "shared": 15
+   "source": "hiero-consensus-node",
+   "target": "hiero-solo-action",
+   "shared": 16
   },
   {
-   "source": "hiero-docs",
-   "target": "tsc",
-   "shared": 15
-  },
-  {
-   "source": "governance",
-   "target": "solo-docs",
-   "shared": 15
+   "source": "hiero-consensus-node",
+   "target": "solo-charts",
+   "shared": 16
   },
   {
    "source": "hiero-block-node",
-   "target": "hiero-sdk-swift",
+   "target": "solo-charts",
    "shared": 15
   },
   {
-   "source": "hiero-sdk-python",
-   "target": "hiero-solo-action",
-   "shared": 15
-  },
-  {
-   "source": "hiero-sdk-rust",
-   "target": "hiero-solo-action",
-   "shared": 15
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
+   "source": "hiero-sdk-java",
    "target": "hiero-website",
-   "shared": 15
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "tsc",
-   "shared": 15
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-java",
-   "shared": 15
-  },
-  {
-   "source": "hiero-sdk-go",
-   "target": "hiero-solo-action",
-   "shared": 15
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "hiero-sdk-python",
-   "shared": 15
-  },
-  {
-   "source": "hiero-sdk-js",
-   "target": "solo-docs",
    "shared": 15
   },
   {
@@ -1479,17 +1429,12 @@
    "shared": 15
   },
   {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-website",
+   "source": "governance",
+   "target": "solo-docs",
    "shared": 15
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "hiero-website",
-   "shared": 15
-  },
-  {
-   "source": "hiero-sdk-cpp",
+   "source": "hiero-sdk-rust",
    "target": "hiero-solo-action",
    "shared": 15
   },
@@ -1499,118 +1444,103 @@
    "shared": 15
   },
   {
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-website",
+   "shared": 15
+  },
+  {
+   "source": "hiero-sdk-python",
+   "target": "hiero-solo-action",
+   "shared": 15
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "tsc",
+   "shared": 15
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "hiero-website",
+   "shared": 15
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-java",
+   "shared": 15
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "hiero-solo-action",
+   "shared": 15
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "hiero-sdk-python",
+   "shared": 15
+  },
+  {
+   "source": "hiero-docs",
+   "target": "tsc",
+   "shared": 15
+  },
+  {
+   "source": "hiero-docs",
+   "target": "hiero-website",
+   "shared": 15
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-gradle-conventions",
+   "shared": 15
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-swift",
+   "shared": 15
+  },
+  {
    "source": "hiero-sdk-swift",
    "target": "hiero-website",
    "shared": 15
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-gradle-conventions",
+   "source": "solo",
+   "target": "solo-containers",
    "shared": 15
   },
   {
-   "source": "hiero-sdk-java",
+   "source": "hiero-mirror-node-explorer",
    "target": "hiero-website",
    "shared": 15
   },
   {
-   "source": "hiero-block-node",
-   "target": "solo-charts",
+   "source": "hiero-sdk-go",
+   "target": "hiero-solo-action",
+   "shared": 15
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "solo-docs",
    "shared": 15
   },
   {
    "source": "hiero-local-node",
-   "target": "sdk-collaboration-hub",
-   "shared": 14
-  },
-  {
-   "source": "governance",
-   "target": "hiero-gradle-conventions",
-   "shared": 14
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "hiero-sdk-swift",
-   "shared": 14
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-mirror-node",
-   "shared": 14
-  },
-  {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-sdk-python",
-   "shared": 14
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-improvement-proposals",
-   "shared": 14
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-sdk-python",
-   "shared": 14
-  },
-  {
-   "source": "solo",
-   "target": "tsc",
-   "shared": 14
-  },
-  {
-   "source": "solo",
-   "target": "solo-containers",
-   "shared": 14
-  },
-  {
-   "source": "governance",
-   "target": "homebrew-tools",
-   "shared": 14
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "solo-docs",
-   "shared": 14
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "hiero-solo-action",
-   "shared": 14
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "tsc",
-   "shared": 14
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-sdk-cpp",
-   "shared": 14
-  },
-  {
-   "source": "hiero-sdk-js",
-   "target": "homebrew-tools",
-   "shared": 14
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "homebrew-tools",
-   "shared": 14
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-sdk-tck",
-   "shared": 14
-  },
-  {
-   "source": "hiero-docs",
    "target": "hiero-sdk-swift",
    "shared": 14
   },
   {
    "source": "hiero-website",
    "target": "tsc",
+   "shared": 14
+  },
+  {
+   "source": "solo",
+   "target": "tsc",
+   "shared": 14
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "sdk-collaboration-hub",
    "shared": 14
   },
   {
@@ -1619,23 +1549,93 @@
    "shared": 14
   },
   {
-   "source": "hiero-website",
-   "target": "sdk-collaboration-hub",
-   "shared": 13
+   "source": "hiero",
+   "target": "hiero-sdk-cpp",
+   "shared": 14
   },
   {
-   "source": "hiero-sdk-rust",
-   "target": "solo-docs",
-   "shared": 13
+   "source": "governance",
+   "target": "homebrew-tools",
+   "shared": 14
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-tck",
+   "shared": 14
+  },
+  {
+   "source": "hiero-sdk-js",
+   "target": "homebrew-tools",
+   "shared": 14
+  },
+  {
+   "source": "solo-charts",
+   "target": "solo-containers",
+   "shared": 14
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "solo-containers",
+   "shared": 14
+  },
+  {
+   "source": "hiero-improvement-proposals",
+   "target": "hiero-solo-action",
+   "shared": 14
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-sdk-python",
+   "shared": 14
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-improvement-proposals",
+   "shared": 14
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "solo-containers",
+   "shared": 14
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "homebrew-tools",
+   "shared": 14
+  },
+  {
+   "source": "governance",
+   "target": "hiero-gradle-conventions",
+   "shared": 14
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "tsc",
+   "shared": 14
   },
   {
    "source": "hiero-docs",
-   "target": "hiero-sdk-cpp",
-   "shared": 13
+   "target": "hiero-sdk-swift",
+   "shared": 14
   },
   {
-   "source": "hiero-sdk-swift",
-   "target": "hiero-solo-action",
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-sdk-python",
+   "shared": 14
+  },
+  {
+   "source": "hiero-consensus-node",
+   "target": "solo-docs",
+   "shared": 14
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-mirror-node",
+   "shared": 14
+  },
+  {
+   "source": ".github",
+   "target": "governance",
    "shared": 13
   },
   {
@@ -1644,68 +1644,13 @@
    "shared": 13
   },
   {
-   "source": "hiero-block-node",
-   "target": "solo-containers",
+   "source": "hiero-local-node",
+   "target": "hiero-sdk-tck",
    "shared": 13
   },
   {
-   "source": "hiero-solo-action",
-   "target": "sdk-collaboration-hub",
-   "shared": 13
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "solo-containers",
-   "shared": 13
-  },
-  {
-   "source": "hiero-consensus-node",
-   "target": "hiero-contracts",
-   "shared": 13
-  },
-  {
-   "source": ".github",
-   "target": "hiero-consensus-node",
-   "shared": 13
-  },
-  {
-   "source": ".github",
-   "target": "hiero-improvement-proposals",
-   "shared": 13
-  },
-  {
-   "source": "hiero-json-rpc-relay",
-   "target": "tsc",
-   "shared": 13
-  },
-  {
-   "source": "hiero-json-rpc-relay",
-   "target": "hiero-solo-action",
-   "shared": 13
-  },
-  {
-   "source": ".github",
-   "target": "hiero-sdk-js",
-   "shared": 13
-  },
-  {
-   "source": "hiero",
-   "target": "solo",
-   "shared": 13
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "hiero-solo-action",
-   "shared": 13
-  },
-  {
-   "source": "solo-charts",
-   "target": "solo-containers",
-   "shared": 13
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-local-node",
+   "source": "hiero-sdk-rust",
+   "target": "solo-docs",
    "shared": 13
   },
   {
@@ -1714,28 +1659,13 @@
    "shared": 13
   },
   {
-   "source": "hiero-cli",
-   "target": "hiero-sdk-go",
-   "shared": 13
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-sdk-rust",
-   "shared": 13
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "hiero-sdk-tck",
+   "source": "hiero-website",
+   "target": "sdk-collaboration-hub",
    "shared": 13
   },
   {
    "source": "hiero-mirror-node",
    "target": "solo-charts",
-   "shared": 13
-  },
-  {
-   "source": ".github",
-   "target": "governance",
    "shared": 13
   },
   {
@@ -1744,23 +1674,133 @@
    "shared": 13
   },
   {
+   "source": ".github",
+   "target": "hiero-sdk-js",
+   "shared": 13
+  },
+  {
+   "source": "hiero",
+   "target": "solo",
+   "shared": 13
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "hiero-solo-action",
+   "shared": 13
+  },
+  {
+   "source": "hiero-mirror-node",
+   "target": "hiero-solo-action",
+   "shared": 13
+  },
+  {
    "source": "hiero-gradle-conventions",
    "target": "hiero-improvement-proposals",
    "shared": 13
   },
   {
+   "source": "hiero-consensus-node",
+   "target": "hiero-contracts",
+   "shared": 13
+  },
+  {
+   "source": "hiero-docs",
+   "target": "hiero-sdk-cpp",
+   "shared": 13
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-rust",
+   "shared": 13
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-local-node",
+   "shared": 13
+  },
+  {
+   "source": "hiero-solo-action",
+   "target": "sdk-collaboration-hub",
+   "shared": 13
+  },
+  {
+   "source": ".github",
+   "target": "hiero-consensus-node",
+   "shared": 13
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-sdk-go",
+   "shared": 13
+  },
+  {
+   "source": "hiero-json-rpc-relay",
+   "target": "tsc",
+   "shared": 13
+  },
+  {
+   "source": "hiero-json-rpc-relay",
+   "target": "hiero-solo-action",
+   "shared": 13
+  },
+  {
+   "source": ".github",
+   "target": "hiero-improvement-proposals",
+   "shared": 13
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "solo",
+   "shared": 12
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-gradle-conventions",
+   "shared": 12
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "hiero-sdk-js",
+   "shared": 12
+  },
+  {
+   "source": "hiero",
+   "target": "sdk-collaboration-hub",
+   "shared": 12
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "hiero-website",
+   "shared": 12
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "homebrew-tools",
+   "shared": 12
+  },
+  {
+   "source": "hiero-mirror-node-explorer",
+   "target": "tsc",
+   "shared": 12
+  },
+  {
+   "source": "hiero-mirror-node-explorer",
+   "target": "hiero-sdk-tck",
+   "shared": 12
+  },
+  {
+   "source": "hiero",
+   "target": "tsc",
+   "shared": 12
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-sdk-tck",
+   "shared": 12
+  },
+  {
    "source": ".github",
    "target": "hiero-sdk-java",
-   "shared": 12
-  },
-  {
-   "source": ".github",
-   "target": "hiero-local-node",
-   "shared": 12
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "solo",
    "shared": 12
   },
   {
@@ -1774,73 +1814,18 @@
    "shared": 12
   },
   {
-   "source": "hiero-contracts",
-   "target": "solo",
-   "shared": 12
-  },
-  {
    "source": "hiero-cli",
-   "target": "hiero-sdk-swift",
+   "target": "hiero-cryptography",
    "shared": 12
   },
   {
-   "source": "hiero-mirror-node-explorer",
-   "target": "hiero-sdk-tck",
+   "source": ".github",
+   "target": "hiero-local-node",
    "shared": 12
   },
   {
-   "source": "hiero",
-   "target": "tsc",
-   "shared": 12
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "solo-docs",
-   "shared": 12
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-sdk-java",
-   "shared": 12
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-sdk-tck",
-   "shared": 12
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "hiero-website",
-   "shared": 12
-  },
-  {
-   "source": "hiero",
-   "target": "sdk-collaboration-hub",
-   "shared": 12
-  },
-  {
-   "source": "hiero-json-rpc-relay",
-   "target": "sdk-collaboration-hub",
-   "shared": 12
-  },
-  {
-   "source": "hiero-docs",
-   "target": "sdk-collaboration-hub",
-   "shared": 12
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "tsc",
-   "shared": 12
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "homebrew-tools",
-   "shared": 12
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-sdk-js",
+   "source": "hiero-gradle-conventions",
+   "target": "solo",
    "shared": 12
   },
   {
@@ -1849,163 +1834,68 @@
    "shared": 12
   },
   {
-   "source": "hiero-cryptography",
-   "target": "hiero-gradle-conventions",
+   "source": "hiero-docs",
+   "target": "sdk-collaboration-hub",
    "shared": 12
   },
   {
    "source": "hiero-cli",
-   "target": "hiero-cryptography",
+   "target": "hiero-sdk-swift",
    "shared": 12
   },
   {
-   "source": "hiero-block-node",
-   "target": "tsc",
-   "shared": 11
+   "source": "hiero-local-node",
+   "target": "solo-docs",
+   "shared": 12
   },
   {
-   "source": "hiero-block-node",
+   "source": "hiero-json-rpc-relay",
+   "target": "sdk-collaboration-hub",
+   "shared": 12
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-sdk-java",
+   "shared": 12
+  },
+  {
+   "source": ".github",
    "target": "hiero-website",
    "shared": 11
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-solo-action",
-   "shared": 11
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-go",
-   "shared": 11
-  },
-  {
-   "source": "hiero-sdk-tck",
+   "source": "hiero-sdk-java",
    "target": "tsc",
-   "shared": 11
-  },
-  {
-   "source": "hiero-solo-action",
-   "target": "hiero-website",
    "shared": 11
   },
   {
    "source": "hiero-mirror-node-explorer",
-   "target": "homebrew-tools",
+   "target": "hiero-solo-action",
    "shared": 11
   },
   {
-   "source": "hiero-mirror-node",
-   "target": "solo-docs",
+   "source": "hiero-sdk-js",
+   "target": "solo-charts",
    "shared": 11
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-js",
-   "shared": 11
-  },
-  {
-   "source": "hiero-cli",
-   "target": "homebrew-tools",
-   "shared": 11
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-cpp",
-   "shared": 11
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "sdk-collaboration-hub",
-   "shared": 11
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "solo-docs",
-   "shared": 11
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-sdk-java",
+   "source": ".github",
+   "target": "hiero-sdk-tck",
    "shared": 11
   },
   {
    "source": "hiero-local-node",
-   "target": "homebrew-tools",
-   "shared": 11
-  },
-  {
-   "source": ".github",
-   "target": "tsc",
-   "shared": 11
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-json-rpc-relay",
-   "shared": 11
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-sdk-rust",
-   "shared": 11
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-mirror-node",
-   "shared": 11
-  },
-  {
-   "source": "hiero-sdk-python",
-   "target": "tsc",
-   "shared": 11
-  },
-  {
-   "source": "hiero-sdk-swift",
-   "target": "solo-docs",
+   "target": "hiero-sdk-python",
    "shared": 11
   },
   {
    "source": "hiero-mirror-node-explorer",
-   "target": "hiero-solo-action",
-   "shared": 11
-  },
-  {
-   "source": "hiero-mirror-node",
-   "target": "solo-containers",
-   "shared": 11
-  },
-  {
-   "source": "homebrew-tools",
-   "target": "solo-docs",
-   "shared": 11
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "sdk-collaboration-hub",
-   "shared": 11
-  },
-  {
-   "source": ".github",
-   "target": "hiero-website",
-   "shared": 11
-  },
-  {
-   "source": ".github",
-   "target": "sdk-collaboration-hub",
-   "shared": 11
-  },
-  {
-   "source": ".github",
-   "target": "hiero",
-   "shared": 11
-  },
-  {
-   "source": "hiero-json-rpc-relay",
    "target": "homebrew-tools",
    "shared": 11
   },
   {
-   "source": "hiero-json-rpc-relay",
-   "target": "solo-docs",
+   "source": "hiero-block-node",
+   "target": "tsc",
    "shared": 11
   },
   {
@@ -2014,23 +1904,78 @@
    "shared": 11
   },
   {
-   "source": "hiero-sdk-java",
+   "source": "hiero-mirror-node",
+   "target": "solo-docs",
+   "shared": 11
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-js",
+   "shared": 11
+  },
+  {
+   "source": "hiero-sdk-python",
    "target": "tsc",
    "shared": 11
   },
   {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-did-sdk-python",
+   "source": "hiero-mirror-node-explorer",
+   "target": "sdk-collaboration-hub",
+   "shared": 11
+  },
+  {
+   "source": "hiero-solo-action",
+   "target": "hiero-website",
+   "shared": 11
+  },
+  {
+   "source": "homebrew-tools",
+   "target": "solo-docs",
+   "shared": 11
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-json-rpc-relay",
+   "shared": 11
+  },
+  {
+   "source": "hiero-sdk-tck",
+   "target": "tsc",
+   "shared": 11
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "solo-docs",
+   "shared": 11
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-go",
+   "shared": 11
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-cpp",
+   "shared": 11
+  },
+  {
+   "source": "hiero-cli",
+   "target": "homebrew-tools",
+   "shared": 11
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-sdk-java",
+   "shared": 11
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "hiero-solo-action",
    "shared": 11
   },
   {
    "source": ".github",
-   "target": "hiero-sdk-python",
-   "shared": 11
-  },
-  {
-   "source": ".github",
-   "target": "hiero-sdk-tck",
+   "target": "tsc",
    "shared": 11
   },
   {
@@ -2039,18 +1984,18 @@
    "shared": 11
   },
   {
-   "source": "hiero",
-   "target": "hiero-sdk-go",
+   "source": ".github",
+   "target": "sdk-collaboration-hub",
    "shared": 11
   },
   {
-   "source": "hiero-local-node",
-   "target": "hiero-solo-action",
+   "source": "hiero-did-sdk-js",
+   "target": "hiero-did-sdk-python",
    "shared": 11
   },
   {
-   "source": "hiero-local-node",
-   "target": "hiero-sdk-python",
+   "source": "hiero-mirror-node",
+   "target": "solo-containers",
    "shared": 11
   },
   {
@@ -2059,23 +2004,68 @@
    "shared": 11
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "solo-charts",
+   "source": ".github",
+   "target": "hiero-sdk-python",
+   "shared": 11
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-sdk-go",
+   "shared": 11
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-mirror-node",
    "shared": 11
   },
   {
    "source": "hiero-json-rpc-relay",
-   "target": "solo-containers",
-   "shared": 10
+   "target": "homebrew-tools",
+   "shared": 11
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "solo-docs",
+   "shared": 11
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "homebrew-tools",
+   "shared": 11
+  },
+  {
+   "source": "hiero-json-rpc-relay",
+   "target": "solo-docs",
+   "shared": 11
+  },
+  {
+   "source": ".github",
+   "target": "hiero",
+   "shared": 11
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-website",
+   "shared": 11
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "sdk-collaboration-hub",
+   "shared": 11
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-solo-action",
+   "shared": 11
   },
   {
    "source": "hiero",
-   "target": "hiero-did-sdk-python",
-   "shared": 10
+   "target": "hiero-sdk-rust",
+   "shared": 11
   },
   {
-   "source": "hiero-sdk-js",
-   "target": "solo-containers",
+   "source": "hiero-sdk-java",
+   "target": "solo-docs",
    "shared": 10
   },
   {
@@ -2084,43 +2074,13 @@
    "shared": 10
   },
   {
-   "source": "hiero-sdk-java",
-   "target": "solo-docs",
-   "shared": 10
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-json-rpc-relay",
-   "shared": 10
-  },
-  {
-   "source": "governance",
+   "source": "hiero-mirror-node-explorer",
    "target": "solo-charts",
    "shared": 10
   },
   {
-   "source": "hiero-improvement-proposals",
-   "target": "homebrew-tools",
-   "shared": 10
-  },
-  {
-   "source": ".github",
-   "target": "solo",
-   "shared": 10
-  },
-  {
-   "source": "governance",
+   "source": "hiero-sdk-js",
    "target": "solo-containers",
-   "shared": 10
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-local-node",
-   "shared": 10
-  },
-  {
-   "source": "hiero-sdk-python",
-   "target": "solo-docs",
    "shared": 10
   },
   {
@@ -2129,23 +2089,8 @@
    "shared": 10
   },
   {
-   "source": ".github",
-   "target": "hiero-sdk-go",
-   "shared": 10
-  },
-  {
-   "source": ".github",
-   "target": "hiero-json-rpc-relay",
-   "shared": 10
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-sdk-js",
-   "shared": 10
-  },
-  {
    "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-tck",
+   "target": "hiero-website",
    "shared": 10
   },
   {
@@ -2154,17 +2099,22 @@
    "shared": 10
   },
   {
-   "source": "hiero-docs",
+   "source": "hiero",
+   "target": "hiero-did-sdk-python",
+   "shared": 10
+  },
+  {
+   "source": ".github",
+   "target": "hiero-sdk-go",
+   "shared": 10
+  },
+  {
+   "source": "hiero-enterprise-java",
    "target": "hiero-sdk-tck",
    "shared": 10
   },
   {
-   "source": "hiero-mirror-node-explorer",
-   "target": "solo-charts",
-   "shared": 10
-  },
-  {
-   "source": "sdk-collaboration-hub",
+   "source": "hiero-sdk-cpp",
    "target": "tsc",
    "shared": 10
   },
@@ -2174,67 +2124,12 @@
    "shared": 10
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-website",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-solo-action",
-   "shared": 10
-  },
-  {
-   "source": "hiero-sdk-cpp",
-   "target": "tsc",
-   "shared": 10
-  },
-  {
-   "source": "homebrew-tools",
-   "target": "solo-charts",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-sdk-rust",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-swift",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "solo-charts",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-website",
-   "shared": 10
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-improvement-proposals",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-rust",
-   "shared": 10
-  },
-  {
    "source": "hiero",
-   "target": "hiero-block-node",
+   "target": "hiero-json-rpc-relay",
    "shared": 10
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-sdk-python",
-   "shared": 10
-  },
-  {
-   "source": "hiero-cryptography",
+   "source": "hiero-json-rpc-relay",
    "target": "solo-containers",
    "shared": 10
   },
@@ -2244,23 +2139,148 @@
    "shared": 10
   },
   {
-   "source": "solo-charts",
+   "source": ".github",
+   "target": "hiero-json-rpc-relay",
+   "shared": 10
+  },
+  {
+   "source": ".github",
+   "target": "solo",
+   "shared": 10
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-block-node",
+   "shared": 10
+  },
+  {
+   "source": "governance",
+   "target": "solo-charts",
+   "shared": 10
+  },
+  {
+   "source": "governance",
+   "target": "solo-containers",
+   "shared": 10
+  },
+  {
+   "source": "hiero-improvement-proposals",
+   "target": "homebrew-tools",
+   "shared": 10
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-sdk-python",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-sdk-rust",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-website",
+   "shared": 10
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-local-node",
+   "shared": 10
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-sdk-js",
+   "shared": 10
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "hiero-improvement-proposals",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-solo-action",
+   "shared": 10
+  },
+  {
+   "source": "hiero-docs",
+   "target": "hiero-sdk-tck",
+   "shared": 10
+  },
+  {
+   "source": "homebrew-tools",
+   "target": "solo-charts",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-rust",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "solo-containers",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "solo-charts",
+   "shared": 10
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-swift",
+   "shared": 10
+  },
+  {
+   "source": "sdk-collaboration-hub",
+   "target": "tsc",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-python",
    "target": "solo-docs",
+   "shared": 10
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "homebrew-tools",
    "shared": 9
   },
   {
-   "source": "hiero-sdk-go",
+   "source": "hiero-sdk-rust",
    "target": "tsc",
    "shared": 9
   },
   {
-   "source": "hiero-local-node",
+   "source": "hiero-sdk-tck",
+   "target": "solo-docs",
+   "shared": 9
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "homebrew-tools",
+   "shared": 9
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-docs",
+   "shared": 9
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-website",
+   "shared": 9
+  },
+  {
+   "source": "homebrew-tools",
    "target": "solo-containers",
    "shared": 9
   },
   {
-   "source": "governance",
-   "target": "hiero-consensus-specifications",
+   "source": "hiero-website",
+   "target": "homebrew-tools",
    "shared": 9
   },
   {
@@ -2269,8 +2289,63 @@
    "shared": 9
   },
   {
-   "source": "governance",
-   "target": "hiero-did-sdk-python",
+   "source": "hiero-improvement-proposals",
+   "target": "solo-docs",
+   "shared": 9
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "solo-charts",
+   "shared": 9
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-gradle-conventions",
+   "shared": 9
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-mirror-node-explorer",
+   "shared": 9
+  },
+  {
+   "source": "hiero-solo-action",
+   "target": "tsc",
+   "shared": 9
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-improvement-proposals",
+   "shared": 9
+  },
+  {
+   "source": "hiero-local-node",
+   "target": "solo-containers",
+   "shared": 9
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "tsc",
+   "shared": 9
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-sdk-python",
+   "shared": 9
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-java",
+   "shared": 9
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-sdk-swift",
+   "shared": 9
+  },
+  {
+   "source": "hiero-sdk-tck",
+   "target": "homebrew-tools",
    "shared": 9
   },
   {
@@ -2279,73 +2354,23 @@
    "shared": 9
   },
   {
-   "source": "hiero",
-   "target": "hiero-sdk-swift",
+   "source": "governance",
+   "target": "hiero-did-sdk-python",
    "shared": 9
   },
   {
-   "source": "hiero-solo-action",
-   "target": "tsc",
+   "source": "governance",
+   "target": "hiero-consensus-specifications",
    "shared": 9
   },
   {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-improvement-proposals",
-   "shared": 9
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-mirror-node-explorer",
-   "shared": 9
-  },
-  {
-   "source": "hiero-local-node",
-   "target": "solo-charts",
+   "source": "hiero-mirror-node-explorer",
+   "target": "hiero-sdk-python",
    "shared": 9
   },
   {
    "source": "hiero-gradle-conventions",
    "target": "hiero-mirror-node-explorer",
-   "shared": 9
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-website",
-   "shared": 9
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-sdk-tck",
-   "shared": 9
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "solo-docs",
-   "shared": 9
-  },
-  {
-   "source": "hiero-hederium",
-   "target": "hiero-sdk-js",
-   "shared": 9
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-gradle-conventions",
-   "shared": 9
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "tsc",
-   "shared": 9
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-sdk-tck",
-   "shared": 9
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-gradle-conventions",
    "shared": 9
   },
   {
@@ -2354,8 +2379,23 @@
    "shared": 9
   },
   {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-sdk-tck",
+   "shared": 9
+  },
+  {
    "source": "hiero-cli",
-   "target": "solo-charts",
+   "target": "hiero-gradle-conventions",
+   "shared": 9
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-sdk-js",
+   "shared": 9
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-website",
    "shared": 9
   },
   {
@@ -2364,8 +2404,18 @@
    "shared": 9
   },
   {
-   "source": "hiero-consensus-node",
-   "target": "hiero-hederium",
+   "source": "hiero-cli",
+   "target": "solo-charts",
+   "shared": 9
+  },
+  {
+   "source": "hiero-cli",
+   "target": "hiero-sdk-tck",
+   "shared": 9
+  },
+  {
+   "source": "hiero-cli",
+   "target": "solo-containers",
    "shared": 9
   },
   {
@@ -2374,23 +2424,18 @@
    "shared": 9
   },
   {
-   "source": "hiero-cli",
-   "target": "solo-containers",
+   "source": "hiero-consensus-node",
+   "target": "hiero-hederium",
    "shared": 9
   },
   {
-   "source": "hiero-sdk-tck",
-   "target": "homebrew-tools",
+   "source": "hiero-enterprise-java",
+   "target": "hiero-solo-action",
    "shared": 9
   },
   {
-   "source": "hiero-cryptography",
-   "target": "hiero-website",
-   "shared": 9
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "solo-containers",
+   "source": "hiero-docs",
+   "target": "hiero-solo-action",
    "shared": 9
   },
   {
@@ -2399,73 +2444,28 @@
    "shared": 9
   },
   {
-   "source": "hiero-sdk-cpp",
-   "target": "homebrew-tools",
-   "shared": 9
-  },
-  {
-   "source": "hiero-docs",
-   "target": "hiero-solo-action",
-   "shared": 9
-  },
-  {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-solo-action",
-   "shared": 9
-  },
-  {
-   "source": "homebrew-tools",
-   "target": "solo-containers",
-   "shared": 9
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-docs",
-   "shared": 9
-  },
-  {
-   "source": "hiero-mirror-node-explorer",
-   "target": "hiero-sdk-python",
-   "shared": 9
-  },
-  {
-   "source": "hiero-cli",
-   "target": "hiero-sdk-python",
-   "shared": 9
-  },
-  {
-   "source": "hiero-website",
-   "target": "homebrew-tools",
-   "shared": 9
-  },
-  {
-   "source": "hiero-sdk-tck",
-   "target": "solo-docs",
-   "shared": 9
-  },
-  {
-   "source": "hiero-sdk-rust",
+   "source": "hiero-sdk-go",
    "target": "tsc",
    "shared": 9
   },
   {
-   "source": "hiero-sdk-rust",
+   "source": "hiero-sdk-cpp",
    "target": "homebrew-tools",
    "shared": 9
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-java",
+   "source": "hiero-mirror-node-explorer",
+   "target": "solo-containers",
    "shared": 9
   },
   {
-   "source": "hiero-sdk-swift",
-   "target": "homebrew-tools",
-   "shared": 9
-  },
-  {
-   "source": "hiero-website",
+   "source": "solo-charts",
    "target": "solo-docs",
+   "shared": 9
+  },
+  {
+   "source": "hiero-consensus-specifications",
+   "target": "hiero-docs",
    "shared": 8
   },
   {
@@ -2484,63 +2484,38 @@
    "shared": 8
   },
   {
-   "source": "hiero-did-sdk-python",
-   "target": "solo",
-   "shared": 8
-  },
-  {
-   "source": "hiero-docs",
-   "target": "solo-docs",
+   "source": "hiero",
+   "target": "hiero-solo-action",
    "shared": 8
   },
   {
    "source": "hiero-enterprise-java",
-   "target": "hiero-mirror-node",
+   "target": "hiero-sdk-go",
+   "shared": 8
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-did-sdk-js",
+   "shared": 8
+  },
+  {
+   "source": "hiero",
+   "target": "hiero-docs",
+   "shared": 8
+  },
+  {
+   "source": ".github",
+   "target": "hiero-sdk-rust",
    "shared": 8
   },
   {
    "source": "hiero-did-sdk-python",
-   "target": "hiero-website",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-sdk-js",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-sdk-tck",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-local-node",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-json-rpc-relay",
+   "target": "hiero-solo-action",
    "shared": 8
   },
   {
    "source": "hiero-did-sdk-js",
-   "target": "hiero-sdk-js",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "solo",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "sdk-collaboration-hub",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-sdk-tck",
+   "target": "hiero-sdk-python",
    "shared": 8
   },
   {
@@ -2550,27 +2525,37 @@
   },
   {
    "source": "hiero-consensus-node",
-   "target": "hiero-did-sdk-python",
-   "shared": 8
-  },
-  {
-   "source": "hiero-consensus-node",
    "target": "hiero-ethereum-execution-spec-tests",
    "shared": 8
   },
   {
-   "source": "hiero-cryptography",
-   "target": "homebrew-tools",
-   "shared": 8
-  },
-  {
    "source": "hiero-contracts",
-   "target": "hiero-solo-action",
+   "target": "hiero-docs",
    "shared": 8
   },
   {
-   "source": "hiero-cryptography",
-   "target": "hiero-solo-action",
+   "source": "hiero-did-sdk-js",
+   "target": "hiero-sdk-js",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-js",
+   "target": "solo",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-local-node",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-js",
+   "target": "hiero-sdk-tck",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-js",
+   "target": "sdk-collaboration-hub",
    "shared": 8
   },
   {
@@ -2584,67 +2569,17 @@
    "shared": 8
   },
   {
-   "source": "hiero-ethereum-execution-spec-tests",
-   "target": "hiero-json-rpc-relay",
-   "shared": 8
-  },
-  {
-   "source": "hiero-ethereum-execution-spec-tests",
-   "target": "hiero-mirror-node",
-   "shared": 8
-  },
-  {
-   "source": "hiero-ethereum-execution-spec-tests",
-   "target": "hiero-improvement-proposals",
-   "shared": 8
-  },
-  {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-swift",
-   "shared": 8
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-docs",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-solo-action",
-   "shared": 8
-  },
-  {
-   "source": ".github",
-   "target": "hiero-block-node",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-solo-action",
-   "shared": 8
-  },
-  {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-improvement-proposals",
-   "shared": 8
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-docs",
-   "shared": 8
-  },
-  {
-   "source": "solo-containers",
+   "source": "hiero-website",
    "target": "solo-docs",
    "shared": 8
   },
   {
-   "source": "hiero-consensus-specifications",
-   "target": "hiero-docs",
+   "source": "hiero-cryptography",
+   "target": "hiero-solo-action",
    "shared": 8
   },
   {
-   "source": "hiero",
+   "source": "hiero-contracts",
    "target": "hiero-solo-action",
    "shared": 8
   },
@@ -2654,6 +2589,31 @@
    "shared": 8
   },
   {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-sdk-js",
+   "shared": 8
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "homebrew-tools",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-json-rpc-relay",
+   "shared": 8
+  },
+  {
+   "source": "hiero-consensus-specifications",
+   "target": "hiero-sdk-js",
+   "shared": 8
+  },
+  {
+   "source": "solo-containers",
+   "target": "solo-docs",
+   "shared": 8
+  },
+  {
    "source": "hiero-sdk-java",
    "target": "solo-charts",
    "shared": 8
@@ -2664,33 +2624,13 @@
    "shared": 8
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-go",
+   "source": "hiero-ethereum-execution-spec-tests",
+   "target": "hiero-json-rpc-relay",
    "shared": 8
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-sdk-cpp",
-   "shared": 8
-  },
-  {
-   "source": "hiero",
-   "target": "hiero-did-sdk-js",
-   "shared": 8
-  },
-  {
-   "source": "hiero-consensus-specifications",
-   "target": "hiero-sdk-js",
-   "shared": 8
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-sdk-python",
-   "shared": 8
-  },
-  {
-   "source": ".github",
-   "target": "hiero-sdk-rust",
+   "source": "hiero-cli",
+   "target": "hiero-contracts",
    "shared": 8
   },
   {
@@ -2699,23 +2639,23 @@
    "shared": 8
   },
   {
-   "source": "hiero-hederium",
-   "target": "hiero-json-rpc-relay",
+   "source": ".github",
+   "target": "hiero-block-node",
    "shared": 8
   },
   {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-sdk-rust",
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-cpp",
    "shared": 8
   },
   {
-   "source": "hiero-hederium",
-   "target": "hiero-local-node",
+   "source": "hiero-did-sdk-js",
+   "target": "hiero-solo-action",
    "shared": 8
   },
   {
-   "source": "hiero",
-   "target": "hiero-cryptography",
+   "source": "hiero-enterprise-java",
+   "target": "hiero-improvement-proposals",
    "shared": 8
   },
   {
@@ -2724,7 +2664,32 @@
    "shared": 8
   },
   {
-   "source": "hiero-hederium",
+   "source": "hiero",
+   "target": "hiero-cryptography",
+   "shared": 8
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-mirror-node",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "solo",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-website",
+   "shared": 8
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-sdk-rust",
+   "shared": 8
+  },
+  {
+   "source": "hiero-ethereum-execution-spec-tests",
    "target": "hiero-mirror-node",
    "shared": 8
   },
@@ -2734,33 +2699,78 @@
    "shared": 8
   },
   {
-   "source": "hiero-cli",
-   "target": "hiero-contracts",
+   "source": "hiero-consensus-node",
+   "target": "hiero-did-sdk-python",
+   "shared": 8
+  },
+  {
+   "source": "hiero-ethereum-execution-spec-tests",
+   "target": "hiero-improvement-proposals",
+   "shared": 8
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-local-node",
+   "shared": 8
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-mirror-node",
+   "shared": 8
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-json-rpc-relay",
    "shared": 8
   },
   {
    "source": "hiero-docs",
-   "target": "homebrew-tools",
+   "target": "solo-docs",
+   "shared": 8
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-sdk-tck",
+   "shared": 8
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-swift",
+   "shared": 8
+  },
+  {
+   "source": "hiero-sdk-rust",
+   "target": "solo-charts",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-swift",
+   "target": "solo-charts",
+   "shared": 7
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "solo-docs",
+   "shared": 7
+  },
+  {
+   "source": "hiero-cryptography",
+   "target": "hiero-sdk-tck",
+   "shared": 7
+  },
+  {
+   "source": "hiero-solo-action",
+   "target": "solo-docs",
    "shared": 7
   },
   {
    "source": "hiero-did-sdk-python",
-   "target": "sdk-collaboration-hub",
+   "target": "hiero-sdk-cpp",
    "shared": 7
   },
   {
    "source": "hiero-did-sdk-python",
    "target": "hiero-mirror-node",
-   "shared": 7
-  },
-  {
-   "source": "hiero-docs",
-   "target": "hiero-hederium",
-   "shared": 7
-  },
-  {
-   "source": "hiero-docs",
-   "target": "hiero-sdk-python",
    "shared": 7
   },
   {
@@ -2774,21 +2784,6 @@
    "shared": 7
   },
   {
-   "source": "hiero-cli",
-   "target": "solo-docs",
-   "shared": 7
-  },
-  {
-   "source": "hiero-cli",
-   "target": "tsc",
-   "shared": 7
-  },
-  {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-sdk-rust",
-   "shared": 7
-  },
-  {
    "source": "hiero-did-sdk-js",
    "target": "hiero-sdk-cpp",
    "shared": 7
@@ -2800,37 +2795,12 @@
   },
   {
    "source": "hiero-did-sdk-js",
-   "target": "hiero-website",
-   "shared": 7
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "hiero-sdk-tck",
-   "shared": 7
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-sdk-swift",
-   "shared": 7
-  },
-  {
-   "source": "hiero-enterprise-java",
    "target": "hiero-sdk-rust",
    "shared": 7
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "solo",
-   "shared": 7
-  },
-  {
-   "source": "hiero-cryptography",
-   "target": "solo-docs",
-   "shared": 7
-  },
-  {
-   "source": "hiero-contracts",
-   "target": "hiero-sdk-tck",
+   "source": "hiero-did-sdk-js",
+   "target": "hiero-website",
    "shared": 7
   },
   {
@@ -2839,8 +2809,8 @@
    "shared": 7
   },
   {
-   "source": "hiero-enterprise-java",
-   "target": "hiero-json-rpc-relay",
+   "source": "hiero-contracts",
+   "target": "hiero-sdk-swift",
    "shared": 7
   },
   {
@@ -2854,52 +2824,27 @@
    "shared": 7
   },
   {
-   "source": "hiero-sdk-go",
-   "target": "solo-containers",
+   "source": "hiero-contracts",
+   "target": "hiero-sdk-tck",
    "shared": 7
   },
   {
-   "source": "hiero-sdk-cpp",
-   "target": "solo-containers",
-   "shared": 7
-  },
-  {
-   "source": "hiero-sdk-rust",
-   "target": "solo-charts",
-   "shared": 7
-  },
-  {
-   "source": "hiero-sdk-swift",
-   "target": "solo-charts",
-   "shared": 7
-  },
-  {
-   "source": "hiero-solo-action",
-   "target": "solo-docs",
-   "shared": 7
-  },
-  {
-   "source": "hiero-enterprise-java",
+   "source": "hiero-gradle-conventions",
    "target": "sdk-collaboration-hub",
    "shared": 7
   },
   {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-sdk-rust",
-   "shared": 7
-  },
-  {
-   "source": "hiero-did-sdk-python",
-   "target": "hiero-sdk-cpp",
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-solo-action",
    "shared": 7
   },
   {
    "source": "hiero-gradle-conventions",
-   "target": "tsc",
+   "target": "hiero-sdk-swift",
    "shared": 7
   },
   {
-   "source": "hiero-gradle-conventions",
+   "source": "hiero-contracts",
    "target": "hiero-sdk-go",
    "shared": 7
   },
@@ -2909,18 +2854,93 @@
    "shared": 7
   },
   {
-   "source": "hiero-contracts",
-   "target": "hiero-sdk-java",
+   "source": "hiero-gradle-conventions",
+   "target": "hiero-sdk-go",
    "shared": 7
   },
   {
-   "source": "hiero-contracts",
-   "target": "hiero-sdk-go",
+   "source": "hiero-docs",
+   "target": "hiero-sdk-python",
+   "shared": 7
+  },
+  {
+   "source": "hiero-cli",
+   "target": "tsc",
+   "shared": 7
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "sdk-collaboration-hub",
+   "shared": 7
+  },
+  {
+   "source": "hiero-docs",
+   "target": "hiero-hederium",
+   "shared": 7
+  },
+  {
+   "source": "hiero-did-sdk-python",
+   "target": "hiero-sdk-rust",
+   "shared": 7
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-sdk-rust",
+   "shared": 7
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "hiero-json-rpc-relay",
+   "shared": 7
+  },
+  {
+   "source": "hiero-docs",
+   "target": "homebrew-tools",
    "shared": 7
   },
   {
    "source": "hiero-contracts",
    "target": "hiero-hederium",
+   "shared": 7
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "solo",
+   "shared": 7
+  },
+  {
+   "source": "hiero-cli",
+   "target": "solo-docs",
+   "shared": 7
+  },
+  {
+   "source": "hiero-gradle-conventions",
+   "target": "tsc",
+   "shared": 7
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-improvement-proposals",
+   "shared": 7
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-enterprise-java",
+   "shared": 7
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-hederium",
+   "shared": 7
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-did-sdk-js",
+   "shared": 7
+  },
+  {
+   "source": "hiero-block-node",
+   "target": "hiero-did-sdk-python",
    "shared": 7
   },
   {
@@ -2929,8 +2949,43 @@
    "shared": 7
   },
   {
-   "source": "hiero",
-   "target": "hiero-hederium",
+   "source": "hiero-improvement-proposals",
+   "target": "solo-containers",
+   "shared": 7
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "solo",
+   "shared": 7
+  },
+  {
+   "source": "hiero-improvement-proposals",
+   "target": "solo-charts",
+   "shared": 7
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-sdk-go",
+   "shared": 7
+  },
+  {
+   "source": "hiero-hederium",
+   "target": "hiero-sdk-cpp",
+   "shared": 7
+  },
+  {
+   "source": "hiero-contracts",
+   "target": "hiero-sdk-java",
+   "shared": 7
+  },
+  {
+   "source": ".github",
+   "target": "hiero-did-sdk-python",
+   "shared": 7
+  },
+  {
+   "source": ".github",
+   "target": "hiero-sdk-swift",
    "shared": 7
   },
   {
@@ -2945,62 +3000,7 @@
   },
   {
    "source": ".github",
-   "target": "hiero-sdk-swift",
-   "shared": 7
-  },
-  {
-   "source": "hiero-hederium",
-   "target": "hiero-sdk-go",
-   "shared": 7
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "solo-containers",
-   "shared": 7
-  },
-  {
-   "source": "hiero-improvement-proposals",
-   "target": "solo-charts",
-   "shared": 7
-  },
-  {
-   "source": "hiero-hederium",
-   "target": "hiero-sdk-cpp",
-   "shared": 7
-  },
-  {
-   "source": "hiero-hederium",
-   "target": "solo",
-   "shared": 7
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-hederium",
-   "shared": 7
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-sdk-swift",
-   "shared": 7
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "sdk-collaboration-hub",
-   "shared": 7
-  },
-  {
-   "source": "hiero-gradle-conventions",
-   "target": "hiero-solo-action",
-   "shared": 7
-  },
-  {
-   "source": "hiero-hederium",
-   "target": "hiero-improvement-proposals",
-   "shared": 7
-  },
-  {
-   "source": "hiero-consensus-specifications",
-   "target": "tsc",
+   "target": "hiero-gradle-conventions",
    "shared": 7
   },
   {
@@ -3025,6 +3025,11 @@
   },
   {
    "source": "hiero-did-sdk-js",
+   "target": "hiero-sdk-java",
+   "shared": 7
+  },
+  {
+   "source": "hiero-did-sdk-js",
    "target": "tsc",
    "shared": 7
   },
@@ -3034,8 +3039,23 @@
    "shared": 7
   },
   {
-   "source": "hiero-did-sdk-js",
-   "target": "hiero-sdk-java",
+   "source": "hiero",
+   "target": "hiero-hederium",
+   "shared": 7
+  },
+  {
+   "source": "hiero-enterprise-java",
+   "target": "sdk-collaboration-hub",
+   "shared": 7
+  },
+  {
+   "source": "governance",
+   "target": "hiero-enterprise-java",
+   "shared": 7
+  },
+  {
+   "source": "hiero-consensus-specifications",
+   "target": "tsc",
    "shared": 7
   },
   {
@@ -3044,38 +3064,18 @@
    "shared": 7
   },
   {
-   "source": "hiero-block-node",
-   "target": "hiero-did-sdk-python",
-   "shared": 7
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-did-sdk-js",
-   "shared": 7
-  },
-  {
-   "source": "hiero-block-node",
-   "target": "hiero-enterprise-java",
-   "shared": 7
-  },
-  {
-   "source": "governance",
-   "target": "hiero-enterprise-java",
-   "shared": 7
-  },
-  {
-   "source": ".github",
-   "target": "hiero-did-sdk-python",
-   "shared": 7
-  },
-  {
-   "source": ".github",
-   "target": "hiero-gradle-conventions",
-   "shared": 7
-  },
-  {
    "source": "governance",
    "target": "hiero-did-sdk-js",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-cpp",
+   "target": "solo-containers",
+   "shared": 7
+  },
+  {
+   "source": "hiero-sdk-go",
+   "target": "solo-containers",
    "shared": 7
   },
   {
@@ -3084,6 +3084,6 @@
    "shared": 7
   }
  ],
- "generated_at": "2026-11-25T01:04:05.185232+00:00",
+ "generated_at": "2026-11-26T01:13:52.325324+00:00",
  "stale": false
 }

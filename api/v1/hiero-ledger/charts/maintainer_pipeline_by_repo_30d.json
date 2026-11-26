@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 30,
-  "end": "2026-11-25T01:03:53.568944+00:00"
+  "end": "2026-11-26T01:13:40.233006+00:00"
  },
  "series": [
   {
@@ -56,37 +56,23 @@
  "rows": [
   {
    "repo": "hiero-consensus-node",
-   "general_user": 11,
+   "general_user": 12,
    "triage": 1,
-   "committer": 29,
+   "committer": 28,
    "maintainer": 11
   },
   {
    "repo": "hiero-sdk-js",
-   "general_user": 20,
+   "general_user": 22,
    "triage": 2,
    "committer": 0,
    "maintainer": 2
   },
   {
    "repo": "solo",
-   "general_user": 11,
+   "general_user": 13,
    "triage": 0,
    "committer": 5,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-mirror-node",
-   "general_user": 8,
-   "triage": 0,
-   "committer": 7,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "general_user": 13,
-   "triage": 1,
-   "committer": 1,
    "maintainer": 2
   },
   {
@@ -102,6 +88,20 @@
    "triage": 0,
    "committer": 2,
    "maintainer": 5
+  },
+  {
+   "repo": "hiero-mirror-node",
+   "general_user": 6,
+   "triage": 0,
+   "committer": 7,
+   "maintainer": 2
+  },
+  {
+   "repo": "hiero-sdk-java",
+   "general_user": 12,
+   "triage": 1,
+   "committer": 1,
+   "maintainer": 1
   },
   {
    "repo": "hiero-json-rpc-relay",
@@ -127,16 +127,9 @@
   {
    "repo": "hiero-sdk-go",
    "general_user": 7,
-   "triage": 1,
+   "triage": 0,
    "committer": 2,
    "maintainer": 1
-  },
-  {
-   "repo": "solo-docs",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 6
   },
   {
    "repo": "hiero-sdk-tck",
@@ -146,10 +139,24 @@
    "maintainer": 2
   },
   {
+   "repo": "solo-docs",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 6
+  },
+  {
    "repo": "hiero-improvement-proposals",
    "general_user": 1,
    "triage": 0,
    "committer": 3,
+   "maintainer": 2
+  },
+  {
+   "repo": "hiero-enterprise-java",
+   "general_user": 2,
+   "triage": 0,
+   "committer": 1,
    "maintainer": 2
   },
   {
@@ -161,13 +168,6 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "general_user": 2,
-   "triage": 0,
-   "committer": 1,
-   "maintainer": 2
-  },
-  {
-   "repo": "hiero-enterprise-java",
    "general_user": 2,
    "triage": 0,
    "committer": 1,
@@ -188,6 +188,13 @@
    "maintainer": 2
   },
   {
+   "repo": "hiero-consensus-specifications",
+   "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 1
+  },
+  {
    "repo": "solo-charts",
    "general_user": 1,
    "triage": 0,
@@ -202,11 +209,11 @@
    "maintainer": 2
   },
   {
-   "repo": "hiero-consensus-specifications",
-   "general_user": 3,
+   "repo": "hiero-ethereum-execution-spec-tests",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
+   "maintainer": 2
   },
   {
    "repo": "hiero-hederium",
@@ -217,20 +224,20 @@
   },
   {
    "repo": "sdk-collaboration-hub",
-   "general_user": 2,
+   "general_user": 3,
+   "triage": 0,
+   "committer": 0,
+   "maintainer": 0
+  },
+  {
+   "repo": ".github",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
   },
   {
-   "repo": "hiero-ethereum-execution-spec-tests",
-   "general_user": 1,
-   "triage": 0,
-   "committer": 0,
-   "maintainer": 2
-  },
-  {
-   "repo": ".github",
+   "repo": "hiero",
    "general_user": 1,
    "triage": 0,
    "committer": 0,
@@ -251,8 +258,8 @@
    "maintainer": 0
   },
   {
-   "repo": "solo-containers",
-   "general_user": 1,
+   "repo": "hiero-agentic-support",
+   "general_user": 0,
    "triage": 0,
    "committer": 0,
    "maintainer": 1
@@ -265,14 +272,14 @@
    "maintainer": 1
   },
   {
-   "repo": "hiero-agentic-support",
-   "general_user": 0,
+   "repo": "solo-containers",
+   "general_user": 1,
    "triage": 0,
    "committer": 0,
-   "maintainer": 1
+   "maintainer": 0
   }
  ],
  "note": "Each bar is a repository, counting people active there over the selected span, grouped by the governance role they hold in that repo (general \u2192 triage \u2192 committer \u2192 maintainer). The chart shows the busiest repositories first; the data view lists every repository.",
- "generated_at": "2026-11-25T01:03:53.568944+00:00",
+ "generated_at": "2026-11-26T01:13:40.233006+00:00",
  "stale": false
 }

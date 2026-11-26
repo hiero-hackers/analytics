@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-25T01:14:47.056057+00:00",
+ "generated_at": "2026-11-26T01:29:48.453701+00:00",
  "provenance": {
   "git_sha": "12befde",
-  "data_as_of": "2026-11-25T01:01:33.364589+00:00"
+  "data_as_of": "2026-11-26T01:01:49.389171+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -397,7 +397,7 @@
      "id": "profiles",
      "macro": "Contributors",
      "title": "All contributors",
-     "row_count": 1539,
+     "row_count": 1541,
      "path": "hiero-ledger/profiles.json"
     },
     {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-25T01:12:48.327372+00:00"
+      "generated_at": "2026-11-26T01:28:00.410928+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-25T01:12:48.324134+00:00"
+      "generated_at": "2026-11-26T01:28:00.407709+00:00"
      }
     },
     {
@@ -1548,7 +1548,7 @@
     "Contributors": [
      {
       "label": "contributors",
-      "value": 1539,
+      "value": 1541,
       "note": "Distinct people with any tracked activity in the organisation, all-time. The denominator for every percentage tile on this tab.",
       "methodology": [
        "Collect every tracked activity event: PRs opened, reviews, merges, issues opened, labels applied.",
@@ -1723,7 +1723,7 @@
     },
     "contributors": {
      "path": "hiero-ledger/entities/contributors.json",
-     "count": 1539
+     "count": 1541
     }
    }
   },

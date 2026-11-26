@@ -28,7 +28,7 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-11-25T01:01:52.375266+00:00"
+  "end": "2026-11-26T01:02:07.468947+00:00"
  },
  "series": [
   {
@@ -93,7 +93,7 @@
   },
   {
    "repo": "hiero-block-node",
-   "Unknown": 392,
+   "Unknown": 380,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -101,7 +101,7 @@
   },
   {
    "repo": "hiero-cli",
-   "Unknown": 32,
+   "Unknown": 31,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -109,7 +109,7 @@
   },
   {
    "repo": "hiero-consensus-node",
-   "Unknown": 650,
+   "Unknown": 645,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -173,7 +173,7 @@
   },
   {
    "repo": "hiero-json-rpc-relay",
-   "Unknown": 32,
+   "Unknown": 31,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -189,7 +189,7 @@
   },
   {
    "repo": "hiero-mirror-node",
-   "Unknown": 79,
+   "Unknown": 80,
    "Good First Issue": 3,
    "Beginner": 0,
    "Intermediate": 0,
@@ -197,7 +197,7 @@
   },
   {
    "repo": "hiero-mirror-node-explorer",
-   "Unknown": 23,
+   "Unknown": 22,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -213,7 +213,7 @@
   },
   {
    "repo": "hiero-sdk-go",
-   "Unknown": 20,
+   "Unknown": 21,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -229,11 +229,11 @@
   },
   {
    "repo": "hiero-sdk-js",
-   "Unknown": 16,
-   "Good First Issue": 1,
-   "Beginner": 3,
-   "Intermediate": 3,
-   "Advanced": 1
+   "Unknown": 19,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 2,
+   "Advanced": 0
   },
   {
    "repo": "hiero-sdk-python",
@@ -285,7 +285,7 @@
   },
   {
    "repo": "sdk-collaboration-hub",
-   "Unknown": 36,
+   "Unknown": 37,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -293,7 +293,7 @@
   },
   {
    "repo": "solo",
-   "Unknown": 97,
+   "Unknown": 96,
    "Good First Issue": 1,
    "Beginner": 0,
    "Intermediate": 0,
@@ -302,6 +302,14 @@
   {
    "repo": "solo-charts",
    "Unknown": 3,
+   "Good First Issue": 0,
+   "Beginner": 0,
+   "Intermediate": 0,
+   "Advanced": 0
+  },
+  {
+   "repo": "solo-containers",
+   "Unknown": 1,
    "Good First Issue": 0,
    "Beginner": 0,
    "Intermediate": 0,
@@ -332,6 +340,6 @@
    "Advanced": 0
   }
  ],
- "generated_at": "2026-11-25T01:01:52.375266+00:00",
+ "generated_at": "2026-11-26T01:02:07.468947+00:00",
  "stale": false
 }

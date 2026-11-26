@@ -641,8 +641,8 @@
      "key": "explicit_permissions",
      "label": "Explicit Permissions",
      "status": "pass",
-     "evidence": "All 9 workflow(s) have explicit GitHub Actions permissions coverage.",
-     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:27; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/pr-assignee.yml:18; .github/workflows/release.yml:36; .github/workflows/release.yml:48; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19"
+     "evidence": "All 10 workflow(s) have explicit GitHub Actions permissions coverage.",
+     "location": ".github/workflows/approved-issues.yml:14; .github/workflows/build.yml:20; .github/workflows/build.yml:30; .github/workflows/build.yml:65; .github/workflows/build.yml:200; .github/workflows/codeql.yml:22; .github/workflows/codeql.yml:33; .github/workflows/mainnet-smoke.yml:14; .github/workflows/mainnet-smoke.yml:20; .github/workflows/moderate-new-issues.yml:14; .github/workflows/pr-assignee.yml:18; .github/workflows/release.yml:36; .github/workflows/release.yml:48; .github/workflows/scorecard.yml:18; .github/workflows/scorecard.yml:24; .github/workflows/spec-drift.yml:13; .github/workflows/spec-drift.yml:19; .github/workflows/tck.yml:39"
     },
     {
      "key": "repository_security_configuration",
@@ -655,8 +655,8 @@
      "key": "dependabot_ecosystems",
      "label": "Dependabot Ecosystems",
      "status": "pass",
-     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/approved-issues.yml, .github/workflows/build.yml, .github/workflows/codeql.yml, .github/workflows/mainnet-smoke.yml, .github/workflows/moderate-new-issues.yml, .github/workflows/pr-assignee.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml, .github/workflows/spec-drift.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
-     "location": ".github/workflows/approved-issues.yml; .github/workflows/build.yml; .github/workflows/codeql.yml; .github/workflows/mainnet-smoke.yml; .github/workflows/moderate-new-issues.yml; .github/workflows/pr-assignee.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; .github/workflows/spec-drift.yml; package.json"
+     "evidence": "github-actions: Declared in Dependabot; manifests: .github/workflows/approved-issues.yml, .github/workflows/build.yml, .github/workflows/codeql.yml, .github/workflows/mainnet-smoke.yml, .github/workflows/moderate-new-issues.yml, .github/workflows/pr-assignee.yml, .github/workflows/release.yml, .github/workflows/scorecard.yml, .github/workflows/spec-drift.yml, .github/workflows/tck.yml.\nnpm: Declared in Dependabot; manifests: package.json.",
+     "location": ".github/workflows/approved-issues.yml; .github/workflows/build.yml; .github/workflows/codeql.yml; .github/workflows/mainnet-smoke.yml; .github/workflows/moderate-new-issues.yml; .github/workflows/pr-assignee.yml; .github/workflows/release.yml; .github/workflows/scorecard.yml; .github/workflows/spec-drift.yml; .github/workflows/tck.yml; package.json"
     }
    ]
   },
@@ -974,6 +974,6 @@
   "na"
  ],
  "macro": "Security & scorecards",
- "generated_at": "2026-11-25T01:14:28.843938+00:00",
+ "generated_at": "2026-11-26T01:29:27.615119+00:00",
  "stale": false
 }
