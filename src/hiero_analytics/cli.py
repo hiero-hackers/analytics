@@ -17,6 +17,7 @@ from hiero_analytics.config.logging_config import setup_logging
 from hiero_analytics.config.orgs import capabilities_of
 from hiero_analytics.config.paths import ORG
 from hiero_analytics.data_sources.dataset_seed import DEFAULT_SEED_REPO, SeedError, format_summary, seed_datasets
+from hiero_analytics.data_sources.dataset_store import track_pipeline_datasets
 from hiero_analytics.data_sources.usage import usage_scope
 from hiero_analytics.pipelines import PIPELINES, PIPELINES_BY_NAME, run_all
 from hiero_analytics.pipelines._shared import api_usage_summary, shared_client
@@ -135,7 +136,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         # Same attribution as a full run: the org the pipeline will use (its
         # --org, else the configured one) and the pipeline's own name.
-        with usage_scope(org=kwargs.get("org") or ORG, dataset=command):
+        with usage_scope(org=kwargs.get("org") or ORG, dataset=command), track_pipeline_datasets():
             pipeline.resolve()(**kwargs)
     except Exception:
         logger.exception("Pipeline %s failed", command)

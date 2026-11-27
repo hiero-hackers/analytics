@@ -51,7 +51,18 @@ def api_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def _write_widgets(org_data: Path, frame: pd.DataFrame) -> None:
     frame.to_csv(org_data / "widgets.csv", index=False)
     Path(f"{org_data / 'widgets.csv'}.meta.json").write_text(
-        json.dumps({"generated_at": "2026-07-25T10:00:00+00:00", "record_count": len(frame)})
+        json.dumps(
+            {
+                "generated_at": "2026-07-25T10:00:00+00:00",
+                "record_count": len(frame),
+                "source_datasets": [
+                    {
+                        "name": "issues_test-org_all.json",
+                        "fetched_at": datetime.now(UTC).isoformat(),
+                    }
+                ],
+            }
+        )
     )
 
 
@@ -128,7 +139,13 @@ def test_data_within_stale_after_is_not_stale(api_env: Path, tmp_path: Path):
     frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
     frame.to_csv(api_env / "widgets.csv", index=False)
     Path(f"{api_env / 'widgets.csv'}.meta.json").write_text(
-        json.dumps({"generated_at": generated_at.isoformat(), "record_count": len(frame)})
+        json.dumps(
+            {
+                "generated_at": generated_at.isoformat(),
+                "record_count": len(frame),
+                "source_datasets": [{"name": "issues_test-org_all.json", "fetched_at": generated_at.isoformat()}],
+            }
+        )
     )
 
     emit_data_api()
@@ -143,13 +160,124 @@ def test_data_past_stale_after_is_stale(api_env: Path, tmp_path: Path):
     frame = pd.DataFrame({"name": ["a"], "count": [3], "last_seen": ["2026-07-01"]})
     frame.to_csv(api_env / "widgets.csv", index=False)
     Path(f"{api_env / 'widgets.csv'}.meta.json").write_text(
-        json.dumps({"generated_at": generated_at.isoformat(), "record_count": len(frame)})
+        json.dumps(
+            {
+                "generated_at": generated_at.isoformat(),
+                "record_count": len(frame),
+                "source_datasets": [{"name": "issues_test-org_all.json", "fetched_at": generated_at.isoformat()}],
+            }
+        )
     )
 
     emit_data_api()
 
     document = json.loads((tmp_path / "data" / "api" / API_VERSION / ORG / "widgets.json").read_text())
     assert document["stale"] is True
+
+
+def test_freshness_uses_oldest_source_fetch_not_output_generation(tmp_path: Path):
+    """Recently generated output stays stale when its oldest source fetch is old."""
+    csv_path = tmp_path / "widgets.csv"
+    generated_at = datetime.now(UTC).isoformat()
+    old_fetch = (datetime.now(UTC) - timedelta(days=8)).isoformat()
+    Path(f"{csv_path}.meta.json").write_text(
+        json.dumps(
+            {
+                "generated_at": generated_at,
+                "source_datasets": [
+                    {"name": "fresh.json", "fetched_at": datetime.now(UTC).isoformat()},
+                    {"name": "old.json", "fetched_at": old_fetch},
+                ],
+            }
+        )
+    )
+
+    freshness = data_api._freshness(csv_path)
+
+    assert freshness["generated_at"] == generated_at
+    assert freshness["stale"] is True
+
+
+def test_freshness_falls_back_to_generated_at_for_empty_sources(tmp_path: Path):
+    """An output with no tracked sources uses its generation timestamp."""
+    csv_path = tmp_path / "widgets.csv"
+    generated_at = (datetime.now(UTC) - timedelta(days=10)).isoformat()
+
+    Path(f"{csv_path}.meta.json").write_text(
+        json.dumps(
+            {
+                "generated_at": generated_at,
+                "source_datasets": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    freshness = data_api._freshness(csv_path)
+
+    assert freshness["generated_at"] == generated_at
+    assert freshness["stale"] is True
+
+
+def test_freshness_falls_back_to_generated_at_for_legacy_sidecar(tmp_path: Path):
+    """A legacy sidecar without source_datasets uses generated_at."""
+    csv_path = tmp_path / "widgets.csv"
+    generated_at = (datetime.now(UTC) - timedelta(days=10)).isoformat()
+
+    Path(f"{csv_path}.meta.json").write_text(
+        json.dumps({"generated_at": generated_at}),
+        encoding="utf-8",
+    )
+
+    freshness = data_api._freshness(csv_path)
+
+    assert freshness["generated_at"] == generated_at
+    assert freshness["stale"] is True
+
+
+def test_freshness_uses_fetched_at_even_when_content_watermark_does_not_advance(tmp_path: Path):
+    """Freshness is based on fetch time, not on whether source content changed."""
+    csv_path = tmp_path / "widgets.csv"
+    fetched_at = datetime.now(UTC).isoformat()
+    Path(f"{csv_path}.meta.json").write_text(
+        json.dumps(
+            {
+                "generated_at": (datetime.now(UTC) - timedelta(days=2)).isoformat(),
+                "source_datasets": [{"name": "issues.json", "fetched_at": fetched_at}],
+            }
+        )
+    )
+
+    assert data_api._freshness(csv_path)["stale"] is False
+
+
+@pytest.mark.parametrize(
+    ("source_datasets", "expected_stale"),
+    [
+        (None, False),
+        ([], False),
+        ([{"name": "issues.json", "fetched_at": None}], True),
+        ([{"name": "issues.json", "fetched_at": "not-a-timestamp"}], True),
+    ],
+)
+def test_unknown_source_freshness_is_not_reported_as_fresh(tmp_path: Path, source_datasets, expected_stale: bool):
+    """Missing sources use generated_at; incomplete source metadata is stale."""
+    csv_path = tmp_path / "widgets.csv"
+    generated_at = datetime.now(UTC).isoformat()
+    meta = {"generated_at": generated_at}
+
+    if source_datasets is not None:
+        meta["source_datasets"] = source_datasets
+
+    Path(f"{csv_path}.meta.json").write_text(
+        json.dumps(meta),
+        encoding="utf-8",
+    )
+
+    freshness = data_api._freshness(csv_path)
+
+    assert freshness["generated_at"] == generated_at
+    assert freshness["stale"] is expected_stale
 
 
 def test_missing_declared_column_fails_loudly(api_env: Path):
