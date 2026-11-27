@@ -33,7 +33,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-26T01:29:27.639719+00:00"
+  "end": "2026-11-27T01:14:30.566280+00:00"
  },
  "series": [
   {
@@ -81,11 +81,11 @@
    "contributors": 2
   },
   {
-   "repo": "hiero-journal-rs",
+   "repo": "hiero-payment-requests",
    "contributors": 2
   },
   {
-   "repo": "hiero-payment-requests",
+   "repo": "hiero-journal-rs",
    "contributors": 2
   },
   {
@@ -97,11 +97,7 @@
    "contributors": 2
   },
   {
-   "repo": "hiero-sdk-csharp",
-   "contributors": 1
-  },
-  {
-   "repo": "hiero-notifications",
+   "repo": "hiero-did-sdk-rs",
    "contributors": 1
   },
   {
@@ -109,11 +105,11 @@
    "contributors": 1
   },
   {
-   "repo": "hiero-did-sdk-rs",
+   "repo": "hiero-receipts",
    "contributors": 1
   },
   {
-   "repo": "hiero-receipts",
+   "repo": "hiero-notifications",
    "contributors": 1
   },
   {
@@ -125,6 +121,6 @@
    "contributors": 1
   }
  ],
- "generated_at": "2026-11-26T01:29:27.639719+00:00",
+ "generated_at": "2026-11-27T01:14:30.566280+00:00",
  "stale": false
 }

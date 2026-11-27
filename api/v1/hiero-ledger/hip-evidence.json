@@ -1151,6 +1151,20 @@
   {
    "hip": 1313,
    "hip_title": "High-Volume Entity Creation",
+   "repo": "hiero-ledger/hiero-consensus-node",
+   "pr_number": 28491,
+   "pr_title": "chore: update HIP-1313 high-volume operation set",
+   "pr_state": "OPEN",
+   "pr_merged_at": null,
+   "match_sources": "title|body",
+   "qualifier": null,
+   "counted": true,
+   "snippet": "chore: update HIP-1313 high-volume operation set",
+   "url": "https://github.com/hiero-ledger/hiero-consensus-node/pull/28491"
+  },
+  {
+   "hip": 1313,
+   "hip_title": "High-Volume Entity Creation",
    "repo": "hiero-ledger/hiero-json-rpc-relay",
    "pr_number": 5607,
    "pr_title": "build(deps): bump the minor-and-patch-npm-daily group across 1 directory with 20 updates",
@@ -11889,20 +11903,6 @@
   {
    "hip": 540,
    "hip_title": "Change Or Remove Existing Keys From A Token",
-   "repo": "hiero-ledger/hiero-docs",
-   "pr_number": 636,
-   "pr_title": "HIP-540",
-   "pr_state": "MERGED",
-   "pr_merged_at": "2024-04-19 13:28:17+00:00",
-   "match_sources": "title|branch|body",
-   "qualifier": "pre-Hiero era",
-   "counted": false,
-   "snippet": "HIP-540",
-   "url": "https://github.com/hiero-ledger/hiero-docs/pull/636"
-  },
-  {
-   "hip": 540,
-   "hip_title": "Change Or Remove Existing Keys From A Token",
    "repo": "hiero-ledger/hiero-mirror-node",
    "pr_number": 8870,
    "pr_title": "HIP-540 Update REST API to return correct value for empty KeyLists",
@@ -12602,7 +12602,7 @@
   }
  ],
  "row_count": 895,
- "generated_at": "2026-11-26T01:28:00.404103+00:00",
+ "generated_at": "2026-11-27T01:13:12.038966+00:00",
  "stale": false,
  "group": "Evidence",
  "macro": "HIPs"

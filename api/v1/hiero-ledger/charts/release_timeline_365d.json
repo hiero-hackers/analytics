@@ -62,21 +62,9 @@
  "window": {
   "kind": "trailing",
   "days": 365,
-  "end": "2026-11-26T01:27:06.724918+00:00"
+  "end": "2026-11-27T01:12:27.398319+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-solo-action",
-   "time": "2025-11-26T07:50:41Z",
-   "tag_name": "v0.16.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-python",
-   "time": "2025-11-26T12:03:22Z",
-   "tag_name": "v0.1.9",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-go",
    "time": "2025-11-27T15:58:17Z",
@@ -3592,8 +3580,14 @@
    "time": "2026-11-25T19:09:09Z",
    "tag_name": "v0.48.0-rc1",
    "type": "prerelease"
+  },
+  {
+   "repo": "hiero-json-rpc-relay",
+   "time": "2026-11-26T13:15:48Z",
+   "tag_name": "v0.82.4",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-26T01:27:06.724918+00:00",
+ "generated_at": "2026-11-27T01:12:27.398319+00:00",
  "stale": false
 }

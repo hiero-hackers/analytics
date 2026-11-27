@@ -383,10 +383,10 @@
  "issues_url": "https://github.com/hiero-hackers/analytics/issues",
  "wip": true,
  "version": "v1",
- "generated_at": "2026-11-26T01:29:48.453701+00:00",
+ "generated_at": "2026-11-27T01:14:49.251033+00:00",
  "provenance": {
   "git_sha": "12befde",
-  "data_as_of": "2026-11-26T01:01:49.389171+00:00"
+  "data_as_of": "2026-11-27T01:01:34.345956+00:00"
  },
  "orgs": {
   "hiero-ledger": {
@@ -1178,7 +1178,7 @@
      "download": {
       "name": "hip_adoption_funnel.csv",
       "path": "hiero-ledger/hip_adoption_funnel.csv",
-      "generated_at": "2026-11-26T01:28:00.410928+00:00"
+      "generated_at": "2026-11-27T01:13:12.047634+00:00"
      }
     },
     {
@@ -1254,7 +1254,7 @@
      "download": {
       "name": "hip_repo_engagement.csv",
       "path": "hiero-ledger/hip_repo_engagement.csv",
-      "generated_at": "2026-11-26T01:28:00.407709+00:00"
+      "generated_at": "2026-11-27T01:13:12.043606+00:00"
      }
     },
     {
@@ -1603,7 +1603,7 @@
      },
      {
       "label": "completed a GFI %",
-      "value": "23%",
+      "value": "22%",
       "note": "The share of contributors who have merged a PR closing an onboarding (good-first-issue) ticket \u2014 the clearest signal that onboarding paths actually convert.",
       "methodology": [
        "Find merged PRs that closed an issue labelled as onboarding-friendly.",
@@ -1706,7 +1706,7 @@
      },
      {
       "label": ">3x their own typical gap",
-      "value": 8,
+      "value": 9,
       "note": "Repos currently more than 3x past their own typical release gap \u2014 furthest behind *relative to their own pace*, not by raw days. A repo with a naturally long cadence isn't counted just for having one; only repos with an established cadence (2+ releases) are eligible.",
       "methodology": [
        "For each repo with 2+ releases, compute the median gap between consecutive releases.",

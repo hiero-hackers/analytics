@@ -97,7 +97,7 @@
  "window": {
   "kind": "snapshot",
   "days": null,
-  "end": "2026-11-26T01:25:58.831429+00:00"
+  "end": "2026-11-27T01:11:27.729921+00:00"
  },
  "rows": [
   {
@@ -227,24 +227,6 @@
    "SAST": 5.0
   },
   {
-   "repo": "hiero-consensus-node",
-   "score": 7.4,
-   "Maintained": 10.0,
-   "Code-Review": 10.0,
-   "CII-Best-Practices": 2.0,
-   "Dangerous-Workflow": 10.0,
-   "Binary-Artifacts": 9.0,
-   "Token-Permissions": 0.0,
-   "Pinned-Dependencies": 9.0,
-   "Fuzzing": 0.0,
-   "License": 10.0,
-   "Signed-Releases": null,
-   "Security-Policy": 10.0,
-   "Branch-Protection": 5.0,
-   "Packaging": 10.0,
-   "SAST": 9.0
-  },
-  {
    "repo": "hiero-docs",
    "score": 7.7,
    "Maintained": 10.0,
@@ -333,6 +315,24 @@
    "Branch-Protection": 4.0,
    "Packaging": 10.0,
    "SAST": 7.0
+  },
+  {
+   "repo": "hiero-sdk-tck",
+   "score": 7.9,
+   "Maintained": 10.0,
+   "Code-Review": 10.0,
+   "CII-Best-Practices": 2.0,
+   "Dangerous-Workflow": 10.0,
+   "Binary-Artifacts": 10.0,
+   "Token-Permissions": 10.0,
+   "Pinned-Dependencies": 9.0,
+   "Fuzzing": 0.0,
+   "License": 10.0,
+   "Signed-Releases": null,
+   "Security-Policy": 10.0,
+   "Branch-Protection": 4.0,
+   "Packaging": null,
+   "SAST": 3.0
   },
   {
    "repo": "hiero-sdk-cpp",
@@ -623,6 +623,6 @@
    "SAST": 8.0
   }
  ],
- "generated_at": "2026-11-26T01:25:58.831429+00:00",
+ "generated_at": "2026-11-27T01:11:27.729921+00:00",
  "stale": false
 }
