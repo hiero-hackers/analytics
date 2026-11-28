@@ -12,7 +12,8 @@
     "test": "vitest run",
     "preview": "vite preview",
     "test:e2e": "playwright test --project=chromium",
-    "test:e2e:firefox": "playwright test --project=firefox"
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:smoke": "playwright test e2e/smoke.spec.ts --project=chromium"
   },
   "overrides": {
     "nanoid": "3.3.18"

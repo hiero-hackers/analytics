@@ -106,3 +106,9 @@ layout, `theme.test.ts` the theme plumbing, `csv.test.ts` the
 provenance-stamped export. Query by role and text, not by class name —
 styling refactors shouldn't break tests. (A single-select `ToggleGroup` has
 `radiogroup`/`radio` roles; cards are labelled `region`s.)
+
+`e2e/` holds the Playwright suite, run against the built app rather than
+jsdom; see `e2e/README.md` for how it stages fixtures and what each spec
+covers. Only its smoke spec runs in CI (`npm run test:e2e:smoke`) — the print
+and entity-detail specs are local-only checks for the features that added
+them.
