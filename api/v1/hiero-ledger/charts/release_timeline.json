@@ -49,8 +49,8 @@
   "solo-charts",
   "hiero-gradle-conventions",
   "solo-containers",
-  "hiero-sdk-java",
   "hiero-sdk-go",
+  "hiero-sdk-java",
   "hiero-solo-action",
   "hiero-sdk-python",
   "hiero-sdk-tck",
@@ -69,39 +69,9 @@
  "window": {
   "kind": "trailing",
   "days": 548,
-  "end": "2026-11-27T01:12:27.398319+00:00"
+  "end": "2026-11-28T01:12:20.521005+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-block-node",
-   "time": "2025-05-28T03:07:36Z",
-   "tag_name": "v0.11.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-sdk-java",
-   "time": "2025-05-28T11:27:22Z",
-   "tag_name": "v2.57.0",
-   "type": "release"
-  },
-  {
-   "repo": "hiero-consensus-node",
-   "time": "2025-05-28T14:31:32Z",
-   "tag_name": "v0.63.0",
-   "type": "release"
-  },
-  {
-   "repo": "solo-charts",
-   "time": "2025-05-28T16:59:33Z",
-   "tag_name": "v0.53.0",
-   "type": "release"
-  },
-  {
-   "repo": "solo",
-   "time": "2025-05-28T20:55:43Z",
-   "tag_name": "v0.36.1",
-   "type": "release"
-  },
   {
    "repo": "hiero-sdk-js",
    "time": "2025-05-29T10:30:21Z",
@@ -5279,8 +5249,14 @@
    "time": "2026-11-26T13:15:48Z",
    "tag_name": "v0.82.4",
    "type": "release"
+  },
+  {
+   "repo": "solo-containers",
+   "time": "2026-11-27T12:29:55Z",
+   "tag_name": "v0.47.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-27T01:12:27.398319+00:00",
+ "generated_at": "2026-11-28T01:12:20.521005+00:00",
  "stale": false
 }

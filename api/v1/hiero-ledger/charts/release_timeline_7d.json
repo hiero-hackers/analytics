@@ -33,30 +33,18 @@
  ],
  "categories": [
   "hiero-json-rpc-relay",
-  "hiero-block-node",
   "hiero-consensus-node",
+  "hiero-block-node",
   "hiero-gradle-conventions",
-  "hiero-mirror-node",
-  "solo"
+  "solo",
+  "solo-containers"
  ],
  "window": {
   "kind": "trailing",
   "days": 7,
-  "end": "2026-11-27T01:12:27.398319+00:00"
+  "end": "2026-11-28T01:12:20.521005+00:00"
  },
  "rows": [
-  {
-   "repo": "hiero-mirror-node",
-   "time": "2026-11-20T17:42:11Z",
-   "tag_name": "v0.167.2-rc1",
-   "type": "prerelease"
-  },
-  {
-   "repo": "hiero-block-node",
-   "time": "2026-11-20T18:38:32Z",
-   "tag_name": "v0.47.0",
-   "type": "release"
-  },
   {
    "repo": "hiero-json-rpc-relay",
    "time": "2026-11-23T09:06:31Z",
@@ -104,8 +92,14 @@
    "time": "2026-11-26T13:15:48Z",
    "tag_name": "v0.82.4",
    "type": "release"
+  },
+  {
+   "repo": "solo-containers",
+   "time": "2026-11-27T12:29:55Z",
+   "tag_name": "v0.47.1",
+   "type": "release"
   }
  ],
- "generated_at": "2026-11-27T01:12:27.398319+00:00",
+ "generated_at": "2026-11-28T01:12:20.521005+00:00",
  "stale": false
 }
